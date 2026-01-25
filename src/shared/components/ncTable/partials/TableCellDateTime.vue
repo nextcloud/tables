@@ -171,7 +171,7 @@ export default {
 				newValue = 'none'
 			} else {
 				const format = this.getDateFormat()
-				newValue = Moment(this.editDateTimeValue).format(format)
+				newValue = Moment(this.editDateTimeValue).utc().format(format)
 			}
 
 			if (newValue === this.value) {
