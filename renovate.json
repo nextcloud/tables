@@ -1,10 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base", ":semanticCommits", ":gitSignOff"],
+  "extends": ["config:base", ":semanticCommits", ":gitSignOff", "helpers:pinGitHubActionDigests"],
   "timezone": "Europe/Berlin",
   "schedule": ["every weekend"],
   "labels": ["dependencies", "3. to review"],
   "rangeStrategy": "bump",
+  "minimumReleaseAge": "7 days",
   "rebaseWhen": "conflicted",
   "ignoreUnstable": false,
   "baseBranches": ["main", "stable1.0", "stable0.9"],
