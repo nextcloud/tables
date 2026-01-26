@@ -203,7 +203,7 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
-			data.customSettings = { width: data.customSettings.width }
+			data.customSettings = { width: data.customSettings?.width, rowHighlightColor: data.customSettings?.rowHighlightColor }
 			console.debug('this column data will be send', data)
 			const res = await this.updateColumn({
 				id: this.editColumn.id,

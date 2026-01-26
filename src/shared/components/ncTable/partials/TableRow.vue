@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<tr v-if="row" :class="{ selected }">
+	<tr v-if="row" :class="{ selected }" :style="rowHighlightStyle">
 		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
@@ -119,6 +119,32 @@ export default {
 		nonInlineEditableColumnTypes() {
 			return [
 			]
+		},
+		// Compute row highlight color based on checkbox columns
+		rowHighlightStyle() {
+			// Find checkbox columns with highlight color setting
+			for (const col of this.visibleColumns) {
+				// Check if column is checkbox type (selection with subtype check)
+				if (col.type === ColumnTypes.SelectionCheck || 
+					(col.type === 'selection' && col.subtype === 'check')) {
+					
+					const highlightColor = col.customSettings?.rowHighlightColor
+					if (highlightColor) {
+						// Get cell value for this column
+						const cell = this.getCell(col.id)
+						const value = cell?.value
+						
+						// Check if checkbox is checked (true or "true")
+						if (value === true || value === 'true') {
+							return {
+								backgroundColor: highlightColor + '33', // Add transparency (20%)
+								borderLeft: `4px solid ${highlightColor}`,
+							}
+						}
+					}
+				}
+			}
+			return {}
 		},
 	},
 	methods: {
