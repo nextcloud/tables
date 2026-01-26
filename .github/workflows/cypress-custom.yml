@@ -37,7 +37,7 @@ jobs:
 
     services:
       mysql:
-        image: ghcr.io/nextcloud/continuous-integration-mariadb-10.6:latest
+        image: ghcr.io/nextcloud/continuous-integration-mariadb-10.6:latest # zizmor: ignore[unpinned-images]
         ports:
           - 4444:3306/tcp
         env:
@@ -47,21 +47,17 @@ jobs:
     steps:
 
       - name: Checkout server
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
+          submodules: true
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
 
-      - name: Checkout submodules
-        shell: bash
-        run: |
-          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-          git submodule sync --recursive
-          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-
       - name: Checkout viewer
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           repository: nextcloud/viewer
           ref: ${{ matrix.server-versions }}
           path: apps/viewer
@@ -87,12 +83,13 @@ jobs:
           ref: ${{ matrix.server-versions }}
 
       - name: Checkout app
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           path: apps/${{ env.APP_NAME }}
 
       - name: Set up node from version file
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           cache: 'npm'
           cache-dependency-path: apps/${{ env.APP_NAME}}/package-lock.json
@@ -107,12 +104,12 @@ jobs:
 
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Set up php ${{ matrix.php-versions }}
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2.36.0
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, zip, zlib, sqlite, pdo_sqlite, apcu, pgsql, pdo_pgsql,mysql, pdo_mysql
@@ -144,7 +141,7 @@ jobs:
           cat data/nextcloud.log
 
       - name: Cypress run
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@8a35f965fbd13e3b18d9fb3bdc5f50ae2f4a5e76 # v7.1.0
         with:
           wait-on: '${{ env.CYPRESS_baseUrl }}'
           working-directory: 'apps/${{ env.APP_NAME }}'
@@ -164,7 +161,7 @@ jobs:
           cat data/nextcloud.log
 
       - name: Upload test failure screenshots ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: Upload screenshots ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
@@ -172,7 +169,7 @@ jobs:
           retention-days: 5
 
       - name: Upload nextcloud logs ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: Upload nextcloud log ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
