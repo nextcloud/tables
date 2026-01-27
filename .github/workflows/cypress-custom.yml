@@ -154,6 +154,7 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_ncVersion: ${{ matrix.server-versions }}
           npm_package_name: ${{ env.APP_NAME }}
+          LIBGL_ALWAYS_SOFTWARE: 1
 
       - name: Print logs ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
         if: always()
