@@ -11,7 +11,7 @@ use DateTime;
 use OCA\Tables\Db\Column;
 use Psr\Log\LoggerInterface;
 
-class SuperBusiness {
+class SuperBusiness implements IColumnTypeBusiness {
 
 	protected LoggerInterface $logger;
 
@@ -21,23 +21,23 @@ class SuperBusiness {
 
 	/**
 	 * @param mixed $value
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
+	public function parseValue($value, Column $column): string {
 		return json_encode($value);
 	}
 
-	public function parseDisplayValue($value, ?Column $column = null): string {
+	public function parseDisplayValue($value, Column $column): string {
 		return $this->parseValue($value, $column);
 	}
 
 	/**
 	 * @param mixed $value
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
+	public function canBeParsed($value, Column $column): bool {
 		return true;
 	}
 
@@ -45,7 +45,7 @@ class SuperBusiness {
 		// override this method in the child class when needed
 	}
 
-	public function canBeParsedDisplayValue($value, ?Column $column = null): bool {
+	public function canBeParsedDisplayValue($value, Column $column): bool {
 		return $this->canBeParsed($value, $column);
 	}
 
