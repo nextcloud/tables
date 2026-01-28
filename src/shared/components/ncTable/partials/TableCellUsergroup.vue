@@ -21,6 +21,7 @@
 				style="width: 100%;"
 				:loading="loading || localLoading"
 				:options="options"
+				:clearable="!column.mandatory"
 				:placeholder="getPlaceholder()"
 				:searchable="true"
 				:get-option-key="(option) => option.key"
