@@ -23,6 +23,7 @@
 							:config="config"
 							:view-setting.sync="localViewSetting"
 							@edit-column="col => $emit('edit-column', col)"
+											@duplicate-column="col => $emit('duplicate-column', col)"
 							@delete-column="col => $emit('delete-column', col)" />
 					</div>
 					<div v-if="getFilterForColumn(col)" class="filter-wrapper">

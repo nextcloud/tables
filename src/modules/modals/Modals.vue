@@ -55,6 +55,8 @@
 <script>
 
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { mapState } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
 import CreateRow from './CreateRow.vue'
 import ImportScheme from './ImportScheme.vue'
 import DeleteColumn from './DeleteColumn.vue'
@@ -121,6 +123,9 @@ export default {
 		}
 	},
 
+	computed: {
+		...mapState(useTablesStore, ["getTable", "getView"]),
+	},
 	mounted() {
 		// table
 		subscribe('tables:table:create', () => { this.showModalCreateTable = true })
@@ -143,6 +148,33 @@ export default {
 		// columns
 		subscribe('tables:column:create', columnInfo => { this.createColumnInfo = columnInfo })
 		subscribe('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
+                subscribe('tables:column:duplicate', columnInfo => {
+			const element = columnInfo.isView ? this.getView(columnInfo.elementId) : this.getTable(columnInfo.elementId)
+			const col = columnInfo.column
+			this.createColumnInfo = {
+				isView: columnInfo.isView,
+				element,
+				preset: {
+					title: col.title + ' (copy)',
+					type: col.type,
+					subtype: col.subtype,
+					description: col.description,
+					mandatory: col.mandatory,
+					numberPrefix: col.numberPrefix,
+					numberSuffix: col.numberSuffix,
+					numberDefault: col.numberDefault,
+					numberMin: col.numberMin,
+					numberMax: col.numberMax,
+					numberDecimals: col.numberDecimals,
+					textDefault: col.textDefault,
+					textAllowedPattern: col.textAllowedPattern,
+					textMaxLength: col.textMaxLength,
+					selectionOptions: col.selectionOptions,
+					selectionDefault: col.selectionDefault,
+					datetimeDefault: col.datetimeDefault,
+				},
+			}
+		})
 		subscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
 
 		// rows
@@ -167,6 +199,7 @@ export default {
 		unsubscribe('tables:view:reload', () => { this.reload(true) })
 		unsubscribe('tables:column:create', columnInfo => { this.createColumnInfo = columnInfo })
 		unsubscribe('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
+                unsubscribe('tables:column:duplicate', () => {})
 		unsubscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
 		unsubscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
 		unsubscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
