@@ -12,6 +12,8 @@ use OCP\IDBConnection;
 
 /** @template-extends RowCellMapperSuper<RowCellNumber, int|float|null, int|float|null> */
 class RowCellNumberMapper extends RowCellMapperSuper {
+	use RowCellBulkFetchTrait;
+
 	protected string $table = 'tables_row_cells_number';
 
 	public function __construct(IDBConnection $db) {

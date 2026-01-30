@@ -11,6 +11,7 @@ use DateTime;
 use Exception;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Dto\Column as ColumnDto;
@@ -557,5 +558,55 @@ class ColumnService extends SuperService {
 			}
 		}
 		return $columns;
+	}
+
+	/**
+	 * @param Table $table
+	 * @param array $column
+	 *
+	 * @return int
+	 *
+	 * @throws InternalError
+	 */
+	public function importColumn(Table $table, array $column): int {
+		$item = new Column();
+		$item->setTableId($table->getId());
+		$item->setTitle($column['title']);
+		$item->setCreatedBy($table->getOwnership());
+		$item->setCreatedAt($column['createdAt']);
+		$item->setLastEditBy($table->getOwnership());
+		$item->setLastEditAt($column['lastEditAt']);
+		$item->setType($column['type']);
+		$item->setSubtype($column['subtype']);
+		$item->setMandatory($column['mandatory']);
+		$item->setDescription($column['description']);
+		$item->setNumberDefault($column['numberDefault']);
+		$item->setNumberMin($column['numberMin']);
+		$item->setNumberMax($column['numberMax']);
+		$item->setNumberDecimals($column['numberDecimals']);
+		$item->setNumberPrefix($column['numberPrefix']);
+		$item->setNumberSuffix($column['numberSuffix']);
+		$item->setTextDefault($column['textDefault']);
+		$item->setTextAllowedPattern($column['textAllowedPattern']);
+		$item->setTextMaxLength($column['textMaxLength']);
+		$item->setTextUnique($column['textUnique']);
+		$item->setSelectionOptions(json_encode($column['selectionOptions']));
+		$item->setSelectionDefault($column['selectionDefault']);
+		$item->setDatetimeDefault($column['datetimeDefault']);
+		$item->setUsergroupDefault(json_encode($column['usergroupDefault']));
+		$item->setUsergroupMultipleItems($column['usergroupMultipleItems']);
+		$item->setUsergroupSelectUsers($column['usergroupSelectUsers']);
+		$item->setUsergroupSelectGroups($column['usergroupSelectGroups']);
+		$item->setUsergroupSelectTeams($column['usergroupSelectTeams']);
+		$item->setShowUserStatus($column['showUserStatus']);
+		$item->setCustomSettings(json_encode($column['customSettings']));
+
+		try {
+			$newColumn = $this->mapper->insert($item);
+		} catch (\Exception $e) {
+			$this->logger->error('importColumn insert error: ' . $e->getMessage());
+			throw new InternalError('importColumn insert error: ' . $e->getMessage());
+		}
+		return $newColumn->getId();
 	}
 }

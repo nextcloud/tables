@@ -13,6 +13,8 @@ use OCP\IDBConnection;
  * @template-extends RowCellMapperSuper<RowCellSelection, string, string|array>
  */
 class RowCellSelectionMapper extends RowCellMapperSuper {
+	use RowCellBulkFetchTrait;
+
 	protected string $table = 'tables_row_cells_selection';
 
 	public function __construct(IDBConnection $db) {

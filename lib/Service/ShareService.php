@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 
 use InvalidArgumentException;
+use OC\User\User;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
@@ -38,6 +39,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\IUserManager;
 use OCP\Security\ISecureRandom;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -61,6 +63,7 @@ class ShareService extends SuperService {
 		private ContextNavigationMapper $contextNavigationMapper,
 		private IDBConnection $dbc,
 		protected ISecureRandom $secureRandom,
+		protected IUserManager $userManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -276,15 +279,17 @@ class ShareService extends SuperService {
 	 * @return Share
 	 * @throws InternalError
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode, ?ShareToken $shareToken = null, ?string $password = null):Share {
-		if (!$this->userId) {
+	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode, ?ShareToken $shareToken = null, ?string $password = null, ?string $sender = null):Share {
+		$sender = $sender ?? $this->userId;
+		if (!$sender) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
 		$time = new DateTime();
 		$item = new Share();
-		$item->setSender($this->userId);
+		$item->setSender($sender);
 		$item->setReceiver($receiver);
 		$item->setReceiverType($receiverType);
 		$item->setNodeId($nodeId);
@@ -575,6 +580,60 @@ class ShareService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error('Could not find shared with users: ' . $e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Could not find shared with users');
+		}
+	}
+
+	/**
+	 * @param int $nodeId
+	 * @param array $share
+	 * @param string $userId
+	 */
+	public function importShare(int $nodeId, array $share, string $userId): void {
+		$existingReceiver = $this->userManager->userExists($share['receiver']);
+
+		if (!$existingReceiver) {
+			return;
+		}
+
+		$nodeType = $share['nodeType'] ?? 'table';
+		$receiver = $share['receiver'];
+		$receiverType = $share['receiverType'] ?? '';
+		$permissionRead = $share['permissionRead'] ?? false;
+		$permissionCreate = $share['permissionCreate'] ?? false;
+		$permissionUpdate = $share['permissionUpdate'] ?? false;
+		$permissionDelete = $share['permissionDelete'] ?? false;
+		$permissionManage = $share['permissionManage'] ?? false;
+		$displayMode = $share['displayMode'] ?? 0;
+		$password = $share['password'] ?? null;
+		$sender = $userId;
+		$shareToken = null;
+
+		if (!empty($share['token'])) {
+			try {
+				$shareToken = new ShareToken($share['token']);
+			} catch (\Throwable $e) {
+				$this->logger->warning('Invalid share token during import: ' . $e->getMessage(), ['token' => $share['token'], 'exception' => $e]);
+			}
+		}
+
+		try {
+			$this->create(
+				$nodeId,
+				$nodeType,
+				$receiver,
+				$receiverType,
+				$permissionRead,
+				$permissionCreate,
+				$permissionUpdate,
+				$permissionDelete,
+				$permissionManage,
+				$displayMode,
+				$shareToken,
+				$password,
+				$sender
+			);
+		} catch (\Throwable $e) {
+			$this->logger->error('Failed to import share: ' . $e->getMessage(), ['exception' => $e, 'share' => $share]);
 		}
 	}
 

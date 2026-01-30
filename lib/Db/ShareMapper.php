@@ -199,4 +199,36 @@ class ShareMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
 			->executeStatement();
 	}
+
+	/**
+	 * @param int[] $tableIds
+	 * @param int[] $contextIds
+	 *
+	 * @return Share[]
+	 */
+	public function findAllSharesForTablesAndContexts(array $tableIds, array $contextIds): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table);
+
+		$orX = $qb->expr()->orX();
+		if (!empty($tableIds)) {
+			$orX->add(
+				$qb->expr()->andX(
+					$qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)),
+					$qb->expr()->in('node_id', $qb->createNamedParameter($tableIds, IQueryBuilder::PARAM_INT_ARRAY))
+				)
+			);
+		}
+		if (!empty($contextIds)) {
+			$orX->add(
+				$qb->expr()->andX(
+					$qb->expr()->eq('node_type', $qb->createNamedParameter('context', IQueryBuilder::PARAM_STR)),
+					$qb->expr()->in('node_id', $qb->createNamedParameter($contextIds, IQueryBuilder::PARAM_INT_ARRAY))
+				)
+			);
+		}
+		$qb->where($orX);
+		return $this->findEntities($qb);
+	}
 }
