@@ -158,8 +158,8 @@ class SharePageShareDataDecorator implements IShare {
 		throw new LogicException('Not implemented');
 	}
 
-	public function getId(): int {
-		return $this->share->getId();
+	public function getId(): string {
+		return (string)$this->share->getId();
 	}
 
 	public function getFullId(): string {
