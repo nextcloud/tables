@@ -8,11 +8,14 @@
 namespace OCA\Tables\Db;
 
 use OCP\IDBConnection;
+use OCA\Tables\Db\RowCellBulkFetchTrait;
 
 /**
  * @template-extends RowCellMapperSuper<RowCellSelection, string, string|array>
  */
 class RowCellSelectionMapper extends RowCellMapperSuper {
+	use RowCellBulkFetchTrait;
+
 	protected string $table = 'tables_row_cells_selection';
 
 	public function __construct(IDBConnection $db) {

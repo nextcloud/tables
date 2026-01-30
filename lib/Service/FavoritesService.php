@@ -115,4 +115,43 @@ class FavoritesService {
 		throw new PermissionError('Invalid node type and id');
 	}
 
+	/**
+	 * @param string|null $userId
+	 *
+	 * @return array<int, array<string, mixed>>
+	 *
+	 * @throws Exception
+	 */
+	public function findAll(?string $userId = null): array {
+		$qb = $this->connection->getQueryBuilder();
+		$qb->select('*')
+			->from('tables_favorites')
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+
+		$result = $qb->executeQuery();
+		return $result->fetchAllAssociative();
+	}
+
+	/**
+	 * @param int $nodeType
+	 * @param int $id
+	 * @param string $userId
+	 * 
+	 * @throws InternalError
+	 * @throws Exception
+	 */
+	public function importFavorite(int $nodeType, int $id, string $userId): void {
+		$this->checkValidNodeType($nodeType);
+		
+		$qb = $this->connection->getQueryBuilder();
+		$qb->insert('tables_favorites')
+			->values([
+				'user_id' => $qb->createNamedParameter($userId),
+				'node_type' => $qb->createNamedParameter($nodeType),
+				'node_id' => $qb->createNamedParameter($id),
+			]);
+		$qb->executeStatement();
+		$this->cache->set($nodeType . '_' . $id, true);
+	}
+
 }

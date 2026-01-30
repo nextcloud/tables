@@ -122,4 +122,20 @@ class RowSleeveMapper extends QBMapper {
 			return 0;
 		}
 	}
+
+	/**
+	 * @param int[] $tableIds
+	 *
+	 * @return RowSleeve[]
+	 */
+	public function findAllByTableIds(array $tableIds): array {
+		if (empty($tableIds)) {
+			return [];
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->in('table_id', $qb->createNamedParameter($tableIds, IQueryBuilder::PARAM_INT_ARRAY)));
+		return $this->findEntities($qb);
+	}
 }

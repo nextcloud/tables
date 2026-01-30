@@ -572,4 +572,31 @@ class TableService extends SuperService {
 		$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
 		return $table;
 	}
+
+	/**
+	 * @param array $table
+	 *
+	 * @return Table
+	 *
+	 * @throws InternalError
+	 */
+	public function importTable(array $table): Table {
+		$item = new Table();
+		$item->setTitle($table['title']);
+		$item->setEmoji($table['emoji']);
+		$item->setOwnership($table['ownership']);
+		$item->setCreatedBy($table['createdBy']);
+		$item->setCreatedAt($table['createdAt']);
+		$item->setLastEditBy($table['lastEditBy']);
+		$item->setLastEditAt($table['lastEditAt']);
+		$item->setArchived((bool)$table['archived']);
+		$item->setDescription($table['description']);
+		try {
+			$newTable = $this->mapper->insert($item);
+		} catch (\Exception $e) {
+			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
+			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
+		}
+		return $newTable;
+	}
 }
