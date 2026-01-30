@@ -9,24 +9,23 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 
-class DatetimeDateBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class DatetimeDateBusiness extends SuperBusiness {
 
 	/**
 	 * @param mixed $value (string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
+	public function parseValue($value, Column $column): string {
 		return json_encode($this->isValidDate((string)$value, 'Y-m-d') ? (string)$value : '');
 	}
 
 	/**
 	 * @param mixed $value (string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
+	public function canBeParsed($value, Column $column): bool {
 		return $this->isValidDate((string)$value, 'Y-m-d');
 	}
-
 }

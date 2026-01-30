@@ -9,19 +9,14 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 
-class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class SelectionBusiness extends SuperBusiness {
 
 	/**
 	 * @param mixed $value (array|string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return '';
-		}
-
+	public function parseValue($value, Column $column): string {
 		$intValue = (int)$value;
 		if (!is_numeric($value) || $intValue != $value) {
 			return '';
@@ -36,12 +31,7 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return '';
 	}
 
-	public function parseDisplayValue($value, ?Column $column = null): string {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return '';
-		}
-
+	public function parseDisplayValue($value, Column $column): string {
 		foreach ($column->getSelectionOptionsArray() as $option) {
 			if ($option['label'] === $value) {
 				return json_encode($option['id']);
@@ -53,14 +43,10 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 	/**
 	 * @param mixed $value (array|string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return false;
-		}
+	public function canBeParsed($value, Column $column): bool {
 		if ($value === null) {
 			return true;
 		}
@@ -79,11 +65,7 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return false;
 	}
 
-	public function canBeParsedDisplayValue($value, ?Column $column = null): bool {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return false;
-		}
+	public function canBeParsedDisplayValue($value, Column $column): bool {
 		if ($value === null) {
 			return true;
 		}
