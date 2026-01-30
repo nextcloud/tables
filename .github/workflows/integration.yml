@@ -53,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server-versions: ['stable31', 'stable32', 'master']
+        server-versions: ['stable31', 'stable32', 'stable33', 'master']
         php-versions: ['8.2']
         databases: ['mysql']
         include:
