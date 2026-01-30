@@ -416,6 +416,7 @@ OC.L10N.register(
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Po povýšení příjemce sdílení na správce tabulky, jakékoli aplikace, vytvořené příjemci sdílení, které tuto tabulku využívají, budou pokračovat v přístupu k jejím datům, i když jejich povýšení později zrušíte.",
     "Confirm table manager promotion" : "Potvrdit povýšení na správce tabulky",
     "Link copied to clipboard" : "Odkaz zkopírován do schánky",
+    "Password copied" : "Heslo zkopírováno",
     "Create public link" : "Vytvořit veřejný odkaz",
     "Create a new share link" : "Vytvořit nový odkaz pro sdílení",
     "Set password" : "Nastavit heslo",
