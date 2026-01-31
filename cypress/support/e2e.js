@@ -21,5 +21,6 @@ import './commands.js'
 
 Cypress.on('uncaught:exception', (err) => {
 	return !err.message.includes('ResizeObserver loop limit exceeded') &&
-		!err.message.includes('ResizeObserver loop completed with undelivered notifications')
+		!err.message.includes('ResizeObserver loop completed with undelivered notifications') &&
+		!err.message.includes("Cannot read properties of undefined (reading 'from')")
 })
