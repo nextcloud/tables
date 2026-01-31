@@ -117,6 +117,8 @@ OC.L10N.register(
     "Delete option" : "Izbriši mogućnost",
     "Add option" : "Dodaj mogućnost",
     "Copy link" : "Kopiraj poveznicu",
+    "Go to previous page" : "Idi na prethodnu stranicu",
+    "Confirmation" : "Potvrda",
     "Confirm" : "Potvrdi",
     "Content" : "Sadržaj",
     "Select" : "Odaberi",
