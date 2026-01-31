@@ -8,9 +8,12 @@
 namespace OCA\Tables\Db;
 
 use OCP\IDBConnection;
+use OCA\Tables\Db\RowCellBulkFetchTrait;
 
 /** @template-extends RowCellMapperSuper<RowCellDatetime, string, string> */
 class RowCellDatetimeMapper extends RowCellMapperSuper {
+	use RowCellBulkFetchTrait;
+
 	protected string $table = 'tables_row_cells_datetime';
 
 	public function __construct(IDBConnection $db) {

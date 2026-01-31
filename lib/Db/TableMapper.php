@@ -137,4 +137,8 @@ class TableMapper extends QBMapper {
 		$this->cache[(string)$entity->getId()] = $entity;
 		return $entity;
 	}
+
+	public function getDbConnection() {
+		return $this->db;
+	}
 }
