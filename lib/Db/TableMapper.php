@@ -51,6 +51,40 @@ class TableMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int[] $ids
+	 * @return array<int, Table> indexed by table id
+	 */
+	public function findMany(array $ids): array {
+		$missing = [];
+		$result = [];
+		foreach ($ids as $id) {
+			$cacheKey = (string)$id;
+			if (isset($this->cache[$cacheKey])) {
+				$result[$id] = $this->cache[$cacheKey];
+			} else {
+				$missing[$id] = true;
+			}
+		}
+
+		if (!$missing) {
+			return $result;
+		}
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->in('id', $qb->createNamedParameter(array_keys($missing), IQueryBuilder::PARAM_INT_ARRAY)));
+
+		$entities = $this->findEntities($qb);
+		foreach ($entities as $entity) {
+			$id = $entity->getId();
+			$this->cache[(string)$id] = $entity;
+			$result[$id] = $entity;
+		}
+		return $result;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @return Table[]
 	 * @throws Exception
