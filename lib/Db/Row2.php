@@ -23,6 +23,7 @@ class Row2 implements JsonSerializable {
 	private ?string $lastEditBy = null;
 	private ?string $lastEditAt = null;
 	private ?array $data = [];
+	private array $cellMetadata = [];
 	private array $changedColumnIds = []; // collect column ids that have changed after $loaded = true
 
 	private bool $loaded = false; // set to true if model is loaded, after that changed column ids will be collected
@@ -134,9 +135,28 @@ class Row2 implements JsonSerializable {
 	}
 
 	/**
+	 * add response-only metadata for a specific column
+	 */
+	public function addCellMeta(int $columnId, array $meta): void {
+		if (!isset($this->cellMetadata[$columnId])) {
+			$this->cellMetadata[$columnId] = [];
+		}
+		$this->cellMetadata[$columnId] = array_merge($this->cellMetadata[$columnId], $meta);
+	}
+
+	/**
 	 * @psalm-return TablesRow
 	 */
 	public function jsonSerialize(): array {
+		$data = [];
+		foreach ($this->data as $cell) {
+			$colId = $cell['columnId'];
+			$merged = $cell;
+			if (isset($this->cellMetadata[$colId])) {
+				$merged = array_merge($merged, $this->cellMetadata[$colId]);
+			}
+			$data[] = $merged;
+		}
 		return [
 			'id' => $this->id,
 			'tableId' => $this->tableId,
@@ -144,7 +164,7 @@ class Row2 implements JsonSerializable {
 			'createdAt' => $this->createdAt,
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditAt' => $this->lastEditAt,
-			'data' => $this->data,
+			'data' => $data,
 		];
 	}
 
@@ -189,6 +209,17 @@ class Row2 implements JsonSerializable {
 	 */
 	public function markAsLoaded(): void {
 		$this->loaded = true;
+	}
+
+	/**
+	 * attach columnName as metadata for each cell
+	 */
+	public function addColumnNames(array $fullRowData): void {
+		foreach ($fullRowData as $meta) {
+			if (isset($meta['columnId']) && array_key_exists('columnName', $meta)) {
+				$this->addCellMeta((int)$meta['columnId'], ['columnName' => $meta['columnName']]);
+			}
+		}
 	}
 
 }
