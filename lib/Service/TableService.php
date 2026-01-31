@@ -102,13 +102,6 @@ class TableService extends SuperService {
 
 		if (!$skipSharedTables && $userId !== '') {
 			$sharedTables = $this->shareService->findTablesSharedWithMe($userId);
-
-			// clean duplicates
-			foreach ($sharedTables as $sharedTable) {
-				if (!isset($allTables[$sharedTable->getId()])) {
-					$allTables[$sharedTable->getId()] = $sharedTable;
-				}
-			}
 		}
 
 		$contexts = $this->contextService->findAll($userId);
@@ -116,7 +109,7 @@ class TableService extends SuperService {
 			$nodes = $context->getNodes();
 			foreach ($nodes as $node) {
 				if ($node['node_type'] !== Application::NODE_TYPE_TABLE
-					|| isset($allTables[$node['node_id']])
+					|| isset($sharedTables[$node['node_id']])
 				) {
 					continue;
 				}
@@ -169,6 +162,7 @@ class TableService extends SuperService {
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
 			try {
+				// fixme: use more efficient query (batched, do not load entities, just do count)
 				$shares = $this->shareService->findAll('table', $table->getId());
 				$table->setHasShares(count($shares) !== 0);
 			} catch (InternalError $e) {

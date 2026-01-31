@@ -50,6 +50,44 @@ class ViewMapper extends QBMapper {
 		return $this->cache[$cacheKey];
 	}
 
+	/**
+	 * @param int[] $ids
+	 * @return array<int, View> indexed by view id
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
+	public function findMany(array $ids): array {
+		$missing = [];
+		$result = [];
+		foreach ($ids as $id) {
+			$cacheKey = (string)$id;
+			if (isset($this->cache[$cacheKey])) {
+				$result[$id] = $this->cache[$cacheKey];
+			} else {
+				$missing[$id] = true;
+			}
+		}
+
+		if (!$missing) {
+			return $result;
+		}
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->where($qb->expr()->in('v.id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+
+		$entities = $this->findEntities($qb);
+		foreach ($entities as $entity) {
+			$id = $entity->getId();
+			$this->cache[(string)$id] = $entity;
+			$result[$id] = $entity;
+		}
+		return $result;
+	}
+
 	public function delete(Entity $entity): View {
 		unset($this->cache[(string)$entity->getId()]);
 		return parent::delete($entity);
