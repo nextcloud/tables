@@ -157,30 +157,24 @@ class ViewService extends SuperService {
 			return [];
 		}
 
-		$allViews = [];
-
 		$sharedViews = $this->shareService->findViewsSharedWithMe($userId);
-		foreach ($sharedViews as $sharedView) {
-			$allViews[$sharedView->getId()] = $sharedView;
-		}
-
 		$contexts = $this->contextService->findAll($userId);
 		foreach ($contexts as $context) {
 			$nodes = $context->getNodes();
 			foreach ($nodes as $node) {
 				if ($node['node_type'] !== Application::NODE_TYPE_VIEW
-					|| isset($allViews[$node['node_id']])
+					|| isset($sharedViews[$node['node_id']])
 				) {
 					continue;
 				}
-				$allViews[$node['node_id']] = $this->find($node['node_id'], false, $userId);
+				$sharedViews[$node['node_id']] = $this->find($node['node_id'], false, $userId);
 			}
 		}
 
-		foreach ($allViews as $view) {
+		foreach ($sharedViews as $view) {
 			$this->enhanceView($view, $userId);
 		}
-		return array_values($allViews);
+		return array_values($sharedViews);
 	}
 
 
@@ -409,6 +403,7 @@ class ViewService extends SuperService {
 	 * $userId can be set or ''
 	 */
 	private function enhanceView(View $view, string $userId): void {
+		// fixme: optimize this method as well in the next iteration
 		// add owner display name for UI
 		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
 
