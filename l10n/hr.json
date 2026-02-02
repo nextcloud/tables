@@ -76,6 +76,7 @@
     "Favorites" : "Favoriti",
     "Clear filter" : "Ukloni filtar",
     "No recommendations. Start typing." : "Nema preporuka. Započnite unos.",
+    "Copy internal link to clipboard" : "Kopiraj unutarnju poveznicu u međuspremnik",
     "Internal link" : "Interna poveznica",
     "group" : "grupa",
     "Permissions" : "Dopuštenja",
@@ -83,6 +84,7 @@
     "Link copied to clipboard" : "Poveznica je kopirana u međuspremnik",
     "Create public link" : "Stvori javnu poveznicu",
     "Create a new share link" : "Stvori novu poveznicu dijeljenja",
+    "Set password" : "Postavi lozinku",
     "Password" : "Zaporka",
     "Share link" : "Dijeli poveznicu",
     "View only" : "Samo za gledanje",
@@ -123,10 +125,12 @@
     "Unchecked" : "Neprovjereno",
     "This year" : "Ove godine",
     "This month" : "Ovaj mjesec",
+    "Select a date" : "Odaberi datum",
     "ID" : "ID",
     "Clipboard is not available" : "Međuspremnik nije dostupan.",
     "seconds ago" : "prije par sekundi",
     "Share not found" : "Dijeljenje nije pronađeno",
+    "This share does not exist or is no longer available" : "Ovo dijeljenje ne postoji ili više nije dostupno",
     "Back to %s" : "Natrag na %s"
 },"pluralForm" :"nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;"
 }

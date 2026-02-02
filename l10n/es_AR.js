@@ -76,6 +76,7 @@ OC.L10N.register(
     "Delete data" : "Borrar datos",
     "Link copied to clipboard" : "Enlace copiado al portapapeles",
     "Password" : "Contraseña",
+    "Share link" : "Compartir link",
     "View only" : "Solo ver",
     "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
