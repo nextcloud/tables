@@ -22,5 +22,19 @@ import './commands.js'
 Cypress.on('uncaught:exception', (err) => {
 	return !err.message.includes('ResizeObserver loop limit exceeded') &&
 		!err.message.includes('ResizeObserver loop completed with undelivered notifications') &&
-		!err.message.includes("Cannot read properties of undefined (reading 'from')")
+		!err.message.includes("Cannot read properties of undefined (reading 'from')") &&
+		!err.message.includes("Cannot read properties of undefined (reading 'createEditor')")
+})
+
+// Handle unsupported browser dialog that appears on page load
+Cypress.Commands.overwrite('visit', (originalVisit, url, options) => {
+	return originalVisit(url, options).then(() => {
+		// Wait a moment for the dialog to appear if needed
+		cy.get('body', { timeout: 1000 }).then(($body) => {
+			const button = $body.find('button:contains("Continue with this unsupported browser")')
+			if (button.length > 0) {
+				cy.contains('button', 'Continue with this unsupported browser').click()
+			}
+		})
+	})
 })
