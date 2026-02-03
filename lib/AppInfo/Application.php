@@ -13,6 +13,7 @@ use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Event\ViewDeletedEvent;
+use OCA\Tables\TablesMigrator;
 use OCA\Tables\Listener\AddMissingIndicesListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\BeforeTemplateRenderedListener;
@@ -94,6 +95,8 @@ class Application extends App implements IBootstrap {
 
 		$context->registerMiddleware(PermissionMiddleware::class);
 		$context->registerMiddleware(ShareControlMiddleware::class);
+
+		$context->registerUserMigrator(TablesMigrator::class);
 	}
 
 	public function boot(IBootContext $context): void {
