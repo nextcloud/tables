@@ -240,16 +240,16 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 			foreach ($tables as $table) {
 				$newTable = $this->tableService->importTable($table);
 
-				$this->importFavorites($importSource, $newTable, $table, $this->favoritesService);
+				$this->importFavorites($importSource, $newTable, $table);
 
-				$columnIdMap = $this->importColumns($importSource, $newTable, $table, $this->columnService, $columnIdMap);
-				$rowIdMap = $this->importRows($importSource, $newTable, $table, $this->rowService, $rowIdMap);
+				$columnIdMap = $this->importColumns($importSource, $newTable, $table, $columnIdMap);
+				$rowIdMap = $this->importRows($importSource, $newTable, $table, $rowIdMap);
 
-				$this->importContexts($contexts, $newTable, $table, $this->contextService, $contextIdMap);
+				$this->importContexts($contexts, $newTable, $table, $contextIdMap);
 				$tableIdMap[$table['id']] = $newTable->getId();
 			}
 
-			$this->importViews($importSource, $tableIdMap, $columnIdMap, $this->viewService);
+			$this->importViews($importSource, $tableIdMap, $columnIdMap);
 			$this->importShares($importSource, $tableIdMap, $contextIdMap);
 
 			$this->importRowCells(
@@ -355,11 +355,10 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param IImportSource $importSource
 	 * @param array $tableIdMap
 	 * @param array $columnIdMap
-	 * @param ViewService $viewService
 	 *
 	 * @return void
 	 */
-	private function importViews($importSource, array $tableIdMap, array $columnIdMap, &$viewService): void
+	private function importViews($importSource, array $tableIdMap, array $columnIdMap): void
 	{
 		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($views as $view) {
@@ -373,7 +372,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 					}
 					unset($setting);
 				}
-				$viewService->importView($newTableId, $view);
+				$this->viewService->importView($newTableId, $view);
 			}
 		}
 	}
@@ -382,16 +381,15 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param IImportSource $importSource
 	 * @param Table $newTable
 	 * @param array $table
-	 * @param FavoritesService $favoritesService
 	 *
 	 * @return void
 	 */
-	private function importFavorites($importSource, $newTable, $table, &$favoritesService): void
+	private function importFavorites($importSource, $newTable, $table): void
 	{
 		$favorites = json_decode($importSource->getFileContents(self::FILE_FAVORITES), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($favorites as $favorite) {
 			if ($table['id'] === $favorite['node_id']) {
-				$favoritesService->importFavorite($favorite['node_type'], $newTable->getId(), $favorite['user_id']);
+				$this->favoritesService->importFavorite($favorite['node_type'], $newTable->getId(), $favorite['user_id']);
 			}
 		}
 	}
@@ -400,17 +398,16 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param IImportSource $importSource
 	 * @param Table $newTable
 	 * @param array $table
-	 * @param ColumnService $columnService
 	 * @param array $columnIdMap
 	 *
 	 * @return array
 	 */
-	private function importColumns($importSource, $newTable, $table, &$columnService, array $columnIdMap): array
+	private function importColumns($importSource, $newTable, $table, array $columnIdMap): array
 	{
 		$columns = json_decode($importSource->getFileContents(self::FILE_COLUMNS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($columns as $column) {
 			if ($table['id'] === $column['tableId']) {
-				$newColumn = $columnService->importColumn($newTable, $column);
+				$newColumn = $this->columnService->importColumn($newTable, $column);
 				$columnIdMap[$column['id']] = $newColumn->getId();
 			}
 		}
@@ -421,17 +418,16 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param IImportSource $importSource
 	 * @param Table $newTable
 	 * @param array $table
-	 * @param RowService $rowService
 	 * @param array $rowIdMap
 	 *
 	 * @return array
 	 */
-	private function importRows($importSource, $newTable, $table, &$rowService, array $rowIdMap): array
+	private function importRows($importSource, $newTable, $table, array $rowIdMap): array
 	{
 		$rows = json_decode($importSource->getFileContents(self::FILE_ROWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($rows as $row) {
 			if ($table['id'] === $row['tableId']) {
-				$newRow = $rowService->importRow($newTable, $row);
+				$newRow = $this->rowService->importRow($newTable, $row);
 				$rowIdMap[$row['id']] = $newRow->getId();
 			}
 		}
@@ -442,15 +438,14 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param array $contexts
 	 * @param Table $newTable
 	 * @param array $table
-	 * @param ContextService $contextService
 	 * @param array $contextIdMap
 	 *
 	 * @return void
 	 */
-	private function importContexts($contexts, $newTable, $table, &$contextService, array &$contextIdMap): void
+	private function importContexts($contexts, $newTable, $table, array &$contextIdMap): void
 	{
 		foreach ($contexts as $context) {
-			$newContext = $contextService->importContext($newTable, $context, $table['id']);
+			$newContext = $this->contextService->importContext($newTable, $context, $table['id']);
 			if ($newContext !== null) {
 				$contextIdMap[$context['id']] = $newContext->getId();
 			}
