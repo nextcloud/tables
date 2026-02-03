@@ -615,16 +615,16 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * @param Table $table
+	 * @param int $tableId
 	 * @param array $view
 	 *
-	 * @return Table
+	 * @return void
 	 *
 	 * @throws InternalError
 	 */
-	public function importView(Table $table, array $view): View {
+	public function importView(int $tableId, array $view): void {
 		$item = new View();
-		$item->setTableId($table->getId());
+		$item->setTableId($tableId);
 		$item->setTitle($view['title']);
 		$item->setEmoji($view['emoji']);
 		$item->setCreatedBy($view['createdBy']);
@@ -641,6 +641,5 @@ class ViewService extends SuperService {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
-		return $newView;
 	}
 }

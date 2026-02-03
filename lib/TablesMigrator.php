@@ -240,7 +240,6 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 			foreach ($tables as $table) {
 				$newTable = $this->tableService->importTable($table);
 
-				$this->importViews($importSource, $newTable, $table, $this->viewService);
 				$this->importFavorites($importSource, $newTable, $table, $this->favoritesService);
 
 				$columnIdMap = $this->importColumns($importSource, $newTable, $table, $this->columnService, $columnIdMap);
@@ -250,6 +249,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$tableIdMap[$table['id']] = $newTable->getId();
 			}
 
+			$this->importViews($importSource, $tableIdMap, $columnIdMap, $this->viewService);
 			$this->importShares($importSource, $tableIdMap, $contextIdMap);
 
 			$this->importRowCells(
@@ -353,18 +353,27 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 
 	/**
 	 * @param IImportSource $importSource
-	 * @param Table $newTable
-	 * @param array $table
+	 * @param array $tableIdMap
+	 * @param array $columnIdMap
 	 * @param ViewService $viewService
 	 *
 	 * @return void
 	 */
-	private function importViews($importSource, $newTable, $table, &$viewService): void
+	private function importViews($importSource, array $tableIdMap, array $columnIdMap, &$viewService): void
 	{
 		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($views as $view) {
-			if ($table['id'] === $view['tableId']) {
-				$viewService->importView($newTable, $view);
+			if (isset($tableIdMap[$view['tableId']])) {
+				$newTableId = $tableIdMap[$view['tableId']];
+				if (isset($view['columnSettings']) && is_array($view['columnSettings'])) {
+					foreach ($view['columnSettings'] as &$setting) {
+						if (isset($setting['columnId']) && isset($columnIdMap[$setting['columnId']])) {
+							$setting['columnId'] = $columnIdMap[$setting['columnId']];
+						}
+					}
+					unset($setting);
+				}
+				$viewService->importView($newTableId, $view);
 			}
 		}
 	}
