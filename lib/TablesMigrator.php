@@ -47,27 +47,6 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 {
 	use TMigratorBasicVersionHandling;
 
-	protected IL10N $l10n;
-	protected TableMapper $tableMapper;
-	protected ColumnMapper $columnMapper;
-	protected RowSleeveMapper $rowSleeveMapper;
-	protected ViewMapper $viewMapper;
-	protected ContextMapper $contextMapper;
-	protected ShareMapper $shareMapper;
-	protected ContextNodeRelationMapper $contextNodeRelationMapper;
-	protected FavoritesService $favoritesService;
-	protected TableService $tableService;
-	protected RowCellNumberMapper $rowCellNumberMapper;
-	protected RowCellSelectionMapper $rowCellSelectionMapper;
-	protected RowCellTextMapper $rowCellTextMapper;
-	protected RowCellUsergroupMapper $rowCellUsergroupMapper;
-	protected RowCellDatetimeMapper $rowCellDatetimeMapper;
-	protected ViewService $viewService;
-	protected ColumnService $columnService;
-	protected RowService $rowService;
-	private ContextService $contextService;
-	private ShareService $shareService;
-
 	protected const FILE_TABLES = 'tables.json';
 	protected const FILE_CONTEXTS = 'contexts.json';
 	protected const FILE_COLUMNS = 'columns.json';
@@ -84,50 +63,28 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	protected const JSON_DEPTH = 512;
 	protected const JSON_OPTIONS = JSON_THROW_ON_ERROR;
 
-	public function __construct(
-		IL10N                     $l10n,
-		TableMapper               $tableMapper,
-		ColumnMapper              $columnMapper,
-		RowSleeveMapper           $rowSleeveMapper,
-		ViewMapper                $viewMapper,
-		ContextMapper             $contextMapper,
-		ShareMapper               $shareMapper,
-		ContextNodeRelationMapper $contextNodeRelationMapper,
-		FavoritesService          $favoritesService,
-		TableService              $tableService,
-		RowCellNumberMapper       $rowCellNumberMapper,
-		RowCellSelectionMapper    $rowCellSelectionMapper,
-		RowCellTextMapper         $rowCellTextMapper,
-		RowCellUsergroupMapper    $rowCellUsergroupMapper,
-		RowCellDatetimeMapper     $rowCellDatetimeMapper,
-		ViewService               $viewService,
-		ColumnService             $columnService,
-		RowService                $rowService,
-		ContextService            $contextService,
-		ShareService              $shareService,
-	)
-	{
-		$this->l10n = $l10n;
-		$this->tableMapper = $tableMapper;
-		$this->columnMapper = $columnMapper;
-		$this->rowSleeveMapper = $rowSleeveMapper;
-		$this->viewMapper = $viewMapper;
-		$this->contextMapper = $contextMapper;
-		$this->shareMapper = $shareMapper;
-		$this->contextNodeRelationMapper = $contextNodeRelationMapper;
-		$this->favoritesService = $favoritesService;
-		$this->tableService = $tableService;
-		$this->rowCellNumberMapper = $rowCellNumberMapper;
-		$this->rowCellSelectionMapper = $rowCellSelectionMapper;
-		$this->rowCellTextMapper = $rowCellTextMapper;
-		$this->rowCellUsergroupMapper = $rowCellUsergroupMapper;
-		$this->rowCellDatetimeMapper = $rowCellDatetimeMapper;
-		$this->viewService = $viewService;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->contextService = $contextService;
-		$this->shareService = $shareService;
-	}
+	   public function __construct(
+		   protected IL10N $l10n,
+		   protected TableMapper $tableMapper,
+		   protected ColumnMapper $columnMapper,
+		   protected RowSleeveMapper $rowSleeveMapper,
+		   protected ViewMapper $viewMapper,
+		   protected ContextMapper $contextMapper,
+		   protected ShareMapper $shareMapper,
+		   protected ContextNodeRelationMapper $contextNodeRelationMapper,
+		   protected FavoritesService $favoritesService,
+		   protected TableService $tableService,
+		   protected RowCellNumberMapper $rowCellNumberMapper,
+		   protected RowCellSelectionMapper $rowCellSelectionMapper,
+		   protected RowCellTextMapper $rowCellTextMapper,
+		   protected RowCellUsergroupMapper $rowCellUsergroupMapper,
+		   protected RowCellDatetimeMapper $rowCellDatetimeMapper,
+		   protected ViewService $viewService,
+		   protected ColumnService $columnService,
+		   protected RowService $rowService,
+		   private ContextService $contextService,
+		   private ShareService $shareService,
+	   ) {}
 
 	/**
 	 * {@inheritDoc}
@@ -199,7 +156,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 
 	/**
 	 * @param array $tableIds
-	 * 
+	 *
 	 * @return array
 	 */
 	private function getAllViewsForTableIds(array $tableIds): array
@@ -233,12 +190,13 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 		$contextIdMap = [];
 		$columnIdMap = [];
 		$rowIdMap = [];
+		$userId = $user->getUID();
 		$connection = $this->tableMapper->getDBConnection();
 		$connection->beginTransaction();
 
 		try {
 			foreach ($tables as $table) {
-				$newTable = $this->tableService->importTable($table);
+				$newTable = $this->tableService->importTable($table, $userId);
 
 				$this->importFavorites($importSource, $newTable, $table);
 
@@ -249,15 +207,16 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$tableIdMap[$table['id']] = $newTable->getId();
 			}
 
-			$this->importViews($importSource, $tableIdMap, $columnIdMap);
-			$this->importShares($importSource, $tableIdMap, $contextIdMap);
+			$this->importViews($importSource, $tableIdMap, $columnIdMap, $userId);
+			$this->importShares($importSource, $tableIdMap, $contextIdMap, $userId);
 
 			$this->importRowCells(
 				json_decode($importSource->getFileContents(self::FILE_ROW_CELL_DATETIME), true, self::JSON_DEPTH, self::JSON_OPTIONS),
 				$rowIdMap,
 				$columnIdMap,
 				RowCellDatetime::class,
-				$this->rowCellDatetimeMapper
+				$this->rowCellDatetimeMapper,
+				$userId,
 			);
 
 			$this->importRowCells(
@@ -265,7 +224,8 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$rowIdMap,
 				$columnIdMap,
 				RowCellNumber::class,
-				$this->rowCellNumberMapper
+				$this->rowCellNumberMapper,
+				$userId,
 			);
 
 			$this->importRowCells(
@@ -273,7 +233,8 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$rowIdMap,
 				$columnIdMap,
 				RowCellText::class,
-				$this->rowCellTextMapper
+				$this->rowCellTextMapper,
+				$userId,
 			);
 
 			$this->importRowCells(
@@ -281,7 +242,8 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$rowIdMap,
 				$columnIdMap,
 				RowCellSelection::class,
-				$this->rowCellSelectionMapper
+				$this->rowCellSelectionMapper,
+				$userId,
 			);
 
 			$this->importRowCells(
@@ -289,7 +251,8 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$rowIdMap,
 				$columnIdMap,
 				RowCellUsergroup::class,
-				$this->rowCellUsergroupMapper
+				$this->rowCellUsergroupMapper,
+				$userId,
 			);
 
 			$connection->commit();
@@ -331,10 +294,11 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param array $columnIdMap
 	 * @param string $class
 	 * @param object $mapper
+	 * @param string $userId
 	 *
 	 * @return void
 	 */
-	private function importRowCells(array $data, array $rowIdMap, array $columnIdMap, string $class, $mapper): void
+	private function importRowCells(array $data, array $rowIdMap, array $columnIdMap, string $class, object $mapper, string $userId): void
 	{
 		foreach ($data as $cellData) {
 			$oldRowId = $cellData['rowId'];
@@ -344,7 +308,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$cell->setRowId($rowIdMap[$oldRowId]);
 				$cell->setColumnId($columnIdMap[$oldColumnId]);
 				$cell->setValue($cellData['value'] ?? null);
-				$cell->setLastEditBy($cellData['lastEditBy'] ?? null);
+				$cell->setLastEditBy($userId ?? null);
 				$cell->setLastEditAt($cellData['lastEditAt'] ?? null);
 				$mapper->insert($cell);
 			}
@@ -355,10 +319,11 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param IImportSource $importSource
 	 * @param array $tableIdMap
 	 * @param array $columnIdMap
+	 * @param string $userId
 	 *
 	 * @return void
 	 */
-	private function importViews($importSource, array $tableIdMap, array $columnIdMap): void
+	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, string $userId): void
 	{
 		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($views as $view) {
@@ -372,7 +337,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 					}
 					unset($setting);
 				}
-				$this->viewService->importView($newTableId, $view);
+				$this->viewService->importView($newTableId, $view, $userId);
 			}
 		}
 	}
@@ -384,12 +349,12 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return void
 	 */
-	private function importFavorites($importSource, $newTable, $table): void
+	private function importFavorites(IImportSource $importSource, Table $newTable, array $table): void
 	{
 		$favorites = json_decode($importSource->getFileContents(self::FILE_FAVORITES), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($favorites as $favorite) {
 			if ($table['id'] === $favorite['node_id']) {
-				$this->favoritesService->importFavorite($favorite['node_type'], $newTable->getId(), $favorite['user_id']);
+				$this->favoritesService->importFavorite($favorite['node_type'], $newTable);
 			}
 		}
 	}
@@ -402,7 +367,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return array
 	 */
-	private function importColumns($importSource, $newTable, $table, array $columnIdMap): array
+	private function importColumns(IImportSource $importSource, Table $newTable, array $table, array $columnIdMap): array
 	{
 		$columns = json_decode($importSource->getFileContents(self::FILE_COLUMNS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($columns as $column) {
@@ -422,7 +387,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return array
 	 */
-	private function importRows($importSource, $newTable, $table, array $rowIdMap): array
+	private function importRows(IImportSource $importSource, Table $newTable, array $table, array $rowIdMap): array
 	{
 		$rows = json_decode($importSource->getFileContents(self::FILE_ROWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($rows as $row) {
@@ -442,7 +407,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return void
 	 */
-	private function importContexts($contexts, $newTable, $table, array &$contextIdMap): void
+	private function importContexts(array $contexts, Table $newTable, array $table, array &$contextIdMap): void
 	{
 		foreach ($contexts as $context) {
 			$newContext = $this->contextService->importContext($newTable, $context, $table['id']);
@@ -456,17 +421,18 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * @param IImportSource $importSource
 	 * @param array $tableIdMap
 	 * @param array $contextIdMap
+	 * @param string $userId
 	 *
 	 * @return void
 	 */
-	private function importShares($importSource, $tableIdMap, $contextIdMap): void
+	private function importShares(IImportSource $importSource, array $tableIdMap, array $contextIdMap, string $userId): void
 	{
 		$shares = json_decode($importSource->getFileContents(self::FILE_SHARES), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($shares as $share) {
 			if ($share['nodeType'] === 'table' && isset($tableIdMap[$share['nodeId']])) {
-				$this->shareService->importShare($tableIdMap[$share['nodeId']], $share);
+				$this->shareService->importShare($tableIdMap[$share['nodeId']], $share, $userId);
 			} elseif ($share['nodeType'] === 'context' && isset($contextIdMap[$share['nodeId']])) {
-				$this->shareService->importShare($contextIdMap[$share['nodeId']], $share);
+				$this->shareService->importShare($contextIdMap[$share['nodeId']], $share, $userId);
 			}
 		}
 	}

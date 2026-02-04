@@ -539,7 +539,7 @@ class ContextService {
         $newContext->setName($context['name'] ?? '');
         $newContext->setIcon($context['iconName'] ?? '');
         $newContext->setDescription($context['description'] ?? '');
-        $newContext->setOwnerId($context['owner'] ?? '');
+        $newContext->setOwnerId($table->getOwnership() ?? '');
         $newContext->setOwnerType($context['ownerType'] ?? 0);
         $this->contextMapper->insert($newContext);
 

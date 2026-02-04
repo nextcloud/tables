@@ -862,19 +862,19 @@ class RowService extends SuperService {
 			$qb->insert('tables_row_sleeves')
 				->values([
 					'table_id' => $qb->createNamedParameter($table->getId(), IQueryBuilder::PARAM_INT),
-					'created_by' => $qb->createNamedParameter($row['createdBy']),
+					'created_by' => $qb->createNamedParameter($table->getOwnership()),
 					'created_at' => $qb->createNamedParameter($row['createdAt']),
-					'last_edit_by' => $qb->createNamedParameter($row['lastEditBy']),
+					'last_edit_by' => $qb->createNamedParameter($table->getOwnership()),
 					'last_edit_at' => $qb->createNamedParameter($row['lastEditAt']),
 				]);
 			$qb->executeStatement();
 			$id = $this->connection->lastInsertId('*PREFIX*tables_row_sleeves');
 			$row2 = new Row2();
-			$row2->setId((int)$id);
+			$row2->setId($id);
 			$row2->setTableId($table->getId());
-			$row2->setCreatedBy($row['createdBy']);
+			$row2->setCreatedBy($table->getOwnership());
 			$row2->setCreatedAt($row['createdAt']);
-			$row2->setLastEditBy($row['lastEditBy']);
+			$row2->setLastEditBy($table->getOwnership());
 			$row2->setLastEditAt($row['lastEditAt']);
 			return $row2;
 		} catch (\Exception $e) {

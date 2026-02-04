@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Service;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -134,24 +135,23 @@ class FavoritesService {
 
 	/**
 	 * @param int $nodeType
-	 * @param int $id
-	 * @param string $userId
-	 * 
+	 * @param Table $table
+	 *
 	 * @throws InternalError
 	 * @throws Exception
 	 */
-	public function importFavorite(int $nodeType, int $id, string $userId): void {
+	public function importFavorite(int $nodeType, Table $table): void {
 		$this->checkValidNodeType($nodeType);
-		
+
 		$qb = $this->connection->getQueryBuilder();
 		$qb->insert('tables_favorites')
 			->values([
-				'user_id' => $qb->createNamedParameter($userId),
+				'user_id' => $qb->createNamedParameter($table->getOwnership()),
 				'node_type' => $qb->createNamedParameter($nodeType),
-				'node_id' => $qb->createNamedParameter($id),
+				'node_id' => $qb->createNamedParameter($table->getId()),
 			]);
 		$qb->executeStatement();
-		$this->cache->set($nodeType . '_' . $id, true);
+		$this->cache->set($nodeType . '_' . $table->getId(), true);
 	}
 
 }

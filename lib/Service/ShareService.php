@@ -583,8 +583,9 @@ class ShareService extends SuperService {
 	/**
 	 * @param int $nodeId
 	 * @param array $share
+	 * @param string $userId
 	 */
-	public function importShare(int $nodeId, array $share): void {
+	public function importShare(int $nodeId, array $share, string $userId): void {
 		$nodeType = $share['nodeType'] ?? 'table';
 		$receiver = $share['receiver'] ?? '';
 		$receiverType = $share['receiverType'] ?? '';
@@ -595,7 +596,7 @@ class ShareService extends SuperService {
 		$permissionManage = $share['permissionManage'] ?? false;
 		$displayMode = $share['displayMode'] ?? 0;
 		$password = $share['password'] ?? null;
-		$sender = $share['sender'] ?? null;
+		$sender = $userId;
 		$shareToken = null;
 
 		if (!empty($share['token'])) {

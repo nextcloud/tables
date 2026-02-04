@@ -563,9 +563,9 @@ class ColumnService extends SuperService {
 	/**
 	 * @param Table $table
 	 * @param array $column
-	 * 
+	 *
 	 * @return Column
-	 * 
+	 *
 	 * @throws InternalError
 	 */
 	public function importColumn(Table $table, array $column): Column
@@ -573,9 +573,9 @@ class ColumnService extends SuperService {
 		$item = new Column();
 		$item->setTableId($table->getId());
 		$item->setTitle($column['title']);
-		$item->setCreatedBy($column['createdBy']);
+		$item->setCreatedBy($table->getOwnership());
 		$item->setCreatedAt($column['createdAt']);
-		$item->setLastEditBy($column['lastEditBy']);
+		$item->setLastEditBy($table->getOwnership());
 		$item->setLastEditAt($column['lastEditAt']);
 		$item->setType($column['type']);
 		$item->setSubtype($column['subtype']);

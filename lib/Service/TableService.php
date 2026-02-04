@@ -575,19 +575,20 @@ class TableService extends SuperService {
 
 	/**
 	 * @param array $table
+	 * @param string $userId
 	 *
 	 * @return Table
 	 *
 	 * @throws InternalError
 	 */
-	public function importTable(array $table): Table {
+	public function importTable(array $table, string $userId): Table {
 		$item = new Table();
 		$item->setTitle($table['title']);
 		$item->setEmoji($table['emoji']);
-		$item->setOwnership($table['ownership']);
-		$item->setCreatedBy($table['createdBy']);
+		$item->setOwnership($userId);
+		$item->setCreatedBy($userId);
 		$item->setCreatedAt($table['createdAt']);
-		$item->setLastEditBy($table['lastEditBy']);
+		$item->setLastEditBy($userId);
 		$item->setLastEditAt($table['lastEditAt']);
 		$item->setArchived((bool)$table['archived']);
 		$item->setDescription($table['description']);
