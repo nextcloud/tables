@@ -94,8 +94,8 @@ describe('Public link sharing', () => {
 			cy.visit(`apps/tables/s/${shareToken}`)
 
 			// Password Gate
-			cy.get('input[type="password"]#password').should('be.visible').type(password)
-			cy.get('input#password-submit').click()
+			cy.get('input[type="password"]').should('be.visible').type(password)
+			cy.get('button[type="submit"], input[type="submit"]').filter(':visible').first().click()
 			cy.get('[data-cy="publicTableElement"]').should('be.visible')
 
 			// Login again to delete share

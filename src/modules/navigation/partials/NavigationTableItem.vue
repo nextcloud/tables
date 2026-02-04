@@ -64,7 +64,7 @@
 			<NcActionButton @click="exportFile">
 				{{ t('tables', 'Export') }}
 				<template #icon>
-					<Import :size="20" />
+					<Export :size="20" />
 				</template>
 			</NcActionButton>
 			<!-- INTEGRATION -->
@@ -151,6 +151,7 @@ import activityMixin from '../../../shared/mixins/activityMixin.js'
 import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
+import Export from 'vue-material-design-icons/Export.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/RenameOutline.vue'
@@ -168,6 +169,7 @@ export default {
 		ArchiveArrowDown,
 		ArchiveArrowUpOutline,
 		Import,
+		Export,
 		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
