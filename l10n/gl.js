@@ -134,7 +134,7 @@ OC.L10N.register(
     "How to do" : "Como facer",
     "Ease of use" : "Facilidade de uso",
     "Done" : "Feito",
-    "Open the tables app" : "Abre a aplicación de táboas",
+    "Open the tables app" : "Abrir a aplicación de táboas",
     "Reachable via the Tables icon in the apps list." : "Accesíbel a través da icona de Táboas na lista de aplicacións.",
     "Add your first row" : "Engadir a súa primeira fila",
     "Use the *+ Create row* button and enter some data inside of the form." : "Use o botón *+ Crear unha fila* e introduza a data dentro do formulario",
