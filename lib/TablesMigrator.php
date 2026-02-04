@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
- */
+*/
 
 namespace OCA\Tables;
 
@@ -308,7 +308,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 				$cell->setRowId($rowIdMap[$oldRowId]);
 				$cell->setColumnId($columnIdMap[$oldColumnId]);
 				$cell->setValue($cellData['value'] ?? null);
-				$cell->setLastEditBy($userId ?? null);
+				$cell->setLastEditBy($userId);
 				$cell->setLastEditAt($cellData['lastEditAt'] ?? null);
 				$mapper->insert($cell);
 			}

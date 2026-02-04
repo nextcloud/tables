@@ -850,9 +850,9 @@ class RowService extends SuperService {
 
 	/**
 	 * @param Table $table
-	 * @param array $rows
+	 * @param array $row
 	 *
-	 * @return Row2[]
+	 * @return Row2
 	 *
 	 * @throws InternalError
 	 */

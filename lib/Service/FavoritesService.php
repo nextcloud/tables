@@ -130,7 +130,11 @@ class FavoritesService {
 			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
 
 		$result = $qb->executeQuery();
-		return $result->fetchAllAssociative();
+		$rows = [];
+		while ($row = $result->fetch()) {
+			$rows[] = $row;
+		}
+		return $rows;
 	}
 
 	/**
