@@ -568,8 +568,7 @@ class ColumnService extends SuperService {
 	 *
 	 * @throws InternalError
 	 */
-	public function importColumn(Table $table, array $column): Column
-	{
+	public function importColumn(Table $table, array $column): Column {
 		$item = new Column();
 		$item->setTableId($table->getId());
 		$item->setTitle($column['title']);

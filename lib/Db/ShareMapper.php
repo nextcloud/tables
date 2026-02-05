@@ -203,7 +203,7 @@ class ShareMapper extends QBMapper {
 	/**
 	 * @param int[] $tableIds
 	 * @param int[] $contextIds
-	 * 
+	 *
 	 * @return Share[]
 	 */
 	// add better function name

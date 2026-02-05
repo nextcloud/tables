@@ -8,7 +8,6 @@
 namespace OCA\Tables\Db;
 
 use OCP\IDBConnection;
-use OCA\Tables\Db\RowCellBulkFetchTrait;
 
 /** @template-extends RowCellMapperSuper<RowCellText, string, string> */
 class RowCellTextMapper extends RowCellMapperSuper {

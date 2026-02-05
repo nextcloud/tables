@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
-*/
+ */
 
 namespace OCA\Tables;
 
@@ -35,16 +35,15 @@ use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\IL10N;
+use OCP\IUser;
 use OCP\UserMigration\IExportDestination;
 use OCP\UserMigration\IImportSource;
 use OCP\UserMigration\IMigrator;
 use OCP\UserMigration\ISizeEstimationMigrator;
 use OCP\UserMigration\TMigratorBasicVersionHandling;
-use OCP\IUser;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TablesMigrator implements IMigrator, ISizeEstimationMigrator
-{
+class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	use TMigratorBasicVersionHandling;
 
 	protected const FILE_TABLES = 'tables.json';
@@ -63,34 +62,34 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	protected const JSON_DEPTH = 512;
 	protected const JSON_OPTIONS = JSON_THROW_ON_ERROR;
 
-	   public function __construct(
-		   protected IL10N $l10n,
-		   protected TableMapper $tableMapper,
-		   protected ColumnMapper $columnMapper,
-		   protected RowSleeveMapper $rowSleeveMapper,
-		   protected ViewMapper $viewMapper,
-		   protected ContextMapper $contextMapper,
-		   protected ShareMapper $shareMapper,
-		   protected ContextNodeRelationMapper $contextNodeRelationMapper,
-		   protected FavoritesService $favoritesService,
-		   protected TableService $tableService,
-		   protected RowCellNumberMapper $rowCellNumberMapper,
-		   protected RowCellSelectionMapper $rowCellSelectionMapper,
-		   protected RowCellTextMapper $rowCellTextMapper,
-		   protected RowCellUsergroupMapper $rowCellUsergroupMapper,
-		   protected RowCellDatetimeMapper $rowCellDatetimeMapper,
-		   protected ViewService $viewService,
-		   protected ColumnService $columnService,
-		   protected RowService $rowService,
-		   private ContextService $contextService,
-		   private ShareService $shareService,
-	   ) {}
+	public function __construct(
+		protected IL10N $l10n,
+		protected TableMapper $tableMapper,
+		protected ColumnMapper $columnMapper,
+		protected RowSleeveMapper $rowSleeveMapper,
+		protected ViewMapper $viewMapper,
+		protected ContextMapper $contextMapper,
+		protected ShareMapper $shareMapper,
+		protected ContextNodeRelationMapper $contextNodeRelationMapper,
+		protected FavoritesService $favoritesService,
+		protected TableService $tableService,
+		protected RowCellNumberMapper $rowCellNumberMapper,
+		protected RowCellSelectionMapper $rowCellSelectionMapper,
+		protected RowCellTextMapper $rowCellTextMapper,
+		protected RowCellUsergroupMapper $rowCellUsergroupMapper,
+		protected RowCellDatetimeMapper $rowCellDatetimeMapper,
+		protected ViewService $viewService,
+		protected ColumnService $columnService,
+		protected RowService $rowService,
+		private ContextService $contextService,
+		private ShareService $shareService,
+	) {
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getEstimatedExportSize(IUser $user): int|float
-	{
+	public function getEstimatedExportSize(IUser $user): int|float {
 		return 0;
 	}
 
@@ -98,11 +97,10 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * {@inheritDoc}
 	 */
 	public function export(
-		IUser              $user,
+		IUser $user,
 		IExportDestination $exportDestination,
-		OutputInterface    $output,
-	): void
-	{
+		OutputInterface $output,
+	): void {
 		try {
 			$uid = $user->getUID();
 
@@ -112,7 +110,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 			$tables = $this->tableMapper->findAll($uid);
 			$exportDestination->addFileContents(self::FILE_TABLES, json_encode($tables));
 
-			$tableIds = array_map(fn($t) => $t->getId(), $tables);
+			$tableIds = array_map(fn ($t) => $t->getId(), $tables);
 			$columns = $this->columnMapper->findAllByTableIds($tableIds);
 			$exportDestination->addFileContents(self::FILE_COLUMNS, json_encode($columns));
 
@@ -124,13 +122,13 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 
 			$contexts = $this->contextMapper->findAll($uid);
 			$exportDestination->addFileContents(self::FILE_CONTEXTS, json_encode($contexts));
-			$contextIds = array_map(fn($c) => $c->getId(), $contexts);
+			$contextIds = array_map(fn ($c) => $c->getId(), $contexts);
 
 			$shares = $this->shareMapper->findByNodeIdsAndTypes($tableIds, $contextIds);
 			$exportDestination->addFileContents(self::FILE_SHARES, json_encode($shares));
 
-			$rowIds = array_map(fn($c) => $c->getId(), $rows);
-			$columnIds = array_map(fn($c) => $c->getId(), $columns);
+			$rowIds = array_map(fn ($c) => $c->getId(), $rows);
+			$columnIds = array_map(fn ($c) => $c->getId(), $columns);
 
 			$rowCellNumbers = $this->rowCellNumberMapper->findAllByRowIdsAndColumnIds($rowIds, $columnIds);
 			$exportDestination->addFileContents(self::FILE_ROW_CELL_NUMBERS, json_encode($rowCellNumbers));
@@ -159,8 +157,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return array
 	 */
-	private function getAllViewsForTableIds(array $tableIds): array
-	{
+	private function getAllViewsForTableIds(array $tableIds): array {
 		$views = [];
 		foreach ($tableIds as $tableId) {
 			$views = array_merge($views, $this->viewMapper->findAll($tableId));
@@ -172,11 +169,10 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 * {@inheritDoc}
 	 */
 	public function import(
-		IUser           $user,
-		IImportSource   $importSource,
+		IUser $user,
+		IImportSource $importSource,
 		OutputInterface $output,
-	): void
-	{
+	): void {
 		if ($importSource->getMigratorVersion($this->getId()) === null) {
 			$output->writeln('No version for migrator ' . $this->getId() . ' (' . static::class . '), skipping import…');
 			return;
@@ -267,24 +263,21 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getId(): string
-	{
+	public function getId(): string {
 		return 'tables';
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getDisplayName(): string
-	{
+	public function getDisplayName(): string {
 		return $this->l10n->t('Tables');
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getDescription(): string
-	{
+	public function getDescription(): string {
 		return $this->l10n->t('All tables, columns, rows, contexts, and sharing information including all tables owned or shared, their structure and content');
 	}
 
@@ -298,8 +291,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return void
 	 */
-	private function importRowCells(array $data, array $rowIdMap, array $columnIdMap, string $class, object $mapper, string $userId): void
-	{
+	private function importRowCells(array $data, array $rowIdMap, array $columnIdMap, string $class, object $mapper, string $userId): void {
 		foreach ($data as $cellData) {
 			$oldRowId = $cellData['rowId'];
 			$oldColumnId = $cellData['columnId'];
@@ -323,8 +315,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return void
 	 */
-	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, string $userId): void
-	{
+	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, string $userId): void {
 		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($views as $view) {
 			if (isset($tableIdMap[$view['tableId']])) {
@@ -349,8 +340,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return void
 	 */
-	private function importFavorites(IImportSource $importSource, Table $newTable, array $table): void
-	{
+	private function importFavorites(IImportSource $importSource, Table $newTable, array $table): void {
 		$favorites = json_decode($importSource->getFileContents(self::FILE_FAVORITES), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($favorites as $favorite) {
 			if ($table['id'] === $favorite['node_id']) {
@@ -367,8 +357,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return array
 	 */
-	private function importColumns(IImportSource $importSource, Table $newTable, array $table, array $columnIdMap): array
-	{
+	private function importColumns(IImportSource $importSource, Table $newTable, array $table, array $columnIdMap): array {
 		$columns = json_decode($importSource->getFileContents(self::FILE_COLUMNS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($columns as $column) {
 			if ($table['id'] === $column['tableId']) {
@@ -387,8 +376,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return array
 	 */
-	private function importRows(IImportSource $importSource, Table $newTable, array $table, array $rowIdMap): array
-	{
+	private function importRows(IImportSource $importSource, Table $newTable, array $table, array $rowIdMap): array {
 		$rows = json_decode($importSource->getFileContents(self::FILE_ROWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($rows as $row) {
 			if ($table['id'] === $row['tableId']) {
@@ -407,8 +395,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return void
 	 */
-	private function importContexts(array $contexts, Table $newTable, array $table, array &$contextIdMap): void
-	{
+	private function importContexts(array $contexts, Table $newTable, array $table, array &$contextIdMap): void {
 		foreach ($contexts as $context) {
 			$newContext = $this->contextService->importContext($newTable, $context, $table['id']);
 			if ($newContext !== null) {
@@ -425,8 +412,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator
 	 *
 	 * @return void
 	 */
-	private function importShares(IImportSource $importSource, array $tableIdMap, array $contextIdMap, string $userId): void
-	{
+	private function importShares(IImportSource $importSource, array $tableIdMap, array $contextIdMap, string $userId): void {
 		$shares = json_decode($importSource->getFileContents(self::FILE_SHARES), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($shares as $share) {
 			if ($share['nodeType'] === 'table' && isset($tableIdMap[$share['nodeId']])) {

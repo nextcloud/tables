@@ -10,22 +10,22 @@ namespace OCA\Tables\Db;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
 trait RowCellBulkFetchTrait {
-    /**
-     * @param int[] $rowIds
-     * @param int[] $columnIds
+	/**
+	 * @param int[] $rowIds
+	 * @param int[] $columnIds
 	 *
-     * @return array
-     */
-    public function findAllByRowIdsAndColumnIds(array $rowIds, array $columnIds): array {
-        if (empty($rowIds) || empty($columnIds)) {
-            return [];
-        }
-        $qb = $this->db->getQueryBuilder();
-        $qb->select('*')
-            ->from($this->table)
-            ->where($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY)))
-            ->andWhere($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY)));
+	 * @return array
+	 */
+	public function findAllByRowIdsAndColumnIds(array $rowIds, array $columnIds): array {
+		if (empty($rowIds) || empty($columnIds)) {
+			return [];
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY)))
+			->andWhere($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY)));
 
 		return $this->findEntities($qb);
-    }
+	}
 }

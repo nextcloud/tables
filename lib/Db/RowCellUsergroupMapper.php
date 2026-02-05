@@ -10,7 +10,6 @@ namespace OCA\Tables\Db;
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
-use OCA\Tables\Db\RowCellBulkFetchTrait;
 use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\IUserSession;
