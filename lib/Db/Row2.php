@@ -145,7 +145,15 @@ class Row2 implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-return TablesRow
+	 * @return array{
+	 *   id: int|null,
+	 *   tableId: int|null,
+	 *   createdBy: string|null,
+	 *   createdAt: string|null,
+	 *   lastEditBy: string|null,
+	 *   lastEditAt: string|null,
+	 *   data: list<array<array-key, mixed>>
+	 * }
 	 */
 	public function jsonSerialize(): array {
 		$data = [];
