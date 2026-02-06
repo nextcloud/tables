@@ -8,8 +8,11 @@
 			:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
 			label="displayName" :aria-label-combobox="getPlaceholder()"
 			:user-select="true"
+			:clearable="!column.mandatory"
 			:disabled="column.viewColumnInformation?.readonly"
-			:close-on-select="false" :multiple="column.usergroupMultipleItems" data-cy="usergroupRowSelect"
+			:close-on-select="false"
+			:multiple="column.usergroupMultipleItems"
+			data-cy="usergroupRowSelect"
 			@search="asyncFind" @input="addItem">
 			<template #noResult>
 				{{ noResultText }}
