@@ -183,6 +183,10 @@ class ImportService extends SuperService {
 				$value = $cell->getValue();
 				// $cellIterator`s index is based on 1, not 0.
 				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
+				if (!array_key_exists($colIndex, $this->columns)) {
+					continue;
+				}
+
 				$column = $this->columns[$colIndex];
 
 				if (!array_key_exists($colIndex, $columns)) {
@@ -370,12 +374,13 @@ class ImportService extends SuperService {
 	 */
 	private function parseValueByColumnType(string $value, Column $column): string {
 		try {
+			// fixme: add cache <columId, businessInstance>
 			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
 			$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
 			/** @var IColumnTypeBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
 			if (!$columnBusiness->canBeParsedDisplayValue($value, $column)) {
-				$this->logger->warning('Value ' . $value . ' could not be parsed for column ' . $column->getTitle());
+				$this->logger->warning('Value "' . $value . '" could not be parsed for column "' . $column->getTitle().'"');
 				$this->countParsingErrors++;
 				return '';
 			}
@@ -439,7 +444,7 @@ class ImportService extends SuperService {
 				if (!$cell || $cell->getValue() === null) {
 					$this->logger->info('Cell is empty while fetching rows data for importing.');
 					if ($column->getMandatory()) {
-						$this->logger->warning('Mandatory column was not set');
+						$this->logger->warning('Mandatory column "'.$column->getTitle().'" was not set');
 						$this->countErrors++;
 						return;
 					}

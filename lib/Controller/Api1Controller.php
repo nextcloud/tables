@@ -23,6 +23,7 @@ use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ImportService;
+use OCA\Tables\Service\RelationService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
@@ -57,6 +58,7 @@ class Api1Controller extends ApiController {
 	private RowService $rowService;
 	private ImportService $importService;
 	private ViewService $viewService;
+	private RelationService $relationService;
 	private ViewMapper $viewMapper;
 	private IL10N $l10N;
 
@@ -77,6 +79,7 @@ class Api1Controller extends ApiController {
 		RowService $rowService,
 		ImportService $importService,
 		ViewService $viewService,
+		RelationService $relationService,
 		ViewMapper $viewMapper,
 		V1Api $v1Api,
 		LoggerInterface $logger,
@@ -90,6 +93,7 @@ class Api1Controller extends ApiController {
 		$this->rowService = $rowService;
 		$this->importService = $importService;
 		$this->viewService = $viewService;
+		$this->relationService = $relationService;
 		$this->viewMapper = $viewMapper;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
@@ -804,12 +808,76 @@ class Api1Controller extends ApiController {
 	}
 
 	/**
+	 * Get all relation data for a table
+	 *
+	 * @param int $tableId Table ID
+	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Relation data returned
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	public function indexTableRelations(int $tableId): DataResponse {
+		try {
+			return new DataResponse($this->relationService->getRelationsForTable($tableId));
+		} catch (PermissionError $e) {
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (InternalError $e) {
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		} catch (NotFoundError $e) {
+			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		}
+	}
+
+	/**
+	 * Get all relation data for a view
+	 *
+	 * @param int $viewId View ID
+	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Relation data returned
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	public function indexViewRelations(int $viewId): DataResponse {
+		try {
+			return new DataResponse($this->relationService->getRelationsForView($viewId));
+		} catch (PermissionError $e) {
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (InternalError $e) {
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		} catch (NotFoundError $e) {
+			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		}
+	}
+
+	/**
 	 * Create a column
 	 *
 	 * @param int|null $tableId Table ID
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1572,7 +1640,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
