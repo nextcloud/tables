@@ -57,6 +57,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-column="col => $emit('edit-column', col)"
+							@duplicate-column="col => $emit('duplicate-column', col)"
 				@delete-column="col => $emit('delete-column', col)"
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, parsedColumns, table)">

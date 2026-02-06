@@ -108,6 +108,13 @@
 							<PencilOutline :size="25" />
 						</template>
 					</NcActionButton>
+					<NcActionButton v-if="showEditColumn"
+						:aria-label="t('tables', 'Duplicate column')"
+						@click="duplicateColumn()">
+						<template #icon>
+							<ContentCopy :size="25" />
+						</template>
+					</NcActionButton>		
 					<NcActionButton v-if="showDeleteColumn"
 						:aria-label="t('tables', 'Delete column')"
 						data-cy="deleteColumnActionBtn"
@@ -127,6 +134,7 @@ import generalHelper from '../../../mixins/generalHelper.js'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
 import EyeOffOutline from 'vue-material-design-icons/EyeOffOutline.vue'
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
@@ -149,6 +157,7 @@ export default {
 		EyeOffOutline,
 		DeleteOutline,
 		PencilOutline,
+		ContentCopy,
 		ChevronLeft,
 		FilterCogOutline,
 		Magnify,
@@ -254,6 +263,10 @@ export default {
 		},
 		showDeleteColumn() {
 			return this.column.id >= 0 && this.config.canDeleteColumns
+		},
+		duplicateColumn() {
+			this.close()
+			this.$emit('duplicate-column', this.column)
 		},
 		selectedOperator: {
 			get() {

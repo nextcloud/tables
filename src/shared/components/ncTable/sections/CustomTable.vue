@@ -14,6 +14,7 @@
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-column="col => $emit('edit-column', col)"
+							@duplicate-column="col => $emit('duplicate-column', col)"
 					@delete-column="col => $emit('delete-column', col)"
 					@download-csv="data => $emit('download-csv', data)"
 					@select-all-rows="selectAllRows">
