@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 
 use InvalidArgumentException;
+use OC\User\User;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
@@ -38,6 +39,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\IUserManager;
 use OCP\Security\ISecureRandom;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -61,6 +63,7 @@ class ShareService extends SuperService {
 		private ContextNavigationMapper $contextNavigationMapper,
 		private IDBConnection $dbc,
 		protected ISecureRandom $secureRandom,
+		protected IUserManager $userManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -586,8 +589,14 @@ class ShareService extends SuperService {
 	 * @param string $userId
 	 */
 	public function importShare(int $nodeId, array $share, string $userId): void {
+		$existingReceiver = $this->userManager->userExists($share['receiver']);
+
+		if (!$existingReceiver) {
+			return;
+		}
+
 		$nodeType = $share['nodeType'] ?? 'table';
-		$receiver = $share['receiver'] ?? '';
+		$receiver = $existingReceiver;
 		$receiverType = $share['receiverType'] ?? '';
 		$permissionRead = $share['permissionRead'] ?? false;
 		$permissionCreate = $share['permissionCreate'] ?? false;
