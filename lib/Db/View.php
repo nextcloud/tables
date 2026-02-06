@@ -35,7 +35,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setCreatedAt(string $createdAt)
  * @method getFilter(): string
  * @method setFilter(string $filter)
- * @method getLastEditBy(): string
+ * @method getViewGroup(): ?string
+ * @method setViewGroup(?string $viewGroup)
  * @method setLastEditBy(string $lastEditBy)
  * @method getLastEditAt(): string
  * @method setLastEditAt(string $lastEditAt)
@@ -72,6 +73,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+        protected ?string $viewGroup = null;
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -207,6 +209,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'ownerDisplayName' => $this->ownerDisplayName,
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
+                $serialisedJson['viewGroup'] = $this->viewGroup;
 
 		return $serialisedJson;
 	}
