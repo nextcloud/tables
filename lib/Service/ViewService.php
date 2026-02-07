@@ -613,4 +613,34 @@ class ViewService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 	}
+
+	/**
+	 * @param int $tableId
+	 * @param array $view
+	 * @param string $userId
+	 *
+	 * @return void
+	 *
+	 * @throws InternalError
+	 */
+	public function importView(int $tableId, array $view, string $userId): void {
+		$item = new View();
+		$item->setTableId($tableId);
+		$item->setTitle($view['title']);
+		$item->setEmoji($view['emoji']);
+		$item->setCreatedBy($userId);
+		$item->setCreatedAt($view['createdAt']);
+		$item->setLastEditBy($userId);
+		$item->setLastEditAt($view['lastEditAt']);
+		$item->setDescription($view['description']);
+		$item->setColumns(json_encode($view['columnSettings']));
+		$item->setSort(json_encode($view['sort']));
+		$item->setFilter(json_encode($view['filter']));
+		try {
+			$this->mapper->insert($item);
+		} catch (\Exception $e) {
+			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
+			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
+		}
+	}
 }

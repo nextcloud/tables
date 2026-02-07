@@ -17,6 +17,7 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -507,5 +508,80 @@ class ContextService {
 			}
 		}
 		$context->setNodes($addedNodes);
+	}
+
+	/**
+	 * @param Table $table
+	 * @param array $context
+	 * @param int $tableOldId
+	 *
+	 * @return Context|null
+	 *
+	 * @throws \Exception
+	 */
+	public function importContext(Table $table, array $context, int $tableOldId): ?Context {
+		// checking if any node in $context['nodes'] matches the old table id
+		$hasMatchingNode = false;
+		if (!empty($context['nodes'])) {
+			foreach ($context['nodes'] as $nodeArr) {
+				if (($nodeArr['node_id'] ?? null) == $tableOldId) {
+					$hasMatchingNode = true;
+					break;
+				}
+			}
+		}
+
+		if (!$hasMatchingNode) {
+			return null;
+		}
+
+		$newContext = new Context();
+		$newContext->setName($context['name'] ?? '');
+		$newContext->setIcon($context['iconName'] ?? '');
+		$newContext->setDescription($context['description'] ?? '');
+		$newContext->setOwnerId($table->getOwnership() ?? '');
+		$newContext->setOwnerType($context['ownerType'] ?? 0);
+		$this->contextMapper->insert($newContext);
+
+		// insert nodes
+		$nodeRelMap = [];
+		if (!empty($context['nodes'])) {
+			foreach ($context['nodes'] as $nodeArr) {
+				$contextNodeRel = new ContextNodeRelation();
+				$contextNodeRel->setContextId($newContext->getId());
+				$contextNodeRel->setNodeId($table->getId());
+				$contextNodeRel->setNodeType($nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0);
+				$contextNodeRel->setPermissions($nodeArr['permissions'] ?? 0);
+				$contextNodeRel = $this->contextNodeRelMapper->insert($contextNodeRel);
+				$nodeRelMap[$nodeArr['id'] ?? null] = $contextNodeRel;
+			}
+		}
+
+		// insert pages
+		$pageMap = [];
+		if (!empty($context['pages'])) {
+			foreach ($context['pages'] as $pageArr) {
+				$page = new Page();
+				$page->setContextId($newContext->getId());
+				$page->setPageType($pageArr['page_type'] ?? $pageArr['pageType'] ?? '');
+				$page = $this->pageMapper->insert($page);
+				$pageMap[$pageArr['id'] ?? null] = $page;
+
+				// insert page conten
+				if (!empty($pageArr['content'])) {
+					foreach ($pageArr['content'] as $contentArr) {
+						$pageContent = new PageContent();
+						$pageContent->setPageId($page->getId());
+						$oldNodeRelId = $contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null;
+						$newNodeRel = $nodeRelMap[$oldNodeRelId] ?? null;
+						$pageContent->setNodeRelId($newNodeRel ? $newNodeRel->getId() : null);
+						$pageContent->setOrder($contentArr['order'] ?? 100);
+						$this->pageContentMapper->insert($pageContent);
+					}
+				}
+			}
+		}
+
+		return $newContext;
 	}
 }

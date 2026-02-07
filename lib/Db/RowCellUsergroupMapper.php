@@ -16,6 +16,8 @@ use OCP\IUserSession;
 
 /** @template-extends RowCellMapperSuper<RowCellUsergroup, array, array> */
 class RowCellUsergroupMapper extends RowCellMapperSuper {
+	use RowCellBulkFetchTrait;
+
 	protected string $table = 'tables_row_cells_usergroup';
 
 	public function __construct(

@@ -208,4 +208,22 @@ class ColumnMapper extends QBMapper {
 	private function getCacheKey(int $id): string {
 		return 'column_' . $id;
 	}
+
+	/**
+	 * @param int[] $tableIds
+	 *
+	 * @return Column[]
+	 */
+	public function findAllByTableIds(array $tableIds): array {
+		if (empty($tableIds)) {
+			return [];
+		}
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->in('table_id', $qb->createNamedParameter($tableIds, IQueryBuilder::PARAM_INT_ARRAY)));
+
+		return $this->findEntities($qb);
+	}
 }
