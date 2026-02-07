@@ -228,7 +228,7 @@ OC.L10N.register(
     "Type" : "Type",
     "Text line" : "Ligne de texte",
     "Simple text" : "Texte simple",
-    "Rich text" : "Texte riche",
+    "Rich text" : "Texte enrichi",
     "Single selection" : "Choix unique",
     "Multiple selection" : "Choix multiple",
     "Yes/No" : "Oui / Non",
