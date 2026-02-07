@@ -14,6 +14,7 @@ use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -252,6 +253,8 @@ class ColumnService extends SuperService {
 			$i++;
 		}
 
+		$this->validateCustomSettings($columnDto->getCustomSettings());
+
 		$time = new DateTime();
 		$item = Column::fromDto($columnDto);
 		$item->setTitle($newTitle);
@@ -352,6 +355,7 @@ class ColumnService extends SuperService {
 			$item->setUsergroupSelectGroups($columnDto->getUsergroupSelectGroups());
 			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
+			$this->validateCustomSettings($columnDto->getCustomSettings());
 			$item->setCustomSettings($columnDto->getCustomSettings());
 
 			$this->updateMetadata($item, $userId);
@@ -359,6 +363,36 @@ class ColumnService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * Validate custom settings
+	 *
+	 * @param string|null $customSettings JSON encoded custom settings
+	 * @throws BadRequestError
+	 */
+	private function validateCustomSettings(?string $customSettings): void {
+		if ($customSettings === null) {
+			return;
+		}
+
+		$settings = json_decode($customSettings, true);
+		if (!is_array($settings)) {
+			return;
+		}
+
+		if (isset($settings['width'])) {
+			$width = $settings['width'];
+			if (!is_numeric($width) || $width < 50 || $width > 1000) {
+				$translatedMessage = $this->l->t('Column width must be between %1$s and %2$s.', [50, 1000]);
+				throw new BadRequestError(
+					$translatedMessage,
+					0,
+					null,
+					$translatedMessage
+				);
+			}
 		}
 	}
 
