@@ -931,6 +931,10 @@ class Api1Controller extends ApiController {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (BadRequestError $e) {
+			$this->logger->warning('A bad request error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->translatedMessage ?: $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1047,6 +1051,10 @@ class Api1Controller extends ApiController {
 				)
 			);
 			return new DataResponse($item->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->logger->warning('A bad request error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->translatedMessage ?: $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1700,6 +1708,10 @@ class Api1Controller extends ApiController {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (BadRequestError $e) {
+			$this->logger->warning('A bad request error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->translatedMessage ?: $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
