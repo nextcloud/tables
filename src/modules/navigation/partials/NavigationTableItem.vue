@@ -127,10 +127,23 @@
 				</template>
 			</NcActionButton>
 		</template>
-		<ul>
-			<NavigationViewItem v-for="view in getViews" :key="'view' + view.id" :view="view"
-				:show-share-sender="false" />
-		</ul>
+                <ul>
+                        <!-- Ungrouped views -->
+                        <NavigationViewItem v-for="view in groupedViews.ungrouped" :key="'view' + view.id" :view="view"
+                                :show-share-sender="false" />
+                        <!-- Grouped views -->
+                        <li v-for="(views, groupName) in groupedViews.groups" :key="'group-' + groupName" class="view-group">
+                                <div class="view-group-header" @click="toggleGroup(groupName)">
+                                        <span class="view-group-icon">{{ collapsedGroups[groupName] ? "▶" : "▼" }}</span>
+                                        <span class="view-group-name">{{ groupName }}</span>
+                                        <span class="view-group-count">({{ views.length }})</span>
+                                </div>
+                                <ul v-show="!collapsedGroups[groupName]" class="view-group-items">
+                                        <NavigationViewItem v-for="view in views" :key="'view' + view.id" :view="view"
+                                                :show-share-sender="false" />
+                                </ul>
+                        </li>
+                </ul>
 	</NcAppNavigationItem>
 </template>
 
@@ -207,6 +220,7 @@ export default {
 	data() {
 		return {
 			isParentOfActiveView: false,
+					collapsedGroups: {},
 		}
 	},
 
@@ -224,7 +238,25 @@ export default {
 		hasViews() {
 			return this.getViews.length > 0
 		},
-	},
+                groupedViews() {
+                        const groups = {}
+                        const ungrouped = []
+                        this.getViews.forEach(view => {
+                                if (view.viewGroup) {
+                                        if (!groups[view.viewGroup]) {
+                                                groups[view.viewGroup] = []
+                                        }
+                                        groups[view.viewGroup].push(view)
+                                } else {
+                                        ungrouped.push(view)
+                                }
+                        })
+                        return { groups, ungrouped }
+                },
+                hasGroups() {
+                        return Object.keys(this.groupedViews.groups).length > 0
+                },
+        },
 	watch: {
 		activeView() {
 			if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
@@ -240,6 +272,9 @@ export default {
 	methods: {
 		...mapActions(useTablesStore, ['favoriteTable', 'removeFavoriteTable', 'updateTable']),
 		emit,
+                toggleGroup(groupName) {
+                        this.$set(this.collapsedGroups, groupName, !this.collapsedGroups[groupName])
+                },
 		deleteTable() {
 			emit('tables:table:delete', this.table)
 		},
@@ -342,5 +377,36 @@ export default {
 	.app-navigation-entry__counter-wrapper .counter-bubble__counter {
 		display: inline;
 	}
+}
+.view-group {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+}
+.view-group-header {
+        display: flex;
+        align-items: center;
+        padding: 8px 8px 8px 32px;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--color-text-maxcontrast);
+        &:hover {
+                background-color: var(--color-background-hover);
+        }
+}
+.view-group-icon {
+        width: 16px;
+        margin-right: 8px;
+        font-size: 10px;
+}
+.view-group-name {
+        flex: 1;
+}
+.view-group-count {
+        font-size: 12px;
+        color: var(--color-text-lighter);
+}
+.view-group-items {
+        padding-left: 16px;
 }
 </style>

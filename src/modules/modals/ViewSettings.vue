@@ -35,6 +35,16 @@
 					<TableDescription :description.sync="description" />
 				</div>
 			</div>
+                        <div class="row">
+                                <div class="col-4 space-T">
+                                        {{ t('tables', 'Group') }}
+                                </div>
+                                <div class="col-4">
+                                        <input v-model="viewGroup"
+                                                type="text"
+                                                :placeholder="t('tables', 'Group name (optional)')">
+                                </div>
+                        </div>
 		</NcAppSettingsSection>
 		<!--columns & order-->
 		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :name="t('tables', 'Columns')">
@@ -129,6 +139,7 @@ export default {
 			open: false,
 			title: '',
 			description: '',
+                        viewGroup: '',
 			icon: '',
 			errorTitle: false,
 			selectedColumns: [],
@@ -294,6 +305,7 @@ export default {
 				title: this.title,
 				description: this.description,
 				emoji: this.icon,
+                                viewGroup: this.viewGroup,
 			}
 			const res = await this.insertNewView({ data })
 			if (res) {
@@ -316,6 +328,7 @@ export default {
 					title: this.title,
 					description: this.description,
 					emoji: this.icon,
+                                        viewGroup: this.viewGroup,
 					columnSettings: JSON.stringify(newColumnSettings),
 				},
 			}
@@ -344,6 +357,7 @@ export default {
 			this.title = this.mutableView.title ?? ''
 			this.description = this.mutableView.description ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
+                        this.viewGroup = this.mutableView.viewGroup ?? ''
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
