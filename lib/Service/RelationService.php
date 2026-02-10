@@ -15,34 +15,18 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
-use Psr\Log\LoggerInterface;
 
 class RelationService {
-
-	private ColumnMapper $columnMapper;
-	private ViewMapper $viewMapper;
-	private Row2Mapper $row2Mapper;
-	private ColumnService $columnService;
-	private LoggerInterface $logger;
-	private ?string $userId;
-
 	/** @var array<string, array> Cache for relation data */
 	private array $cacheRelationData = [];
 
 	public function __construct(
-		ColumnMapper $columnMapper,
-		ViewMapper $viewMapper,
-		Row2Mapper $row2Mapper,
-		ColumnService $columnService,
-		LoggerInterface $logger,
-		?string $userId,
+		private ColumnMapper $columnMapper,
+		private ViewMapper $viewMapper,
+		private Row2Mapper $row2Mapper,
+		private ColumnService $columnService,
+		private ?string $userId,
 	) {
-		$this->columnMapper = $columnMapper;
-		$this->viewMapper = $viewMapper;
-		$this->row2Mapper = $row2Mapper;
-		$this->columnService = $columnService;
-		$this->logger = $logger;
-		$this->userId = $userId;
 	}
 
 	/**
@@ -171,16 +155,16 @@ class RelationService {
 		}
 
 		$settings = $column->getCustomSettingsArray();
-		if (empty($settings['relationType']) || empty($settings['targetId']) || empty($settings['labelColumn'])) {
+		if (empty($settings[Column::RELATION_TYPE]) || empty($settings[Column::RELATION_TARGET_ID]) || empty($settings[Column::RELATION_LABEL_COLUMN])) {
 			$this->cacheRelationData[$cacheKey] = [];
 			return [];
 		}
 
-		$isView = $settings['relationType'] === 'view';
-		$targetId = $settings['targetId'] ?? null;
+		$isView = $settings[Column::RELATION_TYPE] === 'view';
+		$targetId = $settings[Column::RELATION_TARGET_ID] ?? null;
 
 		try {
-			$targetColumn = $this->columnMapper->find($settings['labelColumn']);
+			$targetColumn = $this->columnMapper->find($settings[Column::RELATION_LABEL_COLUMN]);
 			if ($isView) {
 				$view = $this->viewMapper->find($targetId);
 				$rows = $this->row2Mapper->findAll(
@@ -212,7 +196,7 @@ class RelationService {
 		foreach ($rows as $row) {
 			$data = $row->getData();
 			$displayFieldData = array_filter($data, function ($item) use ($settings) {
-				return $item['columnId'] === (int)$settings['labelColumn'];
+				return $item['columnId'] === (int)$settings[Column::RELATION_LABEL_COLUMN];
 			});
 			$value = reset($displayFieldData)['value'] ?? null;
 

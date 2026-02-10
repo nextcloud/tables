@@ -8,6 +8,7 @@
 namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Service\RelationService;
 use Psr\Log\LoggerInterface;
 
@@ -72,5 +73,26 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		return false;
+	}
+
+	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
+		if ($value === null || $value === '') {
+			return;
+		}
+		// Validate that the value exists in the target table/view
+		$relationData = $this->relationService->getRelationData($column);
+
+		// Try to find value by label first
+		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
+		if (!empty($matchingRelation)) {
+			return;
+		}
+
+		// If not found by label, try to find by id
+		if (is_numeric($value) && isset($relationData[(int)$value])) {
+			return;
+		}
+
+		throw new BadRequestError('Relation value does not exist in the target table/view');
 	}
 }
