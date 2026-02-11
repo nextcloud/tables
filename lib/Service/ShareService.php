@@ -554,6 +554,46 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
+	 */
+	public function changeReceiverForNode(string $nodeType, int $nodeId, string $newOwnerUserId, string $userId, string $sender): void {
+		try {
+			$this->mapper->changeReceiverForNode($nodeType, $nodeId, $newOwnerUserId, $userId, $sender);
+		} catch (Exception $e) {
+			$this->logger->warning('Could not update share to change the receiver: ' . $e->getMessage(), ['exception' => $e]);
+			throw new InternalError('Could not update share to change the receiver');
+		}
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function transferSharesForContext(int $contextId, string $newOwnerId, string $oldOwnerId): void {
+		try {
+			$newOwnerShare = $this->mapper->findShareForNode($contextId, 'context', $newOwnerId, 'user');
+			$oldOwnerSelfShare = $this->mapper->findShareForNode($contextId, 'context', $oldOwnerId, 'user');
+
+			$this->changeSenderForNode('context', $contextId, $newOwnerId, $oldOwnerId);
+
+			if ($newOwnerShare) {
+				if ($oldOwnerSelfShare) {
+					$this->contextNavigationMapper->deleteByShareId($oldOwnerSelfShare->getId());
+					$this->mapper->delete($oldOwnerSelfShare);
+				}
+				return;
+			}
+
+			$this->changeReceiverForNode('context', $contextId, $newOwnerId, $oldOwnerId, $newOwnerId);
+			if ($oldOwnerSelfShare) {
+				$this->contextNavigationMapper->deleteByShareIdAndUserId($oldOwnerSelfShare->getId(), $oldOwnerId);
+			}
+		} catch (Exception $e) {
+			$this->logger->error('Failed to transfer shares for context: ' . $e->getMessage(), ['exception' => $e]);
+			throw new InternalError('Failed to transfer shares for context');
+		}
+	}
+
+	/**
+	 * @throws InternalError
 	 * @return string[]
 	 */
 	public function findSharedWithUserIds(int $elementId, string $elementType): array {
