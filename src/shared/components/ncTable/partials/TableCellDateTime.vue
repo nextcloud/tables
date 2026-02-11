@@ -119,30 +119,21 @@ export default {
 		},
 
 		initEditValue() {
-			if (this.value !== null && this.value !== 'none') {
-				const format = this.getDateFormat()
+			const isMissing = this.value === null || this.value === 'none' || this.value === ''
+			const isTimeType = this.column.type === 'datetime-time'
 
-				if (this.column.type === 'datetime-time') {
-					const timeMoment = Moment(this.value, format)
-					if (timeMoment.isValid()) {
-						this.editDateTimeValue = timeMoment.toDate()
-					} else {
-						this.editDateTimeValue = new Date()
-					}
-				} else {
-					const parsedMoment = Moment(this.value, format)
-					this.editDateTimeValue = parsedMoment.isValid() ? parsedMoment.toDate() : null
+			if (!isMissing) {
+				const m = Moment(this.value, this.getDateFormat())
+
+				if (m.isValid()) {
+					this.editDateTimeValue = m.toDate()
+					return // Successful parse, exit early
 				}
-			} else if ((this.value === null || this.value === '') && this.column.datetimeDefault) {
-				if (this.column.datetimeDefault === 'now' || this.column.datetimeDefault === 'today') {
-					this.editDateTimeValue = new Date()
-				} else {
-					this.editDateTimeValue = this.column.type === 'datetime-time' ? new Date() : null
-				}
-			} else {
-				// For time columns, have default Date object to prevent errors
-				this.editDateTimeValue = this.column.type === 'datetime-time' ? new Date() : null
 			}
+
+			// Fallback (missing or invalid values)
+			const isNowOrTodayDefault = this.column.datetimeDefault === 'now' || this.column.datetimeDefault === 'today'
+			this.editDateTimeValue = (isNowOrTodayDefault || isTimeType) ? new Date() : null
 		},
 
 		getDateFormat() {
