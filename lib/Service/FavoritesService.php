@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Service;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -113,6 +114,49 @@ class FavoritesService {
 		}
 
 		throw new PermissionError('Invalid node type and id');
+	}
+
+	/**
+	 * @param string|null $userId
+	 *
+	 * @return array<int, array<string, mixed>>
+	 *
+	 * @throws Exception
+	 */
+	// move this function when refactoring to a FavoriteMapper class
+	public function findAll(?string $userId = null): array {
+		$qb = $this->connection->getQueryBuilder();
+		$qb->select('*')
+			->from('tables_favorites')
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+
+		$result = $qb->executeQuery();
+		$rows = [];
+		while ($row = $result->fetch()) {
+			$rows[] = $row;
+		}
+		return $rows;
+	}
+
+	/**
+	 * @param int $nodeType
+	 * @param Table $table
+	 *
+	 * @throws InternalError
+	 * @throws Exception
+	 */
+	public function importFavorite(int $nodeType, Table $table): void {
+		$this->checkValidNodeType($nodeType);
+
+		$qb = $this->connection->getQueryBuilder();
+		$qb->insert('tables_favorites')
+			->values([
+				'user_id' => $qb->createNamedParameter($table->getOwnership()),
+				'node_type' => $qb->createNamedParameter($nodeType),
+				'node_id' => $qb->createNamedParameter($table->getId()),
+			]);
+		$qb->executeStatement();
+		$this->cache->set($nodeType . '_' . $table->getId(), true);
 	}
 
 }

@@ -12,6 +12,7 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -30,7 +31,9 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\IDBConnection;
 use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -54,6 +57,7 @@ class RowService extends SuperService {
 		private IEventDispatcher $eventDispatcher,
 		private ColumnsHelper $columnsHelper,
 		private ActivityManager $activityManager,
+		private IDBConnection $connection,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 
@@ -842,5 +846,34 @@ class RowService extends SuperService {
 		$columnBusiness = Server::get($businessClassName);
 
 		return $columnBusiness;
+	}
+
+	/**
+	 * @param Table $table
+	 * @param array $row
+	 *
+	 * @return int
+	 *
+	 * @throws InternalError
+	 */
+	public function importRow(Table $table, array $row): int {
+		$qb = $this->connection->getQueryBuilder();
+		try {
+			$qb->insert('tables_row_sleeves')
+				->values([
+					'table_id' => $qb->createNamedParameter($table->getId(), IQueryBuilder::PARAM_INT),
+					'created_by' => $qb->createNamedParameter($table->getOwnership()),
+					'created_at' => $qb->createNamedParameter($row['createdAt']),
+					'last_edit_by' => $qb->createNamedParameter($table->getOwnership()),
+					'last_edit_at' => $qb->createNamedParameter($row['lastEditAt']),
+				]);
+			$qb->executeStatement();
+			$id = $this->connection->lastInsertId('*PREFIX*tables_row_sleeves');
+
+			return $id;
+		} catch (\Exception $e) {
+			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
+			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
+		}
 	}
 }
