@@ -127,5 +127,17 @@ export default {
 				return false
 			}
 		},
+
+		getDateFormat(columnType) {
+			switch (columnType) {
+				case 'datetime-date':
+					return 'YYYY-MM-DD'
+				case 'datetime-time':
+					return 'HH:mm'
+				case 'datetime':
+				default:
+					return 'YYYY-MM-DD HH:mm'
+			}
+		},
 	},
 }
