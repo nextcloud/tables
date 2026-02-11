@@ -33,14 +33,22 @@ export default {
 			return type + 'Default'
 		},
 		isDatetimeValueValid(value, column) {
-			 const columnTypeDefault = this.getColumnTypeDefault(column)
+			const isMissing = value === null || value === '' || value === 'none';
 
-			if (!value || value === 'none') {
-				return !this.isMandatory(column) || (!!column[columnTypeDefault] && column[columnTypeDefault] !== 'none')
+			if (isMissing) {
+				const columnTypeDefault = this.getColumnTypeDefault(column)
+				const hasValidDefault = !!column[columnTypeDefault] && column[columnTypeDefault] !== 'none'
+
+				// If it's missing, it's valid ONLY if it's not mandatory 
+				// OR if there is a default value to catch it.
+				return !this.isMandatory(column) || hasValidDefault
 			}
+			
+			// Now we know we have actual input, so we validate the format
 			if (column.type === ColumnTypes.DatetimeTime) {
 				return Moment(value, 'HH:mm', true).isValid()
 			}
+			
 			return !isNaN(Date.parse(value))
 		},
 		isSelectionValueValid(value, column) {
