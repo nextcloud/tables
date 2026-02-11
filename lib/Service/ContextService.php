@@ -299,10 +299,20 @@ class ContextService {
 			throw new BadRequestError('User does not exist');
 		}
 
+		$oldOwnerId = $context->getOwnerId();
 		$context->setOwnerId($newOwnerId);
 		$context->setOwnerType($newOwnerType);
 
-		$context = $this->contextMapper->update($context);
+		try {
+			$context = $this->atomic(function () use ($context, $contextId, $newOwnerId, $oldOwnerId) {
+				$context = $this->contextMapper->update($context);
+				$this->shareService->transferSharesForContext($contextId, $newOwnerId, $oldOwnerId);
+				return $context;
+			}, $this->dbc);
+		} catch (\Exception $e) {
+			$this->logger->error('Failed to transfer context ownership: ' . $e->getMessage(), ['exception' => $e]);
+			throw new InternalError('Failed to transfer context ownership: ' . $e->getMessage());
+		}
 
 		$auditEvent = new CriticalActionPerformedEvent(
 			sprintf('Tables application with ID %d was transferred to user %s',

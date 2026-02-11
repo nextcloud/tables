@@ -26,9 +26,11 @@ use OCA\Tables\ResponseDefinitions;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception as OcpDbException;
 use OCP\Defaults;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -36,6 +38,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesTable from ResponseDefinitions
  */
 class TableService extends SuperService {
+	use TTransactional;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -52,6 +55,7 @@ class TableService extends SuperService {
 		protected IEventDispatcher $eventDispatcher,
 		private ContextService $contextService,
 		protected IAppManager $appManager,
+		private IDBConnection $dbc,
 		protected IL10N $l,
 		protected Defaults $themingDefaults,
 		private ActivityManager $activityManager,
@@ -341,20 +345,16 @@ class TableService extends SuperService {
 		}
 
 		$table->setOwnership($newOwnerUserId);
-		try {
-			$table = $this->mapper->update($table);
-		} catch (OcpDbException $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
 
-		// change owners of related shares
 		try {
-			$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
-		} catch (InternalError $e) {
-			$this->logger->error('Could not update related shares for a table transfer!');
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			$table = $this->atomic(function () use ($table, $id, $newOwnerUserId, $userId) {
+				$table = $this->mapper->update($table);
+				$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
+				return $table;
+			}, $this->dbc);
+		} catch (\Exception $e) {
+			$this->logger->error('Failed to transfer table ownership: ' . $e->getMessage(), ['exception' => $e]);
+			throw new InternalError('Failed to transfer table ownership: ' . $e->getMessage());
 		}
 
 		$event = new TableOwnershipTransferredEvent(
