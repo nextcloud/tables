@@ -93,7 +93,7 @@ jobs:
         with:
           cache: 'npm'
           cache-dependency-path: apps/${{ env.APP_NAME}}/package-lock.json
-          node-version-file: 'package.json'
+          node-version-file: 'apps/${{ env.APP_NAME }}/package.json'
 
       - name: Install dependencies & build app
         working-directory: apps/${{ env.APP_NAME }}
