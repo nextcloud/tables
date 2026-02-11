@@ -123,7 +123,7 @@ export default {
 			const isTimeType = this.column.type === 'datetime-time'
 
 			if (!isMissing) {
-				const m = Moment(this.value, this.getDateFormat())
+				const m = Moment(this.value, this.getDateFormat(this.column.type))
 
 				if (m.isValid()) {
 					this.editDateTimeValue = m.toDate()
@@ -134,17 +134,6 @@ export default {
 			// Fallback (missing or invalid values)
 			const isNowOrTodayDefault = this.column.datetimeDefault === 'now' || this.column.datetimeDefault === 'today'
 			this.editDateTimeValue = (isNowOrTodayDefault || isTimeType) ? new Date() : null
-		},
-
-		getDateFormat() {
-			switch (this.column.type) {
-			case 'datetime-date':
-				return 'YYYY-MM-DD'
-			case 'datetime-time':
-				return 'HH:mm'
-			default:
-				return 'YYYY-MM-DD HH:mm'
-			}
 		},
 
 		emptyValue() {
@@ -161,7 +150,7 @@ export default {
 			if (this.editDateTimeValue === null) {
 				newValue = 'none'
 			} else {
-				const format = this.getDateFormat()
+				const format = this.getDateFormat(this.column.type)
 				newValue = Moment(this.editDateTimeValue).format(format)
 			}
 
