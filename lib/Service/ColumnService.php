@@ -4,12 +4,15 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
+use InvalidArgumentException;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -32,6 +35,7 @@ class ColumnService extends SuperService {
 	private IL10N $l;
 
 	private UserHelper $userHelper;
+	private ColumnsHelper $columnsHelper;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -42,7 +46,8 @@ class ColumnService extends SuperService {
 		ViewService $viewService,
 		RowService $rowService,
 		IL10N $l,
-		UserHelper $userHelper
+		UserHelper $userHelper,
+		ColumnsHelper $columnsHelper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -51,6 +56,7 @@ class ColumnService extends SuperService {
 		$this->rowService = $rowService;
 		$this->l = $l;
 		$this->userHelper = $userHelper;
+		$this->columnsHelper = $columnsHelper;
 	}
 
 
@@ -172,7 +178,7 @@ class ColumnService extends SuperService {
 	 * @return Column
 	 *
 	 * @throws InternalError
-	 * @throws PermissionError|NotFoundError
+	 * @throws PermissionError|NotFoundError|BadRequestError
 	 */
 	public function create(
 		?string $userId,
@@ -241,7 +247,10 @@ class ColumnService extends SuperService {
 			throw new PermissionError('create column for the table id = '.$table->getId().' is not allowed.');
 		}
 
-		$time = new DateTime();
+		if (!$this->columnsHelper->isSupportedColumnType($type)) {
+			throw new InternalError('Unsupported column type');
+		}
+
 		$item = new Column();
 		$item->setTitle($title);
 		$item->setTableId($table->getId());
@@ -313,7 +322,7 @@ class ColumnService extends SuperService {
 	 * @param string|null $selectionDefault
 	 * @param string|null $datetimeDefault
 	 * @return Column
-	 * @throws InternalError
+	 * @throws InternalError|BadRequestError
 	 */
 	public function update(
 		int $columnId,
@@ -341,7 +350,6 @@ class ColumnService extends SuperService {
 		?string $datetimeDefault
 	):Column {
 		try {
-			/** @var Column $item */
 			$item = $this->mapper->find($columnId);
 
 			// security
@@ -355,7 +363,9 @@ class ColumnService extends SuperService {
 			if ($tableId !== null) {
 				$item->setTableId($tableId);
 			}
-			if ($type !== null) {
+			if ($type !== null
+				&& $this->columnsHelper->isSupportedColumnType($type)
+			) {
 				$item->setType($type);
 			}
 			if ($subtype !== null) {
@@ -388,6 +398,9 @@ class ColumnService extends SuperService {
 
 			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));
+		} catch (InvalidArgumentException $e) {
+			$this->logger->error($e->getMessage());
+			throw new BadRequestError($e->getMessage());
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());

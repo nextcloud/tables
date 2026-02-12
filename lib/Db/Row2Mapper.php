@@ -308,6 +308,9 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string $value): IQueryBuilder {
+		if (!$this->columnsHelper->isSupportedColumnType((string)$column->getType())) {
+			throw new InternalError('Column type is not supported');
+		}
 		$paramType = $this->getColumnDbParamType($column);
 		$value = $this->formatValue($column, $value, 'in');
 

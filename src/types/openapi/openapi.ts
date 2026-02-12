@@ -1389,6 +1389,14 @@ export type operations = {
           "application/json": components["schemas"]["Column"];
         };
       };
+      /** @description Invalid arguments */
+      400: {
+        content: {
+          "application/json": {
+            message: string;
+          };
+        };
+      };
       /** @description No permissions */
       403: {
         content: {
@@ -1501,6 +1509,14 @@ export type operations = {
       200: {
         content: {
           "application/json": components["schemas"]["Column"];
+        };
+      };
+      /** @description Invalid arguments */
+      400: {
+        content: {
+          "application/json": {
+            message: string;
+          };
         };
       };
       500: {

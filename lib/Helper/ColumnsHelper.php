@@ -10,4 +10,9 @@ class ColumnsHelper {
 		'datetime',
 		'selection'
 	];
+
+	public function isSupportedColumnType(string $type): bool {
+		return in_array($type, $this->columns, true);
+	}
+
 }
