@@ -48,7 +48,7 @@ Have a good time and manage whatever you want.
 		<database>pgsql</database>
 		<database>mysql</database>
 		<database>sqlite</database>
-		<nextcloud min-version="31" max-version="34"/>
+		<nextcloud min-version="33" max-version="34"/>
 	</dependencies>
 	<repair-steps>
 		<pre-migration>

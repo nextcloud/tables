@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-import { FileAction, registerFileAction } from '@nextcloud/files'
+import { registerFileAction } from '@nextcloud/files'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 // eslint-disable-next-line import/no-unresolved
 import tablesIcon from '@mdi/svg/svg/table-large.svg?raw'
@@ -16,7 +16,7 @@ const validMimeTypes = [
 	'application/vnd.ms-excel',
 ]
 
-const fileAction = new FileAction({
+registerFileAction({
 	id: 'import-to-tables',
 	displayName: () => t('tables', 'Import into Tables'),
 	iconSvgInline: () => tablesIcon,
@@ -38,5 +38,3 @@ const fileAction = new FileAction({
 		return null
 	},
 })
-
-registerFileAction(fileAction)
