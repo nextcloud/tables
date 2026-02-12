@@ -5,6 +5,19 @@
 
 # Changelog
 
+## 1.0.4
+
+### Fixed
+* [\[stable1.0\] fix: don't bother loop through an array to return an empty one (tables#2313)](https://github.com/nextcloud/tables/pull/2313)
+
+### Other
+* [\[stable1.0\] refactor\(Views\): turn some details into objects with early validation (tables#2310)](https://github.com/nextcloud/tables/pull/2310)
+
+
+### Dependencies
+* [Fix\(deps\): update dependency dompurify to ^3.3.1 \(stable1.0\) (tables#2265)](https://github.com/nextcloud/tables/pull/2265)
+* [Chore\(deps\): update dependency @rollup/rollup\-linux\-x64\-gnu to ^4.57.1 \(stable1.0\) (tables#2267)](https://github.com/nextcloud/tables/pull/2267)
+
 ## 1.0.3
 
 ### Added
