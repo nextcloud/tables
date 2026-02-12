@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.7
+
+### Fixed
+* [\[stable0.7\] fix\(Column\): only accept and work with supported columns (tables#2316)](https://github.com/nextcloud/tables/pull/2316)
+
 ## 0.7.6
 
 ### Fixed
