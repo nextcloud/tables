@@ -57,6 +57,7 @@ Have a good time and manage whatever you want.
 		<post-migration>
 			<step>OCA\Tables\Migration\NewDbStructureRepairStep</step>
 			<step>OCA\Tables\Migration\DbRowSleeveSequence</step>
+			<step>OCA\Tables\Migration\CacheSleeveCells</step>
 		</post-migration>
 	</repair-steps>
 	<commands>
