@@ -16,4 +16,8 @@ class ColumnsHelper {
 		'selection',
 		'usergroup'
 	];
+	public function isSupportedColumnType(string $type): bool {
+		return in_array($type, $this->columns, true);
+	}
+
 }

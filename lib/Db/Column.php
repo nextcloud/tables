@@ -7,11 +7,14 @@
 
 namespace OCA\Tables\Db;
 
+use InvalidArgumentException;
 use JsonSerializable;
 
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
+use OCP\Server;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -172,10 +175,13 @@ class Column extends Entity implements JsonSerializable {
 		], true);
 	}
 
+	/**
+	 * @throws InvalidArgumentException
+	 */
 	public static function fromDto(ColumnDto $data): self {
 		$column = new self();
 		$column->setTitle($data->getTitle());
-		$column->setType($data->getType());
+		$column->setType(self::getSupportedType($data));
 		$column->setSubtype($data->getSubtype() ?? '');
 		$column->setMandatory($data->isMandatory() ?? false);
 		$column->setDescription($data->getDescription() ?? '');
@@ -197,6 +203,18 @@ class Column extends Entity implements JsonSerializable {
 		$column->setUsergroupSelectGroups($data->getUsergroupSelectGroups());
 		$column->setShowUserStatus($data->getShowUserStatus());
 		return $column;
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	private static function getSupportedType(ColumnDto $data): string {
+		$columnsHelper = Server::get(ColumnsHelper::class);
+		$type = (string)$data->getType();
+		if ($columnsHelper->isSupportedColumnType($type)) {
+			return $type;
+		}
+		throw new InvalidArgumentException('Unsupported column type');
 	}
 
 	public function getUsergroupDefaultArray():array {
