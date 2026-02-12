@@ -20,10 +20,10 @@
 			<NcSelect v-model="editValues"
 				:tag-width="80"
 				:options="getAllNonDeletedOrSelectedOptions"
+				:clearable="!column.mandatory"
 				:multiple="true"
 				:aria-label-combobox="t('tables', 'Options')"
 				:disabled="localLoading || !canEditCell()"
-				:clearable="true"
 				style="width: 100%;" />
 			<div v-if="localLoading" class="loading-indicator">
 				<div class="icon-loading-small icon-loading-inline" />
