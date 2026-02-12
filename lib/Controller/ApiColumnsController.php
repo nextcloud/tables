@@ -29,7 +29,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesColumn from ResponseDefinitions
  */
-class ApiColumnsController extends ACommonColumnsController {
+class ApiColumnsController extends ACommonColumnsOCSController {
 
 
 	public function __construct(
