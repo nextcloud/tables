@@ -24,6 +24,10 @@ class ColumnsHelper {
 	) {
 	}
 
+	public function isSupportedColumnType(string $type): bool {
+		return in_array($type, $this->columns, true);
+	}
+
 	public function resolveSearchValue(string $placeholder, string $userId): string {
 		if (str_starts_with($placeholder, '@selection-id-')) {
 			return substr($placeholder, 14);

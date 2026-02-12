@@ -15,6 +15,7 @@ use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -827,9 +828,10 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: Column created
+	 * 400: Invalid arguments
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -914,6 +916,10 @@ class Api1Controller extends ApiController {
 			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		} catch (BadRequestError $e) {
+			$this->logger->info('An invalid request was attempted: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		}
 	}
 
@@ -944,9 +950,10 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: Updated column
+	 * 400: Invalid arguments
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
@@ -1017,6 +1024,10 @@ class Api1Controller extends ApiController {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		} catch (BadRequestError $e) {
+			$this->logger->info('An invalid request was attempted: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		}
 	}
 

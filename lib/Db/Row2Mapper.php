@@ -267,6 +267,9 @@ class Row2Mapper {
 
 			// if is normal column
 			if ($sortData['columnId'] >= 0) {
+				if (!$this->columnsHelper->isSupportedColumnType((string)$column->getType())) {
+					continue;
+				}
 				$valueTable = 'tables_row_cells_' . $column->getType();
 				$alias = 'sort' . $i;
 				$qb->leftJoin($sleevesAlias, $valueTable, $alias,
@@ -367,6 +370,9 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string $value): IQueryBuilder {
+		if (!$this->columnsHelper->isSupportedColumnType((string)$column->getType())) {
+			throw new InternalError('Column type is not supported');
+		}
 		$paramType = $this->getColumnDbParamType($column);
 		$value = $this->getCellMapper($column)->filterValueToQueryParam($column, $value);
 
