@@ -9,9 +9,11 @@ namespace OCA\Tables\Db;
 
 use JsonSerializable;
 
+use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use ValueError;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -34,7 +36,6 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setLastEditByDisplayName(string $displayName)
  * @method getLastEditAt(): string
  * @method setLastEditAt(string $lastEditAt)
- * @method getType(): string
  * @method setType(string $type)
  * @method getSubtype(): string
  * @method setSubtype(string $subtype)
@@ -58,6 +59,7 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setTextDefault(?string $textDefault)
  * @method getTextAllowedPattern(): string
  * @method setTextAllowedPattern(?string $textAllowedPattern)
+ * @method getTextAllowedPattern(): ?string
  * @method getTextMaxLength(): int
  * @method setTextMaxLength(?int $textMaxLength)
  * @method getTextUnique(): bool
@@ -66,6 +68,7 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method getSelectionDefault(): string
  * @method setSelectionOptions(?string $selectionOptionsArray)
  * @method setSelectionDefault(?string $selectionDefault)
+ * @method getSelectionDefault(): ?string
  * @method getDatetimeDefault(): string
  * @method setDatetimeDefault(?string $datetimeDefault)
  * @method getUsergroupDefault(): string
@@ -307,5 +310,12 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public function getCustomSettingsArray(): array {
 		return json_decode($this->customSettings, true) ?: [];
+	}
+
+	/**
+	 * @throws ValueError
+	 */
+	public function getType(): string {
+		return ColumnType::from($this->type)->value;
 	}
 }

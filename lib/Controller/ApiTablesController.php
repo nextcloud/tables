@@ -14,6 +14,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\TableService;
@@ -182,18 +183,19 @@ class ApiTablesController extends AOCSController {
 					$this->userId,
 				);
 
+				$inputColumnsArray = [];
 				if (isset($view['columnSettings'])) {
 					$newColumns = array_map(static function (array $column) use ($colMap): array {
 						$colId = $column['columnId'];
 						$column['columnId'] = $colId > 0 ? $colMap[$colId] : $colId;
 						return $column;
 					}, $view['columnSettings']);
-					$columnModeKey = 'columnSettings';
+					$inputColumnsArray['columnSettings'] = $newColumns;
 				} else {
 					$newColumns = array_map(static function (int $colId) use ($colMap): int {
 						return $colId > 0 ? $colMap[$colId] : $colId;
 					}, $view['columns']);
-					$columnModeKey = 'columns';
+					$inputColumnsArray['columns'] = $newColumns;
 				}
 
 				$newSort = array_map(static function (array $sort) use ($colMap): array {
@@ -212,11 +214,12 @@ class ApiTablesController extends AOCSController {
 					}, $filters);
 				}, $view['filter']);
 
-				$this->viewService->update($newView->getId(), [
-					$columnModeKey => json_encode($newColumns),
-					'sort' => json_encode($newSort),
-					'filter' => json_encode($newFilter),
-				]);
+				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray(
+					array_merge($inputColumnsArray, [
+						'sort' => $newSort,
+						'filter' => $newFilter,
+					])
+				));
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
