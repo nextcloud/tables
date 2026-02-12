@@ -14,6 +14,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Controller;
@@ -87,7 +88,8 @@ class ViewController extends Controller {
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function update(int $id, array $data): DataResponse {
 		return $this->handleError(function () use ($id, $data) {
-			return $this->service->update($id, $data, $this->userId);
+			$inputData = ViewUpdateInput::fromInputArray($data);
+			return $this->service->update($id, $inputData, $this->userId);
 		});
 	}
 
