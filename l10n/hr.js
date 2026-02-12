@@ -85,6 +85,7 @@ OC.L10N.register(
     "Filter" : "Filtar",
     "Sort" : "Razvrstaj",
     "Export" : "Izvoz",
+    "Remove from favorites" : "Ukloni iz omiljenih",
     "Copy" : "Kopirajte",
     "Favorites" : "Favoriti",
     "Clear filter" : "Ukloni filtar",
