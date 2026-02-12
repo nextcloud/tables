@@ -5,6 +5,24 @@
 
 # Changelog
 
+## 2.0.0-beta.2
+
+### Features
+* [\#1424: Add Tables to user\_migration (tables#2292)](https://github.com/nextcloud/tables/pull/2292)
+
+### Fixed
+* [Fix: Listing contexts without user\-id (tables#2260)](https://github.com/nextcloud/tables/pull/2260)
+* [Fix: don't bother loop through an array to return an empty one (tables#2312)](https://github.com/nextcloud/tables/pull/2312)
+
+### Other
+* [Chore: Update max server version (tables#2291)](https://github.com/nextcloud/tables/pull/2291)
+* [Refactor\(Views\): turn some details into objects with early validation (tables#2309)](https://github.com/nextcloud/tables/pull/2309)
+
+
+### Dependencies
+* [\[main\] Fix npm audit (tables#2226)](https://github.com/nextcloud/tables/pull/2226)
+* [Fix\(deps\): update dependency @nextcloud/dialogs to ^7.2.0 \(main\) (tables#2261)](https://github.com/nextcloud/tables/pull/2261)
+
 ## 2.0.0-beta.1
 
 ### Added
