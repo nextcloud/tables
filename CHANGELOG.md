@@ -5,6 +5,16 @@
 
 # Changelog
 
+## 0.9.8
+
+### Fixed
+* [\[stable0.9\] fix\(Column\): only accept and work with supported columns (tables#2311)](https://github.com/nextcloud/tables/pull/2311)
+
+### Dependencies
+* [Fix\(deps\): update dependency @nextcloud/files to ^3.12.2 \(stable0.9\) (tables#2221)](https://github.com/nextcloud/tables/pull/2221)
+* [Fix\(deps\): update dependency @nextcloud/vue to ^8.35.0 \(stable0.9\) (tables#2222)](https://github.com/nextcloud/tables/pull/2222)
+* [Fix\(deps\): update tiptap to ^3.13.0 \(stable0.9\) (tables#2223)](https://github.com/nextcloud/tables/pull/2223)
+
 ## 0.9.7
 
 ### Dependencies
