@@ -400,31 +400,27 @@ class ViewService extends SuperService {
 
 		// Remove detailed view filtering and sorting information if necessary
 		if ($view->getIsShared() && !$view->getOnSharePermissions()->manageTable) {
-			$rawFilterArray = $view->getFilterArray();
-			if ($rawFilterArray) {
-				$view->setFilterArray(
-					array_map(static function ($filterGroup) {
-						// Instead of filter just indicate that there is a filter, but hide details
-						return array_map(null, $filterGroup);
-					},
-						$rawFilterArray));
-			}
+			$view->setFilterArray([]);
+
 			$rawSortArray = $view->getSortArray();
 			if ($rawSortArray) {
 				$view->setSortArray(
-					array_map(static function (array $sortRule) use ($view): array {
-						if (isset($sortRule['columnId'])
-							&& (
-								Column::isValidMetaTypeId($sortRule['columnId'])
-								|| in_array($sortRule['columnId'], $view->getColumnIds(), true)
-							)
-						) {
-							return $sortRule;
-						}
-						// Instead of sort rule just indicate that there is a rule, but hide details
-						return [];
-					},
-						$rawSortArray));
+					array_map(
+						static function (array $sortRule) use ($view): array {
+							if (isset($sortRule['columnId'])
+								&& (
+									Column::isValidMetaTypeId($sortRule['columnId'])
+									|| in_array($sortRule['columnId'], $view->getColumnIds(), true)
+								)
+							) {
+								return $sortRule;
+							}
+							// Instead of sort rule just indicate that there is a rule, but hide details
+							return [];
+						},
+						$rawSortArray
+					)
+				);
 			}
 		}
 
