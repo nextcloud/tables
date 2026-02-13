@@ -100,14 +100,25 @@ class ShareMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function findAllSharesFor(string $nodeType, array $receivers, string $userId, ?string $receiverType = 'user'): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->in('receiver', $qb->createNamedParameter($receivers, IQueryBuilder::PARAM_STR_ARRAY)))
-			->andWhere($qb->expr()->neq('sender', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
-			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
-			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)));
-		return $this->findEntities($qb);
+		if (!$receivers) {
+			return [];
+		}
+
+		$chunks = [];
+		// deduct extra parameters (sender, node type, receiver type)
+		foreach (array_chunk($receivers, 1000 - 3) as $receiversChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->where($qb->expr()->in('receiver', $qb->createNamedParameter($receiversChunk, IQueryBuilder::PARAM_STR_ARRAY)))
+				->andWhere($qb->expr()->neq('sender', $qb->createNamedParameter($userId)))
+				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType)))
+				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType)));
+
+			$chunks[] = $this->findEntities($qb);
+		}
+
+		return array_merge(...$chunks);
 	}
 
 	/**

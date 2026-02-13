@@ -70,16 +70,18 @@ class TableMapper extends QBMapper {
 			return $result;
 		}
 
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->in('id', $qb->createNamedParameter(array_keys($missing), IQueryBuilder::PARAM_INT_ARRAY)));
+		$missing = array_keys($missing);
+		foreach (array_chunk($missing, 1000) as $missingChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->where($qb->expr()->in('id', $qb->createNamedParameter($missingChunk, IQueryBuilder::PARAM_INT_ARRAY)));
 
-		$entities = $this->findEntities($qb);
-		foreach ($entities as $entity) {
-			$id = $entity->getId();
-			$this->cache[(string)$id] = $entity;
-			$result[$id] = $entity;
+			foreach ($this->findEntities($qb) as $entity) {
+				$id = $entity->getId();
+				$this->cache[(string)$id] = $entity;
+				$result[$id] = $entity;
+			}
 		}
 		return $result;
 	}
