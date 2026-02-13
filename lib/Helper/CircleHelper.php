@@ -11,7 +11,6 @@ use OCA\Circles\CirclesManager;
 use OCA\Circles\Model\Circle;
 use OCA\Circles\Model\Member;
 use OCA\Circles\Model\Probes\CircleProbe;
-use OCA\Tables\Errors\InternalError;
 use OCP\App\IAppManager;
 use OCP\IL10N;
 use OCP\Server;
@@ -77,7 +76,6 @@ class CircleHelper {
 	/**
 	 * @param string $userId
 	 * @return Circle[]
-	 * @throws InternalError
 	 */
 	public function getUserCircles(string $userId): array {
 		if (!$this->circlesEnabled) {

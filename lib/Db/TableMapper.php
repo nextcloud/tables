@@ -19,6 +19,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Table> */
 class TableMapper extends QBMapper {
+	use BulkFetchTrait;
+
 	protected string $table = 'tables_tables';
 	protected CappedMemoryCache $cache;
 	public function __construct(
@@ -70,16 +72,18 @@ class TableMapper extends QBMapper {
 			return $result;
 		}
 
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->in('id', $qb->createNamedParameter(array_keys($missing), IQueryBuilder::PARAM_INT_ARRAY)));
+		$missing = array_keys($missing);
+		foreach (array_chunk($missing, $this->getChunkSize()) as $missingChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->where($qb->expr()->in('id', $qb->createNamedParameter($missingChunk, IQueryBuilder::PARAM_INT_ARRAY)));
 
-		$entities = $this->findEntities($qb);
-		foreach ($entities as $entity) {
-			$id = $entity->getId();
-			$this->cache[(string)$id] = $entity;
-			$result[$id] = $entity;
+			foreach ($this->findEntities($qb) as $entity) {
+				$id = $entity->getId();
+				$this->cache[(string)$id] = $entity;
+				$result[$id] = $entity;
+			}
 		}
 		return $result;
 	}

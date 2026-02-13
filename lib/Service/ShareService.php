@@ -570,7 +570,6 @@ class ShareService extends SuperService {
 		}
 	}
 
-
 	/**
 	 * @param int $nodeId
 	 * @param array $share
@@ -624,4 +623,5 @@ class ShareService extends SuperService {
 			$this->logger->error('Failed to import share: ' . $e->getMessage(), ['exception' => $e, 'share' => $share]);
 		}
 	}
+
 }
