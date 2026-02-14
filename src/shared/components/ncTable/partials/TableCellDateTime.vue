@@ -3,27 +3,42 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-datetime" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
-		<div v-if="!isEditing" class="non-edit-mode" role="button" aria-label="Edit date/time"
+	<div class="cell-datetime" :style="cellStyle">
+		<!-- View Mode -->
+		<div v-if="!isEditing"
+			class="non-edit-mode"
+			role="button"
 			tabindex="0"
+			aria-label="Edit date/time"
 			@click="handleStartEditing">
+			@keydown.enter="handleStartEditing"
+			@keydown.space.prevent="handleStartEditing"
 			{{ getValue }}
 		</div>
+		<!-- Edit Mode -->
 		<div v-else
 			ref="editingContainer"
 			class="inline-editing-container"
-			tabindex="0"
 			role="group"
 			aria-label="Edit date/time"
-			@keydown.enter="saveChanges"
+			tabindex="0"
+			@keydown.enter="commitEditValue"
 			@keydown.escape="cancelEdit">
 			<div class="datetime-picker-container" :class="{ 'is-loading': localLoading }">
-				<NcDateTimePickerNative
-					v-model="editDateTimeValue"
+				<NcDateTimePickerNative v-model="editDateTimeValue"
 					:type="getPickerType"
-					:disabled="localLoading || !canEditCell()" />
-				<div v-if="canBeCleared" class="icon-close make-empty" role="button"
-					:aria-label="t('tables', 'Clear value')" @click="emptyValue" />
+					:disabled="localLoading || !canEditCell()" 
+				/>
+				<!-- Clear button -->
+				<div v-if="canBeCleared"
+					class="icon-close make-empty"
+					role="button"
+					tabindex="0"
+					:aria-label="t('tables', 'Clear value')"
+					@click="clearPickerEditValue"
+					@keydown.enter="clearPickerEditValue"
+					@keydown.space.prevent="clearPickerEditValue"
+				/>
 			</div>
 			<div v-if="localLoading" class="loading-indicator">
 				<div class="icon-loading-small icon-loading-inline" />
@@ -71,6 +86,11 @@ export default {
 	},
 
 	computed: {
+		cellstyle() {
+			return {
+				opacity: !this.canEditCell() ? 0.6 : 1,
+			}
+		},
 		getValue() {
 			if (!this.value || this.value === 'none' || this.value === 'today' || this.value === 'now') {
 				return ''
@@ -97,7 +117,7 @@ export default {
 	watch: {
 		isEditing(newValue) {
 			if (newValue) {
-				this.initEditValue()
+				this.initializePickerValue()
 				this.$nextTick(() => {
 					document.addEventListener('click', this.handleClickOutside)
 				})
@@ -118,49 +138,70 @@ export default {
 			event.stopPropagation()
 		},
 
-		initEditValue() {
-			if (this.value !== null && this.value !== 'none') {
-				const format = this.getDateFormat()
+		/*
+		When editing a cell we have the following possible scenarios:
+		1) No value (null, 'none', or '') [never set or explicitly empty; we don't really care in this context I don't think?]
+		2) Pre-existing value
 
+		For "no value" we then have two scenarios:
+		- column default to use (if null or ''; not if expplicitly 'none')
+		- no column default
+
+		For pre-existing value we have just one scenario:
+		- parse for validity
+		*/
+		/**
+		 * - Sets default values if applicable: When the cell is empty (null or '') and the column has a default setting
+		 * - Handles empty/unset Values: When no value exists and the column has no default configured
+		 * - Parses existing values: Converts stored datetime strings ('YYYY-MM-DD HH:mm') back into JavaScript Date objects
+		 */
+		setInitialPickerEditValue() {
+			// null = never set (mandatory or pre-storage/pre-normalized)
+			// 'none' = intentionally empty (normalized)
+			// '' = intentionally empty (pre-storage/pre-normalized)
+			const isEmptyorUnset = !this.value || this.value === 'none'
+
+			// handle existing cell value (i.e. we need to parse it)
+			if (!isEmptyOrUnset) {
+				const inputFormat = this.getDateFormat()
+				const outputFormat = this.getLocaleDateFormat()
+				const parsedMoment = Moment(this.value, inputFormat).format(outputFormat) // storage->locale
+					
 				if (this.column.type === 'datetime-time') {
-					const timeMoment = Moment(this.value, format)
-					if (timeMoment.isValid()) {
-						this.editDateTimeValue = timeMoment.toDate()
-					} else {
-						this.editDateTimeValue = new Date()
-					}
+					this.editDateTimeValue = parsedMoment.isValid()
+						? parsedMoment.toDate()
+						: new Date() // default Date object to prevent errors
 				} else {
-					const parsedMoment = Moment(this.value, format)
-					this.editDateTimeValue = parsedMoment.isValid() ? parsedMoment.toDate() : null
+					this.editDateTimeValue = parsedMoment.isValid()
+						? parsedMoment.toDate()
+						: null
 				}
-			} else if ((this.value === null || this.value === '') && this.column.datetimeDefault) {
+				return
+			}
+
+			// handle explicitly cleared or unset cell that has a default (via column settings)
+			if ((this.value === null || this.value === '') && this.column.datetimeDefault) {
 				if (this.column.datetimeDefault === 'now' || this.column.datetimeDefault === 'today') {
 					this.editDateTimeValue = new Date()
 				} else {
-					this.editDateTimeValue = this.column.type === 'datetime-time' ? new Date() : null
+					this.editDateTimeValue = this.column.type === 'datetime-time'
+						? new Date() // default Date object to prevent errors
+						: null
 				}
-			} else {
-				// For time columns, have default Date object to prevent errors
-				this.editDateTimeValue = this.column.type === 'datetime-time' ? new Date() : null
+				return
 			}
+			
+			// handle unset cell that does not have a default 			
+			this.editDateTimeValue = this.column.type === 'datetime-time'
+				? new Date() // default Date object to prevent errors
+				: null
 		},
 
-		getDateFormat() {
-			switch (this.column.type) {
-			case 'datetime-date':
-				return 'YYYY-MM-DD'
-			case 'datetime-time':
-				return 'HH:mm'
-			default:
-				return 'YYYY-MM-DD HH:mm'
-			}
-		},
-
-		emptyValue() {
+		clearPickerEditValue() {
 			this.editDateTimeValue = null
 		},
 
-		async saveChanges() {
+		async commitEditValue() {
 			if (this.localLoading) {
 				return
 			}
@@ -170,8 +211,9 @@ export default {
 			if (this.editDateTimeValue === null) {
 				newValue = 'none'
 			} else {
-				const format = this.getDateFormat()
-				newValue = Moment(this.editDateTimeValue).format(format)
+				const inputFormat = this.getLocaleDateFormat()
+				const outputFormat = this.getDateFormat()
+				newValue = Moment(this.editDateTimeValue, inputFormat).format(outputFormat) // opposite of edit mode above (locale->storage)
 			}
 
 			if (newValue === this.value) {
@@ -197,7 +239,30 @@ export default {
 			}
 
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
-				this.saveChanges()
+				this.commitEditValue()
+			}
+		},
+
+		getDateFormat() {
+			switch (this.column.type) {
+			case 'datetime-date':
+				return 'YYYY-MM-DD'
+			case 'datetime-time':
+				return 'HH:mm'
+			default:
+				return 'YYYY-MM-DD HH:mm'
+			}
+		},
+
+		// Moment specific
+		getLocaleDateFormat() {
+			switch (this.column.type) {
+			case 'datetime-date':
+				return 'll'
+			case 'datetime-time':
+				return 'LT'
+			default:
+				return 'lll'
 			}
 		},
 	},
