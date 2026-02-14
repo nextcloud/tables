@@ -430,7 +430,7 @@ OC.L10N.register(
     "Share link" : "Ligazón de compartición",
     "View only" : "Só ver",
     "Copy public share link" : "Copiar a ligazón pública para compartir",
-    "Delete link" : "Eliminar ligazón",
+    "Delete link" : "Eliminar a ligazón",
     "Public links" : "Ligazóns públicas",
     "No view in context" : "Non hai ningunha vista no contexto",
     "From {ownerName}" : "De {ownerName}",
