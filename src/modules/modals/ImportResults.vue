@@ -76,6 +76,7 @@ export default {
 					matching_columns_count: 0,
 					created_columns_count: 0,
 					inserted_rows_count: 0,
+					updated_rows_count: 0,
 					errors_parsing_count: 0,
 					errors_count: 0,
 				}
