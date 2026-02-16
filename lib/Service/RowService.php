@@ -462,6 +462,10 @@ class RowService extends SuperService {
 			// Check whether the column of which the value should change is part of the table / view
 			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
 			if ($column) {
+				if (ColumnType::PEOPLE->value === $column->getType()) {
+					$circleId = $entry['value'][0]['id'];
+					$this->circleService->getCircle($circleId);
+				}
 				$item->insertOrUpdateCell($entry);
 			} else {
 				$this->logger->warning('Column to update row not found, will continue and ignore this.');
