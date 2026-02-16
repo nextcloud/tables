@@ -9,12 +9,14 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
+use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -194,6 +196,9 @@ class ColumnService extends SuperService {
 		ColumnDto $columnDto,
 		array $selectedViewIds = [],
 	):Column {
+		if (!in_array($columnDto->getType(), ColumnType::cases())) {
+			throw new BadRequestError('Column type ' . $columnDto->getType() . ' does not exist.');
+		}
 		// security
 		if ($viewId) {
 			try {
