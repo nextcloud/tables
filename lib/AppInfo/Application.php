@@ -36,11 +36,11 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
-use OCP\AppFramework\IAppContainer;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\DB\Events\AddMissingIndicesEvent;
 use OCP\User\Events\BeforeUserDeletedEvent;
+use Psr\Container\ContainerInterface;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'tables';
@@ -73,7 +73,7 @@ class Application extends App implements IBootstrap {
 			throw new Exception('Cannot include autoload. Did you run install dependencies using composer?');
 		}
 
-		$context->registerService(AuditLogServiceInterface::class, fn (IAppContainer $c) => $c->query(DefaultAuditLogService::class));
+		$context->registerService(AuditLogServiceInterface::class, fn (ContainerInterface $c) => $c->get(DefaultAuditLogService::class));
 
 		$context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
