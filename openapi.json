@@ -10303,7 +10303,8 @@
                         "description": "The share token",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "pattern": "^[a-zA-Z0-9]{16}$"
                         }
                     },
                     {

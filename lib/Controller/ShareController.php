@@ -42,7 +42,8 @@ class ShareController extends Controller {
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAll('table', $tableId);
+			$shares = $this->service->findAll('table', $tableId);
+			return array_map([$this->service, 'formatForOutput'], $shares);
 		});
 	}
 
@@ -50,14 +51,15 @@ class ShareController extends Controller {
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
-			return $this->service->findAll('view', $viewId);
+			$shares = $this->service->findAll('view', $viewId);
+			return array_map([$this->service, 'formatForOutput'], $shares);
 		});
 	}
 
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->find($id);
+			return $this->service->formatForOutput($this->service->find($id));
 		});
 	}
 

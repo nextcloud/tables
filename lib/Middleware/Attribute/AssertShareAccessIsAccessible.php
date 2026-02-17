@@ -11,6 +11,6 @@ namespace OCA\Tables\Middleware\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class AssertShareToken {
+class AssertShareAccessIsAccessible {
 
 }
