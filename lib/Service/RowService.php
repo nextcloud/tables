@@ -224,6 +224,16 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
+		$columnsById = [];
+		foreach ($columns as $column) {
+			$columnsById[$column->getId()] = $column;
+		}
+
+		foreach ($data as $entry) {
+			$column = $columnsById[$entry['columnId']];
+			$this->validateColumnValueLimits($column, $entry['value']);
+		}
+
 		$tableId = $tableId ?? $view->getTableId();
 
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
@@ -636,6 +646,7 @@ class RowService extends SuperService {
 			// Check whether the column of which the value should change is part of the table / view
 			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
 			if ($column) {
+				$this->validateColumnValueLimits($column, $entry['value']);
 				$item->insertOrUpdateCell($entry);
 			} else {
 				$this->logger->warning('Column to update row not found, will continue and ignore this.');
@@ -863,6 +874,29 @@ class RowService extends SuperService {
 		} catch (\Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * validate column value constraints (textMaxLength, numberMin, numberMax).
+	 *
+	 * @param Column $column
+	 * @param mixed $value
+	 *
+	 * @throws BadRequestError
+	 */
+	private function validateColumnValueLimits(Column $column, $value): void {
+		$textMaxLength = $column->getTextMaxLength();
+		if ($textMaxLength !== null && is_string($value) && strlen($value) > $textMaxLength) {
+			throw new BadRequestError('Value for column ' . $column->getTitle() . ' exceeds maximum length of ' . $textMaxLength);
+		}
+		$numberMin = $column->getNumberMin();
+		if ($numberMin !== null && is_numeric($value) && $value < $numberMin) {
+			throw new BadRequestError('Value for column ' . $column->getTitle() . ' is less than minimum allowed value of ' . $numberMin);
+		}
+		$numberMax = $column->getNumberMax();
+		if ($numberMax !== null && is_numeric($value) && $value > $numberMax) {
+			throw new BadRequestError('Value for column ' . $column->getTitle() . ' exceeds maximum allowed value of ' . $numberMax);
 		}
 	}
 }
