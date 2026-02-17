@@ -208,6 +208,16 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
+		$columnsById = [];
+		foreach ($columns as $column) {
+			$columnsById[$column->getId()] = $column;
+		}
+
+		foreach ($data as $entry) {
+			$column = $columnsById[$entry['columnId']];
+			$this->validateColumnValueLimits($column, $entry['value']);
+		}
+
 		$tableId = $tableId ?? $view->getTableId();
 
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
@@ -618,6 +628,7 @@ class RowService extends SuperService {
 			// Check whether the column of which the value should change is part of the table / view
 			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
 			if ($column) {
+				$this->validateColumnValueLimits($column, $entry['value']);
 				$item->insertOrUpdateCell($entry);
 			} else {
 				$this->logger->warning('Column to update row not found, will continue and ignore this.');
