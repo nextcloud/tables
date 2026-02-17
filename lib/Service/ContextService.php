@@ -5,6 +5,7 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+
 namespace OCA\Tables\Service;
 
 use InvalidArgumentException;
@@ -238,6 +239,56 @@ class ContextService {
 				$currentPages[$updatedContent->getPageId()]['content'][$updatedContent->getId()] = $updatedContent->jsonSerialize();
 			}
 			unset($nodesBeingAdded);
+
+			// Update order of nodes
+			$startPageId = null;
+			foreach ($currentPages as $page) {
+				if ($page['page_type'] === Page::TYPE_STARTPAGE) {
+					$startPageId = $page['id'];
+					break;
+				}
+			}
+
+			if ($startPageId !== null && isset($currentPages[$startPageId]['content'])) {
+				$nodeTypeIdToRelId = [];
+				foreach ($currentNodes as $relId => $nodeData) {
+					$key = sprintf('t%di%d', $nodeData['node_type'], $nodeData['node_id']);
+					$nodeTypeIdToRelId[$key] = $relId;
+				}
+
+				$relIdToContentId = [];
+				foreach ($currentPages[$startPageId]['content'] as $contentId => $content) {
+					$relIdToContentId[$content['node_rel_id']] = $contentId;
+				}
+
+				$contentsToUpdate = [];
+				foreach ($nodes as $index => $node) {
+					$key = sprintf('t%di%d', $node['type'], $node['id']);
+					if (isset($nodeTypeIdToRelId[$key])) {
+						$relId = $nodeTypeIdToRelId[$key];
+						if (isset($relIdToContentId[$relId])) {
+							$contentId = $relIdToContentId[$relId];
+							$newOrder = ($index + 1) * 10;
+
+							// Optimistic check: if order is already correct in memory, we might skip?
+							// However, simpler to just add to update list, updateContentOrder should handle exceptions.
+							// But to avoid DB writes if nothing changed:
+							if ($currentPages[$startPageId]['content'][$contentId]['order'] !== $newOrder) {
+								$contentsToUpdate[] = [
+									'id' => $contentId,
+									'order' => $newOrder
+								];
+								$currentPages[$startPageId]['content'][$contentId]['order'] = $newOrder;
+								$hasUpdatedNodeInformation = true;
+							}
+						}
+					}
+				}
+
+				if (!empty($contentsToUpdate)) {
+					$this->updateContentOrder($startPageId, $contentsToUpdate);
+				}
+			}
 		}
 
 		$context = $this->contextMapper->update($context);
@@ -306,8 +357,10 @@ class ContextService {
 		$context = $this->contextMapper->update($context);
 
 		$auditEvent = new CriticalActionPerformedEvent(
-			sprintf('Tables application with ID %d was transferred to user %s',
-				$contextId, $newOwnerId,
+			sprintf(
+				'Tables application with ID %d was transferred to user %s',
+				$contextId,
+				$newOwnerId,
 			)
 		);
 
