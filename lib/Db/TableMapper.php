@@ -19,6 +19,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Table> */
 class TableMapper extends QBMapper {
+	use BulkFetchTrait;
+
 	protected string $table = 'tables_tables';
 	protected CappedMemoryCache $cache;
 	public function __construct(
@@ -48,6 +50,42 @@ class TableMapper extends QBMapper {
 			$this->cache[$cacheKey] = $entity;
 		}
 		return $this->cache[$cacheKey];
+	}
+
+	/**
+	 * @param int[] $ids
+	 * @return array<int, Table> indexed by table id
+	 */
+	public function findMany(array $ids): array {
+		$missing = [];
+		$result = [];
+		foreach ($ids as $id) {
+			$cacheKey = (string)$id;
+			if (isset($this->cache[$cacheKey])) {
+				$result[$id] = $this->cache[$cacheKey];
+			} else {
+				$missing[$id] = true;
+			}
+		}
+
+		if (!$missing) {
+			return $result;
+		}
+
+		$missing = array_keys($missing);
+		foreach (array_chunk($missing, $this->getChunkSize()) as $missingChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->where($qb->expr()->in('id', $qb->createNamedParameter($missingChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+
+			foreach ($this->findEntities($qb) as $entity) {
+				$id = $entity->getId();
+				$this->cache[(string)$id] = $entity;
+				$result[$id] = $entity;
+			}
+		}
+		return $result;
 	}
 
 	/**

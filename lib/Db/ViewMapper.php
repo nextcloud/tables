@@ -19,6 +19,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<View> */
 class ViewMapper extends QBMapper {
+	use BulkFetchTrait;
+
 	protected string $table = 'tables_views';
 
 	protected CappedMemoryCache $cache;
@@ -48,6 +50,43 @@ class ViewMapper extends QBMapper {
 			$this->cache[$cacheKey] = $entity;
 		}
 		return $this->cache[$cacheKey];
+	}
+
+	/**
+	 * @param int[] $ids
+	 * @return array<int, View> indexed by view id
+	 */
+	public function findMany(array $ids): array {
+		$missing = [];
+		$result = [];
+		foreach ($ids as $id) {
+			$cacheKey = (string)$id;
+			if (isset($this->cache[$cacheKey])) {
+				$result[$id] = $this->cache[$cacheKey];
+			} else {
+				$missing[$id] = true;
+			}
+		}
+
+		if (!$missing) {
+			return $result;
+		}
+
+		$missing = array_keys($missing);
+		foreach (array_chunk($missing, $this->getChunkSize()) as $missingChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('v.*', 't.ownership')
+				->from($this->table, 'v')
+				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+				->where($qb->expr()->in('v.id', $qb->createNamedParameter($missingChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+
+			foreach ($this->findEntities($qb) as $entity) {
+				$id = $entity->getId();
+				$this->cache[(string)$id] = $entity;
+				$result[$id] = $entity;
+			}
+		}
+		return $result;
 	}
 
 	public function delete(Entity $entity): View {
