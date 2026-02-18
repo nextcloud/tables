@@ -18,7 +18,7 @@
     "nextcloud/coding-standard": "^v1.4.0",
     "nextcloud/ocp": "dev-stable33",
     "staabm/annotate-pull-request-from-checkstyle": "^1.8.6",
-    "phpunit/phpunit": "^9",
+    "phpunit/phpunit": "^13",
     "psalm/phar": "^5.26.1"
   },
   "config": {
