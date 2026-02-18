@@ -13,7 +13,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
-use OCA\Tables\Middleware\Attribute\AssertShareToken;
+use OCA\Tables\Middleware\Attribute\AssertShareAccessIsAccessible;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ShareService;
@@ -58,8 +58,8 @@ class ApiPublicColumnsController extends ACommonColumnsController {
 	 * 500: Internal error
 	 */
 	#[PublicPage]
-	#[AssertShareToken]
-	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/columns')]
+	#[AssertShareAccessIsAccessible]
+	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/columns', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 10, period: 10)]
 	public function indexByPublicLink(string $token): DataResponse {

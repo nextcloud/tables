@@ -40,10 +40,10 @@ class PublicSharePageController extends AuthPublicShareController {
 		IRequest $request,
 		ISession $session,
 		IURLGenerator $urlGenerator,
-		private ShareService $shareService,
-		private NodeService $nodeService,
-		private IInitialState $initialState,
-		private IEventDispatcher $eventDispatcher,
+		private readonly ShareService $shareService,
+		private readonly NodeService $nodeService,
+		private readonly IInitialState $initialState,
+		private readonly IEventDispatcher $eventDispatcher,
 	) {
 		parent::__construct($appName, $request, $session, $urlGenerator);
 		$token = $request->getParam('token');
@@ -86,8 +86,7 @@ class PublicSharePageController extends AuthPublicShareController {
 	public function showAuthenticate(): TemplateResponse {
 		$templateParameters = ['share' => new SharePageShareDataDecorator($this->share)];
 
-		$response = new TemplateResponse('core', 'publicshareauth', $templateParameters, 'guest');
-		return $response;
+		return new TemplateResponse('core', 'publicshareauth', $templateParameters, 'guest');
 	}
 
 	protected function showAuthFailed(): TemplateResponse {
@@ -112,7 +111,7 @@ class PublicSharePageController extends AuthPublicShareController {
 	}
 
 	protected function verifyPassword(string $password): bool {
-		return $password === $this->share->getPassword();
+		return $this->shareService->checkPassword($this->share, $password);
 	}
 
 	protected function loadStyles(): void {

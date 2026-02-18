@@ -12,7 +12,6 @@ namespace OCA\Tables\Service;
 use DateTime;
 
 use InvalidArgumentException;
-use OC\User\User;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
@@ -40,6 +39,7 @@ use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
 use OCP\IUserManager;
+use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -54,20 +54,20 @@ class ShareService extends SuperService {
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
 		?string $userId,
-		protected ShareMapper $mapper,
-		protected TableMapper $tableMapper,
-		protected ViewMapper $viewMapper,
-		protected UserHelper $userHelper,
-		protected GroupHelper $groupHelper,
-		protected CircleHelper $circleHelper,
-		private ContextNavigationMapper $contextNavigationMapper,
-		private IDBConnection $dbc,
-		protected ISecureRandom $secureRandom,
-		protected IUserManager $userManager,
+		private readonly ShareMapper $mapper,
+		private readonly TableMapper $tableMapper,
+		private readonly ViewMapper $viewMapper,
+		private readonly UserHelper $userHelper,
+		private readonly GroupHelper $groupHelper,
+		private readonly CircleHelper $circleHelper,
+		private readonly ContextNavigationMapper $contextNavigationMapper,
+		private readonly IDBConnection $dbc,
+		private readonly ISecureRandom $secureRandom,
+		private readonly IUserManager $userManager,
+		private readonly IHasher $hasher,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
-
 
 	/**
 	 * @throws InternalError
@@ -92,7 +92,16 @@ class ShareService extends SuperService {
 	 * @return TablesShare[]
 	 */
 	public function formatShares(array $items): array {
-		return array_map(fn (Share $item) => $item->jsonSerialize(), $items);
+		return array_map(static fn (Share $item) => $item->jsonSerialize(), $items);
+	}
+
+	public function formatForOutput(Share $share): Share {
+		if ($share->getPassword() === null || $share->getPassword() === '') {
+			return $share;
+		}
+		$clone = clone $share;
+		$clone->setPassword('yes');
+		return $clone;
 	}
 
 	/**
@@ -161,6 +170,10 @@ class ShareService extends SuperService {
 			}
 		}
 		throw $e;
+	}
+
+	public function checkPassword(Share $share, string $password): bool {
+		return $this->hasher->verify($password, $share->getPassword());
 	}
 
 	public function hasLinkShare(Table|View $node): bool {
@@ -238,7 +251,7 @@ class ShareService extends SuperService {
 					throw new InternalError('Cannot find element of type ' . $elementType);
 				}
 				// Check if en element with this id is already in the result array
-				$index = array_search($element->getId(), array_column($returnArray, 'id'));
+				$index = array_search($element->getId(), array_column($returnArray, 'id'), true);
 				if (!$index) {
 					$returnArray[] = $element;
 				}
@@ -254,7 +267,8 @@ class ShareService extends SuperService {
 	 * @param int $elementId
 	 * @param 'table'|'view' $elementType
 	 * @param string|null $userId
-	 * @throws NotFoundError
+	 * @return Permissions
+	 * @throws NotFoundError|InternalError
 	 */
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType = 'table', ?string $userId = null): Permissions {
 		try {
@@ -267,19 +281,9 @@ class ShareService extends SuperService {
 	}
 
 	/**
-	 * @param int $nodeId
-	 * @param string $nodeType
-	 * @param string $receiver
-	 * @param string $receiverType
-	 * @param bool $permissionRead
-	 * @param bool $permissionCreate
-	 * @param bool $permissionUpdate
-	 * @param bool $permissionDelete
-	 * @param bool $permissionManage
-	 * @return Share
 	 * @throws InternalError
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode, ?ShareToken $shareToken = null, ?string $password = null, ?string $sender = null):Share {
+	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode, ?ShareToken $shareToken = null, ?string $password = null, ?string $sender = null): Share {
 		$sender = $sender ?? $this->userId;
 		if (!$sender) {
 			$e = new \Exception('No user given.');
@@ -306,7 +310,7 @@ class ShareService extends SuperService {
 			$item->setToken((string)$shareToken);
 		}
 		if ($password) {
-			$item->setPassword($password);
+			$item->setPassword($this->hasher->hash($password));
 		}
 
 		try {
@@ -502,7 +506,7 @@ class ShareService extends SuperService {
 	public function deleteAllForTable(Table $table):void {
 		try {
 			$this->mapper->deleteByNode($table->getId(), 'table');
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$this->logger->error('something went wrong while deleting shares for table: ' . $table->getId());
 		}
 	}
@@ -510,7 +514,7 @@ class ShareService extends SuperService {
 	public function deleteAllForView(View $view):void {
 		try {
 			$this->mapper->deleteByNode($view->getId(), 'view');
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$this->logger->error('something went wrong while deleting shares for view: ' . $view->getId());
 		}
 	}
@@ -520,12 +524,11 @@ class ShareService extends SuperService {
 			$this->atomic(function () use ($context) {
 				$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
 				foreach ($shares as $share) {
-					/** @var Share $share */
 					$this->contextNavigationMapper->deleteByShareId($share->getId());
 				}
 				$this->mapper->deleteByNode($context->getId(), 'context');
 			}, $this->dbc);
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$this->logger->error('something went wrong while deleting shares for context: ' . $context->getId());
 		}
 	}
@@ -539,7 +542,6 @@ class ShareService extends SuperService {
 		$newShares = [];
 
 		foreach ($sharesForTable as $share) {
-			/* @var Share $share */
 			$share->setSender($newOwnerUserId);
 			try {
 				$this->mapper->update($share);
@@ -561,7 +563,6 @@ class ShareService extends SuperService {
 			$shares = $this->mapper->findAllSharesForNode($elementType, $elementId, '');
 			$sharedWithUserIds = [];
 
-			/** @var Share $share */
 			foreach ($shares as $share) {
 				if ($share->getReceiverType() === ShareReceiverType::USER) {
 					$sharedWithUserIds[$share->getReceiver()] = 1;
@@ -611,7 +612,7 @@ class ShareService extends SuperService {
 		if (!empty($share['token'])) {
 			try {
 				$shareToken = new ShareToken($share['token']);
-			} catch (\Throwable $e) {
+			} catch (Throwable $e) {
 				$this->logger->warning('Invalid share token during import: ' . $e->getMessage(), ['token' => $share['token'], 'exception' => $e]);
 			}
 		}
@@ -632,7 +633,7 @@ class ShareService extends SuperService {
 				$password,
 				$sender
 			);
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			$this->logger->error('Failed to import share: ' . $e->getMessage(), ['exception' => $e, 'share' => $share]);
 		}
 	}

@@ -14,7 +14,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
-use OCA\Tables\Middleware\Attribute\AssertShareToken;
+use OCA\Tables\Middleware\Attribute\AssertShareAccessIsAccessible;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
@@ -59,7 +59,7 @@ class PublicRowOCSController extends AOCSController {
 	 * 500: Internal error
 	 */
 	#[PublicPage]
-	#[AssertShareToken]
+	#[AssertShareAccessIsAccessible]
 	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/rows', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 20, period: 30)]
