@@ -5,48 +5,39 @@
 
 # Changelog
 
-## 2.0.0-beta.2
+## 2.0.0
 
-### Features
+### Added
+- [Enh(Sharing): backend infrastructre for read\-only link shares (tables#2211)](https://github.com/nextcloud/tables/pull/2211)
+- [Feat: lazy initialization for editor setup (tables#2212)](https://github.com/nextcloud/tables/pull/2212)\
 * [\#1424: Add Tables to user\_migration (tables#2292)](https://github.com/nextcloud/tables/pull/2292)
 
 ### Fixed
+- [Fix: Prevent inline editing on Ctrl\-Click for URL columns (tables#2228)](https://github.com/nextcloud/tables/pull/2228)
 * [Fix: Listing contexts without user\-id (tables#2260)](https://github.com/nextcloud/tables/pull/2260)
 * [Fix: don't bother loop through an array to return an empty one (tables#2312)](https://github.com/nextcloud/tables/pull/2312)
+* [Fix\(deps\): update dependency @nextcloud/vue to ^8.36.0 \(main\) (tables#2280)](https://github.com/nextcloud/tables/pull/2280)
+* [Fix: menu items are not closed for row actions (tables#2282)](https://github.com/nextcloud/tables/pull/2282)
+* [Fix\(FileAction\): have to use nc/files 4.0 to register file action in >= 33 (tables#2322)](https://github.com/nextcloud/tables/pull/2322)
+* [Fix\(ImportResults\): add default value for updated\_rows\_count prop (tables#2325)](https://github.com/nextcloud/tables/pull/2325)
 
 ### Other
-* [Chore: Update max server version (tables#2291)](https://github.com/nextcloud/tables/pull/2291)
-* [Refactor\(Views\): turn some details into objects with early validation (tables#2309)](https://github.com/nextcloud/tables/pull/2309)
-
-
-### Dependencies
-* [\[main\] Fix npm audit (tables#2226)](https://github.com/nextcloud/tables/pull/2226)
-* [Fix\(deps\): update dependency @nextcloud/dialogs to ^7.2.0 \(main\) (tables#2261)](https://github.com/nextcloud/tables/pull/2261)
-
-## 2.0.0-beta.1
-
-### Added
-
-- [Enh(Sharing): backend infrastructre for read\-only link shares (tables#2211)](https://github.com/nextcloud/tables/pull/2211)
-- [Feat: lazy initialization for editor setup (tables#2212)](https://github.com/nextcloud/tables/pull/2212)\
-
-### Fixed
-
-- [Fix: Prevent inline editing on Ctrl\-Click for URL columns (tables#2228)](https://github.com/nextcloud/tables/pull/2228)
-
-### Other
-
 - [PHP 8.5 compatibility for PHP Scoper, CI and unit tests (tables#2247)](https://github.com/nextcloud/tables/pull/2247)
 - [Build(deps): drop NC 30 (tables#2213)](https://github.com/nextcloud/tables/pull/2213)
+* [Chore: Update max server version (tables#2291)](https://github.com/nextcloud/tables/pull/2291)
+* [Refactor\(Views\): turn some details into objects with early validation (tables#2309)](https://github.com/nextcloud/tables/pull/2309)
+* [Refactor: clean up ShareService a little (tables#2333)](https://github.com/nextcloud/tables/pull/2333)
 
 ### Dependencies
-
 - [Fix(deps): update dependency @nextcloud/dialogs to v7 (main) (tables#2190)](https://github.com/nextcloud/tables/pull/2190)
 - [Chore(deps): update dependency vite to ^7.3.1 (main) (tables#2217)](https://github.com/nextcloud/tables/pull/2217)
 - [Fix(deps): update dependency @nextcloud/files to ^3.12.2 (main) (tables#2218)](https://github.com/nextcloud/tables/pull/2218)
 - [Fix(deps): update dependency dompurify to ^3.3.1 (main) (tables#2219)](https://github.com/nextcloud/tables/pull/2219)
 - [Fix(deps): update dependency @nextcloud/vue to ^8.35.2 (main) (tables#2220)](https://github.com/nextcloud/tables/pull/2220)
 - [Fix(deps): update dependency @nextcloud/dialogs to ^6.4.2 (main) (tables#2232)](https://github.com/nextcloud/tables/pull/2232)
+* [\[main\] Fix npm audit (tables#2226)](https://github.com/nextcloud/tables/pull/2226)
+* [Fix\(deps\): update dependency @nextcloud/dialogs to ^7.2.0 \(main\) (tables#2261)](https://github.com/nextcloud/tables/pull/2261)
+* [\[main\] Fix npm audit (tables#2329)](https://github.com/nextcloud/tables/pull/2329)
 
 ## 1.0.1
 
