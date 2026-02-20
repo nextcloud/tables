@@ -203,6 +203,7 @@ OC.L10N.register(
     "Password" : "Hasło",
     "Share link" : "Udostępnij link",
     "View only" : "Tylko podgląd",
+    "Delete link" : "Usuń link",
     "Public links" : "Odnośniki publiczne",
     "From {ownerName}" : "Od {ownerName}",
     "Created at" : "Utworzono",
