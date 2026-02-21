@@ -73,7 +73,7 @@
     "cypress": "^13.6.4",
     "cypress-downloadfile": "^1.2.4",
     "cypress-vite": "^1.8.0",
-    "openapi-typescript": "^7.10.1",
+    "openapi-typescript": "^7.13.0",
     "typescript": "^5.3.3",
     "vite": "^7.3.1"
   },
