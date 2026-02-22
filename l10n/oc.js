@@ -95,6 +95,7 @@ OC.L10N.register(
     "Default" : "Defaut",
     "Copy link" : "Copiar lo ligam",
     "Confirm" : "Confirmar",
+    "Insert" : "Inserir",
     "This month" : "Aqueste mes",
     "This week" : "Aquesta setmana",
     "ID" : "ID",
