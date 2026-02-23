@@ -6,6 +6,7 @@ OC.L10N.register(
     "Yes" : "Тийм",
     "The file was uploaded" : "Файл байршуулагдлаа",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Байршуулсан файл php.ini дахь upload_max_filesize хязгаараас хэтэрсэн",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Байршуулсан файл HTML маягтад заасан MAX_FILE_SIZE хязгаараас хэтэрсэн байна",
     "The file was only partially uploaded" : "Файл зөвхөн хэсэгчлэн байршуулагдсан",
     "No file was uploaded" : "Файл байршуулагдаагүй",
     "Missing a temporary folder" : "Түр хавтас олдохгүй байна",
