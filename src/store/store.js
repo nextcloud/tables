@@ -153,9 +153,14 @@ export const useTablesStore = defineStore('store', {
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
 				this.setTables(res.data)
-				this.views = []
 				res.data.forEach(table => {
-					if (table.views) this.views = this.views.concat(table.views)
+					if (table.views) {
+						table.views.forEach(view => {
+							if (this.views.filter(v => v.id === view.id).length === 0) {
+								this.views.push(view)
+							}
+						})
+					}
 				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
