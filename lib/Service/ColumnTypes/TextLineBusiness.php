@@ -13,7 +13,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
-class TextLineBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class TextLineBusiness extends SuperBusiness {
 
 	public function __construct(
 		LoggerInterface $logger,

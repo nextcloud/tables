@@ -9,7 +9,7 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 
-class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class UsergroupBusiness extends SuperBusiness {
 
 	/**
 	 * Parse frontend value (array) and transform for using it in the database (array)
@@ -20,15 +20,10 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * Why not use Mapper::parseValueIncoming
 	 *
 	 * @param mixed $value (array|string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return json_encode([]);
-		}
-
+	public function parseValue($value, Column $column): string {
 		if ($value === null) {
 			return json_encode([]);
 		}
@@ -38,15 +33,10 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 	/**
 	 * @param mixed $value parsable is json encoded array{id: string, type: int}
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return false;
-		}
-
+	public function canBeParsed($value, Column $column): bool {
 		if ($value === null) {
 			return true;
 		}

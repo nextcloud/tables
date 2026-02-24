@@ -11,14 +11,14 @@ use DateTime;
 use Exception;
 use OCA\Tables\Db\Column;
 
-class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class DatetimeBusiness extends SuperBusiness {
 
 	/**
 	 * @param mixed $value (string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
+	public function parseValue($value, Column $column): string {
 		if ($value === '' || $value === null) {
 			return '';
 		}
@@ -38,15 +38,15 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			$this->logger->debug('Could not parse format for datetime value', ['exception' => $e]);
 		}
 
-		return json_encode($newDateTime !== '' ? $newDateTime : '');
+		return json_encode($newDateTime);
 	}
 
 	/**
 	 * @param mixed $value (string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
+	public function canBeParsed($value, Column $column): bool {
 		if ($value === '' || $value === null) {
 			return true;
 		}
