@@ -36,6 +36,7 @@ OC.L10N.register(
     "Transfer" : "Seḍfeṛ",
     "Filter" : "Sizdeg",
     "Sort" : "Smizzwer",
+    "Export" : "Sifeḍ",
     "Add to favorites" : "Rnu ismal",
     "Remove from favorites" : "Kkes-it seg ismal",
     "Copy" : "Nɣel",
