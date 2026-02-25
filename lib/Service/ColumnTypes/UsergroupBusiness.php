@@ -8,8 +8,51 @@
 namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Helper\CircleHelper;
+use Psr\Log\LoggerInterface;
 
 class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
+
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected CircleHelper $circleHelper,
+	) {
+		parent::__construct($logger);
+	}
+
+	/**
+	 * @param mixed $value
+	 * @param Column $column
+	 * @param string $userId
+	 * @param int $tableId
+	 * @param int|null $rowId
+	 *
+	 * @throws BadRequestError
+	 */
+	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
+		if ($value === null) {
+			return;
+		}
+
+		if (is_string($value)) {
+			$value = json_decode($value, true);
+		}
+
+		if (!is_array($value)) {
+			throw new BadRequestError('Invalid value for usergroup column');
+		}
+
+		foreach ($value as $circleEntry) {
+			if (!isset($circleEntry['id']) || !is_string($circleEntry['id'])) {
+				throw new BadRequestError('Invalid circle id');
+			}
+
+			if (!$this->circleHelper->circleExists($circleEntry['id'], $userId)) {
+				throw new BadRequestError("User does not belong to circle: {$circleEntry['displayName']}");
+			}
+		}
+	}
 
 	/**
 	 * Parse frontend value (array) and transform for using it in the database (array)
