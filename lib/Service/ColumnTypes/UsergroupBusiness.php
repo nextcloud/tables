@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Service\ColumnTypes;
 
+use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Helper\CircleHelper;
@@ -47,9 +48,13 @@ class UsergroupBusiness extends SuperBusiness {
 			if (!isset($circleEntry['id']) || !is_string($circleEntry['id'])) {
 				throw new BadRequestError('Invalid circle id');
 			}
-
-			if (!$this->circleHelper->circleExists($circleEntry['id'], $userId)) {
-				throw new BadRequestError("User does not belong to circle: {$circleEntry['displayName']}");
+			if (!isset($circleEntry['type']) || !is_int($circleEntry['type'])) {
+				throw new BadRequestError('Invalid usergroup type');
+			}
+			if ($circleEntry['type'] === UsergroupType::CIRCLE) {
+				if (!$this->circleHelper->circleExists($circleEntry['id'], $userId)) {
+					throw new BadRequestError("User does not belong to circle: {$circleEntry['displayName']}");
+				}
 			}
 		}
 	}
