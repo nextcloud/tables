@@ -7,9 +7,7 @@
 
 namespace OCA\Tables\Service;
 
-use OCA\Circles\Service\CircleService;
 use OCA\Tables\Activity\ActivityManager;
-use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
@@ -59,7 +57,6 @@ class RowService extends SuperService {
 		private ColumnsHelper $columnsHelper,
 		private ActivityManager $activityManager,
 		private IDBConnection $connection,
-		private CircleService $circleService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 
@@ -639,10 +636,6 @@ class RowService extends SuperService {
 			// Check whether the column of which the value should change is part of the table / view
 			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
 			if ($column) {
-				if (ColumnType::PEOPLE->value === $column->getType()) {
-					$circleId = $entry['value'][0]['id'];
-					$this->circleService->getCircle($circleId);
-				}
 				$item->insertOrUpdateCell($entry);
 			} else {
 				$this->logger->warning('Column to update row not found, will continue and ignore this.');

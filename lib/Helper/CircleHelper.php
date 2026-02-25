@@ -129,4 +129,16 @@ class CircleHelper {
 		}
 	}
 
+	public function circleExists(string $circleId, string $userId): bool {
+		if (!$this->circlesEnabled) {
+			return false;
+		}
+
+		$userCircleIds = $this->getCircleIdsForUser($userId);
+		if ($userCircleIds === null) {
+			return false;
+		}
+		return in_array($circleId, $userCircleIds, true);
+	}
+
 }
