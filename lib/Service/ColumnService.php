@@ -196,7 +196,7 @@ class ColumnService extends SuperService {
 		ColumnDto $columnDto,
 		array $selectedViewIds = [],
 	):Column {
-		if (null === ColumnType::tryFrom($columnDto->getType())) {
+		if (ColumnType::tryFrom($columnDto->getType()) === null) {
 			throw new BadRequestError('Column type ' . $columnDto->getType() . ' does not exist.');
 		}
 		// security
