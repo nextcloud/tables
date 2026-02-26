@@ -44,16 +44,16 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			throw new BadRequestError('Invalid value for usergroup column');
 		}
 
-		foreach ($value as $circleEntry) {
-			if (!isset($circleEntry['id']) || !is_string($circleEntry['id'])) {
-				throw new BadRequestError('Invalid circle id');
+		foreach ($value as $userGroupEntry) {
+			if (!isset($userGroupEntry['id']) || !is_string($userGroupEntry['id'])) {
+				throw new BadRequestError('Invalid value for usergroup id');
 			}
-			if (!isset($circleEntry['type']) || !is_int($circleEntry['type'])) {
+			if (!isset($userGroupEntry['type']) || !is_int($userGroupEntry['type'])) {
 				throw new BadRequestError('Invalid usergroup type');
 			}
-			if ($circleEntry['type'] === UsergroupType::CIRCLE) {
-				if (!$this->circleHelper->circleExists($circleEntry['id'], $userId)) {
-					throw new BadRequestError("User does not belong to circle: {$circleEntry['displayName']}");
+			if ($userGroupEntry['type'] === UsergroupType::CIRCLE) {
+				if (!$this->circleHelper->circleExists($userGroupEntry['id'], $userId)) {
+					throw new BadRequestError('Circle not found');
 				}
 			}
 		}
