@@ -46,6 +46,11 @@ export default defineConfig({
 			framework: 'vue',
 			bundler: 'vite',
 			viteConfig: {
+				resolve: {
+					alias: {
+						'vue': 'vue',
+					},
+				},
 				plugins: [vue(), nodePolyfills()],
 				optimizeDeps: {
 					exclude: [
