@@ -19,6 +19,7 @@
 				<SelectionIcon v-if="props.id === 'selection'" />
 				<DatetimeIcon v-if="props.id === 'datetime'" />
 				<ContactsIcon v-if="props.id === 'usergroup'" />
+				<RelationIcon v-if="props.id === 'relation'" />
 				<div class="multiSelectOptionLabel">
 					{{ props.label }}
 				</div>
@@ -33,6 +34,7 @@
 			<SelectionIcon v-if="props.id === 'selection'" />
 			<DatetimeIcon v-if="props.id === 'datetime'" />
 			<ContactsIcon v-if="props.id === 'usergroup'" />
+			<RelationIcon v-if="props.id === 'relation'" />
 			<div class="multiSelectOptionLabel">
 				{{ props.label }}
 			</div>
@@ -50,6 +52,7 @@ import ProgressIcon from 'vue-material-design-icons/ArrowRightThin.vue'
 import SelectionIcon from 'vue-material-design-icons/FormSelect.vue'
 import DatetimeIcon from 'vue-material-design-icons/ClipboardTextClockOutline.vue'
 import ContactsIcon from 'vue-material-design-icons/ContactsOutline.vue'
+import RelationIcon from 'vue-material-design-icons/LinkVariant.vue'
 import { NcSelect } from '@nextcloud/vue'
 
 export default {
@@ -63,6 +66,7 @@ export default {
 		TextLongIcon,
 		NcSelect,
 		ContactsIcon,
+		RelationIcon,
 	},
 	props: {
 		columnId: {
@@ -86,6 +90,7 @@ export default {
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
 				{ id: 'usergroup', label: t('tables', 'Users and groups') },
+				{ id: 'relation', label: t('tables', 'Relation') },
 			],
 		}
 	},

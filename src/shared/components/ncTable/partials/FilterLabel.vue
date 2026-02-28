@@ -49,7 +49,7 @@ export default {
 			return value
 		},
 		labelText() {
-			if (this.operator.id === FilterIds.IsEmpty) {
+			if (this.operator.id === FilterIds.IsEmpty || this.operator.id === FilterIds.IsNotEmpty) {
 				return this.operator.getOperatorLabel()
 			} else {
 				return this.operator.getOperatorLabel() + ' "' + this.getValue + '"'

@@ -22,6 +22,8 @@ export const useDataStore = defineStore('data', {
 		loading: {},
 		rows: {},
 		columns: {},
+		relations: {},
+		relationsLoading: {},
 	}),
 
 	getters: {
@@ -33,6 +35,16 @@ export const useDataStore = defineStore('data', {
 			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
 			return state.rows[stateId] ?? []
 		},
+		getRelations: (state) => (columnId) => {
+			if (state.relations[columnId] === undefined) {
+				set(state.relations, columnId, {})
+			}
+			return state.relations[columnId]
+		},
+		getRelationsLoading: (state) => (isView, elementId) => {
+			const stateId = genStateKey(isView, elementId)
+			return state.relationsLoading[stateId] === true
+		},
 	},
 
 	actions: {
@@ -40,6 +52,8 @@ export const useDataStore = defineStore('data', {
 			this.loading = {}
 			this.columns = {}
 			this.rows = {}
+			this.relations = {}
+			this.relationsLoading = {}
 		},
 
 		// COLUMNS
@@ -176,6 +190,37 @@ export const useDataStore = defineStore('data', {
 			}
 
 			return true
+		},
+
+		// RELATIONS
+		async loadRelationsFromBE({ tableId, viewId, force = false }) {
+			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
+
+			// prevent double-loading
+			if (this.relationsLoading[stateId] === true || (this.relationsLoading[stateId] === false && !force)) {
+				return
+			}
+
+			set(this.relationsLoading, stateId, true)
+
+			let res = null
+
+			try {
+				if (viewId) {
+					res = await axios.get(generateUrl('/apps/tables/api/1/views/' + viewId + '/relations'))
+				} else {
+					res = await axios.get(generateUrl('/apps/tables/api/1/tables/' + tableId + '/relations'))
+				}
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load relation data.'))
+				set(this.relationsLoading, stateId, false)
+				return {}
+			}
+
+			Object.entries(res.data).forEach(([columnId, relations]) => {
+				set(this.relations, columnId, relations)
+			})
+			set(this.relationsLoading, stateId, false)
 		},
 
 		// ROWS

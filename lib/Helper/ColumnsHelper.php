@@ -20,6 +20,7 @@ class ColumnsHelper {
 		Column::TYPE_DATETIME,
 		Column::TYPE_SELECTION,
 		Column::TYPE_USERGROUP,
+		Column::TYPE_RELATION,
 	];
 
 	/**
@@ -36,6 +37,9 @@ class ColumnsHelper {
 	public function resolveSearchValue(string $placeholder, string $userId, ?Column $column = null): string|array {
 		if (str_starts_with($placeholder, '@selection-id-')) {
 			return substr($placeholder, 14);
+		}
+		if (str_starts_with($placeholder, '@relation-id-')) {
+			return substr($placeholder, 13);
 		}
 
 		$placeholderParts = explode(':', $placeholder, 2);
