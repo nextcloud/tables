@@ -1168,7 +1168,12 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
-			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset)));
+			$rows = $this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset);
+			$response = new DataResponse($this->rowService->formatRows($rows));
+			$table = $this->tableService->find($tableId);
+			$lastModified = new \DateTime($table->getLastEditAt());
+			$response->setLastModified($lastModified);
+			return $response;
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
