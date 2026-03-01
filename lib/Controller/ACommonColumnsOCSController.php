@@ -14,7 +14,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 
-abstract class ACommonColumnsController extends AOCSController {
+abstract class ACommonColumnsOCSController extends AOCSController {
 	protected ColumnService $service;
 
 	/**

@@ -31,7 +31,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesPublicColumn from ResponseDefinitions
  */
-class ApiPublicColumnsController extends ACommonColumnsController {
+class ApiPublicColumnsController extends ACommonColumnsOCSController {
 
 	public function __construct(
 		protected ColumnService $service,
