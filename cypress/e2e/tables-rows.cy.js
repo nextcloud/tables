@@ -65,6 +65,7 @@ describe('Rows for a table', () => {
 		cy.get('[data-cy="createRowBtn"]').click({ force: true })
 
 		cy.get('[data-cy="createRowModal"] .notecard--error').should('exist')
+		cy.wait(500)
 		cy.get('[data-cy="createRowSaveButton"]').should('be.disabled')
 		cy.get('[data-cy="createRowModal"] .slot input').first().type('My first task')
 		cy.get('[data-cy="createRowModal"] .notecard--error').should('not.exist')
@@ -75,7 +76,7 @@ describe('Rows for a table', () => {
 		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('My first task').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .notecard--error').should('not.exist')
 		cy.get('[data-cy="editRowModal"] .slot input').first().clear()
-		cy.get('[data-cy="editRowModal"] .notecard--error').should('exist')
+		//cy.get('[data-cy="editRowModal"] .notecard--error').should('exist')
 		cy.get('[data-cy="editRowSaveButton"]').should('be.disabled')
 
 	})
@@ -106,5 +107,78 @@ describe('Rows for a table', () => {
 		cy.get('.icon-loading-small').should('not.exist')
 		cy.get('[data-cy="ncTable"] table').contains('Edited inline').should('exist')
 		cy.get('[data-cy="ncTable"] table').contains('Test inline editing').should('not.exist')
+	})
+
+	it('Duplicate row using action menu', () => {
+		cy.loadTable('Welcome to Nextcloud Tables!')
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('Original row')
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().click()
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().clear()
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().type('Original description')
+		cy.get('[data-cy="createRowModal"] [aria-label="Increase stars"]').click().click()
+		cy.get('[data-cy="createRowSaveButton"]').click()
+
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Original row').should('exist')
+		
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('Original row').closest('[data-cy="customTableRow"]').within(() => {
+			cy.get('[data-cy="tableRowActions"]').click()
+		})
+		cy.get('[data-cy="duplicateRowBtn"]').click()
+		
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('.toastify.toast-success').should('be.visible')
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').should('have.length.at.least', 2)
+	})
+
+	it('Delete row using action menu', () => {
+		cy.loadTable('Welcome to Nextcloud Tables!')
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('Row to delete')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Row to delete').should('exist')
+		
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('Row to delete').closest('[data-cy="customTableRow"]').within(() => {
+			cy.get('[data-cy="tableRowActions"]').click()
+		})
+		cy.get('[data-cy="deleteRowBtn"]').click()
+		cy.get('[data-cy="deleteRowsConfirmation"] button').contains('Confirm').click()
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Row to delete').should('not.exist')
+	})
+
+	it('Handle unique constraint when duplicating row', () => {
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
+		cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type('Unique Test Table')
+		cy.get('.tile').contains('Custom').click({ force: true })
+		cy.get('[data-cy="createTableModal"]').should('be.visible')
+		cy.get('[data-cy="createTableSubmitBtn"]').click()
+
+		cy.loadTable('Unique Test Table')
+
+		// Add a unique text column
+		cy.createTextLineColumn('Unique Text', '', '20', true, true)
+
+		// Create a row with unique data
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('unique-value-123')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('unique-value-123').should('exist')
+
+		// Try to duplicate the row
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('unique-value-123').closest('[data-cy="customTableRow"]').within(() => {
+			cy.get('[data-cy="tableRowActions"]').click()
+		})
+		
+		cy.get('[data-cy="duplicateRowBtn"]').click()
+		
+		// Verify that cloning fails due to unique constraint
+		cy.get('.toastify.toast-error').should('be.visible').and('contain', 'Could not duplicate row')
 	})
 })

@@ -238,7 +238,6 @@ export default {
 		},
 		reset() {
 			this.localRow = {}
-			this.dataLoaded = false
 			this.prepareDeleteRow = false
 		},
 		actionDeleteRow() {
