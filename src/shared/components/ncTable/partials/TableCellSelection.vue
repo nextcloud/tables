@@ -152,6 +152,7 @@ export default {
 <style lang="scss" scoped>
 .cell-selection {
 	width: 100%;
+	min-width: 150px;
 
 	.non-edit-mode {
 		cursor: pointer;
