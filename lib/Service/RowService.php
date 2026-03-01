@@ -224,6 +224,28 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
+		$fullRowData = [];
+		$columnNames = [];
+
+		foreach ($columns as $column) {
+			$columnNames[$column->getId()] = $column->getTitle();
+		}
+
+		$rows = $data instanceof RowDataInput ? iterator_to_array($data) : $data;
+
+		foreach ($rows as $row) {
+			$colId = (int)$row['columnId'];
+			if (!isset($columnNames[$colId])) {
+				continue;
+			}
+
+			$fullRowData[] = [
+				'columnId' => $colId,
+				'value' => $row['value'],
+				'columnName' => $columnNames[$colId],
+			];
+		}
+
 		$tableId = $tableId ?? $view->getTableId();
 
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
@@ -235,6 +257,8 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2);
+			// attach columnName to returned row for the response only
+			$insertedRow->addColumnNames($fullRowData);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 			$this->activityManager->triggerEvent(
@@ -351,7 +375,7 @@ class RowService extends SuperService {
 			if (!$column && $viewId) {
 				throw new InternalError('Column with id ' . $entry['columnId'] . ' is not part of view with id ' . $viewId);
 			} elseif (!$column && $tableId) {
-				throw new InternalError('Column with id ' . $entry['columnId'] . ' is not part of table with id ' . $tableId);
+				throw new BadRequestError('Column with id ' . $entry['columnId'] . ' is not part of table with id ' . $tableId);
 			}
 
 			if (!$column) {
