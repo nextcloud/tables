@@ -140,6 +140,7 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -202,6 +203,7 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -264,6 +266,7 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -321,6 +324,7 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -380,6 +384,7 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
