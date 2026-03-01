@@ -29,8 +29,8 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 		$cell->setValue($this->valueToJsonDbValue($column, $data));
 	}
 
-	public function formatEntity(Column $column, RowCellSuper $cell) {
-		return json_decode($cell->getValue());
+	public function formatRowData(Column $column, array $row) {
+		return json_decode($row['value']);
 	}
 
 	private function valueToJsonDbValue(Column $column, $value): string {

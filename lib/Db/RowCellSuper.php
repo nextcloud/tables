@@ -38,28 +38,8 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 	}
 
 	/**
-	 * Same as Entity::fromRow but ignoring unknown properties
-	 */
-	public static function fromRowData(array $row): RowCellSuper {
-		$instance = new static();
-
-		foreach ($row as $key => $value) {
-			$property = $instance->columnToProperty($key);
-			$setter = 'set' . ucfirst($property);
-			;
-			if (property_exists($instance, $property)) {
-				$instance->$setter($value);
-			}
-		}
-
-		$instance->resetUpdatedFields();
-
-		return $instance;
-	}
-
-	/**
 	 * @param float|null|string $value
-	 * @param int $value_type
+	 * @param int $valueType
 	 */
 	public function jsonSerializePreparation(string|float|null $value, int $valueType = 0): array {
 		return [

@@ -27,14 +27,14 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
-	 * Format a row cell entity to API response array
+	 * Format a row cell raw value from DB to API response array
 	 *
-	 * @param T $cell
+	 * @param array<string, mixed> $row
 	 * @return TOutgoing
 	 */
-	public function formatEntity(Column $column, RowCellSuper $cell) {
+	public function formatRowData(Column $column, array $row) {
 		/** @var TOutgoing $value */
-		$value = $cell->getValue();
+		$value = $row['value'];
 		return $value;
 	}
 	/*
