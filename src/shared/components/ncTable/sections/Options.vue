@@ -4,8 +4,7 @@
 -->
 <template>
 	<div class="options">
-		<div v-if="showOptions && (config.canReadRows || (config.canCreateRows && rows.length > 0))" class="fix-col-4"
-			style="justify-content: space-between;">
+		<div v-if="showOptions && (config.canReadRows || (config.canCreateRows && rows.length > 0))" class="fix-col-4">
 			<div :class="{ 'add-padding-left': isSmallMobile }" class="actionButtonsLeft">
 				<NcButton v-if="!isSmallMobile && config.canCreateRows" :aria-label="t('tables', 'Create row')"
 					:close-after-click="true" type="tertiary" data-cy="createRowBtn" @click="$emit('create-row')">
@@ -25,6 +24,7 @@
 					<SearchForm :columns="columns" :search-string="getSearchString"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
+				<PaginationBlock :rows="rows" />
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -52,6 +52,7 @@
 					</NcActionButton>
 				</NcActions>
 			</div>
+			<div v-else class="selected-rows-placeholder" />
 		</div>
 	</div>
 </template>
@@ -65,6 +66,7 @@ import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
+import PaginationBlock from './PaginationBlock.vue'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
@@ -79,6 +81,7 @@ export default {
 		Check,
 		Delete,
 		Export,
+		PaginationBlock,
 	},
 
 	mixins: [viewportHelper],
@@ -176,6 +179,18 @@ export default {
 	inset-inline-start: 0;
 }
 
+.fix-col-4 {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+}
+
+.selected-rows-placeholder {
+	min-width: fit-content;
+	flex-shrink: 0;
+}
+
 .selected-rows-option {
 	justify-content: flex-end;
 	display: inline-flex;
@@ -196,6 +211,8 @@ export default {
 	display: inline-flex;
 	align-items: center;
 	padding-inline-start: calc(var(--default-grid-baseline) * 1);
+	flex-wrap: wrap;
+	gap: 4px;
 }
 
 :deep(.actionButtonsLeft button) {
@@ -206,5 +223,31 @@ export default {
 	margin-inline-start: calc(var(--default-grid-baseline) * 3);
 	width: auto;
 	min-width: 100px;
+	flex-shrink: 1;
+}
+
+@media only screen and (max-width: 641px) {
+	.fix-col-4 {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.actionButtonsLeft {
+		justify-content: center;
+	}
+
+	.selected-rows-option {
+		justify-content: center;
+		margin-top: 8px;
+	}
+}
+
+@media only screen and (max-width: 480px) {
+	.searchAndFilter {
+		margin-inline-start: calc(var(--default-grid-baseline) * 1);
+		min-width: 80px;
+		order: -1;
+		flex: 1 1 auto;
+	}
 }
 </style>

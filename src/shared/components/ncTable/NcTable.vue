@@ -43,7 +43,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 <template>
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
-			<Options :rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
+			<Options :rows="getSearchedAndFilteredAndSortedRows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
 				:selected-rows="localSelectedRows" :show-options="parsedColumns.length !== 0"
 				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row')"
 				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
@@ -52,7 +52,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" :columns="parsedColumns"
-				:rows="rows" :is-view="isView" :element-id="elementId" :view-setting.sync="localViewSetting"
+				:rows="getSearchedAndFilteredAndSortedRows" :is-view="isView" :element-id="elementId" :view-setting.sync="localViewSetting"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
@@ -103,6 +103,16 @@ import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { parseCol } from './mixins/columnParser.js'
 import { AbstractColumn } from './mixins/columnClass.js'
 import { translate as t } from '@nextcloud/l10n'
+import {
+	TYPE_META_CREATED_AT,
+	TYPE_META_CREATED_BY,
+	TYPE_META_ID,
+	TYPE_META_UPDATED_AT,
+	TYPE_META_UPDATED_BY,
+} from '../../constants.ts'
+import { MetaColumns } from './mixins/metaColumns.js'
+import { MagicFields } from './mixins/magicFields.js'
+import { getFiltersForColumn } from './mixins/filter.js'
 
 export default {
 	name: 'NcTable',
@@ -220,6 +230,153 @@ export default {
 			}
 			return this.columns
 		},
+
+		sorting() {
+			return this.viewSetting?.sorting
+		},
+		getSearchedAndFilteredRows() {
+			const debug = false
+			// if we don't have to search and/or filter
+			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
+				// cleanup markers
+				if (this.rows && this.columns) {
+					this.rows.forEach(row => {
+						if (row && row.data) {
+							this.columns.forEach(column => {
+								const cell = row.data.find(item => item && item.columnId === column.id)
+								if (cell === undefined) {
+									return
+								}
+								delete cell.searchStringFound
+								delete cell.filterFound
+							})
+						}
+					})
+				}
+				return this.rows || []
+			}
+
+			const data = [] // array of rows
+			const searchString = this.viewSetting?.searchString
+			// each row
+			if (!this.rows || !this.columns) {
+				return []
+			}
+
+			for (const row of this.rows) {
+				if (!row || !row.data) {
+					continue
+				}
+
+				if (debug) {
+					console.debug('new row ===============================================', row)
+				}
+				let filterStatusRow = null
+				let searchStatusRow = false
+
+				// each column in a row => cell
+				this.columns.forEach(column => {
+					if (debug) {
+						console.debug('new column -------------------', column)
+					}
+					let filterStatus = null
+					let searchStatus = true
+					const filters = getFiltersForColumn(column, this.viewSetting)
+					let cell
+					if (column.id < 0) {
+						cell = { columnId: column.id }
+						switch (column.id) {
+						case TYPE_META_ID:
+							cell.value = row.id
+							break
+						case TYPE_META_CREATED_BY:
+							cell.value = row.createdBy
+							break
+						case TYPE_META_UPDATED_BY:
+							cell.value = row.editedBy
+							break
+						case TYPE_META_CREATED_AT:
+							cell.value = row.createdAt
+							break
+						case TYPE_META_UPDATED_AT:
+							cell.value = row.editedAt
+							break
+						}
+					} else {
+						cell = row.data.find(item => item && item.columnId === column.id)
+					}
+
+					// if we don't have a value for this cell
+					if (cell === undefined) {
+						if (searchString) {
+							searchStatus = false
+						}
+						cell = { columnId: column.id, value: null }
+					}
+					// cleanup possible old markers
+					delete cell.searchStringFound
+					delete cell.filterFound
+
+					// apply filters (if any)
+					filters.forEach(fil => {
+						this.addMagicFieldsValues(fil)
+						if (filterStatus === null || filterStatus === true) {
+							filterStatus = column.isFilterFound(cell, fil)
+						}
+					})
+					// if we should search
+					if (searchString) {
+						console.debug('look for searchString', searchString)
+						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
+					}
+
+					if (debug) {
+						console.debug('filterStatus for cell', { cell: cell?.value, filterStatusCell: filterStatus, filterStatusRowBefore: filterStatusRow })
+					}
+
+					// if filterStatus is null, this result should be ignored
+					if (filterStatus !== null && (filterStatusRow || filterStatusRow === null)) {
+						filterStatusRow = filterStatus
+					}
+
+					if (debug) {
+						console.debug('new filterStatusRow', filterStatusRow)
+					}
+
+					// filterStatusRow = filterStatus
+					searchStatusRow = searchStatusRow || searchStatus
+				})
+
+				if (debug) {
+					console.debug('if push row', { filterStatusRow, searchStatusRow, result: (filterStatusRow || filterStatusRow === null) && searchStatusRow })
+				}
+				if ((filterStatusRow || filterStatusRow === null) && searchStatusRow) {
+					data.push({ ...row })
+				}
+			}
+			return data
+		},
+		getSearchedAndFilteredAndSortedRows() {
+			const allColumns = this.columns.concat(MetaColumns)
+			const sort = (sortCols) => {
+				const sortColumn = allColumns.find(item => item.id === sortCols?.[0].columnId)
+				const nextSorts = []
+				for (let i = 1; i < sortCols.length; i++) {
+					const sortColumn = allColumns.find(item => item.id === sortCols[i].columnId)
+					nextSorts.push(sortColumn?.sort?.(sortCols[i].mode))
+				}
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(sortCols[0].mode, nextSorts))
+			}
+
+			// if we have to sort
+			if (this.viewSetting?.presetSorting) {
+				return sort(this.viewSetting.presetSorting)
+			}
+			if (this.viewSetting?.sorting) {
+				return sort(this.viewSetting.sorting)
+			}
+			return this.getSearchedAndFilteredRows
+		},
 	},
 	watch: {
 		localSelectedRows() {
@@ -260,6 +417,14 @@ export default {
 		setSearchString(str) {
 			this.localViewSetting.searchString = str !== '' ? str : null
 			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
+		},
+		addMagicFieldsValues(filter) {
+			Object.values(MagicFields).forEach(field => {
+				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
+				if (filter.value !== newFilterValue) {
+					filter.magicValuesEnriched = newFilterValue
+				}
+			})
 		},
 	},
 }
