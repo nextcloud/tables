@@ -11,6 +11,7 @@ use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Helper\CircleHelper;
+use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
 class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
@@ -18,6 +19,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	public function __construct(
 		protected LoggerInterface $logger,
 		protected CircleHelper $circleHelper,
+		protected IUserManager $userManager,
 	) {
 		parent::__construct($logger);
 	}
@@ -52,6 +54,12 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 				throw new BadRequestError('Invalid usergroup type');
 			}
 			if ($userGroupEntry['type'] === UsergroupType::CIRCLE) {
+				if ($this->userManager->get($userId) === null) {
+					throw new BadRequestError('User not found');
+				}
+				if (!$this->circleHelper->circleExists($userGroupEntry['id'], null)) {
+					throw new BadRequestError('Circle does not exist');
+				}
 				if (!$this->circleHelper->circleExists($userGroupEntry['id'], $userId)) {
 					throw new BadRequestError('Circle not found');
 				}
