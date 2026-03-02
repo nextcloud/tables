@@ -266,10 +266,11 @@ export default {
 				}
 			}
 
-			:where(.pagination-footer) {
-				width: unset !important;
-				inset-inline-start: unset !important;
-			}
+			// fixme: what to do here?
+			//:where(.pagination-footer) {
+			// width: unset !important;
+			// inset-inline-start: unset !important;
+			//}
 		}
 
 		& :deep(.options.row) {

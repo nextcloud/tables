@@ -27,6 +27,8 @@
 				</div>
 			</div>
 
+			<PaginationBlock :rows="rows" />
+
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
 				<div style="padding: 10px; color: var(--color-text-maxcontrast);">
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
@@ -65,6 +67,7 @@ import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
+import PaginationBlock from './PaginationBlock.vue'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
@@ -79,6 +82,7 @@ export default {
 		Check,
 		Delete,
 		Export,
+		PaginationBlock,
 	},
 
 	mixins: [viewportHelper],
@@ -206,5 +210,10 @@ export default {
 	margin-inline-start: calc(var(--default-grid-baseline) * 3);
 	width: auto;
 	min-width: 100px;
+}
+@media only screen and (max-width: 641px) {
+	.fix-col-4 {
+		flex-direction: column;
+	}
 }
 </style>
