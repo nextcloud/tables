@@ -41,56 +41,15 @@
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</transition-group>
 		</table>
-		<div v-if="totalPages > 1" class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
-			<div class="pagination-items">
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" :aria-label="t('tables', 'Go to first page')" @click="pageNumber = 1">
-					<template #icon>
-						<PageFirstIcon :size="20" />
-					</template>
-				</NcButton>
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" :aria-label="t('tables', 'Go to previous page')" @click="pageNumber--">
-					<template #icon>
-						<ChevronLeftIcon :size="20" />
-					</template>
-				</NcButton>
-				<div class="page-number">
-					<NcSelect
-						v-model="pageNumber"
-						:options="allPageNumbersArray"
-						:clearable="false"
-						:aria-label-combobox="t('tables', 'Page number')">
-						<template #selected-option-container="{ option }">
-							<span class="selected-page">
-								{{ option.label }} of {{ totalPages }}
-							</span>
-						</template>
-					</NcSelect>
-				</div>
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" :aria-label="t('tables', 'Go to next page')" @click="pageNumber++">
-					<template #icon>
-						<ChevronRightIcon :size="20" />
-					</template>
-				</NcButton>
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" :aria-label="t('tables', 'Go to last page')" @click="pageNumber = totalPages">
-					<template #icon>
-						<PageLastIcon :size="20" />
-					</template>
-				</NcButton>
-			</div>
-		</div>
 	</div>
 </template>
 
 <script>
 import TableHeader from '../partials/TableHeader.vue'
-import PageLastIcon from 'vue-material-design-icons/PageLast.vue'
-import PageFirstIcon from 'vue-material-design-icons/PageFirst.vue'
-import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
-import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
 import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { MagicFields } from '../mixins/magicFields.js'
-import { NcButton, useIsMobile, NcSelect } from '@nextcloud/vue'
+import { useIsMobile } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
@@ -105,12 +64,6 @@ export default {
 	components: {
 		TableRow,
 		TableHeader,
-		NcButton,
-		PageLastIcon,
-		PageFirstIcon,
-		ChevronLeftIcon,
-		ChevronRightIcon,
-		NcSelect,
 	},
 
 	props: {
@@ -404,12 +357,6 @@ export default {
 	},
 }
 </script>
-
-<style>
-.vs__dropdown-menu {
-	min-width: 95px !important;
-}
-</style>
 
 <style lang="scss" scoped>
 :deep(.text-editor__wrapper .paragraph-content:last-child) {
