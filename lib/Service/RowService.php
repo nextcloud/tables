@@ -229,11 +229,6 @@ class RowService extends SuperService {
 			$columnsById[$column->getId()] = $column;
 		}
 
-		foreach ($data as $entry) {
-			$column = $columnsById[$entry['columnId']];
-			$this->validateColumnValueLimits($column, $entry['value']);
-		}
-
 		$tableId = $tableId ?? $view->getTableId();
 
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
@@ -353,6 +348,7 @@ class RowService extends SuperService {
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
 			if ($column) {
+				$this->validateColumnValueLimits($column, $entry['value']);
 				$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
 				$columnBusiness->validateValue($entry['value'], $column, $this->userId, $tableId, $rowId);
 			}
@@ -646,7 +642,6 @@ class RowService extends SuperService {
 			// Check whether the column of which the value should change is part of the table / view
 			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
 			if ($column) {
-				$this->validateColumnValueLimits($column, $entry['value']);
 				$item->insertOrUpdateCell($entry);
 			} else {
 				$this->logger->warning('Column to update row not found, will continue and ignore this.');
