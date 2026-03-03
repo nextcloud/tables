@@ -208,16 +208,6 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
-		$columnsById = [];
-		foreach ($columns as $column) {
-			$columnsById[$column->getId()] = $column;
-		}
-
-		foreach ($data as $entry) {
-			$column = $columnsById[$entry['columnId']];
-			$this->validateColumnValueLimits($column, $entry['value']);
-		}
-
 		$tableId = $tableId ?? $view->getTableId();
 
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
@@ -335,6 +325,7 @@ class RowService extends SuperService {
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
 			if ($column) {
+				$this->validateColumnValueLimits($column, $entry['value']);
 				$columnBusiness = $this->getColumnBusiness($column);
 				$columnBusiness->validateValue($entry['value'], $column, $this->userId, $tableId, $rowId);
 			}
@@ -628,7 +619,6 @@ class RowService extends SuperService {
 			// Check whether the column of which the value should change is part of the table / view
 			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
 			if ($column) {
-				$this->validateColumnValueLimits($column, $entry['value']);
 				$item->insertOrUpdateCell($entry);
 			} else {
 				$this->logger->warning('Column to update row not found, will continue and ignore this.');
@@ -838,6 +828,14 @@ class RowService extends SuperService {
 		return $columnBusiness;
 	}
 
+	/**
+	 * validate column value constraints (textMaxLength, numberMin, numberMax).
+	 *
+	 * @param Column $column
+	 * @param mixed $value
+	 *
+	 * @throws BadRequestError
+	 */
 	private function validateColumnValueLimits(Column $column, $value): void {
 		$textMaxLength = $column->getTextMaxLength();
 		if ($textMaxLength !== null && is_string($value) && mb_strlen($value) > $textMaxLength) {
