@@ -224,11 +224,6 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
-		$columnsById = [];
-		foreach ($columns as $column) {
-			$columnsById[$column->getId()] = $column;
-		}
-
 		$tableId = $tableId ?? $view->getTableId();
 
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
