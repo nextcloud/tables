@@ -30,15 +30,9 @@ describe('Import csv', () => {
 		cy.get('.modal__content button').contains('Preview').click()
 		cy.get('.file_import__preview tbody tr').should('have.length', 4)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*/jobs' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
-		cy.wait('@importUploadReq')
-		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
-		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+		cy.wait('@importUploadReq').its('response.statusCode').should('equal', 200)
 	})
 
 	it('Import csv from device', () => {
@@ -50,15 +44,9 @@ describe('Import csv', () => {
 		cy.get('.modal__content button').contains('Preview').click()
 		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 4)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*/jobs' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
-		cy.wait('@importUploadReq')
-		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
-		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+		cy.wait('@importUploadReq').its('response.statusCode').should('equal', 200)
 	})
 
 	it('Import csv from device with updating of existent files', () => {
@@ -83,16 +71,9 @@ describe('Import csv', () => {
 		cy.get('.modal__content button').contains('Preview').click()
 		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 3)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*/jobs' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
-		cy.wait('@importUploadReq')
-		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '2')
-		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '3')
-		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowsUpdated"]').should('contain.text', '1')
-		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+		cy.wait('@importUploadReq').its('response.statusCode').should('equal', 200)
 	})
 
 })
@@ -118,17 +99,10 @@ describe('Import csv from Files file action', () => {
 
 		cy.intercept({
 			method: 'POST',
-			url: '**/apps/tables/import/table/*'
+			url: '**/apps/tables/import/table/*/jobs',
 		}).as('importNewTableReq')
 		cy.get('[data-cy="fileActionImportButton"]').click({ force: true })
 		cy.wait('@importNewTableReq').its('response.statusCode').should('equal', 200)
-
-		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
-		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
 	})
 
 	it('Import to existing table', () => {
@@ -141,17 +115,10 @@ describe('Import csv from Files file action', () => {
 
 		cy.intercept({
 			method: 'POST',
-			url: '**/apps/tables/import/table/*'
+			url: '**/apps/tables/import/table/*/jobs',
 		}).as('importExistingTableReq')
-		cy.get('[data-cy="fileActionImportButton"]').click({force: true})
+		cy.get('[data-cy="fileActionImportButton"]').click({ force: true })
 		cy.wait('@importExistingTableReq').its('response.statusCode').should('equal', 200)
-
-		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
-		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
 	})
 
 })
