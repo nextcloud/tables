@@ -62,12 +62,12 @@ class UsergroupBusiness extends SuperBusiness {
 			}
 			if ($userGroupEntry['type'] === UsergroupType::GROUP) {
 				if (!$this->groupManager->get($userGroupEntry['id'])) {
-					throw new BadRequestError('Group not found.');
+					throw new BadRequestError('Group not found');
 				}
 			}
 			if ($userGroupEntry['type'] === UsergroupType::CIRCLE) {
 				if (!$this->circleHelper->circleExists($userGroupEntry['id'], $userId)) {
-					throw new BadRequestError('Circle not found.');
+					throw new BadRequestError('Circle not found');
 				}
 			}
 		}
