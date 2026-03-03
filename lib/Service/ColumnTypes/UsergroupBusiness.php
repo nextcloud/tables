@@ -11,6 +11,7 @@ use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Helper\CircleHelper;
+use OCP\IGroupManager;
 use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
@@ -20,6 +21,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		protected LoggerInterface $logger,
 		protected CircleHelper $circleHelper,
 		protected IUserManager $userManager,
+		protected IGroupManager $groupManager,
 	) {
 		parent::__construct($logger);
 	}
@@ -53,15 +55,19 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			if (!isset($userGroupEntry['type']) || !is_int($userGroupEntry['type'])) {
 				throw new BadRequestError('Invalid usergroup type');
 			}
-			if ($userGroupEntry['type'] === UsergroupType::CIRCLE) {
-				if ($this->userManager->get($userId) === null) {
+			if ($userGroupEntry['type'] === UsergroupType::USER) {
+				if (!$this->userManager->get($userGroupEntry['id'])) {
 					throw new BadRequestError('User not found');
 				}
-				if (!$this->circleHelper->circleExists($userGroupEntry['id'], null)) {
-					throw new BadRequestError('Circle does not exist');
+			}
+			if ($userGroupEntry['type'] === UsergroupType::GROUP) {
+				if (!$this->groupManager->get($userGroupEntry['id'])) {
+					throw new BadRequestError('Group not found.');
 				}
+			}
+			if ($userGroupEntry['type'] === UsergroupType::CIRCLE) {
 				if (!$this->circleHelper->circleExists($userGroupEntry['id'], $userId)) {
-					throw new BadRequestError('Circle not found');
+					throw new BadRequestError('Circle not found.');
 				}
 			}
 		}
