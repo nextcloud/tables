@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 
 use InvalidArgumentException;
+use OCA\Circles\Model\Circle;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
@@ -38,6 +39,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\IGroup;
 use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
@@ -194,7 +196,7 @@ class ShareService extends SuperService {
 
 	/**
 	 * @param string|null $userId
-	 * @return array
+	 * @return array<int, View> Indexed by view id
 	 * @throws InternalError
 	 */
 	public function findViewsSharedWithMe(?string $userId = null): array {
@@ -203,7 +205,7 @@ class ShareService extends SuperService {
 
 	/**
 	 * @param string|null $userId
-	 * @return array
+	 * @return array<int, Table> Indexed by table id
 	 * @throws InternalError
 	 */
 	public function findTablesSharedWithMe(?string $userId = null): array {
@@ -216,52 +218,38 @@ class ShareService extends SuperService {
 	private function findElementsSharedWithMe(string $elementType = 'table', ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
-		$returnArray = [];
-
+		$shares = [];
 		try {
-			// get all views or tables that are shared with me as user
-			$elementsSharedWithMe = $this->mapper->findAllSharesFor($elementType, $userId, $userId);
+			$shares['user'] = $this->mapper->findAllSharesFor($elementType, [$userId], $userId);
 
-			// get all views or tables that are shared with me by group
 			$userGroups = $this->userHelper->getGroupsForUser($userId);
-			foreach ($userGroups as $userGroup) {
-				$shares = $this->mapper->findAllSharesFor($elementType, $userGroup->getGid(), $userId, ShareReceiverType::GROUP);
-				$elementsSharedWithMe = array_merge($elementsSharedWithMe, $shares);
-			}
+			$userGroupIds = array_map(static fn (IGroup $group) => $group->getGid(), $userGroups);
+			$shares['groups'] = $this->mapper->findAllSharesFor($elementType, $userGroupIds, $userId, ShareReceiverType::GROUP);
 
-			// get all views or tables that are shared with me by circle
-			if ($this->circleHelper->isCirclesEnabled()) {
-				$userCircles = $this->circleHelper->getUserCircles($userId);
-
-				foreach ($userCircles as $userCircle) {
-					$shares = $this->mapper->findAllSharesFor($elementType, $userCircle->getSingleId(), $userId, ShareReceiverType::CIRCLE);
-					$elementsSharedWithMe = array_merge($elementsSharedWithMe, $shares);
-				}
-			}
+			$userCircles = $this->circleHelper->getUserCircles($userId);
+			$userCircleIds = array_map(static fn (Circle $circle) => $circle->getSingleId(), $userCircles);
+			$shares['circles'] = $this->mapper->findAllSharesFor($elementType, $userCircleIds, $userId, ShareReceiverType::CIRCLE);
 		} catch (Throwable $e) {
-			throw new InternalError($e->getMessage());
+			throw new InternalError($e->getMessage(), previous: $e);
 		}
-		foreach ($elementsSharedWithMe as $share) {
-			try {
-				if ($elementType === 'table') {
-					$element = $this->tableMapper->find($share->getNodeId());
-				} elseif ($elementType === 'view') {
-					$element = $this->viewMapper->find($share->getNodeId());
-				} else {
-					throw new InternalError('Cannot find element of type ' . $elementType);
-				}
-				// Check if en element with this id is already in the result array
-				$index = array_search($element->getId(), array_column($returnArray, 'id'), true);
-				if (!$index) {
-					$returnArray[] = $element;
-				}
-			} catch (DoesNotExistException|Exception|MultipleObjectsReturnedException $e) {
-				throw new InternalError($e->getMessage());
-			}
-		}
-		return $returnArray;
-	}
 
+		$elementIds = [];
+		foreach (array_merge($shares['user'], $shares['groups'], $shares['circles']) as $share) {
+			/** @var Share $share */
+			$elementIds[$share->getNodeId()] = true;
+		}
+		$elementIds = array_keys($elementIds);
+
+		if ($elementType === 'table') {
+			return $this->tableMapper->findMany($elementIds);
+		}
+
+		if ($elementType === 'view') {
+			return $this->viewMapper->findMany($elementIds);
+		}
+
+		throw new InternalError('Cannot find element of type ' . $elementType);
+	}
 
 	/**
 	 * @param int $elementId

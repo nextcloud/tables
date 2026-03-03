@@ -76,7 +76,6 @@ class CircleHelper {
 	/**
 	 * @param string $userId
 	 * @return Circle[]
-	 * @throws InternalError
 	 */
 	public function getUserCircles(string $userId): array {
 		if (!$this->circlesEnabled) {
