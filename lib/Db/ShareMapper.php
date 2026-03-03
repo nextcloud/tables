@@ -66,7 +66,7 @@ class ShareMapper extends QBMapper {
 	 *
 	 * @throws Exception
 	 */
-	public function findShareForNode(int $nodeId, string $nodeType, string $receiver, ?string $receiverType = null): Share {
+	public function findShareForNode(int $nodeId, string $nodeType, string $receiver, ?string $receiverType = null): ?Share {
 		// if shared with user
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -77,16 +77,9 @@ class ShareMapper extends QBMapper {
 		if ($receiverType) {
 			$qb->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)));
 		}
-		try {
-			$items = $this->findEntities($qb);
-			if (count($items) > 0) {
-				return $items[0];
-			}
-		} catch (Exception $e) {
-			$this->logger->warning('Exception occurred while executing SQL statement: ' . $e->getMessage());
-		}
 
-		throw new Exception('no shares found as expected');
+		$items = $this->findEntities($qb);
+		return $items[0] ?? null;
 	}
 
 	/**
@@ -230,5 +223,20 @@ class ShareMapper extends QBMapper {
 		}
 		$qb->where($orX);
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function changeReceiverForNode(string $nodeType, int $nodeId, string $newReceiver, string $oldReceiver, string $sender): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->table)
+			->set('receiver', $qb->createNamedParameter($newReceiver, IQueryBuilder::PARAM_STR))
+			->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('sender', $qb->createNamedParameter($sender, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($oldReceiver, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)))
+			->executeStatement();
 	}
 }

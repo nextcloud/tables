@@ -34,6 +34,17 @@ class ContextNavigationMapper extends QBMapper {
 	/**
 	 * @throws Exception
 	 */
+	public function deleteByShareIdAndUserId(int $shareId, string $userId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->tableName)
+			->where($qb->expr()->eq('share_id', $qb->createNamedParameter($shareId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
+			->executeStatement();
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public function setDisplayModeByShareId(int $shareId, int $displayMode, string $userId): ContextNavigation {
 		$entity = new ContextNavigation();
 		$entity->setShareId($shareId);
