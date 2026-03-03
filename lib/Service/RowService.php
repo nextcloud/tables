@@ -343,6 +343,7 @@ class RowService extends SuperService {
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
 			if ($column) {
+				$this->validateColumnValueLimits($column, $entry['value']);
 				$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
 				$columnBusiness->validateValue($entry['value'], $column, $this->userId, $tableId, $rowId);
 			}
@@ -863,6 +864,29 @@ class RowService extends SuperService {
 		} catch (\Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * validate column value constraints (textMaxLength, numberMin, numberMax).
+	 *
+	 * @param Column $column
+	 * @param mixed $value
+	 *
+	 * @throws BadRequestError
+	 */
+	private function validateColumnValueLimits(Column $column, $value): void {
+		$textMaxLength = $column->getTextMaxLength();
+		if ($textMaxLength !== null && is_string($value) && mb_strlen($value) > $textMaxLength) {
+			throw new BadRequestError('Value for column ' . $column->getTitle() . ' exceeds maximum length of ' . $textMaxLength);
+		}
+		$numberMin = $column->getNumberMin();
+		if ($numberMin !== null && is_numeric($value) && $value < $numberMin) {
+			throw new BadRequestError('Value for column ' . $column->getTitle() . ' is less than minimum allowed value of ' . $numberMin);
+		}
+		$numberMax = $column->getNumberMax();
+		if ($numberMax !== null && is_numeric($value) && $value > $numberMax) {
+			throw new BadRequestError('Value for column ' . $column->getTitle() . ' exceeds maximum allowed value of ' . $numberMax);
 		}
 	}
 }
