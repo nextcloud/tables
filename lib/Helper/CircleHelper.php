@@ -130,7 +130,7 @@ class CircleHelper {
 		}
 	}
 
-	public function circleExists(string $circleId, ?string $userId): bool {
+	public function circleExists(string $circleId, string $userId): bool {
 		if (!$this->circlesEnabled) {
 			return false;
 		}
