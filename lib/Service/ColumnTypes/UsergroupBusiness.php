@@ -7,9 +7,71 @@
 
 namespace OCA\Tables\Service\ColumnTypes;
 
+use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Helper\CircleHelper;
+use OCP\IGroupManager;
+use OCP\IUserManager;
+use Psr\Log\LoggerInterface;
 
 class UsergroupBusiness extends SuperBusiness {
+
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected CircleHelper $circleHelper,
+		protected IUserManager $userManager,
+		protected IGroupManager $groupManager,
+	) {
+		parent::__construct($logger);
+	}
+
+	/**
+	 * @param mixed $value
+	 * @param Column $column
+	 * @param string $userId
+	 * @param int $tableId
+	 * @param int|null $rowId
+	 *
+	 * @throws BadRequestError
+	 */
+	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
+		if ($value === null) {
+			return;
+		}
+
+		if (is_string($value)) {
+			$value = json_decode($value, true);
+		}
+
+		if (!is_array($value)) {
+			throw new BadRequestError('Invalid value for usergroup column');
+		}
+
+		foreach ($value as $userGroupEntry) {
+			if (!isset($userGroupEntry['id']) || !is_string($userGroupEntry['id'])) {
+				throw new BadRequestError('Invalid value for usergroup id');
+			}
+			if (!isset($userGroupEntry['type']) || !is_int($userGroupEntry['type'])) {
+				throw new BadRequestError('Invalid usergroup type');
+			}
+			if ($userGroupEntry['type'] === UsergroupType::USER) {
+				if (!$this->userManager->get($userGroupEntry['id'])) {
+					throw new BadRequestError('User not found');
+				}
+			}
+			if ($userGroupEntry['type'] === UsergroupType::GROUP) {
+				if (!$this->groupManager->get($userGroupEntry['id'])) {
+					throw new BadRequestError('Group not found');
+				}
+			}
+			if ($userGroupEntry['type'] === UsergroupType::CIRCLE) {
+				if (!$this->circleHelper->circleExists($userGroupEntry['id'], $userId)) {
+					throw new BadRequestError('Circle not found');
+				}
+			}
+		}
+	}
 
 	/**
 	 * Parse frontend value (array) and transform for using it in the database (array)
