@@ -9,6 +9,7 @@ namespace OCA\Tables\Controller;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -123,6 +124,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -177,6 +179,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -228,6 +231,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -276,6 +280,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
@@ -325,6 +330,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
