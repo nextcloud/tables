@@ -32,6 +32,7 @@ import permissionsMixin from '../../shared/components/ncTable/mixins/permissions
 import NcUserPicker from '../../shared/components/ncUserPicker/NcUserPicker.vue'
 import { mapState, mapActions } from 'pinia'
 import { getCurrentUser } from '@nextcloud/auth'
+import rebuildNavigation from '../../service/rebuild-navigation.js'
 import { useTablesStore } from '../../store/store.js'
 
 export default {
@@ -84,6 +85,8 @@ export default {
 					name: this.context?.name,
 					user: this.newOwnerId,
 				}))
+
+				await rebuildNavigation()
 
 				if (transferId === this.activeContextId) {
 					await this.$router.push('/').catch(err => err)
