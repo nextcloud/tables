@@ -44,7 +44,11 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 		// values is an array of option-ids as string
 		const objects = []
 		values?.forEach(id => {
-			objects.push(this.getOptionObject(parseInt(id)))
+			const optionsObject = this.getOptionObject(parseInt(id))
+			// skip options that not exists anymore
+			if (optionsObject) {
+				objects.push(optionsObject)
+			}
 		})
 		return objects
 	}
