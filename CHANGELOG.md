@@ -5,6 +5,27 @@
 
 # Changelog
 
+
+## v1.0.5
+
+### Added
+* [\[stable1.0\] feat: Validate custom settings (tables#2362)](https://github.com/nextcloud/tables/pull/2362)
+
+### Fixed
+* [\[Backport 1.0\] Fix: Fix import when column was adjusted in preview screen (tables#2324)](https://github.com/nextcloud/tables/pull/2324)
+* [\[stable1.0\] fix: Merge views instead of resetting to avoid race condition (tables#2341)](https://github.com/nextcloud/tables/pull/2341)
+* [\[stable1.0\] \#1360: Client\-side only enforcement of textMaxLength (tables#2349)](https://github.com/nextcloud/tables/pull/2349)
+* [\[stable1.0\] fix: transfer shares on context ownership change (tables#2352)](https://github.com/nextcloud/tables/pull/2352)
+* [\[stable1.0\] Check for column type (tables#2354)](https://github.com/nextcloud/tables/pull/2354)
+* [\[stable1.0\] fix: Ensure context icon is valid (tables#2356)](https://github.com/nextcloud/tables/pull/2356)
+* [\[stable1.0\] fix: add arbitrary team (tables#2360)](https://github.com/nextcloud/tables/pull/2360)
+
+### Dependencies
+* [Chore\(deps\): update dependency @rollup/rollup\-linux\-x64\-gnu to ^4.59.0 \(stable1.0\) (tables#2345)](https://github.com/nextcloud/tables/pull/2345)
+* [Chore\(deps\): update dependency vite to ^7.3.1 \(stable1.0\) (tables#2304)](https://github.com/nextcloud/tables/pull/2304)
+* [Fix\(deps\): update dependency @nextcloud/files to ^3.12.2 \(stable1.0\) (tables#2263)](https://github.com/nextcloud/tables/pull/2263)
+
+
 ## 1.0.4
 
 ### Fixed
