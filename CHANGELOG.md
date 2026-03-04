@@ -5,6 +5,12 @@
 
 # Changelog
 
+## 0.9.9
+
+### Fixed
+* [\[stable0.9\] fix: transfer shares on context ownership change (tables#2353)](https://github.com/nextcloud/tables/pull/2353)
+* [\[stable0.9\] fix: add arbitrary team (tables#2361)](https://github.com/nextcloud/tables/pull/2361)
+
 ## 0.9.8
 
 ### Fixed
