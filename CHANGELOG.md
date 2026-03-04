@@ -5,6 +5,33 @@
 
 # Changelog
 
+## 2.0.1
+
+### Added
+* [Enhancement: Apply user's timezone to meta fields (tables#2210)](https://github.com/nextcloud/tables/pull/2210)
+* [Feat: Validate custom settings (tables#2303)](https://github.com/nextcloud/tables/pull/2303)
+
+### Fixed
+* [Fix: Merge views instead of resetting to avoid race condition (tables#2279)](https://github.com/nextcloud/tables/pull/2279)
+* [Fix: transfer shares on context ownership change (tables#2351)](https://github.com/nextcloud/tables/pull/2351)
+* [Fix: Ensure context icon is valid (tables#2355)](https://github.com/nextcloud/tables/pull/2355)
+* [Fix: fix export table to csv with deleted options (tables#2357)](https://github.com/nextcloud/tables/pull/2357)
+* [Fix: Duplicate sidebar entries due to race condition (tables#2358)](https://github.com/nextcloud/tables/pull/2358)
+* [Fix: add arbitrary team (tables#2359)](https://github.com/nextcloud/tables/pull/2359)
+* [Fix: rename ACommonsColumnsController to fix openapi attraction (tables#2323)](https://github.com/nextcloud/tables/pull/2323)
+* [Client\-side only enforcement of textMaxLength (tables#2348)](https://github.com/nextcloud/tables/pull/2348)
+* [Check for column type (tables#2350)](https://github.com/nextcloud/tables/pull/2350)
+* [Perf: Optimize shares loading by eliminating N\+1 queries (tables#2293)](https://github.com/nextcloud/tables/pull/2293)
+
+### Dependencies
+* [Chore\(deps\): update dependency @rollup/rollup\-linux\-x64\-gnu to ^4.58.0 \(main\) (tables#2300)](https://github.com/nextcloud/tables/pull/2300)
+* [Fix\(deps\): update dependency @nextcloud/dialogs to ^7.3.0 \(main\) (tables#2344)](https://github.com/nextcloud/tables/pull/2344)
+* [Chore\(deps\): update dependency openapi\-typescript to ^7.13.0 \(main\) (tables#2338)](https://github.com/nextcloud/tables/pull/2338)
+
+### Other
+* [Refactor: Refactor business column classes (tables#2284)](https://github.com/nextcloud/tables/pull/2284)
+
+
 ## 2.0.0
 
 ### Added
