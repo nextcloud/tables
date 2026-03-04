@@ -102,6 +102,9 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
+			if (!$this->isValidIcon($iconName)) {
+				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
+			}
 			return new DataResponse($this->contextService->create(
 				$name,
 				$iconName,
@@ -128,9 +131,10 @@ class ContextController extends AOCSController {
 	 * @param ?string $description provide this parameter to set a new description
 	 * @param ?array{id: int, type: int, permissions: int, order: int} $nodes provide this parameter to set a new list of nodes.
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: returning the full context information
+	 * 400: bad request
 	 * 403: No permissions
 	 * 404: Not found
 	 *
@@ -139,6 +143,9 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
+			if ($iconName !== null && !$this->isValidIcon($iconName)) {
+				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
+			}
 			$nodes = $nodes !== null ? $this->sanitizeInputNodes($nodes) : null;
 			return new DataResponse($this->contextService->update(
 				$contextId,
@@ -269,6 +276,14 @@ class ContextController extends AOCSController {
 		}
 
 		return new DataResponse($this->contextService->updateContentOrder($pageId, $content));
+	}
+
+	protected function isValidIcon(string $iconName): bool {
+		if ($iconName === '' || !preg_match('/^[a-zA-Z0-9-]+$/', $iconName)) {
+			return false;
+		}
+		$iconPath = dirname(__DIR__, 2) . '/img/material/' . $iconName . '.svg';
+		return file_exists($iconPath);
 	}
 
 	/**
