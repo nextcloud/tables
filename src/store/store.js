@@ -507,12 +507,12 @@ export const useTablesStore = defineStore('store', {
 			let res
 			try {
 				res = await axios.get(generateOcsUrl('/apps/tables/api/2/tables/' + id))
-				
+
 				const existingTable = this.tables.find(table => table.id === id)
 				if (existingTable) {
 					return existingTable
 				}
-				
+
 				const tables = this.tables
 				tables.push(res.data.ocs.data)
 				this.setTables([...tables])
@@ -536,12 +536,12 @@ export const useTablesStore = defineStore('store', {
 			let res
 			try {
 				res = await axios.get(generateUrl('/apps/tables/view/' + id))
-				
+
 				const existingView = this.views.find(view => view.id === id)
 				if (existingView) {
 					return existingView
 				}
-				
+
 				const views = this.views
 				views.push(res.data)
 				this.setViews([...views])
