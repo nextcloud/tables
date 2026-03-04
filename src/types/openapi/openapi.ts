@@ -3261,6 +3261,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["Column"];
                 };
             };
+            /** @description Validation error */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -3272,6 +3283,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Internal error */
             readonly 500: {
                 headers: {
                     readonly [name: string]: unknown;

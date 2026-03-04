@@ -605,7 +605,8 @@ class Api1Controller extends ApiController {
 					$permissionDelete,
 					$permissionManage,
 					$displayMode
-				)->jsonSerialize());
+				)->jsonSerialize()
+			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -979,9 +980,11 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Updated column
+	 * 400: Validation error
+	 * 500: Internal error
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
