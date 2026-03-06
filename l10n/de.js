@@ -43,6 +43,7 @@ OC.L10N.register(
     "_%n row_::_%n rows_" : ["%n Zeile","%n Zeilen"],
     "table" : "Tabelle",
     "table view" : "Tabellenansicht",
+    "Column width must be between %1$s and %2$s." : "Spaltenbreite muss zwischen %1$s und %2$s liegen.",
     "This column was automatically created by the import service." : "Diese Spalte wurde automatisch vom Importdienst erstellt.",
     "Column \"%s\" contains a non-unique value." : "Spalte \"%s\" enthält einen nicht eindeutigen Wert.",
     "Welcome to %s Tables!" : "Willkommen zu %s-Tabellen!",

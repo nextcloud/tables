@@ -41,6 +41,7 @@
     "_%n row_::_%n rows_" : ["%n 列"],
     "table" : "表格",
     "table view" : "表格檢視",
+    "Column width must be between %1$s and %2$s." : "欄寬必須在 %1$s 到 %2$s 間。",
     "This column was automatically created by the import service." : "此欄為自動從匯入服務建立。",
     "Column \"%s\" contains a non-unique value." : "「%s」欄包含非唯一值。",
     "Welcome to %s Tables!" : "歡迎使用 %s 表格！",

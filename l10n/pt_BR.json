@@ -41,6 +41,7 @@
     "_%n row_::_%n rows_" : ["%n linha","%n linhas","%n linhas"],
     "table" : "tabela",
     "table view" : "Visualização de tabela",
+    "Column width must be between %1$s and %2$s." : "A largura da coluna deve estar entre %1$s e %2$s.",
     "This column was automatically created by the import service." : "Esta coluna foi criada automaticamente pelo serviço de importação.",
     "Column \"%s\" contains a non-unique value." : "A coluna \"%s\" contém um valor não único.",
     "Welcome to %s Tables!" : "Bem-vindo ao %s Tabelas!",
