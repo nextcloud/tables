@@ -43,6 +43,7 @@ OC.L10N.register(
     "_%n row_::_%n rows_" : ["%n row","%n rows"],
     "table" : "table",
     "table view" : "table view",
+    "Column width must be between %1$s and %2$s." : "Column width must be between %1$s and %2$s.",
     "This column was automatically created by the import service." : "This column was automatically created by the import service.",
     "Column \"%s\" contains a non-unique value." : "Column \"%s\" contains a non-unique value.",
     "Welcome to %s Tables!" : "Welcome to %s Tables!",
