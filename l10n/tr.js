@@ -43,6 +43,7 @@ OC.L10N.register(
     "_%n row_::_%n rows_" : ["%n satır","%n satır"],
     "table" : "tablo",
     "table view" : "tablo görünümü",
+    "Column width must be between %1$s and %2$s." : "Sütun genişliği %1$s ile %2$s arasında olmalıdır.",
     "This column was automatically created by the import service." : "Bu sütun, içe aktarma hizmeti tarafından otomatik olarak oluşturuldu.",
     "Column \"%s\" contains a non-unique value." : "\"%s\" sütununda benzersiz olmayan bir değer var.",
     "Welcome to %s Tables!" : "%s tablolar uygulamasına hoş geldiniz!",

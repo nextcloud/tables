@@ -30,6 +30,7 @@ OC.L10N.register(
     "Feeling over all" : "Sensazione su tutto",
     "Comments" : "Commenti",
     "Name" : "Nome",
+    "Account manager" : "Responsabile dell'account",
     "Description" : "Descrizione",
     "Comment" : "Commento",
     "Dog" : "Cane",
