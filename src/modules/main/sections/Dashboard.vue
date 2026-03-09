@@ -262,11 +262,13 @@ export default {
 		},
 
 		async loadShares() {
-			// load shares for table
-			this.loadingTableShares = true
-			const allTableShares = await this.getSharesForTableFromBE(this.table.id)
-			this.tableShares = allTableShares.filter(s => !isPublicLinkShare(s))
-			this.loadingTableShares = false
+			if (this.canManageElement(this.table)) {
+				// load shares for table
+				this.loadingTableShares = true
+				const allTableShares = await this.getSharesForTableFromBE(this.table.id)
+				this.tableShares = allTableShares.filter(s => !isPublicLinkShare(s))
+				this.loadingTableShares = false
+			}
 
 			// load shares for all views
 			this.loadingViewShares = true
