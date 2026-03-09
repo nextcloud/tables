@@ -52,6 +52,11 @@
       "matchPackagePrefixes": ["@tiptap/", "prosemirror-"]
     },
     {
+      "matchBaseBranches": ["/^stable1.0$/"],
+      "matchPackageNames": ["@nextcloud/files"],
+      "allowedVersions": "<4"
+    },
+    {
       "matchPackageNames": ["vue"],
       "allowedVersions": "<3"
     },
