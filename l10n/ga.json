@@ -41,6 +41,7 @@
     "_%n row_::_%n rows_" : ["%n ró","%n rónna","%n rónna","%n rónna","%n rónna"],
     "table" : "tábla",
     "table view" : "amharc tábla",
+    "Column width must be between %1$s and %2$s." : "Ní mór leithead an cholúin a bheith idir %1$s agus %2$s.",
     "This column was automatically created by the import service." : "Chruthaigh an tseirbhís iompórtála an colún seo go huathoibríoch.",
     "Column \"%s\" contains a non-unique value." : "Tá luach neamh-uathúil sa cholún \"%s\".",
     "Welcome to %s Tables!" : "Fáilte go Táblaí %s!",
