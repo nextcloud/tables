@@ -88,6 +88,19 @@
 			</div>
 		</div>
 	</NcDialog>
+
+	<NcDialog v-else-if="importResults"
+			  :name="t('tables', 'Import successful')"
+			  :open.sync="showResultsDialog"
+			  size="small">
+		<template #actions>
+			<NcButton :aria-label="t('tables', 'Close')" @click="closeResultsDialog()">
+				{{ t('tables', 'Close') }}
+			</NcButton>
+		</template>
+
+		<ImportResults :results="importResults" />
+	</NcDialog>
 </template>
 
 <script>
@@ -106,6 +119,7 @@ import { showError, showInfo } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { translate as t } from '@nextcloud/l10n'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
+import ImportResults from './ImportResults.vue'
 
 export default {
 	name: 'FileActionImport',
@@ -113,6 +127,7 @@ export default {
 	components: {
 		NcButton,
 		NcDialog,
+		ImportResults,
 		NcLoadingIcon,
 		NcSelect,
 		NcCheckboxRadioSwitch,
@@ -141,7 +156,8 @@ export default {
 			},
 			existingTables: [],
 			selectedTable: null,
-
+			importResults: null,
+			showResultsDialog: true,
 			importScheduled: false,
 		}
 	},
@@ -182,6 +198,9 @@ export default {
 		},
 		setNewTableTitle(title) {
 			this.newTable.title = title.srcElement.value
+		},
+		closeResultsDialog() {
+			this.showResultsDialog = false
 		},
 		async importFile() {
 			this.importingFile = true
