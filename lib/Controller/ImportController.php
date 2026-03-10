@@ -65,7 +65,7 @@ class ImportController extends Controller {
 	}
 
 	/**
-	 * @deprecated Use {@link scheduleImportInTable} instead
+	 * @deprecated Use {@link importV2InTable} instead
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
@@ -78,12 +78,15 @@ class ImportController extends Controller {
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
-	public function scheduleImportInTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
+	public function importV2InTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($tableId, $path, $createMissingColumns, $columnsConfig) {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			$this->service->scheduleImport($tableId, null, $path, $createMissingColumns, $columnsConfig);
-
-			return new DataResponse();
+			if ($this->service->shouldImportAsync($path)) {
+				$this->service->scheduleImport($tableId, null, $path, $createMissingColumns, $columnsConfig);
+				return ['async' => true];
+			}
+			$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_USER_FILE, $path, $tableId, null, $createMissingColumns, $columnsConfig);
+			return ['async' => false, 'result' => $result];
 		});
 	}
 
@@ -97,7 +100,7 @@ class ImportController extends Controller {
 	}
 
 	/**
-	 * @deprecated Use {@link scheduleImportInView} instead
+	 * @deprecated Use {@link importV2InView} instead
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
@@ -110,12 +113,15 @@ class ImportController extends Controller {
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
-	public function scheduleImportInView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
+	public function importV2InView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($viewId, $path, $createMissingColumns, $columnsConfig) {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			$this->service->scheduleImport(null, $viewId, $path, $createMissingColumns, $columnsConfig);
-
-			return new DataResponse();
+			if ($this->service->shouldImportAsync($path)) {
+				$this->service->scheduleImport(null, $viewId, $path, $createMissingColumns, $columnsConfig);
+				return ['async' => true];
+			}
+			$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_USER_FILE, $path, null, $viewId, $createMissingColumns, $columnsConfig);
+			return ['async' => false, 'result' => $result];
 		});
 	}
 
@@ -135,7 +141,7 @@ class ImportController extends Controller {
 	}
 
 	/**
-	 * @deprecated Use {@link scheduleImportUploadInTable} instead
+	 * @deprecated Use {@link importV2UploadInTable} instead
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
@@ -171,15 +177,18 @@ class ImportController extends Controller {
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
-	public function scheduleImportUploadInTable(int $tableId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
+	public function importV2UploadInTable(int $tableId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
 		try {
 			$columnsConfigArray = json_decode($columnsConfig, true);
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(function () use ($tableId, $file, $createMissingColumns, $columnsConfigArray) {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-				$this->service->scheduleImport($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
-
-				return new DataResponse();
+				if ($this->service->shouldImportAsync($file['tmp_name'])) {
+					$this->service->scheduleImport($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
+					return ['async' => true];
+				}
+				$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_UPLOADED_FILE, $file['tmp_name'], $tableId, null, $createMissingColumns, $columnsConfigArray);
+				return ['async' => false, 'result' => $result];
 			});
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
@@ -187,10 +196,6 @@ class ImportController extends Controller {
 		}
 	}
 
-	/**
-	 * @deprecated Use {@link scheduleImportUploadInView} instead
-	 */
-	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importUploadInView(int $viewId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
 		try {
@@ -206,18 +211,22 @@ class ImportController extends Controller {
 		}
 	}
 
+
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
-	public function scheduleImportUploadInView(int $viewId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
+	public function importV2UploadInView(int $viewId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
 		try {
 			$columnsConfigArray = json_decode($columnsConfig, true);
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(function () use ($viewId, $file, $createMissingColumns, $columnsConfigArray) {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-				$this->service->scheduleImport(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
-
-				return new DataResponse();
+				if ($this->service->shouldImportAsync($file['tmp_name'])) {
+					$this->service->scheduleImport(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
+					return ['async' => true];
+				}
+				$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_UPLOADED_FILE, $file['tmp_name'], null, $viewId, $createMissingColumns, $columnsConfigArray);
+				return ['async' => false, 'result' => $result];
 			});
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);

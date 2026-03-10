@@ -49,13 +49,16 @@ class ImportTableJob extends QueuedJob {
 			$user = $this->userManager->get($userId);
 			$this->userSession->setUser($user);
 
+			$importType = $argument['user_file_path'] ? ImportService::IMPORT_TYPE_USER_FILE : ImportService::IMPORT_TYPE_APP_FILE;
+			$path = $argument['user_file_path'] ?: $argument['import_file_name'];
+
 			$importStats = $this->importService
 				->importV2(
 					$userId,
+					$importType,
+					$path,
 					$tableId,
 					$viewId,
-					$argument['user_file_path'],
-					$argument['import_file_name'],
 					$argument['create_missing_columns'],
 					$argument['columns_config']
 				);
