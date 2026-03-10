@@ -9,7 +9,7 @@
 		@closing="actionCancel">
 		<div class="modal__content">
 			<!-- Starting -->
-			<div v-if="!loading && !importScheduled && preview === null && !waitForReload">
+			<div v-if="!loading && !importInitialized && preview === null && !waitForReload">
 				<div class="row space-T">
 					{{ t('tables', 'Add data to the table from a file') }}
 				</div>
@@ -67,13 +67,26 @@
 			</div>
 
 			<!-- show preview -->
-			<div v-if="!loading && preview !== null && !importScheduled && !waitForReload">
+			<div v-if="!loading && preview !== null && !importInitialized && !waitForReload">
 				<ImportPreview :preview-data="preview" :element="element" :create-missing-columns="createMissingColumns" @update:columns="onUpdateColumnsConfig" />
 
 				<div class="row">
 					<div class="fix-col-4 space-T end">
 						<NcButton :aria-label="t('tables', 'Import')" type="primary" @click="actionImport">
 							{{ t('tables', 'Import') }}
+						</NcButton>
+					</div>
+				</div>
+			</div>
+
+			<!-- show results -->
+			<div v-if="!loading && importInitialized && result !== null && !waitForReload">
+				<ImportResults :results="result" />
+
+				<div class="row">
+					<div class="fix-col-4 space-T end">
+						<NcButton :aria-label="t('tables', 'Done')" type="primary" @click="actionCloseAndReload">
+							{{ t('tables', 'Done') }}
 						</NcButton>
 					</div>
 				</div>
@@ -114,6 +127,7 @@ import { generateUrl } from '@nextcloud/router'
 import { useTablesStore } from '../../store/store.js'
 import { mapState, mapActions } from 'pinia'
 import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
+import ImportResults from './ImportResults.vue'
 import ImportPreview from './ImportPreview.vue'
 import { translate as t } from '@nextcloud/l10n'
 import { useDataStore } from '../../store/data.js'
@@ -128,6 +142,7 @@ export default {
 		IconFile,
 		NcDialog,
 		NcButton,
+		ImportResults,
 		ImportPreview,
 		NcCheckboxRadioSwitch,
 		RowFormWrapper,
@@ -157,7 +172,8 @@ export default {
 			pathError: false,
 			loading: false,
 			importFailed: false,
-			importScheduled: false,
+			result: null,
+			importInitialized: false,
 			preview: null,
 			columnsConfig: [],
 			waitForReload: false,
@@ -195,7 +211,7 @@ export default {
 		title() {
 			let title = t('tables', 'Import table')
 
-			if (!this.loading && this.preview !== null && !this.importScheduled && !this.waitForReload) {
+			if (!this.loading && this.preview !== null && !this.importInitialized && !this.waitForReload) {
 				title = t('tables', 'Preview imported table')
 			}
 
@@ -329,8 +345,6 @@ export default {
 
 			if (this.selectedUploadFile) {
 				await this.importFromUploadFile()
-				showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
-				this.actionCloseAndReload()
 				return null
 			}
 
@@ -342,8 +356,6 @@ export default {
 
 			this.pathError = false
 			await this.importFromPath()
-			showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
-			this.actionCloseAndReload()
 		},
 		validateColumnsConfig() {
 			const existColumnCount = {}
@@ -371,11 +383,17 @@ export default {
 			this.loading = true
 			try {
 				const res = await axios.post(
-					generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id + '/jobs'),
+					generateUrl('/apps/tables/v2/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id),
 					{ path: this.path, createMissingColumns: this.getCreateMissingColumns, columnsConfig: this.columnsConfig },
 				)
 				if (res.status === 200) {
-					this.importScheduled = true
+					this.importInitialized = true
+					if (res.data.async) {
+						showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
+						this.actionCloseAndReload()
+					} else {
+						this.result = res.data.result
+					}
 				} else {
 					console.debug('error while importing', res)
 					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
@@ -388,7 +406,7 @@ export default {
 		async importFromUploadFile() {
 			this.loading = true
 			try {
-				const url = generateUrl('/apps/tables/importupload/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id + '/jobs')
+				const url = generateUrl('/apps/tables/v2/importupload/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id)
 				const formData = new FormData()
 				formData.append('uploadfile', this.selectedUploadFile)
 				formData.append('createMissingColumns', this.getCreateMissingColumns)
@@ -401,7 +419,13 @@ export default {
 				})
 
 				if (res.status === 200) {
-					this.importScheduled = true
+					this.importInitialized = true
+					if (res.data.async) {
+						showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
+						this.actionCloseAndReload()
+					} else {
+						this.result = res.data.result
+					}
 				} else {
 					console.debug('error while importing', res)
 					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
@@ -419,7 +443,8 @@ export default {
 			this.path = ''
 			this.pathError = false
 			this.createMissingColumns = true
-			this.importScheduled = false
+			this.result = null
+			this.importInitialized = false
 			this.preview = null
 			this.loading = false
 		},
@@ -501,6 +526,19 @@ export default {
 		gap: 12px;
 		padding-inline-start: 12px;
 		padding-bottom: 16px;
+	}
+
+	.result-headline {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		font-size: medium;
+	}
+
+	.errors-count {
+		display: flex;
+		gap: 4px;
 	}
 
 </style>

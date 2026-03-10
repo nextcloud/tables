@@ -102,13 +102,13 @@ return [
 
 		// import
 		['name' => 'import#previewImportTable', 'url' => '/import-preview/table/{tableId}', 'verb' => 'POST'],
-		['name' => 'import#scheduleImportInTable', 'url' => '/import/table/{tableId}/jobs', 'verb' => 'POST'],
-		['name' => 'import#scheduleImportInView', 'url' => '/import/view/{viewId}/jobs', 'verb' => 'POST'],
+		['name' => 'import#importV2InTable', 'url' => '/v2/import/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'import#importV2InView', 'url' => '/v2/import/view/{viewId}', 'verb' => 'POST'],
 		['name' => 'import#previewImportView', 'url' => '/import-preview/view/{viewId}', 'verb' => 'POST'],
 		['name' => 'import#previewUploadImportTable', 'url' => '/importupload-preview/table/{tableId}', 'verb' => 'POST'],
-		['name' => 'import#scheduleImportUploadInTable', 'url' => '/importupload/table/{tableId}/jobs', 'verb' => 'POST'],
 		['name' => 'import#previewUploadImportView', 'url' => '/importupload-preview/view/{viewId}', 'verb' => 'POST'],
-		['name' => 'import#scheduleImportUploadInView', 'url' => '/importupload/view/{viewId}/jobs', 'verb' => 'POST'],
+		['name' => 'import#importV2UploadInTable', 'url' => '/v2/importupload/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'import#importV2UploadInView', 'url' => '/v2/importupload/view/{viewId}', 'verb' => 'POST'],
 		// deprecated endpoints
 		['name' => 'import#importUploadInTable', 'url' => '/importupload/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'import#importUploadInView', 'url' => '/importupload/view/{viewId}', 'verb' => 'POST'],

@@ -22,6 +22,7 @@ use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\ImportStats;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Cell;
+use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\DataType;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\IOFactory;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -77,6 +78,13 @@ class ImportService extends SuperService {
 	private array $rawColumnTitles = [];
 	private array $rawColumnDataTypes = [];
 	private array $columnsConfig = [];
+
+	public const IMPORT_TYPE_USER_FILE = 'user_file';
+	public const IMPORT_TYPE_APP_FILE = 'app_file';
+	public const IMPORT_TYPE_UPLOADED_FILE = 'uploaded_file';
+
+	private const MAX_ROWS_FOR_IMMEDIATE_IMPORT = 200;
+	private const MAX_COLUMNS_FOR_IMMEDIATE_IMPORT = 20;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -146,6 +154,45 @@ class ImportService extends SuperService {
 		}
 
 		return $previewData;
+	}
+
+	/**
+	 * Check if import should be done asynchronously based on file size
+	 */
+	public function shouldImportAsync(string $path): bool {
+		try {
+			if (is_uploaded_file($path) && file_exists($path)) {
+				$spreadsheet = IOFactory::load($path);
+			} else {
+				$userFolder = $this->rootFolder->getUserFolder($this->userId);
+				if ($userFolder->nodeExists($path)) {
+					$file = $userFolder->get($path);
+					$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
+					if ($tmpFileName) {
+						$spreadsheet = IOFactory::load($tmpFileName);
+					} else {
+						// If we can't read the file, default to async
+						return true;
+					}
+				} else {
+					// File doesn't exist, default to async
+					return true;
+				}
+			}
+
+			$worksheet = $spreadsheet->getActiveSheet();
+
+			$highestColumn = $worksheet->getHighestColumn();
+			$columnCount = Coordinate::columnIndexFromString($highestColumn);
+
+			// Count rows (excluding header row)
+			$rowCount = $worksheet->getHighestRow() - 1;
+
+			return $columnCount * $rowCount > self::MAX_COLUMNS_FOR_IMMEDIATE_IMPORT * self::MAX_ROWS_FOR_IMMEDIATE_IMPORT;
+		} catch (\Throwable $e) {
+			$this->logger->error('Error checking import file size', ['exception' => $e]);
+			return true;
+		}
 	}
 
 	/**
@@ -439,8 +486,10 @@ class ImportService extends SuperService {
 	 * @param string $userId
 	 * @param ?int $tableId
 	 * @param ?int $viewId
-	 * @param ?string $userFilePath Path to a file in the user's storage, if the file is not uploaded
-	 * @param ?string $importFileName Name of the file in the app data directory, if the file is uploaded
+	 * @param self::IMPORT_TYPE_* $importType
+	 * @param string $path Path to a file in the user's storage, if the file is not uploaded
+	 *                     or Name of the file in the app data directory, if the file is uploaded
+	 *                     or Path to uploaded file
 	 * @param bool $createMissingColumns
 	 * @param array $columnsConfig
 	 * @return ImportStats
@@ -448,7 +497,7 @@ class ImportService extends SuperService {
 	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 */
-	public function importV2(string $userId, ?int $tableId, ?int $viewId, ?string $userFilePath, ?string $importFileName, bool $createMissingColumns = true, array $columnsConfig = []): ImportStats {
+	public function importV2(string $userId, string $importType, string $path, ?int $tableId, ?int $viewId, bool $createMissingColumns = true, array $columnsConfig = []): ImportStats {
 		$this->userId = $userId;
 		$this->tableId = $tableId;
 		$this->viewId = $viewId;
@@ -456,15 +505,21 @@ class ImportService extends SuperService {
 		$this->columnsConfig = $columnsConfig;
 
 		try {
-			if ($importFileName) {
-				$file = $this->getImportAppDataDir()->getFile($importFileName);
-				$temporaryFile = $this->tempManager->getTemporaryFile('.' . $file->getExtension());
-				file_put_contents($temporaryFile, $file->getContent());
+			if ($importType === self::IMPORT_TYPE_USER_FILE) {
+				$file = $this->rootFolder->getUserFolder($this->userId)->get($path);
+				$temporaryFile = $file->getStorage()->getLocalFile($file->getInternalPath());
 				$spreadsheet = IOFactory::load($temporaryFile);
 				$this->loop($spreadsheet->getActiveSheet());
-			} elseif ($userFilePath) {
-				$file = $this->rootFolder->getUserFolder($this->userId)->get($userFilePath);
-				$temporaryFile = $file->getStorage()->getLocalFile($file->getInternalPath());
+			} elseif ($importType === self::IMPORT_TYPE_UPLOADED_FILE) {
+				if (!is_uploaded_file($path) || !file_exists($path)) {
+					throw new NotFoundError('Uploaded file for import not found.');
+				}
+				$spreadsheet = IOFactory::load($path);
+				$this->loop($spreadsheet->getActiveSheet());
+			} elseif ($importType === self::IMPORT_TYPE_APP_FILE) {
+				$file = $this->getImportAppDataDir()->getFile($path);
+				$temporaryFile = $this->tempManager->getTemporaryFile('.' . $file->getExtension());
+				file_put_contents($temporaryFile, $file->getContent());
 				$spreadsheet = IOFactory::load($temporaryFile);
 				$this->loop($spreadsheet->getActiveSheet());
 			} else {
