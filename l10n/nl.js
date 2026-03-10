@@ -222,6 +222,7 @@ OC.L10N.register(
     "Copy link" : "Link kopiëren",
     "Open link" : "Open link",
     "Close editor" : "Sluit editor",
+    "Go to previous page" : "Ga naar vorige pagina",
     "Confirmation" : "Bevestiging",
     "Confirm" : "Bevestigen",
     "Content" : "Inhoud",
