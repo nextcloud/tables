@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcDialog v-if="!importScheduled"
+	<NcDialog v-if="!importResults"
 		:name="t('tables', 'Import file into Tables')"
 		size="normal"
 		@closing="closeImportDialog">
@@ -88,6 +88,19 @@
 			</div>
 		</div>
 	</NcDialog>
+
+	<NcDialog v-else-if="importResults && !importResults.async"
+		:name="t('tables', 'Import successful')"
+		:open.sync="showResultsDialog"
+		size="small">
+		<template #actions>
+			<NcButton :aria-label="t('tables', 'Close')" @click="closeResultsDialog()">
+				{{ t('tables', 'Close') }}
+			</NcButton>
+		</template>
+
+		<ImportResults :results="importResults.result" />
+	</NcDialog>
 </template>
 
 <script>
@@ -106,6 +119,7 @@ import { showError, showInfo } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { translate as t } from '@nextcloud/l10n'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
+import ImportResults from './ImportResults.vue'
 
 export default {
 	name: 'FileActionImport',
@@ -113,6 +127,7 @@ export default {
 	components: {
 		NcButton,
 		NcDialog,
+		ImportResults,
 		NcLoadingIcon,
 		NcSelect,
 		NcCheckboxRadioSwitch,
@@ -141,8 +156,8 @@ export default {
 			},
 			existingTables: [],
 			selectedTable: null,
-
-			importScheduled: false,
+			importResults: null,
+			showResultsDialog: true,
 		}
 	},
 
@@ -183,16 +198,19 @@ export default {
 		setNewTableTitle(title) {
 			this.newTable.title = title.srcElement.value
 		},
+		closeResultsDialog() {
+			this.showResultsDialog = false
+		},
 		async importFile() {
 			this.importingFile = true
 
 			if (this.importAsNew) {
-				this.importScheduled = await importToNewTable(this.newTable.title, this.newTable.emoji, this.file)
+				this.importResults = await importToNewTable(this.newTable.title, this.newTable.emoji, this.file)
 
-				if (this.importScheduled) {
-					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
-				} else {
+				if (!this.importResults) {
 					showError(t('tables', 'Could not create table'))
+				} else if (this.importResults.async) {
+					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
 				}
 			} else {
 				if (!this.selectedTable) {
@@ -200,12 +218,12 @@ export default {
 					return
 				}
 
-				this.importScheduled = await importToExistingTable(this.selectedTable.value, this.file, this.createMissingColumns)
+				this.importResults = await importToExistingTable(this.selectedTable.value, this.file, this.createMissingColumns)
 
-				if (this.importScheduled) {
-					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
-				} else {
+				if (!this.importResults) {
 					showError(t('tables', 'Could not import data to table'))
+				} else if (this.importResults.async) {
+					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
 				}
 			}
 
@@ -242,12 +260,12 @@ async function insertTable(title, emoji) {
 }
 
 async function updateTable(tableId, path, createMissingColumns) {
-	const res = await axios.post(generateUrl(`/apps/tables/import/table/${tableId}/jobs`), {
+	const res = await axios.post(generateUrl(`/apps/tables/v2/import/table/${tableId}`), {
 		path,
 		createMissingColumns,
 	})
 
-	return res.status === 200
+	return res.data
 }
 </script>
 
