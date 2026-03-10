@@ -22,6 +22,7 @@ use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\ImportStats;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Cell;
+use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\DataType;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\IOFactory;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -77,6 +78,9 @@ class ImportService extends SuperService {
 	private array $rawColumnTitles = [];
 	private array $rawColumnDataTypes = [];
 	private array $columnsConfig = [];
+
+	private const MAX_ROWS_FOR_IMMEDIATE_IMPORT = 200;
+	private const MAX_COLUMNS_FOR_IMMEDIATE_IMPORT = 20;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -146,6 +150,45 @@ class ImportService extends SuperService {
 		}
 
 		return $previewData;
+	}
+
+	/**
+	 * Check if import should be done asynchronously based on file size
+	 */
+	public function shouldImportAsync(string $path): bool {
+		try {
+			if (is_uploaded_file($path) && file_exists($path)) {
+				$spreadsheet = IOFactory::load($path);
+			} else {
+				$userFolder = $this->rootFolder->getUserFolder($this->userId);
+				if ($userFolder->nodeExists($path)) {
+					$file = $userFolder->get($path);
+					$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
+					if ($tmpFileName) {
+						$spreadsheet = IOFactory::load($tmpFileName);
+					} else {
+						// If we can't read the file, default to async
+						return true;
+					}
+				} else {
+					// File doesn't exist, default to async
+					return true;
+				}
+			}
+
+			$worksheet = $spreadsheet->getActiveSheet();
+
+			$highestColumn = $worksheet->getHighestColumn();
+			$columnCount = Coordinate::columnIndexFromString($highestColumn);
+
+			// Count rows (excluding header row)
+			$rowCount = $worksheet->getHighestRow() - 1;
+
+			return $columnCount * $rowCount  > self::MAX_COLUMNS_FOR_IMMEDIATE_IMPORT * self::MAX_ROWS_FOR_IMMEDIATE_IMPORT;
+		} catch (\Throwable $e) {
+			$this->logger->error('Error checking import file size', ['exception' => $e]);
+			return true;
+		}
 	}
 
 	/**

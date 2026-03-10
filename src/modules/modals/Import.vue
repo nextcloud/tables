@@ -371,11 +371,18 @@ export default {
 			this.loading = true
 			try {
 				const res = await axios.post(
-					generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id + '/jobs'),
+					generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id),
 					{ path: this.path, createMissingColumns: this.getCreateMissingColumns, columnsConfig: this.columnsConfig },
 				)
 				if (res.status === 200) {
-					this.importScheduled = true
+					if (res.data.async) {
+						// Import was scheduled asynchronously
+						this.importScheduled = true
+					} else {
+						// Import completed immediately, show results
+						this.importScheduled = true
+						// You could optionally show the results here with res.data.result
+					}
 				} else {
 					console.debug('error while importing', res)
 					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
@@ -388,7 +395,7 @@ export default {
 		async importFromUploadFile() {
 			this.loading = true
 			try {
-				const url = generateUrl('/apps/tables/importupload/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id + '/jobs')
+				const url = generateUrl('/apps/tables/importupload/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id)
 				const formData = new FormData()
 				formData.append('uploadfile', this.selectedUploadFile)
 				formData.append('createMissingColumns', this.getCreateMissingColumns)
@@ -401,7 +408,14 @@ export default {
 				})
 
 				if (res.status === 200) {
-					this.importScheduled = true
+					if (res.data.async) {
+						// Import was scheduled asynchronously
+						this.importScheduled = true
+					} else {
+						// Import completed immediately, show results
+						this.importScheduled = true
+						// You could optionally show the results here with res.data.result
+					}
 				} else {
 					console.debug('error while importing', res)
 					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
