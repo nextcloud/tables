@@ -39,6 +39,7 @@ export function getFilterWithId(id) {
 
 export const FilterIds = {
 	Contains: 'contains',
+	ContainsItem: 'contains-item',
 	DoesNotContain: 'does-not-contain',
 	BeginsWith: 'begins-with',
 	EndsWith: 'ends-with',
@@ -52,6 +53,12 @@ export const FilterIds = {
 }
 
 export const Filters = {
+	ContainsItem: new Filter({
+		id: FilterIds.ContainsItem,
+		label: t('tables', 'Contains items'),
+		goodFor: [ColumnTypes.SelectionMulti, ColumnTypes.Selection],
+		incompatibleWith: [FilterIds.DoesNotContain, FilterIds.IsEmpty, FilterIds.IsEqual],
+	}),
 	Contains: new Filter({
 		id: FilterIds.Contains,
 		label: t('tables', 'Contains'),
@@ -128,8 +135,18 @@ export const Filters = {
 }
 
 export function getFiltersForColumn(column, viewSetting) {
-	if (viewSetting?.filter?.length > 0) {
-		return viewSetting.filter.filter(filter => filter.columnId === column.id)
+	const filters = viewSetting.filter?.filter(item => {
+		if (item.columnId !== column.id) {
+			return false
+		}
+
+		if (item.operator.id === FilterIds.ContainsItem) {
+			return item.value.length > 0
+		}
+
+		return true
+	})
+	if (filters?.length > 0) {
+		return filters
 	}
-	return []
 }

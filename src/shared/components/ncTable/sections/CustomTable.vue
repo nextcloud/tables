@@ -347,6 +347,10 @@ export default {
 	methods: {
 		t,
 		addMagicFieldsValues(filter) {
+			if (FilterIds.ContainsItem === filter.operator.id) {
+				return
+			}
+
 			Object.values(MagicFields).forEach(field => {
 				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
 				if (filter.value !== newFilterValue) {
