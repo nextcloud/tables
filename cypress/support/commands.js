@@ -121,10 +121,10 @@ Cypress.Commands.add('createView', (title) => {
 
 Cypress.Commands.add('openCreateColumnModal', (isFirstColumn) => {
 	if (isFirstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+		cy.get('.button-vue__text').should('be.visible').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').should('be.visible').contains('Create column').click({ force: true })
 	}
 })
 
@@ -165,6 +165,7 @@ Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {
 
 Cypress.Commands.add('loadTable', (name) => {
 	cy.get('[data-cy="navigationTableItem"] a[title="' + name + '"]').last().click({ force: true })
+	cy.get('h1').should('be.visible').contains(name)
 })
 
 Cypress.Commands.add('getTutorialTableName', () => {
@@ -496,8 +497,8 @@ Cypress.Commands.add('addUserToGroup', (userId, groupId) => {
 })
 
 Cypress.Commands.add('removeColumn', (title) => {
-	cy.get('.custom-table table tr th .cell').contains(title).click()
-	cy.get('[data-cy="deleteColumnActionBtn"] button').click()
+	cy.get('.custom-table table tr th .cell').should('be.visible').contains(title).click()
+	cy.get('[data-cy="deleteColumnActionBtn"] button').should('be.visible').click()
 	cy.get('[data-cy="confirmDialog"] button').contains('Confirm').click()
 })
 
