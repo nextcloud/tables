@@ -47,7 +47,7 @@
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
-import { getFilterWithId } from '../mixins/filter.js'
+import { FilterIds, getFilterWithId } from '../mixins/filter.js'
 import { getColumnWidthStyle } from '../mixins/columnHandler.js'
 
 export default {
@@ -117,7 +117,17 @@ export default {
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
 		},
 		getFilterForColumn(column) {
-			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
+			return this.localViewSetting?.filter?.filter(item => {
+				if (item.columnId !== column.id) {
+					return false
+				}
+
+				if (item.operator.id === FilterIds.ContainsItem) {
+					return item.value.length > 0
+				}
+
+				return true
+			})
 		},
 		hasRightHiddenNeighbor(colId) {
 			return this.localViewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
