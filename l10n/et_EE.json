@@ -41,6 +41,7 @@
     "_%n row_::_%n rows_" : ["%n rida","%n rida"],
     "table" : "tabel",
     "table view" : "tabelivaade",
+    "Column width must be between %1$s and %2$s." : "Veeru laius peab olema vahemikus %1$s kuni %2$s",
     "This column was automatically created by the import service." : "Veerg on lisatud automaatselt importimise ajal",
     "Column \"%s\" contains a non-unique value." : "„%s“ veerus on mitteunikaalne väärtus.",
     "Welcome to %s Tables!" : "Tere tulemast kasutama rakendust %si Tabelid",
