@@ -45,6 +45,10 @@ export default class RelationColumn extends AbstractColumn {
 		return super.isFilterFound(filterMethod, cell)
 	}
 
+	default() {
+		return null
+	}
+
 	parseValue(value) {
 		return value
 	}
