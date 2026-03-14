@@ -80,9 +80,34 @@ class Version001000Date20260315000000 extends SimpleMigrationStep {
 			$table->addIndex(['relation_column_id'], 'row_rel_column');
 		}
 
-		// Drop the old cell table for relation type — relations now live in the join table
-		if ($schema->hasTable('tables_row_cells_relation')) {
-			$schema->dropTable('tables_row_cells_relation');
+		// Keep tables_row_cells_relation — Row2Mapper iterates all column types
+		// and queries their cell tables via UNION ALL. The table stays empty for
+		// relation columns since actual data lives in tables_row_relations.
+		if (!$schema->hasTable('tables_row_cells_relation')) {
+			$cellTable = $schema->createTable('tables_row_cells_relation');
+			$cellTable->addColumn('id', Types::INTEGER, [
+				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$cellTable->addColumn('column_id', Types::INTEGER, [
+				'notnull' => true,
+			]);
+			$cellTable->addColumn('row_id', Types::INTEGER, [
+				'notnull' => true,
+			]);
+			$cellTable->addColumn('value', Types::TEXT, [
+				'notnull' => false,
+			]);
+			$cellTable->addColumn('last_edit_by', Types::STRING, [
+				'notnull' => false,
+				'length' => 64,
+			]);
+			$cellTable->addColumn('last_edit_at', Types::DATETIME, [
+				'notnull' => false,
+			]);
+			$cellTable->setPrimaryKey(['id']);
+			$cellTable->addIndex(['column_id'], 'row_cell_rel_col');
+			$cellTable->addIndex(['row_id'], 'row_cell_rel_row');
 		}
 
 		return $schema;
