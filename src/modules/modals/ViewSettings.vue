@@ -26,6 +26,21 @@
 						:placeholder="createView ? t('tables', 'Title of the new view') : t('tables', 'New title of the view')">
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-4 space-T view-type-row">
+					<span class="view-type-label">{{ t('tables', 'View type') }}</span>
+					<div class="view-type-buttons">
+						<NcButton :type="viewType.id === 'table' ? 'primary' : 'secondary'"
+							@click="viewType = viewTypeOptions[0]">
+							{{ t('tables', 'Table') }}
+						</NcButton>
+						<NcButton :type="viewType.id === 'chart' ? 'primary' : 'secondary'"
+							@click="viewType = viewTypeOptions[1]">
+							{{ t('tables', 'Chart') }}
+						</NcButton>
+					</div>
+				</div>
+			</div>
 
 			<div class="row">
 				<div class="col-4 space-T mandatory">
@@ -140,6 +155,11 @@ export default {
 			startDragIndex: null,
 			mutableView: null,
 			generatedView: null,
+			viewType: { id: 'table', label: 'Table' },
+			viewTypeOptions: [
+				{ id: 'table', label: 'Table' },
+				{ id: 'chart', label: 'Chart' },
+			],
 		}
 	},
 	computed: {
@@ -294,6 +314,7 @@ export default {
 				title: this.title,
 				description: this.description,
 				emoji: this.icon,
+				type: this.viewType.id,
 			}
 			const res = await this.insertNewView({ data })
 			if (res) {
@@ -316,6 +337,7 @@ export default {
 					title: this.title,
 					description: this.description,
 					emoji: this.icon,
+					type: this.viewType.id,
 					columnSettings: JSON.stringify(newColumnSettings),
 				},
 			}
@@ -344,6 +366,7 @@ export default {
 			this.title = this.mutableView.title ?? ''
 			this.description = this.mutableView.description ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
+			this.viewType = this.viewTypeOptions.find(o => o.id === (this.mutableView.type || 'table')) || this.viewTypeOptions[0]
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
@@ -379,5 +402,21 @@ export default {
 .sticky {
 	position: sticky;
 	bottom: 0;
+}
+
+.view-type-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.view-type-label {
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.view-type-buttons {
+	display: flex;
+	gap: 8px;
 }
 </style>

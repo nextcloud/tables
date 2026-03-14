@@ -272,6 +272,40 @@ class ColumnService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		// Auto-create reverse relation column on target table
+		if ($entity->getType() === 'relation' && $entity->getRelationTableId() !== null) {
+			// Build reverse column using fromDto to ensure all required fields have defaults
+			$reverseDto = new ColumnDto(
+				title: $table->getTitle() . ' (linked)',
+				type: 'relation',
+				subtype: '',
+				description: '',
+				relationTableId: $table->getId(),
+				relationType: $entity->getRelationType() ?? 'many-to-many',
+				relationTargetColumnId: $entity->getId(),
+				relationMultiple: $entity->getRelationMultiple(),
+			);
+			$reverseColumn = Column::fromDto($reverseDto);
+			$reverseColumn->setTableId($entity->getRelationTableId());
+			// Set required DB defaults for non-nullable columns
+			$reverseColumn->setNumberPrefix('');
+			$reverseColumn->setNumberSuffix('');
+			$reverseColumn->setNumberDecimals(0);
+			$reverseColumn->setOrderWeight(0);
+			$reverseColumn->setMandatory(false);
+			$this->updateMetadata($reverseColumn, $userId, true);
+			try {
+				$reverseColumn = $this->mapper->insert($reverseColumn);
+
+				// Update the original column to point to the reverse column
+				$entity->setRelationTargetColumnId($reverseColumn->getId());
+				$this->mapper->update($entity);
+			} catch (\OCP\DB\Exception $e) {
+				$this->logger->error('Failed to create reverse relation column: ' . $e->getMessage(), ['exception' => $e]);
+			}
+		}
+
 		if (isset($view) && $view) {
 			// Add columns to view(s)
 			$this->viewService->addColumnToView($view, $entity, $userId);
@@ -362,6 +396,13 @@ class ColumnService extends SuperService {
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
 			$this->validateCustomSettings($columnDto->getCustomSettings());
 			$item->setCustomSettings($columnDto->getCustomSettings());
+
+			if ($columnDto->getRelationTableId() !== null) {
+				$item->setRelationTableId($columnDto->getRelationTableId());
+			}
+			if ($columnDto->getRelationMultiple() !== null) {
+				$item->setRelationMultiple($columnDto->getRelationMultiple());
+			}
 
 			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));
@@ -470,6 +511,24 @@ class ColumnService extends SuperService {
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			$this->viewService->deleteColumnDataFromViews($id, $table);
+		}
+
+		// Clean up relation data if this is a relation column
+		if ($item->getType() === 'relation') {
+			// Delete the reverse column if it exists
+			$reverseColumnId = $item->getRelationTargetColumnId();
+			if ($reverseColumnId) {
+				try {
+					$reverseColumn = $this->mapper->find($reverseColumnId);
+					// Clear reverse pointer to avoid infinite loop
+					$reverseColumn->setRelationTargetColumnId(null);
+					$this->mapper->update($reverseColumn);
+					// Then delete it
+					$this->mapper->delete($reverseColumn);
+				} catch (\Exception $e) {
+					// Reverse column may already be deleted
+				}
+			}
 		}
 
 		try {

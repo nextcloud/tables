@@ -45,6 +45,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setEmoji(string $emoji)
  * @method getDescription(): string
  * @method setDescription(string $description)
+ * @method string getType()
+ * @method void setType(string $type)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
  * @method getOnSharePermissions(): ?Permissions
@@ -71,6 +73,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $lastEditAt = null;
 	protected ?string $emoji = null;
 	protected ?string $description = null;
+	protected ?string $type = 'table';
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
@@ -89,6 +92,7 @@ class View extends EntitySuper implements JsonSerializable {
 	public function __construct() {
 		$this->addType('id', 'integer');
 		$this->addType('tableId', 'integer');
+		$this->addType('type', 'string');
 	}
 
 	/**
@@ -184,6 +188,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'tableId' => ($this->tableId || $this->tableId === 0) ? $this->tableId : -1,
 			'title' => $this->title ?: '',
 			'description' => $this->description,
+			'type' => $this->getType(),
 			'emoji' => $this->emoji,
 			'ownership' => $this->ownership ?: '',
 			'createdBy' => $this->createdBy ?: '',

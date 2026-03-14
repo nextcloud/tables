@@ -6,8 +6,21 @@
 	<div>
 		<ElementTitle :active-element="view" :is-table="false" :view-setting.sync="localViewSetting" />
 		<TableDescription :description="view.description" :read-only="true" />
+		<ViewTabBar
+			:views="siblingViews"
+			:active-view-id="view.id"
+			:is-table-active="false"
+			:can-create="canManageElement(view)"
+			@select-table="openTable"
+			@select-view="openView"
+			@create-view="createView" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="view" />
+			<ChartView v-else-if="view.type === 'chart'"
+				:rows="rows"
+				:columns="columns"
+				:element="view"
+				:is-view="true" />
 			<TableView v-else
 				:rows="rows"
 				:columns="columns"
@@ -25,7 +38,7 @@
 				<template #actions>
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 						<NcActionCaption v-if="canManageElement(view)" :name="t('tables', 'Manage view')" />
-						<NcActionButton v-if="canManageElement(view) "
+						<NcActionButton v-if="canManageElement(view)"
 							:close-after-click="true"
 							@click="editView">
 							<template #icon>
@@ -77,7 +90,8 @@
 
 <script>
 import TableView from '../partials/TableView.vue'
-
+import ChartView from '../partials/ChartView.vue'
+import ViewTabBar from '../partials/ViewTabBar.vue'
 import EmptyView from './EmptyView.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
@@ -88,12 +102,16 @@ import IconImport from 'vue-material-design-icons/Import.vue'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import ElementTitle from './ElementTitle.vue'
 import TableDescription from './TableDescription.vue'
+import { mapState } from 'pinia'
+import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	components: {
 		TableDescription,
 		EmptyView,
 		TableView,
+		ChartView,
+		ViewTabBar,
 		PlaylistEdit,
 		IconImport,
 		NcActions,
@@ -107,23 +125,10 @@ export default {
 	mixins: [permissionsMixin],
 
 	props: {
-		view: {
-			type: Object,
-			default: null,
-		},
-		columns: {
-			type: Array,
-			default: null,
-		},
-		rows: {
-			type: Array,
-			default: null,
-		},
-		viewSetting: {
-			type: Object,
-			default: null,
-		},
-
+		view: { type: Object, default: null },
+		columns: { type: Array, default: null },
+		rows: { type: Array, default: null },
+		viewSetting: { type: Object, default: null },
 	},
 
 	data() {
@@ -134,8 +139,12 @@ export default {
 		}
 	},
 	computed: {
+		...mapState(useTablesStore, ['views']),
 		isViewSettingSet() {
 			return !(!this.localViewSetting || ((!this.localViewSetting.hiddenColumns || this.localViewSetting.hiddenColumns.length === 0) && (!this.localViewSetting.sorting) && (!this.localViewSetting.filter || this.localViewSetting.filter.length === 0)))
+		},
+		siblingViews() {
+			return this.views.filter(v => v.tableId === this.view.tableId)
 		},
 	},
 	watch: {
@@ -149,6 +158,15 @@ export default {
 	methods: {
 		editView() {
 			emit('tables:view:edit', { view: this.view, viewSetting: this.localViewSetting })
+		},
+		openTable() {
+			this.$router.push('/table/' + parseInt(this.view.tableId)).catch(err => err)
+		},
+		openView(view) {
+			this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
+		},
+		createView() {
+			emit('tables:view:create', { tableId: this.view.tableId, viewSetting: this.localViewSetting })
 		},
 	},
 }

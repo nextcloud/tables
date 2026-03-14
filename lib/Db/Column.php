@@ -103,6 +103,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const TYPE_NUMBER = 'number';
 	public const TYPE_DATETIME = 'datetime';
 	public const TYPE_USERGROUP = 'usergroup';
+	public const TYPE_RELATION = 'relation';
 
 	public const SUBTYPE_DATETIME_DATE = 'date';
 	public const SUBTYPE_DATETIME_TIME = 'time';
@@ -156,6 +157,13 @@ class Column extends EntitySuper implements JsonSerializable {
 	protected ?bool $showUserStatus = null;
 	protected ?string $customSettings = null;
 
+	// type relation
+	protected ?int $relationTableId = null;
+	protected ?bool $relationMultiple = null;
+	protected ?int $relationTargetColumnId = null;
+	protected ?string $relationType = null;
+	protected ?int $relationDisplayColumnId = null;
+
 	// virtual properties
 	protected ?string $createdByDisplayName = null;
 	protected ?string $lastEditByDisplayName = null;
@@ -186,6 +194,13 @@ class Column extends EntitySuper implements JsonSerializable {
 		$this->addType('showUserStatus', 'boolean');
 
 		$this->addType('customSettings', 'string');
+
+		// type relation
+		$this->addType('relationTableId', 'integer');
+		$this->addType('relationMultiple', 'boolean');
+		$this->addType('relationTargetColumnId', 'integer');
+		$this->addType('relationType', 'string');
+		$this->addType('relationDisplayColumnId', 'integer');
 	}
 
 	public static function isValidMetaTypeId(int $metaTypeId): bool {
@@ -225,6 +240,11 @@ class Column extends EntitySuper implements JsonSerializable {
 		$column->setUsergroupSelectTeams($data->getUsergroupSelectTeams());
 		$column->setShowUserStatus($data->getShowUserStatus());
 		$column->setCustomSettings($data->getCustomSettings());
+		$column->setRelationTableId($data->getRelationTableId());
+		$column->setRelationMultiple($data->getRelationMultiple());
+		$column->setRelationTargetColumnId($data->getRelationTargetColumnId());
+		$column->setRelationType($data->getRelationType());
+		$column->setRelationDisplayColumnId($data->getRelationDisplayColumnId());
 		return $column;
 	}
 
@@ -305,6 +325,13 @@ class Column extends EntitySuper implements JsonSerializable {
 			'usergroupSelectTeams' => $this->usergroupSelectTeams,
 			'showUserStatus' => $this->showUserStatus,
 			'customSettings' => $this->getCustomSettingsArray() ?: new \stdClass(),
+
+			// type relation
+			'relationTableId' => $this->getRelationTableId(),
+			'relationMultiple' => $this->getRelationMultiple(),
+			'relationTargetColumnId' => $this->getRelationTargetColumnId(),
+			'relationType' => $this->getRelationType(),
+			'relationDisplayColumnId' => $this->getRelationDisplayColumnId(),
 		];
 	}
 
