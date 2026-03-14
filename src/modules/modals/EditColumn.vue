@@ -66,6 +66,7 @@ import DatetimeForm from '../../shared/components/ncTable/partials/columnTypePar
 import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
+import RelationForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
@@ -96,6 +97,7 @@ export default {
 		NcButton,
 		NcUserBubble,
 		UsergroupForm,
+		RelationForm,
 	},
 	filters: {
 		truncate(text, length, suffix) {
