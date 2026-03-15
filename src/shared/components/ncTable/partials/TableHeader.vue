@@ -25,7 +25,7 @@
 							@edit-column="col => $emit('edit-column', col)"
 							@delete-column="col => $emit('delete-column', col)" />
 					</div>
-					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
+					<div v-if="getFilterForColumn(col).length > 0" class="filter-wrapper">
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
 							:id="filter.columnId + filter.operator.id+ filter.value"
 							:key="filter.columnId + filter.operator.id+ filter.value"
@@ -47,7 +47,7 @@
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
-import { getFilterWithId } from '../mixins/filter.js'
+import { getFilterWithId, getFiltersForColumn } from '../mixins/filter.js'
 import { getColumnWidthStyle } from '../mixins/columnHandler.js'
 
 export default {
@@ -117,7 +117,7 @@ export default {
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
 		},
 		getFilterForColumn(column) {
-			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
+			return getFiltersForColumn(column, this.localViewSetting)
 		},
 		hasRightHiddenNeighbor(colId) {
 			return this.localViewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
