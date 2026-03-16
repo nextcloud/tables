@@ -6,9 +6,12 @@
 	<div>
 		<div>
 			<ResourceForm :resources="localResources" data-cy="contextResourceForm" @add="addResource" />
-			<ResourceList :resources="localResources" data-cy="contextResourceList" @remove="removeResource" />
-			<ResourceSharees :select-users="true" :select-groups="true" :receivers="localReceivers" data-cy="contextResourceShare" @update="updateReceivers" />
-			<ResourceSharePermissions :resources="localResources" data-cy="contextResourcePerms" @update="updateResourcePermissions" />
+			<ResourceList :resources="localResources" data-cy="contextResourceList" @remove="removeResource"
+				@update:resources="updateOrder" />
+			<ResourceSharees :select-users="true" :select-groups="true" :receivers="localReceivers"
+				data-cy="contextResourceShare" @update="updateReceivers" />
+			<ResourceSharePermissions :resources="localResources" data-cy="contextResourcePerms"
+				@update="updateResourcePermissions" />
 		</div>
 	</div>
 </template>
@@ -81,6 +84,10 @@ export default {
 		},
 		addResource(resource) {
 			this.contextResources.push(resource)
+			this.localResources = this.contextResources
+		},
+		updateOrder(resources) {
+			this.contextResources = resources
 			this.localResources = this.contextResources
 		},
 		updateReceivers(receivers) {
