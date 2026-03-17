@@ -43,6 +43,7 @@ OC.L10N.register(
     "_%n row_::_%n rows_" : ["%n рядок","%n рядки","%n рядків","%n рядків"],
     "table" : "таблиця",
     "table view" : "подання таблиці",
+    "Column width must be between %1$s and %2$s." : "Ширина стовпця має бути між %1$s та %2$s.",
     "This column was automatically created by the import service." : "Ця колонка була автоматично створена сервісом імпорту.",
     "Column \"%s\" contains a non-unique value." : "Стовпець \"%s\" містить неунікальне значення.",
     "Welcome to %s Tables!" : "Вітання у %s Таблицях!",
