@@ -24,7 +24,7 @@ describe('Test column ' + columnTitle, () => {
 		cy.createTable(tableTitle)
 	})
 
-	it('Insert and test rows', () => {
+	it('Test insert and test rows', () => {
 		cy.loadTable(tableTitle)
 		cy.createSelectionMultiColumn(columnTitle, ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], ['second option', 'first option'], true)
 
