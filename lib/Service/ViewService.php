@@ -193,7 +193,7 @@ class ViewService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null): View {
+	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null, ?string $layout = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -209,6 +209,7 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
+		$item->setLayout(in_array($layout, ['tiles', 'gallery'], true) ? $layout : null);
 		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -610,6 +611,7 @@ class ViewService extends SuperService {
 		$item->setColumns(json_encode($view['columnSettings']));
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
+		$item->setLayout(in_array($view['layout'] ?? null, ['tiles', 'gallery'], true) ? $view['layout'] : null);
 		try {
 			$this->mapper->insert($item);
 		} catch (\Exception $e) {

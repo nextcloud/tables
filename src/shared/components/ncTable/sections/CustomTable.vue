@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="container">
-		<table class="tables-list__table">
+		<table v-if="currentLayout === 'table'" class="tables-list__table">
 			<thead class="tables-list__thead">
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
@@ -41,6 +41,38 @@
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</transition-group>
 		</table>
+		<div v-else class="card-layout" :class="`card-layout--${currentLayout}`">
+			<button v-for="row in currentPageRows"
+				:key="row.id"
+				type="button"
+				class="layout-card"
+				:data-cy="`${currentLayout}LayoutCard`"
+				@click="$emit('edit-row', row.id)">
+				<div class="layout-card__image-wrapper">
+					<img v-if="getPreviewUrl(row)"
+						:src="getPreviewUrl(row)"
+						:alt="getCardTitle(row)"
+						class="layout-card__image">
+					<div v-else class="layout-card__no-image">
+						{{ t('tables', 'No image') }}
+					</div>
+					<div v-if="currentLayout === 'tiles'" class="layout-card__title-banner">
+						{{ getCardTitle(row) }}
+					</div>
+				</div>
+				<div v-if="currentLayout === 'gallery'" class="layout-card__body" data-cy="galleryLayoutBody">
+					<div class="layout-card__title">
+						{{ getCardTitle(row) }}
+					</div>
+					<ul class="layout-card__metadata">
+						<li v-for="item in getGalleryMetadata(row)" :key="`${row.id}-${item.columnId}`" data-cy="galleryMetadataItem">
+							<span class="layout-card__metadata-label">{{ item.title }}</span>
+							<span class="layout-card__metadata-value">{{ item.value }}</span>
+						</li>
+					</ul>
+				</div>
+			</button>
+		</div>
 		<div v-if="totalPages > 1" class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
 			<div class="pagination-items">
 				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" :aria-label="t('tables', 'Go to first page')" @click="pageNumber = 1">
@@ -98,6 +130,7 @@ import {
 import { MetaColumns } from '../mixins/metaColumns.js'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../store/store.js'
+import { generateUrl } from '@nextcloud/router'
 
 export default {
 	name: 'CustomTable',
@@ -159,6 +192,9 @@ export default {
 
 	computed: {
 		...mapState(useTablesStore, ['appNavCollapsed']),
+		currentLayout() {
+			return ['tiles', 'gallery'].includes(this.localViewSetting?.layout) ? this.localViewSetting.layout : 'table'
+		},
 		allPageNumbersArray() {
 			return Array.from(
 				{ length: this.totalPages },
@@ -176,9 +212,7 @@ export default {
 		},
 		getSearchedAndFilteredRows() {
 			const debug = false
-			// if we don't have to search and/or filter
 			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
-				// cleanup markers
 				if (this.rows && this.columns) {
 					this.rows.forEach(row => {
 						if (row && row.data) {
@@ -196,9 +230,8 @@ export default {
 				return this.rows || []
 			}
 
-			const data = [] // array of rows
+			const data = []
 			const searchString = this.viewSetting?.searchString
-			// each row
 			if (!this.rows || !this.columns) {
 				return []
 			}
@@ -214,7 +247,6 @@ export default {
 				let filterStatusRow = null
 				let searchStatusRow = false
 
-				// each column in a row => cell
 				this.columns.forEach(column => {
 					if (debug) {
 						console.debug('new column -------------------', column)
@@ -246,18 +278,15 @@ export default {
 						cell = row.data.find(item => item && item.columnId === column.id)
 					}
 
-					// if we don't have a value for this cell
 					if (cell === undefined) {
 						if (searchString) {
 							searchStatus = false
 						}
 						cell = { columnId: column.id, value: null }
 					}
-					// cleanup possible old markers
 					delete cell.searchStringFound
 					delete cell.filterFound
 
-					// if we should filter
 					if (filters !== null) {
 						filters.forEach(fil => {
 							this.addMagicFieldsValues(fil)
@@ -266,7 +295,6 @@ export default {
 							}
 						})
 					}
-					// if we should search
 					if (searchString) {
 						console.debug('look for searchString', searchString)
 						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
@@ -276,7 +304,6 @@ export default {
 						console.debug('filterStatus for cell', { cell: cell?.value, filterStatusCell: filterStatus, filterStatusRowBefore: filterStatusRow })
 					}
 
-					// if filterStatus is null, this result should be ignored
 					if (filterStatus !== null && (filterStatusRow || filterStatusRow === null)) {
 						filterStatusRow = filterStatus
 					}
@@ -285,7 +312,6 @@ export default {
 						console.debug('new filterStatusRow', filterStatusRow)
 					}
 
-					// filterStatusRow = filterStatus
 					searchStatusRow = searchStatusRow || searchStatus
 				})
 
@@ -310,7 +336,6 @@ export default {
 				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(sortCols[0].mode, nextSorts))
 			}
 
-			// if we have to sort
 			if (this.viewSetting?.presetSorting) {
 				return sort(this.viewSetting.presetSorting)
 			}
@@ -327,6 +352,9 @@ export default {
 		},
 		viewSetting() {
 			this.localViewSetting = this.viewSetting
+		},
+		currentLayout() {
+			this.pageNumber = 1
 		},
 	},
 
@@ -401,6 +429,42 @@ export default {
 		disableRowAnimation() {
 			this.rowAnimation = false
 		},
+		getCell(row, columnId) {
+			return row?.data?.find(item => item?.columnId === columnId) ?? null
+		},
+		getPreviewUrl(row) {
+			const firstColumn = this.columns[0]
+			const rawValue = this.getCell(row, firstColumn?.id)?.value
+			const serialized = typeof rawValue === 'string' ? rawValue : JSON.stringify(rawValue)
+			const match = serialized?.match(/\/f\/(\d+)/)
+			if (!match) {
+				return null
+			}
+			return generateUrl(`/core/preview?fileId=${match[1]}&x=1024&y=1024&a=true`)
+		},
+		getDisplayValue(column, row) {
+			const valueObject = this.getCell(row, column.id)
+			if (!valueObject || valueObject.value === null || valueObject.value === undefined || valueObject.value === '') {
+				return ''
+			}
+			if (typeof column.getValueString === 'function') {
+				return String(column.getValueString(valueObject) ?? '')
+			}
+			return String(valueObject.value)
+		},
+		getCardTitle(row) {
+			const titleColumn = this.columns[1] ?? this.columns[0]
+			return this.getDisplayValue(titleColumn, row) || `${t('tables', 'Row')} ${row.id}`
+		},
+		getGalleryMetadata(row) {
+			return this.columns.slice(1)
+				.map(column => ({
+					columnId: column.id,
+					title: column.title,
+					value: this.getDisplayValue(column, row),
+				}))
+				.filter(item => item.value !== '')
+		},
 	},
 }
 </script>
@@ -461,6 +525,91 @@ export default {
 	}
 }
 
+.card-layout {
+	display: grid;
+	gap: 16px;
+	padding-inline: calc(var(--default-grid-baseline) * 2);
+	padding-top: 8px;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.layout-card {
+	padding: 0;
+	border: 1px solid var(--color-border-dark);
+	border-radius: var(--border-radius-large);
+	overflow: hidden;
+	background: var(--color-main-background);
+	text-align: start;
+	cursor: pointer;
+}
+
+.layout-card__image-wrapper {
+	position: relative;
+	aspect-ratio: 1 / 1;
+	background: var(--color-background-dark);
+}
+
+.layout-card__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.layout-card__no-image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--color-text-maxcontrast);
+}
+
+.layout-card__title-banner {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 12px;
+	background: rgba(0,0,0,0.4);
+	color: #fff;
+	text-align: center;
+	font-weight: 600;
+}
+
+.layout-card__body {
+	padding: 12px;
+}
+
+.layout-card__title {
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.layout-card__metadata {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.layout-card__metadata li {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.layout-card__metadata-label {
+	font-size: 12px;
+	color: var(--color-text-maxcontrast);
+}
+
+.layout-card__metadata-value {
+	white-space: normal;
+	word-break: break-word;
+}
+
 :deep(table) {
 	position: relative;
 	border-collapse: collapse;
@@ -472,7 +621,6 @@ export default {
 	* {
 		border: none;
 	}
-	// white-space: nowrap;
 
 	td, th {
 		padding-inline-end: 8px;
@@ -505,7 +653,7 @@ export default {
 			th {
 				vertical-align: middle;
 				color: var(--color-text-maxcontrast);
-				box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
+				box-shadow: inset 0 -1px 0 var(--color-border);
 				background-color: var(--color-main-background-translucent);
 				z-index: 5;
 			}
@@ -513,7 +661,6 @@ export default {
 	}
 
 	tbody {
-
 		td {
 			text-align: start;
 			vertical-align: middle;
@@ -537,7 +684,6 @@ export default {
 			background-color: inherit;
 		}
 
-		// viewer integration
 		.editor-wrapper {
 			min-width: 100px;
 			overflow-y: auto;
@@ -559,7 +705,6 @@ export default {
 			}
 		}
 
-		// inline editing
 		.inline-editing-container {
 			position: relative;
 			width: 100%;
@@ -603,15 +748,12 @@ export default {
 	}
 
 	tr>td.sticky:last-child {
-		// visibility: hidden;
 		opacity: 0;
 	}
 
 	tr:hover>td:last-child {
-		// visibility: visible;
 		opacity: 1;
 	}
-
 }
 
 .table-row-leave-active {
@@ -627,5 +769,4 @@ export default {
   margin-bottom: 0 !important;
   transform: translateX(-1rem);
 }
-
 </style>

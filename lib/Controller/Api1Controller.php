@@ -346,9 +346,9 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
-	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
+	public function createView(int $tableId, string $title, ?string $emoji, ?string $layout = null): DataResponse {
 		try {
-			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId))->jsonSerialize());
+			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId), null, $layout)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -404,6 +404,7 @@ class Api1Controller extends ApiController {
 	 *      columns?: list<int>,
 	 *      columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *      sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
+	 *      layout?: 'table'|'tiles'|'gallery'|null,
 	 *      filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 *  } $data fields of the view with their new values
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
