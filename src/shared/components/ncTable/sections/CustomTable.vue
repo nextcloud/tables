@@ -566,8 +566,7 @@ export default {
 
 .layout-card__title-banner {
 	position: absolute;
-	left: 0;
-	right: 0;
+	inset-inline: 0;
 	bottom: 0;
 	padding: 12px;
 	background: rgba(0,0,0,0.4);
@@ -607,7 +606,7 @@ export default {
 
 .layout-card__metadata-value {
 	white-space: normal;
-	word-break: break-word;
+	overflow-wrap: anywhere;
 }
 
 :deep(table) {

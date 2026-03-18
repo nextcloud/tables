@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Db;
 
+use InvalidArgumentException;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\View;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
-use InvalidArgumentException;
 
 class ViewLayoutTest extends DatabaseTestCase {
 	public function testMigrationAddsLayoutColumn(): void {
@@ -25,15 +25,15 @@ class ViewLayoutTest extends DatabaseTestCase {
 	}
 
 	public function testViewUpdateInputAcceptsValidLayout(): void {
-		$input = ViewUpdateInput::fromInputArray(['layout' => 'tiles']);
+		$input = ViewUpdateInput::fromInputArray(['title' => 'Layout view', 'layout' => 'tiles']);
 		$updates = iterator_to_array($input->updateDetail());
 
 		$this->assertSame('tiles', $updates[ViewUpdatableParameters::LAYOUT]);
 	}
 
 	public function testViewUpdateInputDefaultsMissingOrTableLayoutToNull(): void {
-		$missing = iterator_to_array(ViewUpdateInput::fromInputArray([])->updateDetail());
-		$table = iterator_to_array(ViewUpdateInput::fromInputArray(['layout' => 'table'])->updateDetail());
+		$missing = iterator_to_array(ViewUpdateInput::fromInputArray(['title' => 'Missing layout'])->updateDetail());
+		$table = iterator_to_array(ViewUpdateInput::fromInputArray(['title' => 'Table layout', 'layout' => 'table'])->updateDetail());
 
 		$this->assertArrayNotHasKey(ViewUpdatableParameters::LAYOUT, $missing);
 		$this->assertArrayNotHasKey(ViewUpdatableParameters::LAYOUT, $table);
@@ -41,7 +41,7 @@ class ViewLayoutTest extends DatabaseTestCase {
 
 	public function testViewUpdateInputRejectsInvalidLayout(): void {
 		$this->expectException(InvalidArgumentException::class);
-		ViewUpdateInput::fromInputArray(['layout' => 'masonry']);
+		ViewUpdateInput::fromInputArray(['title' => 'Invalid layout', 'layout' => 'masonry']);
 	}
 
 	public function testViewSerializationNormalizesLayout(): void {
