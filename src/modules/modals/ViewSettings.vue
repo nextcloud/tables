@@ -55,17 +55,26 @@
 		</NcAppSettingsSection>
 
 		<NcAppSettingsSection v-if="columns != null" id="layout" :name="t('tables', 'Layout')">
-			<div class="layout-options">
-				<NcCheckboxRadioSwitch :checked.sync="layout" value="table" name="viewLayout" type="radio" data-cy="viewLayoutTable">
-					{{ t('tables', 'Table') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="layout" value="tiles" name="viewLayout" type="radio" data-cy="viewLayoutTiles">
-					{{ t('tables', 'Tile') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="layout" value="gallery" name="viewLayout" type="radio" data-cy="viewLayoutGallery">
-					{{ t('tables', 'Gallery') }}
-				</NcCheckboxRadioSwitch>
-			</div>
+			<table class="layout-options" role="presentation">
+				<tbody>
+					<tr class="layout-options__selection">
+						<td>
+							<NcCheckboxRadioSwitch :checked.sync="layout" value="table" name="viewLayout" type="radio" data-cy="viewLayoutTable" :aria-label="t('tables', 'Table')" />
+						</td>
+						<td>
+							<NcCheckboxRadioSwitch :checked.sync="layout" value="tiles" name="viewLayout" type="radio" data-cy="viewLayoutTiles" :aria-label="t('tables', 'Tile')" />
+						</td>
+						<td>
+							<NcCheckboxRadioSwitch :checked.sync="layout" value="gallery" name="viewLayout" type="radio" data-cy="viewLayoutGallery" :aria-label="t('tables', 'Gallery')" />
+						</td>
+					</tr>
+					<tr class="layout-options__title">
+						<td>{{ t('tables', 'Table') }}</td>
+						<td>{{ t('tables', 'Tile') }}</td>
+						<td>{{ t('tables', 'Gallery') }}</td>
+					</tr>
+				</tbody>
+			</table>
 		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null" id="sort" :name="t('tables', 'Sort')">
@@ -397,9 +406,24 @@ export default {
 }
 
 .layout-options {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: separate;
+	border-spacing: 12px 8px;
+}
+
+.layout-options td {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.layout-options__selection :deep(.checkbox-radio-switch) {
+	display: inline-flex;
+}
+
+.layout-options__title td {
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
 }
 
 .sticky {
