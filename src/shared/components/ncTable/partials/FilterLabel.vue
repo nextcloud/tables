@@ -42,6 +42,10 @@ export default {
 
 	computed: {
 		getValue() {
+			if (FilterIds.ContainsItem === this.operator.id) {
+				return this.value
+			}
+
 			let value = this.value
 			Object.values(MagicFields).forEach(field => {
 				value = value.replace('@' + field.id, field.label)
@@ -51,6 +55,8 @@ export default {
 		labelText() {
 			if (this.operator.id === FilterIds.IsEmpty) {
 				return this.operator.getOperatorLabel()
+			} else if (this.operator.id === FilterIds.ContainsItem) {
+				return this.operator.getOperatorLabel() + ' "' + this.getValue.map(item => item.label).join(', ') + '"'
 			} else {
 				return this.operator.getOperatorLabel() + ' "' + this.getValue + '"'
 			}

@@ -54,6 +54,7 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 		const cellLabel = this.getLabel(cell.value)
 		const filterMethod = {
+			[FilterIds.ContainsItem]() { return filterValue.map(option => option.id).includes(cell.value) },
 			[FilterIds.Contains]() { return cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
 			[FilterIds.DoesNotContain]() { return !cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
 			[FilterIds.BeginsWith]() { return cellLabel?.startsWith(filterValue) },
