@@ -13,6 +13,7 @@ enum ViewUpdatableParameters: string {
 	case TITLE = 'title';
 	case EMOJI = 'emoji';
 	case DESCRIPTION = 'description';
+	case TYPE = 'type';
 	case SORT = 'sort';
 	case FILTER = 'filter';
 	case COLUMN_SETTINGS = 'columns';

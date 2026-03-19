@@ -26,6 +26,7 @@ class ViewUpdateInput {
 		protected readonly ?Title $title = null,
 		protected readonly ?string $description = null,
 		protected readonly ?Emoji $emoji = null,
+		protected readonly ?string $type = null,
 		protected readonly ?ColumnSettings $columnSettings = null,
 		protected readonly ?FilterSet $filterSet = null,
 		protected readonly ?SortRuleSet $sortRuleSet = null,
@@ -41,6 +42,9 @@ class ViewUpdateInput {
 		}
 		if ($this->emoji) {
 			yield ViewUpdatableParameters::EMOJI => $this->emoji;
+		}
+		if ($this->type) {
+			yield ViewUpdatableParameters::TYPE => $this->type;
 		}
 		if ($this->columnSettings) {
 			yield ViewUpdatableParameters::COLUMN_SETTINGS => $this->columnSettings;
@@ -84,6 +88,7 @@ class ViewUpdateInput {
 			title: $data['title'] ? new Title($data['title']) : null,
 			description: $data['description'] ?? null,
 			emoji: $data['emoji'] ? new Emoji($data['emoji']) : null,
+			type: $data['type'] ?? null,
 			columnSettings: $data['columnSettings'] ? ColumnSettings::createFromInputArray($data['columnSettings']) : null,
 			filterSet: $data['filter'] ? FilterSet::createFromInputArray($data['filter']) : null,
 			sortRuleSet: $data['sort'] ? SortRuleSet::createFromInputArray($data['sort']) : null,
