@@ -252,12 +252,12 @@ class ViewService extends SuperService {
 					$this->assertInputColumnsAreValid($view, $userId, $value);
 				}
 
-				if ($value instanceof JsonSerializable) {
-					$insertableValue = json_encode($value);
-				}
+				$insertableValue = $value instanceof JsonSerializable
+					? json_encode($value)
+					: $value;
 
 				$setterMethod = 'set' . ucfirst($parameter->value);
-				$view->$setterMethod($insertableValue ?? $value);
+				$view->$setterMethod($insertableValue);
 			}
 
 			$time = new DateTime();
