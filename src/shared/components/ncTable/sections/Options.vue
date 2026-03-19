@@ -25,6 +25,8 @@
 					<SearchForm :columns="columns" :search-string="getSearchString"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
+
+				<PaginationBlock :rows="rows" />
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -65,6 +67,7 @@ import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
+import PaginationBlock from './PaginationBlock.vue'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
@@ -79,6 +82,7 @@ export default {
 		Check,
 		Delete,
 		Export,
+		PaginationBlock,
 	},
 
 	mixins: [viewportHelper],
