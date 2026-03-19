@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="container">
+	<div class="container" :class="{ 'container--cards': currentLayout !== 'table' }">
 		<table v-if="currentLayout === 'table'" class="tables-list__table">
 			<thead class="tables-list__thead">
 				<TableHeader :columns="columns"
@@ -56,14 +56,11 @@
 					<div v-else class="layout-card__no-image">
 						{{ t('tables', 'No image') }}
 					</div>
-					<div v-if="currentLayout === 'tiles'" class="layout-card__title-banner">
+					<div class="layout-card__title-banner">
 						{{ getCardTitle(row) }}
 					</div>
 				</div>
 				<div v-if="currentLayout === 'gallery'" class="layout-card__body" data-cy="galleryLayoutBody">
-					<div class="layout-card__title">
-						{{ getCardTitle(row) }}
-					</div>
 					<ul class="layout-card__metadata">
 						<li v-for="item in getGalleryMetadata(row)" :key="`${row.id}-${item.columnId}`" data-cy="galleryMetadataItem">
 							<span class="layout-card__metadata-label">{{ item.title }}</span>
@@ -435,14 +432,40 @@ export default {
 		getPreviewUrl(row) {
 			const firstColumn = this.columns[0]
 			const rawValue = this.getCell(row, firstColumn?.id)?.value
-			const serialized = typeof rawValue === 'string' ? rawValue : JSON.stringify(rawValue)
-			const match = serialized?.match(/\/f\/(\d+)/)
-			if (!match) {
+			if (rawValue === null || rawValue === undefined || rawValue === '') {
 				return null
 			}
-			return generateUrl(`/core/preview?fileId=${match[1]}&x=1024&y=1024&a=true`)
+
+			const candidates = [rawValue]
+			if (typeof rawValue === 'string') {
+				try {
+					const parsed = JSON.parse(rawValue)
+					candidates.push(parsed?.value, parsed?.resourceUrl, parsed?.thumbnailUrl)
+				} catch (err) {
+					// Keep raw string candidate
+				}
+			}
+
+			for (const candidate of candidates) {
+				if (typeof candidate !== 'string' || candidate.length === 0) {
+					continue
+				}
+				const normalized = candidate.replace(/\\\//g, '/')
+				const fileIdMatch = normalized.match(/[?&]fileId=(\d+)/i) ?? normalized.match(/\/f\/(\d+)/)
+				if (fileIdMatch) {
+					return generateUrl(`/core/preview?fileId=${fileIdMatch[1]}&x=1024&y=1024&a=true`)
+				}
+				if (normalized.includes('/core/preview?')) {
+					return normalized
+				}
+			}
+
+			return null
 		},
 		getDisplayValue(column, row) {
+			if (!column) {
+				return ''
+			}
 			const valueObject = this.getCell(row, column.id)
 			if (!valueObject || valueObject.value === null || valueObject.value === undefined || valueObject.value === '') {
 				return ''
@@ -452,12 +475,17 @@ export default {
 			}
 			return String(valueObject.value)
 		},
+		getTitleColumn() {
+			return this.columns[1] ?? this.columns[0] ?? null
+		},
 		getCardTitle(row) {
-			const titleColumn = this.columns[1] ?? this.columns[0]
+			const titleColumn = this.getTitleColumn()
 			return this.getDisplayValue(titleColumn, row) || `${t('tables', 'Row')} ${row.id}`
 		},
 		getGalleryMetadata(row) {
+			const titleColumnId = this.getTitleColumn()?.id
 			return this.columns.slice(1)
+				.filter(column => column.id !== titleColumnId)
 				.map(column => ({
 					columnId: column.id,
 					title: column.title,
@@ -525,15 +553,28 @@ export default {
 	}
 }
 
+.container {
+	min-width: 0;
+}
+
+.container--cards {
+	width: var(--app-content-width, 100%);
+	max-width: var(--app-content-width, 100%);
+}
+
 .card-layout {
+	width: 100%;
 	display: grid;
+	grid-auto-flow: row;
 	gap: 16px;
 	padding-inline: calc(var(--default-grid-baseline) * 2);
 	padding-top: 8px;
-	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
 .layout-card {
+	width: 100%;
+	max-width: 100%;
 	padding: 0;
 	border: 1px solid var(--color-border-dark);
 	border-radius: var(--border-radius-large);
@@ -599,12 +640,17 @@ export default {
 	gap: 2px;
 }
 
+.layout-card__metadata li + li {
+	padding-top: 8px;
+}
+
 .layout-card__metadata-label {
 	font-size: 12px;
 	color: var(--color-text-maxcontrast);
 }
 
 .layout-card__metadata-value {
+	font-weight: 400;
 	white-space: normal;
 	overflow-wrap: anywhere;
 }
