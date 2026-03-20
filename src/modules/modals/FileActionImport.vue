@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcDialog v-if="!importResults"
+	<NcDialog v-if="!importScheduled"
 		:name="t('tables', 'Import file into Tables')"
 		size="normal"
 		@closing="closeImportDialog">
@@ -89,10 +89,10 @@
 		</div>
 	</NcDialog>
 
-	<NcDialog v-else
-		:name="t('tables', 'Import successful')"
-		:open.sync="showResultsDialog"
-		size="small">
+	<NcDialog v-else-if="importResults"
+			  :name="t('tables', 'Import successful')"
+			  :open.sync="showResultsDialog"
+			  size="small">
 		<template #actions>
 			<NcButton :aria-label="t('tables', 'Close')" @click="closeResultsDialog()">
 				{{ t('tables', 'Close') }}
@@ -115,7 +115,7 @@ import {
 
 import { generateUrl } from '@nextcloud/router'
 import { Node } from '@nextcloud/files'
-import { showError } from '@nextcloud/dialogs'
+import { showError, showInfo } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { translate as t } from '@nextcloud/l10n'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
@@ -156,9 +156,9 @@ export default {
 			},
 			existingTables: [],
 			selectedTable: null,
-
 			importResults: null,
 			showResultsDialog: true,
+			importScheduled: false,
 		}
 	},
 
@@ -206,9 +206,11 @@ export default {
 			this.importingFile = true
 
 			if (this.importAsNew) {
-				this.importResults = await importToNewTable(this.newTable.title, this.newTable.emoji, this.file)
+				this.importScheduled = await importToNewTable(this.newTable.title, this.newTable.emoji, this.file)
 
-				if (!this.importResults) {
+				if (this.importScheduled) {
+					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
+				} else {
 					showError(t('tables', 'Could not create table'))
 				}
 			} else {
@@ -217,9 +219,11 @@ export default {
 					return
 				}
 
-				this.importResults = await importToExistingTable(this.selectedTable.value, this.file, this.createMissingColumns)
+				this.importScheduled = await importToExistingTable(this.selectedTable.value, this.file, this.createMissingColumns)
 
-				if (!this.importResults) {
+				if (this.importScheduled) {
+					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
+				} else {
 					showError(t('tables', 'Could not import data to table'))
 				}
 			}
@@ -257,12 +261,12 @@ async function insertTable(title, emoji) {
 }
 
 async function updateTable(tableId, path, createMissingColumns) {
-	const res = await axios.post(generateUrl(`/apps/tables/import/table/${tableId}`), {
+	const res = await axios.post(generateUrl(`/apps/tables/import/table/${tableId}/jobs`), {
 		path,
 		createMissingColumns,
 	})
 
-	return res.data
+	return res.status === 200
 }
 </script>
 
