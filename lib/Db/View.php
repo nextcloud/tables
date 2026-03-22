@@ -45,6 +45,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setEmoji(string $emoji)
  * @method getDescription(): string
  * @method setDescription(string $description)
+ * @method getLayout(): ?string
+ * @method setLayout(?string $layout)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
  * @method getOnSharePermissions(): ?Permissions
@@ -74,6 +76,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+	protected ?string $layout = null;
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -171,6 +174,10 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
+	public function getLayoutNormalized(): string {
+		return in_array($this->layout, ['tiles', 'gallery'], true) ? $this->layout : 'table';
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -199,6 +206,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'hasShares' => (bool)$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
+			'layout' => $this->getLayoutNormalized(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

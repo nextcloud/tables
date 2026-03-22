@@ -16,4 +16,5 @@ enum ViewUpdatableParameters: string {
 	case SORT = 'sort';
 	case FILTER = 'filter';
 	case COLUMN_SETTINGS = 'columns';
+	case LAYOUT = 'layout';
 }
