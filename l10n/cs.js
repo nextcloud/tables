@@ -43,6 +43,7 @@ OC.L10N.register(
     "_%n row_::_%n rows_" : ["%n řádek","%n řádky","%n řádků","%n řádky"],
     "table" : "tabulka",
     "table view" : "zobrazení tabulky",
+    "Column width must be between %1$s and %2$s." : "Je třeba, aby šířka sloupce byla z rozmezí %1$s až %2$s.",
     "This column was automatically created by the import service." : "Tento sloupec byl automaticky vytvořen službou importu.",
     "Column \"%s\" contains a non-unique value." : "Sloupec „%s“ obsahuje opakující se hodnotu.",
     "Welcome to %s Tables!" : "Vítejte v %s Tabulkách!",
