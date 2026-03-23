@@ -277,4 +277,8 @@ class SharePageShareDataDecorator implements IShare {
 	public function canDownload(): bool {
 		throw new LogicException('Not implemented');
 	}
+
+	public function getOriginalTarget(): ?string {
+		throw new LogicException('Not implemented');
+	}
 }
