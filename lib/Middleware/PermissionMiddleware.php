@@ -14,10 +14,13 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\PermissionsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Middleware;
+use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCSController;
 use OCP\AppFramework\Utility\IControllerMethodReflector;
 use OCP\IRequest;
 
@@ -26,18 +29,21 @@ class PermissionMiddleware extends Middleware {
 	private PermissionsService $permissionsService;
 	private ?string $userId;
 	private IRequest $request;
+	private ContextService $contextService;
 
 	public function __construct(
 		IControllerMethodReflector $reflector,
 		PermissionsService $permissionsService,
 		IRequest $request,
 		?string $userId,
+		contextService $contextService,
 	) {
 
 		$this->reflector = $reflector;
 		$this->permissionsService = $permissionsService;
 		$this->userId = $userId;
 		$this->request = $request;
+		$this->contextService = $contextService;
 	}
 
 	/**
@@ -74,7 +80,16 @@ class PermissionMiddleware extends Middleware {
 		}
 		$nodeId = (int)$nodeId;
 
-		$nodeType = $attribute->getType() ?? $this->request->getParam($attribute->getTypeParam());
+		$nodeType = $attribute->getType();
+		if (null === $nodeType) {
+			$typeParam = $attribute->getTypeParam();
+			$requestValue = null !== $typeParam ? $this->request->getParam($typeParam) : null;
+			if (null !== $requestValue) {
+				$nodeType = $requestValue;
+			} else {
+				$nodeType = $typeParam;
+			}
+		}
 		$isContext = false;
 		if (!is_numeric($nodeType)) {
 			if ($nodeType === 'context') {
@@ -171,7 +186,8 @@ class PermissionMiddleware extends Middleware {
 				));
 			}
 		} else {
-			if (!$this->permissionsService->canManageContextById($nodeId, $this->userId)) {
+			$context = $this->contextService->findById($nodeId, $this->userId);
+			if ($context->getOwnerId() !== $this->userId || !$this->permissionsService->canManageContextById($nodeId, $this->userId)) {
 				throw new PermissionError(sprintf('User %s cannot manage context %d',
 					$this->userId, $nodeId
 				));
@@ -231,6 +247,9 @@ class PermissionMiddleware extends Middleware {
 
 	public function afterException($controller, $methodName, \Exception $exception) {
 		if ($exception instanceof PermissionError) {
+			if ($controller instanceof OCSController) {
+				throw new OCSForbiddenException($exception->getMessage(), $exception);
+			}
 			return new Http\DataResponse(['message' => $exception->getMessage()], Http::STATUS_FORBIDDEN);
 		}
 		if ($exception instanceof NotFoundError) {
