@@ -264,6 +264,43 @@ class ShareService extends SuperService {
 		$item->setReceiverType($receiverType);
 		$item->setNodeId($nodeId);
 		$item->setNodeType($nodeType);
+		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
+		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		return $item;
+	}
+
+	/**
+	 * @param int $nodeId
+	 * @param string $nodeType
+	 * @param string $receiver
+	 * @param string $receiverType
+	 * @param bool $permissionRead
+	 * @param bool $permissionCreate
+	 * @param bool $permissionUpdate
+	 * @param bool $permissionDelete
+	 * @param bool $permissionManage
+	 * @param ?string $password
+	 * @param ?ShareToken $shareToken
+	 *
+	 * @throws InternalError
+	 *
+	 * @return Share
+	 */
+	private function createNodeShare(
+		int $nodeId,
+		string $nodeType,
+		string $receiver,
+		string $receiverType,
+		bool $permissionRead,
+		bool $permissionCreate,
+		bool $permissionUpdate,
+		bool $permissionDelete,
+		bool $permissionManage,
+		?string $password,
+		?ShareToken $shareToken = null,
+	): Share {
+		$item = $this->buildBaseShare($nodeId, $nodeType, $receiver, $receiverType);
 		$item->setPermissionRead($permissionRead);
 		$item->setPermissionCreate($permissionCreate);
 		$item->setPermissionUpdate($permissionUpdate);
@@ -278,19 +315,49 @@ class ShareService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 
-		if ($nodeType === 'context') {
-			// set the default visibility of the nav bar item for Application shares
-			$navigationItem = new ContextNavigation();
-			$navigationItem->setShareId($item->getId());
-			$navigationItem->setUserId('');
-			$navigationItem->setDisplayMode($displayMode);
+		return $this->addReceiverDisplayName($newShare);
+	}
 
-			try {
-				$this->contextNavigationMapper->insert($navigationItem);
-			} catch (Exception $e) {
-				$this->logger->error($e->getMessage());
-				throw new InternalError($e->getMessage());
-			}
+	/**
+	 * @param int $nodeId
+	 * @param string $receiver
+	 * @param string $receiverType
+	 * @param int $displayMode
+	 *
+	 * @throws InternalError
+	 *
+	 * @return Share
+	 */
+	private function createContextShare(
+		int $nodeId,
+		string $receiver,
+		string $receiverType,
+		int $displayMode
+	): Share {
+		$item = $this->buildBaseShare($nodeId, 'context', $receiver, $receiverType);
+		$item->setPermissionRead(false);
+		$item->setPermissionCreate(false);
+		$item->setPermissionUpdate(false);
+		$item->setPermissionDelete(false);
+		$item->setPermissionManage(false);
+
+		try {
+			$newShare = $this->mapper->insert($item);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+
+		$navigationItem = new ContextNavigation();
+		$navigationItem->setShareId($item->getId());
+		$navigationItem->setUserId('');
+		$navigationItem->setDisplayMode($displayMode);
+
+		try {
+			$this->contextNavigationMapper->insert($navigationItem);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
 		}
 
 		return $this->addReceiverDisplayName($newShare);
