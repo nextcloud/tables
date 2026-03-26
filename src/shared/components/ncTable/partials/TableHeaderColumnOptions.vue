@@ -36,7 +36,26 @@
 					{{ t('tables', 'Back') }}
 				</NcActionButton>
 				<NcActionCaption :name="t('tables', 'Search for value')" />
+
+				<template v-if="'contains-item' === selectedOperator.id">
+					<NcActionInput
+						v-model="searchOptions"
+						type="multiselect"
+						:multiple="true"
+						:options="column.selectionOptions"
+						:placeholder="t('tables', 'Select options')" />
+					<NcActionButton
+						:close-after-click="true"
+						@click="submitFilterInput()">
+						<template #icon>
+							<Magnify :size="20" />
+						</template>
+						{{ t('tables', 'Submit') }}
+					</NcActionButton>
+				</template>
+
 				<NcActionInput
+					v-else
 					:label-visible="false"
 					:label="t('tables', 'Keyword and submit')"
 					:value.sync="searchValue"
@@ -46,6 +65,7 @@
 						<Magnify :size="20" />
 					</template>
 				</NcActionInput>
+
 				<NcActionCaption
 					v-if="getMagicFields.length > 0"
 					:name="t('tables', 'Or use magic values')" />
@@ -183,6 +203,7 @@ export default {
 	data() {
 		return {
 			searchValue: '',
+			searchOptions: [],
 			operator: null,
 			sortMode: null,
 			term: '',
@@ -326,6 +347,8 @@ export default {
 			}
 			this.createFilter()
 			this.localOpenState = false
+			this.searchOptions = []
+			this.selectOperator = false
 		},
 		getFilterForColumn(column) {
 			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
@@ -334,18 +357,18 @@ export default {
 			const filterObject = {
 				columnId: this.column.id,
 				operator: this.selectedOperator,
-				value: this.searchValue,
+				value: FilterIds.ContainsItem === this.selectedOperator.id ? this.searchOptions : this.searchValue,
 			}
 			if (!this.localViewSetting.filter) {
 				this.localViewSetting.filter = []
 			}
 			this.localViewSetting.filter.push(filterObject)
 			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
-			this.close()
 		},
 		reset() {
 			this.operator = null
 			this.searchValue = ''
+			this.searchOptions = []
 			this.sortMode = this.getSortMode
 			this.selectOperator = false
 			this.selectValue = false
@@ -400,5 +423,9 @@ export default {
 
 .selected-option {
 	width: 100%;
+}
+
+:deep(.vs__dropdown-menu) {
+	--vs-dropdown-max-height: 120px;
 }
 </style>
