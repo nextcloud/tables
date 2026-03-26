@@ -12,49 +12,49 @@
 			<tr>
 				<td>{{ t('tables', 'Found columns') }}</td>
 				<td data-cy="importResultColumnsFound">
-					{{ results.found_columns_count }}
+					{{ results.foundColumnsCount }}
 				</td>
 			</tr>
 
 			<tr>
 				<td>{{ t('tables', 'Matching columns') }}</td>
 				<td data-cy="importResultColumnsMatch">
-					{{ results.matching_columns_count }}
+					{{ results.matchingColumnsCount }}
 				</td>
 			</tr>
 
 			<tr>
 				<td>{{ t('tables', 'Created columns') }}</td>
 				<td data-cy="importResultColumnsCreated">
-					{{ results.created_columns_count }}
+					{{ results.createdColumnsCount }}
 				</td>
 			</tr>
 
 			<tr>
 				<td>{{ t('tables', 'Inserted rows') }}</td>
 				<td data-cy="importResultRowsInserted">
-					{{ results.inserted_rows_count }}
+					{{ results.insertedRowsCount }}
 				</td>
 			</tr>
 
 			<tr>
 				<td>{{ t('tables', 'Updated rows') }}</td>
 				<td data-cy="importResultRowsUpdated">
-					{{ results.updated_rows_count }}
+					{{ results.updatedRowsCount }}
 				</td>
 			</tr>
 
 			<tr>
 				<td>{{ t('tables', 'Value parsing errors') }}</td>
 				<td data-cy="importResultParsingErrors">
-					{{ results.errors_parsing_count }}
+					{{ results.errorsParsingCount }}
 				</td>
 			</tr>
 
 			<tr>
 				<td>{{ t('tables', 'Row creation errors') }}</td>
 				<td data-cy="importResultRowErrors">
-					{{ results.errors_count }}
+					{{ results.errorsCount }}
 				</td>
 			</tr>
 		</tbody>
@@ -72,13 +72,13 @@ export default {
 			type: Object,
 			default() {
 				return {
-					found_columns_count: 0,
-					matching_columns_count: 0,
-					created_columns_count: 0,
-					inserted_rows_count: 0,
-					updated_rows_count: 0,
-					errors_parsing_count: 0,
-					errors_count: 0,
+					foundColumnsCount: 0,
+					matchingColumnsCount: 0,
+					createdColumnsCount: 0,
+					insertedRowsCount: 0,
+					updatedRowsCount: 0,
+					errorsParsingCount: 0,
+					errorsCount: 0,
 				}
 			},
 		},

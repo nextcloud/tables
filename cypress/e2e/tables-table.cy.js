@@ -37,7 +37,7 @@ describe('Manage a table', () => {
 	})
 
 	it('Create with import', () => {
-		cy.uploadFile('test-import.csv', 'text/csv')
+		cy.uploadFile('test-import-small.csv', 'text/csv')
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		// should type before selecting the table type tile
