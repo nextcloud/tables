@@ -98,6 +98,7 @@ import {
 import { MetaColumns } from '../mixins/metaColumns.js'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../store/store.js'
+import { getFiltersForColumn } from '../mixins/filter.js'
 
 export default {
 	name: 'CustomTable',
@@ -221,7 +222,7 @@ export default {
 					}
 					let filterStatus = null
 					let searchStatus = true
-					const filters = this.getFiltersForColumn(column)
+					const filters = getFiltersForColumn(column, this.viewSetting)
 					let cell
 					if (column.id < 0) {
 						cell = { columnId: column.id }
@@ -257,15 +258,13 @@ export default {
 					delete cell.searchStringFound
 					delete cell.filterFound
 
-					// if we should filter
-					if (filters !== null) {
-						filters.forEach(fil => {
-							this.addMagicFieldsValues(fil)
-							if (filterStatus === null || filterStatus === true) {
-								filterStatus = column.isFilterFound(cell, fil)
-							}
-						})
-					}
+					// apply filters (if any)
+					filters.forEach(fil => {
+						this.addMagicFieldsValues(fil)
+						if (filterStatus === null || filterStatus === true) {
+							filterStatus = column.isFilterFound(cell, fil)
+						}
+					})
 					// if we should search
 					if (searchString) {
 						console.debug('look for searchString', searchString)
@@ -354,15 +353,6 @@ export default {
 					filter.magicValuesEnriched = newFilterValue
 				}
 			})
-		},
-		getFiltersForColumn(column) {
-			if (this.viewSetting?.filter?.length > 0) {
-				const columnFilter = this.viewSetting.filter.filter(item => item.columnId === column.id)
-				if (columnFilter.length > 0) {
-					return columnFilter
-				}
-			}
-			return null
 		},
 		deselectAllRows(elementId, isView) {
 			if (parseInt(elementId) === parseInt(this.elementId) && isView === this.isView) {
