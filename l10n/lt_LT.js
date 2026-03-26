@@ -177,6 +177,7 @@ OC.L10N.register(
     "Confirm" : "Patvirtinti",
     "Content" : "Turinys",
     "Select" : "Žymėti",
+    "This year" : "Šie metai",
     "This month" : "Šį mėnesį",
     "This week" : "Šią savaitę",
     "Now" : "Dabar",
