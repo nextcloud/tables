@@ -79,6 +79,7 @@ OC.L10N.register(
     "Please select a file." : "Odaberite datoteku.",
     "Select from Files" : "Odaberi iz datoteka",
     "Upload from device" : "Prenesi s uređaja",
+    "Preview" : "Pretpregled",
     "Failed" : "Neuspjelo",
     "Result" : "Rezultat",
     "Transfer" : "Prijenos",
