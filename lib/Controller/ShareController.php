@@ -39,7 +39,7 @@ class ShareController extends Controller {
 
 
 	#[NoAdminRequired]
-	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
 			$shares = $this->service->findAll('table', $tableId);
