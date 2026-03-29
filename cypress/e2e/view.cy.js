@@ -7,6 +7,7 @@ const firstTitle = 'Test view'
 const secondTitle = 'Test view 2'
 const thirdTitle = 'Test view 3'
 const fourthTitle = 'Test view 4'
+const fifthTitle = 'Gallery view'
 
 describe('Interact with views', () => {
 
@@ -59,6 +60,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="navigationTableItem"]').contains(secondTitle).should('not.exist')
 		cy.get('[data-cy="navigationTableItem"]').contains(thirdTitle).should('not.exist')
 		cy.get('[data-cy="navigationTableItem"]').contains(fourthTitle).should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains(fifthTitle).should('not.exist')
 	})
 
 	it('Create view and insert rows in the view', () => {
@@ -154,6 +156,34 @@ describe('Interact with views', () => {
 		// cy.get('[data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		// cy.get('[data-cy="editRowModal"]').contains('.row.space-T', 'title').find('input').should('have.attr', 'readonly')
 		// cy.get('[data-cy="editRowSaveButton"]').contains('Save').click()
+	})
+
+
+
+	it('Persists the configured gallery layout for a view', () => {
+		cy.loadTable('View test table')
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
+		cy.get('[data-cy="viewSettingsDialogTitleInput"]').type(fifthTitle)
+		cy.get('[data-cy="viewLayoutGallery"]').click({ force: true })
+
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
+		cy.get('[data-cy="modifyViewBtn"]').contains('Create View').click()
+		cy.wait('@createView').its('request.body').should('include', { layout: 'gallery' })
+		cy.wait('@updateView').its('request.body.data').should('include', { layout: 'gallery' })
+
+		cy.get('[data-cy="customTableRow"]').should('not.exist')
+		cy.get('[data-cy="galleryLayoutBody"]').should('have.length.at.least', 1)
+		cy.get('[data-cy="galleryMetadataItem"]').contains('title').should('not.exist')
+		cy.get('[data-cy="galleryMetadataItem"]').contains('selection').should('exist')
+		cy.get('[data-cy="viewSettingsDialog"]').should('not.exist')
+		cy.contains('.options', 'Gallery').should('not.exist')
+
+		cy.reload()
+		cy.loadView(fifthTitle)
+		cy.get('[data-cy="galleryLayoutBody"]').should('have.length.at.least', 1)
+		cy.get('[data-cy="customTableRow"]').should('not.exist')
 	})
 
 	it('Create view and delete rows in the view', () => {

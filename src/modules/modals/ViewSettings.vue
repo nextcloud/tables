@@ -53,6 +53,29 @@
 				:generated-filters="viewSetting ? generatedView.filter : null"
 				:columns="allColumns" />
 		</NcAppSettingsSection>
+
+		<NcAppSettingsSection v-if="columns != null" id="layout" :name="t('tables', 'Layout')">
+			<table class="layout-options" role="presentation">
+				<tbody>
+					<tr class="layout-options__selection">
+						<td>
+							<NcCheckboxRadioSwitch :checked.sync="layout" value="table" name="viewLayout" type="radio" data-cy="viewLayoutTable" :aria-label="t('tables', 'Table')" />
+						</td>
+						<td>
+							<NcCheckboxRadioSwitch :checked.sync="layout" value="tiles" name="viewLayout" type="radio" data-cy="viewLayoutTiles" :aria-label="t('tables', 'Tile')" />
+						</td>
+						<td>
+							<NcCheckboxRadioSwitch :checked.sync="layout" value="gallery" name="viewLayout" type="radio" data-cy="viewLayoutGallery" :aria-label="t('tables', 'Gallery')" />
+						</td>
+					</tr>
+					<tr class="layout-options__title">
+						<td>{{ t('tables', 'Table') }}</td>
+						<td>{{ t('tables', 'Tile') }}</td>
+						<td>{{ t('tables', 'Gallery') }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null" id="sort" :name="t('tables', 'Sort')">
 			<SortForm
@@ -78,7 +101,7 @@
 </template>
 
 <script>
-import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
@@ -98,6 +121,7 @@ export default {
 		NcAppSettingsSection,
 		NcEmojiPicker,
 		NcButton,
+		NcCheckboxRadioSwitch,
 		FilterForm,
 		SelectedViewColumns,
 		SortForm,
@@ -130,6 +154,7 @@ export default {
 			title: '',
 			description: '',
 			icon: '',
+			layout: 'table',
 			errorTitle: false,
 			selectedColumns: [],
 			allColumns: [],
@@ -173,6 +198,7 @@ export default {
 					mergedViewSettings.columnSettings = this.view.columnSettings
 				}
 			}
+			mergedViewSettings.layout = this.view.layout ?? 'table'
 			if (this.viewSetting.sorting) {
 				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
 			} else {
@@ -294,6 +320,7 @@ export default {
 				title: this.title,
 				description: this.description,
 				emoji: this.icon,
+				layout: this.layout,
 			}
 			const res = await this.insertNewView({ data })
 			if (res) {
@@ -316,6 +343,7 @@ export default {
 					title: this.title,
 					description: this.description,
 					emoji: this.icon,
+					layout: this.layout,
 					columnSettings: JSON.stringify(newColumnSettings),
 				},
 			}
@@ -344,6 +372,7 @@ export default {
 			this.title = this.mutableView.title ?? ''
 			this.description = this.mutableView.description ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
+			this.layout = this.mutableView.layout ?? 'table'
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
@@ -374,6 +403,27 @@ export default {
 :deep(.element-description) {
 	padding-inline: 0 !important;
 	max-width: 100%;
+}
+
+.layout-options {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: separate;
+	border-spacing: 12px 8px;
+}
+
+.layout-options td {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.layout-options__selection :deep(.checkbox-radio-switch) {
+	display: inline-flex;
+}
+
+.layout-options__title td {
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
 }
 
 .sticky {
