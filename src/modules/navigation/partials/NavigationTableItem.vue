@@ -4,8 +4,8 @@
 -->
 <template>
 	<NcAppNavigationItem v-if="table" data-cy="navigationTableItem" :name="table.title"
-		:class="{ active: activeTable && table.id === activeTable.id }" :allow-collapse="hasViews" :force-menu="true"
-		:open.sync="isParentOfActiveView" :to="'/table/' + parseInt(table.id)" @click="openTable">
+		:active="isActive" :allow-collapse="hasViews" :force-menu="true"
+		:open.sync="isOpen" :to="'/table/' + parseInt(table.id)" @click="openTable">
 		<template #icon>
 			<template v-if="table.emoji">
 				{{ table.emoji }}
@@ -206,7 +206,7 @@ export default {
 
 	data() {
 		return {
-			isParentOfActiveView: false,
+			isOpen: false,
 		}
 	},
 
@@ -224,18 +224,13 @@ export default {
 		hasViews() {
 			return this.getViews.length > 0
 		},
+		isActive() {
+			if (this.activeTable && this.table.id === this.activeTable.id) return true
+			if (!this.isOpen && this.activeView && this.activeView.tableId === this.table.id) return true
+			return false
+		},
 	},
 	watch: {
-		activeView() {
-			if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
-				this.isParentOfActiveView = true
-			}
-		},
-		filterString() {
-			if (!this.isParentOfActiveView && this.filterString && !this.table.title.toLowerCase().includes(this.filterString.toLowerCase())) {
-				this.isParentOfActiveView = true
-			}
-		},
 	},
 	methods: {
 		...mapActions(useTablesStore, ['favoriteTable', 'removeFavoriteTable', 'updateTable']),
@@ -279,7 +274,6 @@ export default {
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		openTable() {
-			this.isParentOfActiveView = true
 			// Close navigation
 			if (window.innerWidth < 960) {
 				emit('toggle-navigation', {
@@ -316,6 +310,7 @@ export default {
 	.icon-collapse {
 		color: var(--color-primary-element-text)
 	}
+
 }
 
 :deep(.app-navigation-entry__counter-wrapper) {
