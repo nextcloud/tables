@@ -4,11 +4,18 @@
  */
 
 import {
+	configureNextcloud,
+	getContainer,
+	runExec,
+	runOcc,
 	startNextcloud,
 	stopNextcloud,
+	waitOnNextcloud,
 } from '@nextcloud/e2e-test-server/docker'
 import { readFileSync } from 'fs'
 import { execSync } from 'node:child_process'
+
+const TEXT_REPOSITORY = 'https://github.com/nextcloud/text.git'
 
 async function start() {
 	let branch = process.env.SERVER_BRANCH || 'stable33'
@@ -34,6 +41,54 @@ async function start() {
 	})
 }
 
+async function moveAppAside(sourcePath, targetPathPrefix) {
+	const container = getContainer()
+
+	try {
+		await runExec(['test', '-d', sourcePath], { container })
+		const backupPath = `${targetPathPrefix}-${Date.now()}`
+		await runExec(['mv', sourcePath, backupPath], {
+			container,
+			user: 'root',
+		})
+	} catch {
+		// App path does not exist in this image, so there is nothing to move aside.
+	}
+}
+
+async function installVendoredText(vendoredBranch) {
+	const container = getContainer()
+
+	await runOcc(['app:disable', 'text'], { container }).catch(() => {
+		// Text might not be registered yet, which is fine for a fresh container.
+	})
+
+	await moveAppAside(
+		'/var/www/html/apps/text',
+		'/var/www/html/apps/text.server',
+	)
+	await moveAppAside(
+		'/var/www/html/apps-extra/text',
+		'/var/www/html/apps-extra/text.server',
+	)
+
+	await runExec(
+		[
+			'git',
+			'clone',
+			'--depth=1',
+			`--branch=${vendoredBranch}`,
+			TEXT_REPOSITORY,
+			'apps/text',
+		],
+		{ container, verbose: true },
+	)
+	await runOcc(['app:enable', '--force', 'text'], {
+		container,
+		verbose: true,
+	})
+}
+
 async function stop() {
 	process.stderr.write('Stopping Nextcloud server…\n')
 	await stopNextcloud()
@@ -41,12 +96,18 @@ async function stop() {
 	process.exit(0)
 }
 
-// Start the Nextcloud docker container
-await start()
-
-// Listen for process to exit (tests done) and shut down the docker container
 process.on('SIGINT', stop)
 process.on('SIGTERM', stop)
+
+// Start and fully configure the Nextcloud docker container before Playwright continues.
+const ip = await start()
+await waitOnNextcloud(ip)
+
+const serverBranch = process.env.SERVER_BRANCH || 'stable33'
+const vendoredBranch = serverBranch === 'master' ? 'main' : serverBranch
+
+await configureNextcloud(['tables'], vendoredBranch)
+await installVendoredText(vendoredBranch)
 
 // Idle to wait for shutdown
 while (true) {
