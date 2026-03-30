@@ -108,6 +108,7 @@ const vendoredBranch = serverBranch === 'master' ? 'main' : serverBranch
 
 await configureNextcloud(['tables'], vendoredBranch)
 await installVendoredText(vendoredBranch)
+process.stdout.write('Tables Playwright environment is ready\n')
 
 // Idle to wait for shutdown
 while (true) {
