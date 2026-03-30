@@ -21,3 +21,4 @@ tests/unit/.phpunit.result.cache
 /cypress/downloads
 /vendor-bin/*/vendor
 /lib/Vendor/
+/test-results/
