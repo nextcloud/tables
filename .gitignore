@@ -19,6 +19,7 @@ tests/unit/.phpunit.result.cache
 .DS_Store
 /cypress/videos
 /cypress/downloads
+/cypress/fixtures/test-import-update.csv
 /playwright/test-results/
 /playwright-report/
 /vendor-bin/*/vendor

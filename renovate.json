@@ -71,6 +71,11 @@
       "allowedVersions": "<=5.3.3"
     },
     {
+      "description": "Group Playwright and Cypress e2e tooling for coordinated updates while both runners are in use",
+      "matchPackageNames": ["@playwright/test", "cypress", "cypress-downloadfile", "cypress-vite", "@nextcloud/cypress"],
+      "groupName": "e2e-test-runners"
+    },
+    {
       "matchPackageNames": ["phpoffice/phpspreadsheet"],
       "allowedVersions": "<1.30",
       "description": "Pinned as later version have a regressive bug"

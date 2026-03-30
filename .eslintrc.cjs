@@ -12,6 +12,19 @@ module.exports = {
 		'jsdoc/require-jsdoc': 'off',
 		'jsdoc/tag-lines': 'off',
 		'vue/first-attribute-linebreak': 'off',
-		'vue/max-attributes-per-line': 'off'
-	}
+		'vue/max-attributes-per-line': 'off',
+	},
+	overrides: [
+		{
+			files: ['cypress/**/*.js'],
+			env: {
+				mocha: true,
+			},
+			globals: {
+				cy: 'readonly',
+				Cypress: 'readonly',
+				expect: 'readonly',
+			},
+		},
+	],
 }

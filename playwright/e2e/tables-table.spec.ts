@@ -4,13 +4,9 @@
  */
 
 import { test, expect } from '../support/fixtures'
-import * as fs from 'fs'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
-import { createRandomUser, uploadFile } from '../support/api'
+import { createRandomUser } from '../support/api'
 import { createTable, deleteTable, loadTable } from '../support/commands'
 import { login } from '../support/login'
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 test.describe('Manage a table', () => {
 
@@ -34,46 +30,6 @@ test.describe('Manage a table', () => {
 		await expect(page.locator('h1', { hasText: 'to do list' }).first()).toBeVisible()
 		await expect(page.locator('table th', { hasText: 'Task' }).first()).toBeVisible()
 		await expect(page.locator('.text-editor__content p').filter({ hasText: 'to Do List description' })).toBeVisible()
-	})
-
-	test('Create with import', async ({ userPage: { page, user } }) => {
-		const csvContent = fs.readFileSync(path.join(__dirname, '../fixtures/test-import.csv'))
-		await uploadFile(page.request, user, 'test-import.csv', 'text/csv', csvContent)
-
-		await page.goto('/index.php/apps/tables')
-
-		await expect(page.locator('.icon-loading').first()).toBeHidden()
-		await page.locator('[data-cy="navigationCreateTableIcon"]').click({ force: true })
-
-		const createModal = page.locator('.modal__content')
-		await createModal.locator('input[type="text"]').clear()
-		await createModal.locator('input[type="text"]').fill('import list')
-		await page.locator('.tile').filter({ hasText: 'Import table' }).first().click({ force: true })
-
-		await page.locator('[data-cy="createTableSubmitBtn"]').scrollIntoViewIfNeeded()
-		await page.locator('[data-cy="createTableSubmitBtn"]').click()
-
-		await expect(page.locator('h2', { hasText: 'Import' })).toBeVisible()
-
-		await createModal.locator('button').filter({ hasText: 'Select from Files' }).click()
-		await page.locator('.file-picker__files').filter({ hasText: 'test-import' }).click()
-		await page.locator('.file-picker').getByRole('button', { name: /^Import$/ }).first().click()
-		await createModal.locator('button').filter({ hasText: 'Preview' }).click()
-		await expect(page.locator('.file_import__preview tbody tr')).toHaveCount(4)
-
-		const importUploadReqPromise = page.waitForResponse(response => response.url().includes('/apps/tables/import/table/') && response.request().method() === 'POST')
-
-		await createModal.getByRole('button', { name: /^Import$/ }).scrollIntoViewIfNeeded()
-		await createModal.getByRole('button', { name: /^Import$/ }).click()
-
-		await importUploadReqPromise
-
-		await expect(page.locator('[data-cy="importResultColumnsFound"]')).toContainText('4')
-		await expect(page.locator('[data-cy="importResultColumnsMatch"]')).toContainText('0')
-		await expect(page.locator('[data-cy="importResultColumnsCreated"]')).toContainText('4')
-		await expect(page.locator('[data-cy="importResultRowsInserted"]')).toContainText('3')
-		await expect(page.locator('[data-cy="importResultParsingErrors"]')).toContainText('0')
-		await expect(page.locator('[data-cy="importResultRowErrors"]')).toContainText('0')
 	})
 
 	test('Update description', async ({ userPage: { page } }) => {

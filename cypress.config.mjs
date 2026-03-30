@@ -9,10 +9,13 @@ import vue from '@vitejs/plugin-vue2'
 
 
 
+const baseUrl = process.env.CYPRESS_baseUrl ?? 'http://127.0.0.1:8089/index.php/'
+
 export default defineConfig({
 	projectId: 'ixbf9n',
 	e2e: {
-		baseUrl: 'http://nextcloud.local/index.php/',
+		baseUrl,
+		supportFile: 'cypress/support/e2e.js',
 		setupNodeEvents(on, config) {
 			on('file:preprocessor', vitePreprocessor({
 				plugins: [vue(), nodePolyfills()],
