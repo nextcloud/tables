@@ -11,6 +11,7 @@
 			</h2>
 			<Options
 				:config="tablePermissions"
+				:rows="filteredRows"
 				:show-options="true"
 				@create-row="createRow"
 				@set-search-string="search" />
@@ -265,12 +266,6 @@ export default {
 					background: transparent !important;
 				}
 			}
-
-			// fixme: what to do here?
-			//:where(.pagination-footer) {
-			// width: unset !important;
-			// inset-inline-start: unset !important;
-			//}
 		}
 
 		& :deep(.options.row) {

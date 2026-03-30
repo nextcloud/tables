@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div v-if="totalPages > 1" class="pagination-block" :class="{'large-width': !appNavCollapsed || isMobile}">
+	<div class="pagination-block">
 		<div class="pagination-items">
 			<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" :aria-label="t('tables', 'Go to first page')" @click="pageNumber = 1">
 				<template #icon>
@@ -15,18 +15,16 @@
 					<ChevronLeftIcon :size="20" />
 				</template>
 			</NcButton>
-			<div class="page-number">
-				<NcSelect
-					v-model="pageNumber"
-					:options="allPageNumbersArray"
-					:clearable="false"
-					:aria-label-combobox="t('tables', 'Page number')">
-					<template #selected-option-container="{ option }">
-						<span class="selected-page">
-							{{ option.label }} of {{ totalPages }}
-						</span>
-					</template>
-				</NcSelect>
+			<div class="page-number page-input">
+				<span class="page-label">{{ t('tables', 'Page') }}</span>
+				<NcTextField
+					v-model.number="pageNumber"
+					type="number"
+					:aria-label="t('tables', 'Page number')"
+					:min="1"
+					:max="totalPages"
+					@change="validatePageInput" />
+				<span class="page-of">/ {{ totalPages }}</span>
 			</div>
 			<div class="page-number">
 				<NcSelect v-model="rowsPerPage"
@@ -53,7 +51,7 @@ import PageLastIcon from 'vue-material-design-icons/PageLast.vue'
 import PageFirstIcon from 'vue-material-design-icons/PageFirst.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
-import { NcButton, NcSelect, useIsMobile } from '@nextcloud/vue'
+import { NcButton, NcSelect, useIsMobile, NcTextField } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../store/store.js'
@@ -69,6 +67,7 @@ export default {
 		ChevronLeftIcon,
 		ChevronRightIcon,
 		NcSelect,
+		NcTextField,
 	},
 
 	props: {
@@ -121,6 +120,14 @@ export default {
 
 	methods: {
 		t,
+		validatePageInput() {
+			// Ensure page number is within valid range
+			if (this.pageNumber < 1) {
+				this.pageNumber = 1
+			} else if (this.pageNumber > this.totalPages) {
+				this.pageNumber = this.totalPages
+			}
+		},
 	},
 }
 </script>
@@ -128,43 +135,100 @@ export default {
 <style lang="scss" scoped>
 .selected-page{
 	padding-inline-start: 5px;
-
-	display:inline-flex;
+	display: inline-flex;
 	align-items: center;
+}
+
+.page-of {
+	font-size: 14px;
+	color: var(--color-text-maxcontrast);
+	white-space: nowrap;
+}
+
+.page-input {
+	padding-inline: 5px;
+	box-sizing: border-box;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+
+	.page-label {
+		font-size: 14px;
+		color: var(--color-text-maxcontrast);
+		white-space: nowrap;
+	}
+
+	:deep(.input-field) {
+		width: 50px;
+		margin: 0;
+	}
+
+	:deep(.input-field__main-wrapper) {
+		height: 34px;
+	}
+
+	:deep(.input-field__input) {
+		height: 32px;
+		min-height: 32px;
+		padding: 0 4px;
+		text-align: center;
+	}
 }
 
 .page-number{
 	padding-inline: 5px;
-}
-
-.large-width{
-	//width: 100vw !important;
-	//inset-inline-start: 0 !important;
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	height: 36px;
 }
 
 .pagination-items{
 	background-color: var(--color-main-background);
 	border-radius: var(--border-radius-large);
 	pointer-events: all;
-
 	display: flex;
 	align-items: center;
+	flex-shrink: 0;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-top: 8px;
+	padding: 4px;
+	gap: 4px;
+
+	:deep(.button-vue) {
+		height: 36px;
+		min-height: 36px;
+		width: 36px;
+		min-width: 36px;
+	}
 }
 
 .pagination-block{
-	//width: calc(100vw - 316px);
 	pointer-events: none;
-
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	max-width: 100%;
 
 	:deep(.v-select) {
-		min-width: 95px !important;
+		min-width: 120px !important;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.pagination-items {
+		gap: 1px;
+		padding: 2px;
 	}
 
-	:deep(.vs__dropdown-menu) {
-		min-width: 95px !important;
+	.page-number {
+		padding-inline: 2px;
+	}
+
+	.page-input :deep(.input-field) {
+		width: 40px;
 	}
 }
 </style>
