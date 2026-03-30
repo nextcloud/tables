@@ -21,6 +21,7 @@ namespace OCA\Tables;
  * 	ownership: string,
  * 	ownerDisplayName: string|null,
  * 	createdBy: string,
+ * 	dataByAlias: array<string, array{columnId: int, value: mixed}>,
  * 	createdAt: string,
  * 	lastEditBy: string,
  * 	lastEditAt: string,
@@ -88,6 +89,7 @@ namespace OCA\Tables;
  *    createdAt: string,
  *    lastEditAt: string,
  *    data: ?array{columnId: int, value: mixed},
+ *    dataByAlias: array<string, array{columnId: int, value: mixed}>,
  *  }
  *
  * @psalm-type TablesLinkShare = array{
@@ -115,6 +117,7 @@ namespace OCA\Tables;
  * @psalm-type TablesColumn = array{
  *  id: int,
  *  title: string,
+ *  technicalName: string,
  *  tableId: int,
  *  createdBy: string,
  *  createdByDisplayName: string,
@@ -160,6 +163,7 @@ namespace OCA\Tables;
  * @psalm-type TablesPublicColumn = array{
  *   id: int,
  *   title: string,
+ *   technicalName: string,
  *   createdAt: string,
  *   lastEditAt: string,
  *   type: string,

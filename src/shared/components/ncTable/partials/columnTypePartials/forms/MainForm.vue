@@ -12,6 +12,17 @@
 			<input v-model="localTitle" data-cy="columnTypeFormInput" :placeholder="t('tables', 'Enter a column title')">
 		</div>
 
+		<!-- technical name -->
+		<div class="fix-col-4 title space-T" :class="{error: technicalNameInvalidError}">
+			{{ t('tables', 'Technical name') }}
+		</div>
+		<div class="fix-col-4" :class="{error: technicalNameInvalidError}">
+			<input
+				v-model="localTechnicalName"
+				data-cy="columnTechnicalNameInput"
+				:placeholder="t('tables', 'Optional, e.g. customer_name')">
+		</div>
+
 		<!-- description -->
 		<div class="fix-col-4 title space-T">
 			{{ t('tables', 'Description') }}
@@ -98,6 +109,10 @@ export default {
 			type: Boolean,
 			default: null,
 		},
+		technicalName: {
+			type: String,
+			default: null,
+		},
 		selectedViews: {
 			type: Array,
 			default: null,
@@ -107,6 +122,10 @@ export default {
 			default: false,
 		},
 		widthInvalidError: {
+			type: Boolean,
+			default: false,
+		},
+		technicalNameInvalidError: {
 			type: Boolean,
 			default: false,
 		},
@@ -136,6 +155,10 @@ export default {
 		localDescription: {
 			get() { return this.description },
 			set(description) { this.$emit('update:description', description) },
+		},
+		localTechnicalName: {
+			get() { return this.technicalName },
+			set(technicalName) { this.$emit('update:technicalName', technicalName) },
 		},
 		localMandatory: {
 			get() { return this.mandatory },

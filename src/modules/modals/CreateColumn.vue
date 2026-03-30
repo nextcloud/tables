@@ -12,10 +12,12 @@
 				<div class="fix-col-2">
 					<MainForm :description.sync="column.description"
 						:mandatory.sync="column.mandatory"
+						:technical-name.sync="column.technicalName"
 						:title.sync="column.title"
 						:custom-settings.sync="column.customSettings"
 						:selected-views.sync="column.selectedViews"
 						:title-missing-error="titleMissingError"
+						:technical-name-invalid-error="technicalNameInvalidError"
 						:width-invalid-error="widthInvalidError" />
 				</div>
 				<div class="fix-col-2" style="display: block">
@@ -172,6 +174,7 @@ export default {
 				numberPrefix: '',
 				numberSuffix: '',
 				selectedViews: [],
+				technicalName: '',
 				mandatory: false,
 				numberDefault: null,
 				numberMin: 0,
@@ -197,6 +200,7 @@ export default {
 			typeMissingError: false,
 			widthInvalidError: false,
 			titleMissingError: false,
+			technicalNameInvalidError: false,
 			typeOptions: [
 				{ id: 'text', label: t('tables', 'Text') },
 				{ id: 'text-link', label: t('tables', 'Link') },
@@ -292,6 +296,9 @@ export default {
 			if (!this.column.title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
 				this.titleMissingError = true
+			} else if (!this.isTechnicalNameValid()) {
+				showError(t('tables', 'Cannot save column. Technical name must start with a lowercase letter and only contain lowercase letters, numbers, and underscores.'))
+				this.technicalNameInvalidError = true
 			} else if (this.column.customSettings?.width
 				&& (this.column.customSettings?.width < COLUMN_WIDTH_MIN || this.column.customSettings?.width > COLUMN_WIDTH_MAX)) {
 				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
@@ -321,10 +328,12 @@ export default {
 			this.$emit('close')
 		},
 		prepareSubmitData() {
+			const technicalName = this.normalizeTechnicalName(this.column.technicalName)
 			const data = {
 				type: this.column.type,
 				subtype: this.column.subtype,
 				title: this.column.title,
+				technicalName,
 				description: this.column.description,
 				selectedViewIds: this.column.selectedViews.map(view => view.id),
 				mandatory: this.column.mandatory,
@@ -398,6 +407,7 @@ export default {
 				type: this.column.type,
 				subtype: this.column.subtype,
 				title: this.column.title,
+				technicalName: this.column.technicalName,
 				description: this.column.description,
 				selectedViews: this.column.selectedViews,
 				mandatory: this.column.mandatory,
@@ -424,6 +434,7 @@ export default {
 			}
 			if (mainForm) {
 				this.column.title = ''
+				this.column.technicalName = ''
 				this.column.description = ''
 				this.column.mandatory = false
 			}
@@ -435,8 +446,21 @@ export default {
 				this.column.selectedViews = []
 			}
 			this.titleMissingError = false
+			this.technicalNameInvalidError = false
 			this.widthInvalidError = false
 			this.typeMissingError = false
+		},
+		normalizeTechnicalName(technicalName) {
+			const normalized = technicalName?.trim()
+			return normalized === '' ? null : normalized
+		},
+		isTechnicalNameValid() {
+			const technicalName = this.normalizeTechnicalName(this.column.technicalName)
+			if (technicalName === null) {
+				return true
+			}
+
+			return /^[a-z][a-z0-9_]*$/.test(technicalName)
 		},
 	},
 }
