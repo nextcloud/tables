@@ -13,6 +13,8 @@ export interface TestUser {
 type OcsRequestForm = Record<string, string | number | boolean>
 type OcsRequestData = Record<string, unknown>
 
+const REQUEST_TIMEOUT = 30000
+
 async function fetchRequestToken(
 	request: APIRequestContext,
 	user: TestUser,
@@ -22,6 +24,7 @@ async function fetchRequestToken(
 	for (let attempt = 1; attempt <= 3; attempt++) {
 		try {
 			const requestTokenRes = await request.get('/index.php/csrftoken', {
+				timeout: REQUEST_TIMEOUT,
 				headers: {
 					Authorization:
 						'Basic '
@@ -61,6 +64,7 @@ export async function createRandomUser(request: APIRequestContext) {
 		userId = 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10)
 		try {
 			const res = await request.post('/ocs/v2.php/cloud/users?format=json', {
+				timeout: REQUEST_TIMEOUT,
 				headers: {
 					'OCS-APIRequest': 'true',
 					Authorization: 'Basic ' + Buffer.from('admin:admin').toString('base64'),
@@ -92,6 +96,7 @@ export async function ocsRequest(
 	options: { method: string; url: string; data?: OcsRequestData; form?: OcsRequestForm },
 ) {
 	const res = await request.fetch(options.url, {
+		timeout: REQUEST_TIMEOUT,
 		method: options.method,
 		headers: {
 			'OCS-APIRequest': 'true',
@@ -122,6 +127,7 @@ export async function createGroup(
 	groupName: string,
 ) {
 	await request.post('/ocs/v2.php/cloud/groups?format=json', {
+		timeout: REQUEST_TIMEOUT,
 		headers: {
 			'OCS-APIRequest': 'true',
 			Authorization: 'Basic ' + Buffer.from('admin:admin').toString('base64'),
@@ -139,6 +145,7 @@ export async function addUserToGroup(
 	groupId: string,
 ) {
 	await request.post(`/ocs/v2.php/cloud/users/${userId}/groups?format=json`, {
+		timeout: REQUEST_TIMEOUT,
 		headers: {
 			'OCS-APIRequest': 'true',
 			Authorization: 'Basic ' + Buffer.from('admin:admin').toString('base64'),
@@ -159,6 +166,7 @@ export async function uploadFile(
 	const token = await fetchRequestToken(request, user)
 
 	const res = await request.put(`/remote.php/webdav/${fileName}`, {
+		timeout: REQUEST_TIMEOUT,
 		headers: {
 			requesttoken: token,
 			'Content-Type': mimeType,
