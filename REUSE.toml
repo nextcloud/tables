@@ -18,7 +18,7 @@ SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = ["tsconfig.json", "vendor-bin/openapi-extractor/composer.json", "cypress/e2e/ToDo list.json", "vendor-bin/openapi-extractor/composer.lock"]
+path = ["tsconfig.json", "vendor-bin/openapi-extractor/composer.json", "playwright/e2e/ToDo list.json", "vendor-bin/openapi-extractor/composer.lock"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
@@ -66,13 +66,13 @@ SPDX-FileCopyrightText = "2017 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = ["cypress/styleguide/assets/img/filetypes/font.svg", "cypress/styleguide/assets/img/actions/star-rounded.svg", "cypress/fixtures/example.json", "cypress/fixtures/NC_server_test.pdf", "cypress/fixtures/photo-test-1.jpeg", "cypress/fixtures/test-import.csv", "docs/permissions-matrix.xlsx", "tests/stub.phpstub", "tests/integration/composer.json", "tests/integration/composer.lock", "tests/integration/base-query-count.txt"]
+path = ["cypress/styleguide/assets/img/filetypes/font.svg", "cypress/styleguide/assets/img/actions/star-rounded.svg", "cypress/fixtures/example.json", "cypress/fixtures/NC_server_test.pdf", "cypress/fixtures/photo-test-1.jpeg", "playwright/fixtures/example.json", "playwright/fixtures/NC_server_test.pdf", "playwright/fixtures/photo-test-1.jpeg", "playwright/fixtures/test-import.csv", "docs/permissions-matrix.xlsx", "tests/stub.phpstub", "tests/integration/composer.json", "tests/integration/composer.lock", "tests/integration/base-query-count.txt"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = ["cypress/styleguide/assets/close.svg", "cypress/styleguide/assets/img/manifest.json", "img/material/meta.json", "cypress/fixtures/widgets/createRow.json", "cypress/fixtures/widgets/editRow.json", "cypress/fixtures/widgets/richObject.json"]
+path = ["cypress/styleguide/assets/close.svg", "cypress/styleguide/assets/img/manifest.json", "img/material/meta.json", "cypress/fixtures/widgets/createRow.json", "cypress/fixtures/widgets/editRow.json", "cypress/fixtures/widgets/richObject.json", "playwright/fixtures/widgets/createRow.json", "playwright/fixtures/widgets/editRow.json", "playwright/fixtures/widgets/richObject.json"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
