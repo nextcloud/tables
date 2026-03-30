@@ -12,10 +12,12 @@
 				<div class="col-2">
 					<MainForm :description.sync="editColumn.description"
 						:mandatory.sync="editColumn.mandatory"
+						:technical-name.sync="editColumn.technicalName"
 						:title.sync="editColumn.title"
 						:custom-settings.sync="editColumn.customSettings"
 						:edit-column="true"
 						:title-missing-error="editErrorTitle"
+						:technical-name-invalid-error="technicalNameInvalidError"
 						:width-invalid-error="widthInvalidError" />
 				</div>
 				<div class="col-2 space-LR space-T">
@@ -125,6 +127,7 @@ export default {
 			editColumn: JSON.parse(JSON.stringify(this.column)),
 			deleteId: null,
 			editErrorTitle: false,
+			technicalNameInvalidError: false,
 			widthInvalidError: false,
 			canSave: true, // used to avoid saving an incorrect config
 		}
@@ -171,6 +174,12 @@ export default {
 				return
 			}
 
+			if (!this.isTechnicalNameValid()) {
+				showError(t('tables', 'Cannot save column. Technical name must start with a lowercase letter and only contain lowercase letters, numbers, and underscores.'))
+				this.technicalNameInvalidError = true
+				return
+			}
+
 			if (this.editColumn.customSettings?.width
 				&& (this.editColumn.customSettings?.width < COLUMN_WIDTH_MIN || this.editColumn.customSettings?.width > COLUMN_WIDTH_MAX)) {
 				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
@@ -187,6 +196,7 @@ export default {
 			this.editColumn = null
 			this.deleteId = null
 			this.editErrorTitle = false
+			this.technicalNameInvalidError = false
 			this.widthInvalidError = false
 		},
 		async updateLocalColumn() {
@@ -203,6 +213,7 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
+			data.technicalName = this.normalizeTechnicalName(data.technicalName)
 			data.customSettings = { width: data.customSettings.width }
 			console.debug('this column data will be send', data)
 			const res = await this.updateColumn({
@@ -215,6 +226,18 @@ export default {
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}
+		},
+		normalizeTechnicalName(technicalName) {
+			const normalized = technicalName?.trim()
+			return normalized === '' ? null : normalized
+		},
+		isTechnicalNameValid() {
+			const technicalName = this.normalizeTechnicalName(this.editColumn.technicalName)
+			if (technicalName === null) {
+				return false
+			}
+
+			return /^[a-z][a-z0-9_]*$/.test(technicalName)
 		},
 	},
 }
