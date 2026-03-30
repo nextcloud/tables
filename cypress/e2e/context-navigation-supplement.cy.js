@@ -9,6 +9,10 @@ const contextTitlePrefix = 'test application'
 let contextTitle = contextTitlePrefix
 let testNumber = 0
 
+function appMenuEntrySelector(title) {
+	return `header .app-menu [title="${title}"], nav[aria-label="Applications menu"] [title="${title}"]`
+}
+
 describe('Test context navigation (Cypress supplement)', () => {
 	before(function() {
 		cy.createRandomUser().then(user => {
@@ -33,7 +37,7 @@ describe('Test context navigation (Cypress supplement)', () => {
 		cy.visit('apps/tables')
 
 		// Confirming that the context is shown in the navigation for the owner
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('exist')
+		cy.get(appMenuEntrySelector(contextTitle)).should('exist')
 
 		cy.loadContext(contextTitle)
 		cy.get('[data-cy="context-title"]').should('be.visible')
@@ -48,12 +52,14 @@ describe('Test context navigation (Cypress supplement)', () => {
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('be.checked')
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').click({ force: true })
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('not.be.checked')
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('not.exist')
+		cy.get('body').then(($body) => {
+			expect($body.find(appMenuEntrySelector(contextTitle)).length).to.eq(0)
+		})
 
 		// Confirming that the context is still shown by default
 		// in the navigation for the shared user
 		cy.login(nonLocalUser)
 		cy.visit('apps/tables')
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('exist')
+		cy.get(appMenuEntrySelector(contextTitle)).should('exist')
 	})
 })
