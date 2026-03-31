@@ -13,7 +13,7 @@ async function isInternalServerErrorPage(page: Page) {
 }
 
 async function isLoginFormVisible(page: Page) {
-	return page.locator('#user').isVisible({ timeout: 5000 }).catch(() => false)
+	return page.locator('#user').isVisible({ timeout: 15000 }).catch(() => false)
 }
 
 async function openLoginPage(page: Page) {

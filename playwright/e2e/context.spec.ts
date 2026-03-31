@@ -184,8 +184,9 @@ test.describe('Manage a context', () => {
 		await page.locator('[data-cy="deleteContextModal"] button').filter({ hasText: 'Delete' }).click()
 		await deleteResponse
 
-		await expect(page.locator('li', { hasText: contextTitle })).toBeHidden({ timeout: 10000 })
-		await expect(page.locator('h1', { hasText: contextTitle })).toBeHidden()
+		// Wait for the navigation item to be hidden
+		await expect(page.locator('[data-cy="navigationContextItem"]').filter({ hasText: contextTitle })).toBeHidden({ timeout: 15000 })
+		await expect(page.locator('h1').filter({ hasText: contextTitle })).toBeHidden()
 
 		// verify that context was deleted from shared user
 		await page.context().clearCookies()

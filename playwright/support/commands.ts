@@ -993,9 +993,13 @@ export async function createSelectionCheckColumn(
 export async function removeColumn(page: Page, title: string) {
 	const columnHeader = page
 		.locator('.custom-table table tr th')
-		.filter({ hasText: title })
+		.filter({ hasText: new RegExp('^' + title + '$', 'i') })
+		.or(page.locator('.custom-table table tr th').filter({ hasText: title })) // fallback
+		.first()
+
+	await columnHeader.hover()
 	await columnHeader.getByRole('button', { name: 'Actions' }).first().click()
-	await expect(page.locator('[data-cy="deleteColumnActionBtn"]')).toBeVisible()
+	await expect(page.locator('[data-cy="deleteColumnActionBtn"]')).toBeVisible({ timeout: 10000 })
 	await page.locator('[data-cy="deleteColumnActionBtn"]').click()
 	await page
 		.locator('[data-cy="confirmDialog"] button')

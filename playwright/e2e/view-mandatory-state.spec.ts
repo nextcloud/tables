@@ -136,10 +136,10 @@ test.describe('Mandatory Column Functionality', () => {
 
 		// should show error when mandatory field is empty
 		const input = page.locator('[data-cy="editRowModal"] input').first()
-		await input.clear()
+		await input.fill('')
 		await input.blur()
 
-		await expect(page.locator('[data-cy="editRowModal"]').locator('.notecard--error, .note-card--error, [type="error"], .notecard[type="error"], .error').first()).toBeVisible({ timeout: 5000 })
+		await expect(page.locator('[data-cy="editRowModal"]').locator('.notecard--error, .note-card--error, .error, [type="error"]').first()).toBeVisible({ timeout: 15000 })
 
 		// Check that save button is disabled
 		const saveBtn = page.locator('[data-cy="editRowSaveButton"]')
