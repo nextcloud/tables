@@ -82,6 +82,7 @@ namespace OCA\Tables;
  * 	lastEditBy: string,
  * 	lastEditAt: string,
  *  data: ?array{columnId: int, value: mixed},
+ *  dataByAlias: array<string, array{columnId: int, value: mixed}>,
  * }
  *
  * @psalm-type TablesPublicRow = array{

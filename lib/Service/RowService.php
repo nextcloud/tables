@@ -72,12 +72,13 @@ class RowService extends SuperService {
 
 	/**
 	 * @param Row2[] $rows
-	 * @return TablesPublicRow[]
+	 * @psalm-return TablesPublicRow[]
 	 */
 	public function formatRowsForPublicShare(array $rows): array {
 		return array_map(static function (Row2 $row): array {
 			$rowData = $row->jsonSerialize();
 			unset($rowData['tableId'], $rowData['createdBy'], $rowData['lastEditBy']);
+			/** @var TablesPublicRow $rowData */
 			return $rowData;
 		}, $rows);
 	}
