@@ -181,6 +181,7 @@ class ApiTablesController extends AOCSController {
 					$view['emoji'],
 					$table,
 					$this->userId,
+					$view['layout'] ?? null,
 				);
 
 				$inputColumnsArray = [];
@@ -218,6 +219,7 @@ class ApiTablesController extends AOCSController {
 					array_merge($inputColumnsArray, [
 						'sort' => $newSort,
 						'filter' => $newFilter,
+						'layout' => $view['layout'] ?? null,
 					])
 				));
 			}
