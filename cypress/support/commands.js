@@ -120,11 +120,12 @@ Cypress.Commands.add('createView', (title) => {
 })
 
 Cypress.Commands.add('openCreateColumnModal', (isFirstColumn) => {
+	cy.get('.icon-loading').should('not.exist')
 	if (isFirstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+		cy.get('[data-cy="emptyTableCreateColumnBtn"]').should('be.visible').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').should('be.visible').click({ force: true })
 	}
 })
 
@@ -496,8 +497,13 @@ Cypress.Commands.add('addUserToGroup', (userId, groupId) => {
 })
 
 Cypress.Commands.add('removeColumn', (title) => {
-	cy.get('.custom-table table tr th .cell').contains(title).click()
-	cy.get('[data-cy="deleteColumnActionBtn"] button').click()
+	cy.contains('.custom-table table tr th .cell', title)
+		.parents('th')
+		.first()
+		.find('.menu button')
+		.first()
+		.click({ force: true })
+	cy.get('[data-cy="deleteColumnActionBtn"]').should('be.visible').click({ force: true })
 	cy.get('[data-cy="confirmDialog"] button').contains('Confirm').click()
 })
 

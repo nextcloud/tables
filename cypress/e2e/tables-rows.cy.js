@@ -33,23 +33,35 @@ describe('Rows for a table', () => {
 
 	it('Edit', () => {
 		cy.loadTable('Welcome to Nextcloud Tables!')
-		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('My first task').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('Row to edit')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('Row to edit').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .slot input').first().clear().type('Changed column value')
 		cy.get('[data-cy="editRowModal"] [aria-label="Increase stars"]').click().click()
 		cy.get('[data-cy="editRowSaveButton"]').click()
 
 		cy.get('[data-cy="editRowModal"]').should('not.exist')
+		cy.get('.icon-loading-small').should('not.exist')
 		cy.get('[data-cy="ncTable"] table').contains('Changed column value').should('exist')
 	})
 
 	it('Delete', () => {
 		cy.loadTable('Welcome to Nextcloud Tables!')
-		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('Changed column value').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('Row to delete')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('Row to delete').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowDeleteButton"]').click()
 		cy.get('[data-cy="editRowDeleteConfirmButton"]').click()
 
 		cy.get('[data-cy="editRowModal"]').should('not.exist')
-		cy.get('[data-cy="ncTable"] table').contains('Changed column value').should('not.exist')
+		cy.get('.icon-loading-small').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Row to delete').should('not.exist')
 	})
 
 	it('Check mandatory fields error', () => {

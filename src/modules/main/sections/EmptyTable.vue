@@ -9,7 +9,7 @@
 			{{ table.emoji }}
 		</template>
 		<template v-if="canManageTable(table)" #action>
-			<NcButton :aria-label="t('table', 'Create column')" type="primary" @click="createColumn()">
+			<NcButton data-cy="emptyTableCreateColumnBtn" :aria-label="t('table', 'Create column')" type="primary" @click="createColumn()">
 				{{ t('tables', 'Create column') }}
 			</NcButton>
 		</template>
