@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { test as base } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
-import type { Page } from '@playwright/test'
+import type { BrowserContext, Page } from '@playwright/test'
+import { createRandomUser } from '../support/api'
+import { login } from '../support/login'
 import { createSelectionColumn, createTable, createTextLineColumn, fillInValueSelection, fillInValueTextLine, loadTable } from '../support/commands'
 
 const firstTitle = 'Test view'
@@ -31,10 +34,39 @@ async function setupTestTable(page: Page) {
 }
 
 test.describe('Interact with views', () => {
+	test.describe.configure({ mode: 'serial' })
 
-	test('Create view and insert rows in the view', async ({ userPage: { page } }) => {
+	let context: BrowserContext
+	let page: Page
+
+	// @ts-expect-error - Playwright complex types mismatch in this environment
+	base.beforeAll(async ({ browser, baseURL }) => {
+		context = await browser.newContext({
+			baseURL,
+		})
+		page = await context.newPage()
+
+		const user = await createRandomUser(page.request)
+		await login(page, user)
+
 		await page.goto('/index.php/apps/tables')
 		await setupTestTable(page)
+		await loadTable(page, tableTitle)
+	}, 120000)
+
+	test.afterAll(async () => {
+		await context?.close()
+	})
+
+	test.beforeEach(async () => {
+		await page.goto('/index.php/apps/tables')
+		await loadTable(page, tableTitle)
+		// Ensure no modals are left open from previous tests.
+		// In serial mode, a failed test might leave a modal open.
+		await page.keyboard.press('Escape')
+	})
+
+	test('Create view and insert rows in the view', async () => {
 		await loadTable(page, tableTitle)
 
 		// create view
@@ -77,9 +109,7 @@ test.describe('Interact with views', () => {
 		}
 	})
 
-	test('Create view and update rows in the view', async ({ userPage: { page } }) => {
-		await page.goto('/index.php/apps/tables')
-		await setupTestTable(page)
+	test('Create view and update rows in the view', async () => {
 		await loadTable(page, tableTitle)
 
 		// create view
@@ -118,9 +148,7 @@ test.describe('Interact with views', () => {
 		await expect(page.getByRole('cell', { name: 'Changed row', exact: true }).first()).toBeVisible({ timeout: 10000 })
 	})
 
-	test('Create view and make column readonly in the view', async ({ userPage: { page } }) => {
-		await page.goto('/index.php/apps/tables')
-		await setupTestTable(page)
+	test('Create view and make column readonly in the view', async () => {
 		await loadTable(page, tableTitle)
 
 		// create view
@@ -144,9 +172,7 @@ test.describe('Interact with views', () => {
 		await expect(page.locator('[data-cy="navigationViewItem"]').filter({ hasText: thirdTitle }).first()).toBeVisible()
 	})
 
-	test('Create view and delete rows in the view', async ({ userPage: { page } }) => {
-		await page.goto('/index.php/apps/tables')
-		await setupTestTable(page)
+	test('Create view and delete rows in the view', async () => {
 		await loadTable(page, tableTitle)
 
 		// create view

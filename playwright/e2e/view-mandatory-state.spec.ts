@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { test as base } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
-import type { Page } from '@playwright/test'
+import type { BrowserContext, Page } from '@playwright/test'
+import { createRandomUser } from '../support/api'
+import { login } from '../support/login'
 import { createTable, createTextLineColumn, fillInValueTextLine, loadTable } from '../support/commands'
 
 const tableTitle = 'Mandatory test table'
@@ -22,10 +25,38 @@ async function setupMandatoryTable(page: Page) {
 }
 
 test.describe('Mandatory Column Functionality', () => {
+	test.describe.configure({ mode: 'serial' })
 
-	test('SelectedViewColumns - Mandatory Checkbox display', async ({ userPage: { page } }) => {
+	let context: BrowserContext
+	let page: Page
+
+	// @ts-expect-error - Playwright complex types mismatch in this environment
+	base.beforeAll(async ({ browser, baseURL }) => {
+		context = await browser.newContext({
+			baseURL,
+		})
+		page = await context.newPage()
+
+		const user = await createRandomUser(page.request)
+		await login(page, user)
+
 		await page.goto('/index.php/apps/tables')
 		await setupMandatoryTable(page)
+		await loadTable(page, tableTitle)
+	}, 120000)
+
+	test.afterAll(async () => {
+		await context?.close()
+	})
+
+	test.beforeEach(async () => {
+		await page.goto('/index.php/apps/tables')
+		await loadTable(page, tableTitle)
+		// Ensure no modals are left open from previous tests in serial mode
+		await page.keyboard.press('Escape')
+	})
+
+	test('SelectedViewColumns - Mandatory Checkbox display', async () => {
 		await loadTable(page, tableTitle)
 
 		// create a new view
@@ -47,9 +78,7 @@ test.describe('Mandatory Column Functionality', () => {
 		await expect(page.locator('[data-cy="columnMandatoryCheckbox"]').filter({ hasText: 'Mandatory' }).first()).toBeVisible()
 	})
 
-	test('SelectedViewColumns - Checkboxes mutual exclusivity', async ({ userPage: { page } }) => {
-		await page.goto('/index.php/apps/tables')
-		await setupMandatoryTable(page)
+	test('SelectedViewColumns - Checkboxes mutual exclusivity', async () => {
 		await loadTable(page, tableTitle)
 
 		// create a new view
@@ -81,9 +110,7 @@ test.describe('Mandatory Column Functionality', () => {
 		await expect(page.locator('[data-cy="columnReadonlyCheckbox"] input')).toBeDisabled()
 	})
 
-	test('EditRow - Mandatory Field Validation', async ({ userPage: { page } }) => {
-		await page.goto('/index.php/apps/tables')
-		await setupMandatoryTable(page)
+	test('EditRow - Mandatory Field Validation', async () => {
 		await loadTable(page, tableTitle)
 
 		// Create a view with mandatory settings first

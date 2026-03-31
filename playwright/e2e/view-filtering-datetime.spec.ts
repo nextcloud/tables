@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { test, expect } from '../support/fixtures'
-import type { Page } from '@playwright/test'
+import { test as base, expect, type BrowserContext, type Page } from '@playwright/test'
+import { test } from '../support/fixtures'
 import { createDatetimeDateColumn, createTable, createTextLineColumn, fillInValueTextLine, loadTable } from '../support/commands'
+import { createRandomUser } from '../support/api'
+import { login } from '../support/login'
 
 const tableTitle = 'View datetime filtering test table'
 
@@ -42,10 +44,40 @@ async function setupDatetimeFilteringTable(page: Page) {
 }
 
 test.describe('Filtering in a view by datetime', () => {
+	// Run tests serially, sharing a single page/user/table to avoid
+	// overwhelming the CI server with repeated heavy setup.
+	test.describe.configure({ mode: 'serial' })
 
-	test('Filter view for dates 1-30 days ahead', async ({ userPage: { page } }) => {
+	let context: BrowserContext
+	let page: Page
+
+	// @ts-expect-error - Playwright complex types mismatch in this environment
+	base.beforeAll(async ({ browser, baseURL }) => {
+		context = await browser.newContext({
+			baseURL,
+		})
+		page = await context.newPage()
+
+		const user = await createRandomUser(page.request)
+		await login(page, user)
+
 		await page.goto('/index.php/apps/tables')
 		await setupDatetimeFilteringTable(page)
+		await loadTable(page, tableTitle)
+	}, 120000)
+
+	test.afterAll(async () => {
+		await context?.close()
+	})
+
+	test.beforeEach(async () => {
+		await page.goto('/index.php/apps/tables')
+		await loadTable(page, tableTitle)
+		// Ensure no modals are left open from previous tests in serial mode
+		await page.keyboard.press('Escape')
+	})
+
+	test('Filter view for dates 1-30 days ahead', async () => {
 		await loadTable(page, tableTitle)
 
 		// create view
@@ -85,20 +117,18 @@ test.describe('Filtering in a view by datetime', () => {
 		await expect(page.locator('.app-navigation-entry-link span').filter({ hasText: title })).toBeVisible()
 
 		// check for existing rows
-		await expect(page.locator('.custom-table table tr td div').filter({ hasText: 'tomorrow' }).first()).toBeVisible()
-		await expect(page.locator('.custom-table table tr td div').filter({ hasText: '30 days ahead' }).first()).toBeVisible()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /tomorrow/i }).first()).toBeVisible({ timeout: 10000 })
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /30 days ahead/i }).first()).toBeVisible({ timeout: 10000 })
 
 		// check for not existing rows
-		await expect(page.locator('.custom-table table tr td div', { hasText: 'today' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: 'yesterday' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: '60 days ahead' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: '30 days ago' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: '60 days ago' })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^today$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^yesterday$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^60 days ahead$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^30 days ago$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^60 days ago$/i })).toBeHidden()
 	})
 
-	test('Filter view for dates 1-30 days ago', async ({ userPage: { page } }) => {
-		await page.goto('/index.php/apps/tables')
-		await setupDatetimeFilteringTable(page)
+	test('Filter view for dates 1-30 days ago', async () => {
 		await loadTable(page, tableTitle)
 
 		// create view
@@ -138,14 +168,14 @@ test.describe('Filtering in a view by datetime', () => {
 		await expect(page.locator('.app-navigation-entry-link span').filter({ hasText: title })).toBeVisible()
 
 		// check for existing rows
-		await expect(page.locator('.custom-table table tr td div').filter({ hasText: 'yesterday' }).first()).toBeVisible()
-		await expect(page.locator('.custom-table table tr td div').filter({ hasText: '30 days ago' }).first()).toBeVisible()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /yesterday/i }).first()).toBeVisible({ timeout: 10000 })
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /30 days ago/i }).first()).toBeVisible({ timeout: 10000 })
 
 		// check for not existing rows
-		await expect(page.locator('.custom-table table tr td div', { hasText: 'today' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: 'tomorrow' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: '30 days ahead' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: '60 days ahead' })).toBeHidden()
-		await expect(page.locator('.custom-table table tr td div', { hasText: '60 days ago' })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^today$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^tomorrow$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^30 days ahead$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^60 days ahead$/i })).toBeHidden()
+		await expect(page.locator('[data-cy="customTableRow"]').filter({ hasText: /^60 days ago$/i })).toBeHidden()
 	})
 })

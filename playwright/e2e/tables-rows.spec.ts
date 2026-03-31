@@ -3,13 +3,43 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { test as base } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
+import type { BrowserContext, Page } from '@playwright/test'
+import { createRandomUser } from '../support/api'
+import { login } from '../support/login'
 import { createTable, createTextLineColumn, fillInValueTextLine, loadTable, openCreateRowModal } from '../support/commands'
 
 test.describe('Rows for a table', () => {
+	test.describe.configure({ mode: 'serial' })
+
+	let context: BrowserContext
+	let page: Page
+
+	// @ts-expect-error - Playwright complex types mismatch in this environment
+	base.beforeAll(async ({ browser, baseURL }) => {
+		context = await browser.newContext({
+			baseURL,
+		})
+		page = await context.newPage()
+
+		const user = await createRandomUser(page.request)
+		await login(page, user)
+	}, 120000)
+
+	test.afterAll(async () => {
+		await context?.close()
+	})
+
+	test.beforeEach(async () => {
+		await page.goto('/index.php/apps/tables')
+		// Ensure no modals are left open.
+		await page.keyboard.press('Escape')
+	})
+
 	test.setTimeout(60000)
 
-	test('Create row', async ({ userPage: { page } }) => {
+	test('Create row', async () => {
 		await page.goto('/index.php/apps/tables')
 		await loadTable(page, 'Welcome to Nextcloud Tables!')
 		await expect(page.locator('.icon-loading').first()).toBeHidden()
@@ -31,7 +61,7 @@ test.describe('Rows for a table', () => {
 		await expect(page.locator('[data-cy="ncTable"] table').filter({ hasText: 'My first task' }).first()).toBeVisible()
 	})
 
-	test('Edit and Delete row', async ({ userPage: { page } }) => {
+	test('Edit and Delete row', async () => {
 		await page.goto('/index.php/apps/tables')
 		await createTable(page, 'Row edit table')
 		await createTextLineColumn(page, 'title', '', '', true)
@@ -74,7 +104,7 @@ test.describe('Rows for a table', () => {
 		await expect(page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]')).toHaveCount(0, { timeout: 10000 })
 	})
 
-	test('Check mandatory fields error', async ({ userPage: { page } }) => {
+	test('Check mandatory fields error', async () => {
 		await page.goto('/index.php/apps/tables')
 		await expect(page.locator('.icon-loading').first()).toBeHidden()
 		await page.locator('[data-cy="navigationCreateTableIcon"]').click({ force: true })
@@ -107,7 +137,7 @@ test.describe('Rows for a table', () => {
 		await expect(page.locator('[data-cy="editRowSaveButton"]')).toBeDisabled()
 	})
 
-	test('Inline Edit', async ({ userPage: { page } }) => {
+	test('Inline Edit', async () => {
 		await page.goto('/index.php/apps/tables')
 		// Create a test row first
 		await loadTable(page, 'Welcome to Nextcloud Tables!')
