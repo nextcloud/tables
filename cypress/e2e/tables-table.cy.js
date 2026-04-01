@@ -51,7 +51,7 @@ describe('Manage a table', () => {
 		cy.get('.file-picker button span').contains('Import').click()
 		cy.get('.modal__content button').contains('Preview').click()
 		cy.get('.file_import__preview tbody tr').should('have.length', 4)
-		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').scrollIntoView().click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
