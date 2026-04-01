@@ -27,10 +27,12 @@ describe('Import csv', () => {
 		cy.get('.file-picker button span').contains('Import').click()
 		cy.get('.modal__content .import-filename', { timeout: 5000 }).should('be.visible')
 
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import-preview/**' }).as('importPreviewPath')
 		cy.get('.modal__content button').contains('Preview').click()
-		cy.get('.file_import__preview tbody tr').should('have.length', 4)
+		cy.wait('@importPreviewPath')
+		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 4)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
@@ -47,10 +49,12 @@ describe('Import csv', () => {
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import.csv', { force: true })
 
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload-preview/**' }).as('importPreviewUpload')
 		cy.get('.modal__content button').contains('Preview').click()
+		cy.wait('@importPreviewUpload')
 		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 4)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '4')
@@ -80,10 +84,12 @@ describe('Import csv', () => {
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-update.csv', { force: true })
 
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload-preview/**' }).as('importPreviewUpdate')
 		cy.get('.modal__content button').contains('Preview').click()
+		cy.wait('@importPreviewUpdate')
 		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 3)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '2')
@@ -99,7 +105,7 @@ describe('Import csv', () => {
 
 describe('Import csv from Files file action', () => {
 
-	before(function () {
+	before(function() {
 		cy.createRandomUser().then(user => {
 			localUser = user
 			cy.login(localUser)
@@ -107,9 +113,12 @@ describe('Import csv from Files file action', () => {
 		})
 	})
 
-	beforeEach(function () {
+	beforeEach(function() {
 		cy.login(localUser)
+		// Tables file actions register via init script; wait for the bundle before opening menus.
+		cy.intercept({ method: 'GET', url: '**/tables-files*' }).as('tablesFilesBundle')
 		cy.visit('apps/files/files')
+		cy.wait('@tablesFilesBundle', { timeout: 120000 })
 	})
 
 	it('Import to new table', () => {
@@ -118,7 +127,7 @@ describe('Import csv from Files file action', () => {
 
 		cy.intercept({
 			method: 'POST',
-			url: '**/apps/tables/import/table/*'
+			url: '**/apps/tables/import/table/*',
 		}).as('importNewTableReq')
 		cy.get('[data-cy="fileActionImportButton"]').click({ force: true })
 		cy.wait('@importNewTableReq').its('response.statusCode').should('equal', 200)
@@ -141,9 +150,9 @@ describe('Import csv from Files file action', () => {
 
 		cy.intercept({
 			method: 'POST',
-			url: '**/apps/tables/import/table/*'
+			url: '**/apps/tables/import/table/*',
 		}).as('importExistingTableReq')
-		cy.get('[data-cy="fileActionImportButton"]').click({force: true})
+		cy.get('[data-cy="fileActionImportButton"]').click({ force: true })
 		cy.wait('@importExistingTableReq').its('response.statusCode').should('equal', 200)
 
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')

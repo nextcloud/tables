@@ -20,12 +20,16 @@
     "watch": "vite --mode development build --watch",
     "typescript:check": "tsc --noEmit",
     "typescript:generate": "npx openapi-typescript ./openapi.json --immutable -t -o src/types/openapi/openapi.ts",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .js,.vue src",
-    "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .js,.vue src --fix",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .js,.vue,.ts,.mjs src playwright cypress/e2e cypress/support/e2e.js",
+    "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .js,.vue,.ts,.mjs src playwright cypress/e2e cypress/support/e2e.js --fix",
     "stylelint": "stylelint 'css/*.css' 'css/*.scss' 'src/**/*.scss' 'src/**/*.vue'",
     "stylelint:fix": "stylelint 'css/*.css' 'css/*.scss' 'src/**/*.scss' 'src/**/*.vue' --fix",
-    "tests": "npx cypress run",
-    "tests:component": "npx cypress run --component"
+    "tests:component": "npx cypress run --component",
+    "test:e2e": "playwright test",
+    "test:e2e:cypress": "cypress run --spec cypress/e2e/context-navigation.cy.js,cypress/e2e/tables-import.cy.js,cypress/e2e/tables-table.cy.js,cypress/e2e/view-filtering-selection-row-removal.cy.js",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "start:nextcloud": "node playwright/start-nextcloud-server.mjs"
   },
   "dependencies": {
     "@mdi/svg": "^7.4.47",
@@ -75,7 +79,9 @@
     "cypress-vite": "^1.8.0",
     "openapi-typescript": "^7.13.0",
     "typescript": "^5.3.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "@nextcloud/e2e-test-server": "^0.4.0",
+    "@playwright/test": "^1.58.2"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.59.0"

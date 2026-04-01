@@ -1,0 +1,406 @@
+{
+  "id": 49,
+  "type": 0,
+  "title": "Customers",
+  "emoji": "💼",
+  "ownership": "admin",
+  "ownerDisplayName": "admin",
+  "isShared": null,
+  "onSharePermissions": null,
+  "rowsCount": 3,
+  "link": "http://nextcloud.local/index.php/apps/tables/#/table/49/content",
+  "columns": [
+    {
+      "id": 159,
+      "tableId": 49,
+      "title": "Name",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "text",
+      "subtype": "line",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    },
+    {
+      "id": 160,
+      "tableId": 49,
+      "title": "Account manager",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "text",
+      "subtype": "line",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    },
+    {
+      "id": 161,
+      "tableId": 49,
+      "title": "Contract type",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "text",
+      "subtype": "line",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    },
+    {
+      "id": 162,
+      "tableId": 49,
+      "title": "Contract start",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "datetime",
+      "subtype": "date",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": "today"
+    },
+    {
+      "id": 163,
+      "tableId": 49,
+      "title": "Contract end",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "datetime",
+      "subtype": "date",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    },
+    {
+      "id": 164,
+      "tableId": 49,
+      "title": "Description",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "text",
+      "subtype": "rich",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    },
+    {
+      "id": 165,
+      "tableId": 49,
+      "title": "Contact information",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "text",
+      "subtype": "rich",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    },
+    {
+      "id": 166,
+      "tableId": 49,
+      "title": "Quality of relationship",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "number",
+      "subtype": "progress",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": 30,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    },
+    {
+      "id": 167,
+      "tableId": 49,
+      "title": "Comment",
+      "createdBy": "admin",
+      "createdByDisplayName": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditByDisplayName": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "type": "text",
+      "subtype": "rich",
+      "mandatory": false,
+      "description": "",
+      "numberDefault": null,
+      "numberMin": null,
+      "numberMax": null,
+      "numberDecimals": 0,
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "textDefault": "",
+      "textAllowedPattern": "",
+      "textMaxLength": -1,
+      "textUnique": false,
+      "selectionOptions": [],
+      "selectionDefault": "",
+      "datetimeDefault": ""
+    }
+  ],
+  "rows": [
+    {
+      "id": 226,
+      "tableId": 49,
+      "createdBy": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "data": [
+        {
+          "columnId": 159,
+          "value": "Dog"
+        },
+        {
+          "columnId": 160,
+          "value": "Mr. Smith"
+        },
+        {
+          "columnId": 161,
+          "value": "Dog food every week"
+        },
+        {
+          "columnId": 164,
+          "value": "The dog is our best friend."
+        },
+        {
+          "columnId": 165,
+          "value": "Standard, SLA Level 2"
+        },
+        {
+          "columnId": 167,
+          "value": "Likes treats"
+        },
+        {
+          "columnId": 166,
+          "value": 80
+        },
+        {
+          "columnId": 162,
+          "value": "2023-01-01"
+        },
+        {
+          "columnId": 163,
+          "value": "2023-12-31"
+        }
+      ]
+    },
+    {
+      "id": 227,
+      "tableId": 49,
+      "createdBy": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "data": [
+        {
+          "columnId": 159,
+          "value": "Cat"
+        },
+        {
+          "columnId": 160,
+          "value": "Mr. Smith"
+        },
+        {
+          "columnId": 161,
+          "value": "Cat food every week"
+        },
+        {
+          "columnId": 164,
+          "value": "The cat is also our best friend."
+        },
+        {
+          "columnId": 165,
+          "value": "Standard, SLA Level 1"
+        },
+        {
+          "columnId": 167,
+          "value": "New customer, let's see if there is more."
+        },
+        {
+          "columnId": 166,
+          "value": 40
+        },
+        {
+          "columnId": 162,
+          "value": "2023-03-01"
+        },
+        {
+          "columnId": 163,
+          "value": "2023-09-15"
+        }
+      ]
+    },
+    {
+      "id": 228,
+      "tableId": 49,
+      "createdBy": "admin",
+      "createdAt": "2024-04-16 17:50:52",
+      "lastEditBy": "admin",
+      "lastEditAt": "2024-04-16 17:50:52",
+      "data": [
+        {
+          "columnId": 159,
+          "value": "Horse"
+        },
+        {
+          "columnId": 160,
+          "value": "Alice"
+        },
+        {
+          "columnId": 161,
+          "value": "Hay and straw"
+        },
+        {
+          "columnId": 164,
+          "value": "Summer only"
+        },
+        {
+          "columnId": 165,
+          "value": "Special"
+        },
+        {
+          "columnId": 167,
+          "value": "Maybe we can make it fix for every year?!"
+        },
+        {
+          "columnId": 166,
+          "value": 60
+        },
+        {
+          "columnId": 162,
+          "value": "2023-06-01"
+        },
+        {
+          "columnId": 163,
+          "value": "2023-08-31"
+        }
+      ]
+    }
+  ]
+}
