@@ -103,7 +103,7 @@ OC.L10N.register(
     "Edit" : "Taisyti",
     "Activity" : "Veikla",
     "I really want to delete this row!" : "Aš tikrai noriu ištrinti šią eilutę!",
-    "Owner" : "Savivinkas",
+    "Owner" : "Savininkas",
     "I really want to delete this table!" : "Aš tikrai noriu ištrinti šią lentelę!",
     "Could not create table" : "Nepavyko sukurti lentelės",
     "Import successful" : "Importavimas pavyko",
