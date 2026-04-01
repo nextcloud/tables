@@ -28,6 +28,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.fillInValueSelectionMulti('multi selection', ['A', 'B'])
 		cy.fillInValueSelectionCheck('check')
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// add row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -36,6 +37,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.fillInValueSelectionMulti('multi selection', ['B'])
 		cy.fillInValueSelectionCheck('check')
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// add row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -43,6 +45,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.fillInValueSelection('selection', 'sel3')
 		cy.fillInValueSelectionMulti('multi selection', ['C', 'B', 'D'])
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// add row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -50,6 +53,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.fillInValueSelectionMulti('multi selection', ['A'])
 		cy.fillInValueSelectionCheck('check')
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// add row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -58,6 +62,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.fillInValueSelectionMulti('multi selection', ['D'])
 		cy.fillInValueSelectionCheck('check')
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// add row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -66,6 +71,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.fillInValueSelectionMulti('multi selection', ['C', 'D'])
 		cy.fillInValueSelectionCheck('check')
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// add row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -73,6 +79,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.fillInValueSelection('selection', 'sel2')
 		cy.fillInValueSelectionMulti('multi selection', ['A', 'C', 'B', 'D'])
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		cy.loadTable('View filtering test table')
 	})
@@ -116,6 +123,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 
 		// ## check if row is visible
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('be.visible')
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// # insert a unchecked row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -130,6 +138,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 
 		// ## check if row does not exist
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'unchecked row').should('not.exist')
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// # edit checked row
 		// ## uncheck
@@ -145,6 +154,7 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 
 		// ## check if row does not exist
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('not.exist')
+		cy.get('[data-cy="editRowModal"]').should('not.exist')
 
 		// # inline edit row
 		// ## uncheck row
@@ -153,7 +163,6 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 
 		// ## check server response for /view/{viewId}/row/{id}/present
 		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			cy.wait(1000)
 			expect(present).to.equal(false)
 		})
 
