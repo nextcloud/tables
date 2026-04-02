@@ -85,6 +85,31 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 	})
 
 	it('Filter view remove row when it no longer matches filter', () => {
+		const waitForRowPresenceCheck = (alias, rowId, expectedPresent, retries = 20) => {
+			cy.wait(alias, { timeout: 20000 }).then(({ request, response }) => {
+				if (request.url.includes(`/row/${rowId}/present`)) {
+					if (response.body.present === expectedPresent) {
+						return
+					}
+
+					if (retries <= 0) {
+						expect(response.body.present).to.equal(expectedPresent)
+					}
+
+					waitForRowPresenceCheck(alias, rowId, expectedPresent, retries - 1)
+					return
+				}
+
+				if (retries <= 0) {
+					throw new Error(`Did not receive /present check for row ${rowId}`)
+				}
+
+				waitForRowPresenceCheck(alias, rowId, expectedPresent, retries - 1)
+			})
+		}
+
+		let checkedRowId = null
+
 		// # create view with filter
 		// ## create view and set title
 		const title = 'Filter for check enabled'
@@ -110,15 +135,16 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.contains('.app-navigation-entry-link span', title).should('exist')
 
 		// # insert a checked row
+		cy.intercept({ method: 'POST', url: '**/apps/tables/api/2/views/*/rows' }).as('insertRowInView')
+		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresentChecked')
 		cy.get('[data-cy="createRowBtn"]').click()
 		cy.fillInValueTextLine('title', 'checked row')
 		cy.fillInValueSelectionCheck('check')
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
 		cy.get('[data-cy="createRowSaveButton"]').click()
 
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.equal(true)
+		cy.wait('@insertRowInView').then(({ response }) => {
+			checkedRowId = response.body.ocs.data.id
+			waitForRowPresenceCheck('@isRowInViewPresentChecked', checkedRowId, true)
 		})
 
 		// ## check if row is visible
@@ -126,14 +152,15 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		cy.get('[data-cy="createRowModal"]').should('not.exist')
 
 		// # insert a unchecked row
+		cy.intercept({ method: 'POST', url: '**/apps/tables/api/2/views/*/rows' }).as('insertUncheckedRowInView')
+		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresentUnchecked')
 		cy.get('[data-cy="createRowBtn"]').click()
 		cy.fillInValueTextLine('title', 'unchecked row')
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
 		cy.get('[data-cy="createRowSaveButton"]').click()
 
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.equal(false)
+		cy.wait('@insertUncheckedRowInView').then(({ response }) => {
+			const uncheckedRowId = response.body.ocs.data.id
+			waitForRowPresenceCheck('@isRowInViewPresentUnchecked', uncheckedRowId, false)
 		})
 
 		// ## check if row does not exist
@@ -142,15 +169,12 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 
 		// # edit checked row
 		// ## uncheck
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('updateCheckedRow')
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .checkbox-radio-switch').click()
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
 		cy.get('[data-cy="editRowSaveButton"]').click()
 
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.equal(false)
-		})
+		cy.wait('@updateCheckedRow')
 
 		// ## check if row does not exist
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('not.exist')
@@ -158,13 +182,10 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 
 		// # inline edit row
 		// ## uncheck row
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('inlineUpdateRow')
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').closest('[data-cy="customTableRow"]').find('.inline-editing-container input').click({ force: true })
 
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.equal(false)
-		})
+		cy.wait('@inlineUpdateRow')
 
 		// ## check if row does not exist
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').should('not.exist')
