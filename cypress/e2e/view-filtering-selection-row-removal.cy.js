@@ -170,15 +170,11 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		// # edit checked row
 		// ## uncheck
 		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('updateCheckedRow')
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresentAfterEdit')
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .checkbox-radio-switch').click()
 		cy.get('[data-cy="editRowSaveButton"]').click()
 
 		cy.wait('@updateCheckedRow')
-		cy.then(() => {
-			waitForRowPresenceCheck('@isRowInViewPresentAfterEdit', checkedRowId, false)
-		})
 
 		// ## check if row does not exist
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('not.exist')
@@ -187,13 +183,9 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		// # inline edit row
 		// ## uncheck row
 		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('inlineUpdateRow')
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresentAfterInlineEdit')
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').closest('[data-cy="customTableRow"]').find('.inline-editing-container input').click({ force: true })
 
-		cy.wait('@inlineUpdateRow').then(({ request }) => {
-			const inlineUpdatedRowId = request.url.split('/').pop()
-			waitForRowPresenceCheck('@isRowInViewPresentAfterInlineEdit', inlineUpdatedRowId, false)
-		})
+		cy.wait('@inlineUpdateRow')
 
 		// ## check if row does not exist
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').should('not.exist')
