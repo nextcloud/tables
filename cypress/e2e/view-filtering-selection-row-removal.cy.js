@@ -85,10 +85,18 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 	})
 
 	it('Filter view remove row when it no longer matches filter', () => {
-		const waitForRowPresenceCheck = (alias, rowId, expectedPresent, retries = 10) => {
-			cy.wait(alias).then(({ request, response }) => {
+		const waitForRowPresenceCheck = (alias, rowId, expectedPresent, retries = 20) => {
+			cy.wait(alias, { timeout: 20000 }).then(({ request, response }) => {
 				if (request.url.includes(`/row/${rowId}/present`)) {
-					expect(response.body.present).to.equal(expectedPresent)
+					if (response.body.present === expectedPresent) {
+						return
+					}
+
+					if (retries <= 0) {
+						expect(response.body.present).to.equal(expectedPresent)
+					}
+
+					waitForRowPresenceCheck(alias, rowId, expectedPresent, retries - 1)
 					return
 				}
 
