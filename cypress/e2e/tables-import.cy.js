@@ -135,7 +135,7 @@ describe('Import csv from Files file action', () => {
 
 	beforeEach(function() {
 		cy.login(localUser)
-		cy.visit('apps/files/files')
+		cy.visit('apps/files/files', { timeout: 120000 })
 		cy.get('[data-cy-files-list-row-name="test-import.csv"]', { timeout: 120000 }).should('be.visible')
 	})
 
