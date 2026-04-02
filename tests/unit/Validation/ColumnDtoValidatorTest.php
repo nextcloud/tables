@@ -54,6 +54,9 @@ class ColumnDtoValidatorTest extends TestCase {
 		$this->validator->validate($this->dto('test' . str_repeat('t', 197)));
 	}
 
+	/**
+	 * @dataProvider reservedNameProvider
+	 */
 	#[DataProvider('reservedNameProvider')]
 	public function testReservedTechnicalNamesAreRejected(string $name): void {
 		$this->expectException(BadRequestError::class);
@@ -72,6 +75,9 @@ class ColumnDtoValidatorTest extends TestCase {
 		];
 	}
 
+	/**
+	 * @dataProvider invalidFormatProvider
+	 */
 	#[DataProvider('invalidFormatProvider')]
 	public function testInvalidFormatIsRejected(string $name): void {
 		$this->expectException(BadRequestError::class);
@@ -90,6 +96,9 @@ class ColumnDtoValidatorTest extends TestCase {
 		];
 	}
 
+	/**
+	 * @dataProvider validFormatProvider
+	 */
 	#[DataProvider('validFormatProvider')]
 	public function testValidFormatIsAccepted(string $name): void {
 		$this->expectNotToPerformAssertions();
