@@ -104,6 +104,26 @@ describe('Import csv', () => {
 })
 
 describe('Import csv from Files file action', () => {
+	const rowActionsButton = '[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button'
+	const importToTablesAction = '[data-cy-files-list-row-action="import-to-tables"]'
+
+	const openImportToTablesAction = (retries = 8) => {
+		cy.get(rowActionsButton).click()
+		cy.get('body').then($body => {
+			if ($body.find(importToTablesAction).length > 0) {
+				cy.get(importToTablesAction).first().click()
+				return
+			}
+
+			if (retries <= 0) {
+				throw new Error('Import to Tables action did not become available in file actions menu')
+			}
+
+			cy.get('body').click(0, 0)
+			cy.wait(1000)
+			openImportToTablesAction(retries - 1)
+		})
+	}
 
 	before(function() {
 		cy.createRandomUser().then(user => {
@@ -115,15 +135,12 @@ describe('Import csv from Files file action', () => {
 
 	beforeEach(function() {
 		cy.login(localUser)
-		// Tables file actions register via init script; wait for the bundle before opening menus.
-		cy.intercept({ method: 'GET', url: '**/tables-files*' }).as('tablesFilesBundle')
 		cy.visit('apps/files/files')
-		cy.wait('@tablesFilesBundle', { timeout: 120000 })
+		cy.get('[data-cy-files-list-row-name="test-import.csv"]', { timeout: 120000 }).should('be.visible')
 	})
 
 	it('Import to new table', () => {
-		cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
-		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
+		openImportToTablesAction()
 
 		cy.intercept({
 			method: 'POST',
@@ -141,8 +158,7 @@ describe('Import csv from Files file action', () => {
 	})
 
 	it('Import to existing table', () => {
-		cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
-		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
+		openImportToTablesAction()
 
 		cy.get('.modal__content [data-cy="importAsNewTableSwitch"] input').uncheck({ force: true })
 		cy.get('[data-cy="selectExistingTableDropdown"]').type('Welcome to Nextcloud Tables!')
