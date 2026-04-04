@@ -20,6 +20,7 @@ class ColumnsHelper {
 		Column::TYPE_DATETIME,
 		Column::TYPE_SELECTION,
 		Column::TYPE_USERGROUP,
+		Column::TYPE_RELATION,
 	];
 
 	/**

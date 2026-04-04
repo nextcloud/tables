@@ -25,6 +25,7 @@ use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ImportService;
+use OCA\Tables\Service\RelationService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
@@ -69,6 +70,8 @@ class Api1Controller extends ApiController {
 
 	protected LoggerInterface $logger;
 
+	private RelationService $relationService;
+
 	use Errors;
 
 
@@ -85,6 +88,7 @@ class Api1Controller extends ApiController {
 		LoggerInterface $logger,
 		IL10N $l10N,
 		?string $userId,
+		RelationService $relationService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->tableService = $service;
@@ -98,6 +102,7 @@ class Api1Controller extends ApiController {
 		$this->v1Api = $v1Api;
 		$this->logger = $logger;
 		$this->l10N = $l10N;
+		$this->relationService = $relationService;
 	}
 
 	// Tables
@@ -346,9 +351,9 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
-	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
+	public function createView(int $tableId, string $title, ?string $emoji, ?string $type = 'table'): DataResponse {
 		try {
-			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId))->jsonSerialize());
+			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId), null, $type)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1727,6 +1732,41 @@ class Api1Controller extends ApiController {
 			$this->logger->info('A invalid value was provided: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
+		}
+	}
+
+	// Relations
+
+	/**
+	 * @NoAdminRequired
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	public function getRelations(int $columnId, int $rowId): DataResponse {
+		try {
+			$linkedIds = $this->relationService->getLinkedRowIds($rowId, $columnId);
+			return new DataResponse($linkedIds);
+		} catch (\Exception $e) {
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	public function setRelations(int $columnId, int $rowId, array $targetRowIds = []): DataResponse {
+		try {
+			$column = $this->columnService->find($columnId);
+			$userId = $this->userId;
+			$this->relationService->setLinks($columnId, $rowId, $targetRowIds, $userId, $column);
+			$linkedIds = $this->relationService->getLinkedRowIds($rowId, $columnId);
+			return new DataResponse($linkedIds);
+		} catch (\Exception $e) {
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

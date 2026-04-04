@@ -412,4 +412,62 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 		);
 		return new DataResponse($column->jsonSerialize());
 	}
+
+	/**
+	 * [api v2] Create new relation column
+	 *
+	 * Links rows from one table to rows in another table
+	 *
+	 * @param int $baseNodeId Context of the column creation
+	 * @param string $title Title
+	 * @param int $relationTableId ID of the related table
+	 * @param boolean $relationMultiple Whether multiple rows can be linked
+	 * @param string $relationType Relation type: 'one-to-one', 'one-to-many', 'many-to-many'
+	 * @param int|null $relationDisplayColumnId Column ID from target table to display
+	 * @param string|null $description Description
+	 * @param list<int>|null $selectedViewIds View IDs where this columns
+	 *                                        should be added
+	 * @param boolean $mandatory Is mandatory
+	 * @param 'table'|'view' $baseNodeType Context type of the column creation
+	 * @param array<string, mixed> $customSettings Custom settings for the
+	 *                                             column
+	 *
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
+	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
+	 *     array{message: string}, array{}>
+	 *
+	 *
+	 * 200: Column created
+	 * 403: No permission
+	 * 404: Not found
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws BadRequestError
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
+	public function createRelationColumn(int $baseNodeId, string $title, int $relationTableId, ?bool $relationMultiple = false, string $relationType = 'many-to-many', ?int $relationDisplayColumnId = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
+		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
+		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
+		$column = $this->service->create(
+			$this->userId,
+			$tableId,
+			$viewId,
+			new ColumnDto(
+				title: $title,
+				type: ColumnType::RELATION->value,
+				mandatory: $mandatory,
+				description: $description,
+				customSettings: json_encode($customSettings),
+				relationTableId: $relationTableId,
+				relationMultiple: $relationMultiple,
+				relationType: $relationType,
+				relationDisplayColumnId: $relationDisplayColumnId,
+			),
+			$selectedViewIds
+		);
+		return new DataResponse($column->jsonSerialize());
+	}
 }

@@ -48,6 +48,7 @@ import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import TableCellUsergroup from './TableCellUsergroup.vue'
+import TableCellRelation from './TableCellRelation.vue'
 import { ColumnTypes, getColumnWidthStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
@@ -73,6 +74,7 @@ export default {
 		TableCellMultiSelection,
 		TableCellTextRich,
 		TableCellUsergroup,
+		TableCellRelation,
 	},
 
 	mixins: [activityMixin],
@@ -118,6 +120,7 @@ export default {
 		// to be used to trigger the edit modal instead of inline editing
 		nonInlineEditableColumnTypes() {
 			return [
+				ColumnTypes.Relation,
 			]
 		},
 	},
@@ -145,6 +148,7 @@ export default {
 			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'
 			case ColumnTypes.Usergroup: return 'TableCellUsergroup'
+			case ColumnTypes.Relation: return 'TableCellRelation'
 			default: return 'TableCellHtml'
 			}
 		},

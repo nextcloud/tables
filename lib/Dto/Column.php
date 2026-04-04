@@ -34,6 +34,11 @@ class Column {
 		private ?bool $usergroupSelectTeams = null,
 		private ?bool $showUserStatus = null,
 		private ?string $customSettings = null,
+		private ?int $relationTableId = null,
+		private ?bool $relationMultiple = null,
+		private ?int $relationTargetColumnId = null,
+		private ?string $relationType = null,
+		private ?int $relationDisplayColumnId = null,
 	) {
 	}
 
@@ -69,6 +74,11 @@ class Column {
 			usergroupSelectTeams: $data['usergroupSelectTeams'] ?? null,
 			showUserStatus: $data['showUserStatus'] ?? null,
 			customSettings: $customSettings,
+			relationTableId: $data['relationTableId'] ?? null,
+			relationMultiple: $data['relationMultiple'] ?? null,
+			relationTargetColumnId: $data['relationTargetColumnId'] ?? null,
+			relationType: $data['relationType'] ?? null,
+			relationDisplayColumnId: $data['relationDisplayColumnId'] ?? null,
 		);
 	}
 
@@ -170,5 +180,25 @@ class Column {
 
 	public function getCustomSettings(): ?string {
 		return $this->customSettings;
+	}
+
+	public function getRelationTableId(): ?int {
+		return $this->relationTableId;
+	}
+
+	public function getRelationMultiple(): ?bool {
+		return $this->relationMultiple;
+	}
+
+	public function getRelationTargetColumnId(): ?int {
+		return $this->relationTargetColumnId;
+	}
+
+	public function getRelationType(): ?string {
+		return $this->relationType;
+	}
+
+	public function getRelationDisplayColumnId(): ?int {
+		return $this->relationDisplayColumnId;
 	}
 }
