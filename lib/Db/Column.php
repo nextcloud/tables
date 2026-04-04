@@ -103,6 +103,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const TYPE_NUMBER = 'number';
 	public const TYPE_DATETIME = 'datetime';
 	public const TYPE_USERGROUP = 'usergroup';
+	public const TYPE_RELATION = 'relation';
 
 	public const SUBTYPE_DATETIME_DATE = 'date';
 	public const SUBTYPE_DATETIME_TIME = 'time';
@@ -113,6 +114,10 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const SUBTYPE_TEXT_LINE = 'line';
 
 	public const META_ID_TITLE = 'id';
+
+	public const RELATION_TYPE = 'relationType';
+	public const RELATION_TARGET_ID = 'targetId';
+	public const RELATION_LABEL_COLUMN = 'labelColumn';
 
 	protected ?string $title = null;
 	protected ?int $tableId = null;
