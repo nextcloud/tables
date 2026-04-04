@@ -40,6 +40,7 @@ OC.L10N.register(
     "Birthday" : "Gimtadienis",
     "Progress" : "Eiga",
     "Add more actions" : "Pridėti daugiau veiksmų",
+    "What" : "Ką",
     "Done" : "Atlikta",
     "Table" : "Lentelė",
     "View" : "Rodyti",
