@@ -380,7 +380,7 @@ class PermissionsService {
 	public function canReadShare(Share $share, ?string $userId = null): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			$this->logger->warning('Cannot pre check the user id, permission denied');
 			return false;
 		}
@@ -392,7 +392,7 @@ class PermissionsService {
 			if ($this->canManageElementById($share->getNodeId(), $share->getNodeType())) {
 				return true;
 			}
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			$this->logger->warning('Cannot check manage permissions, permission denied');
 			return false;
 		}
@@ -410,11 +410,11 @@ class PermissionsService {
 			try {
 				$userGroups = $this->userHelper->getGroupsForUser($userId);
 				foreach ($userGroups as $userGroup) {
-					if ($userGroup->getDisplayName() === $share->getReceiver()) {
+					if ($userGroup->getGID() === $share->getReceiver()) {
 						return true;
 					}
 				}
-			} catch (InternalError $e) {
+			} catch (InternalError) {
 				$this->logger->warning('Cannot get user groups, permission denied');
 				return false;
 			}
