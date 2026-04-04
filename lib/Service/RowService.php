@@ -877,7 +877,7 @@ class RowService extends SuperService {
 	 */
 	private function validateColumnValueLimits(Column $column, $value): void {
 		$textMaxLength = $column->getTextMaxLength();
-		if ($textMaxLength !== null && is_string($value) && mb_strlen($value) > $textMaxLength) {
+		if ($textMaxLength !== null && $textMaxLength >= 0 && is_string($value) && mb_strlen($value) > $textMaxLength) {
 			throw new BadRequestError('Value for column ' . $column->getTitle() . ' exceeds maximum length of ' . $textMaxLength);
 		}
 		$numberMin = $column->getNumberMin();
