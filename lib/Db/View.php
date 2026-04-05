@@ -114,7 +114,7 @@ class View extends EntitySuper implements JsonSerializable {
 		}
 
 		if (is_array(reset($columns))) {
-			return array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $columns);
+			return array_values(array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $columns));
 		}
 
 		$result = [];
