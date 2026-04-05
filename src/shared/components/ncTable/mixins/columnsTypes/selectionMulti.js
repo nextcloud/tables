@@ -71,8 +71,8 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 		const valueString = this.getValueString(cell)
 
 		const filterMethod = {
-			[FilterIds.Contains]() { return valueString?.includes(filterValue) },
-			[FilterIds.DoesNotContain]() { return !valueString?.includes(filterValue) },
+			[FilterIds.Contains]() { return valueString?.toLowerCase().includes(filterValue.toLowerCase()) },
+			[FilterIds.DoesNotContain]() { return !valueString?.toLowerCase().includes(filterValue.toLowerCase()) },
 			[FilterIds.IsEqual]() { return valueString === filterValue },
 			[FilterIds.IsNotEqual]() { return valueString !== filterValue },
 			[FilterIds.IsEmpty]() { return !valueString },
