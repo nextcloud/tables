@@ -67,8 +67,8 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 	}
 
 	isFilterFound(cell, filter) {
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		const valueString = this.getValueString(cell)
+		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
+		const valueString = this.getValueString(cell)?.toLowerCase()
 
 		const filterMethod = {
 			[FilterIds.ContainsItem]() {
