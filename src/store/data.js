@@ -61,11 +61,11 @@ export const useDataStore = defineStore('data', {
 				if (!Array.isArray(res.data)) {
 					const e = new Error('Expected array, but is not')
 					displayError(e, 'Format for loaded columns not valid.')
-					return false
+					return []
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load columns.'))
-				return false
+				return []
 			}
 
 			const columns = res.data.map(col => parseCol(col))
@@ -90,6 +90,8 @@ export const useDataStore = defineStore('data', {
 						return orderA - orderB
 					})
 				}
+			} else {
+				allColumns = allColumns.sort((a, b) => a.id - b.id)
 			}
 			const stateId = genStateKey(!!(view?.id), view?.id ?? tableId)
 			set(this.columns, stateId, allColumns)
@@ -108,10 +110,11 @@ export const useDataStore = defineStore('data', {
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load columns.'))
-				return false
+				return []
 			}
 
 			const columns = res.data.ocs.data.map(col => parseCol(col))
+				.sort((a, b) => a.id - b.id)
 			// Fix up columns to match expected structure if needed
 			// Public API might return slightly different structure, but parseCol should handle it if it's standard TableColumn
 
