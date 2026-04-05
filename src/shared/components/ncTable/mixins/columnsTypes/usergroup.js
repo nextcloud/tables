@@ -29,7 +29,7 @@ export default class UsergroupColumn extends AbstractUsergroupColumn {
 				ret += ', ' + obj.id
 			}
 		})
-		return ret
+		return ret.toLowerCase()
 	}
 
 	getObjects(values) {
