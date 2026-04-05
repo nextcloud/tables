@@ -58,7 +58,15 @@ export class AbstractColumn {
 		return false
 	}
 
-	isFilterFound(filterMethod, cell) {
+	getFilterMethods(cell, filter) {
+		throw new Error(`getFilterMethods() must be implemented by ${this.constructor.name}`)
+	}
+
+	isFilterFound(cell, filter) {
+		const filterMethod = this.getFilterMethods(cell, filter)[filter.operator.id]
+		if (!filterMethod) {
+			throw new Error(`No filter method found for column ${this.constructor.name} and operator ${filter.operator.id}`)
+		}
 		if (filterMethod()) {
 			cell.filterFound = true
 			return true

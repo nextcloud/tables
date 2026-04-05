@@ -41,11 +41,12 @@ export default class TextLineColumn extends AbstractTextColumn {
 		return super.isSearchStringFound(cell.value, cell, searchString)
 	}
 
-	isFilterFound(cell, filter) {
+	getFilterMethods(cell, filter) {
 		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
 		const cellValue = cell.value?.toLowerCase()
-		if (!cellValue & filter.operator.id !== FilterIds.IsEmpty) return false
-		const filterMethod = {
+		if (!cellValue && filter.operator.id !== FilterIds.IsEmpty) return {}
+
+		return {
 			[FilterIds.Contains]() { return cellValue.includes(filterValue) },
 			[FilterIds.DoesNotContain]() { return !cellValue.includes(filterValue) },
 			[FilterIds.BeginsWith]() { return cellValue.startsWith(filterValue) },
@@ -53,10 +54,7 @@ export default class TextLineColumn extends AbstractTextColumn {
 			[FilterIds.IsEqual]() { return cellValue === filterValue },
 			[FilterIds.IsNotEqual]() { return cellValue !== filterValue },
 			[FilterIds.IsEmpty]() { return !cellValue },
-		}[filter.operator.id]
-
-		return super.isFilterFound(filterMethod, cell)
-
+		}
 	}
 
 }

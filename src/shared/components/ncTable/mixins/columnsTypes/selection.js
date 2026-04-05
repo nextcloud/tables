@@ -50,10 +50,11 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 		return super.isSearchStringFound(this.getLabel(cell.value), cell, searchString)
 	}
 
-	isFilterFound(cell, filter) {
+	getFilterMethods(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 		const cellLabel = this.getLabel(cell.value)
-		const filterMethod = {
+
+		return {
 			[FilterIds.Contains]() { return cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
 			[FilterIds.DoesNotContain]() { return !cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
 			[FilterIds.BeginsWith]() { return cellLabel?.startsWith(filterValue) },
@@ -61,8 +62,7 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 			[FilterIds.IsEqual]() { return cellLabel === filterValue },
 			[FilterIds.IsNotEqual]() { return cellLabel !== filterValue },
 			[FilterIds.IsEmpty]() { return !cellLabel },
-		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
+		}
 	}
 
 	parseValue(value) {

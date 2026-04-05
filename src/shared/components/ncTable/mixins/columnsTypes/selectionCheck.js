@@ -28,7 +28,7 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 		return false
 	}
 
-	isFilterFound(cell, filter) {
+	getFilterMethods(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ?? filter.value
 
 		// Normalize cell value to boolean
@@ -49,12 +49,11 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 			filterBoolean = Boolean(filterValue)
 		}
 
-		const filterMethod = {
+		return {
 			[FilterIds.IsEqual]() { return cellBoolean === filterBoolean },
 			[FilterIds.IsNotEqual]() { return cellBoolean !== filterBoolean },
 			[FilterIds.IsEmpty]() { return cell.value === null || cell.value === undefined || cell.value === '' },
-		}[filter.operator.id]
-		return filterMethod ? filterMethod() : super.isFilterFound(filterMethod, cell)
+		}
 	}
 
 }

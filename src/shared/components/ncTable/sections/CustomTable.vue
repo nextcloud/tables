@@ -259,10 +259,10 @@ export default {
 
 					// if we should filter
 					if (filters !== null) {
-						filters.forEach(fil => {
-							this.addMagicFieldsValues(fil)
+						filters.forEach(filter => {
+							this.addMagicFieldsValues(filter)
 							if (filterStatus === null || filterStatus === true) {
-								filterStatus = column.isFilterFound(cell, fil)
+								filterStatus = column.isFilterFound(cell, filter)
 							}
 						})
 					}

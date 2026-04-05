@@ -51,11 +51,11 @@ export default class TextLinkColumn extends AbstractTextColumn {
 		return super.isSearchStringFound(cell.value, cell, searchString)
 	}
 
-	isFilterFound(cell, filter) {
+	getFilterMethods(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 		const value = this.getValueFromCellValue(cell.value)
 
-		const filterMethod = {
+		return {
 			[FilterIds.Contains]() { return value.includes(filterValue) },
 			[FilterIds.DoesNotContain]() { return !value.includes(filterValue) },
 			[FilterIds.BeginsWith]() { return value.startsWith(filterValue) },
@@ -63,8 +63,7 @@ export default class TextLinkColumn extends AbstractTextColumn {
 			[FilterIds.IsEqual]() { return value === filterValue },
 			[FilterIds.IsNotEqual]() { return value !== filterValue },
 			[FilterIds.IsEmpty]() { return !value },
-		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
+		}
 	}
 
 }

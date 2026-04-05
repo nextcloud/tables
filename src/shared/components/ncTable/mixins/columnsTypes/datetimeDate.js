@@ -43,12 +43,12 @@ export default class DatetimeDateColumn extends AbstractDatetimeColumn {
 		return super.isSearchStringFound(date, cell, searchString)
 	}
 
-	isFilterFound(cell, filter) {
+	getFilterMethods(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 		const filterDate = new Moment(filterValue)
 		const valueDate = new Moment(cell.value)
 
-		const filterMethod = {
+		return {
 			[FilterIds.IsEqual]() { return filterDate.isSame(valueDate) },
 			[FilterIds.IsNotEqual]() { return !filterDate.isSame(valueDate) },
 			[FilterIds.IsGreaterThan]() { return filterDate.isBefore(valueDate) },
@@ -56,8 +56,7 @@ export default class DatetimeDateColumn extends AbstractDatetimeColumn {
 			[FilterIds.IsLowerThan]() { return filterDate.isAfter(valueDate) },
 			[FilterIds.IsLowerThanOrEqual]() { return filterDate.isSameOrAfter(valueDate) },
 			[FilterIds.IsEmpty]() { return !cell.value },
-		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
+		}
 	}
 
 }

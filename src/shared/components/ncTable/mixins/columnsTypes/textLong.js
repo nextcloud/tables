@@ -21,15 +21,14 @@ export default class TextLongColumn extends AbstractTextColumn {
 		return super.isSearchStringFound(cell.value, cell, searchString)
 	}
 
-	isFilterFound(cell, filter) {
+	getFilterMethods(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
-		const filterMethod = {
+		return {
 			[FilterIds.Contains]() { return cell.value.includes(filterValue) },
 			[FilterIds.DoesNotContain]() { return !cell.value.includes(filterValue) },
 			[FilterIds.IsEmpty]() { return !cell.value },
-		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
+		}
 	}
 
 }

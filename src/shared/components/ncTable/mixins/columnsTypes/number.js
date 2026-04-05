@@ -45,10 +45,10 @@ export default class NumberColumn extends AbstractNumberColumn {
 		return super.isSearchStringFound(('' + cell.value), cell, searchString)
 	}
 
-	isFilterFound(cell, filter) {
+	getFilterMethods(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
-		const filterMethod = {
+		return {
 			[FilterIds.IsEqual]() { return parseInt(cell.value) === parseInt(filterValue) },
 			[FilterIds.IsNotEqual]() { return parseInt(cell.value) !== parseInt(filterValue) },
 			[FilterIds.IsGreaterThan]() { return parseInt(cell.value) > parseInt(filterValue) },
@@ -56,8 +56,7 @@ export default class NumberColumn extends AbstractNumberColumn {
 			[FilterIds.IsLowerThan]() { return parseInt(cell.value) < parseInt(filterValue) },
 			[FilterIds.IsLowerThanOrEqual]() { return parseInt(cell.value) <= parseInt(filterValue) },
 			[FilterIds.IsEmpty]() { return !cell.value },
-		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
+		}
 	}
 
 	parseValue(value) {
