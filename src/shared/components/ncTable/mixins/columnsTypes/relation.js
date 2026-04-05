@@ -79,11 +79,11 @@ export default class RelationColumn extends AbstractColumn {
 	 * @return {boolean} Whether the filter matches
 	 */
 	isFilterFound(cell, filter) {
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		const cellLabel = this.getLabel(cell.value)
+		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
+		const cellLabel = this.getLabel(cell.value)?.toLowerCase()
 		const filterMethod = {
-			[FilterIds.Contains]() { return cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
-			[FilterIds.DoesNotContain]() { return !cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
+			[FilterIds.Contains]() { return cellLabel?.includes(filterValue) },
+			[FilterIds.DoesNotContain]() { return !cellLabel?.includes(filterValue) },
 			[FilterIds.IsEqual]() { return cellLabel === filterValue },
 			[FilterIds.IsNotEqual]() { return cellLabel !== filterValue },
 			[FilterIds.IsEmpty]() { return !cellLabel },
