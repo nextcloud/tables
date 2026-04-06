@@ -6,7 +6,8 @@
 	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description">
 		<NcSelect
 			v-model="localValue"
-			:options="getAllNonDeletedOptions"
+			:options="selectableOptions"
+			:selectable="option => !option?.deleted"
 			:clearable="!column.mandatory"
 			:disabled="column.viewColumnInformation?.readonly"
 			:aria-label-combobox="t('tables', 'Options')" />
@@ -38,7 +39,7 @@ export default {
 		localValue: {
 			get() {
 				if (this.value !== null) {
-					return this.getOptionObject(parseInt(this.value))
+					return this.selectedOption
 				} else {
 					this.$emit('update:value', this.getDefaultId)
 					return this.getDefaultOptionObject
@@ -47,23 +48,29 @@ export default {
 			set(v) { this.$emit('update:value', v?.id) },
 		},
 		getOptions() {
-			return this.column?.selectionOptions || null
+			return this.column?.selectionOptions || []
 		},
 		getDefaultId() {
 			return !isNaN(this.column.selectionDefault) ? parseInt(this.column.selectionDefault) : null
 		},
 		getDefaultOptionObject() {
-			return this.getOptionObject(this.getDefaultId) || null
+			return this.column.getOptionObject(this.getDefaultId)
 		},
-		getAllNonDeletedOptions() {
-			return this.getOptions.filter(item => {
-				return !item.deleted
-			})
+		selectedOptionId() {
+			const optionId = parseInt(this.value)
+			return Number.isNaN(optionId) ? null : optionId
 		},
-	},
-	methods: {
-		getOptionObject(id) {
-			return this.getOptions.find(e => e.id === id) || null
+		selectedOption() {
+			if (this.selectedOptionId === null) {
+				return null
+			}
+			return this.column.getOptionObject(this.selectedOptionId)
+		},
+		selectableOptions() {
+			if (this.selectedOption?.deleted) {
+				return [...this.getOptions, this.selectedOption]
+			}
+			return this.getOptions
 		},
 	},
 }
