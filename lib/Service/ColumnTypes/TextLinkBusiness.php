@@ -8,8 +8,18 @@
 namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Errors\BadRequestError;
+use OCP\IL10N;
+use Psr\Log\LoggerInterface;
 
 class TextLinkBusiness extends SuperBusiness {
+
+	public function __construct(
+		LoggerInterface $logger,
+		private IL10N $n,
+	) {
+		parent::__construct($logger);
+	}
 
 	/**
 	 * @param mixed $value (string|null)
@@ -95,5 +105,20 @@ class TextLinkBusiness extends SuperBusiness {
 
 		preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', $value, $matches);
 		return !empty($matches);
+	}
+
+	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
+		$data = json_decode($value, true);
+
+		// Only allow URLs that start with http or https
+		if (isset($data['value']) && !preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', $data['value'])) {
+			throw new BadRequestError(
+				'Column "' . $column->getTitle() . '" contains an invalid protocol. Only http and https are allowed.',
+				translatedMessage: $this->n->t(
+					'Column "%s" contains an invalid protocol. Only http and https are allowed.',
+					[$column->getTitle()]
+				),
+			);
+		}
 	}
 }
