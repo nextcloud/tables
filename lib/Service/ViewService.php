@@ -535,6 +535,9 @@ class ViewService extends SuperService {
 				}
 				$currentGroup[] = $filterArray;
 			}
+			if (empty($currentGroup)) {
+				continue;
+			}
 			$applicableFilterSetArray[] = $currentGroup;
 		}
 		return $applicableFilterSetArray;
