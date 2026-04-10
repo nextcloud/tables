@@ -901,6 +901,7 @@ class Api1Controller extends ApiController {
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1036,6 +1037,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $columnId Column ID that will be updated
 	 * @param string|null $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1683,6 +1685,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
