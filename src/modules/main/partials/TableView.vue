@@ -26,6 +26,7 @@
 		@create-row="createRow"
 		@edit-row="editRow"
 		@copy-row="copyRow"
+		@delete-row="deleteRow"
 		@delete-selected-rows="deleteSelectedRows">
 		<template #actions>
 			<slot name="actions" />
@@ -138,6 +139,9 @@ export default {
 		},
 		copyRow(rowId) {
 			emit('tables:row:copy', { row: this.rows.find(r => r.id === rowId), columns: this.columns, isView: this.isView, elementId: this.element.id })
+		},
+		deleteRow(rowId) {
+			emit('tables:row:delete', { rows: [rowId], isView: this.isView, elementId: this.element.id })
 		},
 		deleteSelectedRows(rows) {
 			emit('tables:row:delete', { rows, isView: this.isView, elementId: this.element.id })

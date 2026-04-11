@@ -56,6 +56,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@copy-row="rowId => $emit('copy-row', rowId)"
+				@delete-row="rowId => $emit('delete-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-column="col => $emit('edit-column', col)"
 				@delete-column="col => $emit('delete-column', col)"
