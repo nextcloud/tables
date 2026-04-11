@@ -51,6 +51,11 @@
       "allowedVersions": "<4"
     },
     {
+      "matchPackageNames": ["pinia"],
+      "allowedVersions": "<3",
+      "description": "Pin to Vue 2-compatible major"
+    },
+    {
       "matchPackageNames": ["vueuse"],
       "allowedVersions": "<12"
     },
@@ -64,7 +69,7 @@
     },
     {
       "matchPackageNames": ["@nextcloud/stylelint-config"],
-      "allowedVersions": "3.1.1",
+      "allowedVersions": "<=3.1.1",
       "description": "Pin due to stylelint peer dependency conflict"
     },
     {
