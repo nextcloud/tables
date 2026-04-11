@@ -47,7 +47,7 @@ class ApiGeneralController extends AOCSController {
 	 *
 	 * Tables and views incl. shares
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesIndex, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesIndex, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string, code: string}, array{}>
 	 *
 	 * 200: Index returned
 	 */
@@ -59,7 +59,7 @@ class ApiGeneralController extends AOCSController {
 			return new DataResponse([ 'tables' => $tables, 'views' => $views ]);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
-			$message = ['message' => $e->getMessage()];
+			$message = ['message' => 'An internal error occurred', 'code' => 'internal_error'];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
