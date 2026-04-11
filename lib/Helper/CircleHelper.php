@@ -62,7 +62,7 @@ class CircleHelper {
 			return $circle ? ($circle->getDisplayName() ?: $circleId) : $circleId;
 		} catch (Throwable $e) {
 			if ($e->getCode() === 404) {
-				return $this->l10n->t('Deleted circle %s.', [$circleId]);
+				return $this->l10n->t('Deleted team %s.', [$circleId]);
 			}
 
 			$this->logger->warning('Failed to get circle display name: ' . $e->getMessage(), [
