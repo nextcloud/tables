@@ -37,6 +37,7 @@
 				</NcActionButton>
 				<NcActionCaption :name="t('tables', 'Search for value')" />
 				<NcActionInput
+					ref="filterInput"
 					:label-visible="false"
 					:label="t('tables', 'Keyword and submit')"
 					:value.sync="searchValue"
@@ -279,6 +280,13 @@ export default {
 	watch: {
 		localOpenState() {
 			this.reset()
+		},
+		selectValue(val) {
+			if (val) {
+				this.$nextTick(() => {
+					this.$refs.filterInput?.$el?.querySelector('input')?.focus()
+				})
+			}
 		},
 		localViewSetting() {
 			this.$emit('update:viewSetting', this.localViewSetting)
