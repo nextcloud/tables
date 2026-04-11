@@ -71,9 +71,24 @@
       "allowedVersions": "<=5.3.3"
     },
     {
-      "description": "Group Playwright and Cypress e2e tooling for coordinated updates while both runners are in use",
-      "matchPackageNames": ["@playwright/test", "cypress", "cypress-downloadfile", "cypress-vite", "@nextcloud/cypress"],
-      "groupName": "e2e-test-runners"
+      "groupName": "cypress",
+      "matchPackageNames": [
+        "cypress"
+      ],
+      "allowedVersions": "<=13.6.4"
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": [
+        "@nextcloud/cypress"
+      ],
+      "allowedVersions": "<=1.0.0-beta.7"
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": [
+        "@cypress/"
+      ]
     },
     {
       "matchPackageNames": ["phpoffice/phpspreadsheet"],
