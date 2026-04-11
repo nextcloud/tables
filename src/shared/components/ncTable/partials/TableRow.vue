@@ -28,19 +28,36 @@
 				:is-view="isView"
 				:can-edit="config.canEditRows" />
 		</td>
-		<td v-if="config.showActions" :class="{sticky: config.showActions}">
-			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
-				<template #icon>
-					<Fullscreen :size="20" />
-				</template>
-			</NcButton>
+		<td v-if="config.showActions && (config.canEditRows || config.canDeleteRows || config.canCreateRows)"
+			:class="{sticky: config.showActions}">
+			<NcActions data-cy="rowActionMenu">
+				<NcActionButton v-if="config.canEditRows || config.canDeleteRows"
+					data-cy="editRowBtn"
+					:close-after-click="true"
+					@click="$emit('edit-row', row.id)">
+					<template #icon>
+						<Pencil :size="20" />
+					</template>
+					{{ t('tables', 'Edit row') }}
+				</NcActionButton>
+				<NcActionButton v-if="config.canCreateRows"
+					data-cy="copyRowBtn"
+					:close-after-click="true"
+					@click="$emit('copy-row', row.id)">
+					<template #icon>
+						<ContentCopy :size="20" />
+					</template>
+					{{ t('tables', 'Copy row') }}
+				</NcActionButton>
+			</NcActions>
 		</td>
 	</tr>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
-import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
+import { NcCheckboxRadioSwitch, NcActions, NcActionButton } from '@nextcloud/vue'
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
+import Pencil from 'vue-material-design-icons/PencilOutline.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -69,8 +86,10 @@ export default {
 		TableCellLink,
 		TableCellProgress,
 		TableCellHtml,
-		NcButton,
-		Fullscreen,
+		NcActions,
+		NcActionButton,
+		ContentCopy,
+		Pencil,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,

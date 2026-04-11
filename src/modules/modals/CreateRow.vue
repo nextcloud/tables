@@ -80,6 +80,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		prefillData: {
+			type: Array,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -112,6 +116,13 @@ export default {
 	watch: {
 		showModal() {
 			if (this.showModal) {
+				if (this.prefillData) {
+					const prefilled = {}
+					this.prefillData.forEach(item => {
+						prefilled[item.columnId] = item.value
+					})
+					this.row = prefilled
+				}
 				this.$nextTick(() => {
 					this.$el.querySelector('input')?.focus()
 				})
