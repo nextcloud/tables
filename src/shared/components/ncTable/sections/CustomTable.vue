@@ -39,7 +39,8 @@
 					:is-view="isView"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)"
-					@copy-row="rowId => $emit('copy-row', rowId)" />
+					@copy-row="rowId => $emit('copy-row', rowId)"
+					@delete-row="rowId => $emit('delete-row', rowId)" />
 			</transition-group>
 		</table>
 		<div v-if="totalPages > 1" class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">

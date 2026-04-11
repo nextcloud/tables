@@ -44,6 +44,15 @@
 					</template>
 					{{ t('tables', 'Copy row') }}
 				</NcActionButton>
+				<NcActionButton v-if="config.canDeleteRows"
+					data-cy="deleteRowBtn"
+					:close-after-click="true"
+					@click="$emit('delete-row', row.id)">
+					<template #icon>
+						<TrashCanOutline :size="20" />
+					</template>
+					{{ t('tables', 'Delete row') }}
+				</NcActionButton>
 			</NcActions>
 		</td>
 	</tr>
@@ -53,6 +62,7 @@
 import { NcCheckboxRadioSwitch, NcActions, NcActionButton } from '@nextcloud/vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import Pencil from 'vue-material-design-icons/PencilOutline.vue'
+import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -85,6 +95,7 @@ export default {
 		NcActionButton,
 		ContentCopy,
 		Pencil,
+		TrashCanOutline,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
