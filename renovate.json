@@ -63,6 +63,11 @@
       "allowedVersions": "<=1.5.6"
     },
     {
+      "matchPackageNames": ["@nextcloud/stylelint-config"],
+      "allowedVersions": "3.1.1",
+      "description": "Pin due to stylelint peer dependency conflict"
+    },
+    {
       "matchPackageNames": ["@vue/tsconfig"],
       "allowedVersions": "<=0.5.1"
     },
