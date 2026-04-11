@@ -8,7 +8,7 @@ import { test, expect } from '../support/fixtures'
 import type { BrowserContext, Page } from '@playwright/test'
 import { createRandomUser } from '../support/api'
 import { login } from '../support/login'
-import { createTable, createTextLineColumn, fillInValueTextLine, loadTable } from '../support/commands'
+import { createTable, createTextLineColumn, fillInValueTextLine, loadTable, openRowActionMenu } from '../support/commands'
 
 const tableTitle = 'Mandatory test table'
 
@@ -131,7 +131,9 @@ test.describe('Mandatory Column Functionality', () => {
 		await expect(page.locator('.icon-loading').first()).toBeHidden()
 
 		// Now open edit row dialog
-		await page.locator('[data-cy="editRowBtn"]').first().click()
+		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
+		await openRowActionMenu(page, firstRow)
+		await page.locator('[data-cy="editRowBtn"]').click()
 		await expect(page.locator('[data-cy="editRowModal"]')).toBeVisible()
 
 		// should show error when mandatory field is empty

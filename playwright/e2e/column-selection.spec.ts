@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from '../support/fixtures'
-import { createSelectionColumn, createTable, deleteTable, loadTable } from '../support/commands'
+import { createSelectionColumn, createTable, deleteTable, loadTable, openRowActionMenu } from '../support/commands'
 
 const columnTitle = 'single selection'
 const tableTitle = 'Test number column'
@@ -37,7 +37,9 @@ test.describe('Test column ' + columnTitle, () => {
 		await expect(page.locator('[data-cy="ncTable"] tr td div').filter({ hasText: 'third option' }).first()).toBeVisible()
 
 		// edit the explicitly created row
-		await page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]:has-text("👋 third option")').locator('[data-cy="editRowBtn"]').click()
+		const thirdOptionRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: '👋 third option' }).first()
+		await openRowActionMenu(page, thirdOptionRow)
+		await page.locator('[data-cy="editRowBtn"]').click()
 		await page.locator('[data-cy="editRowModal"] .slot input').first().click()
 		await page.locator('ul.vs__dropdown-menu li span[title="first option"]').first().click()
 		await page.locator('[data-cy="editRowSaveButton"]').click()
@@ -59,6 +61,6 @@ test.describe('Test column ' + columnTitle, () => {
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 
 		await expect(page.locator('[data-cy="ncTable"] tr td div').first()).toBeVisible()
-		await expect(page.locator('[data-cy="ncTable"] [data-cy="editRowBtn"]').first()).toBeVisible()
+		await expect(page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()).toBeVisible()
 	})
 })

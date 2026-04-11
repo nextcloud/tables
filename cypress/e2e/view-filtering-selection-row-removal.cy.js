@@ -22,16 +22,19 @@ describe('Filtering view with row removal', () => {
 
 	it('Removes rows from the filtered view once they no longer match', () => {
 		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('updateCheckedRow')
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').closest('[data-cy="customTableRow"]').find('[data-cy="rowActionMenu"] button').click()
+		cy.get('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .checkbox-radio-switch').click()
 		cy.get('[data-cy="editRowSaveButton"]').click()
 		cy.wait('@updateCheckedRow')
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').should('not.exist')
+		// Wait for the row to be removed from the filtered view (async removal)
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row', { timeout: 8000 }).should('not.exist')
 		cy.get('[data-cy="editRowModal"]').should('not.exist')
 
 		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('inlineUpdateRow')
 		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'second row').closest('[data-cy="customTableRow"]').find('.inline-editing-container input').click({ force: true })
 		cy.wait('@inlineUpdateRow')
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'second row').should('not.exist')
+		// Wait for the row to be removed from the filtered view (async removal)
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'second row', { timeout: 8000 }).should('not.exist')
 	})
 })

@@ -202,30 +202,25 @@ export async function deleteTable(page: Page, title: string) {
 	).not.toBeVisible()
 }
 
+export async function openRowActionMenu(page: Page, rowLocator: Locator) {
+	await rowLocator.hover()
+	await rowLocator.locator('[data-cy="rowActionMenu"] button').click()
+}
+
 export async function deleteRow(page: Page, rowIndex: number) {
 	const deleteResponse = page.waitForResponse(
 		(response) =>
 			/\/apps\/tables\/(row|view\/\d+\/row)\//.test(response.url())
       && response.request().method() === 'DELETE',
 	).catch(() => null)
-	await page
-		.locator('[data-cy="ncTable"] [data-cy="editRowBtn"]')
-		.nth(rowIndex)
-		.click()
-	await page.locator('[data-cy="editRowDeleteButton"]').click({ force: true })
-	const confirmDeleteButton = page.locator('[data-cy="editRowDeleteConfirmButton"]')
-	if (await confirmDeleteButton.isVisible().catch(() => false)) {
-		await confirmDeleteButton.click({ force: true })
-	}
+	const row = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').nth(rowIndex)
+	await openRowActionMenu(page, row)
+	const deleteBtn = page.locator('[data-cy="deleteRowBtn"]')
+	await deleteBtn.waitFor({ state: 'visible', timeout: 5000 })
+	await deleteBtn.click()
+	await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
 	await deleteResponse
-	await page
-		.locator('[data-cy="editRowModal"]')
-		.waitFor({ state: 'hidden', timeout: 10000 })
-		.catch(async () => {
-			if (await page.locator('[data-cy="editRowModal"]').isVisible().catch(() => false)) {
-				await page.locator('[data-cy="editRowModal"] button[aria-label="Close"]').click().catch(() => {})
-			}
-		})
+	await page.locator('[data-cy="confirmDialog"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {})
 }
 
 export async function createView(page: Page, title: string) {
