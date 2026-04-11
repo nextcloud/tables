@@ -8,7 +8,7 @@ import { test, expect } from '../support/fixtures'
 import type { BrowserContext, Page } from '@playwright/test'
 import { createRandomUser } from '../support/api'
 import { login } from '../support/login'
-import { createTable, createTextLineColumn, fillInValueTextLine, loadTable, openCreateRowModal } from '../support/commands'
+import { createTable, createTextLineColumn, fillInValueTextLine, loadTable, openCreateRowModal, openRowActionMenu } from '../support/commands'
 
 test.describe('Rows for a table', () => {
 	test.describe.configure({ mode: 'serial' })
@@ -91,7 +91,9 @@ test.describe('Rows for a table', () => {
 		).toHaveCount(0, { timeout: 10000 })
 
 		// Delete
-		await page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first().locator('[data-cy="editRowBtn"]').click()
+		const rowToDelete = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
+		await openRowActionMenu(page, rowToDelete)
+		await page.locator('[data-cy="editRowBtn"]').click()
 
 		const deleteReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'DELETE')
 		await page.locator('[data-cy="editRowDeleteButton"]').click()
@@ -129,12 +131,65 @@ test.describe('Rows for a table', () => {
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 
 		await loadTable(page, 'to do list')
-		await page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]:has-text("My first task")').locator('[data-cy="editRowBtn"]').click()
+		const mandatoryRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'My first task' }).first()
+		await openRowActionMenu(page, mandatoryRow)
+		await page.locator('[data-cy="editRowBtn"]').click()
 		await expect(page.locator('[data-cy="editRowModal"] .notecard--error')).toBeHidden()
 
 		await page.locator('[data-cy="editRowModal"] .slot input').first().clear()
 		await expect(page.locator('[data-cy="editRowModal"] .notecard--error')).toBeVisible()
 		await expect(page.locator('[data-cy="editRowSaveButton"]')).toBeDisabled()
+	})
+
+	test('Delete row via row action menu', async () => {
+		await page.goto('/index.php/apps/tables')
+		await createTable(page, 'Row delete menu table')
+		await createTextLineColumn(page, 'title', '', '', true)
+
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'title', 'Row to delete')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+		await expect(page.locator('[data-cy="createRowModal"]')).toBeHidden()
+
+		const rowToDelete = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'Row to delete' }).first()
+		await expect(rowToDelete).toBeVisible({ timeout: 10000 })
+
+		const deleteReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'DELETE')
+		await openRowActionMenu(page, rowToDelete)
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await deleteReqPromise
+
+		await expect(page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]')).toHaveCount(0, { timeout: 10000 })
+	})
+
+	test('Copy row via row action menu', async () => {
+		await page.goto('/index.php/apps/tables')
+		await createTable(page, 'Row copy menu table')
+		await createTextLineColumn(page, 'title', '', '', true)
+
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'title', 'Original row')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+		await expect(page.locator('[data-cy="createRowModal"]')).toBeHidden()
+
+		const originalRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'Original row' }).first()
+		await expect(originalRow).toBeVisible({ timeout: 10000 })
+
+		// Open copy dialog via the row action menu
+		await openRowActionMenu(page, originalRow)
+		await page.locator('[data-cy="copyRowBtn"]').click()
+
+		// Verify create modal opens with pre-filled value
+		await expect(page.locator('[data-cy="createRowModal"]')).toBeVisible({ timeout: 10000 })
+		await expect(page.locator('[data-cy="createRowModal"] input').first()).toHaveValue('Original row')
+
+		// Save the copy
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+		await expect(page.locator('[data-cy="createRowModal"]')).toBeHidden()
+
+		// Both original and copy should be visible
+		await expect(page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'Original row' })).toHaveCount(2, { timeout: 10000 })
 	})
 
 	test('Inline Edit', async () => {

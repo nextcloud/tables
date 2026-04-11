@@ -201,8 +201,11 @@ test.describe('Public link sharing', () => {
 		await expect(publicPage.locator('[data-cy="ncTable"]').getByText('Test row for editing')).toBeVisible()
 
 		// Verify edit button exists and edit the row
-		await expect(publicPage.locator('[data-cy="editRowBtn"]').last()).toBeVisible()
-		await publicPage.locator('[data-cy="editRowBtn"]').last().click()
+		const lastRow = publicPage.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').last()
+		await lastRow.hover()
+		await lastRow.locator('[data-cy="rowActionMenu"] button').click()
+		await expect(publicPage.locator('[data-cy="editRowBtn"]')).toBeVisible()
+		await publicPage.locator('[data-cy="editRowBtn"]').click()
 		await expect(publicPage.locator('[data-cy="editRowModal"]')).toBeVisible()
 		await publicPage.locator('[data-cy="editRowModal"]').getByRole('textbox').first().fill('Updated row')
 		await publicPage.locator('[data-cy="editRowSaveButton"]').click()
@@ -210,7 +213,11 @@ test.describe('Public link sharing', () => {
 		await expect(publicPage.locator('[data-cy="ncTable"]').getByText('Test row for editing')).toHaveCount(0)
 
 		// Delete the row
-		await publicPage.locator('[data-cy="editRowBtn"]').last().click()
+		const updatedRow = publicPage.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').last()
+		await updatedRow.hover()
+		await updatedRow.locator('[data-cy="rowActionMenu"] button').click()
+		await expect(publicPage.locator('[data-cy="editRowBtn"]')).toBeVisible()
+		await publicPage.locator('[data-cy="editRowBtn"]').click()
 		await expect(publicPage.locator('[data-cy="editRowModal"]')).toBeVisible()
 		await publicPage.locator('[data-cy="editRowDeleteButton"]').click()
 		await publicPage.locator('[data-cy="editRowDeleteConfirmButton"]').click()

@@ -80,8 +80,9 @@ describe('ContentReferenceWidget', () => {
 				cy.reply('**/index.php/apps/tables/row/*', rowData)
 			})
 
-		// Click the edit button on the first row
-		cy.get('@rows').first().find('td.sticky button').click({ force: true })
+		// Open the row action menu on the first row, then click Edit
+		cy.get('@rows').first().find('[data-cy="rowActionMenu"] button').click({ force: true })
+		cy.get('[data-cy="editRowBtn"]').click()
 
 		// Get the first field of the Edit Row modal
 		cy.get('.modal__content').as('editRowModal')
