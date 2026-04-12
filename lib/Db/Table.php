@@ -28,7 +28,6 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method getEmoji(): string
  * @method setEmoji(string $emoji)
  * @method getArchived(): bool
- * @method isArchived(): bool
  * @method setArchived(bool $archived)
  * @method getDescription(): string
  * @method setDescription(string $description)
@@ -129,6 +128,10 @@ class Table extends EntitySuper implements JsonSerializable {
 	private function applyUuid(string $uuid): void {
 		$this->uuid = $uuid;
 		$this->markFieldUpdated('uuid');
+	}
+
+	public function isArchived(): bool {
+		return $this->archived;
 	}
 
 	/**
