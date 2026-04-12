@@ -36,7 +36,6 @@
     "Could not write file to disk" : "Nepodarilo sa zapísať súbor na disk",
     "A PHP extension stopped the file upload" : "Rozšírenie PHP zastavilo nahrávanie súboru",
     "No file uploaded or file size exceeds maximum of %s" : "Nenahral sa žiadny súbor alebo jeho veľkosť presiahla %s",
-    "Deleted circle %s." : "Vymazaný kruh %s.",
     "Nextcloud tables" : "Tabuľky Nextcloud",
     "_%n row_::_%n rows_" : ["jeden riadok","%n riadky","%n riadkov","%n riadkov"],
     "table" : "tabuľka",

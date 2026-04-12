@@ -38,7 +38,6 @@ OC.L10N.register(
     "Could not write file to disk" : "Impossible d’écrire le fichier sur le disque",
     "A PHP extension stopped the file upload" : "Une extension PHP a arrêté le téléversement du fichier",
     "No file uploaded or file size exceeds maximum of %s" : "Aucun fichier téléversé ou la taille du fichier dépasse le maximum de %s",
-    "Deleted circle %s." : "Supprimer l'équipe %s.",
     "Nextcloud tables" : "Tableaux Nextcloud",
     "_%n row_::_%n rows_" : ["%n ligne","%n lignes","%n lignes"],
     "table" : "tableau",
