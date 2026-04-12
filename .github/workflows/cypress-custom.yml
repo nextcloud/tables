@@ -68,7 +68,8 @@ jobs:
 
       - name: Register text Git reference
         run: |
-          text_app_ref="$(if [ "${{ matrix.server-versions }}" = "stable31" ]; then echo -n "main"; else echo -n "${{ matrix.server-versions }}"; fi)"
+          # Text no longer has a stable31 branch, so pin the latest 31.x app release tag instead.
+          text_app_ref="$(if [ "${{ matrix.server-versions }}" = "stable31" ]; then echo -n "v31.0.12"; else echo -n "${{ matrix.server-versions }}"; fi)"
           echo "text_app_ref=$text_app_ref" >> $GITHUB_ENV
 
       - name: Checkout text app
