@@ -137,6 +137,46 @@ class ContextService {
 	}
 
 	/**
+	 * Archive a context for the given user.
+	 *
+	 * If the user is the owner the entity flag is set and all per-user
+	 * overrides are cleared; otherwise a personal override is stored.
+	 * Access is validated by the mapper (NotFoundError if no access).
+	 *
+	 * @throws Exception
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function archiveContext(int $contextId, string $userId): Context {
+		// Load directly from mapper to get entity-level archived (bypasses per-user enrichment)
+		$context = $this->contextMapper->findById($contextId, $userId);
+		$isOwner = $context->getOwnerId() === $userId;
+		$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner);
+		return $this->findById($contextId, $userId);
+	}
+
+	/**
+	 * Unarchive a context for the given user.
+	 *
+	 * If the user is the owner the entity flag is cleared and all per-user
+	 * overrides are reset; otherwise the personal override is removed or
+	 * set to false if the owner has archived the context.
+	 * Access is validated by the mapper (NotFoundError if no access).
+	 *
+	 * @throws Exception
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function unarchiveContext(int $contextId, string $userId): Context {
+		// Load directly from mapper to get entity-level archived (bypasses per-user enrichment)
+		$context = $this->contextMapper->findById($contextId, $userId);
+		$isOwner = $context->getOwnerId() === $userId;
+		$entityArchived = $context->isArchived(); // entity-level flag, not per-user
+		$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner, $entityArchived);
+		return $this->findById($contextId, $userId);
+	}
+
+	/**
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
