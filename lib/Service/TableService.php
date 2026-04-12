@@ -71,6 +71,7 @@ class TableService extends SuperService {
 		protected Defaults $themingDefaults,
 		private ActivityManager $activityManager,
 		private FederationService $federationService,
+		private ArchiveService $archiveService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -154,6 +155,14 @@ class TableService extends SuperService {
 				if ($table->getIsShared()) {
 					$table->setHasShares(false);
 				}
+			}
+		}
+
+		if ($userId !== '') {
+			try {
+				$this->archiveService->enrichTablesWithArchiveState(array_values($allTables), $userId);
+			} catch (OcpDbException $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}
 		}
 
@@ -275,6 +284,26 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+	}
+
+	/**
+	 * Fetch a single table and resolve the per-user `archived` flag.
+	 *
+	 * Use this instead of `find()` when the caller needs the correct per-user
+	 * archive state (e.g. GET /tables/{id} API endpoints).
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function getTableForUser(int $id, string $userId): Table {
+		$table = $this->find($id, false, $userId);
+		try {
+			$this->archiveService->enrichTablesWithArchiveState([$table], $userId);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+		return $table;
 	}
 
 	/**
@@ -482,6 +511,13 @@ class TableService extends SuperService {
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		// remove per-user archive overrides for this table
+		try {
+			$this->archiveService->deleteNodeArchiveOverrides(Application::NODE_TYPE_TABLE, $id);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 		}
 
 		$event = new TableDeletedEvent(table: $item);
