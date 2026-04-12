@@ -222,7 +222,7 @@ class ArchiveServiceTest extends TestCase {
 	 */
 	private function createMockQueryBuilder(bool $archived): object {
 		$expr = $this->createMock(\OCP\DB\QueryBuilder\IExpressionBuilder::class);
-		$expr->method('eq')->willReturnSelf();
+		$expr->method('eq')->willReturn('1=1');
 
 		$qb = $this->createMock(\OCP\DB\QueryBuilder\IQueryBuilder::class);
 		$qb->method('update')->willReturnSelf();

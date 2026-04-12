@@ -20,7 +20,6 @@ use JsonSerializable;
  * @method setOwnerId(string $value): void
  * @method getOwnerType(): int
  * @method setOwnerType(int $value): void
- * @method isArchived(): bool
  * @method setArchived(bool $value): void
  *
  * @method getSharing(): array
@@ -49,6 +48,10 @@ class Context extends EntitySuper implements JsonSerializable {
 		$this->addType('id', 'integer');
 		$this->addType('owner_type', 'integer');
 		$this->addType('archived', 'boolean');
+	}
+
+	public function isArchived(): bool {
+		return $this->archived;
 	}
 
 	public function jsonSerialize(): array {
