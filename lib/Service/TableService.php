@@ -294,6 +294,52 @@ class TableService extends SuperService {
 	}
 
 	/**
+	 * Archive a table for the given user.
+	 *
+	 * If the user is the owner the entity flag is set and all per-user
+	 * overrides are cleared; otherwise a personal override is stored.
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function archiveTable(int $id, string $userId): Table {
+		$table = $this->find($id, true, $userId);
+		$isOwner = $table->getOwnership() === $userId;
+		try {
+			$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_TABLE, $id, $isOwner);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		return $this->getTableForUser($id, $userId);
+	}
+
+	/**
+	 * Unarchive a table for the given user.
+	 *
+	 * If the user is the owner the entity flag is cleared and all per-user
+	 * overrides are reset; otherwise the personal override is removed or
+	 * set to false if the owner has archived the table.
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function unarchiveTable(int $id, string $userId): Table {
+		$table = $this->find($id, true, $userId);
+		$isOwner = $table->getOwnership() === $userId;
+		$entityArchived = $table->isArchived(); // entity-level flag, not per-user
+		try {
+			$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_TABLE, $id, $isOwner, $entityArchived);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		return $this->getTableForUser($id, $userId);
+	}
+
+	/**
 	 * @param string $title
 	 * @param string $template
 	 * @param string|null $emoji

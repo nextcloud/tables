@@ -25,6 +25,7 @@ use OCA\Tables\Service\ValueObject\ColumnOrderInformation;
  * @method getEmoji(): string
  * @method setEmoji(string $emoji)
  * @method getArchived(): bool
+ * @method isArchived(): bool
  * @method setArchived(bool $archived)
  * @method getDescription(): string
  * @method setDescription(string $description)
