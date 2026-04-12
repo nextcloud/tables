@@ -379,10 +379,18 @@ class TableService extends SuperService {
 			throw new PermissionError('PermissionError: can not change table owner with table id ' . $id);
 		}
 
+		$oldOwnerId = $table->getOwnership();
+		$oldArchived = $table->isArchived();
 		$table->setOwnership($newOwnerUserId);
 
 		try {
-			$table = $this->atomic(function () use ($table, $id, $newOwnerUserId, $userId) {
+			$table = $this->atomic(function () use ($table, $id, $newOwnerUserId, $userId, $oldOwnerId, $oldArchived) {
+				$newArchived = $this->archiveService->prepareOwnershipTransfer(
+					$oldOwnerId, $newOwnerUserId, Application::NODE_TYPE_TABLE, $id, $oldArchived
+				);
+				if ($newArchived !== $oldArchived) {
+					$table->setArchived($newArchived);
+				}
 				$table = $this->mapper->update($table);
 				$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
 				return $table;

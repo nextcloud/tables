@@ -319,11 +319,18 @@ class ContextService {
 		}
 
 		$oldOwnerId = $context->getOwnerId();
+		$oldArchived = $context->isArchived();
 		$context->setOwnerId($newOwnerId);
 		$context->setOwnerType($newOwnerType);
 
 		try {
-			$context = $this->atomic(function () use ($context, $contextId, $newOwnerId, $oldOwnerId) {
+			$context = $this->atomic(function () use ($context, $contextId, $newOwnerId, $oldOwnerId, $oldArchived) {
+				$newArchived = $this->archiveService->prepareOwnershipTransfer(
+					$oldOwnerId, $newOwnerId, Application::NODE_TYPE_CONTEXT, $contextId, $oldArchived
+				);
+				if ($newArchived !== $oldArchived) {
+					$context->setArchived($newArchived);
+				}
 				$context = $this->contextMapper->update($context);
 				$this->shareService->transferSharesForContext($contextId, $newOwnerId, $oldOwnerId);
 				return $context;
