@@ -23,7 +23,6 @@ use OCA\Tables\ResponseDefinitions;
  * @method getEmoji(): string
  * @method setEmoji(string $emoji)
  * @method getArchived(): bool
- * @method isArchived(): bool
  * @method setArchived(bool $archived)
  * @method getDescription(): string
  * @method setDescription(string $description)
@@ -83,6 +82,10 @@ class Table extends EntitySuper implements JsonSerializable {
 	public function __construct() {
 		$this->addType('id', 'integer');
 		$this->addType('archived', 'boolean');
+	}
+
+	public function isArchived(): bool {
+		return $this->archived;
 	}
 
 	/**
