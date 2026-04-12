@@ -349,6 +349,70 @@ export const useTablesStore = defineStore('store', {
 			return true
 		},
 
+		async archiveTable({ id }) {
+			try {
+				await axios.post(generateOcsUrl(`/apps/tables/api/2/tables/${id}/archive`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not archive table.'))
+				return false
+			}
+
+			const index = this.tables.findIndex(t => t.id === id)
+			const table = this.tables[index]
+			table.archived = true
+			this.setTable(table)
+
+			return true
+		},
+
+		async unarchiveTable({ id }) {
+			try {
+				await axios.delete(generateOcsUrl(`/apps/tables/api/2/tables/${id}/archive`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not unarchive table.'))
+				return false
+			}
+
+			const index = this.tables.findIndex(t => t.id === id)
+			const table = this.tables[index]
+			table.archived = false
+			this.setTable(table)
+
+			return true
+		},
+
+		async archiveContext({ id }) {
+			try {
+				await axios.post(generateOcsUrl(`/apps/tables/api/2/contexts/${id}/archive`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not archive application.'))
+				return false
+			}
+
+			const index = this.contexts.findIndex(c => c.id === id)
+			const context = this.contexts[index]
+			context.archived = true
+			this.setContext(context)
+
+			return true
+		},
+
+		async unarchiveContext({ id }) {
+			try {
+				await axios.delete(generateOcsUrl(`/apps/tables/api/2/contexts/${id}/archive`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not unarchive application.'))
+				return false
+			}
+
+			const index = this.contexts.findIndex(c => c.id === id)
+			const context = this.contexts[index]
+			context.archived = false
+			this.setContext(context)
+
+			return true
+		},
+
 		async shareContext({ id, previousReceivers, receivers, displayMode }) {
 			const share = {
 				nodeType: 'context',
