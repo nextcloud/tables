@@ -133,6 +133,49 @@ class ArchiveService {
 	}
 
 	/**
+	 * Migrate per-user archive overrides when ownership is transferred.
+	 *
+	 * Two invariants are maintained:
+	 * 1. If the incoming owner held a personal override, that value is promoted
+	 *    to the entity-level flag and their override row is deleted.
+	 * 2. If the entity flag changes as a result, the outgoing owner receives a
+	 *    preservation record so their view is unchanged after the transfer.
+	 *
+	 * Must be called inside the same atomic block as the ownership-column
+	 * update so that archive state and ownership are always consistent.
+	 *
+	 * Returns the new entity-level archived value. The caller must call
+	 * `$entity->setArchived($newArchived)` when the returned value differs
+	 * from $entityArchived, before persisting the entity.
+	 *
+	 * @throws Exception
+	 */
+	public function prepareOwnershipTransfer(
+		string $oldOwnerId,
+		string $newOwnerId,
+		int $nodeType,
+		int $nodeId,
+		bool $entityArchived,
+	): bool {
+		$newOwnerOverride = $this->userArchiveMapper->findForUser($newOwnerId, $nodeType, $nodeId);
+
+		if ($newOwnerOverride !== null) {
+			$newArchived = $newOwnerOverride->isArchived();
+			// Remove the override — entity flag becomes authoritative for the new owner
+			$this->userArchiveMapper->deleteForUser($newOwnerId, $nodeType, $nodeId);
+		} else {
+			$newArchived = $entityArchived;
+		}
+
+		// Preserve the outgoing owner's view if the entity flag will change
+		if ($newArchived !== $entityArchived) {
+			$this->userArchiveMapper->upsert($oldOwnerId, $nodeType, $nodeId, $entityArchived);
+		}
+
+		return $newArchived;
+	}
+
+	/**
 	 * Remove all per-user archive overrides for a node.
 	 *
 	 * Called when a table or context is permanently deleted so that
