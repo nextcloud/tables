@@ -133,6 +133,18 @@ class ArchiveService {
 	}
 
 	/**
+	 * Remove all per-user archive overrides for a node.
+	 *
+	 * Called when a table or context is permanently deleted so that
+	 * `tables_archive_user` does not accumulate orphaned rows.
+	 *
+	 * @throws Exception
+	 */
+	public function deleteNodeArchiveOverrides(int $nodeType, int $nodeId): void {
+		$this->userArchiveMapper->deleteAllForNode($nodeType, $nodeId);
+	}
+
+	/**
 	 * Directly set the entity-level `archived` flag for a table or context row.
 	 *
 	 * Intentionally bypasses TableService / ContextService to avoid a circular

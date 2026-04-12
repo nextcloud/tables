@@ -50,6 +50,7 @@ class ContextService {
 		private bool $isCLI,
 		protected INavigationManager $navigationManager,
 		protected IURLGenerator $urlGenerator,
+		private ArchiveService $archiveService,
 	) {
 	}
 
@@ -69,7 +70,15 @@ class ContextService {
 			$this->logger->warning($error);
 			throw new InternalError($error);
 		}
-		return $this->contextMapper->findAll($userId);
+		$contexts = $this->contextMapper->findAll($userId);
+		if ($userId !== null) {
+			try {
+				$this->archiveService->enrichContextsWithArchiveState($contexts, $userId);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
+		}
+		return $contexts;
 	}
 
 	public function findForNavigation(string $userId): array {
@@ -116,7 +125,15 @@ class ContextService {
 			throw new InternalError($error);
 		}
 
-		return $this->contextMapper->findById($id, $userId);
+		$context = $this->contextMapper->findById($id, $userId);
+		if ($userId !== null) {
+			try {
+				$this->archiveService->enrichContextsWithArchiveState([$context], $userId);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
+		}
+		return $context;
 	}
 
 	/**
@@ -265,6 +282,7 @@ class ContextService {
 				$this->pageMapper->deleteByPageId($pageId);
 			}
 			$this->contextMapper->delete($context);
+			$this->archiveService->deleteNodeArchiveOverrides(Application::NODE_TYPE_CONTEXT, $context->getId());
 		}, $this->dbc);
 		return $context;
 	}
