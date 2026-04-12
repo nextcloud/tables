@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\AppInfo\Application;
-use OCA\Tables\Db\UserArchive;
 use OCA\Tables\Db\UserArchiveMapper;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 
