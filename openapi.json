@@ -863,6 +863,7 @@
                     "columnSettings",
                     "sort",
                     "filter",
+                    "layout",
                     "isShared",
                     "favorite",
                     "onSharePermissions",
@@ -1834,6 +1835,10 @@
                                         "type": "string",
                                         "nullable": true,
                                         "description": "Emoji for the view"
+                                    },
+                                    "layout": {
+                                        "type": "string",
+                                        "nullable": true
                                     }
                                 }
                             }
@@ -2111,6 +2116,15 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            "layout": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "enum": [
+                                                    "table",
+                                                    "tiles",
+                                                    "gallery"
+                                                ]
                                             },
                                             "sort": {
                                                 "type": "array",
