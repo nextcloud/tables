@@ -106,8 +106,9 @@
 import { NcDialog, NcButton, NcCheckboxRadioSwitch, NcLoadingIcon } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
+import { mapState, mapActions } from 'pinia'
 import AirtableImportProgress from './AirtableImportProgress.vue'
-import { startAirtableImport, getAirtableImportStatus, cancelAirtableImport } from '../../api/airtableImport.js'
+import { useAirtableImportStore } from '../../store/airtableImportStore.js'
 
 const POLL_INTERVAL_MS = 3000
 
@@ -133,24 +134,22 @@ export default {
 
 	data() {
 		return {
-			// Input step
+			// Input step (form state stays local — not shared across components)
 			step: 'input',
 			shareUrl: '',
 			sessionCookie: '',
 			urlError: false,
 			loading: false,
 
-			// Progress step
-			jobId: null,
-			jobStatus: null,
-			progressDone: 0,
-			progressTotal: 0,
-			errorMessage: null,
+			// Polling timer stays local because it needs beforeUnmount cleanup
 			pollingTimer: null,
 		}
 	},
 
 	computed: {
+		// Job state from store
+		...mapState(useAirtableImportStore, ['jobStatus', 'progressDone', 'progressTotal', 'errorMessage']),
+
 		dialogTitle() {
 			if (this.step === 'running') {
 				if (this.jobStatus === 'finished') {
@@ -173,6 +172,8 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useAirtableImportStore, ['startJob', 'pollStatus', 'cancelJob', 'resetJob']),
+
 		// -----------------------------------------------------------------------
 		// Input step
 		// -----------------------------------------------------------------------
@@ -187,9 +188,7 @@ export default {
 
 			this.loading = true
 			try {
-				const data = await startAirtableImport(url, this.sessionCookie.trim() || null)
-				this.jobId = data.jobId
-				this.jobStatus = data.status
+				await this.startJob(url, this.sessionCookie.trim() || null)
 				this.step = 'running'
 				this.startPolling()
 			} catch (e) {
@@ -206,9 +205,9 @@ export default {
 		// -----------------------------------------------------------------------
 
 		startPolling() {
-			this.pollingTimer = setInterval(this.pollStatus, POLL_INTERVAL_MS)
+			this.pollingTimer = setInterval(this.doPoll, POLL_INTERVAL_MS)
 			// Poll immediately for a snappy first update
-			this.pollStatus()
+			this.doPoll()
 		},
 
 		stopPolling() {
@@ -218,17 +217,10 @@ export default {
 			}
 		},
 
-		async pollStatus() {
-			if (this.jobId === null) {
-				return
-			}
+		async doPoll() {
 			try {
-				const data = await getAirtableImportStatus(this.jobId)
-				this.jobStatus = data.status
-				this.progressDone = data.progressDone ?? 0
-				this.progressTotal = data.progressTotal ?? 0
-				this.errorMessage = data.errorMessage ?? null
-				if (['finished', 'failed', 'cancelled'].includes(this.jobStatus)) {
+				const data = await this.pollStatus()
+				if (data && ['finished', 'failed', 'cancelled'].includes(data.status)) {
 					this.stopPolling()
 				}
 			} catch (e) {
@@ -237,13 +229,9 @@ export default {
 		},
 
 		async cancelImport() {
-			if (this.jobId === null) {
-				return
-			}
 			try {
-				await cancelAirtableImport(this.jobId)
+				await this.cancelJob()
 				this.stopPolling()
-				this.jobStatus = 'cancelled'
 			} catch (e) {
 				const message = e?.response?.data?.message
 					|| t('tables', 'Could not cancel import.')
@@ -262,11 +250,7 @@ export default {
 
 		retryImport() {
 			this.stopPolling()
-			this.jobId = null
-			this.jobStatus = null
-			this.progressDone = 0
-			this.progressTotal = 0
-			this.errorMessage = null
+			this.resetJob()
 			this.step = 'input'
 		},
 
@@ -276,21 +260,13 @@ export default {
 
 		actionCancel() {
 			this.stopPolling()
-			this.reset()
-			this.$emit('close')
-		},
-
-		reset() {
+			this.resetJob()
 			this.step = 'input'
 			this.shareUrl = ''
 			this.sessionCookie = ''
 			this.urlError = false
 			this.loading = false
-			this.jobId = null
-			this.jobStatus = null
-			this.progressDone = 0
-			this.progressTotal = 0
-			this.errorMessage = null
+			this.$emit('close')
 		},
 	},
 }
