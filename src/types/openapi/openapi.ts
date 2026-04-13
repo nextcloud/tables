@@ -1661,7 +1661,7 @@ export interface operations {
                     readonly emoji?: string | null;
                     /** @description Layout for the view */
                     /** @enum {string|null} */
-                    readonly layout?: "table" | "tiles" | "gallery" | null;
+                    readonly layout?: string | null;
                 };
             };
         };
