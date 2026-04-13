@@ -237,6 +237,7 @@ OC.L10N.register(
     "Owner" : "Tulajdonos",
     "I really want to delete this table!" : "Mindenképp törlöm ezt a táblázatot.",
     "Create missing columns" : "Hiányzó oszlopok létrehozása",
+    "Import successful" : "Sikeres importálás",
     "Close" : "Bezárás",
     "Could not import data due to unknown errors." : "Az adatok importálása ismeretlen hibák miatt nem sikerült.",
     "Please select a file." : "Válasszon egy fájlt.",

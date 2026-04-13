@@ -34,20 +34,6 @@
       "reviewers": ["enjeck", "blizzz"]
     },
     {
-      "groupName": "cypress",
-      "matchPackageNames": ["cypress"],
-      "allowedVersions": "<=13.6.4"
-    },
-    {
-      "groupName": "cypress",
-      "matchPackageNames": ["@nextcloud/cypress"],
-      "allowedVersions": "<=1.0.0-beta.7"
-    },
-    {
-      "groupName": "cypress",
-      "matchPackageNames": ["@cypress/"]
-    },
-    {
       "groupName": "tiptap",
       "matchPackagePrefixes": ["@tiptap/", "prosemirror-"]
     },
@@ -65,6 +51,11 @@
       "allowedVersions": "<4"
     },
     {
+      "matchPackageNames": ["pinia"],
+      "allowedVersions": "<3",
+      "description": "Pin to Vue 2-compatible major"
+    },
+    {
       "matchPackageNames": ["vueuse"],
       "allowedVersions": "<12"
     },
@@ -77,12 +68,37 @@
       "allowedVersions": "<=1.5.6"
     },
     {
+      "matchPackageNames": ["@nextcloud/stylelint-config"],
+      "allowedVersions": "<=3.1.1",
+      "description": "Pin due to stylelint peer dependency conflict"
+    },
+    {
       "matchPackageNames": ["@vue/tsconfig"],
       "allowedVersions": "<=0.5.1"
     },
     {
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<=5.3.3"
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": [
+        "cypress"
+      ],
+      "allowedVersions": "<=13.6.4"
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": [
+        "@nextcloud/cypress"
+      ],
+      "allowedVersions": "<=1.0.0-beta.7"
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": [
+        "@cypress/"
+      ]
     },
     {
       "matchPackageNames": ["phpoffice/phpspreadsheet"],

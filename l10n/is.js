@@ -2,6 +2,8 @@ OC.L10N.register(
     "tables",
     {
     "Tables" : "Töflur",
+    "No" : "Nei",
+    "Yes" : "Já",
     "The file was uploaded" : "Skráin var send inn",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Innsend skrá er stærri en upload_max stillingin í php.ini:",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Innsenda skráin er stærri en MAX_FILE_SIZE sem skilgreint er í HTML sniðinu.",

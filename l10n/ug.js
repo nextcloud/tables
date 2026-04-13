@@ -38,7 +38,6 @@ OC.L10N.register(
     "Could not write file to disk" : "دىسكىغا ھۆججەت يازالمىدى",
     "A PHP extension stopped the file upload" : "PHP كېڭەيتىلمىسى ھۆججەت يوللاشنى توختاتتى",
     "No file uploaded or file size exceeds maximum of %s" : "يۈكلەنگەن ياكى ھۆججەتنىڭ چوڭلۇقى ئەڭ كۆپ بولغاندا %s دىن ئېشىپ كەتمەيدۇ",
-    "Deleted circle %s." : "%s چەمبىرى ئۆچۈرۈلدى.",
     "Nextcloud tables" : "كېيىنكى بۇلۇت جەدۋىلى",
     "_%n row_::_%n rows_" : ["%n قۇر","%n قۇرلار"],
     "table" : "جەدۋەل",

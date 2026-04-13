@@ -161,6 +161,7 @@ OC.L10N.register(
     "Confirm" : "אימות",
     "Content" : "תוכן",
     "Select" : "בחר",
+    "Insert" : "הכנסה",
     "Unchecked" : "לא נבדק",
     "This month" : "החודש",
     "This week" : "השבוע",

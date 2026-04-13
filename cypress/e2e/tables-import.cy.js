@@ -27,10 +27,12 @@ describe('Import csv', () => {
 		cy.get('.file-picker button span').contains('Import').click()
 		cy.get('.modal__content .import-filename', { timeout: 5000 }).should('be.visible')
 
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import-preview/**' }).as('importPreviewPath')
 		cy.get('.modal__content button').contains('Preview').click()
-		cy.get('.file_import__preview tbody tr').should('have.length', 4)
+		cy.wait('@importPreviewPath')
+		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 4)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
@@ -47,10 +49,12 @@ describe('Import csv', () => {
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import.csv', { force: true })
 
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload-preview/**' }).as('importPreviewUpload')
 		cy.get('.modal__content button').contains('Preview').click()
+		cy.wait('@importPreviewUpload')
 		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 4)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '4')
@@ -80,10 +84,12 @@ describe('Import csv', () => {
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-update.csv', { force: true })
 
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload-preview/**' }).as('importPreviewUpdate')
 		cy.get('.modal__content button').contains('Preview').click()
+		cy.wait('@importPreviewUpdate')
 		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 3)
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '2')
@@ -98,8 +104,28 @@ describe('Import csv', () => {
 })
 
 describe('Import csv from Files file action', () => {
+	const rowActionsButton = '[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button'
+	const importToTablesAction = '[data-cy-files-list-row-action="import-to-tables"]'
 
-	before(function () {
+	const openImportToTablesAction = (retries = 8) => {
+		cy.get(rowActionsButton).click()
+		cy.get('body').then($body => {
+			if ($body.find(importToTablesAction).length > 0) {
+				cy.get(importToTablesAction).first().click()
+				return
+			}
+
+			if (retries <= 0) {
+				throw new Error('Import to Tables action did not become available in file actions menu')
+			}
+
+			cy.get('body').click(0, 0)
+			cy.wait(1000)
+			openImportToTablesAction(retries - 1)
+		})
+	}
+
+	before(function() {
 		cy.createRandomUser().then(user => {
 			localUser = user
 			cy.login(localUser)
@@ -107,18 +133,18 @@ describe('Import csv from Files file action', () => {
 		})
 	})
 
-	beforeEach(function () {
+	beforeEach(function() {
 		cy.login(localUser)
-		cy.visit('apps/files/files')
+		cy.visit('apps/files/files', { timeout: 120000 })
+		cy.get('[data-cy-files-list-row-name="test-import.csv"]', { timeout: 120000 }).should('be.visible')
 	})
 
 	it('Import to new table', () => {
-		cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
-		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
+		openImportToTablesAction()
 
 		cy.intercept({
 			method: 'POST',
-			url: '**/apps/tables/import/table/*'
+			url: '**/apps/tables/import/table/*',
 		}).as('importNewTableReq')
 		cy.get('[data-cy="fileActionImportButton"]').click({ force: true })
 		cy.wait('@importNewTableReq').its('response.statusCode').should('equal', 200)
@@ -132,8 +158,7 @@ describe('Import csv from Files file action', () => {
 	})
 
 	it('Import to existing table', () => {
-		cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
-		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
+		openImportToTablesAction()
 
 		cy.get('.modal__content [data-cy="importAsNewTableSwitch"] input').uncheck({ force: true })
 		cy.get('[data-cy="selectExistingTableDropdown"]').type('Welcome to Nextcloud Tables!')
@@ -141,9 +166,9 @@ describe('Import csv from Files file action', () => {
 
 		cy.intercept({
 			method: 'POST',
-			url: '**/apps/tables/import/table/*'
+			url: '**/apps/tables/import/table/*',
 		}).as('importExistingTableReq')
-		cy.get('[data-cy="fileActionImportButton"]').click({force: true})
+		cy.get('[data-cy="fileActionImportButton"]').click({ force: true })
 		cy.wait('@importExistingTableReq').its('response.statusCode').should('equal', 200)
 
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')

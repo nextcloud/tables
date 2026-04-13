@@ -47,23 +47,23 @@ export default {
 		return {
 			selectUsers: this.column.usergroupSelectUsers,
 			selectGroups: this.column.usergroupSelectGroups,
-			internalLocalValue: [],
 		}
 	},
 	computed: {
 		localValue: {
 			get() {
-				return this.internalLocalValue
+				let value = this.value
+				if (!value || (Array.isArray(value) && value.length === 0)) {
+					value = this.column.usergroupDefault || []
+				}
+				return (Array.isArray(value) ? value : []).map(item => ({
+					...(item ?? {}),
+					// Adding a unique key such that removing items works correctly
+					key: this.getKeyPrefix(item?.type) + (item?.id ?? ''),
+				}))
 			},
 			set(v) {
-				let formattedValue = null
-				if (Array.isArray(v)) {
-					formattedValue = v
-				} else {
-					formattedValue = [v]
-				}
-				this.internalLocalValue = formattedValue
-				this.$emit('update:value', formattedValue)
+				this.$emit('update:value', Array.isArray(v) ? v : [v])
 			},
 		},
 	},
@@ -73,20 +73,10 @@ export default {
 		// since the data() function runs before the capabilities are fully initialized
 		this.selectCircles = this.isCirclesEnabled ? this.column.usergroupSelectTeams : false
 
-		let initialValue = this.value
-		if (!initialValue || (Array.isArray(initialValue) && initialValue.length === 0)) {
-			initialValue = this.column.usergroupDefault || []
-		}
-
-		const formatted = (Array.isArray(initialValue) ? initialValue : []).map(item => ({
-			...(item ?? {}),
-			// Adding a unique key such that removing items works correctly
-			key: this.getKeyPrefix(item?.type) + (item?.id ?? ''),
-		}))
-		this.internalLocalValue = formatted
-
-		if (formatted.length > 0) {
-			this.$emit('update:value', formatted)
+		if (!this.value || (Array.isArray(this.value) && this.value.length === 0)) {
+			if (this.localValue.length > 0) {
+				this.$emit('update:value', this.localValue)
+			}
 		}
 	},
 	methods: {

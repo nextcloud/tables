@@ -102,12 +102,6 @@ jobs:
           TESTING=true npm run build --if-present
           composer i --no-dev
 
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-        with:
-          node-version: ${{ matrix.node-version }}
-
       - name: Set up php ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2.36.0
         with:
@@ -145,6 +139,7 @@ jobs:
         with:
           wait-on: '${{ env.CYPRESS_baseUrl }}'
           working-directory: 'apps/${{ env.APP_NAME }}'
+          command: npm run test:e2e:cypress
           config: defaultCommandTimeout=10000,video=false
         env:
           # https://github.com/cypress-io/github-action/issues/124
@@ -189,3 +184,4 @@ jobs:
     steps:
       - name: Summary status
         run: if ${{ needs.cypress.result != 'success' && needs.cypress.result != 'skipped' }}; then exit 1; fi
+
