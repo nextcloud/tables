@@ -30,6 +30,7 @@ use OCA\Tables\Reference\ReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\Support\DefaultAuditLogService;
+use OCA\Tables\Notification\Notifier;
 use OCA\Tables\UserMigration\TablesMigrator;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -97,6 +98,8 @@ class Application extends App implements IBootstrap {
 		$context->registerMiddleware(ShareControlMiddleware::class);
 
 		$context->registerUserMigrator(TablesMigrator::class);
+
+		$context->registerNotifierService(Notifier::class);
 	}
 
 	public function boot(IBootContext $context): void {
