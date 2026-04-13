@@ -1659,8 +1659,10 @@ export interface operations {
                     readonly title: string;
                     /** @description Emoji for the view */
                     readonly emoji?: string | null;
-                    /** @description Layout for the view */
-                    /** @enum {string|null} */
+                    /**
+                     * @description Layout for the view with 'table', 'tiles', 'gallery' or null
+                     * @default null
+                     */
                     readonly layout?: string | null;
                 };
             };
@@ -1813,14 +1815,14 @@ export interface operations {
                             readonly readonly?: boolean;
                             readonly mandatory?: boolean;
                         }[];
-                        /** @enum {string|null} */
-                        readonly layout?: "table" | "tiles" | "gallery" | null;
                         readonly sort?: readonly {
                             /** Format: int64 */
                             readonly columnId: number;
                             /** @enum {string} */
                             readonly mode: "ASC" | "DESC";
                         }[];
+                        /** @enum {string|null} */
+                        readonly layout?: "table" | "tiles" | "gallery" | null;
                         readonly filter?: readonly (readonly {
                             /** Format: int64 */
                             readonly columnId: number;
