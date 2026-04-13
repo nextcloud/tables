@@ -30,6 +30,8 @@ class ViewUpdateInput {
 		protected readonly ?FilterSet $filterSet = null,
 		protected readonly ?SortRuleSet $sortRuleSet = null,
 		protected readonly ?string $layout = null,
+		protected readonly ?int $cardBackgroundSource = null,
+		protected readonly ?int $cardTitleSource = null,
 	) {
 	}
 
@@ -55,6 +57,12 @@ class ViewUpdateInput {
 		if ($this->layout !== null) {
 			yield ViewUpdatableParameters::LAYOUT => $this->layout;
 		}
+		if ($this->cardBackgroundSource !== null) {
+			yield ViewUpdatableParameters::CARD_BACKGROUND_SOURCE => $this->cardBackgroundSource;
+		}
+		if ($this->cardTitleSource !== null) {
+			yield ViewUpdatableParameters::CARD_TITLE_SOURCE => $this->cardTitleSource;
+		}
 	}
 
 	/**
@@ -66,6 +74,8 @@ class ViewUpdateInput {
 	 *     columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
 	 *     layout?: 'table'|'tiles'|'gallery'|null,
+	 *     cardBackgroundSource?: int|null,
+	 *     cardTitleSource?: int|null,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 * } $data
 	 */
@@ -95,6 +105,8 @@ class ViewUpdateInput {
 			filterSet: $data['filter'] ? FilterSet::createFromInputArray($data['filter']) : null,
 			sortRuleSet: $data['sort'] ? SortRuleSet::createFromInputArray($data['sort']) : null,
 			layout: $layout,
+			cardBackgroundSource: array_key_exists('cardBackgroundSource', $data) && $data['cardBackgroundSource'] !== null ? (int)$data['cardBackgroundSource'] : null,
+			cardTitleSource: array_key_exists('cardTitleSource', $data) && $data['cardTitleSource'] !== null ? (int)$data['cardTitleSource'] : null,
 		);
 	}
 
