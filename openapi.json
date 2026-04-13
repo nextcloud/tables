@@ -1014,6 +1014,14 @@
                             }
                         }
                     },
+                    "layout": {
+                        "type": "string",
+                        "enum": [
+                            "table",
+                            "tiles",
+                            "gallery"
+                        ]
+                    },
                     "isShared": {
                         "type": "boolean"
                     },
@@ -1838,7 +1846,9 @@
                                     },
                                     "layout": {
                                         "type": "string",
-                                        "nullable": true
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Layout for the view with 'table', 'tiles', 'gallery' or null"
                                     }
                                 }
                             }
@@ -2117,15 +2127,6 @@
                                                     }
                                                 }
                                             },
-                                            "layout": {
-                                                "type": "string",
-                                                "nullable": true,
-                                                "enum": [
-                                                    "table",
-                                                    "tiles",
-                                                    "gallery"
-                                                ]
-                                            },
                                             "sort": {
                                                 "type": "array",
                                                 "items": {
@@ -2148,6 +2149,15 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            "layout": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "enum": [
+                                                    "table",
+                                                    "tiles",
+                                                    "gallery"
+                                                ]
                                             },
                                             "filter": {
                                                 "type": "array",
