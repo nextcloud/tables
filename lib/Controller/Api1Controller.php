@@ -334,6 +334,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID that will hold the view
 	 * @param string $title Title for the view
 	 * @param string|null $emoji Emoji for the view
+	 * @param string|null $layout Layout for the view with 'table', 'tiles', 'gallery' or null
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
