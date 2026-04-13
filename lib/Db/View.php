@@ -47,6 +47,10 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setDescription(string $description)
  * @method getLayout(): ?string
  * @method setLayout(?string $layout)
+ * @method getCardBackgroundSource(): ?int
+ * @method setCardBackgroundSource(?int $cardBackgroundSource)
+ * @method getCardTitleSource(): ?int
+ * @method setCardTitleSource(?int $cardTitleSource)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
  * @method getOnSharePermissions(): ?Permissions
@@ -77,6 +81,8 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
 	protected ?string $layout = null;
+	protected ?int $cardBackgroundSource = null;
+	protected ?int $cardTitleSource = null;
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -92,6 +98,8 @@ class View extends EntitySuper implements JsonSerializable {
 	public function __construct() {
 		$this->addType('id', 'integer');
 		$this->addType('tableId', 'integer');
+		$this->addType('cardBackgroundSource', 'integer');
+		$this->addType('cardTitleSource', 'integer');
 	}
 
 	/**
@@ -207,6 +215,8 @@ class View extends EntitySuper implements JsonSerializable {
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'layout' => $this->getLayoutNormalized(),
+			'cardBackgroundSource' => $this->cardBackgroundSource,
+			'cardTitleSource' => $this->cardTitleSource,
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 
