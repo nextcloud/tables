@@ -430,8 +430,8 @@ export default {
 			return row?.data?.find(item => item?.columnId === columnId) ?? null
 		},
 		getPreviewUrl(row) {
-			const firstColumn = this.columns[0]
-			const rawValue = this.getCell(row, firstColumn?.id)?.value
+			const backgroundColumn = this.getBackgroundColumn()
+			const rawValue = this.getCell(row, backgroundColumn?.id)?.value
 			if (rawValue === null || rawValue === undefined || rawValue === '') {
 				return null
 			}
@@ -476,7 +476,12 @@ export default {
 			return String(valueObject.value)
 		},
 		getTitleColumn() {
-			return this.columns[1] ?? this.columns[0] ?? null
+			const preferredColumnId = this.localViewSetting?.cardTitleSource
+			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[1] ?? this.columns[0] ?? null
+		},
+		getBackgroundColumn() {
+			const preferredColumnId = this.localViewSetting?.cardBackgroundSource
+			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[0] ?? null
 		},
 		getCardTitle(row) {
 			const titleColumn = this.getTitleColumn()
@@ -484,14 +489,17 @@ export default {
 		},
 		getGalleryMetadata(row) {
 			const titleColumnId = this.getTitleColumn()?.id
-			return this.columns.slice(1)
+			const backgroundColumnId = this.getBackgroundColumn()?.id
+			return this.columns
 				.filter(column => column.id !== titleColumnId)
+				.filter(column => column.id !== backgroundColumnId)
 				.map(column => ({
 					columnId: column.id,
 					title: column.title,
 					value: this.getDisplayValue(column, row),
 				}))
 				.filter(item => item.value !== '')
+				.slice(0, 6)
 		},
 	},
 }
@@ -582,11 +590,12 @@ export default {
 	background: var(--color-main-background);
 	text-align: start;
 	cursor: pointer;
+	color: var(--color-main-text);
 }
 
 .layout-card__image-wrapper {
 	position: relative;
-	aspect-ratio: 1 / 1;
+	aspect-ratio: 3 / 2;
 	background: var(--color-background-dark);
 }
 
@@ -612,12 +621,16 @@ export default {
 	padding: 12px;
 	background: rgba(0,0,0,0.4);
 	color: #fff;
-	text-align: center;
+	text-align: start;
 	font-weight: 600;
+	display: flex;
+	justify-content: flex-start;
 }
 
 .layout-card__body {
 	padding: 12px;
+	max-height: 168px;
+	overflow: hidden;
 }
 
 .layout-card__title {
@@ -635,9 +648,7 @@ export default {
 }
 
 .layout-card__metadata li {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
+	display: block;
 }
 
 .layout-card__metadata li + li {
@@ -646,13 +657,20 @@ export default {
 
 .layout-card__metadata-label {
 	font-size: 12px;
+	font-weight: 600;
 	color: var(--color-text-maxcontrast);
+	margin-bottom: 2px;
 }
 
 .layout-card__metadata-value {
 	font-weight: 400;
+	color: var(--color-main-text);
 	white-space: normal;
 	overflow-wrap: anywhere;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 :deep(table) {
