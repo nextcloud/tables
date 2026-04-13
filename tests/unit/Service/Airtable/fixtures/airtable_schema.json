@@ -1,0 +1,252 @@
+{
+  "tableSchemas": [
+    {
+      "id": "tblPROJECTS",
+      "name": "Projects",
+      "columns": [
+        {
+          "id": "fldNAME",
+          "name": "Name",
+          "type": "text"
+        },
+        {
+          "id": "fldNOTES",
+          "name": "Notes",
+          "type": "richText"
+        },
+        {
+          "id": "fldURL",
+          "name": "Website",
+          "type": "url"
+        },
+        {
+          "id": "fldEMAIL",
+          "name": "Contact email",
+          "type": "email"
+        },
+        {
+          "id": "fldPHONE",
+          "name": "Phone",
+          "type": "phone"
+        },
+        {
+          "id": "fldBUDGET",
+          "name": "Budget",
+          "type": "number",
+          "typeOptions": {
+            "precision": 2
+          }
+        },
+        {
+          "id": "fldAMOUNT",
+          "name": "Amount",
+          "type": "currency",
+          "typeOptions": {
+            "symbol": "$",
+            "precision": 2
+          }
+        },
+        {
+          "id": "fldPCT",
+          "name": "Completion",
+          "type": "percent",
+          "typeOptions": {
+            "precision": 0
+          }
+        },
+        {
+          "id": "fldPRIO",
+          "name": "Priority",
+          "type": "rating",
+          "typeOptions": {
+            "max": 5
+          }
+        },
+        {
+          "id": "fldDUR",
+          "name": "Time spent",
+          "type": "duration"
+        },
+        {
+          "id": "fldCOMPLETE",
+          "name": "Complete",
+          "type": "checkbox"
+        },
+        {
+          "id": "fldDUE",
+          "name": "Due date",
+          "type": "date"
+        },
+        {
+          "id": "fldUPDATED",
+          "name": "Last updated",
+          "type": "dateTime"
+        },
+        {
+          "id": "fldCREATED",
+          "name": "Created",
+          "type": "createdTime"
+        },
+        {
+          "id": "fldMODIFIED",
+          "name": "Modified",
+          "type": "lastModifiedTime"
+        },
+        {
+          "id": "fldSTATUS",
+          "name": "Status",
+          "type": "singleSelect",
+          "typeOptions": {
+            "choices": [
+              {"id": "selTODO",       "name": "Todo"},
+              {"id": "selINPROG",     "name": "In Progress"},
+              {"id": "selDONE",       "name": "Done"}
+            ]
+          }
+        },
+        {
+          "id": "fldTAGS",
+          "name": "Tags",
+          "type": "multiSelect",
+          "typeOptions": {
+            "choices": [
+              {"id": "selDESIGN",  "name": "Design"},
+              {"id": "selDEV",     "name": "Development"},
+              {"id": "selQA",      "name": "QA"}
+            ]
+          }
+        },
+        {
+          "id": "fldOWNER",
+          "name": "Owner",
+          "type": "singleCollaborator"
+        },
+        {
+          "id": "fldTEAM",
+          "name": "Team",
+          "type": "multipleCollaborators"
+        },
+        {
+          "id": "fldCREATEDBY",
+          "name": "Created by",
+          "type": "createdBy"
+        },
+        {
+          "id": "fldMODIFIEDBY",
+          "name": "Modified by",
+          "type": "lastModifiedBy"
+        },
+        {
+          "id": "fldBARCODE",
+          "name": "Barcode",
+          "type": "barcode"
+        },
+        {
+          "id": "fldROWID",
+          "name": "Row #",
+          "type": "autoNumber"
+        },
+        {
+          "id": "fldFORMULA",
+          "name": "Auto total",
+          "type": "formula",
+          "typeOptions": {
+            "formula": "{Budget} + {Amount}"
+          }
+        },
+        {
+          "id": "fldLINKED",
+          "name": "Related tasks",
+          "type": "foreignKey"
+        },
+        {
+          "id": "fldLOOKUP",
+          "name": "Task names",
+          "type": "lookup"
+        },
+        {
+          "id": "fldROLLUP",
+          "name": "Total hours",
+          "type": "rollup"
+        },
+        {
+          "id": "fldCOUNT",
+          "name": "Task count",
+          "type": "count"
+        },
+        {
+          "id": "fldBUTTON",
+          "name": "Send report",
+          "type": "button"
+        },
+        {
+          "id": "fldATTACH",
+          "name": "Files",
+          "type": "multipleAttachments"
+        },
+        {
+          "id": "fldAITEXT",
+          "name": "AI summary",
+          "type": "aiText"
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "rec001",
+      "cellValuesByColumnId": {
+        "fldNAME":      "Website redesign",
+        "fldNOTES":     "**Bold** and _italic_ text",
+        "fldURL":       "https://nextcloud.com",
+        "fldEMAIL":     "contact@example.com",
+        "fldPHONE":     "+1-555-0100",
+        "fldBUDGET":    9500.50,
+        "fldAMOUNT":    1200.00,
+        "fldPCT":       0.75,
+        "fldPRIO":      4,
+        "fldDUR":       7200,
+        "fldCOMPLETE":  true,
+        "fldDUE":       "2026-06-30",
+        "fldUPDATED":   "2026-04-01T12:00:00.000Z",
+        "fldCREATED":   "2026-01-15T10:00:00.000Z",
+        "fldMODIFIED":  "2026-04-10T08:30:00.000Z",
+        "fldSTATUS":    "In Progress",
+        "fldTAGS":      ["Design", "Development"],
+        "fldOWNER":     {"id": "usrALICE", "name": "Alice", "email": "alice@example.com"},
+        "fldTEAM":      [
+          {"id": "usrALICE", "name": "Alice", "email": "alice@example.com"},
+          {"id": "usrBOB",   "name": "Bob",   "email": "bob@example.com"}
+        ],
+        "fldCREATEDBY": {"id": "usrALICE", "name": "Alice", "email": "alice@example.com"},
+        "fldMODIFIEDBY":{"id": "usrBOB",   "name": "Bob",   "email": "bob@example.com"},
+        "fldBARCODE":   {"text": "9780201379624", "type": "code128"},
+        "fldROWID":     1,
+        "fldFORMULA":   10700.50,
+        "fldLINKED":    ["recOTHER1"],
+        "fldLOOKUP":    ["Task A", "Task B"],
+        "fldROLLUP":    42,
+        "fldCOUNT":     3,
+        "fldBUTTON":    null,
+        "fldATTACH":    [{"url": "https://example.com/file.pdf", "filename": "file.pdf"}],
+        "fldAITEXT":    "AI-generated summary here."
+      }
+    },
+    {
+      "id": "rec002",
+      "cellValuesByColumnId": {
+        "fldNAME":     "Mobile app update",
+        "fldSTATUS":   "Todo",
+        "fldTAGS":     ["Development", "QA"],
+        "fldPRIO":     2,
+        "fldCOMPLETE": false,
+        "fldPCT":      0.0,
+        "fldDUR":      0,
+        "fldBUDGET":   null,
+        "fldAMOUNT":   null,
+        "fldOWNER":    {"id": "usrBOB", "name": "Bob", "email": "bob@example.com"},
+        "fldCREATED":  "2026-02-01T09:00:00.000Z"
+      }
+    }
+  ]
+}
