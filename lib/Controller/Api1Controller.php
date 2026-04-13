@@ -406,6 +406,8 @@ class Api1Controller extends ApiController {
 	 *      columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *      sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
 	 *      layout?: 'table'|'tiles'|'gallery'|null,
+	 *      cardBackgroundSource?: int|null,
+	 *      cardTitleSource?: int|null,
 	 *      filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 *  } $data fields of the view with their new values
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
