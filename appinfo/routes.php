@@ -110,6 +110,11 @@ return [
 		['name' => 'import#previewUploadImportView', 'url' => '/importupload-preview/view/{viewId}', 'verb' => 'POST'],
 		['name' => 'import#importUploadInView', 'url' => '/importupload/view/{viewId}', 'verb' => 'POST'],
 
+		// Airtable import
+		['name' => 'airtableImport#startImport',  'url' => '/api/1/import/airtable',                  'verb' => 'POST'],
+		['name' => 'airtableImport#getStatus',    'url' => '/api/1/import/airtable/{jobId}/status',   'verb' => 'GET'],
+		['name' => 'airtableImport#cancelImport', 'url' => '/api/1/import/airtable/{jobId}',          'verb' => 'DELETE'],
+
 		// search
 		['name' => 'search#all', 'url' => '/search/all', 'verb' => 'GET'],
 	],
