@@ -11,6 +11,10 @@ namespace OCA\Tables\BackgroundJob;
 
 use DateTime;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Service\Airtable\AirtableDataImporter;
+use OCA\Tables\Service\Airtable\AirtableFetcher;
+use OCA\Tables\Service\Airtable\AirtableImportReportBuilder;
+use OCA\Tables\Service\Airtable\AirtableSchemaConverter;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\QueuedJob;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -28,10 +32,10 @@ use Psr\Log\LoggerInterface;
  *
  * Orchestration (high-level):
  *   1. Mark job as "running" in the DB.
- *   2. Fetch the Airtable schema           (B0.3 – AirtableFetcher).
- *   3. Convert schema → Tables columns     (B0.4-B0.7 – AirtableSchemaConverter).
- *   4. Paginate and import row data        (B0.8 – AirtableDataImporter).
- *   5. Build the import-report table       (B0.9 – AirtableImportReportBuilder).
+ *   2. Fetch the Airtable schema           (AirtableFetcher).
+ *   3. Convert schema → Tables columns     (AirtableSchemaConverter).
+ *   4. Paginate and import row data        (AirtableDataImporter).
+ *   5. Build the import-report table       (AirtableImportReportBuilder).
  *   6. Mark job as "finished" and notify the user.
  *
  * On any unhandled exception the job marks itself "failed", stores the error
@@ -44,9 +48,9 @@ class AirtableImportJob extends QueuedJob {
 	public const STATUS_FINISHED = 'finished';
 	public const STATUS_FAILED   = 'failed';
 
-	/** Notification subject sent on successful completion (B0.12). */
+	/** Notification subject sent on successful completion. */
 	public const NOTIFICATION_SUBJECT_DONE   = 'airtable_import_done';
-	/** Notification subject sent on failure (B0.12). */
+	/** Notification subject sent on failure. */
 	public const NOTIFICATION_SUBJECT_FAILED = 'airtable_import_failed';
 
 	public function __construct(
@@ -54,24 +58,25 @@ class AirtableImportJob extends QueuedJob {
 		private readonly IDBConnection $db,
 		private readonly INotificationManager $notificationManager,
 		private readonly LoggerInterface $logger,
-		// @todo B0.3  – inject AirtableFetcher
-		// @todo B0.4-B0.7 – inject AirtableSchemaConverter
-		// @todo B0.8  – inject AirtableDataImporter
-		// @todo B0.9  – inject AirtableImportReportBuilder
+		private readonly AirtableFetcher $fetcher,
+		private readonly AirtableSchemaConverter $schemaConverter,
+		private readonly AirtableDataImporter $dataImporter,
+		private readonly AirtableImportReportBuilder $reportBuilder,
 	) {
 		parent::__construct($time);
 	}
 
 	/**
-	 * @param array{job_id: int, user_id: string} $argument
+	 * @param array{job_id: int, user_id: string, session_cookie?: string|null} $argument
 	 */
 	protected function run(mixed $argument): void {
-		$jobId = (int) ($argument['job_id'] ?? 0);
-		$userId = (string) ($argument['user_id'] ?? '');
+		$jobId          = (int) ($argument['job_id'] ?? 0);
+		$userId         = (string) ($argument['user_id'] ?? '');
+		$sessionCookie  = $argument['session_cookie'] ?? null;
 
 		if ($jobId === 0 || $userId === '') {
 			$this->logger->error('AirtableImportJob: started with invalid arguments', [
-				'app' => Application::APP_ID,
+				'app'      => Application::APP_ID,
 				'argument' => $argument,
 			]);
 			return;
@@ -80,7 +85,7 @@ class AirtableImportJob extends QueuedJob {
 		$row = $this->fetchJobRow($jobId);
 		if ($row === null) {
 			$this->logger->error('AirtableImportJob: job row not found', [
-				'app' => Application::APP_ID,
+				'app'    => Application::APP_ID,
 				'job_id' => $jobId,
 			]);
 			return;
@@ -88,55 +93,65 @@ class AirtableImportJob extends QueuedJob {
 
 		$this->setStatus($jobId, self::STATUS_RUNNING);
 		$this->logger->info('AirtableImportJob: starting import', [
-			'app' => Application::APP_ID,
-			'job_id' => $jobId,
+			'app'     => Application::APP_ID,
+			'job_id'  => $jobId,
 			'user_id' => $userId,
 		]);
 
 		try {
-			// @todo B0.3  – fetch Airtable schema:
-			//   $schema = $this->fetcher->fetchSchema(
-			//       $row['share_url'],
-			//       $row['session_cookie'] ?? null
-			//   );
+			$shareUrl    = (string) $row['share_url'];
+			$reportRows  = [];
 
-			// @todo B0.4-B0.7 – convert schema to Tables columns/tables:
-			//   [$tables, $reportRows] = $this->schemaConverter->convert(
-			//       $schema,
-			//       $userId,
-			//       (int) ($row['target_context_id'] ?? 0)
-			//   );
+			// 1. Fetch Airtable schema + request metadata for row fetching.
+			$fetchResult    = $this->fetcher->fetchAll($shareUrl, $sessionCookie ?: null);
+			$schema         = $fetchResult['schema'];
+			$appId          = $fetchResult['appId'];
+			$requestHeaders = $fetchResult['requestHeaders'];
+			$cookies        = $fetchResult['cookies'];
 
-			// @todo B0.8  – paginate and bulk-insert row data:
-			//   $this->dataImporter->import($tables, $schema, $jobId);
+			// 2. Convert schema to Nextcloud Tables tables + columns.
+			$conversionResult = $this->schemaConverter->convert($schema, $userId, $reportRows);
+			$tableMapping     = $conversionResult['tableMapping'];
+			$importedTableIds = $conversionResult['importedTableIds'];
 
-			// @todo B0.9  – create import-report table for lossy/skipped fields:
-			//   $this->reportBuilder->build($reportRows, $userId);
+			// Set progress total based on table count as a rough estimate;
+			// AirtableDataImporter increments progress_done per row.
+			$this->setProgressTotal($jobId, count($tableMapping));
+
+			// 3. Paginate and bulk-insert row data.
+			$this->dataImporter->import(
+				$appId,
+				$tableMapping,
+				$requestHeaders,
+				$cookies,
+				$jobId,
+				$userId,
+				$reportRows,
+			);
+
+			// 4. Create the import-report table (only if there were issues).
+			$this->reportBuilder->build($reportRows, $userId, $jobId);
 
 			$this->setStatus($jobId, self::STATUS_FINISHED);
 			$this->logger->info('AirtableImportJob: import finished', [
-				'app' => Application::APP_ID,
+				'app'    => Application::APP_ID,
 				'job_id' => $jobId,
 			]);
-			// $importedTableIds will be populated by B0.4-B0.7 once the schema
-			// converter and data importer are wired up.  The empty string is a
-			// valid placeholder; Notifier::prepareDone() handles it gracefully
-			// by falling back to the app root URL.
-			$importedTableIds = []; // @todo B0.4-B0.7: replace with actual IDs
+
 			$this->notify($userId, self::NOTIFICATION_SUBJECT_DONE, [
-				'job_id'   => $jobId,
+				'job_id'    => $jobId,
 				'table_ids' => implode(',', $importedTableIds),
 			]);
 		} catch (\Throwable $e) {
 			$this->logger->error('AirtableImportJob: import failed', [
-				'app' => Application::APP_ID,
-				'job_id' => $jobId,
+				'app'       => Application::APP_ID,
+				'job_id'    => $jobId,
 				'exception' => $e,
 			]);
 			$this->setStatus($jobId, self::STATUS_FAILED, $e->getMessage());
 			$this->notify($userId, self::NOTIFICATION_SUBJECT_FAILED, [
 				'job_id' => $jobId,
-				'error' => $e->getMessage(),
+				'error'  => $e->getMessage(),
 			]);
 		}
 	}
@@ -149,7 +164,7 @@ class AirtableImportJob extends QueuedJob {
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($jobId, IQueryBuilder::PARAM_INT)));
 
 		$result = $qb->executeQuery();
-		$row = $result->fetch();
+		$row    = $result->fetch();
 		$result->closeCursor();
 
 		return $row !== false ? $row : null;
@@ -158,7 +173,7 @@ class AirtableImportJob extends QueuedJob {
 	private function setStatus(int $jobId, string $status, ?string $errorMessage = null): void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->update('tables_airtable_imports')
-			->set('status', $qb->createNamedParameter($status))
+			->set('status',     $qb->createNamedParameter($status))
 			->set('updated_at', $qb->createNamedParameter(new DateTime('now'), IQueryBuilder::PARAM_DATE))
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($jobId, IQueryBuilder::PARAM_INT)));
 
@@ -166,6 +181,14 @@ class AirtableImportJob extends QueuedJob {
 			$qb->set('error_message', $qb->createNamedParameter($errorMessage));
 		}
 
+		$qb->executeStatement();
+	}
+
+	private function setProgressTotal(int $jobId, int $total): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->update('tables_airtable_imports')
+			->set('progress_total', $qb->createNamedParameter($total, IQueryBuilder::PARAM_INT))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($jobId, IQueryBuilder::PARAM_INT)));
 		$qb->executeStatement();
 	}
 
@@ -181,10 +204,8 @@ class AirtableImportJob extends QueuedJob {
 		try {
 			$this->notificationManager->notify($notification);
 		} catch (\InvalidArgumentException $e) {
-			// INotificationManager throws when no Notifier is registered for the
-			// app yet.  This is expected until B0.12 wires up the Notifier class.
-			$this->logger->debug('AirtableImportJob: notification skipped – no Notifier registered yet', [
-				'app' => Application::APP_ID,
+			$this->logger->debug('AirtableImportJob: notification skipped', [
+				'app'     => Application::APP_ID,
 				'subject' => $subject,
 			]);
 		}

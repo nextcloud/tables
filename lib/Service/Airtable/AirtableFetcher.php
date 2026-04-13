@@ -73,6 +73,20 @@ class AirtableFetcher {
 	 * @throws AirtableFetchException            for all other network / parse errors.
 	 */
 	public function fetchSchema(string $shareUrl, ?string $sessionCookie = null): array {
+		return $this->fetchAll($shareUrl, $sessionCookie)['schema'];
+	}
+
+	/**
+	 * Fetch the schema AND return the appId, request headers, and cookies
+	 * needed by AirtableDataImporter to fetch row data.
+	 *
+	 * @return array{schema: array<string, mixed>, appId: string, requestHeaders: array<string, string>, cookies: array<string, string>}
+	 *
+	 * @throws AirtableBaseNotPublicException
+	 * @throws AirtableShareIsNotABaseException
+	 * @throws AirtableFetchException
+	 */
+	public function fetchAll(string $shareUrl, ?string $sessionCookie = null): array {
 		$shareId = $this->extractShareId($shareUrl);
 
 		$this->logger->debug('AirtableFetcher: fetching share page', [
@@ -87,7 +101,14 @@ class AirtableFetcher {
 			'app_id' => $appId,
 		]);
 
-		return $this->fetchSchemaData($appId, $requestHeaders, $cookies);
+		$schema = $this->fetchSchemaData($appId, $requestHeaders, $cookies);
+
+		return [
+			'schema'         => $schema,
+			'appId'          => $appId,
+			'requestHeaders' => $requestHeaders,
+			'cookies'        => $cookies,
+		];
 	}
 
 	// -------------------------------------------------------------------------
