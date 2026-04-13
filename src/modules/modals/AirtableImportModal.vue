@@ -86,7 +86,7 @@
 			</div>
 
 			<!-- ================================================================
-			     Step 2 — Progress
+			     Step 2 — Progress (rendered by AirtableImportProgress)
 			     ================================================================ -->
 			<AirtableImportProgress v-else-if="step === 'running'"
 				:job-status="jobStatus"
@@ -105,10 +105,9 @@
 <script>
 import { NcDialog, NcButton, NcCheckboxRadioSwitch, NcLoadingIcon } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
-import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
 import { translate as t } from '@nextcloud/l10n'
 import AirtableImportProgress from './AirtableImportProgress.vue'
+import { startAirtableImport, getAirtableImportStatus, cancelAirtableImport } from '../../api/airtableImport.js'
 
 const POLL_INTERVAL_MS = 3000
 
@@ -188,15 +187,9 @@ export default {
 
 			this.loading = true
 			try {
-				const res = await axios.post(
-					generateUrl('/apps/tables/api/1/import/airtable'),
-					{
-						shareUrl: url,
-						sessionCookie: this.sessionCookie.trim() || null,
-					},
-				)
-				this.jobId = res.data.jobId
-				this.jobStatus = res.data.status
+				const data = await startAirtableImport(url, this.sessionCookie.trim() || null)
+				this.jobId = data.jobId
+				this.jobStatus = data.status
 				this.step = 'running'
 				this.startPolling()
 			} catch (e) {
@@ -230,14 +223,11 @@ export default {
 				return
 			}
 			try {
-				const res = await axios.get(
-					generateUrl('/apps/tables/api/1/import/airtable/' + this.jobId + '/status'),
-				)
-				this.jobStatus = res.data.status
-				this.progressDone = res.data.progressDone ?? 0
-				this.progressTotal = res.data.progressTotal ?? 0
-				this.errorMessage = res.data.errorMessage ?? null
-
+				const data = await getAirtableImportStatus(this.jobId)
+				this.jobStatus = data.status
+				this.progressDone = data.progressDone ?? 0
+				this.progressTotal = data.progressTotal ?? 0
+				this.errorMessage = data.errorMessage ?? null
 				if (['finished', 'failed', 'cancelled'].includes(this.jobStatus)) {
 					this.stopPolling()
 				}
@@ -251,9 +241,7 @@ export default {
 				return
 			}
 			try {
-				await axios.delete(
-					generateUrl('/apps/tables/api/1/import/airtable/' + this.jobId),
-				)
+				await cancelAirtableImport(this.jobId)
 				this.stopPolling()
 				this.jobStatus = 'cancelled'
 			} catch (e) {
