@@ -55,6 +55,14 @@
 						:tabbable="true"
 						@set-template="setTemplate('import')" />
 				</div>
+				<div class="col-2 block space-R space-B">
+					<NcTile
+						:title="t('tables', '✈️ Import from Airtable')"
+						:body="t('tables', 'Import tables from an Airtable base.')"
+						:active="templateChoice === 'airtable'"
+						:tabbable="true"
+						@set-template="setTemplate('airtable')" />
+				</div>
 				<div v-for="template in templates" :key="template.name" class="col-2 block space-R space-B">
 					<NcTile
 						:title="template.icon + ' ' + template.title"
@@ -155,6 +163,8 @@ export default {
 					this.icon = '🔧'
 				} else if (name === 'import') {
 					this.icon = '📄'
+				} else if (name === 'airtable') {
+					this.icon = '✈️'
 				} else {
 					const templateObject = this.templates?.find(item => item.name === name) || ''
 					this.icon = templateObject?.icon
@@ -162,7 +172,7 @@ export default {
 			}
 
 			if (!this.customTitleChosen) {
-				if (name === 'custom' || name === 'import') {
+				if (name === 'custom' || name === 'import' || name === 'airtable') {
 					this.title = ''
 				} else {
 					const templateObject = this.templates?.find(item => item.name === name) || ''
@@ -179,6 +189,11 @@ export default {
 			this.$emit('close')
 		},
 		async submit() {
+			if (this.templateChoice === 'airtable') {
+				emit('tables:modal:airtableImport')
+				this.actionCancel()
+				return
+			}
 			if (this.templateChoice === 'scheme') {
 				emit('tables:modal:scheme', this.title)
 				this.actionCancel()
