@@ -86,107 +86,29 @@
 			</div>
 
 			<!-- ================================================================
-			     Step 2 — Progress  (F0.3 will extract this into AirtableImportProgress.vue)
+			     Step 2 — Progress
 			     ================================================================ -->
-			<div v-else-if="step === 'running'">
-				<!-- Running / pending -->
-				<div v-if="jobStatus === 'pending' || jobStatus === 'running'">
-					<NcEmptyContent :name="t('tables', 'Import in progress…')"
-						:description="progressDescription">
-						<template #icon>
-							<NcLoadingIcon :size="64" />
-						</template>
-					</NcEmptyContent>
-					<NcProgressBar :value="progressPercent" />
-					<div class="row space-T">
-						<div class="fix-col-4 end">
-							<NcButton :aria-label="t('tables', 'Cancel import')" @click="cancelImport">
-								{{ t('tables', 'Cancel import') }}
-							</NcButton>
-						</div>
-					</div>
-				</div>
-
-				<!-- Finished -->
-				<div v-else-if="jobStatus === 'finished'">
-					<NcEmptyContent :name="t('tables', 'Import finished!')"
-						:description="t('tables', 'All tables have been imported successfully.')">
-						<template #icon>
-							<IconCheck :size="64" />
-						</template>
-					</NcEmptyContent>
-					<div class="row space-T">
-						<div class="fix-col-4 end">
-							<NcButton :aria-label="t('tables', 'Close')" @click="actionCancel">
-								{{ t('tables', 'Close') }}
-							</NcButton>
-							<NcButton type="primary"
-								:aria-label="t('tables', 'Go to imported tables')"
-								@click="goToTables">
-								{{ t('tables', 'Go to imported tables') }}
-							</NcButton>
-						</div>
-					</div>
-				</div>
-
-				<!-- Failed -->
-				<div v-else-if="jobStatus === 'failed'">
-					<NcEmptyContent :name="t('tables', 'Import failed')"
-						:description="errorMessage || t('tables', 'An unknown error occurred.')">
-						<template #icon>
-							<IconAlertCircle :size="64" />
-						</template>
-					</NcEmptyContent>
-					<div class="row space-T">
-						<div class="fix-col-4 end">
-							<NcButton :aria-label="t('tables', 'Close')" @click="actionCancel">
-								{{ t('tables', 'Close') }}
-							</NcButton>
-							<NcButton type="primary"
-								:aria-label="t('tables', 'Retry')"
-								@click="retryImport">
-								{{ t('tables', 'Retry') }}
-							</NcButton>
-						</div>
-					</div>
-				</div>
-
-				<!-- Cancelled -->
-				<div v-else-if="jobStatus === 'cancelled'">
-					<NcEmptyContent :name="t('tables', 'Import cancelled')"
-						:description="t('tables', 'The import was cancelled.')">
-						<template #icon>
-							<IconCancel :size="64" />
-						</template>
-					</NcEmptyContent>
-					<div class="row space-T">
-						<div class="fix-col-4 end">
-							<NcButton :aria-label="t('tables', 'Close')" @click="actionCancel">
-								{{ t('tables', 'Close') }}
-							</NcButton>
-							<NcButton type="primary"
-								:aria-label="t('tables', 'Start a new import')"
-								@click="retryImport">
-								{{ t('tables', 'Start a new import') }}
-							</NcButton>
-						</div>
-					</div>
-				</div>
-			</div>
+			<AirtableImportProgress v-else-if="step === 'running'"
+				:job-status="jobStatus"
+				:progress-done="progressDone"
+				:progress-total="progressTotal"
+				:error-message="errorMessage"
+				@cancel="cancelImport"
+				@retry="retryImport"
+				@close="actionCancel"
+				@go-to-tables="goToTables" />
 
 		</div>
 	</NcDialog>
 </template>
 
 <script>
-import { NcDialog, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon, NcProgressBar } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcCheckboxRadioSwitch, NcLoadingIcon } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
-import IconCheck from 'vue-material-design-icons/Check.vue'
-import IconAlertCircle from 'vue-material-design-icons/AlertCircle.vue'
-import IconCancel from 'vue-material-design-icons/Cancel.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { translate as t } from '@nextcloud/l10n'
+import AirtableImportProgress from './AirtableImportProgress.vue'
 
 const POLL_INTERVAL_MS = 3000
 
@@ -197,12 +119,8 @@ export default {
 		NcDialog,
 		NcButton,
 		NcCheckboxRadioSwitch,
-		NcEmptyContent,
 		NcLoadingIcon,
-		NcProgressBar,
-		IconCheck,
-		IconAlertCircle,
-		IconCancel,
+		AirtableImportProgress,
 	},
 
 	props: {
@@ -248,21 +166,6 @@ export default {
 				return t('tables', 'Airtable import — running…')
 			}
 			return t('tables', 'Import from Airtable')
-		},
-		progressPercent() {
-			if (this.progressTotal <= 0) {
-				return 0
-			}
-			return Math.round((this.progressDone / this.progressTotal) * 100)
-		},
-		progressDescription() {
-			if (this.progressTotal > 0) {
-				return t('tables', '{done} of {total} rows imported', {
-					done: this.progressDone,
-					total: this.progressTotal,
-				})
-			}
-			return t('tables', 'Fetching schema and preparing tables…')
 		},
 	},
 
@@ -439,9 +342,5 @@ export default {
 	display: flex;
 	justify-content: flex-end;
 	gap: calc(var(--default-grid-baseline) * 2);
-}
-
-:deep(.progress-bar) {
-	margin-block: calc(var(--default-grid-baseline) * 3);
 }
 </style>
