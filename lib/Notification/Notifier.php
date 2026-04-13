@@ -82,6 +82,19 @@ class Notifier implements INotifier {
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
 		);
 
+		// Navigate to the first imported table if the IDs are available,
+		// otherwise fall back to the Tables app root.
+		$params    = $notification->getSubjectParameters();
+		$tableIds  = array_filter(
+			array_map('intval', explode(',', (string) ($params['table_ids'] ?? '')))
+		);
+		$firstId   = !empty($tableIds) ? (int) reset($tableIds) : 0;
+		$link      = $firstId > 0
+			? $this->urlGenerator->linkToRoute('tables.page.index') . '#/table/' . $firstId
+			: $this->urlGenerator->linkToRoute('tables.page.index');
+
+		$notification->setLink($link);
+
 		return $notification;
 	}
 
@@ -102,6 +115,10 @@ class Notifier implements INotifier {
 		$notification->setIcon(
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
 		);
+
+		// On failure, clicking the notification opens the Tables app root
+		// so the user can inspect the import history or retry.
+		$notification->setLink($this->urlGenerator->linkToRoute('tables.page.index'));
 
 		return $notification;
 	}

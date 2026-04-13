@@ -118,7 +118,15 @@ class AirtableImportJob extends QueuedJob {
 				'app' => Application::APP_ID,
 				'job_id' => $jobId,
 			]);
-			$this->notify($userId, self::NOTIFICATION_SUBJECT_DONE, ['job_id' => $jobId]);
+			// $importedTableIds will be populated by B0.4-B0.7 once the schema
+			// converter and data importer are wired up.  The empty string is a
+			// valid placeholder; Notifier::prepareDone() handles it gracefully
+			// by falling back to the app root URL.
+			$importedTableIds = []; // @todo B0.4-B0.7: replace with actual IDs
+			$this->notify($userId, self::NOTIFICATION_SUBJECT_DONE, [
+				'job_id'   => $jobId,
+				'table_ids' => implode(',', $importedTableIds),
+			]);
 		} catch (\Throwable $e) {
 			$this->logger->error('AirtableImportJob: import failed', [
 				'app' => Application::APP_ID,
