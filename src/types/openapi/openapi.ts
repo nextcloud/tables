@@ -1171,6 +1171,8 @@ export type components = {
                 readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
                 readonly value: string | number;
             }[])[];
+            /** @enum {string} */
+            readonly layout: "table" | "tiles" | "gallery";
             readonly isShared: boolean;
             readonly favorite: boolean;
             readonly onSharePermissions: {
@@ -1657,6 +1659,9 @@ export interface operations {
                     readonly title: string;
                     /** @description Emoji for the view */
                     readonly emoji?: string | null;
+                    /** @description Layout for the view */
+                    /** @enum {string|null} */
+                    readonly layout?: "table" | "tiles" | "gallery" | null;
                 };
             };
         };
@@ -1808,6 +1813,8 @@ export interface operations {
                             readonly readonly?: boolean;
                             readonly mandatory?: boolean;
                         }[];
+                        /** @enum {string|null} */
+                        readonly layout?: "table" | "tiles" | "gallery" | null;
                         readonly sort?: readonly {
                             /** Format: int64 */
                             readonly columnId: number;
