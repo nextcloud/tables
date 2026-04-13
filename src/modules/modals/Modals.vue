@@ -45,6 +45,9 @@
 			:show-modal="showImportScheme"
 			:title="importSchemeTitle"
 			@close="showImportScheme = false" />
+		<AirtableImportModal
+			:show-modal="showAirtableImport"
+			@close="showAirtableImport = false" />
 		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
 		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
@@ -56,6 +59,7 @@
 
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import CreateRow from './CreateRow.vue'
+import AirtableImportModal from './AirtableImportModal.vue'
 import ImportScheme from './ImportScheme.vue'
 import DeleteColumn from './DeleteColumn.vue'
 import EditColumn from './EditColumn.vue'
@@ -76,6 +80,7 @@ import DeleteContext from './DeleteContext.vue'
 
 export default {
 	components: {
+		AirtableImportModal,
 		EditTable,
 		DeleteView,
 		CreateTable,
@@ -107,6 +112,7 @@ export default {
 			viewToEdit: null,
 			showModalCreateTable: false,
 			showModalCreateContext: false,
+			showAirtableImport: false,
 			importToElement: null,
 			showImportScheme: false,
 			importSchemeTitle: '',
@@ -155,6 +161,7 @@ export default {
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
 		subscribe('tables:modal:scheme', title => { this.importSchemeTitle = title; this.showImportScheme = true })
+		subscribe('tables:modal:airtableImport', () => { this.showAirtableImport = true })
 
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
@@ -183,6 +190,7 @@ export default {
 		})
 		unsubscribe('tables:table:create', () => { this.showModalCreateTable = true })
 		unsubscribe('tables:modal:import', element => { this.importToElement = element })
+		unsubscribe('tables:modal:airtableImport', () => { this.showAirtableImport = true })
 		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
 		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
