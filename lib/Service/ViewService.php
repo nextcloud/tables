@@ -615,6 +615,8 @@ class ViewService extends SuperService {
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
 		$item->setLayout(in_array($view['layout'] ?? null, ['tiles', 'gallery'], true) ? $view['layout'] : null);
+		$item->setCardBackgroundSource(isset($view['cardBackgroundSource']) ? (int)$view['cardBackgroundSource'] : null);
+		$item->setCardTitleSource(isset($view['cardTitleSource']) ? (int)$view['cardTitleSource'] : null);
 		try {
 			$this->mapper->insert($item);
 		} catch (\Exception $e) {
