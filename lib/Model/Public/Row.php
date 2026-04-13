@@ -19,6 +19,7 @@ final class Row implements JsonSerializable {
 	 * @param int $rowId
 	 * @param array<int,mixed>|null $previousValues key is the columnId. Only set on Update events.
 	 * @param array<int,mixed>|null $values key is the columnId. Contains values across all events, including Delete.
+	 * @param array<string, array{columnId: int, value: mixed}>|null $dataByAlias key is the column technicalName (or column_{id} fallback).
 	 *
 	 * @since 0.8
 	 */
@@ -31,12 +32,14 @@ final class Row implements JsonSerializable {
 		public ?array $previousValues = null,
 		/** @readonly */
 		public ?array $values = null,
+		/** @readonly */
+		public ?array $dataByAlias = null,
 	) {
 	}
 
 
 	/**
-	 * @return array{"tableId": int, "rowId": int, "previousValues": null|array<int, mixed>, "values": null|array<int, mixed>}
+	 * @return array{"tableId": int, "rowId": int, "previousValues": null|array<int, mixed>, "values": null|array<int, mixed>, "dataByAlias": null|array<string, array{columnId: int, value: mixed}>}
 	 *
 	 * @since 0.8
 	 */
@@ -46,6 +49,7 @@ final class Row implements JsonSerializable {
 			'rowId' => $this->rowId,
 			'previousValues' => $this->previousValues,
 			'values' => $this->values,
+			'dataByAlias' => $this->dataByAlias,
 		];
 	}
 }

@@ -171,6 +171,7 @@ class Row2 implements JsonSerializable {
 			rowId: $this->id,
 			previousValues: $previousValues,
 			values: $this->data,
+			dataByAlias: $this->dataByAlias,
 		);
 	}
 

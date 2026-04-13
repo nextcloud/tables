@@ -73,6 +73,7 @@ import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../store/data.js'
 import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
+import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
 
 export default {
 	name: 'EditColumn',
@@ -228,16 +229,10 @@ export default {
 			}
 		},
 		normalizeTechnicalName(technicalName) {
-			const normalized = technicalName?.trim()
-			return normalized === '' ? null : normalized
+			return normalizeTechnicalName(technicalName)
 		},
 		isTechnicalNameValid() {
-			const technicalName = this.normalizeTechnicalName(this.editColumn.technicalName)
-			if (technicalName === null) {
-				return false
-			}
-
-			return /^[a-z][a-z0-9_]*$/.test(technicalName)
+			return isTechnicalNameValid(this.editColumn.technicalName)
 		},
 	},
 }
