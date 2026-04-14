@@ -61,7 +61,7 @@ export default {
 			this.$emit('delete-share', share)
 		},
 		onUpdateShare(data) {
-			this.$emit('update-share', data)
+			this.$emit('update-share-permissions', data)
 		},
 	},
 }

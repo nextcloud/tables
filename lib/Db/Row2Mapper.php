@@ -122,6 +122,10 @@ class Row2Mapper {
 		return $rowSleeve->getTableId();
 	}
 
+	public function setUserId(string $userId): void {
+		$this->userId = $userId;
+	}
+
 	/**
 	 * @return int[]
 	 * @throws InternalError

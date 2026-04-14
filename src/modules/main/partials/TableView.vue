@@ -18,6 +18,7 @@
 		:can-edit-columns="canEditColumns"
 		:can-delete-columns="canDeleteColumns"
 		:can-delete-table="canDeleteTable"
+		:is-form-mode="isFormMode"
 		@import="openImportModal"
 		@create-column="createColumn"
 		@edit-column="editColumn"
@@ -98,6 +99,10 @@ export default {
 		canDeleteTable: {
 			type: Boolean,
 			default: true,
+		},
+		isFormMode: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {
