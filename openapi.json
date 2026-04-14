@@ -864,6 +864,8 @@
                     "sort",
                     "filter",
                     "layout",
+                    "cardBackgroundSource",
+                    "cardTitleSource",
                     "isShared",
                     "favorite",
                     "onSharePermissions",
@@ -1021,6 +1023,16 @@
                             "tiles",
                             "gallery"
                         ]
+                    },
+                    "cardBackgroundSource": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "cardTitleSource": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
                     },
                     "isShared": {
                         "type": "boolean"
@@ -2158,6 +2170,16 @@
                                                     "tiles",
                                                     "gallery"
                                                 ]
+                                            },
+                                            "cardBackgroundSource": {
+                                                "type": "integer",
+                                                "format": "int64",
+                                                "nullable": true
+                                            },
+                                            "cardTitleSource": {
+                                                "type": "integer",
+                                                "format": "int64",
+                                                "nullable": true
                                             },
                                             "filter": {
                                                 "type": "array",
