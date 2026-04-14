@@ -71,6 +71,12 @@ class PublicSharePageController extends AuthPublicShareController {
 		$this->initialState->provideInitialState('shareToken', (string)$this->shareToken);
 		$this->initialState->provideInitialState('nodeType', $this->share->getNodeType());
 		$this->initialState->provideInitialState('nodeData', $nodeData);
+		$this->initialState->provideInitialState('sharePermissions', [
+			'read' => $this->share->getPermissionRead(),
+			'create' => $this->share->getPermissionCreate(),
+			'update' => $this->share->getPermissionUpdate(),
+			'delete' => $this->share->getPermissionDelete(),
+		]);
 
 		if (class_exists(LoadEditor::class)) {
 			$this->eventDispatcher->dispatchTyped(new LoadEditor());

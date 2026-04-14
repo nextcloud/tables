@@ -178,7 +178,7 @@ class RowService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function create(?int $tableId, ?int $viewId, RowDataInput|array $data): Row2 {
-		if ($this->userId === null || $this->userId === '') {
+		if ($this->userId === null) {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -685,7 +685,7 @@ class RowService extends SuperService {
 	 * @throws PermissionError
 	 * @noinspection DuplicatedCode
 	 */
-	public function delete(int $id, ?int $viewId, string $userId): Row2 {
+	public function delete(int $id, ?int $viewId, string $userId, ?int $tableId = null): Row2 {
 		try {
 			$item = $this->getRowById($id);
 		} catch (InternalError $e) {
@@ -720,6 +720,12 @@ class RowService extends SuperService {
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
+			if ($tableId !== null && $tableId !== $item->getTableId()) {
+				$e = new \Exception('Row does not belong to table with id ' . $tableId);
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+
 			// security
 			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
 				$e = new \Exception('Row not found.');

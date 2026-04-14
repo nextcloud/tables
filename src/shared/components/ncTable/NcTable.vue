@@ -65,18 +65,19 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				</template>
 			</CustomTable>
 			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
-				:name="t('tables', 'Create rows')"
-				:description="t('tables', 'You are not allowed to read this table, but you can still create rows.')">
+				:name="emptyStateTitle"
+				:description="emptyStateDescription">
 				<template #icon>
-					<Plus :size="25" />
+					<FileDocumentEditOutline v-if="isFormMode" :size="25" />
+					<Plus v-else :size="25" />
 				</template>
 				<template #action>
-					<NcButton :aria-label="t('tables', 'Create row')" type="primary"
+					<NcButton :aria-label="emptyStateButtonLabel" type="primary"
 						@click="$emit('create-row')">
 						<template #icon>
 							<Plus :size="25" />
 						</template>
-						{{ t('tables', 'Create row') }}
+						{{ emptyStateButtonLabel }}
 					</NcButton>
 				</template>
 			</NcEmptyContent>
@@ -99,6 +100,7 @@ import exportTableMixin from './mixins/exportTableMixin.js'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Cancel from 'vue-material-design-icons/Cancel.vue'
+import FileDocumentEditOutline from 'vue-material-design-icons/FileDocumentEditOutline.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { parseCol } from './mixins/columnParser.js'
 import { AbstractColumn } from './mixins/columnClass.js'
@@ -117,7 +119,7 @@ import { getFiltersForColumn } from './mixins/filter.js'
 export default {
 	name: 'NcTable',
 
-	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus, Cancel },
+	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus, Cancel, FileDocumentEditOutline },
 
 	mixins: [exportTableMixin],
 
@@ -198,6 +200,10 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		isFormMode: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -229,6 +235,15 @@ export default {
 				return this.columns.map(col => parseCol(col))
 			}
 			return this.columns
+		},
+		emptyStateTitle() {
+			return this.isFormMode ? t('tables', 'This is a public form.') : t('tables', 'Create rows')
+		},
+		emptyStateDescription() {
+			return this.isFormMode ? t('tables', 'You can add one or more replies.') : t('tables', 'You are not allowed to read this table, but you can still create rows.')
+		},
+		emptyStateButtonLabel() {
+			return this.isFormMode ? t('tables', 'Fill form') : t('tables', 'Create row')
 		},
 
 		sorting() {
