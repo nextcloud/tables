@@ -175,7 +175,7 @@ export default {
 		this.loadValues()
 	},
 	methods: {
-		...mapActions(useDataStore, ['updateRow', 'removeRow']),
+		...mapActions(useDataStore, ['updateRow', 'removeRow', 'updatePublicRow', 'removePublicRow']),
 		...mapActions(useTablesStore, ['setActiveRowId']),
 		t,
 		loadValues() {
@@ -229,6 +229,11 @@ export default {
 				})
 			}
 
+			const token = useDataStore().publicToken
+			if (token) {
+				return await this.updatePublicRow({ token, rowId: this.row.id, data })
+			}
+
 			return await this.updateRow({
 				id: this.row.id,
 				isView: this.isView,
@@ -248,11 +253,10 @@ export default {
 			await this.loadStore()
 
 			this.localLoading = true
-			const res = await this.removeRow({
-				rowId,
-				isView: this.isView,
-				elementId: this.element.id,
-			})
+			const token = useDataStore().publicToken
+			const res = token
+				? await this.removePublicRow({ token, rowId })
+				: await this.removeRow({ rowId, isView: this.isView, elementId: this.element.id })
 			if (!res) {
 				showError(t('tables', 'Could not delete row.'))
 			}

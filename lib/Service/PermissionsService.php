@@ -45,6 +45,8 @@ class PermissionsService {
 
 	protected bool $isCli = false;
 
+	private bool $isPublicContext = false;
+
 	private ContextMapper $contextMapper;
 
 	public function __construct(
@@ -549,6 +551,11 @@ class PermissionsService {
 		);
 	}
 
+	public function setPublicContext(): void {
+		$this->userId = '';
+		$this->isPublicContext = true;
+	}
+
 	private function hasPermission(int $existingPermissions, string $permissionName): bool {
 		$constantName = 'PERMISSION_' . strtoupper($permissionName);
 		try {
@@ -634,7 +641,7 @@ class PermissionsService {
 		}
 
 		if ($userId === '') {
-			return true;
+			return $this->isCli || $this->isPublicContext;
 		}
 
 		if ($this->userIsElementOwner($element, $userId, $nodeType)) {

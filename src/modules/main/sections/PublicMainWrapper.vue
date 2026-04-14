@@ -20,6 +20,9 @@ import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
 
+const nodeData = loadState('tables', 'nodeData', null)
+const sharePermissions = loadState('tables', 'sharePermissions', null)
+
 export default {
 	name: 'PublicMainWrapper',
 
@@ -43,9 +46,8 @@ export default {
 		const stateKey = 'public-' + props.token
 		const rows = computed(() => getRows.value(false, stateKey))
 		const columns = computed(() => getColumns.value(false, stateKey))
-		const nodeData = loadState('tables', 'nodeData')
 
-		return { rows, columns, nodeData }
+		return { rows, columns }
 	},
 
 	data() {
@@ -53,33 +55,28 @@ export default {
 			loading: false,
 			publicElement: {
 				id: 'public',
-				emoji: this.nodeData.emoji,
-				title: this.nodeData.title,
-				description: this.nodeData.description,
+				emoji: nodeData.emoji,
+				title: nodeData.title,
+				description: nodeData.description,
 				isShared: false, // Setting as false to hide the user bubble
 				onSharePermissions: {
-					read: true,
+					read: sharePermissions.read,
+					create: sharePermissions.create,
+					update: sharePermissions.update,
+					delete: sharePermissions.delete,
 					manage: false,
-					share: false,
-					update: false,
-					create: false,
-					delete: false,
 				},
-				permissionDelete: false,
-				permissionManage: false,
-				permissionShare: false,
-				permissionUpdate: false,
-				permissionCreate: false,
 			},
 		}
 	},
 
 	beforeMount() {
+		this.setPublicToken(this.token)
 		this.loadData()
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE']),
+		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'setPublicToken']),
 
 		async loadData() {
 			this.loading = true

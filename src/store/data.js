@@ -22,6 +22,7 @@ export const useDataStore = defineStore('data', {
 		loading: {},
 		rows: {},
 		columns: {},
+		publicToken: null,
 	}),
 
 	getters: {
@@ -40,6 +41,11 @@ export const useDataStore = defineStore('data', {
 			this.loading = {}
 			this.columns = {}
 			this.rows = {}
+			this.publicToken = null
+		},
+
+		setPublicToken(token) {
+			this.publicToken = token
 		},
 
 		// COLUMNS
@@ -211,7 +217,6 @@ export const useDataStore = defineStore('data', {
 			try {
 				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows'))
 			} catch (e) {
-				displayError(e, t('tables', 'Could not load rows.'))
 				return false
 			}
 
@@ -253,6 +258,23 @@ export const useDataStore = defineStore('data', {
 			return true
 		},
 
+		async updatePublicRow({ token, rowId, data }) {
+			let res = null
+			try {
+				res = await axios.put(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows/' + rowId), { data })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update row.'))
+				return false
+			}
+			const stateId = 'public-' + token
+			if (this.rows[stateId]) {
+				const row = res?.data?.ocs?.data
+				const index = this.rows[stateId].findIndex(r => r.id === rowId)
+				set(this.rows[stateId], index, row)
+			}
+			return true
+		},
+
 		async insertNewRow({ viewId, tableId, data }) {
 			let res = null
 
@@ -271,6 +293,26 @@ export const useDataStore = defineStore('data', {
 				const newIndex = this.rows[stateId].length
 				set(this.rows[stateId], newIndex, row)
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
+			}
+
+			return true
+		},
+
+		async insertPublicRow({ token, data }) {
+			let res = null
+
+			try {
+				res = await axios.post(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows'), { data })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not insert row.'))
+				return false
+			}
+
+			const stateId = 'public-' + token
+			if (this.rows[stateId]) {
+				const row = res?.data?.ocs?.data
+				const newIndex = this.rows[stateId].length
+				set(this.rows[stateId], newIndex, row)
 			}
 
 			return true
@@ -296,6 +338,21 @@ export const useDataStore = defineStore('data', {
 
 			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.rows[stateId]) {
+				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
+				set(this.rows, stateId, filteredRows)
+			}
+			return true
+		},
+
+		async removePublicRow({ token, rowId }) {
+			try {
+				await axios.delete(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows/' + rowId))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove row.'))
+				return false
+			}
+			const stateId = 'public-' + token
+			if (this.rows[stateId]) {
 				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
 				set(this.rows, stateId, filteredRows)
 			}

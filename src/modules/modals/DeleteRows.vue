@@ -40,17 +40,20 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		token: {
+			type: String,
+			default: null,
+		},
 	},
 	methods: {
-		...mapActions(useDataStore, ['removeRow']),
+		...mapActions(useDataStore, ['removeRow', 'removePublicRow']),
 		deleteRows() {
+			const token = useDataStore().publicToken
 			let error = false
 			this.rowsToDelete.forEach(rowId => {
-				const res = this.removeRow({
-					rowId,
-					isView: this.isView,
-					elementId: this.elementId,
-				})
+				const res = token
+					? this.removePublicRow({ token, rowId })
+					: this.removeRow({ rowId, isView: this.isView, elementId: this.elementId })
 				if (!res) {
 					error = true
 				}

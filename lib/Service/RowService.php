@@ -175,7 +175,7 @@ class RowService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function create(?int $tableId, ?int $viewId, RowDataInput|array $data): Row2 {
-		if ($this->userId === null || $this->userId === '') {
+		if ($this->userId === null) {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());

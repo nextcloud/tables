@@ -12,7 +12,7 @@
 				:shares="linkShares"
 				@create-link-share="onCreateLinkShare"
 				@delete-share="removeShare"
-				@update-share="updateShare" />
+				@update-share-permissions="updateSharePermissions" />
 		</div>
 	</div>
 </template>
@@ -121,6 +121,12 @@ export default {
 			const shareId = data.id
 			delete data.id
 			await this.updateShareToBE(shareId, data)
+			await this.loadSharesFromBE()
+		},
+		async updateSharePermissions(data) {
+			const shareId = data.id
+			delete data.id
+			await this.updateSharePermissionsToBE(shareId, data)
 			await this.loadSharesFromBE()
 		},
 		async onCreateLinkShare(password) {
