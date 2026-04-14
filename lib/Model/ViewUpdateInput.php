@@ -29,6 +29,9 @@ class ViewUpdateInput {
 		protected readonly ?ColumnSettings $columnSettings = null,
 		protected readonly ?FilterSet $filterSet = null,
 		protected readonly ?SortRuleSet $sortRuleSet = null,
+		protected readonly ?string $layout = null,
+		protected readonly ?int $cardBackgroundSource = null,
+		protected readonly ?int $cardTitleSource = null,
 	) {
 	}
 
@@ -51,6 +54,15 @@ class ViewUpdateInput {
 		if ($this->sortRuleSet) {
 			yield ViewUpdatableParameters::SORT => $this->sortRuleSet;
 		}
+		if ($this->layout !== null) {
+			yield ViewUpdatableParameters::LAYOUT => $this->layout;
+		}
+		if ($this->cardBackgroundSource !== null) {
+			yield ViewUpdatableParameters::CARD_BACKGROUND_SOURCE => $this->cardBackgroundSource;
+		}
+		if ($this->cardTitleSource !== null) {
+			yield ViewUpdatableParameters::CARD_TITLE_SOURCE => $this->cardTitleSource;
+		}
 	}
 
 	/**
@@ -61,6 +73,9 @@ class ViewUpdateInput {
 	 *     columns?: list<int>,
 	 *     columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
+	 *     layout?: 'table'|'tiles'|'gallery'|null,
+	 *     cardBackgroundSource?: int|null,
+	 *     cardTitleSource?: int|null,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 * } $data
 	 */
@@ -80,6 +95,8 @@ class ViewUpdateInput {
 			$data['columnSettings'] = $value;
 		}
 
+		$layout = self::normalizeLayout($data['layout'] ?? null);
+
 		return new self(
 			title: $data['title'] ? new Title($data['title']) : null,
 			description: $data['description'] ?? null,
@@ -87,7 +104,27 @@ class ViewUpdateInput {
 			columnSettings: $data['columnSettings'] ? ColumnSettings::createFromInputArray($data['columnSettings']) : null,
 			filterSet: $data['filter'] ? FilterSet::createFromInputArray($data['filter']) : null,
 			sortRuleSet: $data['sort'] ? SortRuleSet::createFromInputArray($data['sort']) : null,
+			layout: $layout,
+			cardBackgroundSource: array_key_exists('cardBackgroundSource', $data) && $data['cardBackgroundSource'] !== null ? (int)$data['cardBackgroundSource'] : null,
+			cardTitleSource: array_key_exists('cardTitleSource', $data) && $data['cardTitleSource'] !== null ? (int)$data['cardTitleSource'] : null,
 		);
+	}
+
+
+	private static function normalizeLayout(mixed $layout): ?string {
+		if ($layout === null || $layout === '') {
+			return null;
+		}
+
+		if (!is_string($layout)) {
+			throw new \InvalidArgumentException('Invalid layout value.');
+		}
+
+		if (!in_array($layout, ['table', 'tiles', 'gallery'], true)) {
+			throw new \InvalidArgumentException('Invalid layout value.');
+		}
+
+		return $layout;
 	}
 
 	protected static function transformJsonToArrayInPayload(array $input, array $keys): array {

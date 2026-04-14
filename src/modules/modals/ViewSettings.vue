@@ -53,6 +53,48 @@
 				:generated-filters="viewSetting ? generatedView.filter : null"
 				:columns="allColumns" />
 		</NcAppSettingsSection>
+
+		<NcAppSettingsSection v-if="columns != null" id="layout" :name="t('tables', 'Layout')">
+			<table class="layout-options" role="presentation">
+				<tbody>
+					<tr class="layout-options__selection">
+						<td colspan="3">
+							<NcRadioGroup v-model="layout" :label="t('tables', 'Layout')" hide-label>
+								<NcRadioGroupButton :label="t('tables', 'Table')" value="table" data-cy="viewLayoutTable" />
+								<NcRadioGroupButton :label="t('tables', 'Tile')" value="tiles" data-cy="viewLayoutTiles" />
+								<NcRadioGroupButton :label="t('tables', 'Gallery')" value="gallery" data-cy="viewLayoutGallery" />
+							</NcRadioGroup>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="layout-source-settings">
+				<div class="layout-source-settings__item">
+					<div class="layout-source-settings__label">
+						{{ t('tables', 'Background source') }}
+					</div>
+					<NcSelect
+						v-model="backgroundSourceValue"
+						:options="cardSourceOptions"
+						:clearable="false"
+						label="title"
+						:reduce="option => option.id"
+						:aria-label-combobox="t('tables', 'Background source')" />
+				</div>
+				<div class="layout-source-settings__item">
+					<div class="layout-source-settings__label">
+						{{ t('tables', 'Title source') }}
+					</div>
+					<NcSelect
+						v-model="titleSourceValue"
+						:options="cardSourceOptions"
+						:clearable="false"
+						label="title"
+						:reduce="option => option.id"
+						:aria-label-combobox="t('tables', 'Title source')" />
+				</div>
+			</div>
+		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null" id="sort" :name="t('tables', 'Sort')">
 			<SortForm
@@ -78,7 +120,7 @@
 </template>
 
 <script>
-import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcRadioGroup, NcRadioGroupButton, NcSelect } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
@@ -98,6 +140,9 @@ export default {
 		NcAppSettingsSection,
 		NcEmojiPicker,
 		NcButton,
+		NcRadioGroup,
+		NcRadioGroupButton,
+		NcSelect,
 		FilterForm,
 		SelectedViewColumns,
 		SortForm,
@@ -130,6 +175,7 @@ export default {
 			title: '',
 			description: '',
 			icon: '',
+			layout: 'table',
 			errorTitle: false,
 			selectedColumns: [],
 			allColumns: [],
@@ -149,6 +195,28 @@ export default {
 			},
 			set(filters) {
 				this.mutableView.filter = filters
+			},
+		},
+		cardSourceOptions() {
+			return this.columns?.map(column => ({
+				id: column.id,
+				title: column.title,
+			})) ?? []
+		},
+		backgroundSourceValue: {
+			get() {
+				return this.mutableView?.cardBackgroundSource ?? this.columns?.[0]?.id ?? null
+			},
+			set(value) {
+				this.$set(this.mutableView, 'cardBackgroundSource', value ?? null)
+			},
+		},
+		titleSourceValue: {
+			get() {
+				return this.mutableView?.cardTitleSource ?? this.columns?.[1]?.id ?? this.columns?.[0]?.id ?? null
+			},
+			set(value) {
+				this.$set(this.mutableView, 'cardTitleSource', value ?? null)
 			},
 		},
 		saveText() {
@@ -173,6 +241,7 @@ export default {
 					mergedViewSettings.columnSettings = this.view.columnSettings
 				}
 			}
+			mergedViewSettings.layout = this.view.layout ?? 'table'
 			if (this.viewSetting.sorting) {
 				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
 			} else {
@@ -294,6 +363,7 @@ export default {
 				title: this.title,
 				description: this.description,
 				emoji: this.icon,
+				layout: this.layout,
 			}
 			const res = await this.insertNewView({ data })
 			if (res) {
@@ -316,7 +386,10 @@ export default {
 					title: this.title,
 					description: this.description,
 					emoji: this.icon,
+					layout: this.layout,
 					columnSettings: JSON.stringify(newColumnSettings),
+					cardBackgroundSource: this.mutableView.cardBackgroundSource,
+					cardTitleSource: this.mutableView.cardTitleSource,
 				},
 			}
 			// Update sorting rules if they don't contain hidden rules (= rules regarding rows the user can not see) that were not overwritten
@@ -344,6 +417,9 @@ export default {
 			this.title = this.mutableView.title ?? ''
 			this.description = this.mutableView.description ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
+			this.layout = this.mutableView.layout ?? 'table'
+			this.$set(this.mutableView, 'cardBackgroundSource', this.mutableView.cardBackgroundSource ?? this.viewSetting?.cardBackgroundSource ?? this.mutableView.columnSettings?.[0]?.columnId ?? null)
+			this.$set(this.mutableView, 'cardTitleSource', this.mutableView.cardTitleSource ?? this.viewSetting?.cardTitleSource ?? this.mutableView.columnSettings?.[1]?.columnId ?? this.mutableView.columnSettings?.[0]?.columnId ?? null)
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
@@ -374,6 +450,39 @@ export default {
 :deep(.element-description) {
 	padding-inline: 0 !important;
 	max-width: 100%;
+}
+
+.layout-options {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: separate;
+	border-spacing: 12px 8px;
+}
+
+.layout-options td {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.layout-options__selection :deep(.checkbox-radio-switch) {
+	display: inline-flex;
+}
+
+.layout-source-settings {
+	display: grid;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.layout-source-settings__label {
+	margin-bottom: 6px;
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
+}
+
+.layout-options__title td {
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
 }
 
 .sticky {

@@ -863,6 +863,9 @@
                     "columnSettings",
                     "sort",
                     "filter",
+                    "layout",
+                    "cardBackgroundSource",
+                    "cardTitleSource",
                     "isShared",
                     "favorite",
                     "onSharePermissions",
@@ -1012,6 +1015,24 @@
                                 }
                             }
                         }
+                    },
+                    "layout": {
+                        "type": "string",
+                        "enum": [
+                            "table",
+                            "tiles",
+                            "gallery"
+                        ]
+                    },
+                    "cardBackgroundSource": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "cardTitleSource": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
                     },
                     "isShared": {
                         "type": "boolean"
@@ -1834,6 +1855,12 @@
                                         "type": "string",
                                         "nullable": true,
                                         "description": "Emoji for the view"
+                                    },
+                                    "layout": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Layout for the view with 'table', 'tiles', 'gallery' or null"
                                     }
                                 }
                             }
@@ -2134,6 +2161,25 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            "layout": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "enum": [
+                                                    "table",
+                                                    "tiles",
+                                                    "gallery"
+                                                ]
+                                            },
+                                            "cardBackgroundSource": {
+                                                "type": "integer",
+                                                "format": "int64",
+                                                "nullable": true
+                                            },
+                                            "cardTitleSource": {
+                                                "type": "integer",
+                                                "format": "int64",
+                                                "nullable": true
                                             },
                                             "filter": {
                                                 "type": "array",
