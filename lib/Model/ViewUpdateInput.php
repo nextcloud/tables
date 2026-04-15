@@ -81,12 +81,12 @@ class ViewUpdateInput {
 		}
 
 		return new self(
-			title: $data['title'] ? new Title($data['title']) : null,
+			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
 			description: $data['description'] ?? null,
-			emoji: $data['emoji'] ? new Emoji($data['emoji']) : null,
-			columnSettings: $data['columnSettings'] ? ColumnSettings::createFromInputArray($data['columnSettings']) : null,
-			filterSet: $data['filter'] ? FilterSet::createFromInputArray($data['filter']) : null,
-			sortRuleSet: $data['sort'] ? SortRuleSet::createFromInputArray($data['sort']) : null,
+			emoji: ($data['emoji'] ?? null) ? new Emoji($data['emoji']) : null,
+			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createFromInputArray($data['columnSettings']) : null,
+			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter']) : null,
+			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort']) : null,
 		);
 	}
 
