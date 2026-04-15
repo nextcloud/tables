@@ -133,7 +133,7 @@ export default {
 				this.clearState()
 
 				this.viewSetting = {}
-				if (this.isView && this.element?.sort?.length) {
+				if (this.element?.sort?.length) {
 					this.viewSetting.presetSorting = [...this.element.sort]
 				}
 

@@ -91,7 +91,7 @@ export const useDataStore = defineStore('data', {
 					})
 				}
 			} else {
-				allColumns = allColumns.sort((a, b) => a.id - b.id)
+				// no view: keep the backend-ordered result (ColumnService::findAllByTable already applies columnOrder)
 			}
 			const stateId = genStateKey(!!(view?.id), view?.id ?? tableId)
 			set(this.columns, stateId, allColumns)
