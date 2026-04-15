@@ -135,18 +135,16 @@ export const Filters = {
 }
 
 export function getFiltersForColumn(column, viewSetting) {
-	const filters = viewSetting.filter?.filter(item => {
-		if (item.columnId !== column.id) {
+	const filters = viewSetting?.filter?.filter(filter => {
+		if (filter.columnId !== column.id) {
 			return false
 		}
 
-		if (item.operator.id === FilterIds.ContainsItem) {
-			return item.value.length > 0
+		if (filter.operator.id === FilterIds.ContainsItem) {
+			return filter.value.length > 0
 		}
 
 		return true
 	})
-	if (filters?.length > 0) {
-		return filters
-	}
+	return filters?.length > 0 ? filters : []
 }

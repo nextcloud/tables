@@ -98,7 +98,7 @@ import {
 import { MetaColumns } from '../mixins/metaColumns.js'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../store/store.js'
-import { getFiltersForColumn } from '../mixins/filter.js'
+import { FilterIds, getFiltersForColumn } from '../mixins/filter.js'
 
 export default {
 	name: 'CustomTable',
