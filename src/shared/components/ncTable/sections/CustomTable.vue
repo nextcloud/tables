@@ -98,7 +98,7 @@ import {
 import { MetaColumns } from '../mixins/metaColumns.js'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../store/store.js'
-import { getFiltersForColumn } from '../mixins/filter.js'
+import { FilterIds, getFiltersForColumn } from '../mixins/filter.js'
 
 export default {
 	name: 'CustomTable',
@@ -347,6 +347,10 @@ export default {
 	methods: {
 		t,
 		addMagicFieldsValues(filter) {
+			if (FilterIds.ContainsItem === filter.operator.id) {
+				return
+			}
+
 			Object.values(MagicFields).forEach(field => {
 				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
 				if (filter.value !== newFilterValue) {
