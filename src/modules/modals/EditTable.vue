@@ -39,7 +39,7 @@
 				:columns="tableColumns"
 				@update:columnSettings="localColumnSettings = $event" />
 		</NcAppSettingsSection>
-		<NcAppSettingsSection id="default-sort" :name="t('tables', 'Default sort')">
+		<NcAppSettingsSection id="default-sort" :name="t('tables', 'Default sorting')">
 			<DefaultSortRules
 				:columns="tableColumns"
 				:sort-rules="localSortRules"
