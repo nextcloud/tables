@@ -83,7 +83,7 @@ export default {
 
 	computed: {
 		totalPages() {
-			return Math.ceil(this.rows.length / this.rowsPerPage)
+			return Math.max(1, Math.ceil(this.rows.length / this.rowsPerPage))
 		},
 	},
 
