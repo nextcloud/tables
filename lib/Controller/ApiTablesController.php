@@ -181,6 +181,7 @@ class ApiTablesController extends AOCSController {
 					$view['emoji'],
 					$table,
 					$this->userId,
+					$view['description'] ?? null,
 				);
 
 				$inputColumnsArray = [];

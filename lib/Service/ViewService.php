@@ -189,11 +189,12 @@ class ViewService extends SuperService {
 	 * @param string|null $emoji
 	 * @param Table $table
 	 * @param string|null $userId
+	 * @param string|null $description
 	 * @return View
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null): View {
+	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null, ?string $description = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -208,7 +209,7 @@ class ViewService extends SuperService {
 		if ($emoji) {
 			$item->setEmoji($emoji);
 		}
-		$item->setDescription('');
+		$item->setDescription($description ?? '');
 		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
