@@ -13,8 +13,11 @@
 				:can-edit-columns="false" :can-delete-columns="false" :can-delete-table="false">
 				<template #actions>
 					<NcActions :force-menu="true" type="tertiary">
-						<NcActionButton :close-after-click="true" icon="icon-download" data-cy="dataTableExportBtn"
+						<NcActionButton :close-after-click="true" data-cy="dataTableExportBtn"
 							@click="$emit('download-csv')">
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
 							{{ t('tables', 'Export as CSV') }}
 						</NcActionButton>
 					</NcActions>
@@ -30,11 +33,13 @@ import EmptyView from './EmptyView.vue'
 import TableDescription from './TableDescription.vue'
 import ElementTitle from './ElementTitle.vue'
 import { NcActions, NcActionButton } from '@nextcloud/vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 
 export default {
 	name: 'PublicElement',
 	components: {
 		EmptyView,
+		TrayArrowDown,
 		TableView,
 		NcActions,
 		NcActionButton,
