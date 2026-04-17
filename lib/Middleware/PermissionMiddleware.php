@@ -36,7 +36,7 @@ class PermissionMiddleware extends Middleware {
 		PermissionsService $permissionsService,
 		IRequest $request,
 		?string $userId,
-		contextService $contextService,
+		ContextService $contextService,
 	) {
 
 		$this->reflector = $reflector;
@@ -80,16 +80,7 @@ class PermissionMiddleware extends Middleware {
 		}
 		$nodeId = (int)$nodeId;
 
-		$nodeType = $attribute->getType();
-		if (null === $nodeType) {
-			$typeParam = $attribute->getTypeParam();
-			$requestValue = null !== $typeParam ? $this->request->getParam($typeParam) : null;
-			if (null !== $requestValue) {
-				$nodeType = $requestValue;
-			} else {
-				$nodeType = $typeParam;
-			}
-		}
+		$nodeType = $attribute->getType() ?? $this->request->getParam($attribute->getTypeParam()) ?? $attribute->getTypeParam();
 		$isContext = false;
 		if (!is_numeric($nodeType)) {
 			if ($nodeType === 'context') {
@@ -123,6 +114,7 @@ class PermissionMiddleware extends Middleware {
 		match ($attribute->getPermission()) {
 			Application::PERMISSION_READ => true, // this is guaranteed in the pre-test ^
 			Application::PERMISSION_MANAGE => $this->assertManagePermission($isContext, $nodeType, $nodeId),
+			Application::PERMISSION_OWNER => $this->assertOwnerPermission($isContext, $nodeType, $nodeId),
 			Application::PERMISSION_CREATE => $this->assertCreatePermissions($nodeType, $nodeId),
 			Application::PERMISSION_UPDATE => $this->assertUpdatePermissions($nodeType, $nodeId),
 			Application::PERMISSION_DELETE => $this->assertDeletePermissions($nodeType, $nodeId),
@@ -186,10 +178,30 @@ class PermissionMiddleware extends Middleware {
 				));
 			}
 		} else {
-			$context = $this->contextService->findById($nodeId, $this->userId);
-			if ($context->getOwnerId() !== $this->userId || !$this->permissionsService->canManageContextById($nodeId, $this->userId)) {
+			if (!$this->permissionsService->canManageContextById($nodeId, $this->userId)) {
 				throw new PermissionError(sprintf('User %s cannot manage context %d',
 					$this->userId, $nodeId
+				));
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @throws PermissionError
+	 */
+	private function assertOwnerPermission(bool $isContext, int $nodeType, int $nodeId): bool {
+		if ($isContext) {
+			$context = $this->contextService->findById($nodeId, $this->userId);
+			if ($context->getOwnerId() !== $this->userId) {
+				throw new PermissionError(sprintf('User %s is not the owner of context %d',
+					$this->userId, $nodeId
+				));
+			}
+		} else {
+			if (!$this->permissionsService->isNodeOwnerById($nodeType, $nodeId, $this->userId)) {
+				throw new PermissionError(sprintf('User %s is not the owner of node %d (type %d)',
+					$this->userId, $nodeId, $nodeType
 				));
 			}
 		}

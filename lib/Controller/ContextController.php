@@ -229,7 +229,7 @@ class ContextController extends AOCSController {
 	 * @psalm-param int<0, 0> $newOwnerType
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
+	#[RequirePermission(Application::PERMISSION_OWNER, null, 'context', 'contextId')]
 	public function transfer(int $contextId, string $newOwnerId, int $newOwnerType = 0): DataResponse {
 		try {
 			return new DataResponse($this->contextService->transfer($contextId, $newOwnerId, $newOwnerType)->jsonSerialize());
