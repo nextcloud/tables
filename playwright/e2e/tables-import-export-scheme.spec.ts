@@ -258,6 +258,7 @@ test.describe('Import Export Scheme', () => {
 			'createdByDisplayName',
 			'lastEditBy',
 			'lastEditByDisplayName',
+			'technicalName',
 		]
 
 		const todoListItem = page

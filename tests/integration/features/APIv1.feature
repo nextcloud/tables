@@ -522,3 +522,23 @@ Feature: APIv1
     Then view "general-tasks" has exactly the following rows
       | task             |
       | New general task |
+
+  @api1 @columns @rows
+  Scenario: Column technicalName is returned and dataByAlias maps alias to row values
+    Given table "Alias test" with emoji "🔖" exists for user "participant1" as "base1"
+    Then column "name" exists with following properties
+      | type          | text        |
+      | subtype       | line        |
+      | mandatory     | 0           |
+      | technicalName | name        |
+    Then column "score" exists with following properties
+      | type          | number      |
+      | mandatory     | 0           |
+      | technicalName | score       |
+    Then row exists with following values
+      | name  | check1 |
+      | score | 42    |
+    Then the last created row has the following dataByAlias
+      | name  | check1 |
+      | score | 42    |
+    Then user "participant1" deletes table with keyword "Alias test"
