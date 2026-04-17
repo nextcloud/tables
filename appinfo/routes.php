@@ -62,6 +62,9 @@ return [
 		['name' => 'api1#deleteRowByView',	'url' => '/api/1/views/{viewId}/rows/{rowId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'PUT'],
 		['name' => 'api1#deleteRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'DELETE'],
+		// -> relations
+		['name' => 'api1#getRelations', 'url' => '/api/1/relations/{columnId}/{rowId}', 'verb' => 'GET'],
+		['name' => 'api1#setRelations', 'url' => '/api/1/relations/{columnId}/{rowId}', 'verb' => 'PUT'],
 		// -> import
 		['name' => 'api1#importInTable', 'url' => '/api/1/import/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'api1#importInView', 'url' => '/api/1/import/views/{viewId}', 'verb' => 'POST'],
@@ -135,6 +138,7 @@ return [
 		['name' => 'ApiColumns#createSelectionColumn', 'url' => '/api/2/columns/selection', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createDatetimeColumn', 'url' => '/api/2/columns/datetime', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createUsergroupColumn', 'url' => '/api/2/columns/usergroup', 'verb' => 'POST'],
+		['name' => 'ApiColumns#createRelationColumn', 'url' => '/api/2/columns/relation', 'verb' => 'POST'],
 
 		['name' => 'ApiFavorite#create', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'POST', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
 		['name' => 'ApiFavorite#destroy', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'DELETE', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],

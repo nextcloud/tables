@@ -55,13 +55,13 @@ export const Filters = {
 	Contains: new Filter({
 		id: FilterIds.Contains,
 		label: t('tables', 'Contains'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.DoesNotContain, FilterIds.IsEmpty, FilterIds.IsEqual],
 	}),
 	DoesNotContain: new Filter({
 		id: FilterIds.DoesNotContain,
 		label: t('tables', 'Does not contain'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.Contains, FilterIds.IsEmpty, FilterIds.IsEqual],
 	}),
 	BeginsWith: new Filter({
@@ -121,7 +121,7 @@ export const Filters = {
 	IsEmpty: new Filter({
 		id: FilterIds.IsEmpty,
 		label: t('tables', 'Is empty'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.SelectionCheck, ColumnTypes.Usergroup],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.SelectionCheck, ColumnTypes.Usergroup, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.Contains, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual, FilterIds.IsEmpty],
 		noSearchValue: true,
 	}),

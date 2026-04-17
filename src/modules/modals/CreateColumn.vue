@@ -113,6 +113,7 @@ import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
+import RelationForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationForm.vue'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
@@ -139,6 +140,7 @@ export default {
 		SelectionForm,
 		SelectionMultiForm,
 		UsergroupForm,
+		RelationForm,
 	},
 	props: {
 		showModal: {
@@ -190,6 +192,11 @@ export default {
 				usergroupSelectGroups: false,
 				usergroupSelectTeams: false,
 				showUserStatus: false,
+				relationTableId: null,
+				relationMultiple: false,
+				relationType: 'many-to-many',
+				relationDisplayColumnId: null,
+				relationTargetColumnId: null,
 				customSettings: {},
 			},
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
@@ -209,6 +216,7 @@ export default {
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
 				{ id: 'usergroup', label: t('tables', 'Users and groups') },
+				{ id: 'relation', label: t('tables', 'Relation') },
 			],
 		}
 	},
@@ -357,6 +365,12 @@ export default {
 				data.usergroupSelectGroups = this.column.usergroupSelectGroups
 				data.usergroupSelectTeams = this.column.usergroupSelectTeams
 				data.showUserStatus = this.column.showUserStatus
+			} else if (this.column.type === 'relation') {
+				data.relationTableId = this.column.relationTableId
+				data.relationMultiple = this.column.relationMultiple
+				data.relationType = this.column.relationType
+				data.relationDisplayColumnId = this.column.relationDisplayColumnId
+				data.relationTargetColumnId = this.column.relationTargetColumnId
 			} else if (this.column.type === 'number') {
 				data.numberDefault = this.column.numberDefault
 				if (this.column.subtype === '') {
@@ -420,6 +434,11 @@ export default {
 				usergroupSelectGroups: false,
 				usergroupSelectTeams: false,
 				showUserStatus: false,
+				relationTableId: null,
+				relationMultiple: false,
+				relationType: 'many-to-many',
+				relationDisplayColumnId: null,
+				relationTargetColumnId: null,
 				customSettings: {},
 			}
 			if (mainForm) {
