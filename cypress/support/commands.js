@@ -151,7 +151,7 @@ Cypress.Commands.add('openContextEditModal', (title) => {
 
 Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
 	cy.get('[data-cy="customTableAction"] button').click()
-	cy.get('[data-cy="dataTableExportBtn"]').contains(optionName).click({ force: true })
+	cy.get('.v-popper__popper button, [role="menuitem"]').contains(optionName).click({ force: true })
 })
 
 Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {

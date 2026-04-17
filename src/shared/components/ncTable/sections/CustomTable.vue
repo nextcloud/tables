@@ -327,6 +327,9 @@ export default {
 		viewSetting() {
 			this.localViewSetting = this.viewSetting
 		},
+		getSearchedAndFilteredAndSortedRows(rows) {
+			this.$emit('update:filteredRows', rows)
+		},
 	},
 
 	updated() {
@@ -338,6 +341,7 @@ export default {
 	mounted() {
 		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		subscribe('tables:row:animate', this.enableRowAnimation)
+		this.$emit('update:filteredRows', this.getSearchedAndFilteredAndSortedRows)
 	},
 	beforeDestroy() {
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))

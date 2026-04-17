@@ -25,8 +25,8 @@
 		@create-row="createRow"
 		@edit-row="editRow"
 		@delete-selected-rows="deleteSelectedRows">
-		<template #actions>
-			<slot name="actions" />
+		<template #actions="slotProps">
+			<slot name="actions" v-bind="slotProps" />
 		</template>
 	</NcTable>
 </template>

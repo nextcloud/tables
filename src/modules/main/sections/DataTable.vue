@@ -45,10 +45,13 @@
 							</template>
 							{{ t('tables', 'Import') }}
 						</NcActionButton>
-						<NcActionButton v-if="canReadData(table)" :close-after-click="true"
-							icon="icon-download"
+						<NcActionButton v-if="canReadData(table)"
+							:close-after-click="true"
 							@click="$emit('download-csv')">
-							{{ t('tables', 'Export as CSV') }}
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export all rows') }}
 						</NcActionButton>
 						<NcActionButton v-if="canShareElement(table)"
 							:close-after-click="true"
@@ -85,7 +88,7 @@
 				:can-edit-columns="canManageTable(table)"
 				:can-delete-columns="canManageTable(table)"
 				:can-delete-table="canManageTable(table)">
-				<template #actions>
+				<template #actions="{ isFiltered, onExportFiltered }">
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 						<NcActionCaption v-if="canManageElement(table)" :name="t('tables', 'Manage table')" />
 						<NcActionButton v-if="canManageElement(table)"
@@ -115,16 +118,29 @@
 						<NcActionCaption :name="t('tables', 'Integration')" />
 						<NcActionButton v-if="canCreateRowInElement(table)"
 							:close-after-click="true"
-							data-cy="dataTableExportBtn" @click="$emit('import', table)">
+							data-cy="dataTableImportBtn" @click="$emit('import', table)">
 							<template #icon>
 								<Import :size="20" decorative title="Import" />
 							</template>
 							{{ t('tables', 'Import') }}
 						</NcActionButton>
-						<NcActionButton v-if="canReadData(table)" :close-after-click="true"
-							icon="icon-download"
-							data-cy="dataTableExportBtn" @click="$emit('download-csv')">
-							{{ t('tables', 'Export as CSV') }}
+						<NcActionButton v-if="canReadData(table)"
+							:close-after-click="true"
+							data-cy="dataTableExportAllBtn"
+							@click="$emit('download-csv')">
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export all rows') }}
+						</NcActionButton>
+						<NcActionButton v-if="canReadData(table) && isFiltered"
+							:close-after-click="true"
+							data-cy="dataTableExportFilteredBtn"
+							@click="onExportFiltered">
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export filtered rows') }}
 						</NcActionButton>
 						<NcActionButton v-if="canShareElement(table)"
 							data-cy="dataTableShareBtn"
@@ -157,6 +173,7 @@ import IconTool from 'vue-material-design-icons/TableCog.vue'
 import TableView from '../partials/TableView.vue'
 import EmptyTable from './EmptyTable.vue'
 import Connection from 'vue-material-design-icons/Connection.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import { NcActionButton, NcActions, NcActionCaption } from '@nextcloud/vue'
 import { mapState } from 'pinia'
@@ -169,6 +186,7 @@ export default {
 		TableView,
 		NcActionButton,
 		Connection,
+		TrayArrowDown,
 		NcActionCaption,
 		NcActions,
 		TableColumnPlusAfter,
