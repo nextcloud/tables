@@ -67,7 +67,7 @@ async function openTableActionsMenu(page: Page) {
 
 	const menuButton = page.locator('[data-cy="customTableAction"] button').first()
 	const anyMenuAction = page.locator(
-		'[data-cy="dataTableEditTableBtn"], [data-cy="dataTableCreateViewBtn"], [data-cy="dataTableCreateColumnBtn"], [data-cy="dataTableShareBtn"], [data-cy="dataTableExportBtn"]',
+		'[data-cy="dataTableEditTableBtn"], [data-cy="dataTableCreateViewBtn"], [data-cy="dataTableCreateColumnBtn"], [data-cy="dataTableShareBtn"], [data-cy="dataTableExportAllBtn"]',
 	)
 
 	for (let attempt = 1; attempt <= 3; attempt++) {
@@ -97,9 +97,11 @@ function getTableActionLocator(page: Page, optionName: string) {
 	case 'Share':
 		return page.locator('[data-cy="dataTableShareBtn"]')
 	case 'Import':
-		return page.locator('[data-cy="dataTableExportBtn"]').filter({ hasText: /^Import$/ })
-	case 'Export as CSV':
-		return page.locator('[data-cy="dataTableExportBtn"]').filter({ hasText: /^Export as CSV$/ })
+		return page.locator('[data-cy="dataTableImportBtn"]')
+	case 'Export all rows':
+		return page.locator('[data-cy="dataTableExportAllBtn"]')
+	case 'Export filtered rows':
+		return page.locator('[data-cy="dataTableExportFilteredBtn"]')
 	default:
 		return null
 	}
