@@ -20,8 +20,11 @@
 				:is-form-mode="isFormMode">
 				<template #actions>
 					<NcActions :force-menu="true" type="tertiary">
-						<NcActionButton :close-after-click="true" icon="icon-download" data-cy="dataTableExportBtn"
+						<NcActionButton :close-after-click="true" data-cy="dataTableExportBtn"
 							@click="$emit('download-csv')">
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
 							{{ t('tables', 'Export as CSV') }}
 						</NcActionButton>
 					</NcActions>
@@ -62,6 +65,7 @@ import CreateRow from '../../modals/CreateRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import EditRow from '../../modals/EditRow.vue'
 import DeleteRows from '../../modals/DeleteRows.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 
 export default {
 	name: 'PublicElement',
@@ -70,6 +74,7 @@ export default {
 		DeleteRows,
 		EditRow,
 		EmptyView,
+		TrayArrowDown,
 		TableView,
 		NcActions,
 		NcActionButton,

@@ -32,11 +32,17 @@
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
 				</div>
 				<NcActions type="secondary" :force-name="true" :inline="showFullOptions ? 2 : 0">
-					<NcActionButton close-after-click @click="exportCsv">
+					<NcActionButton close-after-click data-cy="exportSelectedBtn" @click="exportSelected">
 						<template #icon>
-							<Export :size="20" />
+							<TrayArrowDown :size="20" />
 						</template>
-						{{ t('tables', 'Export CSV') }}
+						{{ t('tables', 'Export selected rows') }}
+					</NcActionButton>
+					<NcActionButton v-if="isFiltered" close-after-click data-cy="exportFilteredBtn" @click="exportFiltered">
+						<template #icon>
+							<TrayArrowDown :size="20" />
+						</template>
+						{{ t('tables', 'Export filtered rows') }}
 					</NcActionButton>
 					<NcActionButton v-if="config.canDeleteRows" close-after-click @click="deleteSelectedRows">
 						<template #icon>
@@ -63,11 +69,11 @@ import { emit } from '@nextcloud/event-bus'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
-import Export from 'vue-material-design-icons/Export.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
 import PaginationBlock from './PaginationBlock.vue'
-import { translate as t } from '@nextcloud/l10n'
+import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 
 export default {
 	name: 'Options',
@@ -80,7 +86,7 @@ export default {
 		Plus,
 		Check,
 		Delete,
-		Export,
+		TrayArrowDown,
 		PaginationBlock,
 	},
 
@@ -115,6 +121,10 @@ export default {
 			type: Array,
 			default: null,
 		},
+		filteredRows: {
+			type: Array,
+			default: () => [],
+		},
 		viewSetting: {
 			type: Object,
 			default: null,
@@ -145,19 +155,30 @@ export default {
 		showFullOptions() {
 			return this.optionsDivWidth > 800
 		},
+		isFiltered() {
+			return (this.viewSetting?.filter?.length > 0) || !!this.viewSetting?.searchString
+		},
 	},
 
-	created() {
+	mounted() {
 		this.updateOptionsDivWidth()
 		window.addEventListener('resize', this.updateOptionsDivWidth)
 	},
 
+	beforeDestroy() {
+		window.removeEventListener('resize', this.updateOptionsDivWidth)
+	},
+
 	methods: {
 		t,
+		n,
 		updateOptionsDivWidth() {
-			this.optionsDivWidth = document.getElementsByClassName('options row')[0]?.offsetWidth
+			this.optionsDivWidth = this.$el?.offsetWidth
 		},
-		exportCsv() {
+		exportFiltered() {
+			this.$emit('download-csv', this.filteredRows)
+		},
+		exportSelected() {
 			this.$emit('download-csv', this.getSelectedRows)
 		},
 		getRowById(rowId) {
@@ -254,4 +275,5 @@ export default {
 		flex: 1 1 auto;
 	}
 }
+
 </style>

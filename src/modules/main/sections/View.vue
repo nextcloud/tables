@@ -22,7 +22,7 @@
 				:can-edit-columns="canManageTable(view)"
 				:can-delete-columns="canManageTable(view)"
 				:can-delete-table="canManageTable(view)">
-				<template #actions>
+				<template #actions="{ isFiltered, onExportFiltered }">
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 						<NcActionCaption v-if="canManageElement(view)" :name="t('tables', 'Manage view')" />
 						<NcActionButton v-if="canManageElement(view) "
@@ -49,10 +49,21 @@
 							</template>
 							{{ t('tables', 'Import') }}
 						</NcActionButton>
-						<NcActionButton v-if="canReadData(view)" :close-after-click="true"
-							icon="icon-download"
+						<NcActionButton v-if="canReadData(view)"
+							:close-after-click="true"
 							@click="$emit('download-csv')">
-							{{ t('tables', 'Export as CSV') }}
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export all rows') }}
+						</NcActionButton>
+						<NcActionButton v-if="canReadData(view) && isFiltered"
+							:close-after-click="true"
+							@click="onExportFiltered">
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export filtered rows') }}
 						</NcActionButton>
 						<NcActionButton v-if="canShareElement(view)"
 							:close-after-click="true"
@@ -84,6 +95,7 @@ import { emit } from '@nextcloud/event-bus'
 import { NcActions, NcActionButton, NcActionCaption } from '@nextcloud/vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import ElementTitle from './ElementTitle.vue'
@@ -93,6 +105,7 @@ export default {
 	components: {
 		TableDescription,
 		EmptyView,
+		TrayArrowDown,
 		TableView,
 		PlaylistEdit,
 		IconImport,
