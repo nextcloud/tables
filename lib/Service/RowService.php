@@ -98,7 +98,7 @@ class RowService extends SuperService {
 				$showColumnIds = array_map(fn (Column $column) => $column->getId(), $tableColumns);
 
 				$table = $this->tableMapper->find($tableId);
-				$sort = !empty($table->getSortArray()) ? $table->getSortArray() : null;
+				$sort = $table->getSortArray() ?: null;
 
 				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
 			} else {

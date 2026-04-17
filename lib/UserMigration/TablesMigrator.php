@@ -200,6 +200,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 
 				$columnIdMap = $this->importColumns($importSource, $newTable, $table, $columnIdMap);
 
+				$needsUpdate = false;
 				if (!empty($table['columnOrder'])) {
 					$remapped = array_map(function (array $entry) use ($columnIdMap): array {
 						if (isset($entry['columnId'])) {
@@ -208,7 +209,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 						return $entry;
 					}, $table['columnOrder']);
 					$newTable->setColumnOrder(json_encode($remapped));
-					$this->tableMapper->update($newTable);
+					$needsUpdate = true;
 				}
 				if (!empty($table['sort'])) {
 					$remapped = array_map(function (array $entry) use ($columnIdMap): array {
@@ -218,6 +219,9 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 						return $entry;
 					}, $table['sort']);
 					$newTable->setSort(json_encode($remapped));
+					$needsUpdate = true;
+				}
+				if ($needsUpdate) {
 					$this->tableMapper->update($newTable);
 				}
 
