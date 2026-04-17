@@ -7,7 +7,8 @@
 		<NcSelect
 			v-model="localValues"
 			:tag-width="80"
-			:options="getAllNonDeletedOrSelectedOptions"
+			:options="selectableOptions"
+			:selectable="option => !option?.deleted"
 			:clearable="!column.mandatory"
 			:disabled="column.viewColumnInformation?.readonly"
 			:multiple="true"
@@ -40,7 +41,7 @@ export default {
 		localValues: {
 			get() {
 				if (this.value !== null) {
-					return this.column.getObjects(this.value)
+					return this.selectedOptionIds.map(id => this.column.getOptionObject(id))
 				} else {
 					this.$emit('update:value', this.column.default())
 					return this.column.getDefaultObjects()
@@ -51,26 +52,21 @@ export default {
 			},
 		},
 		getOptions() {
-			return this.column.selectionOptions || null
+			return this.column.selectionOptions || []
 		},
-		getAllNonDeletedOrSelectedOptions() {
-			const options = this.getOptions?.filter(item => {
-				return !item.deleted || this.optionIdIsSelected(item.id)
-			}) || []
-
-			options.forEach(opt => {
-				if (opt.deleted) {
-					opt.label += ' ⚠️'
-				}
-			})
-			return options
+		selectedOptionIds() {
+			return (this.value || [])
+				.map(item => parseInt(item))
+				.filter(id => !Number.isNaN(id))
+		},
+		selectableOptions() {
+			const missingOptions = this.selectedOptionIds
+				.map(id => this.column.getOptionObject(id))
+				.filter(opt => opt.deleted)
+			return [...this.getOptions, ...missingOptions]
 		},
 	},
 	methods: {
-		optionIdIsSelected(id) {
-			// check if the given id is selected (in the value array)
-			return this.values.includes(id)
-		},
 		getIdArrayFromObjects(objects) {
 			const ids = []
 			objects.forEach(o => {

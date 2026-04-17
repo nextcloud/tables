@@ -5,7 +5,12 @@
 <template>
 	<div class="cell-selection">
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
-			{{ column.getLabel(value) }}<span v-if="isDeleted()" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
+			<template v-if="selectedOption.deleted">
+				<span class="outdated-option-label">{{ selectedOptionId }}</span><span
+					class="outdated-option-indicator"
+					:title="t('tables', 'This option is outdated.')">⚠️</span>
+			</template>
+			<span v-else>{{ selectedOption?.label }}</span>
 		</div>
 		<div v-else
 			ref="editingContainer"
@@ -14,7 +19,8 @@
 			@keydown.enter.stop="saveChanges"
 			@keydown.escape.stop="cancelEdit">
 			<NcSelect v-model="editValue"
-				:options="getAllNonDeletedOptions"
+				:options="selectableOptions"
+				:selectable="option => !option?.deleted"
 				:clearable="!column.mandatory"
 				:aria-label-combobox="t('tables', 'Options')"
 				:disabled="localLoading || !canEditCell()"
@@ -64,13 +70,24 @@ export default {
 	},
 
 	computed: {
-		getOptions() {
+		options() {
 			return this.column?.selectionOptions || []
 		},
-		getAllNonDeletedOptions() {
-			return this.getOptions.filter(item => {
-				return !item.deleted
-			})
+		selectedOptionId() {
+			const optionId = parseInt(this.value)
+			return Number.isNaN(optionId) ? null : optionId
+		},
+		selectedOption() {
+			if (this.selectedOptionId === null) {
+				return null
+			}
+			return this.column.getOptionObject(this.selectedOptionId)
+		},
+		selectableOptions() {
+			if (this.selectedOption?.deleted) {
+				return [...this.options, this.selectedOption]
+			}
+			return this.options
 		},
 	},
 
@@ -101,17 +118,9 @@ export default {
 			event.stopPropagation()
 		},
 
-		isDeleted() {
-			return this.column.isDeletedLabel(this.value)
-		},
-
-		getOptionObject(id) {
-			return this.getOptions.find(e => e.id === id) || null
-		},
-
 		initEditValue() {
-			if (this.value !== null) {
-				this.editValue = this.getOptionObject(parseInt(this.value))
+			if (this.value !== null && this.value !== undefined) {
+				this.editValue = this.selectedOption
 			} else {
 				this.editValue = null
 			}
@@ -170,7 +179,11 @@ export default {
 	}
 }
 
-span {
+.outdated-option-indicator {
 	cursor: help;
+}
+
+.outdated-option-label {
+	opacity: 0.6;
 }
 </style>

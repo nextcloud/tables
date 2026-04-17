@@ -6,8 +6,13 @@
 	<div class="cell-multi-selection" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<ul>
-				<li v-for="v in getObjects()" :key="v.id">
-					{{ v.label }}<span v-if="v.deleted" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
+				<li v-for="v in displayObjects" :key="v.id">
+					<template v-if="v.deleted">
+						<span class="outdated-option-label">{{ v.label }}</span><span
+							class="outdated-option-indicator"
+							:title="t('tables', 'This option is outdated.')">⚠️</span>
+					</template>
+					<span v-else>{{ v.label }}</span>
 				</li>
 			</ul>
 		</div>
@@ -19,7 +24,8 @@
 			@keydown.escape.stop="cancelEdit">
 			<NcSelect v-model="editValues"
 				:tag-width="80"
-				:options="getAllNonDeletedOrSelectedOptions"
+				:options="selectableOptions"
+				:selectable="option => !option?.deleted"
 				:clearable="!column.mandatory"
 				:multiple="true"
 				:aria-label-combobox="t('tables', 'Options')"
@@ -71,20 +77,22 @@ export default {
 	},
 
 	computed: {
-		getOptions() {
+		options() {
 			return this.column.selectionOptions || []
 		},
-		getAllNonDeletedOrSelectedOptions() {
-			const options = this.getOptions.filter(item => {
-				return !item.deleted || this.optionIdIsSelected(item.id)
-			}) || []
-
-			options.forEach(opt => {
-				if (opt.deleted) {
-					opt.label += ' ⚠️'
-				}
-			})
-			return options
+		selectedOptionIds() {
+			return (this.value || [])
+				.map(item => parseInt(item))
+				.filter(id => !Number.isNaN(id))
+		},
+		selectableOptions() {
+			const missingOptions = this.selectedOptionIds
+				.map(id => this.column.getOptionObject(id))
+				.filter(opt => opt.deleted)
+			return [...this.options, ...missingOptions]
+		},
+		displayObjects() {
+			return this.selectedOptionIds.map(id => this.column.getOptionObject(id))
 		},
 		editValues: {
 			get() {
@@ -122,15 +130,6 @@ export default {
 			event.stopPropagation()
 		},
 
-		getObjects() {
-			return this.column.getObjects(this.value)
-		},
-
-		optionIdIsSelected(id) {
-			// Check if the given id is selected (in the value array)
-			return this.value && this.value.includes(id)
-		},
-
 		getIdArrayFromObjects(objects) {
 			const ids = []
 			objects.forEach(o => {
@@ -141,7 +140,7 @@ export default {
 
 		initEditValues() {
 			if (this.value !== null) {
-				this.localEditValues = this.column.getObjects(this.value)
+				this.localEditValues = this.displayObjects
 			} else {
 				this.localEditValues = []
 			}
@@ -214,5 +213,13 @@ export default {
 ul {
 	list-style-type: disc;
 	padding-inline-start: calc(var(--default-grid-baseline) * 3);
+}
+
+.outdated-option-indicator {
+	cursor: help;
+}
+
+.outdated-option-label {
+	opacity: 0.6;
 }
 </style>
