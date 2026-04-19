@@ -10,7 +10,16 @@
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
 		</th>
-		<th v-for="col in visibleColumns" :key="col.id" :style="getColumnWidthStyle(col)">
+		<th v-for="(col, index) in visibleColumns"
+			:key="col.id"
+			:style="{
+				...getColumnWidthStyle(col),
+				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns),
+			}"
+			:class="{
+				'frozen-column': index <= pinnedColumnIndex,
+				'frozen-column--last': index === pinnedColumnIndex,
+			}">
 			<div class="cell-wrapper">
 				<div class="cell-options-wrapper">
 					<div class="cell">
@@ -50,7 +59,7 @@ import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
 import { getFilterWithId, getFiltersForColumn } from '../mixins/filter.js'
-import { getColumnWidthStyle } from '../mixins/columnHandler.js'
+import { getColumnWidthStyle, getFrozenColumnStyle } from '../mixins/columnHandler.js'
 
 export default {
 
@@ -105,6 +114,10 @@ export default {
 		visibleColumns() {
 			return this.columns.filter(col => !this.localViewSetting?.hiddenColumns?.includes(col.id))
 		},
+		pinnedColumnIndex() {
+			if (this.pinnedColumnId === null) return -1
+			return this.visibleColumns.findIndex(col => col.id === this.pinnedColumnId)
+		},
 	},
 	watch: {
 		localViewSetting() {
@@ -118,6 +131,7 @@ export default {
 	methods: {
 		getFilterWithId,
 		getColumnWidthStyle,
+		getFrozenColumnStyle,
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
