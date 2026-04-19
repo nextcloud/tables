@@ -61,6 +61,13 @@
 				</NcActionButton>
 			</template>
 			<template v-else>
+				<NcActionButton v-if="column.id >= 0" @click="pinColumn()">
+					<template #icon>
+						<PinOffIcon v-if="pinnedColumnId === column.id" :size="20" />
+						<PinIcon v-else :size="20" />
+					</template>
+					{{ pinnedColumnId === column.id ? t('tables', 'Unpin column') : t('tables', 'Pin column') }}
+				</NcActionButton>
 				<NcActionCaption v-if="!hasPresetSorting && canSort" :name="t('tables', 'Sorting')" />
 				<NcActionButtonGroup v-if="!hasPresetSorting && canSort">
 					<NcActionButton :class="{ selected: getSortMode === 'ASC' }" :aria-label="t('tables', 'Sort asc')" @click="sort('ASC')">
@@ -133,6 +140,8 @@ import EyeOffOutline from 'vue-material-design-icons/EyeOffOutline.vue'
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import FilterCogOutline from 'vue-material-design-icons/FilterCogOutline.vue'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
+import PinIcon from 'vue-material-design-icons/Pin.vue'
+import PinOffIcon from 'vue-material-design-icons/PinOff.vue'
 import {
 	NcActionButton,
 	NcActionButtonGroup,
@@ -153,6 +162,8 @@ export default {
 		ChevronLeft,
 		FilterCogOutline,
 		Magnify,
+		PinIcon,
+		PinOffIcon,
 		NcActionInput,
 		NcActionRadio,
 		NcActionCaption,
@@ -178,6 +189,10 @@ export default {
 		},
 		viewSetting: {
 			type: Object,
+			default: null,
+		},
+		pinnedColumnId: {
+			type: Number,
 			default: null,
 		},
 	},
@@ -310,6 +325,10 @@ export default {
 		},
 		close() {
 			this.localOpenState = false
+		},
+		pinColumn() {
+			this.$emit('pin-column', this.column.id)
+			this.close()
 		},
 		changeFilterOperator(op) {
 			this.selectedOperator = op
