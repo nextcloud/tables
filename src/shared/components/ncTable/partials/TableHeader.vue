@@ -22,8 +22,10 @@
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
 							:config="config"
 							:view-setting.sync="localViewSetting"
+							:pinned-column-id="pinnedColumnId"
 							@edit-column="col => $emit('edit-column', col)"
-							@delete-column="col => $emit('delete-column', col)" />
+							@delete-column="col => $emit('delete-column', col)"
+							@pin-column="id => $emit('pin-column', id)" />
 					</div>
 					<div v-if="getFilterForColumn(col).length > 0" class="filter-wrapper">
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
@@ -77,6 +79,10 @@ export default {
 		},
 		config: {
 			type: Object,
+			default: null,
+		},
+		pinnedColumnId: {
+			type: Number,
 			default: null,
 		},
 	},
