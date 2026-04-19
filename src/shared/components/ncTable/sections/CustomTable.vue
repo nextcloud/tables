@@ -11,12 +11,14 @@
 					:rows="getSearchedAndFilteredAndSortedRows"
 					:view-setting.sync="localViewSetting"
 					:config="config"
+					:pinned-column-id="pinnedColumnId"
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-column="col => $emit('edit-column', col)"
 					@delete-column="col => $emit('delete-column', col)"
 					@download-csv="data => $emit('download-csv', data)"
-					@select-all-rows="selectAllRows">
+					@select-all-rows="selectAllRows"
+					@pin-column="setPinnedColumn">
 					<template #actions>
 						<slot name="actions" />
 					</template>
@@ -37,6 +39,7 @@
 					:config="config"
 					:element-id="elementId"
 					:is-view="isView"
+					:pinned-column-id="pinnedColumnId"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</transition-group>
@@ -155,6 +158,7 @@ export default {
 			pageNumber: 1,
 			rowsPerPage: 100,
 			rowAnimation: false,
+			pinnedColumnId: null,
 		}
 	},
 
@@ -346,6 +350,9 @@ export default {
 
 	methods: {
 		t,
+		setPinnedColumn(columnId) {
+			this.pinnedColumnId = this.pinnedColumnId === columnId ? null : columnId
+		},
 		addMagicFieldsValues(filter) {
 			Object.values(MagicFields).forEach(field => {
 				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
