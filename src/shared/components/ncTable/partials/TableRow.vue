@@ -10,7 +10,7 @@
 		<td v-for="(col, index) in visibleColumns" :key="col.id"
 			:style="{
 				...getColumnWidthStyle(col),
-				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns),
+				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns, columnWidths),
 			}"
 			:class="{
 				'search-result': getCell(col.id)?.searchStringFound,
@@ -112,6 +112,10 @@ export default {
 		},
 		pinnedColumnId: {
 			type: Number,
+			default: null,
+		},
+		columnWidths: {
+			type: Object,
 			default: null,
 		},
 	},

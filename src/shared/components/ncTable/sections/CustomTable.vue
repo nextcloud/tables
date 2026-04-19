@@ -12,6 +12,7 @@
 					:view-setting.sync="localViewSetting"
 					:config="config"
 					:pinned-column-id="pinnedColumnId"
+					:column-widths="columnWidths"
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-column="col => $emit('edit-column', col)"
@@ -40,6 +41,7 @@
 					:element-id="elementId"
 					:is-view="isView"
 					:pinned-column-id="pinnedColumnId"
+					:column-widths="columnWidths"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</transition-group>
@@ -159,6 +161,7 @@ export default {
 			rowsPerPage: 100,
 			rowAnimation: false,
 			pinnedColumnId: null,
+			columnWidths: null,
 		}
 	},
 
@@ -331,6 +334,13 @@ export default {
 		viewSetting() {
 			this.localViewSetting = this.viewSetting
 		},
+		pinnedColumnId(newVal) {
+			if (newVal !== null) {
+				this.$nextTick(() => this.measureColumnWidths())
+			} else {
+				this.columnWidths = null
+			}
+		},
 	},
 
 	updated() {
@@ -352,6 +362,17 @@ export default {
 		t,
 		setPinnedColumn(columnId) {
 			this.pinnedColumnId = this.pinnedColumnId === columnId ? null : columnId
+		},
+		measureColumnWidths() {
+			const headerRow = this.$el.querySelector('thead tr')
+			if (!headerRow) return
+			const widths = {}
+			headerRow.querySelectorAll('th[data-col-id]').forEach(th => {
+				widths[parseInt(th.dataset.colId, 10)] = th.offsetWidth
+			})
+			if (JSON.stringify(widths) !== JSON.stringify(this.columnWidths)) {
+				this.columnWidths = widths
+			}
 		},
 		addMagicFieldsValues(filter) {
 			Object.values(MagicFields).forEach(field => {
@@ -590,9 +611,22 @@ export default {
 
 	thead tr > th.frozen-column {
 		z-index: 6;
+		// Combine the existing thead bottom-border shadow with a per-column right-border shadow.
+		// This rule has higher specificity than `thead tr th`, so it must re-declare both shadows.
+		box-shadow: inset 0 -1px 0 var(--color-border), inset -1px 0 0 var(--color-border-dark);
 	}
 
-	tr > th.frozen-column--last,
+	// Right border via box-shadow: with border-collapse the shared border is "owned" by the
+	// non-frozen neighbouring cell and scrolls away with it. box-shadow stays on the sticky cell.
+	tr > td.frozen-column {
+		box-shadow: inset -1px 0 0 var(--color-border-dark);
+	}
+
+	// Visual separator on the last frozen column — 2px overrides the 1px per-column border above.
+	thead tr > th.frozen-column--last {
+		box-shadow: inset 0 -1px 0 var(--color-border), inset -2px 0 0 var(--color-border-dark);
+	}
+
 	tr > td.frozen-column--last {
 		box-shadow: inset -2px 0 0 var(--color-border-dark);
 	}
