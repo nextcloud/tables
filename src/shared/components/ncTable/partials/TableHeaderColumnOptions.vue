@@ -61,6 +61,13 @@
 				</NcActionButton>
 			</template>
 			<template v-else>
+				<NcActionButton v-if="column.id >= 0" @click="pinColumn()">
+					<template #icon>
+						<PinOffIcon v-if="pinnedColumnId === column.id" :size="20" />
+						<PinIcon v-else :size="20" />
+					</template>
+					{{ pinnedColumnId === column.id ? t('tables', 'Unpin column') : t('tables', 'Pin column') }}
+				</NcActionButton>
 				<NcActionCaption v-if="!hasPresetSorting && canSort" :name="t('tables', 'Sorting')" />
 				<NcActionButtonGroup v-if="!hasPresetSorting && canSort">
 					<NcActionButton :class="{ selected: getSortMode === 'ASC' }" :aria-label="t('tables', 'Sort asc')" @click="sort('ASC')">
@@ -118,13 +125,6 @@
 						</template>
 					</NcActionButton>
 				</NcActionButtonGroup>
-				<NcActionButton v-if="column.id >= 0" @click="$emit('pin-column', column.id)">
-					<template #icon>
-						<PinOffIcon v-if="pinnedColumnId === column.id" :size="20" />
-						<PinIcon v-else :size="20" />
-					</template>
-					{{ pinnedColumnId === column.id ? t('tables', 'Unpin column') : t('tables', 'Pin column') }}
-				</NcActionButton>
 			</template>
 		</NcActions>
 	</div>
@@ -325,6 +325,10 @@ export default {
 		},
 		close() {
 			this.localOpenState = false
+		},
+		pinColumn() {
+			this.$emit('pin-column', this.column.id)
+			this.close()
 		},
 		changeFilterOperator(op) {
 			this.selectedOperator = op
