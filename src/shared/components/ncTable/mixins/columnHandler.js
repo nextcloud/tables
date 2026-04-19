@@ -24,3 +24,27 @@ export function getColumnWidthStyle(column) {
 
 	return width ? { width, maxWidth: width, minWidth: width } : null
 }
+
+const CHECKBOX_COLUMN_WIDTH = 60
+const DEFAULT_COLUMN_WIDTH = 150
+
+/**
+ * Returns a sticky-positioning style for a column within the frozen range, or null if it should scroll normally.
+ */
+export function getFrozenColumnStyle(col, colIndex, pinnedColumnIndex, hasCheckboxColumn, visibleColumns) {
+	if (pinnedColumnIndex < 0 || colIndex > pinnedColumnIndex) {
+		return null
+	}
+
+	const baseOffset = hasCheckboxColumn ? CHECKBOX_COLUMN_WIDTH : 0
+	const leftOffset = visibleColumns
+		.slice(0, colIndex)
+		.reduce((sum, c) => sum + (c.customSettings?.width ?? DEFAULT_COLUMN_WIDTH), baseOffset)
+
+	return {
+		position: 'sticky',
+		insetInlineStart: `${leftOffset}px`,
+		zIndex: 4,
+		backgroundColor: 'inherit',
+	}
+}
