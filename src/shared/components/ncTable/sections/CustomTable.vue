@@ -582,6 +582,21 @@ export default {
 		}
 	}
 
+	tr > th.frozen-column,
+	tr > td.frozen-column {
+		background-color: inherit;
+		z-index: 4;
+	}
+
+	thead tr > th.frozen-column {
+		z-index: 6;
+	}
+
+	tr > th.frozen-column--last,
+	tr > td.frozen-column--last {
+		box-shadow: inset -2px 0 0 var(--color-border-dark);
+	}
+
 	tr>th.sticky:first-child,tr>td.sticky:first-child {
 		position: sticky;
 		inset-inline-start: 0;
