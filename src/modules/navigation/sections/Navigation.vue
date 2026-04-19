@@ -68,9 +68,26 @@
 					</template>
 				</NcAppNavigationCaption>
 
-				<template v-for="node in getAllContexts">
+				<template v-for="node in getActiveContexts">
 					<NavigationContextItem :key="node.id" :context="node" />
 				</template>
+
+				<!-- ARCHIVED APPLICATIONS -->
+				<NcAppNavigationItem v-if="getArchivedContexts.length > 0" :name="t('tables', 'Archived applications')"
+					:allow-collapse="true" :open="false">
+					<template #icon>
+						<ArchiveOutline :size="20" />
+					</template>
+
+					<template #counter>
+						<NcCounterBubble>
+							{{ getArchivedContexts.length }}
+						</NcCounterBubble>
+					</template>
+
+					<NavigationContextItem v-for="context in getArchivedContexts" :key="context.id"
+						:context="context" />
+				</NcAppNavigationItem>
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -182,6 +199,12 @@ export default {
 		},
 		getAllContexts() {
 			return this.contexts.filter(context => context.name.toLowerCase().includes(this.filterString.toLowerCase()))
+		},
+		getActiveContexts() {
+			return this.getAllContexts.filter(context => !context.archived)
+		},
+		getArchivedContexts() {
+			return this.getAllContexts.filter(context => context.archived)
 		},
 		isStandaloneContext() {
 			try {

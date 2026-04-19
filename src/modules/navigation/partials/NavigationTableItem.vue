@@ -102,7 +102,7 @@
 			</NcActionButton>
 
 			<!-- ARCHIVE -->
-			<NcActionButton v-if="canManageElement(table) && !table.archived && !table.favorite"
+			<NcActionButton v-if="!table.archived && !table.favorite"
 				:close-after-click="true" @click="toggleArchiveTable(true)">
 				{{ t('tables', 'Archive table') }}
 				<template #icon>
@@ -111,7 +111,7 @@
 			</NcActionButton>
 
 			<!-- UNARCHIVE -->
-			<NcActionButton v-if="canManageElement(table) && table.archived" :close-after-click="true"
+			<NcActionButton v-if="table.archived" :close-after-click="true"
 				@click="toggleArchiveTable(false)">
 				{{ t('tables', 'Unarchive table') }}
 				<template #icon>
@@ -238,7 +238,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(useTablesStore, ['favoriteTable', 'removeFavoriteTable', 'updateTable']),
+		...mapActions(useTablesStore, ['favoriteTable', 'removeFavoriteTable', 'archiveTable', 'unarchiveTable']),
 		emit,
 		deleteTable() {
 			emit('tables:table:delete', this.table)
@@ -288,10 +288,11 @@ export default {
 			}
 		},
 		async toggleArchiveTable(archived) {
-			await this.updateTable({
-				id: this.table.id,
-				data: { archived },
-			})
+			if (archived) {
+				await this.archiveTable({ id: this.table.id })
+			} else {
+				await this.unarchiveTable({ id: this.table.id })
+			}
 		},
 		async toggleFavoriteTable(favorite) {
 			if (favorite) {
