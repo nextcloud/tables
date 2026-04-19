@@ -170,7 +170,8 @@ describe('Filtering in a view by selection columns (Cypress supplement – row r
 		// # edit checked row
 		// ## uncheck
 		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('updateCheckedRow')
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').closest('[data-cy="customTableRow"]').find('[data-cy="rowActionMenu"] button').click()
+		cy.get('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .checkbox-radio-switch').click()
 		cy.get('[data-cy="editRowSaveButton"]').click()
 
