@@ -12,9 +12,10 @@
 		</th>
 		<th v-for="(col, index) in visibleColumns"
 			:key="col.id"
+			:data-col-id="col.id"
 			:style="{
 				...getColumnWidthStyle(col),
-				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns),
+				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns, columnWidths),
 			}"
 			:class="{
 				'frozen-column': index <= pinnedColumnIndex,
@@ -92,6 +93,10 @@ export default {
 		},
 		pinnedColumnId: {
 			type: Number,
+			default: null,
+		},
+		columnWidths: {
+			type: Object,
 			default: null,
 		},
 	},
