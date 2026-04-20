@@ -89,6 +89,28 @@ class ShareController extends Controller {
 		});
 	}
 
+	#[NoAdminRequired]
+	public function updatePermissions(
+		int $id,
+		bool $permissionRead = false,
+		bool $permissionCreate = false,
+		bool $permissionUpdate = false,
+		bool $permissionDelete = false,
+	): DataResponse {
+		return $this->handleError(function () use ($id, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete) {
+			$permissions = [
+				'read' => $permissionRead,
+				'create' => $permissionCreate,
+				'update' => $permissionUpdate && $permissionRead,
+				'delete' => $permissionDelete && $permissionRead,
+			];
+			foreach ($permissions as $permission => $value) {
+				$this->service->updatePermission($id, $permission, $value);
+			}
+			return $this->service->find($id);
+		});
+	}
+
 	/**
 	 * @psalm-param int<0, 2> $displayMode
 	 * @psalm-param ("default"|"self") $target

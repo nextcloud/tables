@@ -4,7 +4,7 @@
 -->
 <template>
 	<NcDialog v-if="showModal"
-		:name="t('tables', 'Create row')"
+		:name="dialogTitle"
 		size="large"
 		data-cy="createRowModal"
 		@closing="actionCancel">
@@ -26,11 +26,11 @@
 				<div class="fix-col-4 space-T end">
 					<div class="padding-right">
 						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch" data-cy="createRowAddMoreSwitch">
-							{{ t('tables', 'Add more') }}
+							{{ addMoreLabel }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<NcButton v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows || hasInvalidUrlProtocol" data-cy="createRowSaveButton" @click="actionConfirm()">
-						{{ t('tables', 'Save') }}
+						{{ saveButtonLabel }}
 					</NcButton>
 				</div>
 			</div>
@@ -76,6 +76,10 @@ export default {
 			type: Number,
 			default: null,
 		},
+		isFormMode: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -95,6 +99,15 @@ export default {
 		hasInvalidUrlProtocol() {
 			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.row[col.id]))
 		},
+		dialogTitle() {
+			return this.isFormMode ? t('tables', 'Fill form') : t('tables', 'Create row')
+		},
+		addMoreLabel() {
+			return this.isFormMode ? t('tables', 'Fill form again') : t('tables', 'Add more')
+		},
+		saveButtonLabel() {
+			return this.isFormMode ? t('tables', 'Submit') : t('tables', 'Save')
+		},
 	},
 	watch: {
 		showModal() {
@@ -106,7 +119,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(useDataStore, ['insertNewRow']),
+		...mapActions(useDataStore, ['insertNewRow', 'insertPublicRow']),
 		t,
 		actionCancel() {
 			this.reset()
@@ -121,10 +134,15 @@ export default {
 			if (!success) {
 				return
 			}
+
+			const successMessage = this.isFormMode
+				? t('tables', 'Form successfully submitted.')
+				: t('tables', 'Row successfully created.')
+			showSuccess(successMessage)
+
 			if (!this.addNewAfterSave) {
 				this.actionCancel()
 			} else {
-				showSuccess(t('tables', 'Row successfully created.'))
 				this.reset()
 			}
 		},
@@ -139,6 +157,12 @@ export default {
 				for (const [key, value] of Object.entries(this.row)) {
 					data[key] = value
 				}
+
+				const token = useDataStore().publicToken
+				if (token) {
+					return await this.insertPublicRow({ token, data })
+				}
+
 				return await this.insertNewRow({
 					viewId: this.isView ? this.elementId : null,
 					tableId: !this.isView ? this.elementId : null,

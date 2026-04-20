@@ -21,4 +21,9 @@ class SuperService {
 		$this->logger = $logger;
 		$this->userId = $userId;
 	}
+
+	public function setPublicContext(): void {
+		$this->userId = '';
+		$this->permissionsService->setPublicContext();
+	}
 }
