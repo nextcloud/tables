@@ -60,6 +60,17 @@
 				</template>
 			</NcActionButton>
 
+			<!-- IMPORT STRUCTURE -->
+			<NcActionButton v-if="canManageElement(table)" :close-after-click="true"
+				@click="actionImportStructure">
+				{{ t('tables', 'Import structure') }}
+				<template #icon>
+					<TableArrowDown :size="20" />
+				</template>
+			</NcActionButton>
+			<input ref="importStructureFileInput" type="file" aria-hidden="true" class="hidden-visually"
+				accept="application/json" @change="onImportStructureFileChange">
+
 			<!-- EXPORT -->
 			<NcActionButton @click="exportFile">
 				{{ t('tables', 'Export') }}
@@ -137,8 +148,11 @@
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
+import { showError } from '@nextcloud/dialogs'
 import { mapState, mapActions } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
+import axios from '@nextcloud/axios'
+import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { useTablesStore } from '../../../store/store.js'
 import Table from 'vue-material-design-icons/Table.vue'
 import Star from 'vue-material-design-icons/Star.vue'
@@ -152,11 +166,11 @@ import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import Export from 'vue-material-design-icons/Export.vue'
+import TableArrowDown from 'vue-material-design-icons/TableArrowDown.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/RenameOutline.vue'
 import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
-import { generateUrl } from '@nextcloud/router'
 
 export default {
 
@@ -170,6 +184,7 @@ export default {
 		ArchiveArrowUpOutline,
 		Import,
 		Export,
+		TableArrowDown,
 		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
@@ -207,6 +222,8 @@ export default {
 	data() {
 		return {
 			isParentOfActiveView: false,
+			importStructureDiff: null,
+			importStructureScheme: null,
 		}
 	},
 
@@ -269,6 +286,36 @@ export default {
 		},
 		async actionShowImport(table) {
 			emit('tables:modal:import', { element: table, isView: false })
+		},
+		actionImportStructure() {
+			this.$refs.importStructureFileInput.click()
+		},
+		async onImportStructureFileChange(event) {
+			const file = event.target.files?.[0]
+			event.target.value = ''
+			if (!file) {
+				return
+			}
+			let scheme
+			try {
+				const text = await file.text()
+				scheme = JSON.parse(text)
+			} catch (_e) {
+				showError(t('tables', 'Could not parse the JSON file. Please check that it is valid JSON.'))
+				return
+			}
+			if (!Array.isArray(scheme?.columns) || !Array.isArray(scheme?.views)) {
+				showError(t('tables', 'The selected file does not appear to be a valid table structure export.'))
+				return
+			}
+			try {
+				const url = generateOcsUrl('/apps/tables/api/2/tables/{id}/scheme/diff', { id: this.table.id })
+				const response = await axios.post(url, { scheme })
+				const diff = response.data?.ocs?.data
+				emit('tables:modal:importStructure', { tableId: this.table.id, scheme, diff })
+			} catch (_e) {
+				showError(t('tables', 'Failed to compute structural differences. Please try again.'))
+			}
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
