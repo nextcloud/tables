@@ -44,7 +44,8 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
-				:selected-rows="localSelectedRows" :show-options="parsedColumns.length !== 0"
+				:selected-rows="localSelectedRows" :filtered-rows="localFilteredRows"
+				:show-options="parsedColumns.length !== 0"
 				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row')"
 				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
 				@set-search-string="str => setSearchString(str)"
@@ -59,9 +60,12 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@edit-column="col => $emit('edit-column', col)"
 				@delete-column="col => $emit('delete-column', col)"
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
+				@update:filteredRows="rows => localFilteredRows = rows"
 				@download-csv="data => downloadCsv(data, parsedColumns, table)">
 				<template #actions>
-					<slot name="actions" />
+					<slot name="actions"
+						:is-filtered="isFilteredComputed"
+						:on-export-filtered="() => downloadCsv(localFilteredRows, parsedColumns, downloadTitle)" />
 				</template>
 			</CustomTable>
 			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
@@ -193,6 +197,7 @@ export default {
 		return {
 			localSelectedRows: [],
 			localViewSetting: this.viewSetting ?? {},
+			localFilteredRows: this.rows,
 			viewerAppAvailable: !!window.OCA?.Viewer?.open,
 			table: null,
 		}
@@ -220,6 +225,9 @@ export default {
 			}
 			return this.columns
 		},
+		isFilteredComputed() {
+			return (this.localViewSetting?.filter?.length > 0) || !!this.localViewSetting?.searchString
+		},
 	},
 	watch: {
 		localSelectedRows() {
@@ -230,6 +238,9 @@ export default {
 		},
 		viewSetting() {
 			this.localViewSetting = this.viewSetting
+		},
+		rows(newRows) {
+			this.localFilteredRows = newRows
 		},
 	},
 	mounted() {
