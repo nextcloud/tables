@@ -158,7 +158,7 @@ class StructureDiffServiceTest extends TestCase {
 
 		self::assertCount(1, $result['columns']);
 		self::assertSame('add', $result['columns'][0]['action']);
-		self::assertSame('Score', $result['columns'][0]['title']);
+		self::assertSame('Score', $result['columns'][0]['column']['title']);
 	}
 
 	public function testMatchedColumnWithPropertyDiffProducesUpdateAction(): void {
@@ -177,8 +177,7 @@ class StructureDiffServiceTest extends TestCase {
 		$colDiff = $result['columns'][0];
 		self::assertSame('update', $colDiff['action']);
 		self::assertSame(1, $colDiff['targetId']);
-		$fields = array_column($colDiff['changes'], 'field');
-		self::assertContains('description', $fields);
+		self::assertArrayHasKey('description', $colDiff['changes']);
 	}
 
 	public function testTargetOnlyColumnProducesDeleteAction(): void {
@@ -192,7 +191,7 @@ class StructureDiffServiceTest extends TestCase {
 
 		self::assertCount(1, $result['columns']);
 		self::assertSame('delete', $result['columns'][0]['action']);
-		self::assertSame('OldCol', $result['columns'][0]['title']);
+		self::assertSame('OldCol', $result['columns'][0]['column']['title']);
 	}
 
 	public function testSameNameDifferentTypeProducesAddAndDelete(): void {
@@ -225,7 +224,7 @@ class StructureDiffServiceTest extends TestCase {
 
 		self::assertCount(1, $result['views']);
 		self::assertSame('add', $result['views'][0]['action']);
-		self::assertSame('My View', $result['views'][0]['title']);
+		self::assertSame('My View', $result['views'][0]['view']['title']);
 	}
 
 	public function testMatchedViewWithFilterDiffProducesUpdateAction(): void {

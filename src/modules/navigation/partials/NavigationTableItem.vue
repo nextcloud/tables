@@ -140,19 +140,15 @@
 			<NavigationViewItem v-for="view in getViews" :key="'view' + view.id" :view="view"
 				:show-share-sender="false" />
 		</ul>
-		<input ref="importStructureFileInput" type="file" aria-hidden="true" class="hidden-visually"
-			accept="application/json" @change="onImportStructureFileChange">
 	</NcAppNavigationItem>
 </template>
 
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
-import { showError } from '@nextcloud/dialogs'
 import { mapState, mapActions } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
-import axios from '@nextcloud/axios'
-import { generateOcsUrl, generateUrl } from '@nextcloud/router'
+import { generateUrl } from '@nextcloud/router'
 import { useTablesStore } from '../../../store/store.js'
 import Table from 'vue-material-design-icons/Table.vue'
 import Star from 'vue-material-design-icons/Star.vue'
@@ -222,8 +218,6 @@ export default {
 	data() {
 		return {
 			isParentOfActiveView: false,
-			importStructureDiff: null,
-			importStructureScheme: null,
 		}
 	},
 
@@ -288,34 +282,7 @@ export default {
 			emit('tables:modal:import', { element: table, isView: false })
 		},
 		actionImportStructure() {
-			this.$refs.importStructureFileInput.click()
-		},
-		async onImportStructureFileChange(event) {
-			const file = event.target.files?.[0]
-			event.target.value = ''
-			if (!file) {
-				return
-			}
-			let scheme
-			try {
-				const text = await file.text()
-				scheme = JSON.parse(text)
-			} catch (_e) {
-				showError(t('tables', 'Could not parse the JSON file. Please check that it is valid JSON.'))
-				return
-			}
-			if (!Array.isArray(scheme?.columns) || !Array.isArray(scheme?.views)) {
-				showError(t('tables', 'The selected file does not appear to be a valid table structure export.'))
-				return
-			}
-			try {
-				const url = generateOcsUrl('/apps/tables/api/2/tables/' + this.table.id + '/scheme/diff')
-				const response = await axios.post(url, { scheme })
-				const diff = response.data?.ocs?.data
-				emit('tables:modal:importStructure', { tableId: this.table.id, scheme, diff })
-			} catch (_e) {
-				showError(t('tables', 'Failed to compute structural differences. Please try again.'))
-			}
+			emit('tables:modal:importStructure:pick', { tableId: this.table.id })
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })

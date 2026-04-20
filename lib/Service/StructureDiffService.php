@@ -70,7 +70,7 @@ class StructureDiffService extends SuperService {
 		}
 
 		$tableMeta = $this->diffTableMeta($table, $scheme);
-		if (!empty($tableMeta['changes'])) {
+		if (!empty($tableMeta)) {
 			$diff['tableMeta'] = $tableMeta;
 		}
 
@@ -154,10 +154,10 @@ class StructureDiffService extends SuperService {
 			$current = $table->{$getters[$field]}();
 			$incoming = $scheme[$field];
 			if ($current !== $incoming) {
-				$changes[] = ['field' => $field, 'current' => $current, 'incoming' => $incoming];
+				$changes[$field] = ['current' => $current, 'incoming' => $incoming];
 			}
 		}
-		return ['changes' => $changes];
+		return $changes;
 	}
 
 	/**
@@ -190,13 +190,15 @@ class StructureDiffService extends SuperService {
 				];
 				$changes = $this->diffColumnProperties($targetCol, $srcCol);
 				if (!empty($changes)) {
+					$changesObj = [];
+					foreach ($changes as $change) {
+						$changesObj[$change['field']] = ['current' => $change['current'], 'incoming' => $change['incoming']];
+					}
 					$columnDiff[] = [
 						'action' => 'update',
-						'sourceId' => $srcCol['id'],
 						'targetId' => $targetCol->getId(),
-						'title' => $srcCol['title'],
-						'type' => $srcCol['type'],
-						'changes' => $changes,
+						'column' => ['title' => $srcCol['title'], 'type' => $srcCol['type']],
+						'changes' => $changesObj,
 					];
 				}
 			} else {
@@ -208,10 +210,7 @@ class StructureDiffService extends SuperService {
 				];
 				$columnDiff[] = [
 					'action' => 'add',
-					'sourceId' => $srcCol['id'],
-					'title' => $srcCol['title'],
-					'type' => $srcCol['type'],
-					'details' => $srcCol,
+					'column' => $srcCol,
 				];
 			}
 		}
@@ -221,8 +220,7 @@ class StructureDiffService extends SuperService {
 				$columnDiff[] = [
 					'action' => 'delete',
 					'targetId' => $targetCol->getId(),
-					'title' => $targetCol->getTitle(),
-					'type' => $targetCol->getType(),
+					'column' => ['title' => $targetCol->getTitle(), 'type' => $targetCol->getType()],
 				];
 			}
 		}
@@ -269,17 +267,20 @@ class StructureDiffService extends SuperService {
 			if (!isset($targetByTitle[$title])) {
 				$viewDiff[] = [
 					'action' => 'add',
-					'title' => $title,
-					'details' => $srcView,
+					'view' => $srcView,
 				];
 			} else {
 				$targetView = $targetByTitle[$title];
 				$changes = $this->diffViewProperties($targetView, $srcView);
 				if (!empty($changes)) {
+					$changesObj = [];
+					foreach ($changes as $change) {
+						$changesObj[$change['field']] = ['current' => $change['current'], 'incoming' => $change['incoming']];
+					}
 					$item = [
 						'action' => 'update',
 						'title' => $title,
-						'changes' => $changes,
+						'changes' => $changesObj,
 					];
 					if ($this->hasSelectionFilterWarning($srcView, $overriddenSelectionColumnIds, $sourceColumnIds)) {
 						$item['selectionFilterWarning'] = true;
