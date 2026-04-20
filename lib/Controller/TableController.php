@@ -70,9 +70,15 @@ class TableController extends Controller {
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
-	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
-		return $this->handleError(function () use ($id, $title, $emoji, $archived) {
-			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId);
+	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null, null|array|string $columnSettings = null, null|array|string $sort = null): DataResponse {
+		if (is_string($columnSettings)) {
+			$columnSettings = json_decode($columnSettings, true) ?? null;
+		}
+		if (is_string($sort)) {
+			$sort = json_decode($sort, true) ?? null;
+		}
+		return $this->handleError(function () use ($id, $title, $emoji, $archived, $columnSettings, $sort) {
+			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId, $columnSettings, $sort);
 		});
 	}
 }

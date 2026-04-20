@@ -71,7 +71,7 @@ describe('Manage a table', () => {
 		// Updating the title is flaky, so skipping it for now
 		// cy.get('[data-cy="editTableModal"] [data-cy="editTableTitleInput"]').should('be.visible').should('be.enabled')
 		// cy.get('[data-cy="editTableModal"] [data-cy="editTableTitleInput"]').clear().type('ToDo list')
-		cy.get('.modal__content #description-editor .tiptap.ProseMirror').type('Updated ToDo List description')
+		cy.get('[data-cy="editTableModal"] #description-editor .tiptap.ProseMirror').type('Updated ToDo List description')
 		cy.get('[data-cy="editTableSaveBtn"]').should('be.enabled').click()
 
 		cy.wait(10).get('.toastify.toast-success').should('be.visible')

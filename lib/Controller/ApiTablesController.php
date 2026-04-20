@@ -130,12 +130,14 @@ class ApiTablesController extends AOCSController {
 	 * @param string $description description
 	 * @param list<TablesColumn> $columns columns
 	 * @param list<TablesView> $views views
+	 * @param list<array{columnId: int, order: int, readonly: bool}> $columnOrder Default column order settings
+	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sort Default sort rules
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
 	#[NoAdminRequired]
-	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views): DataResponse {
+	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
 		try {
 			$this->db->beginTransaction();
 			$table = $this->service->create($title, 'custom', $emoji, $description);
@@ -174,6 +176,21 @@ class ApiTablesController extends AOCSController {
 					)
 				);
 				$colMap[$column['id']] = $col->getId();
+			}
+			if (!empty($columnOrder) || !empty($sort)) {
+				$remappedColumnOrder = !empty($columnOrder) ? array_map(static function (array $entry) use ($colMap): array {
+					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
+						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
+					}
+					return $entry;
+				}, $columnOrder) : null;
+				$remappedSort = !empty($sort) ? array_map(static function (array $entry) use ($colMap): array {
+					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
+						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
+					}
+					return $entry;
+				}, $sort) : null;
+				$table = $this->service->update($table->getId(), null, null, null, null, $this->userId, $remappedColumnOrder, $remappedSort);
 			}
 			foreach ($views as $view) {
 				$newView = $this->viewService->create(
@@ -262,6 +279,8 @@ class ApiTablesController extends AOCSController {
 	 * @param string|null $emoji New table emoji
 	 * @param bool $archived whether the table is archived
 	 * @param string $description the tables description
+	 * @param list<array{columnId: int, order: int, readonly: bool}>|string|null $columnSettings Default column order settings (array or JSON string)
+	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}>|string|null $sort Default sort rules (array or JSON string)
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
@@ -270,9 +289,15 @@ class ApiTablesController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
-	public function update(int $id, ?string $title = null, ?string $emoji = null, ?string $description = null, ?bool $archived = null): DataResponse {
+	public function update(int $id, ?string $title = null, ?string $emoji = null, ?string $description = null, ?bool $archived = null, null|array|string $columnSettings = null, null|array|string $sort = null): DataResponse {
+		if (is_string($columnSettings)) {
+			$columnSettings = json_decode($columnSettings, true) ?? null;
+		}
+		if (is_string($sort)) {
+			$sort = json_decode($sort, true) ?? null;
+		}
 		try {
-			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId)->jsonSerialize());
+			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId, $columnSettings, $sort)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {

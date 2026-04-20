@@ -18,6 +18,9 @@
 			</NcButton>
 		</div>
 		<div v-else>
+			<p v-if="mutableSort.length >= 2" class="span">
+				{{ t('tables', 'Rules are applied in order. The first rule sorts all rows, and any additional rules determine the order within any group of rows that share the same value.') }}
+			</p>
 			<div v-for="(sortingRule, i) in removedSortingRules" :key="'deleted'+sortingRule.columnId+i">
 				<DeletedSortEntry
 					:sort-entry="sortingRule"
@@ -42,9 +45,6 @@
 					<Plus :size="25" />
 				</template>
 			</NcButton>
-			<p class="span">
-				{{ t('tables', 'The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows.') }}
-			</p>
 		</div>
 	</div>
 </template>

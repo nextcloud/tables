@@ -66,6 +66,8 @@ namespace OCA\Tables;
  *  rowsCount: int,
  *  views: list<TablesView>,
  *  columnsCount: int,
+ *  columnOrder: list<array{columnId: int, order: int, readonly: bool}>,
+ *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
  * }
  *
  * @psalm-type TablesIndex = array{
