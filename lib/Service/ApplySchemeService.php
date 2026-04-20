@@ -196,8 +196,10 @@ class ApplySchemeService extends SuperService {
 					}
 					$srcView = $sourceViewsByTitle[$viewTitle];
 					$failedStep = "update view '{$viewTitle}'";
+					// Remap source column IDs to target IDs before applying
+					$remappedView = $this->remapViewColumnIds($srcView, $combinedColMap, $viewTitle);
 					// Only apply selected fields
-					$updatePayload = $this->buildPartialViewPayload($srcView, $fields);
+					$updatePayload = $this->buildPartialViewPayload($remappedView, $fields);
 					$this->viewService->update($view->getId(), ViewUpdateInput::fromInputArray($updatePayload), $this->userId);
 				}
 

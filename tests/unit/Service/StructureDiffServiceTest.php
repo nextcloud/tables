@@ -146,6 +146,40 @@ class StructureDiffServiceTest extends TestCase {
 		self::assertArrayNotHasKey('columns', $result);
 	}
 
+	public function testSelectionColumnWithIdenticalOptionsProducesNoDiff(): void {
+		$table = $this->makeTable();
+		$col = $this->makeColumn(1, 'Status', 'selection');
+		$col->setSelectionOptions('[{"id":1,"label":"A"},{"id":2,"label":"B"}]');
+		$this->tableService->method('find')->willReturn($table);
+		$this->columnService->method('findAllByTable')->willReturn([$col]);
+		$this->viewService->method('findAll')->willReturn([]);
+
+		$result = $this->service->computeDiff(1, $this->baseScheme([
+			$this->sourceColumn(1, 'Status', 'selection', [
+				'selectionOptions' => [['id' => 1, 'label' => 'A'], ['id' => 2, 'label' => 'B']],
+			]),
+		]));
+
+		self::assertArrayNotHasKey('columns', $result);
+	}
+
+	public function testBooleanFalseInDbAndMissingInImportProducesNoDiff(): void {
+		$table = $this->makeTable();
+		$col = $this->makeColumn(1, 'Notes', 'text');
+		$col->setMandatory(false);
+		$col->setTextUnique(false);
+		$this->tableService->method('find')->willReturn($table);
+		$this->columnService->method('findAllByTable')->willReturn([$col]);
+		$this->viewService->method('findAll')->willReturn([]);
+
+		// Import omits mandatory and textUnique (they will be null = absent)
+		$result = $this->service->computeDiff(1, $this->baseScheme([
+			$this->sourceColumn(1, 'Notes', 'text'),
+		]));
+
+		self::assertArrayNotHasKey('columns', $result);
+	}
+
 	public function testNewColumnInSourceProducesAddAction(): void {
 		$table = $this->makeTable();
 		$this->tableService->method('find')->willReturn($table);

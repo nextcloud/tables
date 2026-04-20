@@ -234,14 +234,31 @@ class StructureDiffService extends SuperService {
 		foreach (self::COLUMN_DIFFABLE_FIELDS as $field) {
 			$current = $targetArr[$field] ?? null;
 			$incoming = $srcCol[$field] ?? null;
-			if ($field === 'selectionOptions' && is_array($incoming)) {
-				$incoming = json_encode($incoming);
-			}
-			if ($current !== $incoming) {
+			$currentNorm = $this->normalizeForComparison($current);
+			$incomingNorm = $this->normalizeForComparison($incoming);
+			if ($currentNorm !== $incomingNorm) {
 				$changes[] = ['field' => $field, 'current' => $current, 'incoming' => $incoming];
 			}
 		}
 		return $changes;
+	}
+
+	/**
+	 * Normalize a value for structural comparison.
+	 * - false and null are treated as equivalent: boolean fields default to false in the DB
+	 *   but are absent (null) when omitted from an exported scheme, so they must not
+	 *   trigger a spurious "false → (none)" diff entry.
+	 * - Arrays and objects (including \stdClass) are JSON-encoded so that e.g. an empty
+	 *   \stdClass and an empty array compare as equal.
+	 */
+	private function normalizeForComparison(mixed $value): mixed {
+		if ($value === false) {
+			return null;
+		}
+		if (!is_array($value) && !is_object($value)) {
+			return $value;
+		}
+		return json_encode(json_decode(json_encode($value), true));
 	}
 
 	/**
@@ -271,7 +288,10 @@ class StructureDiffService extends SuperService {
 				];
 			} else {
 				$targetView = $targetByTitle[$title];
-				$changes = $this->diffViewProperties($targetView, $srcView);
+				// Remap source column IDs to target IDs for comparison only;
+				// the original $srcView values are used in the diff output for display.
+				$srcViewRemapped = $this->remapIncomingViewForComparison($srcView, $columnMap);
+				$changes = $this->diffViewProperties($targetView, $srcViewRemapped, $srcView);
 				if (!empty($changes)) {
 					$changesObj = [];
 					foreach ($changes as $change) {
@@ -293,12 +313,16 @@ class StructureDiffService extends SuperService {
 		return $viewDiff;
 	}
 
-	private function diffViewProperties(\OCA\Tables\Db\View $targetView, array $srcView): array {
+	private function diffViewProperties(
+		\OCA\Tables\Db\View $targetView,
+		array $srcViewForComparison,
+		array $srcViewOriginal,
+	): array {
 		$changes = [];
 		$targetArr = $targetView->jsonSerialize();
 		foreach (self::VIEW_DIFFABLE_FIELDS as $field) {
 			$current = $targetArr[$field] ?? null;
-			$incoming = $srcView[$field] ?? null;
+			$incoming = $srcViewForComparison[$field] ?? null;
 			if (is_array($current)) {
 				$current = json_encode($current);
 			}
@@ -306,10 +330,61 @@ class StructureDiffService extends SuperService {
 				$incoming = json_encode($incoming);
 			}
 			if ($current !== $incoming) {
-				$changes[] = ['field' => $field, 'current' => $targetArr[$field] ?? null, 'incoming' => $srcView[$field] ?? null];
+				// Use original (non-remapped) incoming value in the diff output so
+				// the frontend can resolve source column names for display.
+				$changes[] = ['field' => $field, 'current' => $targetArr[$field] ?? null, 'incoming' => $srcViewOriginal[$field] ?? null];
 			}
 		}
 		return $changes;
+	}
+
+	/**
+	 * Remap source column IDs to target IDs in a view's structural fields for comparison.
+	 * Source IDs without a matching target are left unchanged so they still produce a diff.
+	 */
+	private function remapIncomingViewForComparison(array $srcView, array $columnMap): array {
+		$idMap = [];
+		foreach ($columnMap as $entry) {
+			if ($entry['targetId'] !== null) {
+				$idMap[(int)$entry['sourceId']] = $entry['targetId'];
+			}
+		}
+
+		$remapped = $srcView;
+
+		if (isset($remapped['filter']) && is_array($remapped['filter'])) {
+			foreach ($remapped['filter'] as &$group) {
+				foreach ($group as &$cond) {
+					if (isset($cond['columnId'])) {
+						$cond['columnId'] = $idMap[(int)$cond['columnId']] ?? $cond['columnId'];
+					}
+				}
+			}
+		}
+
+		if (isset($remapped['sort']) && is_array($remapped['sort'])) {
+			foreach ($remapped['sort'] as &$rule) {
+				if (isset($rule['columnId'])) {
+					$rule['columnId'] = $idMap[(int)$rule['columnId']] ?? $rule['columnId'];
+				}
+			}
+		}
+
+		if (isset($remapped['columns']) && is_array($remapped['columns'])) {
+			foreach ($remapped['columns'] as &$id) {
+				$id = $idMap[(int)$id] ?? $id;
+			}
+		}
+
+		if (isset($remapped['columnSettings']) && is_array($remapped['columnSettings'])) {
+			foreach ($remapped['columnSettings'] as &$cs) {
+				if (isset($cs['columnId'])) {
+					$cs['columnId'] = $idMap[(int)$cs['columnId']] ?? $cs['columnId'];
+				}
+			}
+		}
+
+		return $remapped;
 	}
 
 	/**

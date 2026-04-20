@@ -13,18 +13,24 @@
 
 			<!-- Table metadata section -->
 			<template v-if="tableMetaChangedFields.length > 0">
-				<h3 class="import-structure-preview__section-title">
-					{{ t('tables', 'Table metadata') }}
-				</h3>
-				<ul class="import-structure-preview__list">
+				<button class="import-structure-preview__section-title import-structure-preview__section-title--collapsible"
+					:aria-expanded="sectionsExpanded.tableMeta ? 'true' : 'false'"
+					@click="sectionsExpanded.tableMeta = !sectionsExpanded.tableMeta">
+					<span>{{ t('tables', 'Table metadata') }}</span>
+					<ChevronDown v-if="!sectionsExpanded.tableMeta" :size="20" />
+					<ChevronUp v-if="sectionsExpanded.tableMeta" :size="20" />
+				</button>
+				<ul v-if="sectionsExpanded.tableMeta" class="import-structure-preview__list">
 					<li v-for="field in tableMetaChangedFields" :key="field">
 						<NcCheckboxRadioSwitch :checked="selection.tableMeta.includes(field)"
 							@update:checked="toggleTableMeta(field, $event)">
-							<span class="import-structure-preview__field-label">{{ formatFieldName(field) }}</span>
-							<span class="import-structure-preview__change">
-								<span class="import-structure-preview__current">{{ diff.tableMeta[field].current || t('tables', '(none)') }}</span>
-								<span class="import-structure-preview__arrow"> → </span>
-								<span class="import-structure-preview__incoming">{{ diff.tableMeta[field].incoming || t('tables', '(none)') }}</span>
+							<span class="import-structure-preview__label-wrap">
+								<span class="import-structure-preview__field-label">{{ formatFieldName(field) }}</span>
+								<span class="import-structure-preview__change">
+									<span class="import-structure-preview__current">{{ diff.tableMeta[field].current || t('tables', '(none)') }}</span>
+									<span class="import-structure-preview__arrow"> → </span>
+									<span class="import-structure-preview__incoming">{{ diff.tableMeta[field].incoming || t('tables', '(none)') }}</span>
+								</span>
 							</span>
 						</NcCheckboxRadioSwitch>
 					</li>
@@ -33,10 +39,14 @@
 
 			<!-- Columns — Add section -->
 			<template v-if="columnsToAdd.length > 0">
-				<h3 class="import-structure-preview__section-title">
-					{{ n('tables', 'Add column (%n)', 'Add columns (%n)', columnsToAdd.length) }}
-				</h3>
-				<ul class="import-structure-preview__list">
+				<button class="import-structure-preview__section-title import-structure-preview__section-title--collapsible"
+					:aria-expanded="sectionsExpanded.columnsAdd ? 'true' : 'false'"
+					@click="sectionsExpanded.columnsAdd = !sectionsExpanded.columnsAdd">
+					<span>{{ n('tables', 'Add column (%n)', 'Add columns (%n)', columnsToAdd.length) }}</span>
+					<ChevronDown v-if="!sectionsExpanded.columnsAdd" :size="20" />
+					<ChevronUp v-if="sectionsExpanded.columnsAdd" :size="20" />
+				</button>
+				<ul v-if="sectionsExpanded.columnsAdd" class="import-structure-preview__list">
 					<li v-for="item in columnsToAdd" :key="item.column.id">
 						<NcCheckboxRadioSwitch :checked="selection.columnsAdd.includes(item.column.id)"
 							@update:checked="toggleColumnAdd(item.column.id, $event)">
@@ -49,10 +59,14 @@
 
 			<!-- Columns — Update section -->
 			<template v-if="columnsToUpdate.length > 0">
-				<h3 class="import-structure-preview__section-title">
-					{{ n('tables', 'Update column (%n)', 'Update columns (%n)', columnsToUpdate.length) }}
-				</h3>
-				<ul class="import-structure-preview__list">
+				<button class="import-structure-preview__section-title import-structure-preview__section-title--collapsible"
+					:aria-expanded="sectionsExpanded.columnsUpdate ? 'true' : 'false'"
+					@click="sectionsExpanded.columnsUpdate = !sectionsExpanded.columnsUpdate">
+					<span>{{ n('tables', 'Update column (%n)', 'Update columns (%n)', columnsToUpdate.length) }}</span>
+					<ChevronDown v-if="!sectionsExpanded.columnsUpdate" :size="20" />
+					<ChevronUp v-if="sectionsExpanded.columnsUpdate" :size="20" />
+				</button>
+				<ul v-if="sectionsExpanded.columnsUpdate" class="import-structure-preview__list">
 					<li v-for="item in columnsToUpdate" :key="item.targetId" class="import-structure-preview__expandable">
 						<NcCheckboxRadioSwitch :checked="isColumnUpdateChecked(item)"
 							:indeterminate="isColumnUpdateIndeterminate(item)"
@@ -63,11 +77,13 @@
 							<li v-for="(change, field) in item.changes" :key="field">
 								<NcCheckboxRadioSwitch :checked="isColumnFieldChecked(item.targetId, field)"
 									@update:checked="toggleColumnField(item.targetId, field, $event)">
-									<span class="import-structure-preview__field-label">{{ formatFieldName(field) }}</span>
-									<span class="import-structure-preview__change">
-										<span class="import-structure-preview__current">{{ formatValue(change.current) }}</span>
-										<span class="import-structure-preview__arrow"> → </span>
-										<span class="import-structure-preview__incoming">{{ formatValue(change.incoming) }}</span>
+									<span class="import-structure-preview__label-wrap">
+										<span class="import-structure-preview__field-label">{{ formatFieldName(field) }}</span>
+										<span class="import-structure-preview__change">
+											<span class="import-structure-preview__current">{{ formatValue(change.current) }}</span>
+											<span class="import-structure-preview__arrow"> → </span>
+											<span class="import-structure-preview__incoming">{{ formatValue(change.incoming) }}</span>
+										</span>
 									</span>
 								</NcCheckboxRadioSwitch>
 							</li>
@@ -79,13 +95,13 @@
 			<!-- Columns — Delete section (collapsed by default) -->
 			<template v-if="columnsToDelete.length > 0">
 				<button class="import-structure-preview__section-title import-structure-preview__section-title--collapsible"
-					:aria-expanded="deleteColumnExpanded ? 'true' : 'false'"
-					@click="deleteColumnExpanded = !deleteColumnExpanded">
+					:aria-expanded="sectionsExpanded.columnsDelete ? 'true' : 'false'"
+					@click="sectionsExpanded.columnsDelete = !sectionsExpanded.columnsDelete">
 					<span>{{ n('tables', 'Delete column (%n)', 'Delete columns (%n)', columnsToDelete.length) }}</span>
-					<ChevronDown v-if="!deleteColumnExpanded" :size="20" />
-					<ChevronUp v-if="deleteColumnExpanded" :size="20" />
+					<ChevronDown v-if="!sectionsExpanded.columnsDelete" :size="20" />
+					<ChevronUp v-if="sectionsExpanded.columnsDelete" :size="20" />
 				</button>
-				<ul v-if="deleteColumnExpanded" class="import-structure-preview__list">
+				<ul v-if="sectionsExpanded.columnsDelete" class="import-structure-preview__list">
 					<li v-for="item in columnsToDelete" :key="item.targetId">
 						<NcCheckboxRadioSwitch :checked="selection.columnsDelete.includes(item.targetId)"
 							class="import-structure-preview__delete-item"
@@ -99,10 +115,14 @@
 
 			<!-- Views — Add section -->
 			<template v-if="viewsToAdd.length > 0">
-				<h3 class="import-structure-preview__section-title">
-					{{ n('tables', 'Create view (%n)', 'Create views (%n)', viewsToAdd.length) }}
-				</h3>
-				<ul class="import-structure-preview__list">
+				<button class="import-structure-preview__section-title import-structure-preview__section-title--collapsible"
+					:aria-expanded="sectionsExpanded.viewsAdd ? 'true' : 'false'"
+					@click="sectionsExpanded.viewsAdd = !sectionsExpanded.viewsAdd">
+					<span>{{ n('tables', 'Create view (%n)', 'Create views (%n)', viewsToAdd.length) }}</span>
+					<ChevronDown v-if="!sectionsExpanded.viewsAdd" :size="20" />
+					<ChevronUp v-if="sectionsExpanded.viewsAdd" :size="20" />
+				</button>
+				<ul v-if="sectionsExpanded.viewsAdd" class="import-structure-preview__list">
 					<li v-for="item in viewsToAdd" :key="item.view.title">
 						<NcCheckboxRadioSwitch :checked="selection.viewsAdd.includes(item.view.title)"
 							@update:checked="toggleViewAdd(item.view.title, $event)">
@@ -115,10 +135,14 @@
 
 			<!-- Views — Update section -->
 			<template v-if="viewsToUpdate.length > 0">
-				<h3 class="import-structure-preview__section-title">
-					{{ n('tables', 'Update view (%n)', 'Update views (%n)', viewsToUpdate.length) }}
-				</h3>
-				<ul class="import-structure-preview__list">
+				<button class="import-structure-preview__section-title import-structure-preview__section-title--collapsible"
+					:aria-expanded="sectionsExpanded.viewsUpdate ? 'true' : 'false'"
+					@click="sectionsExpanded.viewsUpdate = !sectionsExpanded.viewsUpdate">
+					<span>{{ n('tables', 'Update view (%n)', 'Update views (%n)', viewsToUpdate.length) }}</span>
+					<ChevronDown v-if="!sectionsExpanded.viewsUpdate" :size="20" />
+					<ChevronUp v-if="sectionsExpanded.viewsUpdate" :size="20" />
+				</button>
+				<ul v-if="sectionsExpanded.viewsUpdate" class="import-structure-preview__list">
 					<li v-for="item in viewsToUpdate" :key="item.title" class="import-structure-preview__expandable">
 						<NcCheckboxRadioSwitch :checked="isViewUpdateChecked(item)"
 							:indeterminate="isViewUpdateIndeterminate(item)"
@@ -132,7 +156,14 @@
 							<li v-for="(change, field) in item.changes" :key="field">
 								<NcCheckboxRadioSwitch :checked="isViewFieldChecked(item.title, field)"
 									@update:checked="toggleViewField(item.title, field, $event)">
-									<span class="import-structure-preview__field-label">{{ formatFieldName(field) }}</span>
+									<span class="import-structure-preview__label-wrap">
+										<span class="import-structure-preview__field-label">{{ formatFieldName(field) }}</span>
+										<span class="import-structure-preview__change">
+											<span class="import-structure-preview__current">{{ formatViewFieldValue(field, change.current, false) }}</span>
+											<span class="import-structure-preview__arrow"> → </span>
+											<span class="import-structure-preview__incoming">{{ formatViewFieldValue(field, change.incoming, true) }}</span>
+										</span>
+									</span>
 								</NcCheckboxRadioSwitch>
 							</li>
 						</ul>
@@ -203,7 +234,14 @@ export default {
 	data() {
 		return {
 			applying: false,
-			deleteColumnExpanded: false,
+			sectionsExpanded: {
+				tableMeta: true,
+				columnsAdd: true,
+				columnsUpdate: true,
+				columnsDelete: false,
+				viewsAdd: true,
+				viewsUpdate: true,
+			},
 			selection: {
 				tableMeta: [],
 				columnsAdd: [],
@@ -251,6 +289,22 @@ export default {
 				|| this.selection.viewsAdd.length > 0
 				|| Object.values(this.selection.viewsUpdate).some(fields => fields.length > 0)
 		},
+		sourceColNames() {
+			const map = {}
+			for (const entry of (this.diff.columnMap ?? [])) {
+				map[entry.sourceId] = entry.sourceName
+			}
+			return map
+		},
+		targetColNames() {
+			const map = {}
+			for (const entry of (this.diff.columnMap ?? [])) {
+				if (entry.targetId !== null) {
+					map[entry.targetId] = entry.sourceName
+				}
+			}
+			return map
+		},
 	},
 
 	watch: {
@@ -275,12 +329,42 @@ export default {
 				viewsAdd: [],
 				viewsUpdate: {},
 			}
+			// Table metadata: check all changed fields by default
+			for (const field of Object.keys(diff.tableMeta ?? {})) {
+				sel.tableMeta.push(field)
+			}
+			// Columns-add: checked by default
+			for (const item of (diff.columns ?? []).filter(c => c.action === 'add')) {
+				sel.columnsAdd.push(item.column.id)
+			}
+			// Columns-update: check all changed fields by default
+			for (const item of (diff.columns ?? []).filter(c => c.action === 'update')) {
+				sel.columnsUpdate[item.targetId] = Object.keys(item.changes)
+			}
 			// Views-add: checked by default
 			for (const item of (diff.views ?? []).filter(v => v.action === 'add')) {
 				sel.viewsAdd.push(item.view.title)
 			}
+			// Views-update: check filter, sort, columns and columnSettings always;
+			// also check any other field that is being set for the first time (current is absent)
+			const alwaysCheckViewFields = new Set(['emoji', 'description', 'filter', 'sort', 'columns', 'columnSettings'])
+			for (const item of (diff.views ?? []).filter(v => v.action === 'update')) {
+				const fields = Object.keys(item.changes).filter(f =>
+					alwaysCheckViewFields.has(f) || !item.changes[f].current,
+				)
+				if (fields.length > 0) {
+					sel.viewsUpdate[item.title] = fields
+				}
+			}
 			this.selection = sel
-			this.deleteColumnExpanded = false
+			this.sectionsExpanded = {
+				tableMeta: true,
+				columnsAdd: true,
+				columnsUpdate: true,
+				columnsDelete: false,
+				viewsAdd: true,
+				viewsUpdate: true,
+			}
 		},
 
 		toggleTableMeta(field, checked) {
@@ -404,6 +488,47 @@ export default {
 			return String(value)
 		},
 
+		resolveColId(id, colNames) {
+			const name = colNames[id]
+			return name ? `${name} (ID: ${id})` : `(ID: ${id})`
+		},
+
+		formatFilter(filter, colNames) {
+			if (!Array.isArray(filter) || filter.length === 0) return t('tables', '(none)')
+			return filter.map(group => {
+				if (!Array.isArray(group)) return String(group)
+				return group.map(cond => {
+					const col = this.resolveColId(cond.columnId, colNames)
+					return `${col} ${cond.operator} "${cond.value}"`
+				}).join(' & ')
+			}).join(' | ')
+		},
+
+		formatSort(sort, colNames) {
+			if (!Array.isArray(sort) || sort.length === 0) return t('tables', '(none)')
+			return sort.map(rule => `${this.resolveColId(rule.columnId, colNames)} ${rule.mode}`).join(', ')
+		},
+
+		formatColumns(columns, colNames) {
+			if (!Array.isArray(columns) || columns.length === 0) return t('tables', '(none)')
+			return columns.map(id => this.resolveColId(id, colNames)).join(', ')
+		},
+
+		formatColumnSettings(columnSettings, colNames) {
+			if (!Array.isArray(columnSettings) || columnSettings.length === 0) return t('tables', '(none)')
+			const sorted = [...columnSettings].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+			return sorted.map(cs => this.resolveColId(cs.columnId, colNames)).join(', ')
+		},
+
+		formatViewFieldValue(field, value, isIncoming) {
+			const colNames = isIncoming ? this.sourceColNames : this.targetColNames
+			if (field === 'filter') return this.formatFilter(value, colNames)
+			if (field === 'sort') return this.formatSort(value, colNames)
+			if (field === 'columns') return this.formatColumns(value, colNames)
+			if (field === 'columnSettings') return this.formatColumnSettings(value, colNames)
+			return this.formatValue(value)
+		},
+
 		actionCancel() {
 			this.$emit('close')
 		},
@@ -454,7 +579,7 @@ export default {
 			cursor: pointer;
 			background: none;
 			border: none;
-			padding: 0;
+			padding: 0 0 0 4px;
 			color: inherit;
 			width: 100%;
 			text-align: start;
@@ -485,10 +610,15 @@ export default {
 		gap: 4px;
 	}
 
+	&__label-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
 	&__change {
 		font-size: 0.85rem;
 		color: var(--color-text-lighter);
-		margin-inline-start: 8px;
 	}
 
 	&__current {
