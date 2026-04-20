@@ -68,8 +68,6 @@
 					<TableArrowDown :size="20" />
 				</template>
 			</NcActionButton>
-			<input ref="importStructureFileInput" type="file" aria-hidden="true" class="hidden-visually"
-				accept="application/json" @change="onImportStructureFileChange">
 
 			<!-- EXPORT -->
 			<NcActionButton @click="exportFile">
@@ -142,6 +140,8 @@
 			<NavigationViewItem v-for="view in getViews" :key="'view' + view.id" :view="view"
 				:show-share-sender="false" />
 		</ul>
+		<input ref="importStructureFileInput" type="file" aria-hidden="true" class="hidden-visually"
+			accept="application/json" @change="onImportStructureFileChange">
 	</NcAppNavigationItem>
 </template>
 
