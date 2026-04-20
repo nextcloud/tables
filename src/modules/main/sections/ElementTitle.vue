@@ -90,6 +90,7 @@ export default {
 }
 
 .row.first-row {
+	width: var(--app-content-width, auto);
 	position: sticky;
 	inset-inline-start: 0;
 	top: 0;
