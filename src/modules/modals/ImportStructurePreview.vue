@@ -411,7 +411,7 @@ export default {
 		async actionApply() {
 			this.applying = true
 			try {
-				const url = generateOcsUrl('/apps/tables/api/2/tables/{id}/scheme', { id: this.tableId })
+				const url = generateOcsUrl('/apps/tables/api/2/tables/' + this.tableId + '/scheme')
 				await axios.put(url, { scheme: this.scheme, selection: this.selection })
 				await this.loadTablesFromBE()
 				this.$emit('close')

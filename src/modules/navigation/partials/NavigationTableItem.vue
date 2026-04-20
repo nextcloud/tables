@@ -309,7 +309,7 @@ export default {
 				return
 			}
 			try {
-				const url = generateOcsUrl('/apps/tables/api/2/tables/{id}/scheme/diff', { id: this.table.id })
+				const url = generateOcsUrl('/apps/tables/api/2/tables/' + this.table.id + '/scheme/diff')
 				const response = await axios.post(url, { scheme })
 				const diff = response.data?.ocs?.data
 				emit('tables:modal:importStructure', { tableId: this.table.id, scheme, diff })
