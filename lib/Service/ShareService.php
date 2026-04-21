@@ -167,7 +167,7 @@ class ShareService extends SuperService {
 			// there is the theoretical chance, that an existing share token would be re-used,
 			// so we take up to three attempts to try to generate it.
 			try {
-				return $this->create(
+				return $this->create(new ShareCreate(
 					$node->getId(),
 					ConversionHelper::object2String($node),
 					'',
@@ -178,9 +178,9 @@ class ShareService extends SuperService {
 					false,
 					false,
 					Application::NAV_ENTRY_MODE_HIDDEN,
-					$this->generateShareToken(),
 					$password,
-				);
+					$this->generateShareToken(),
+				));
 			} catch (InternalError $e) {
 			}
 		}
@@ -283,13 +283,13 @@ class ShareService extends SuperService {
 
 	/**
 	 * @param ShareCreate $dto
-
+	 *
 	 * @return Share
-
+	 *
 	 * @throws InternalError
 	 */
 	public function create(ShareCreate $dto): Share {
-		if ('context' === $dto->getNodeType()) {
+		if ($dto->getNodeType() === 'context') {
 			return $this->createContextShare(
 				$dto->getNodeId(),
 				$dto->getReceiver(),
@@ -327,7 +327,7 @@ class ShareService extends SuperService {
 		int $nodeId,
 		string $nodeType,
 		string $receiver,
-		string $receiverType
+		string $receiverType,
 	): Share {
 		if (!$this->userId) {
 			$e = new \Exception('No user given.');
@@ -390,7 +390,7 @@ class ShareService extends SuperService {
 		$item->setPermissionManage($permissionManage);
 
 		if ($shareToken) {
-			$item->setToken(new ShareToken($shareToken));
+			$item->setToken((string)$shareToken);
 		}
 
 		if ($password) {
@@ -421,7 +421,7 @@ class ShareService extends SuperService {
 		int $nodeId,
 		string $receiver,
 		string $receiverType,
-		int $displayMode
+		int $displayMode,
 	): Share {
 		$item = $this->buildBaseShare($nodeId, 'context', $receiver, $receiverType);
 		$item->setPermissionRead(false);
@@ -840,7 +840,6 @@ class ShareService extends SuperService {
 		$permissionManage = $share['permissionManage'] ?? false;
 		$displayMode = $share['displayMode'] ?? 0;
 		$password = $share['password'] ?? null;
-		$sender = $userId;
 		$shareToken = null;
 
 		if (!empty($share['token'])) {
@@ -852,7 +851,7 @@ class ShareService extends SuperService {
 		}
 
 		try {
-			$this->create(
+			$this->create(new ShareCreate(
 				$nodeId,
 				$nodeType,
 				$receiver,
@@ -863,10 +862,9 @@ class ShareService extends SuperService {
 				$permissionDelete,
 				$permissionManage,
 				$displayMode,
-				$shareToken,
 				$password,
-				$sender
-			);
+				$shareToken,
+			));
 		} catch (Throwable $e) {
 			$this->logger->error('Failed to import share: ' . $e->getMessage(), ['exception' => $e, 'share' => $share]);
 		}

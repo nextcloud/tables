@@ -16,7 +16,7 @@ use OCP\Migration\SimpleMigrationStep;
 use Override;
 
 class Version1000Date20260324000000 extends SimpleMigrationStep {
-    private IDBConnection $connection;
+	private IDBConnection $connection;
 
 	public function __construct(IDBConnection $connection) {
 		$this->connection = $connection;
@@ -33,8 +33,6 @@ class Version1000Date20260324000000 extends SimpleMigrationStep {
 			->set('permission_manage', $qb->createNamedParameter(0))
 			->where($qb->expr()->eq('node_type', $qb->createNamedParameter('context')));
 		$affected = $qb->executeStatement();
-		if ($output) {
-			$output->info('Version001100Date20260121180000: Rows affected: ' . $affected);
-		}
+		$output->info('Version001100Date20260121180000: Rows affected: ' . $affected);
 	}
 }

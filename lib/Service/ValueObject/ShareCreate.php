@@ -23,65 +23,54 @@ class ShareCreate {
 		private int $displayMode,
 		private ?string $password = null,
 		private ?ShareToken $shareToken = null,
-	) {}
+	) {
+	}
 
-	public function getNodeId(): int
-	{
+	public function getNodeId(): int {
 		return $this->nodeId;
 	}
 
-	public function getNodeType(): string
-	{
+	public function getNodeType(): string {
 		return $this->nodeType;
 	}
 
-	public function getReceiver(): string
-	{
+	public function getReceiver(): string {
 		return $this->receiver;
 	}
 
-	public function getReceiverType(): string
-	{
+	public function getReceiverType(): string {
 		return $this->receiverType;
 	}
 
-	public function getPermissionRead(): bool
-	{
+	public function getPermissionRead(): bool {
 		return $this->permissionRead;
 	}
 
-	public function getPermissionCreate(): bool
-	{
+	public function getPermissionCreate(): bool {
 		return $this->permissionCreate;
 	}
 
-	public function getPermissionUpdate(): bool
-	{
+	public function getPermissionUpdate(): bool {
 		return $this->permissionUpdate;
 	}
 
-	public function getPermissionDelete(): bool
-	{
+	public function getPermissionDelete(): bool {
 		return $this->permissionDelete;
 	}
 
-	public function getPermissionManage(): bool
-	{
+	public function getPermissionManage(): bool {
 		return $this->permissionManage;
 	}
 
-	public function getDisplayMode(): int
-	{
+	public function getDisplayMode(): int {
 		return $this->displayMode;
 	}
 
-	public function getPassword(): ?string
-	{
+	public function getPassword(): ?string {
 		return $this->password;
 	}
 
-	public function getShareToken(): ?ShareToken
-	{
+	public function getShareToken(): ?ShareToken {
 		return $this->shareToken;
 	}
 }
