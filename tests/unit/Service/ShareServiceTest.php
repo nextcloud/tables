@@ -9,25 +9,24 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Service;
 
-use OCA\Tables\Errors\PermissionError;
-use OCA\Tables\Service\ShareService;
+use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
-use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
-use OCA\Tables\Helper\UserHelper;
-use OCA\Tables\Helper\GroupHelper;
+use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\CircleHelper;
-use OCA\Tables\Db\ContextNavigationMapper;
+use OCA\Tables\Helper\GroupHelper;
+use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Service\PermissionsService;
+use OCA\Tables\Service\ShareService;
+use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use OCA\Tables\Service\ValueObject\ShareCreate;
-
 
 class ShareServiceTest extends TestCase {
 	private $permissionsService;
@@ -45,8 +44,7 @@ class ShareServiceTest extends TestCase {
 	private $hasher;
 	protected $shareService;
 
-	protected function setUp(): void
-	{
+	protected function setUp(): void {
 		parent::setUp();
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
@@ -81,7 +79,7 @@ class ShareServiceTest extends TestCase {
 	}
 
 	public function testCreateContextShareSetsAllPermissionsFalse(): void {
-		$this->mapper->method('insert')->willReturnCallback(function(Share $share) {
+		$this->mapper->method('insert')->willReturnCallback(function (Share $share) {
 			return $share;
 		});
 
@@ -103,8 +101,7 @@ class ShareServiceTest extends TestCase {
 		$this->assertFalse($share->getPermissionManage());
 	}
 
-	public function testUpdatePermissionThrowsOnContextShare(): void
-	{
+	public function testUpdatePermissionThrowsOnContextShare(): void {
 		$share = new Share();
 		$share->setNodeType('context');
 		$share->setNodeId(9);
