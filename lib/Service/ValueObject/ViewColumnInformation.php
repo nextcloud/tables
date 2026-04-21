@@ -58,6 +58,9 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 	}
 
 	public static function fromArray(array $data): static {
+		if (!isset($data[self::KEY_ID], $data[self::KEY_ORDER])) {
+			throw new \InvalidArgumentException('Column settings entry is missing required fields: columnId and order are required');
+		}
 		$vci = new static(
 			(int)$data[self::KEY_ID],
 			(int)$data[self::KEY_ORDER],

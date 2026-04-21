@@ -36,6 +36,9 @@ class ColumnSettings implements JSONSerializable {
 	public static function createFromInputArray(array $inputColumnSettings): self {
 		$columnSettings = [];
 		foreach ($inputColumnSettings as $inputColumnSetting) {
+			if (!is_array($inputColumnSetting)) {
+				throw new \InvalidArgumentException('Each column settings entry must be an array');
+			}
 			$columnSettings[] = ViewColumnInformation::fromArray($inputColumnSetting);
 		}
 		return new self($columnSettings);
