@@ -77,9 +77,9 @@ class ApplySchemeServiceTest extends TestCase {
 		$view->setTitle($title);
 		$view->setEmoji(null);
 		$view->setDescription(null);
-		$view->setFilter([]);
-		$view->setSort([]);
-		$view->setColumnSettings([]);
+		$view->setFilterArray([]);
+		$view->setSortArray([]);
+		$view->setColumnsArray([]);
 		return $view;
 	}
 
@@ -252,7 +252,7 @@ class ApplySchemeServiceTest extends TestCase {
 		$this->service->apply(1,
 			$this->baseScheme(
 				[$this->srcCol($srcColId, 'Score', 'number')],
-				[['title' => 'Score View', 'filter' => [[['columnId' => $srcColId, 'operator' => 'is-not-empty', 'value' => '']]], 'sort' => [], 'columns' => [], 'columnSettings' => []]],
+				[['title' => 'Score View', 'filter' => [[['columnId' => $srcColId, 'operator' => 'is-empty', 'value' => '']]], 'sort' => [], 'columns' => [], 'columnSettings' => []]],
 			),
 			[
 				'columnsAdd' => [$srcColId],
@@ -275,7 +275,7 @@ class ApplySchemeServiceTest extends TestCase {
 		$this->service->apply(1,
 			$this->baseScheme(
 				[],
-				[['title' => 'V', 'filter' => [[['columnId' => 999, 'operator' => 'is-not-empty', 'value' => '']]], 'sort' => [], 'columns' => [], 'columnSettings' => []]],
+				[['title' => 'V', 'filter' => [[['columnId' => 999, 'operator' => 'is-empty', 'value' => '']]], 'sort' => [], 'columns' => [], 'columnSettings' => []]],
 			),
 			['viewsAdd' => ['V']]
 		);
