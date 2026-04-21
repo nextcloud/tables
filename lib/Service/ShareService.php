@@ -332,7 +332,7 @@ class ShareService extends SuperService {
 		int $nodeId,
 		string $receiver,
 		string $receiverType,
-		int $displayMode
+		int $displayMode,
 	): Share {
 		$item = $this->buildBaseShare($nodeId, 'context', $receiver, $receiverType);
 		$item->setPermissionRead(false);
