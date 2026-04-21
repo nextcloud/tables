@@ -8,10 +8,12 @@
 			<div class="row space-T">
 				{{ t('tables', 'Select a table structure JSON file to preview and apply changes.') }}
 			</div>
-			<RowFormWrapper>
-				<div v-if="selectedFileName" class="import-filename">
-					<IconFile :size="20" />{{ selectedFileName }}
-				</div>
+
+			<div v-if="selectedFileName" class="row import-filename">
+				<IconFile :size="20" />{{ selectedFileName }}
+			</div>
+
+			<div class="row space-T">
 				<div class="fix-col-4 middle">
 					<NcButton :aria-label="t('tables', 'Select from Files')" @click="pickFile">
 						<template #icon>
@@ -32,18 +34,19 @@
 						accept="application/json"
 						@change="onUploadFileInputChange">
 				</div>
-				<div class="fix-col-4">
-					<p class="span">
-						{{ t('tables', 'Supported format: JSON (table structure export)') }}
-					</p>
-				</div>
-			</RowFormWrapper>
-
-			<div v-if="loading" class="row">
-				<NcLoadingIcon :size="32" :name="t('tables', 'Loading diff…')" />
 			</div>
 
 			<div class="row">
+				<p class="fix-col-4 span">
+					{{ t('tables', 'Supported format: JSON (table structure export)') }}
+				</p>
+			</div>
+
+			<div v-if="loading" class="row space-T">
+				<NcLoadingIcon :size="32" :name="t('tables', 'Loading diff…')" />
+			</div>
+
+			<div class="row space-T">
 				<div class="fix-col-4 end">
 					<NcButton :aria-label="t('tables', 'Preview changes')" type="primary"
 						:disabled="loading" @click="actionPreview">
@@ -61,7 +64,6 @@ import { getFilePickerBuilder, FilePickerType, showError, showWarning } from '@n
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { emit } from '@nextcloud/event-bus'
 import axios from '@nextcloud/axios'
-import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
 import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
@@ -71,7 +73,6 @@ export default {
 		NcDialog,
 		NcButton,
 		NcLoadingIcon,
-		RowFormWrapper,
 		IconFolder,
 		IconUpload,
 		IconFile,
@@ -209,3 +210,22 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+.middle {
+	align-items: center;
+}
+
+.middle button {
+	min-width: fit-content;
+	margin-inline-end: calc(var(--default-grid-baseline) * 3);
+}
+
+.import-filename {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding-inline-start: 12px;
+	padding-bottom: 16px;
+}
+</style>
