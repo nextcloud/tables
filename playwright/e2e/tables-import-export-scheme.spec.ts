@@ -25,6 +25,11 @@ interface SchemeColumnSetting {
 	mandatory?: boolean
 }
 
+interface SchemeColumnOrderEntry {
+	columnId: number
+	order?: number
+}
+
 interface SchemeSort {
 	columnId: number
 	mode: string
@@ -51,6 +56,8 @@ interface TableScheme extends Record<string, unknown> {
 	columns: SchemeColumn[]
 	views: SchemeView[]
 	tablesVersion?: string
+	columnOrder?: SchemeColumnOrderEntry[]
+	sort?: SchemeSort[]
 }
 
 async function getTutorialScheme(page: Page): Promise<TableScheme> {
@@ -108,6 +115,18 @@ function normalizeViews(views: SchemeView[], columns: SchemeColumn[]) {
 			})),
 		),
 	}))
+}
+
+function normalizeTableLevelFields(scheme: TableScheme, columns: SchemeColumn[]) {
+	const columnTitleById = new Map(columns.map((column) => [column.id, column.title]))
+	scheme.columnOrder = (scheme.columnOrder ?? []).map((entry) => ({
+		title: columnTitleById.get(entry.columnId) ?? entry.columnId,
+		order: entry.order,
+	})) as unknown as SchemeColumnOrderEntry[]
+	scheme.sort = (scheme.sort ?? []).map((sort) => ({
+		title: columnTitleById.get(sort.columnId) ?? sort.columnId,
+		mode: sort.mode,
+	})) as unknown as SchemeSort[]
 }
 
 function formatOperatorLabel(operator: string) {
@@ -287,6 +306,8 @@ test.describe('Import Export Scheme', () => {
 		content.columns = omitSubFields(content.columns, columnFieldsToIgnore) as SchemeColumn[]
 		sourceScheme.views = normalizeViews(sourceScheme.views, sourceColumns) as SchemeView[]
 		content.views = normalizeViews(content.views, contentColumns) as SchemeView[]
+		normalizeTableLevelFields(sourceScheme, sourceColumns)
+		normalizeTableLevelFields(content, contentColumns)
 		content.tablesVersion = ''
 		sourceScheme.tablesVersion = ''
 

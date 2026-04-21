@@ -199,6 +199,32 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				$this->importFavorites($importSource, $newTable, $table);
 
 				$columnIdMap = $this->importColumns($importSource, $newTable, $table, $columnIdMap);
+
+				$needsUpdate = false;
+				if (!empty($table['columnOrder'])) {
+					$remapped = array_map(function (array $entry) use ($columnIdMap): array {
+						if (isset($entry['columnId'])) {
+							$entry['columnId'] = $columnIdMap[$entry['columnId']] ?? $entry['columnId'];
+						}
+						return $entry;
+					}, $table['columnOrder']);
+					$newTable->setColumnOrder(json_encode($remapped));
+					$needsUpdate = true;
+				}
+				if (!empty($table['sort'])) {
+					$remapped = array_map(function (array $entry) use ($columnIdMap): array {
+						if (isset($entry['columnId'])) {
+							$entry['columnId'] = $columnIdMap[$entry['columnId']] ?? $entry['columnId'];
+						}
+						return $entry;
+					}, $table['sort']);
+					$newTable->setSort(json_encode($remapped));
+					$needsUpdate = true;
+				}
+				if ($needsUpdate) {
+					$this->tableMapper->update($newTable);
+				}
+
 				$rowIdMap = $this->importRows($importSource, $newTable, $table, $rowIdMap);
 
 				$this->importContexts($contexts, $newTable, $table, $contextIdMap);

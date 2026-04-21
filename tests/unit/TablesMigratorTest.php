@@ -238,4 +238,54 @@ class TablesMigratorTest extends TestCase {
 		$this->expectException(\Exception::class);
 		$this->migrator->import($user, $importSource, $output);
 	}
+
+	public function testImportAppliesColumnOrderAndSortWithColumnIdRemapping(): void {
+		$user = $this->createMock(IUser::class);
+		$importSource = $this->createMock(IImportSource::class);
+		$output = new NullOutput();
+
+		$user->method('getUID')->willReturn('user1');
+		$importSource->method('getMigratorVersion')->willReturn(1);
+
+		$tableData = [
+			'id' => 1,
+			'title' => 'Test',
+			'columnOrder' => [['columnId' => 10, 'order' => 1, 'readonly' => false, 'mandatory' => false]],
+			'sort' => [['columnId' => 10, 'mode' => 'ASC']],
+		];
+
+		$importSource->method('getFileContents')->willReturnCallback(static function (string $file) use ($tableData): string {
+			return match ($file) {
+				'tables.json' => json_encode([$tableData]),
+				'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+				default => json_encode([]),
+			};
+		});
+
+		$newTable = new Table();
+		$this->tableService->method('importTable')->willReturn($newTable);
+		$this->columnService->method('importColumn')->willReturn(20);
+		$this->rowService->method('importRow')->willReturn(1);
+
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+		$this->tableMapper->method('update')->willReturnArgument(0);
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertSame(
+			json_encode([['columnId' => 20, 'order' => 1, 'readonly' => false, 'mandatory' => false]]),
+			$newTable->getColumnOrder()
+		);
+		$this->assertSame(
+			json_encode([['columnId' => 20, 'mode' => 'ASC']]),
+			$newTable->getSort()
+		);
+	}
 }

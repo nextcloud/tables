@@ -97,7 +97,10 @@ class RowService extends SuperService {
 				$tableColumns = $this->columnMapper->findAllByTable($tableId);
 				$showColumnIds = array_map(fn (Column $column) => $column->getId(), $tableColumns);
 
-				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, null, $userId);
+				$table = $this->tableMapper->find($tableId);
+				$sort = $table->getSortArray() ?: null;
+
+				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
 			} else {
 				throw new PermissionError('no read access to table id = ' . $tableId);
 			}

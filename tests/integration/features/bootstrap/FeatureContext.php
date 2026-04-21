@@ -861,6 +861,27 @@ class FeatureContext implements Context {
 		$this->sendUpdateViewRequest($viewName, ['sort' => json_encode($sortData)]);
 	}
 
+	#[When('following sort order is applied to table :tableName:')]
+	public function applySortToTable(string $tableName, TableNode $sortOrder): void {
+		$sortData = [];
+		foreach ($sortOrder->getRows() as $row) {
+			$columnId = $this->columnIds[$row[0]]
+				?? $this->collectionManager->getByAlias('column', $row[0])['id'];
+			$sortData[] = [
+				'columnId' => $columnId,
+				'mode' => $row[1],
+			];
+		}
+
+		$this->sendOcsRequest(
+			'PUT',
+			'/apps/tables/api/2/tables/' . $this->tableIds[$tableName],
+			['sort' => $sortData]
+		);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+	}
+
 	/**
 	 * @When user :user update view :viewName with title :title and emoji :emoji
 	 *
@@ -923,6 +944,51 @@ class FeatureContext implements Context {
 		$view = $this->collectionManager->getByAlias('view', $viewAlias);
 		$view['columnSettings'] = $columnSettings;
 		$this->collectionManager->update($view, 'view', $view['id']);
+	}
+
+	/**
+	 * @When user :user sets columnSettings :columnList to table :tableName
+	 */
+	public function applyColumnsToTable(string $user, string $columnList, string $tableName): void {
+		$this->setCurrentUser($user);
+
+		$columns = explode(',', $columnList);
+		$columnSettings = array_map(function (string $columnAlias, int $index) {
+			$colId = $this->columnIds[$columnAlias]
+				?? $this->collectionManager->getByAlias('column', $columnAlias)['id'];
+			return [
+				'columnId' => $colId,
+				'order' => $index,
+			];
+		}, $columns, array_keys($columns));
+
+		$this->sendOcsRequest(
+			'PUT',
+			'/apps/tables/api/2/tables/' . $this->tableIds[$tableName],
+			['columnSettings' => $columnSettings]
+		);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @Then table :tableName has columns in order :titleList for user :user via v2
+	 */
+	public function tableHasColumnsInOrder(string $tableName, string $titleList, string $user): void {
+		$this->setCurrentUser($user);
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/columns/table/' . $this->tableIds[$tableName]
+		);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$data = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$actualTitles = array_column($data, 'title');
+		$expectedTitles = explode(',', $titleList);
+
+		Assert::assertEquals($expectedTitles, $actualTitles);
 	}
 
 	/**

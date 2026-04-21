@@ -5,7 +5,7 @@
 
 import { test, expect } from '../support/fixtures'
 import { createRandomUser } from '../support/api'
-import { createTable, deleteTable, loadTable } from '../support/commands'
+import { createTable, createTextLineColumn, deleteTable, loadTable } from '../support/commands'
 import { login } from '../support/login'
 
 test.describe('Manage a table', () => {
@@ -42,7 +42,7 @@ test.describe('Manage a table', () => {
 		await page.getByRole('menuitem', { name: 'Edit table' }).click()
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
-		await page.locator('.modal__content #description-editor .tiptap.ProseMirror').fill('Updated ToDo List description')
+		await page.locator('#description-editor .tiptap.ProseMirror').fill('Updated ToDo List description')
 		await expect(page.locator('[data-cy="editTableSaveBtn"]')).toBeEnabled()
 		await page.locator('[data-cy="editTableSaveBtn"]').click()
 
@@ -109,5 +109,82 @@ test.describe('Manage a table', () => {
 		await login(page, targetUserTransfer)
 		await page.goto('/index.php/apps/tables')
 		await expect(page.locator('.app-navigation__list').filter({ hasText: 'test table' })).toBeVisible()
+	})
+
+	test('Set column order in Edit Table modal', async ({ userPage: { page } }) => {
+		await page.goto('/index.php/apps/tables')
+		await createTable(page, 'Column order test table')
+		await createTextLineColumn(page, 'colFirst', '', '', true)
+		await createTextLineColumn(page, 'colSecond', '', '', false)
+
+		const tableItem = page.locator('[data-cy="navigationTableItem"]').filter({ hasText: 'Column order test table' }).first()
+		await tableItem.getByRole('button', { name: /Actions|Open menu/i }).click({ force: true })
+		await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
+
+		const columnOrderSection = page.locator('#settings-section_column-order')
+		await columnOrderSection.scrollIntoViewIfNeeded()
+
+		const columnEntries = columnOrderSection.locator('.column-entry')
+		await expect(columnEntries.filter({ hasText: 'colFirst' })).toBeVisible()
+		await expect(columnEntries.filter({ hasText: 'colSecond' })).toBeVisible()
+
+		// Move colFirst down so colSecond becomes first
+		const colFirstEntry = columnEntries.filter({ hasText: 'colFirst' })
+		await colFirstEntry.hover()
+		await colFirstEntry.getByRole('button', { name: 'Move down' }).click()
+
+		await expect(columnEntries.nth(0)).toContainText('colSecond')
+		await expect(columnEntries.nth(1)).toContainText('colFirst')
+
+		const updateReqPromise = page.waitForResponse(
+			(response) => response.url().includes('/apps/tables/api/2/tables/') && response.request().method() === 'PUT',
+		)
+		await page.locator('[data-cy="editTableSaveBtn"]').click()
+		const updateResponse = await updateReqPromise
+		expect(updateResponse.ok()).toBeTruthy()
+		const body = await updateResponse.json()
+		expect(body.ocs.data.columnOrder).toHaveLength(2)
+
+		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
+	})
+
+	test('Set default sort in Edit Table modal', async ({ userPage: { page } }) => {
+		await page.goto('/index.php/apps/tables')
+		await createTable(page, 'Default sort test table')
+		await createTextLineColumn(page, 'name', '', '', true)
+
+		const tableItem = page.locator('[data-cy="navigationTableItem"]').filter({ hasText: 'Default sort test table' }).first()
+		await tableItem.getByRole('button', { name: /Actions|Open menu/i }).click({ force: true })
+		await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
+
+		const defaultSortSection = page.locator('#settings-section_default-sort')
+		await defaultSortSection.scrollIntoViewIfNeeded()
+
+		await defaultSortSection.getByRole('button', { name: 'Add new sorting rule' }).click()
+
+		const sortEntry = defaultSortSection.locator('.sort-entry').first()
+		await sortEntry.locator('.select-field').click()
+		await page.locator('ul.vs__dropdown-menu li span[title="name"]').click()
+
+		await expect(sortEntry.locator('.checkbox-radio-switch__input[value="ASC"]')).toBeChecked()
+
+		await sortEntry.locator('input[value="DESC"]').click({ force: true })
+		await expect(sortEntry.locator('input[value="DESC"]')).toBeChecked()
+
+		const updateReqPromise = page.waitForResponse(
+			(response) => response.url().includes('/apps/tables/api/2/tables/') && response.request().method() === 'PUT',
+		)
+		await page.locator('[data-cy="editTableSaveBtn"]').click()
+		const updateResponse = await updateReqPromise
+		expect(updateResponse.ok()).toBeTruthy()
+		const body = await updateResponse.json()
+		expect(body.ocs.data.sort).toHaveLength(1)
+		expect(body.ocs.data.sort[0].mode).toBe('DESC')
+
+		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
 	})
 })

@@ -757,7 +757,9 @@
                     "hasShares",
                     "rowsCount",
                     "views",
-                    "columnsCount"
+                    "columnsCount",
+                    "columnOrder",
+                    "sort"
                 ],
                 "properties": {
                     "id": {
@@ -842,6 +844,53 @@
                     "columnsCount": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "columnOrder": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "order",
+                                "readonly"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "order": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "readonly": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "sort": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "mode"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "mode": {
+                                    "type": "string",
+                                    "enum": [
+                                        "ASC",
+                                        "DESC"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -6913,6 +6962,73 @@
                                         "type": "boolean",
                                         "default": null,
                                         "description": "whether the table is archived"
+                                    },
+                                    "columnSettings": {
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Default column order settings (array or JSON string)",
+                                        "oneOf": [
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "columnId",
+                                                        "order",
+                                                        "readonly"
+                                                    ],
+                                                    "properties": {
+                                                        "columnId": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "order": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "readonly": {
+                                                            "type": "boolean"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    "sort": {
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Default sort rules (array or JSON string)",
+                                        "oneOf": [
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "columnId",
+                                                        "mode"
+                                                    ],
+                                                    "properties": {
+                                                        "columnId": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "mode": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "ASC",
+                                                                "DESC"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
                                     }
                                 }
                             }
@@ -7594,6 +7710,57 @@
                                         "description": "views",
                                         "items": {
                                             "$ref": "#/components/schemas/View"
+                                        }
+                                    },
+                                    "columnOrder": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "Default column order settings",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "columnId",
+                                                "order",
+                                                "readonly"
+                                            ],
+                                            "properties": {
+                                                "columnId": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "order": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "readonly": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "sort": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "Default sort rules",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "columnId",
+                                                "mode"
+                                            ],
+                                            "properties": {
+                                                "columnId": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "mode": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "ASC",
+                                                        "DESC"
+                                                    ]
+                                                }
+                                            }
                                         }
                                     }
                                 }

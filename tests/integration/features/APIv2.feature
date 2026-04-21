@@ -1524,3 +1524,37 @@ Feature: APIv2
       When user "participant1-v2" updates row "row-1" with following values:
         | one | YES |
       Then the reported status is "400"
+
+  @api2 @column-order
+  Scenario: Set default column order on a table
+    Given table "TableCO" with emoji "📋" exists for user "participant1-v2" as "tco" via v2
+    Then column from main type "text" for node type "table" and node name "tco" exists with name "colA" and following properties via v2
+      | subtype | line  |
+      | title   | Alpha |
+    Then column from main type "text" for node type "table" and node name "tco" exists with name "colB" and following properties via v2
+      | subtype | line |
+      | title   | Beta |
+    Then column from main type "text" for node type "table" and node name "tco" exists with name "colC" and following properties via v2
+      | subtype | line  |
+      | title   | Gamma |
+    When user "participant1-v2" sets columnSettings "colC,colA,colB" to table "tco"
+    Then table "tco" has columns in order "Gamma,Alpha,Beta" for user "participant1-v2" via v2
+
+  @api2 @default-sort
+  Scenario: Set default sort order on a table and verify rows are returned sorted
+    Given as user "participant1-v2"
+    And table "TableSort" with emoji "🔢" exists for user "participant1-v2" as "tsort" via v2
+    And column "weight" exists with following properties
+      | type        | number                  |
+      | mandatory   | 1                       |
+      | description | Weight of the entry     |
+    And using table "tsort"
+    And user "participant1-v2" creates row "rs1" with following values:
+      | weight | 75 |
+    And user "participant1-v2" creates row "rs2" with following values:
+      | weight | 92 |
+    And user "participant1-v2" creates row "rs3" with following values:
+      | weight | 67 |
+    When following sort order is applied to table "tsort":
+      | weight | DESC |
+    Then "table" "tsort" has exactly these rows "rs2,rs1,rs3" in exactly this order

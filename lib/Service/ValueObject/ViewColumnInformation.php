@@ -59,10 +59,10 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 
 	public static function fromArray(array $data): static {
 		$vci = new static(
-			$data[self::KEY_ID],
-			$data[self::KEY_ORDER],
-			$data[self::KEY_READONLY] ?? false,
-			$data[self::KEY_MANDATORY] ?? false,
+			(int)$data[self::KEY_ID],
+			(int)$data[self::KEY_ORDER],
+			(bool)($data[self::KEY_READONLY] ?? false),
+			(bool)($data[self::KEY_MANDATORY] ?? false),
 		);
 
 		return $vci;

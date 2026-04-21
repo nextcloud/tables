@@ -47,6 +47,9 @@ class ColumnService extends SuperService {
 
 	private ColumnDtoValidator $columnDtoValidator;
 
+	/** @var array<int, int[]> Per-request cache of sorted column-id order, keyed by tableId. */
+	private array $columnOrderCache = [];
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
@@ -74,10 +77,40 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId, ?string $userId = null): array {
+	public function findAllByTable(int $tableId, ?string $userId = null, ?Table $table = null): array {
 		if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
 			try {
-				return $this->enhanceColumns($this->mapper->findAllByTable($tableId));
+				$columns = $this->enhanceColumns($this->mapper->findAllByTable($tableId));
+
+				// Apply table-level default column order when set.
+				// Use a per-request cache to avoid a redundant DB fetch when the
+				// caller did not pass the Table entity and the TableMapper cache
+				// is cold (e.g. CLI/migration paths with $userId = '').
+				if (!array_key_exists($tableId, $this->columnOrderCache)) {
+					$entity = $table ?? $this->tableMapper->find($tableId);
+					$this->columnOrderCache[$tableId] = $entity->getColumnOrderArray();
+				}
+				$columnOrder = $this->columnOrderCache[$tableId];
+				if (!empty($columnOrder)) {
+					$indexed = [];
+					foreach ($columns as $column) {
+						$indexed[$column->getId()] = $column;
+					}
+					$ordered = [];
+					foreach ($columnOrder as $id) {
+						if (isset($indexed[$id])) {
+							$ordered[] = $indexed[$id];
+							unset($indexed[$id]);
+						}
+					}
+					// append any columns not listed in the order (e.g. newly added)
+					foreach ($indexed as $column) {
+						$ordered[] = $column;
+					}
+					return $ordered;
+				}
+
+				return $columns;
 			} catch (\OCP\DB\Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
