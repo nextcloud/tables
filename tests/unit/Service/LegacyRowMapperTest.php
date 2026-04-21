@@ -137,6 +137,8 @@ class LegacyRowMapperTest extends TestCase {
 		$data2 = $row2->getData();
 
 		self::assertTrue($data === $data2);
-		self::assertTrue($legacyRow->jsonSerialize() === $row2->jsonSerialize());
+		$row2Serialized = $row2->jsonSerialize();
+		unset($row2Serialized['dataByAlias']);
+		self::assertTrue($legacyRow->jsonSerialize() === $row2Serialized);
 	}
 }

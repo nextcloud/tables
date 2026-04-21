@@ -73,6 +73,7 @@
                 "required": [
                     "id",
                     "title",
+                    "technicalName",
                     "tableId",
                     "createdBy",
                     "createdByDisplayName",
@@ -113,6 +114,9 @@
                         "format": "int64"
                     },
                     "title": {
+                        "type": "string"
+                    },
+                    "technicalName": {
                         "type": "string"
                     },
                     "tableId": {
@@ -422,6 +426,7 @@
                 "required": [
                     "id",
                     "title",
+                    "technicalName",
                     "createdAt",
                     "lastEditAt",
                     "type",
@@ -457,6 +462,9 @@
                         "format": "int64"
                     },
                     "title": {
+                        "type": "string"
+                    },
+                    "technicalName": {
                         "type": "string"
                     },
                     "createdAt": {
@@ -590,7 +598,8 @@
                     "id",
                     "createdAt",
                     "lastEditAt",
-                    "data"
+                    "data",
+                    "dataByAlias"
                 ],
                 "properties": {
                     "id": {
@@ -619,6 +628,25 @@
                                 "type": "object"
                             }
                         }
+                    },
+                    "dataByAlias": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "value"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "value": {
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -631,7 +659,8 @@
                     "createdAt",
                     "lastEditBy",
                     "lastEditAt",
-                    "data"
+                    "data",
+                    "dataByAlias"
                 ],
                 "properties": {
                     "id": {
@@ -668,6 +697,25 @@
                             },
                             "value": {
                                 "type": "object"
+                            }
+                        }
+                    },
+                    "dataByAlias": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "value"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "value": {
+                                    "type": "object"
+                                }
                             }
                         }
                     }
@@ -855,6 +903,7 @@
                     "ownership",
                     "ownerDisplayName",
                     "createdBy",
+                    "dataByAlias",
                     "createdAt",
                     "lastEditBy",
                     "lastEditAt",
@@ -894,6 +943,25 @@
                     },
                     "createdBy": {
                         "type": "string"
+                    },
+                    "dataByAlias": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "value"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "value": {
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "createdAt": {
                         "type": "string"
@@ -3630,6 +3698,11 @@
                                         "type": "string",
                                         "description": "Title"
                                     },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
+                                    },
                                     "type": {
                                         "type": "string",
                                         "enum": [
@@ -4058,6 +4131,11 @@
                                         "type": "string",
                                         "description": "Title"
                                     },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
+                                    },
                                     "type": {
                                         "type": "string",
                                         "enum": [
@@ -4347,6 +4425,11 @@
                                         "type": "string",
                                         "nullable": true,
                                         "description": "Title"
+                                    },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
                                     },
                                     "subtype": {
                                         "type": "string",
@@ -8463,6 +8546,11 @@
                                         "type": "string",
                                         "description": "Title"
                                     },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
+                                    },
                                     "numberDefault": {
                                         "type": "number",
                                         "format": "double",
@@ -8779,6 +8867,11 @@
                                         "type": "string",
                                         "description": "Title"
                                     },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
+                                    },
                                     "textDefault": {
                                         "type": "string",
                                         "nullable": true,
@@ -9084,6 +9177,11 @@
                                         "type": "string",
                                         "description": "Title"
                                     },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
+                                    },
                                     "selectionOptions": {
                                         "type": "string",
                                         "description": "Json array{id: int, label: string} with options that can be selected, eg [{\"id\": 1, \"label\": \"first\"},{\"id\": 2, \"label\": \"second\"}]"
@@ -9375,6 +9473,11 @@
                                         "type": "string",
                                         "description": "Title"
                                     },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
+                                    },
                                     "datetimeDefault": {
                                         "type": "string",
                                         "nullable": true,
@@ -9664,6 +9767,11 @@
                                     "title": {
                                         "type": "string",
                                         "description": "Title"
+                                    },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Technical name of the column"
                                     },
                                     "usergroupDefault": {
                                         "type": "string",

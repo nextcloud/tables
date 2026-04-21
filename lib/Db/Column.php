@@ -22,6 +22,8 @@ use ValueError;
  *
  * @method getTitle(): string
  * @method setTitle(string $title)
+ * @method getTechnicalName(): string
+ * @method setTechnicalName(?string $technicalName)
  * @method getTableId(): int
  * @method setTableId(int $tableId)
  * @method getCreatedBy(): string
@@ -115,6 +117,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const META_ID_TITLE = 'id';
 
 	protected ?string $title = null;
+	protected ?string $technicalName = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
 	protected ?string $createdAt = null;
@@ -201,6 +204,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public static function fromDto(ColumnDto $data): self {
 		$column = new self();
 		$column->setTitle($data->getTitle());
+		$column->setTechnicalName($data->getTechnicalName());
 		$column->setType($data->getType());
 		$column->setSubtype($data->getSubtype() ?? '');
 		$column->setMandatory($data->isMandatory() ?? false);
@@ -264,6 +268,7 @@ class Column extends EntitySuper implements JsonSerializable {
 			'id' => $this->id,
 			'tableId' => $this->tableId,
 			'title' => $this->title,
+			'technicalName' => $this->technicalName,
 			'createdBy' => $this->createdBy,
 			'createdByDisplayName' => $this->createdByDisplayName,
 			'createdAt' => $this->createdAt,
