@@ -71,9 +71,9 @@ class StructureDiffServiceTest extends TestCase {
 		$view->setTitle($title);
 		$view->setEmoji(null);
 		$view->setDescription(null);
-		$view->setFilter([]);
-		$view->setSort([]);
-		$view->setColumnSettings([]);
+		$view->setFilter('[]');
+		$view->setSort('[]');
+		$view->setColumns('[]');
 		return $view;
 	}
 
@@ -316,7 +316,7 @@ class StructureDiffServiceTest extends TestCase {
 		$selCol = $this->makeColumn(10, 'Status', 'selection');
 		$selCol->setSelectionOptions('[{"id":1,"label":"A"}]');
 		$view = $this->makeView('Filter View');
-		$view->setFilter([[['columnId' => 99, 'operator' => 'is-equal', 'value' => '@selection-id-1']]]);
+		$view->setFilter(json_encode([[['columnId' => 99, 'operator' => 'is-equal', 'value' => '@selection-id-1']]]));
 
 		$this->tableService->method('find')->willReturn($table);
 		$this->columnService->method('findAllByTable')->willReturn([$selCol]);

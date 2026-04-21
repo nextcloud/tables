@@ -248,17 +248,24 @@ class StructureDiffService extends SuperService {
 	 * - false and null are treated as equivalent: boolean fields default to false in the DB
 	 *   but are absent (null) when omitted from an exported scheme, so they must not
 	 *   trigger a spurious "false → (none)" diff entry.
-	 * - Arrays and objects (including \stdClass) are JSON-encoded so that e.g. an empty
-	 *   \stdClass and an empty array compare as equal.
+	 * - Empty arrays and empty objects (e.g. \stdClass with no properties) are treated as
+	 *   equivalent to null: jsonSerialize() returns new \stdClass() for unset customSettings
+	 *   and [] for unset selectionOptions, which must not diff against absent (null) values
+	 *   in a source scheme.
+	 * - Non-empty arrays and objects are JSON-encoded for structural equality.
 	 */
 	private function normalizeForComparison(mixed $value): mixed {
-		if ($value === false) {
+		if ($value === false || $value === '') {
 			return null;
 		}
 		if (!is_array($value) && !is_object($value)) {
 			return $value;
 		}
-		return json_encode(json_decode(json_encode($value), true));
+		$arr = json_decode(json_encode($value), true);
+		if (empty($arr)) {
+			return null;
+		}
+		return json_encode($arr);
 	}
 
 	/**
@@ -409,15 +416,25 @@ class StructureDiffService extends SuperService {
 		if (empty($overriddenSelectionColumnIds)) {
 			return false;
 		}
-		$filterJson = is_array($srcView['filter'] ?? null)
-			? json_encode($srcView['filter'])
-			: ($srcView['filter'] ?? '');
-		if (!is_string($filterJson) || $filterJson === '') {
+		$filter = $srcView['filter'] ?? null;
+		if (!is_array($filter) || empty($filter)) {
 			return false;
 		}
-		if (preg_match_all('/@selection-id-(\d+)/', $filterJson, $matches)) {
-			foreach ($overriddenSelectionColumnIds as $id) {
-				if (in_array((string)$id, $matches[1], true)) {
+		foreach ($filter as $group) {
+			if (!is_array($group)) {
+				continue;
+			}
+			foreach ($group as $cond) {
+				if (!is_array($cond)) {
+					continue;
+				}
+				$columnId = isset($cond['columnId']) ? (int)$cond['columnId'] : null;
+				if ($columnId !== null
+					&& in_array($columnId, $overriddenSelectionColumnIds, true)
+					&& isset($cond['value'])
+					&& is_string($cond['value'])
+					&& str_starts_with($cond['value'], '@selection-id-')
+				) {
 					return true;
 				}
 			}
