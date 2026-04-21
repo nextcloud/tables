@@ -132,12 +132,23 @@ class ApiTablesController extends AOCSController {
 	 * @param list<TablesView> $views views
 	 * @param list<array{columnId: int, order: int, readonly: bool}> $columnOrder Default column order settings
 	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sort Default sort rules
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
 	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
+		foreach ($columnOrder as $entry) {
+			if (!is_array($entry) || !isset($entry['columnId'], $entry['order'])) {
+				return new DataResponse(['message' => 'Invalid columnOrder format: each entry requires columnId (int) and order (int)'], Http::STATUS_BAD_REQUEST);
+			}
+		}
+		foreach ($sort as $entry) {
+			if (!is_array($entry) || !isset($entry['columnId'], $entry['mode']) || !in_array($entry['mode'], ['ASC', 'DESC'], true)) {
+				return new DataResponse(['message' => 'Invalid sort format: each entry requires columnId (int) and mode (ASC or DESC)'], Http::STATUS_BAD_REQUEST);
+			}
+		}
 		try {
 			$this->db->beginTransaction();
 			$table = $this->service->create($title, 'custom', $emoji, $description);
@@ -240,6 +251,14 @@ class ApiTablesController extends AOCSController {
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
+		} catch (\InvalidArgumentException $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
 			try {
 				$this->db->rollBack();
@@ -281,9 +300,10 @@ class ApiTablesController extends AOCSController {
 	 * @param string $description the tables description
 	 * @param list<array{columnId: int, order: int, readonly: bool}>|string|null $columnSettings Default column order settings (array or JSON string)
 	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}>|string|null $sort Default sort rules (array or JSON string)
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -296,10 +316,33 @@ class ApiTablesController extends AOCSController {
 		if (is_string($sort)) {
 			$sort = json_decode($sort, true) ?? null;
 		}
+		if ($columnSettings !== null) {
+			if (!is_array($columnSettings)) {
+				return new DataResponse(['message' => 'Invalid columnSettings: must be a JSON array'], Http::STATUS_BAD_REQUEST);
+			}
+			foreach ($columnSettings as $entry) {
+				if (!is_array($entry) || !isset($entry['columnId'], $entry['order'])) {
+					return new DataResponse(['message' => 'Invalid columnSettings format: each entry requires columnId (int) and order (int)'], Http::STATUS_BAD_REQUEST);
+				}
+			}
+		}
+		if ($sort !== null) {
+			if (!is_array($sort)) {
+				return new DataResponse(['message' => 'Invalid sort: must be a JSON array'], Http::STATUS_BAD_REQUEST);
+			}
+			foreach ($sort as $entry) {
+				if (!is_array($entry) || !isset($entry['columnId'], $entry['mode']) || !in_array($entry['mode'], ['ASC', 'DESC'], true)) {
+					return new DataResponse(['message' => 'Invalid sort format: each entry requires columnId (int) and mode (ASC or DESC)'], Http::STATUS_BAD_REQUEST);
+				}
+			}
+		}
 		try {
 			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId, $columnSettings, $sort)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			return $this->handleError($e);
 		} catch (NotFoundError $e) {

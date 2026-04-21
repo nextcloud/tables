@@ -78,6 +78,26 @@ class TableController extends Controller {
 			$sort = json_decode($sort, true) ?? null;
 		}
 		return $this->handleError(function () use ($id, $title, $emoji, $archived, $columnSettings, $sort) {
+			if ($columnSettings !== null) {
+				if (!is_array($columnSettings)) {
+					throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
+				}
+				foreach ($columnSettings as $entry) {
+					if (!is_array($entry) || !isset($entry['columnId'], $entry['order'])) {
+						throw new \InvalidArgumentException('Invalid columnSettings format: each entry requires columnId (int) and order (int)');
+					}
+				}
+			}
+			if ($sort !== null) {
+				if (!is_array($sort)) {
+					throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
+				}
+				foreach ($sort as $entry) {
+					if (!is_array($entry) || !isset($entry['columnId'], $entry['mode']) || !in_array($entry['mode'], ['ASC', 'DESC'], true)) {
+						throw new \InvalidArgumentException('Invalid sort format: each entry requires columnId (int) and mode (ASC or DESC)');
+					}
+				}
+			}
 			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId, $columnSettings, $sort);
 		});
 	}
