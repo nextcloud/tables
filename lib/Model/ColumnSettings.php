@@ -13,7 +13,7 @@ use Generator;
 use JsonSerializable;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
-class ColumnSettings implements JSONSerializable {
+class ColumnSettings implements JsonSerializable {
 	/**
 	 * @param ViewColumnInformation[] $columnSettings
 	 */
@@ -44,7 +44,7 @@ class ColumnSettings implements JSONSerializable {
 		return new self($columnSettings);
 	}
 
-	public function jsonSerialize(): mixed {
-		return $this->columnSettings;
+	public function jsonSerialize(): array {
+		return array_map(static fn (ViewColumnInformation $vci) => $vci->jsonSerialize(), $this->columnSettings);
 	}
 }

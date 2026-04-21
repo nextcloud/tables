@@ -154,7 +154,7 @@ class Table extends EntitySuper implements JsonSerializable {
 			return [];
 		}
 
-		if (is_array(reset($columns))) {
+		if (is_array($columns[array_key_first($columns)] ?? null)) {
 			return array_values(array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $columns));
 		}
 

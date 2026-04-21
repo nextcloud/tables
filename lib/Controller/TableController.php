@@ -9,6 +9,8 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -82,21 +84,13 @@ class TableController extends Controller {
 				if (!is_array($columnSettings)) {
 					throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
 				}
-				foreach ($columnSettings as $entry) {
-					if (!is_array($entry) || !isset($entry['columnId'], $entry['order'])) {
-						throw new \InvalidArgumentException('Invalid columnSettings format: each entry requires columnId (int) and order (int)');
-					}
-				}
+				ColumnSettings::createFromInputArray($columnSettings);
 			}
 			if ($sort !== null) {
 				if (!is_array($sort)) {
 					throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
 				}
-				foreach ($sort as $entry) {
-					if (!is_array($entry) || !isset($entry['columnId'], $entry['mode']) || !in_array($entry['mode'], ['ASC', 'DESC'], true)) {
-						throw new \InvalidArgumentException('Invalid sort format: each entry requires columnId (int) and mode (ASC or DESC)');
-					}
-				}
+				SortRuleSet::createFromInputArray($sort);
 			}
 			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId, $columnSettings, $sort);
 		});

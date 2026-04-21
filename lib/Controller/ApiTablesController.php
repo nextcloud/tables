@@ -14,6 +14,8 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
@@ -139,15 +141,11 @@ class ApiTablesController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
-		foreach ($columnOrder as $entry) {
-			if (!is_array($entry) || !isset($entry['columnId'], $entry['order'])) {
-				return new DataResponse(['message' => 'Invalid columnOrder format: each entry requires columnId (int) and order (int)'], Http::STATUS_BAD_REQUEST);
-			}
-		}
-		foreach ($sort as $entry) {
-			if (!is_array($entry) || !isset($entry['columnId'], $entry['mode']) || !in_array($entry['mode'], ['ASC', 'DESC'], true)) {
-				return new DataResponse(['message' => 'Invalid sort format: each entry requires columnId (int) and mode (ASC or DESC)'], Http::STATUS_BAD_REQUEST);
-			}
+		try {
+			ColumnSettings::createFromInputArray($columnOrder);
+			SortRuleSet::createFromInputArray($sort);
+		} catch (\InvalidArgumentException $e) {
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 		try {
 			$this->db->beginTransaction();
@@ -316,25 +314,21 @@ class ApiTablesController extends AOCSController {
 		if (is_string($sort)) {
 			$sort = json_decode($sort, true) ?? null;
 		}
-		if ($columnSettings !== null) {
-			if (!is_array($columnSettings)) {
-				return new DataResponse(['message' => 'Invalid columnSettings: must be a JSON array'], Http::STATUS_BAD_REQUEST);
-			}
-			foreach ($columnSettings as $entry) {
-				if (!is_array($entry) || !isset($entry['columnId'], $entry['order'])) {
-					return new DataResponse(['message' => 'Invalid columnSettings format: each entry requires columnId (int) and order (int)'], Http::STATUS_BAD_REQUEST);
+		try {
+			if ($columnSettings !== null) {
+				if (!is_array($columnSettings)) {
+					throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
 				}
+				ColumnSettings::createFromInputArray($columnSettings);
 			}
-		}
-		if ($sort !== null) {
-			if (!is_array($sort)) {
-				return new DataResponse(['message' => 'Invalid sort: must be a JSON array'], Http::STATUS_BAD_REQUEST);
-			}
-			foreach ($sort as $entry) {
-				if (!is_array($entry) || !isset($entry['columnId'], $entry['mode']) || !in_array($entry['mode'], ['ASC', 'DESC'], true)) {
-					return new DataResponse(['message' => 'Invalid sort format: each entry requires columnId (int) and mode (ASC or DESC)'], Http::STATUS_BAD_REQUEST);
+			if ($sort !== null) {
+				if (!is_array($sort)) {
+					throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
 				}
+				SortRuleSet::createFromInputArray($sort);
 			}
+		} catch (\InvalidArgumentException $e) {
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 		try {
 			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId, $columnSettings, $sort)->jsonSerialize());
