@@ -81,6 +81,7 @@ class ContextMapper extends QBMapper {
 			'description' => $rows[0]['description'],
 			'owner_id' => $rows[0]['owner_id'],
 			'owner_type' => $rows[0]['owner_type'],
+			'archived' => (bool)($rows[0]['archived'] ?? false),
 		];
 
 		$formatted['sharing'] = array_reduce($rows, function (array $carry, array $item) use ($userId) {

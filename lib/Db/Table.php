@@ -84,6 +84,10 @@ class Table extends EntitySuper implements JsonSerializable {
 		$this->addType('archived', 'boolean');
 	}
 
+	public function isArchived(): bool {
+		return $this->archived;
+	}
+
 	/**
 	 * @psalm-return TablesTable
 	 */

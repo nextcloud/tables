@@ -127,6 +127,8 @@ return [
 		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
 		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],
 		['name' => 'ApiTables#transfer', 'url' => '/api/2/tables/{id}/transfer', 'verb' => 'PUT'],
+		['name' => 'ApiTables#archiveTable', 'url' => '/api/2/tables/{id}/archive', 'verb' => 'POST'],
+		['name' => 'ApiTables#unarchiveTable', 'url' => '/api/2/tables/{id}/archive', 'verb' => 'DELETE'],
 
 		['name' => 'ApiColumns#index', 'url' => '/api/2/columns/{nodeType}/{nodeId}', 'verb' => 'GET'],
 		['name' => 'ApiColumns#show', 'url' => '/api/2/columns/{id}', 'verb' => 'GET'],
@@ -145,6 +147,8 @@ return [
 		['name' => 'Context#update', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'PUT'],
 		['name' => 'Context#destroy', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'DELETE'],
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
+		['name' => 'Context#archiveContext', 'url' => '/api/2/contexts/{contextId}/archive', 'verb' => 'POST'],
+		['name' => 'Context#unarchiveContext', 'url' => '/api/2/contexts/{contextId}/archive', 'verb' => 'DELETE'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
 
 		['name' => 'RowOCS#createRow',	'url' => '/api/2/{nodeCollection}/{nodeId}/rows', 'verb' => 'POST', 'requirements' => ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)']],
