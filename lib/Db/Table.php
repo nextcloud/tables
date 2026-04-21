@@ -11,7 +11,7 @@ use JsonSerializable;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\ResponseDefinitions;
-use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Service\ValueObject\ColumnOrderInformation;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -44,7 +44,7 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setRowsCount(int $rowsCount)
  * @method getColumnsCount(): int
  * @method setColumnsCount(int $columnsCount)
- * @method getViews(): ?array
+ * @method getViews(): ?array<TablesView>
  * @method setViews(array $views)
  * @method getColumns(): array
  * @method setColumns(array $columns)
@@ -109,14 +109,17 @@ class Table extends EntitySuper implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt ?: '',
 			'archived' => $this->archived,
 			'isShared' => (bool)$this->isShared,
-			'favorite' => $this->favorite,
+			'favorite' => (bool)$this->favorite,
 			'onSharePermissions' => $this->getSharePermissions()?->jsonSerialize(),
 			'hasShares' => (bool)$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'columnsCount' => $this->columnsCount ?: 0,
-			'views' => $this->getViewsArray(),
-			'description' => $this->description ?:'',
-			'columnOrder' => $this->getColumnOrderSettingsArray(),
+			'description' => $this->description ?: '',
+			'views' => array_values($this->getViewsArray()),
+			'columnOrder' => array_map(
+				static fn (ColumnOrderInformation $c) => ['columnId' => $c->getId(), 'order' => $c->getOrder()],
+				$this->getColumnOrderSettingsArray()
+			),
 			'sort' => $this->getSortArray(),
 		];
 	}
@@ -126,7 +129,6 @@ class Table extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return TablesView[]
 	 */
 	private function getViewsArray(): array {
@@ -134,19 +136,19 @@ class Table extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return int[]
 	 */
 	public function getColumnOrderArray(): array {
 		$columnSettings = $this->getColumnOrderSettingsArray();
-		usort($columnSettings, static function (ViewColumnInformation $a, ViewColumnInformation $b) {
+		usort($columnSettings, static function (ColumnOrderInformation $a, ColumnOrderInformation $b) {
 			return $a->getOrder() - $b->getOrder();
 		});
-		return array_map(static fn (ViewColumnInformation $vci): int => $vci->getId(), $columnSettings);
+		/** @var list<ColumnOrderInformation> $columnSettings */
+		return array_map(static fn (ColumnOrderInformation $vci): int => $vci->getId(), $columnSettings);
 	}
 
 	/**
-	 * @return array<ViewColumnInformation>
+	 * @return list<ColumnOrderInformation>
 	 */
 	public function getColumnOrderSettingsArray(): array {
 		$columns = $this->getArray($this->getColumnOrder());
@@ -155,18 +157,17 @@ class Table extends EntitySuper implements JsonSerializable {
 		}
 
 		if (is_array($columns[array_key_first($columns)] ?? null)) {
-			return array_values(array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $columns));
+			return array_values(array_map(static fn (array $a): ColumnOrderInformation => ColumnOrderInformation::fromArray($a), $columns));
 		}
 
 		$result = [];
 		foreach ($columns as $index => $columnId) {
-			$result[] = new ViewColumnInformation($columnId, order: (int)$index + 1);
+			$result[] = new ColumnOrderInformation((int)$columnId, order: (int)$index + 1);
 		}
 		return $result;
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
 	 */
 	public function getSortArray(): array {
@@ -176,9 +177,8 @@ class Table extends EntitySuper implements JsonSerializable {
 
 	private function getArray(?string $json): array {
 		if ($json !== '' && $json !== null && $json !== 'null') {
-			return \json_decode($json, true);
-		} else {
-			return [];
+			return \json_decode($json, true) ?? [];
 		}
+		return [];
 	}
 }

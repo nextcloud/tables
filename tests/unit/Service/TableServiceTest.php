@@ -73,7 +73,7 @@ class TableServiceTest extends TestCase {
 	}
 
 	public function testGetSchemeColumnOrderRoundTrip(): void {
-		$columnOrder = [['columnId' => 3, 'order' => 1, 'readonly' => false, 'mandatory' => false]];
+		$columnOrder = [['columnId' => 3, 'order' => 1]];
 
 		$table = new Table();
 		$table->setColumnOrder(\json_encode($columnOrder));

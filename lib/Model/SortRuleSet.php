@@ -50,6 +50,9 @@ class SortRuleSet implements JsonSerializable {
 		return new self($sortRules);
 	}
 
+	/**
+	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
+	 */
 	public function jsonSerialize(): array {
 		return array_map(static fn (SortRule $s) => $s->jsonSerialize(), $this->sortRules);
 	}

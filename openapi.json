@@ -756,6 +756,7 @@
                     "onSharePermissions",
                     "hasShares",
                     "rowsCount",
+                    "description",
                     "views",
                     "columnsCount",
                     "columnOrder",
@@ -835,6 +836,9 @@
                         "type": "integer",
                         "format": "int64"
                     },
+                    "description": {
+                        "type": "string"
+                    },
                     "views": {
                         "type": "array",
                         "items": {
@@ -851,8 +855,7 @@
                             "type": "object",
                             "required": [
                                 "columnId",
-                                "order",
-                                "readonly"
+                                "order"
                             ],
                             "properties": {
                                 "columnId": {
@@ -862,9 +865,6 @@
                                 "order": {
                                     "type": "integer",
                                     "format": "int64"
-                                },
-                                "readonly": {
-                                    "type": "boolean"
                                 }
                             }
                         }

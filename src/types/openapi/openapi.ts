@@ -1132,6 +1132,7 @@ export type components = {
             readonly hasShares: boolean;
             /** Format: int64 */
             readonly rowsCount: number;
+            readonly description: string;
             readonly views: readonly components["schemas"]["View"][];
             /** Format: int64 */
             readonly columnsCount: number;
@@ -1140,7 +1141,6 @@ export type components = {
                 readonly columnId: number;
                 /** Format: int64 */
                 readonly order: number;
-                readonly readonly: boolean;
             }[];
             readonly sort: readonly {
                 /** Format: int64 */

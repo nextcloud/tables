@@ -80,19 +80,17 @@ class TableController extends Controller {
 			$sort = json_decode($sort, true) ?? null;
 		}
 		return $this->handleError(function () use ($id, $title, $emoji, $archived, $columnSettings, $sort) {
-			if ($columnSettings !== null) {
-				if (!is_array($columnSettings)) {
-					throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
-				}
-				ColumnSettings::createFromInputArray($columnSettings);
+			if ($columnSettings !== null && !is_array($columnSettings)) {
+				throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
 			}
-			if ($sort !== null) {
-				if (!is_array($sort)) {
-					throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
-				}
-				SortRuleSet::createFromInputArray($sort);
+			if ($sort !== null && !is_array($sort)) {
+				throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
 			}
-			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId, $columnSettings, $sort);
+			return $this->service->update(
+				$id, $title, $emoji, null, $archived, $this->userId,
+				$columnSettings !== null ? ColumnSettings::createFromInputArray($columnSettings) : null,
+				$sort !== null ? SortRuleSet::createFromInputArray($sort) : null,
+			);
 		});
 	}
 }

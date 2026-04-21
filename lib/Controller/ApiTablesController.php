@@ -187,18 +187,18 @@ class ApiTablesController extends AOCSController {
 				$colMap[$column['id']] = $col->getId();
 			}
 			if (!empty($columnOrder) || !empty($sort)) {
-				$remappedColumnOrder = !empty($columnOrder) ? array_map(static function (array $entry) use ($colMap): array {
+				$remappedColumnOrder = !empty($columnOrder) ? ColumnSettings::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
 					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
 						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
 					}
 					return $entry;
-				}, $columnOrder) : null;
-				$remappedSort = !empty($sort) ? array_map(static function (array $entry) use ($colMap): array {
+				}, $columnOrder)) : null;
+				$remappedSort = !empty($sort) ? SortRuleSet::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
 					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
 						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
 					}
 					return $entry;
-				}, $sort) : null;
+				}, $sort)) : null;
 				$table = $this->service->update($table->getId(), null, null, null, null, $this->userId, $remappedColumnOrder, $remappedSort);
 			}
 			foreach ($views as $view) {
@@ -315,23 +315,19 @@ class ApiTablesController extends AOCSController {
 			$sort = json_decode($sort, true) ?? null;
 		}
 		try {
-			if ($columnSettings !== null) {
-				if (!is_array($columnSettings)) {
-					throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
-				}
-				ColumnSettings::createFromInputArray($columnSettings);
+			if ($columnSettings !== null && !is_array($columnSettings)) {
+				throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
 			}
-			if ($sort !== null) {
-				if (!is_array($sort)) {
-					throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
-				}
-				SortRuleSet::createFromInputArray($sort);
+			if ($sort !== null && !is_array($sort)) {
+				throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
 			}
+			$columnSettingsObj = $columnSettings !== null ? ColumnSettings::createFromInputArray($columnSettings) : null;
+			$sortObj = $sort !== null ? SortRuleSet::createFromInputArray($sort) : null;
 		} catch (\InvalidArgumentException $e) {
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 		try {
-			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId, $columnSettings, $sort)->jsonSerialize());
+			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId, $columnSettingsObj, $sortObj)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (\InvalidArgumentException $e) {
