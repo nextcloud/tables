@@ -171,6 +171,8 @@ OC.L10N.register(
     "Column type" : "Тип стовпця",
     "Move" : "Перемістити",
     "Metadata" : "Метадані",
+    "Move up" : "Пересунуту догори",
+    "Move down" : "Пересунути вниз",
     "Add new sorting rule" : "Додати нове правило впорядкування",
     "Read only" : "Тільки читання",
     "Mandatory" : "Обов'язково",

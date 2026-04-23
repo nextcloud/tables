@@ -168,6 +168,8 @@ OC.L10N.register(
     "Column type" : "ستون تىپى",
     "Move" : "Move",
     "Metadata" : "Metadata",
+    "Move up" : "يۆتكەڭ",
+    "Move down" : "تۆۋەنگە يۆتكەڭ",
     "Add new sorting rule" : "يېڭى تەرتىپلەش قائىدىسىنى قوشۇڭ",
     "Read only" : "پەقەت ئوقۇڭ",
     "Mandatory" : "مەجبۇرى",

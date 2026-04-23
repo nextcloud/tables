@@ -115,6 +115,8 @@ OC.L10N.register(
     "Users and groups" : "Пользователи и группы",
     "Move" : "Переместить",
     "Metadata" : "Метаданные",
+    "Move up" : "Переместить выше",
+    "Move down" : "Переместить ниже",
     "Add new sorting rule" : "Создать правило сортировки",
     "Read only" : "Только для чтения",
     "Mandatory" : "Обязательный",

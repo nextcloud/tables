@@ -96,6 +96,8 @@ OC.L10N.register(
     "Column type" : "Тып слупка",
     "Move" : "Перамясціць",
     "Metadata" : "Метаданыя",
+    "Move up" : "Перамясціць уверх",
+    "Move down" : "Перамясціць уніз",
     "Add new sorting rule" : "Дадаць новае правіла сартавання",
     "Read only" : "Толькі для чытання",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",

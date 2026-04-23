@@ -98,6 +98,8 @@ OC.L10N.register(
     "Users and groups" : "Użytkownicy i grupy",
     "Move" : "Przenieś",
     "Metadata" : "Metadane",
+    "Move up" : "Przenieś wyżej",
+    "Move down" : "Przenieś niżej",
     "Read only" : "Tylko do odczytu",
     "Mandatory" : "Obowiązkowe",
     "Column" : "Kolumna",

@@ -99,6 +99,8 @@ OC.L10N.register(
     "Users and groups" : "Utenti e gruppi",
     "Move" : "Sposta",
     "Metadata" : "Metadati",
+    "Move up" : "Sposta su",
+    "Move down" : "Sposta giù",
     "Read only" : "Sola lettura",
     "Mandatory" : "Obbligatorio",
     "hh:mm" : "hh:mm",

@@ -171,6 +171,8 @@ OC.L10N.register(
     "Column type" : "Cineál colún",
     "Move" : "Bog",
     "Metadata" : "Meiteashonraí",
+    "Move up" : "Éirí suas",
+    "Move down" : "Bog síos",
     "Add new sorting rule" : "Cuir riail sórtála nua leis",
     "Read only" : "Léamh amháin",
     "Mandatory" : "Éigeantach",

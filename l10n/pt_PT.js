@@ -37,6 +37,8 @@ OC.L10N.register(
     "Selection" : "Seleção",
     "Move" : "Mover",
     "Metadata" : "Metadados",
+    "Move up" : "Mover para cima",
+    "Move down" : "Mover para baixo",
     "Read only" : "Apenas leitura",
     "Operator" : "Operador",
     "Ascending" : "Ascending",

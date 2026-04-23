@@ -131,6 +131,8 @@ OC.L10N.register(
     "Users and groups" : "Users and groups",
     "Move" : "انتقال",
     "Metadata" : "ابرداده",
+    "Move up" : "حرکت به بالا",
+    "Move down" : "حرکت به پایین",
     "Add new sorting rule" : "Add new sorting rule",
     "Read only" : "فقط خواندنی",
     "Mandatory" : "Mandatory",

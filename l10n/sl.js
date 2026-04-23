@@ -128,6 +128,8 @@ OC.L10N.register(
     "Users and groups" : "Uporabniki in skupine",
     "Move" : "Premakni",
     "Metadata" : "Metapodatki",
+    "Move up" : "Premakni navzgor",
+    "Move down" : "Premakni navzdol",
     "Add new sorting rule" : "Dodaj novo pravilo razvrščanja",
     "Read only" : "Le za branje",
     "Mandatory" : "Obvezno polje",

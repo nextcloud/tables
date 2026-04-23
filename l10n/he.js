@@ -81,6 +81,7 @@ OC.L10N.register(
     "Link" : "קישור",
     "Move" : "העברה",
     "Metadata" : "נתוני על",
+    "Move down" : "להוריד למטה",
     "Read only" : "קריאה בלבד",
     "Mandatory" : "חובה",
     "Views" : "תצוגות",

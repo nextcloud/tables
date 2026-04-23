@@ -168,6 +168,8 @@
     "Column type" : "Type de colonne",
     "Move" : "Déplacer",
     "Metadata" : "Métadonnées",
+    "Move up" : "Déplacer vers le haut",
+    "Move down" : "Déplacer vers le bas",
     "Add new sorting rule" : "Ajouter une nouvelle règle de tri",
     "Read only" : "Lecture seule",
     "Mandatory" : "Obligatoire",

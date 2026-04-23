@@ -45,6 +45,8 @@ OC.L10N.register(
     "Users and groups" : "Users and groups",
     "Move" : "Hamisha",
     "Metadata" : "Metadata",
+    "Move up" : "Hamia juu",
+    "Move down" : "Hamia chini",
     "Read only" : "Kusoma pekee",
     "Mandatory" : "Lazima",
     "Column" : "Safu wima",

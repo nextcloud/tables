@@ -39,6 +39,8 @@ OC.L10N.register(
     "Selection" : "Pilihan",
     "Move" : "Pindah",
     "Metadata" : "Metadata",
+    "Move up" : "Pindah ke atas",
+    "Move down" : "Pindah ke bawah",
     "Read only" : "Hanya baca",
     "Column" : "Kolom",
     "Operator" : "Operator",

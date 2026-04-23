@@ -139,6 +139,8 @@ OC.L10N.register(
     "Column type" : "列类型",
     "Move" : "移动",
     "Metadata" : "元数据",
+    "Move up" : "上移",
+    "Move down" : "下移",
     "Add new sorting rule" : "添加新的排序规则",
     "Read only" : "只读",
     "Mandatory" : "必填项",

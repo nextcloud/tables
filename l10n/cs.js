@@ -170,6 +170,8 @@ OC.L10N.register(
     "Column type" : "Typ sloupce",
     "Move" : "Přesunout",
     "Metadata" : "Metadata",
+    "Move up" : "Přesunout výše",
+    "Move down" : "Přesunout dolů",
     "Add new sorting rule" : "Přidat nové pravidlo pro řazení",
     "Read only" : "Pouze pro čtení",
     "Mandatory" : "Povinné",

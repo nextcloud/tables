@@ -120,6 +120,8 @@ OC.L10N.register(
     "Users and groups" : "Usuaris i grups",
     "Move" : "Mou",
     "Metadata" : "Metadades",
+    "Move up" : "Mou amunt",
+    "Move down" : "Mou avall",
     "Read only" : "Només de lectura",
     "Mandatory" : "Obligatori",
     "Column" : "Columna",

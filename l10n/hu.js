@@ -135,6 +135,8 @@ OC.L10N.register(
     "Users and groups" : "Felhasználók és csoportok",
     "Move" : "Áthelyezés",
     "Metadata" : "Metaadatok",
+    "Move up" : "Mozgatás fel",
+    "Move down" : "Mozgatás le",
     "Add new sorting rule" : "Új rendezési szabály hozzáadása",
     "Read only" : "Csak olvasható",
     "Mandatory" : "Kötelező",

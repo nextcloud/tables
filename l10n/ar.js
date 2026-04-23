@@ -151,6 +151,8 @@ OC.L10N.register(
     "Column type" : "نوع العمود",
     "Move" : "نقل",
     "Metadata" : "البيانات الوصفية metadata",
+    "Move up" : "نقلٌ للأعلي",
+    "Move down" : "نقلٌ للأسفل",
     "Add new sorting rule" : "أضِف شرط فرزٍ جديد",
     "Read only" : "للقراءة فقط",
     "Mandatory" : "إلزامي",

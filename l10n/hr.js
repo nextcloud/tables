@@ -47,6 +47,8 @@ OC.L10N.register(
     "Users and groups" : "Korisnici i grupe",
     "Move" : "Premjesti",
     "Metadata" : "Metapodaci",
+    "Move up" : "Premjesti gore",
+    "Move down" : "Premjesti dolje",
     "Read only" : "Samo za čitanje",
     "Mandatory" : "Obavezno",
     "Delete filter" : "Izbriši filtar",

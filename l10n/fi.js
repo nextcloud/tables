@@ -151,6 +151,8 @@ OC.L10N.register(
     "Column type" : "Sarakkeen tyyppi",
     "Move" : "Siirrä",
     "Metadata" : "Metatieto",
+    "Move up" : "Siirrä ylös",
+    "Move down" : "Siirrä alas",
     "Add new sorting rule" : "Lisää uusi lajittelusääntö",
     "Read only" : "Vain luku",
     "Mandatory" : "Pakollinen",

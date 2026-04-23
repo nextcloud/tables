@@ -166,6 +166,8 @@
     "Column type" : "Typ stĺpca",
     "Move" : "Presunúť",
     "Metadata" : "Metadáta",
+    "Move up" : "Presunúť hore",
+    "Move down" : "Presunúť dole",
     "Add new sorting rule" : "Pridať nové pravidlo pre triedenie",
     "Read only" : "Iba na čítanie",
     "Mandatory" : "Povinné",

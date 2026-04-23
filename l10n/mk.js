@@ -37,6 +37,8 @@ OC.L10N.register(
     "Users and groups" : "Корисници и групи",
     "Move" : "Премести",
     "Metadata" : "Метаподатоци",
+    "Move up" : "Помести горе",
+    "Move down" : "Помести доле",
     "Read only" : "Само читај",
     "Ascending" : "Растечки",
     "Descending" : "Опаѓачки",

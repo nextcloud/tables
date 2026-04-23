@@ -102,6 +102,8 @@ OC.L10N.register(
     "Users and groups" : "Gebruikers en groepen",
     "Move" : "Verplaatsen",
     "Metadata" : "Metadata",
+    "Move up" : "Verplaats naar boven",
+    "Move down" : "Lager zetten",
     "Read only" : "Alleen-lezen",
     "Mandatory" : "Verplicht",
     "Column" : "Kolom",

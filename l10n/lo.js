@@ -168,6 +168,8 @@ OC.L10N.register(
     "Column type" : "ປະເພດຖັນ",
     "Move" : "ຍ້າຍ",
     "Metadata" : "ຂໍ້ມູນເມຕາ",
+    "Move up" : "Move up",
+    "Move down" : "Move down",
     "Add new sorting rule" : "ເພີ່ມກົດການຈັດລຽງໃໝ່",
     "Read only" : "ອ່ານຢ່າງດຽວ",
     "Mandatory" : "ຈຳເປັນ",

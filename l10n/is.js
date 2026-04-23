@@ -38,6 +38,8 @@ OC.L10N.register(
     "Selection" : "Val",
     "Move" : "Færa",
     "Metadata" : "Lýsigögn",
+    "Move up" : "Færa upp",
+    "Move down" : "Færa niður",
     "Read only" : "Skrifvarið",
     "Operator" : "Virki",
     "Delete filter" : "Eyða síu",

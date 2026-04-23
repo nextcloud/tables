@@ -36,6 +36,8 @@ OC.L10N.register(
     "Users and groups" : "Хэрэглэгчид болон бүлгүүд",
     "Move" : "–ó”©”©—Ö",
     "Metadata" : "Мета өгөгдөл",
+    "Move up" : "Дээшлүүлэх",
+    "Move down" : "Доошлуулах",
     "Read only" : "–ó”©–≤—Ö”©–Ω —É–Ω—à–∏—Ö",
     "Delete filter" : "Шүүлтүүр устгах",
     "Ascending" : "Өсөх",

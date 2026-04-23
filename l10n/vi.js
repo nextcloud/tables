@@ -92,6 +92,8 @@ OC.L10N.register(
     "Column type" : "Loại cột",
     "Move" : "Dịch chuyển",
     "Metadata" : "Metadata",
+    "Move up" : "Di chuyển lên",
+    "Move down" : "Di chuyển xuống",
     "Add new sorting rule" : "Thêm quy tắc sắp xếp mới",
     "Read only" : "Chỉ xem",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",

@@ -139,6 +139,8 @@ OC.L10N.register(
     "Column type" : "Kolonnetype",
     "Move" : "Flytt",
     "Metadata" : "Metadata",
+    "Move up" : "Flytt opp",
+    "Move down" : "Flytt ned",
     "Add new sorting rule" : "Legg til ny sorteringsregel",
     "Read only" : "Skrivebeskyttet",
     "Mandatory" : "Obligatorisk",

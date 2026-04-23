@@ -57,6 +57,8 @@ OC.L10N.register(
     "Users and groups" : "Naudotojai ir grupės",
     "Move" : "Perkelti",
     "Metadata" : "Metaduomenys",
+    "Move up" : "Pakelti",
+    "Move down" : "Nuleisti",
     "Read only" : "Tik skaitymui",
     "Mandatory" : "Privalomas",
     "Operator" : "Operatorius",

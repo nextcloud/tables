@@ -171,6 +171,8 @@ OC.L10N.register(
     "Column type" : "Veeru tüüp",
     "Move" : "Teisalda",
     "Metadata" : "Metaandmed",
+    "Move up" : "Liiguta ülespoole",
+    "Move down" : "Liiguta allapoole",
     "Add new sorting rule" : "Lisa uus järjestusreegel",
     "Read only" : "kirjutuskaitstud",
     "Mandatory" : "Kohustuslik",

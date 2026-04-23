@@ -126,6 +126,8 @@ OC.L10N.register(
     "Users and groups" : "Потребители и групи",
     "Move" : "Преместване",
     "Metadata" : "Метаданни",
+    "Move up" : "Преместване нагоре",
+    "Move down" : "Преместване  надолу",
     "Read only" : "Само за четене",
     "Mandatory" : "Задължително",
     "Column" : "Колона",

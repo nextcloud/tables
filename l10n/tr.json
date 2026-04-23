@@ -168,6 +168,8 @@
     "Column type" : "Sütun türü",
     "Move" : "Taşı",
     "Metadata" : "Üst veriler",
+    "Move up" : "Yukarı taşı",
+    "Move down" : "Aşağı taşı",
     "Add new sorting rule" : "Yeni sıralama kuralı ekle",
     "Read only" : "Salt okunur",
     "Mandatory" : "Zorunlu",

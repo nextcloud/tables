@@ -39,6 +39,8 @@ OC.L10N.register(
     "Link" : "Liga",
     "Selection" : "Selección",
     "Move" : "Mover",
+    "Move up" : "Mover arriba",
+    "Move down" : "Mover abajo",
     "Read only" : "Sólo lectura",
     "Column" : "Columna",
     "Operator" : "Operador",

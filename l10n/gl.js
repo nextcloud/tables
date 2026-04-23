@@ -170,6 +170,8 @@ OC.L10N.register(
     "Column type" : "Tipo de columna",
     "Move" : "Mover",
     "Metadata" : "Metadatos",
+    "Move up" : "Mover cara arriba",
+    "Move down" : "Mover cara abaixo",
     "Add new sorting rule" : "Engadir unha nova regra de ordenación",
     "Read only" : "Só lectura",
     "Mandatory" : "Obrigatorio",

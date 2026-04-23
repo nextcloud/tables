@@ -36,6 +36,8 @@ OC.L10N.register(
     "Number" : "Număr",
     "Users and groups" : "Utilizatori și grupuri",
     "Move" : "Mută",
+    "Move up" : "Mută înainte",
+    "Move down" : "Mută în jos",
     "Read only" : "Doar citire",
     "Views" : "Mod de viziualizare",
     "Shares" : "Partajări",

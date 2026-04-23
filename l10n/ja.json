@@ -136,6 +136,8 @@
     "Column type" : "カラム種類",
     "Move" : "移動",
     "Metadata" : "メタデータ",
+    "Move up" : "上に移動",
+    "Move down" : "下に移動",
     "Add new sorting rule" : "追加する新しい並べ替えルール",
     "Read only" : "読み込み専用",
     "Mandatory" : "必須",

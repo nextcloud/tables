@@ -126,6 +126,8 @@ OC.L10N.register(
     "Users and groups" : "Usuarios y grupos",
     "Move" : "Mover",
     "Metadata" : "Metadatos",
+    "Move up" : "Mover arriba",
+    "Move down" : "Mover abajo",
     "Read only" : "Sólo lectura",
     "Mandatory" : "Obligatorio",
     "Column" : "Columna",

@@ -168,6 +168,8 @@ OC.L10N.register(
     "Column type" : "Тип колоне",
     "Move" : "Помери",
     "Metadata" : "Метаподаци",
+    "Move up" : "Помери нагоре",
+    "Move down" : "Помери надоле",
     "Add new sorting rule" : "Додај ново правило сортирања",
     "Read only" : "Само за читање",
     "Mandatory" : "Обавезно",
