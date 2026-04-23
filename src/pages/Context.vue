@@ -256,6 +256,8 @@ export default {
 
 .resource {
 	margin: 40px 0;
+	width: max-content;
+	min-width: var(--app-content-width, 100%);
 
 	&:deep(.row.first-row) {
 		margin-inline-start: 20px;
