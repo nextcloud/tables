@@ -12,7 +12,7 @@
   },
   "type": "module",
   "url": "https://github.com/nextcloud/tables/wiki",
-  "license": "agpl",
+  "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
     "build": "vite --mode production build",
