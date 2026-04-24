@@ -55,6 +55,7 @@ import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	components: {
@@ -144,7 +145,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['loadContext']),
+		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE']),
 		async reload() {
 			if (!this.activeContextId) {
@@ -236,7 +237,19 @@ export default {
 		createColumn(isView, element) {
 			emit('tables:column:create', { isView, element })
 		},
-		downloadCSV(element, isView) {
+		async downloadCSV(element, isView) {
+			const access = await this.validateExportAccess({
+				id: element.id,
+				isView,
+			})
+
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+
 			const rowId = this.getKey(isView, element.key)
 			const colId = this.getKey(isView, element.key)
 			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)

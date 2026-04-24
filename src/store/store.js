@@ -556,6 +556,26 @@ export const useTablesStore = defineStore('store', {
 			return res?.data
 		},
 
+		async validateExportAccess({ id, isView }) {
+			id = parseInt(id)
+
+			try {
+				if (isView) {
+					await axios.get(generateUrl('/apps/tables/view/' + id))
+				} else {
+					await axios.get(generateOcsUrl('/apps/tables/api/2/tables/' + id))
+				}
+			} catch (e) {
+				if ([401, 403, 404].includes(e?.response?.status)) {
+					return { ok: false, reason: 'NO_ACCESS' }
+				}
+				displayError(e, t('tables', 'Could not verify export permissions.'))
+				return { ok: false, reason: 'ERROR' }
+			}
+
+			return { ok: true }
+		},
+
 		async transferContext({ id, data }) {
 			try {
 				await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id + '/transfer'), data)
