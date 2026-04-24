@@ -5,6 +5,24 @@
 
 # Changelog
 
+## v1.0.6
+
+### Added
+* [[stable1.0] feat: update loading shares of table (tables#2508)](https://github.com/nextcloud/tables/pull/2508)
+
+### Fixed
+* [[stable1.0] fix: Duplicate sidebar entries due to race condition (tables#2509)](https://github.com/nextcloud/tables/pull/2509)
+
+### Dependencies
+* [Chore(deps): update dependency openapi-typescript to ^7.13.0 (stable1.0) (tables#2369)](https://github.com/nextcloud/tables/pull/2369)
+* [Fix(deps): update dependency bamarni/composer-bin-plugin to ^1.9.1 (stable1.0) (tables#2371)](https://github.com/nextcloud/tables/pull/2371)
+* [Fix(deps): update dependency dompurify to ^3.3.3 (stable1.0) (tables#2410)](https://github.com/nextcloud/tables/pull/2410)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.37.0 (stable1.0) (tables#2422)](https://github.com/nextcloud/tables/pull/2422)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.60.1 (stable1.0) (tables#2464)](https://github.com/nextcloud/tables/pull/2464)
+* [Chore(deps): update dependency vite to ^7.3.2 (stable1.0) (tables#2488)](https://github.com/nextcloud/tables/pull/2488)
+* [Fix(deps): update tiptap to ^3.22.3 (stable1.0) (tables#2489)](https://github.com/nextcloud/tables/pull/2489)
+* [[stable1.0] Fix npm audit (tables#2492)](https://github.com/nextcloud/tables/pull/2492)
+* [[stable1.0] chore(deps): update dependency phpunit/phpunit to v9.6.34 (tables#2501)](https://github.com/nextcloud/tables/pull/2501)
 
 ## v1.0.5
 
