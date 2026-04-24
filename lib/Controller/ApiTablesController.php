@@ -190,7 +190,7 @@ class ApiTablesController extends AOCSController {
 				$remappedColumnOrder = null;
 				if (!empty($columnOrder)) {
 					$remappedColumnOrder = ColumnSettings::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
-						if (isset($entry['columnId']) && $entry['columnId'] > 0) {
+						if ($entry['columnId'] > 0) {
 							$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
 						}
 						return $entry;
@@ -199,7 +199,7 @@ class ApiTablesController extends AOCSController {
 				$remappedSort = null;
 				if (!empty($sort)) {
 					$remappedSort = SortRuleSet::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
-						if (isset($entry['columnId']) && $entry['columnId'] > 0) {
+						if ($entry['columnId'] > 0) {
 							$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
 						}
 						return $entry;
