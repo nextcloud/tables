@@ -476,7 +476,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null, ?array $columnSettings = null, ?array $sort = null): Table {
+	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null, ?ColumnSettings $columnSettings = null, ?SortRuleSet $sort = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -509,10 +509,10 @@ class TableService extends SuperService {
 			$table->setDescription($description);
 		}
 		if ($columnSettings !== null) {
-			$table->setColumnOrder(\json_encode(ColumnSettings::createFromInputArray($columnSettings)->jsonSerialize()));
+			$table->setColumnOrder(\json_encode($columnSettings->jsonSerialize()));
 		}
 		if ($sort !== null) {
-			$table->setSort(\json_encode(SortRuleSet::createFromInputArray($sort)->jsonSerialize()));
+			$table->setSort(\json_encode($sort->jsonSerialize()));
 		}
 		$table->setLastEditBy($userId);
 		$table->setLastEditAt($time->format('Y-m-d H:i:s'));

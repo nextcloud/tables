@@ -14,6 +14,8 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
@@ -132,12 +134,19 @@ class ApiTablesController extends AOCSController {
 	 * @param list<TablesView> $views views
 	 * @param list<array{columnId: int, order: int, readonly: bool}> $columnOrder Default column order settings
 	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sort Default sort rules
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
 	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
+		try {
+			ColumnSettings::createFromInputArray($columnOrder);
+			SortRuleSet::createFromInputArray($sort);
+		} catch (\InvalidArgumentException $e) {
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
 		try {
 			$this->db->beginTransaction();
 			$table = $this->service->create($title, 'custom', $emoji, $description);
@@ -178,18 +187,24 @@ class ApiTablesController extends AOCSController {
 				$colMap[$column['id']] = $col->getId();
 			}
 			if (!empty($columnOrder) || !empty($sort)) {
-				$remappedColumnOrder = !empty($columnOrder) ? array_map(static function (array $entry) use ($colMap): array {
-					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
-						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
-					}
-					return $entry;
-				}, $columnOrder) : null;
-				$remappedSort = !empty($sort) ? array_map(static function (array $entry) use ($colMap): array {
-					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
-						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
-					}
-					return $entry;
-				}, $sort) : null;
+				$remappedColumnOrder = null;
+				if (!empty($columnOrder)) {
+					$remappedColumnOrder = ColumnSettings::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
+						if ($entry['columnId'] > 0) {
+							$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
+						}
+						return $entry;
+					}, $columnOrder));
+				}
+				$remappedSort = null;
+				if (!empty($sort)) {
+					$remappedSort = SortRuleSet::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
+						if ($entry['columnId'] > 0) {
+							$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
+						}
+						return $entry;
+					}, $sort));
+				}
 				$table = $this->service->update($table->getId(), null, null, null, null, $this->userId, $remappedColumnOrder, $remappedSort);
 			}
 			foreach ($views as $view) {
@@ -240,6 +255,14 @@ class ApiTablesController extends AOCSController {
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
+		} catch (\InvalidArgumentException $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
 			try {
 				$this->db->rollBack();
@@ -281,9 +304,10 @@ class ApiTablesController extends AOCSController {
 	 * @param string $description the tables description
 	 * @param list<array{columnId: int, order: int, readonly: bool}>|string|null $columnSettings Default column order settings (array or JSON string)
 	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}>|string|null $sort Default sort rules (array or JSON string)
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -297,9 +321,24 @@ class ApiTablesController extends AOCSController {
 			$sort = json_decode($sort, true) ?? null;
 		}
 		try {
-			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId, $columnSettings, $sort)->jsonSerialize());
+			if ($columnSettings !== null && !is_array($columnSettings)) {
+				throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
+			}
+			if ($sort !== null && !is_array($sort)) {
+				throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
+			}
+			$columnSettingsObj = $columnSettings !== null ? ColumnSettings::createFromInputArray($columnSettings) : null;
+			$sortObj = $sort !== null ? SortRuleSet::createFromInputArray($sort) : null;
+		} catch (\InvalidArgumentException $e) {
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+		try {
+			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId, $columnSettingsObj, $sortObj)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			return $this->handleError($e);
 		} catch (NotFoundError $e) {

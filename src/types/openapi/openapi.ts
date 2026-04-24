@@ -1132,6 +1132,7 @@ export type components = {
             readonly hasShares: boolean;
             /** Format: int64 */
             readonly rowsCount: number;
+            readonly description: string;
             readonly views: readonly components["schemas"]["View"][];
             /** Format: int64 */
             readonly columnsCount: number;
@@ -1140,7 +1141,6 @@ export type components = {
                 readonly columnId: number;
                 /** Format: int64 */
                 readonly order: number;
-                readonly readonly: boolean;
             }[];
             readonly sort: readonly {
                 /** Format: int64 */
@@ -4550,6 +4550,22 @@ export interface operations {
                     };
                 };
             };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -4855,6 +4871,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };

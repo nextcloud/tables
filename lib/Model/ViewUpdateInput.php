@@ -84,7 +84,7 @@ class ViewUpdateInput {
 			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
 			description: $data['description'] ?? null,
 			emoji: ($data['emoji'] ?? null) ? new Emoji($data['emoji']) : null,
-			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createFromInputArray($data['columnSettings']) : null,
+			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings']) : null,
 			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter']) : null,
 			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort']) : null,
 		);

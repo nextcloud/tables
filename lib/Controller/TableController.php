@@ -9,6 +9,8 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -78,7 +80,17 @@ class TableController extends Controller {
 			$sort = json_decode($sort, true) ?? null;
 		}
 		return $this->handleError(function () use ($id, $title, $emoji, $archived, $columnSettings, $sort) {
-			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId, $columnSettings, $sort);
+			if ($columnSettings !== null && !is_array($columnSettings)) {
+				throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
+			}
+			if ($sort !== null && !is_array($sort)) {
+				throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
+			}
+			return $this->service->update(
+				$id, $title, $emoji, null, $archived, $this->userId,
+				$columnSettings !== null ? ColumnSettings::createFromInputArray($columnSettings) : null,
+				$sort !== null ? SortRuleSet::createFromInputArray($sort) : null,
+			);
 		});
 	}
 }

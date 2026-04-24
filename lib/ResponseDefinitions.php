@@ -64,9 +64,10 @@ namespace OCA\Tables;
  * 	},
  *  hasShares: bool,
  *  rowsCount: int,
+ *  description: string,
  *  views: list<TablesView>,
  *  columnsCount: int,
- *  columnOrder: list<array{columnId: int, order: int, readonly: bool}>,
+ *  columnOrder: list<array{columnId: int, order: int}>,
  *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
  * }
  *
