@@ -42,9 +42,7 @@ class ViewColumnInformation extends ColumnOrderInformation {
 	}
 
 	public static function fromArray(array $data): static {
-		if (!isset($data[self::KEY_ID], $data[self::KEY_ORDER])) {
-			throw new \InvalidArgumentException('Column settings entry is missing required fields: columnId and order are required');
-		}
+		static::assertRequiredFields($data);
 		return new static(
 			(int)$data[self::KEY_ID],
 			(int)$data[self::KEY_ORDER],
@@ -57,21 +55,17 @@ class ViewColumnInformation extends ColumnOrderInformation {
 	 * @return array{columnId: int, order: int, readonly: bool, mandatory: bool}
 	 */
 	public function jsonSerialize(): array {
-		return [
-			self::KEY_ID => $this->getId(),
-			self::KEY_ORDER => $this->getOrder(),
+		return array_merge(parent::jsonSerialize(), [
 			self::KEY_READONLY => $this->isReadonly(),
 			self::KEY_MANDATORY => $this->isMandatory(),
-		];
+		]);
 	}
 
 	protected function ensureType(string $offset, mixed $value): int|bool {
 		return match ($offset) {
-			self::KEY_ID,
-			self::KEY_ORDER => (int)$value,
-			self::KEY_READONLY,
+			self::KEY_READONLY => (bool)$value,
 			self::KEY_MANDATORY => (bool)$value,
-			default => throw new \InvalidArgumentException("Invalid offset: $offset"),
+			default => parent::ensureType($offset, $value),
 		};
 	}
 }

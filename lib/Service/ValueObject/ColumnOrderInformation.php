@@ -42,10 +42,14 @@ class ColumnOrderInformation implements ArrayAccess, JsonSerializable {
 	}
 
 	public static function fromArray(array $data): self {
+		static::assertRequiredFields($data);
+		return new self((int)$data[self::KEY_ID], (int)$data[self::KEY_ORDER]);
+	}
+
+	protected static function assertRequiredFields(array $data): void {
 		if (!isset($data[self::KEY_ID], $data[self::KEY_ORDER])) {
 			throw new \InvalidArgumentException('Column settings entry is missing required fields: columnId and order are required');
 		}
-		return new self((int)$data[self::KEY_ID], (int)$data[self::KEY_ORDER]);
 	}
 
 	public function offsetExists(mixed $offset): bool {
