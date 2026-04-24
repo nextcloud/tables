@@ -55,10 +55,12 @@ class ViewColumnInformation extends ColumnOrderInformation {
 	 * @return array{columnId: int, order: int, readonly: bool, mandatory: bool}
 	 */
 	public function jsonSerialize(): array {
-		return array_merge(parent::jsonSerialize(), [
+		return [
+			self::KEY_ID => $this->getId(),
+			self::KEY_ORDER => $this->getOrder(),
 			self::KEY_READONLY => $this->isReadonly(),
 			self::KEY_MANDATORY => $this->isMandatory(),
-		]);
+		];
 	}
 
 	protected function ensureType(string $offset, mixed $value): int|bool {
