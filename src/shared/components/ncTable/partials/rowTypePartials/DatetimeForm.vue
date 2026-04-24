@@ -45,7 +45,7 @@ export default {
 					return Moment.utc(this.value, 'YYYY-MM-DD HH:mm').local().toDate()
 				} else if (this.value === null && this.column.datetimeDefault === 'now') {
 					const dt = Moment()
-					this.$emit('update:value', dt.format('YYYY-MM-DD HH:mm'))
+					this.$emit('update:value', dt.clone().utc().format('YYYY-MM-DD HH:mm'))
 					return dt.toDate()
 				} else {
 					return null
