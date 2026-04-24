@@ -5,7 +5,7 @@
 
 # Changelog
 
-## 2.0.2
+## 2.1.0
 
 ### Added
 * [Feat: update loading shares of table (tables#2379)](https://github.com/nextcloud/tables/pull/2379)
