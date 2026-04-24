@@ -187,18 +187,24 @@ class ApiTablesController extends AOCSController {
 				$colMap[$column['id']] = $col->getId();
 			}
 			if (!empty($columnOrder) || !empty($sort)) {
-				$remappedColumnOrder = !empty($columnOrder) ? ColumnSettings::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
-					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
-						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
-					}
-					return $entry;
-				}, $columnOrder)) : null;
-				$remappedSort = !empty($sort) ? SortRuleSet::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
-					if (isset($entry['columnId']) && $entry['columnId'] > 0) {
-						$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
-					}
-					return $entry;
-				}, $sort)) : null;
+				$remappedColumnOrder = null;
+				if (!empty($columnOrder)) {
+					$remappedColumnOrder = ColumnSettings::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
+						if (isset($entry['columnId']) && $entry['columnId'] > 0) {
+							$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
+						}
+						return $entry;
+					}, $columnOrder));
+				}
+				$remappedSort = null;
+				if (!empty($sort)) {
+					$remappedSort = SortRuleSet::createFromInputArray(array_map(static function (array $entry) use ($colMap): array {
+						if (isset($entry['columnId']) && $entry['columnId'] > 0) {
+							$entry['columnId'] = $colMap[$entry['columnId']] ?? $entry['columnId'];
+						}
+						return $entry;
+					}, $sort));
+				}
 				$table = $this->service->update($table->getId(), null, null, null, null, $this->userId, $remappedColumnOrder, $remappedSort);
 			}
 			foreach ($views as $view) {
