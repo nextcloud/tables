@@ -56,7 +56,7 @@ vendor/bin/phpunit --bootstrap tests/unit/bootstrap.php tests/unit/path/to/TestF
 
 ### Code Generation
 ```bash
-composer openapi        # Regenerate openapi.json and TS types from PHP annotations
+composer run openapi         # Regenerate openapi.json and TS types from PHP annotations
 npm run typescript:generate  # Regenerate TS types from openapi.json only
 ```
 
@@ -92,7 +92,7 @@ Supports PostgreSQL, MySQL, and SQLite. The unusual design detail is that row ce
 
 ### API
 
-`openapi.json` (auto-generated) is the source of truth for the REST API contract. The TypeScript types in `src/types/` are derived from it — always regenerate both together with `composer openapi` when changing API shapes.
+`openapi.json` (auto-generated) is the source of truth for the REST API contract. The TypeScript types in `src/types/` are derived from it — always regenerate both together with `composer run openapi` when changing API shapes. Never edit `openapi.json` or `src/types/openapi/openapi.ts` by hand; they are generated artifacts.
 
 ## Commits
 
@@ -126,3 +126,90 @@ Supports PostgreSQL, MySQL, and SQLite. The unusual design detail is that row ce
 
 - Do not use decorative section-divider comments of any kind (e.g. `// ── Title ───`, `// ------`, `// ======`).
 - Every new file must end with exactly one empty trailing line (no more, no less).
+- After writing or modifying any PHP code, run the following checks before considering the task complete:
+  1. `composer run cs:fix` — auto-correct coding-standard violations, then verify with `composer cs:check` that no issues remain.
+  2. `composer run psalm` — static analysis; fix every reported type error or logical issue (no suppressions).
+  3. `composer run lint` — PHP syntax check across all source files.
+- After writing or modifying any frontend code (Vue, JS, TS, CSS/SCSS), run `npm run dev` to verify the frontend compiles without errors before considering the task complete.
+
+### Clean code
+
+Apply standard clean-code practices to every file you touch:
+
+- **Single responsibility** — each class and method does one thing. Split large methods if they handle multiple concerns.
+- **Meaningful names** — variables, parameters, and methods must describe their purpose. Avoid abbreviations and generic names like `$data`, `$arr`, or `$tmp`.
+- **No dead code** — do not leave commented-out code, unused variables, or unreachable branches in the codebase.
+- **Early returns** — prefer guard clauses over deeply nested `if/else` trees.
+- **Boolean casts** — use explicit `(bool)` only when a value truly represents a boolean; do not silently coerce unrelated types.
+- **Avoid double negatives** — name booleans positively (`isEnabled`, `hasShares`) rather than negatively (`isNotDisabled`).
+
+### Psalm annotations
+
+Never add `@psalm-suppress` annotations to work around a type error. A suppression is a red flag that signals the code or its type annotation is wrong. Fix the root cause instead:
+
+- If the return type annotation does not match what the method actually returns, fix the annotation or the implementation.
+- Use explicit, closed Psalm array shapes — `array{columnId: int, order: int}` — never leave a trailing `...` in a shape literal.
+- Do not use `@psalm-suppress MismatchingDocblockReturnType` (or any other suppression) just because a Psalm rule is inconvenient to satisfy.
+
+## Architecture Patterns
+
+### New REST endpoints
+
+Every new OCS endpoint that mutates data must carry:
+- `#[NoAdminRequired]`
+- `#[RequirePermission(Application::PERMISSION_MANAGE)]` (or the appropriate permission constant)
+- `#[UserRateLimit(limit: 20, period: 60)]` for mutation endpoints (see `ImportController` for the pattern)
+
+Every controller method must return `->jsonSerialize()` directly. Do not add a separate GET round-trip after a create/update/delete — the response body is the authoritative post-mutation state.
+
+After any of the following changes, run `composer run openapi` to regenerate `openapi.json` and the TypeScript types in `src/types/openapi/openapi.ts`. CI fails if either file is stale.
+
+Triggers that require regeneration:
+- Adding, removing, or renaming a controller route
+- Changing a controller method signature (parameters, return type, or PHPDoc `@param`/`@return` annotations)
+- Changing a response shape (adding/removing fields in `ResponseDefinitions.php` or a `jsonSerialize()` method)
+- Adding or removing an HTTP status code from a controller method's return type annotation
+- Changing a Psalm array-shape type that appears in a public API response
+
+### Selection option values
+
+Selection column values are encoded as magic strings: `@selection-id-{id}` where `{id}` is the selection option's DB primary key. This format is used by the filter component, the sort evaluator, and any condition-based feature (e.g. conditional formatting). Always use this format — never store or compare bare option labels.
+
+On import/export, selection option IDs change. `ColumnService::importColumn()` must return a `selectionOptionIdMap` alongside the new column ID so callers can remap stored option references. Unmapped IDs should be flagged as `broken: true` rather than silently dropped.
+
+### Soft-invalidation ("broken" flag)
+
+When a stored rule, filter, or condition references a column or option that no longer exists (due to deletion, type change, or import remapping), mark it `broken: true` instead of deleting it. Surface the broken state in the UI. Provide an auto-clear path that removes the flag when the rule is next saved in a valid state.
+
+### XSS / CSS injection
+
+- Never use `v-html`, `innerHTML`, `eval`, or `new Function` with user-supplied values.
+- Apply dynamic styles via Vue's `:style` binding only.
+- Validate any user-supplied CSS color values on the backend with `/^#[0-9a-fA-F]{3,6}$/` before storing. Reject other formats.
+
+### Input validation and value objects
+
+**Validate structured array input at the controller boundary, before the service layer.**
+
+When a controller parameter accepts a structured array (e.g. `$columnSettings`, `$sort`), parse and validate it into a typed value object — such as `ColumnSettings::createFromInputArray()` or `SortRuleSet::createFromInputArray()` — immediately in the controller, before calling any service method. If the input is invalid, return `Http::STATUS_BAD_REQUEST` with a descriptive message. Never pass a raw unvalidated array into a service method.
+
+```php
+// Good — validate at controller boundary, pass value objects downstream
+try {
+    $columnSettingsObj = $columnSettings !== null
+        ? ColumnSettings::createFromInputArray($columnSettings)
+        : null;
+    $sortObj = $sort !== null ? SortRuleSet::createFromInputArray($sort) : null;
+} catch (\InvalidArgumentException $e) {
+    return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+}
+return new DataResponse($this->service->update(..., $columnSettingsObj, $sortObj)->jsonSerialize());
+```
+
+**Service methods must declare typed value-object parameters, not raw arrays.**
+
+`TableService::update()` and equivalent methods must accept `?ColumnSettings` and `?SortRuleSet`, not `?array`. This makes the contract explicit and prevents the service from receiving unvalidated data.
+
+**Value objects must throw, not silently coerce.**
+
+`fromArray()` / `__construct()` methods on value objects must throw `\InvalidArgumentException` when required fields are missing or have an incompatible type. Do not add silent casts like `(int)$data['columnId']` that accept garbage input without error — that hides bugs and lets invalid data propagate to the database. The correct pattern is to call `static::assertRequiredFields($data)` (which throws) before casting.
