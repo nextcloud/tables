@@ -84,6 +84,6 @@
     "@playwright/test": "^1.59.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.60.1"
+    "@rollup/rollup-linux-x64-gnu": "^4.60.2"
   }
 }
