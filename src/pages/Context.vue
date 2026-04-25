@@ -267,6 +267,15 @@ export default {
 
 <style scoped lang="scss">
 .context {
+	.row.first-row {
+		position: sticky;
+		inset-inline-start: 0;
+		top: 0;
+		z-index: 15;
+		background-color: var(--color-main-background);
+		width: var(--app-content-width, 100%);
+	}
+
 	&__title {
 		display: inline-flex;
 	}
