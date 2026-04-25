@@ -247,6 +247,14 @@ export default {
 		width: auto;
 	}
 
+	.row.space-T {
+		position: sticky;
+		inset-inline-start: 0;
+		z-index: 15;
+		background-color: var(--color-main-background);
+		width: var(--app-content-width, 100%);
+	}
+
 	h2 {
 		display: inline-flex;
 		align-items: center;
