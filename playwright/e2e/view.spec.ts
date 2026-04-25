@@ -8,7 +8,7 @@ import { test, expect } from '../support/fixtures'
 import type { BrowserContext, Page } from '@playwright/test'
 import { createRandomUser } from '../support/api'
 import { login } from '../support/login'
-import { createSelectionColumn, createTable, createTextLineColumn, fillInValueSelection, fillInValueTextLine, loadTable } from '../support/commands'
+import { createSelectionColumn, createTable, createTextLineColumn, fillInValueSelection, fillInValueTextLine, loadTable, openRowActionMenu } from '../support/commands'
 
 const firstTitle = 'Test view'
 const secondTitle = 'Test view 2'
@@ -192,14 +192,14 @@ test.describe('Interact with views', () => {
 		await expect(page.locator('.icon-loading').first()).toBeHidden()
 
 		// Delete the first row
-		await page.locator('[data-cy="customTableRow"]').first().locator('[data-cy="editRowBtn"]').click()
-		await page.locator('[data-cy="editRowModal"] [data-cy="editRowDeleteButton"]').click()
-		await page.locator('[data-cy="editRowModal"] [data-cy="editRowDeleteConfirmButton"]').click()
+		const rowCountBefore = await page.locator('[data-cy="customTableRow"]').count()
+		const firstRow = page.locator('[data-cy="customTableRow"]').first()
+		await openRowActionMenu(page, firstRow)
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await page.locator('[data-cy="confirmDialog"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {})
 
-		await expect(page.locator('[data-cy="editRowModal"]')).toBeHidden()
-
-		// Verify one row was deleted by checking the count decreased
-		const count = await page.locator('[data-cy="customTableRow"]').count()
-		expect(count).toBeLessThan(4)
+		// Verify one row was deleted — toHaveCount retries until the DOM settles
+		await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(rowCountBefore - 1, { timeout: 10000 })
 	})
 })
