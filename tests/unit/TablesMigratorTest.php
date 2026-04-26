@@ -183,7 +183,7 @@ class TablesMigratorTest extends TestCase {
 
 		$this->tableService->method('importTable')->willReturn($this->createMock(Table::class));
 		$this->favoritesService->method('findAll')->willReturn([]);
-		$this->columnService->method('importColumn')->willReturn(1);
+		$this->columnService->method('importColumn')->willReturn(['columnId' => 1, 'selectionOptionIdMap' => []]);
 		$this->rowService->method('importRow')->willReturn(1);
 		$this->viewService->method('importView');
 		$this->shareService->method('importShare');
@@ -262,7 +262,7 @@ class TablesMigratorTest extends TestCase {
 
 		$newTable = new Table();
 		$this->tableService->method('importTable')->willReturn($newTable);
-		$this->columnService->method('importColumn')->willReturn(20);
+		$this->columnService->method('importColumn')->willReturn(['columnId' => 20, 'selectionOptionIdMap' => []]);
 		$this->rowService->method('importRow')->willReturn(1);
 
 		$this->tableMapper->method('getDBConnection')->willReturn(new class {
@@ -330,7 +330,7 @@ class TablesMigratorTest extends TestCase {
 		$newTable = new Table();
 		$newTable->setId(100);
 		$this->tableService->method('importTable')->willReturn($newTable);
-		$this->columnService->method('importColumn')->willReturnOnConsecutiveCalls(20, 21);
+		$this->columnService->method('importColumn')->willReturnOnConsecutiveCalls(['columnId' => 20, 'selectionOptionIdMap' => []], ['columnId' => 21, 'selectionOptionIdMap' => []]);
 		$this->rowService->method('importRow')->willReturn(1);
 
 		$this->tableMapper->method('getDBConnection')->willReturn(new class {
