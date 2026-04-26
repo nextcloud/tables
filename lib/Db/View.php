@@ -78,6 +78,8 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setShareToken(?string $shareToken)
  * @method getSidebarOrder(): ?int
  * @method setSidebarOrder(?int $sidebarOrder)
+ * @method getFormatting(): ?string
+ * @method setFormatting(?string $formatting)
  */
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $uuid = null;
@@ -96,6 +98,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $filter = null; // json
 	protected ?string $layout = null;
 	protected ?string $viewSettings = null; // json
+	protected ?string $formatting = null; // json
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -232,6 +235,14 @@ class View extends EntitySuper implements JsonSerializable {
 		return ViewSettings::createFromStoredArray($this->getArray($this->getViewSettings()));
 	}
 
+	public function getFormattingArray(): array {
+		return $this->getArray($this->getFormatting());
+	}
+
+	public function setFormattingArray(array $array): void {
+		$this->setFormatting(\json_encode($array));
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -268,6 +279,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
+		$serialisedJson['formatting'] = $this->getFormattingArray();
 
 		return $serialisedJson;
 	}
