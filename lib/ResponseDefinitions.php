@@ -13,6 +13,52 @@
 namespace OCA\Tables;
 
 /**
+ * @psalm-type TablesFormattingCondition = array{
+ *   columnId: int,
+ *   columnType: string,
+ *   operator: 'begins-with'|'ends-with'|'contains'|'contains-item'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty'|'is-not-empty',
+ *   value?: string|int|float|bool|list<array{id: int, label: string, uuid?: string}>,
+ * }
+ *
+ * @psalm-type TablesFormattingConditionGroup = array{
+ *   conditions: list<TablesFormattingCondition>,
+ * }
+ *
+ * @psalm-type TablesFormattingConditionSet = array{
+ *   groups: list<TablesFormattingConditionGroup>,
+ * }
+ *
+ * @psalm-type TablesFormattingStyle = array{
+ *   backgroundColor?: string,
+ *   textColor?: string,
+ *   fontWeight?: 'bold',
+ *   fontStyle?: 'italic',
+ *   textDecoration?: 'strikethrough'|'underline',
+ * }
+ *
+ * @psalm-type TablesFormattingRule = array{
+ *   id: string,
+ *   title: string,
+ *   sortOrder: int,
+ *   enabled: bool,
+ *   broken: bool,
+ *   condition: TablesFormattingConditionSet,
+ *   format: TablesFormattingStyle,
+ * }
+ *
+ * @psalm-type TablesFormattingRuleSet = array{
+ *   id: string,
+ *   title: string,
+ *   targetType: 'row'|'column',
+ *   targetCol: int|null,
+ *   mode: 'first-match'|'all-matches',
+ *   marker: 'circle'|'star'|'flag'|'alert'|'check'|null,
+ *   sortOrder: int,
+ *   enabled: bool,
+ *   broken: bool,
+ *   rules: list<TablesFormattingRule>,
+ * }
+ *
  * @psalm-type TablesView = array{
  * 	id: int,
  *  uuid: string,
@@ -47,6 +93,7 @@ namespace OCA\Tables;
  *  rowsCount: int,
  *  isFederated: bool,
  *  sidebarOrder: int|null,
+ *  formatting: list<TablesFormattingRuleSet>,
  * }
  *
  * @psalm-type TablesTable = array{
