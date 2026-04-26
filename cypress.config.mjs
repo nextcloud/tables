@@ -10,6 +10,10 @@ import vue from '@vitejs/plugin-vue2'
 const baseUrl = process.env.CYPRESS_baseUrl ?? 'http://127.0.0.1:8089/index.php/'
 
 export default defineConfig({
+	allowCypressEnv: false,
+	defaultBrowser: 'chrome',
+	experimentalMemoryManagement: true,
+	numTestsKeptInMemory: 0,
 	projectId: 'ixbf9n',
 	e2e: {
 		baseUrl,

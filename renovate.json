@@ -56,16 +56,12 @@
       "description": "Pin to Vue 2-compatible major"
     },
     {
-      "matchPackageNames": ["vueuse"],
+      "matchPackageNames": ["@vueuse/core"],
       "allowedVersions": "<12"
     },
     {
       "matchPackageNames": ["@vue/test-utils"],
       "allowedVersions": "<2"
-    },
-    {
-      "matchPackageNames": ["@nextcloud/vite-config"],
-      "allowedVersions": "<=1.5.6"
     },
     {
       "matchPackageNames": ["@nextcloud/stylelint-config"],
@@ -82,23 +78,8 @@
     },
     {
       "groupName": "cypress",
-      "matchPackageNames": [
-        "cypress"
-      ],
-      "allowedVersions": "<=13.6.4"
-    },
-    {
-      "groupName": "cypress",
-      "matchPackageNames": [
-        "@nextcloud/cypress"
-      ],
-      "allowedVersions": "<=1.0.0-beta.7"
-    },
-    {
-      "groupName": "cypress",
-      "matchPackageNames": [
-        "@cypress/"
-      ]
+      "matchPackageNames": ["cypress", "@nextcloud/cypress"],
+      "matchPackagePrefixes": ["@cypress/"]
     },
     {
       "matchPackageNames": ["phpoffice/phpspreadsheet"],

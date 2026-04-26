@@ -26,7 +26,7 @@
     "stylelint:fix": "stylelint 'css/*.css' 'css/*.scss' 'src/**/*.scss' 'src/**/*.vue' --fix",
     "tests:component": "cypress run --component",
     "test:e2e": "playwright test",
-    "test:e2e:cypress": "cypress run --spec cypress/e2e/context-navigation.cy.js,cypress/e2e/tables-import.cy.js,cypress/e2e/tables-table.cy.js,cypress/e2e/view-filtering-selection-row-removal.cy.js",
+    "test:e2e:cypress": "cypress run --browser chrome --no-runner-ui --spec cypress/e2e/context-navigation-hidden.cy.js,cypress/e2e/context-navigation-shared.cy.js,cypress/e2e/tables-import.cy.js,cypress/e2e/tables-table.cy.js,cypress/e2e/view-filtering-selection-row-checked.cy.js,cypress/e2e/view-filtering-selection-row-unchecked.cy.js,cypress/e2e/view-filtering-selection-row-removal.cy.js",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
     "start:nextcloud": "node playwright/start-nextcloud-server.mjs"
