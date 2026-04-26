@@ -11,7 +11,7 @@
 					class="rule-set-editor__input"
 					type="text"
 					:placeholder="t('tables', 'Rule set name')"
-					@change="onMetaChange" />
+					@change="onMetaChange">
 			</div>
 
 			<div class="rule-set-editor__field">

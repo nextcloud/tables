@@ -104,10 +104,6 @@ export default {
 
 	mixins: [viewportHelper],
 
-	setup() {
-		return { formattingStore: useFormattingStore() }
-	},
-
 	props: {
 		selectedRows: {
 			type: Array,
@@ -145,6 +141,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+	},
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
 	},
 
 	data() {

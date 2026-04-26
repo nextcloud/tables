@@ -6,7 +6,6 @@
 import { defineStore } from 'pinia'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
 import displayError from '../shared/utils/displayError.js'
 import { useTablesStore } from './store.js'
 
@@ -40,11 +39,11 @@ function getCellValue(row, columnId) {
 function evalCondition(cond, row) {
 	const cellVal = getCellValue(row, cond.columnId)
 	switch (cond.operator) {
-	case 'isEmpty':    return cellVal === null || cellVal === '' || cellVal === undefined
+	case 'isEmpty': return cellVal === null || cellVal === '' || cellVal === undefined
 	case 'isNotEmpty': return cellVal !== null && cellVal !== '' && cellVal !== undefined
-	case 'isTrue':     return cellVal === true || cellVal === 1 || cellVal === '1'
-	case 'isFalse':    return cellVal === false || cellVal === 0 || cellVal === '0'
-	case 'isToday':    return sameDay(cellVal, new Date())
+	case 'isTrue': return cellVal === true || cellVal === 1 || cellVal === '1'
+	case 'isFalse': return cellVal === false || cellVal === 0 || cellVal === '0'
+	case 'isToday': return sameDay(cellVal, new Date())
 	case 'isThisWeek': return sameWeek(cellVal, new Date())
 	case 'eq':
 		if (cond.columnType === 'selection') return Number(cellVal) === selectionId(cond.value)
@@ -52,15 +51,15 @@ function evalCondition(cond, row) {
 	case 'neq':
 		if (cond.columnType === 'selection') return Number(cellVal) !== selectionId(cond.value)
 		return String(cellVal) !== String(cond.value)
-	case 'gt':       return Number(cellVal) > Number(cond.value)
-	case 'lt':       return Number(cellVal) < Number(cond.value)
-	case 'gte':      return Number(cellVal) >= Number(cond.value)
-	case 'lte':      return Number(cellVal) <= Number(cond.value)
-	case 'between':  return Number(cellVal) >= Number(cond.values[0]) && Number(cellVal) <= Number(cond.values[1])
-	case 'contains':   return String(cellVal).toLowerCase().includes(String(cond.value).toLowerCase())
+	case 'gt': return Number(cellVal) > Number(cond.value)
+	case 'lt': return Number(cellVal) < Number(cond.value)
+	case 'gte': return Number(cellVal) >= Number(cond.value)
+	case 'lte': return Number(cellVal) <= Number(cond.value)
+	case 'between': return Number(cellVal) >= Number(cond.values[0]) && Number(cellVal) <= Number(cond.values[1])
+	case 'contains': return String(cellVal).toLowerCase().includes(String(cond.value).toLowerCase())
 	case 'startsWith': return String(cellVal).toLowerCase().startsWith(String(cond.value).toLowerCase())
 	case 'before': return new Date(cellVal) < new Date(cond.value)
-	case 'after':  return new Date(cellVal) > new Date(cond.value)
+	case 'after': return new Date(cellVal) > new Date(cond.value)
 	case 'in':
 		if (cond.columnType === 'selection') return cond.values.some(v => Number(cellVal) === selectionId(v))
 		return cond.values.map(String).includes(String(cellVal))
@@ -83,8 +82,11 @@ export function toCSS(fmt) {
 		color: fmt.textColor || undefined,
 		fontWeight: fmt.fontWeight === 'bold' ? '700' : undefined,
 		fontStyle: fmt.fontStyle === 'italic' ? 'italic' : undefined,
-		textDecoration: fmt.textDecoration === 'strikethrough' ? 'line-through'
-			: fmt.textDecoration === 'underline' ? 'underline' : undefined,
+		textDecoration: fmt.textDecoration === 'strikethrough'
+			? 'line-through'
+			: fmt.textDecoration === 'underline'
+				? 'underline'
+				: undefined,
 	}
 }
 
@@ -128,7 +130,7 @@ export const useFormattingStore = defineStore('formatting', {
 		hasRulesForColumn: (state) => (columnId) => {
 			return state.ruleSets.some(rs =>
 				rs.enabled && !rs.broken
-				&& (rs.targetType === 'column' && rs.targetCol === columnId
+				&& ((rs.targetType === 'column' && rs.targetCol === columnId)
 					|| rs.targetType === 'row'),
 			)
 		},
