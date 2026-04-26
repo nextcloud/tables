@@ -24,3 +24,25 @@ export function getColumnWidthStyle(column) {
 
 	return width ? { width, maxWidth: width, minWidth: width } : null
 }
+
+const CHECKBOX_COLUMN_WIDTH = 60
+const DEFAULT_COLUMN_WIDTH = 150
+
+export function getFrozenColumnStyle(col, colIndex, pinnedColumnIndex, hasCheckboxColumn, visibleColumns, columnWidths = null) {
+	if (pinnedColumnIndex < 0 || colIndex > pinnedColumnIndex) {
+		return null
+	}
+
+	const getWidth = (c) => columnWidths?.[c.id] ?? c.customSettings?.width ?? DEFAULT_COLUMN_WIDTH
+	const baseOffset = hasCheckboxColumn ? CHECKBOX_COLUMN_WIDTH : 0
+	const leftOffset = visibleColumns
+		.slice(0, colIndex)
+		.reduce((sum, c) => sum + getWidth(c), baseOffset)
+
+	return {
+		position: 'sticky',
+		insetInlineStart: `${leftOffset}px`,
+		zIndex: 4,
+		backgroundColor: 'inherit',
+	}
+}
