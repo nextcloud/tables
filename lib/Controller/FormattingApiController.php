@@ -54,7 +54,7 @@ class FormattingApiController extends ApiController {
 	 * @param int|null $targetCol Target column ID (required when targetType is 'column')
 	 * @param string $mode Evaluation mode: 'first-match' or 'all-matches'
 	 * @param bool $enabled Whether the rule set is enabled
-	 * @param list<array{title?: string, enabled?: bool, condition?: array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: string, value?: string|int|float|bool, values?: list<string|int|float>}>}>}, format?: array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'}}> $rules List of rule definitions
+	 * @param list<array{title?: string, enabled?: bool, condition?: array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: 'begins-with'|'ends-with'|'contains'|'contains-item'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty'|'is-not-empty', value?: string|int|float|bool|list<mixed>}>}>}, format?: array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'}}> $rules List of rule definitions
 	 * @return DataResponse<Http::STATUS_OK, TablesFormattingRuleSet, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rule set created
@@ -92,6 +92,9 @@ class FormattingApiController extends ApiController {
 		}
 		try {
 			return new DataResponse($this->formattingService->createRuleSet($viewId, $this->userId, $input));
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->info($e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning($e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
@@ -114,7 +117,7 @@ class FormattingApiController extends ApiController {
 	 * @param int|null $targetCol Target column ID
 	 * @param string $mode Evaluation mode: 'first-match' or 'all-matches'
 	 * @param bool $enabled Whether the rule set is enabled
-	 * @param list<array{title?: string, enabled?: bool, condition?: array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: string, value?: string|int|float|bool, values?: list<string|int|float>}>}>}, format?: array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'}}> $rules Replacement list of rule definitions
+	 * @param list<array{title?: string, enabled?: bool, condition?: array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: 'begins-with'|'ends-with'|'contains'|'contains-item'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty'|'is-not-empty', value?: string|int|float|bool|list<mixed>}>}>}, format?: array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'}}> $rules Replacement list of rule definitions
 	 * @return DataResponse<Http::STATUS_OK, TablesFormattingRuleSet, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rule set updated
@@ -153,6 +156,9 @@ class FormattingApiController extends ApiController {
 		}
 		try {
 			return new DataResponse($this->formattingService->updateRuleSet($viewId, $id, $this->userId, $input));
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->info($e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning($e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
@@ -240,8 +246,8 @@ class FormattingApiController extends ApiController {
 	 * @param string $ruleSetId Rule set ID
 	 * @param string $title Rule title
 	 * @param bool $enabled Whether the rule is enabled
-	 * @param array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: string, value?: string|int|float|bool, values?: list<string|int|float>}>}>} $condition Condition set definition
-	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $format Style definition
+	 * @param array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: 'begins-with'|'ends-with'|'contains'|'contains-item'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty'|'is-not-empty', value?: string|int|float|bool|list<mixed>}>}>} $condition Condition set definition
+	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $style Style definition
 	 * @return DataResponse<Http::STATUS_OK, TablesFormattingRule, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rule created
@@ -262,20 +268,23 @@ class FormattingApiController extends ApiController {
 		string $title = '',
 		bool $enabled = true,
 		array $condition = ['groups' => []],
-		array $format = [],
+		array $style = [],
 	): DataResponse {
 		try {
 			$input = FormattingRuleInput::createFromInputArray([
 				'title' => $title,
 				'enabled' => $enabled,
 				'condition' => $condition,
-				'format' => $format,
+				'format' => $style,
 			]);
 		} catch (\InvalidArgumentException $e) {
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 		try {
 			return new DataResponse($this->formattingService->createRule($viewId, $ruleSetId, $this->userId, $input));
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->info($e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning($e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
@@ -296,8 +305,8 @@ class FormattingApiController extends ApiController {
 	 * @param string $id Rule ID
 	 * @param string $title Rule title
 	 * @param bool $enabled Whether the rule is enabled
-	 * @param array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: string, value?: string|int|float|bool, values?: list<string|int|float>}>}>} $condition Condition set definition
-	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $format Style definition
+	 * @param array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: 'begins-with'|'ends-with'|'contains'|'contains-item'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty'|'is-not-empty', value?: string|int|float|bool|list<mixed>}>}>} $condition Condition set definition
+	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $style Style definition
 	 * @return DataResponse<Http::STATUS_OK, TablesFormattingRule, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rule updated
@@ -319,20 +328,23 @@ class FormattingApiController extends ApiController {
 		string $title = '',
 		bool $enabled = true,
 		array $condition = ['groups' => []],
-		array $format = [],
+		array $style = [],
 	): DataResponse {
 		try {
 			$input = FormattingRuleInput::createFromInputArray([
 				'title' => $title,
 				'enabled' => $enabled,
 				'condition' => $condition,
-				'format' => $format,
+				'format' => $style,
 			]);
 		} catch (\InvalidArgumentException $e) {
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 		try {
 			return new DataResponse($this->formattingService->updateRule($viewId, $ruleSetId, $id, $this->userId, $input));
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->info($e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning($e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
