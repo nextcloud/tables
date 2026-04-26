@@ -4,8 +4,8 @@
 -->
 <template>
 	<div class="icon-picker__icons">
-		<template v-for="icon in icons">
-			<Icon :key="icon.name" :name="icon.name" @select="select" />
+		<template v-for="icon in icons" :key="icon.name">
+			<Icon :name="icon.name" @select="select" />
 		</template>
 	</div>
 </template>
