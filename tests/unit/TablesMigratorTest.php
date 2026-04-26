@@ -391,7 +391,7 @@ class TablesMigratorTest extends TestCase {
 				'sortOrder' => 0,
 				'enabled' => true,
 				'broken' => false,
-				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'number', 'operator' => 'gt', 'value' => 5]]]]],
+				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'number', 'operator' => 'is-greater-than', 'value' => 5]]]]],
 				'format' => ['backgroundColor' => '#ff0000'],
 			]],
 		]];
@@ -411,6 +411,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 		$this->columnService->method('importColumn')->willReturn(['columnId' => 99, 'selectionOptionIdMap' => []]);
 
@@ -460,7 +461,7 @@ class TablesMigratorTest extends TestCase {
 				'sortOrder' => 0,
 				'enabled' => true,
 				'broken' => false,
-				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'selection', 'operator' => 'eq', 'value' => '@selection-id-5']]]]],
+				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'selection', 'operator' => 'is-equal', 'value' => '@selection-id-5']]]]],
 				'format' => ['backgroundColor' => '#ff0000'],
 			]],
 		]];
@@ -480,6 +481,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 		$this->columnService->method('importColumn')->willReturn(['columnId' => 10, 'selectionOptionIdMap' => [5 => 42]]);
 
@@ -614,7 +616,7 @@ class TablesMigratorTest extends TestCase {
 				'sortOrder' => 0,
 				'enabled' => true,
 				'broken' => false,
-				'condition' => ['groups' => [['conditions' => [['columnId' => 99, 'columnType' => 'number', 'operator' => 'gt', 'value' => 5]]]]],
+				'condition' => ['groups' => [['conditions' => [['columnId' => 99, 'columnType' => 'number', 'operator' => 'is-greater-than', 'value' => 5]]]]],
 				'format' => ['backgroundColor' => '#ff0000'],
 			]],
 		]];
@@ -634,6 +636,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 
 		$this->tableMapper->method('getDBConnection')->willReturn(new class {
@@ -682,7 +685,7 @@ class TablesMigratorTest extends TestCase {
 				'enabled' => true,
 				'broken' => false,
 				// value references option 5, but selectionOptionIdMap has no entry for 5
-				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'selection', 'operator' => 'eq', 'value' => '@selection-id-5']]]]],
+				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'selection', 'operator' => 'is-equal', 'value' => '@selection-id-5']]]]],
 				'format' => ['backgroundColor' => '#ff0000'],
 			]],
 		]];
@@ -702,6 +705,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 		// importColumn returns no selectionOptionIdMap entries for option 5
 		$this->columnService->method('importColumn')->willReturn(['columnId' => 10, 'selectionOptionIdMap' => []]);
