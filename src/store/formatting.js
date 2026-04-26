@@ -7,247 +7,232 @@ import { defineStore } from 'pinia'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../shared/utils/displayError.js'
+import { getFilterWithId } from '../shared/components/ncTable/mixins/filter.js'
+import { resolveMagicValues } from '../shared/components/ncTable/mixins/magicFields.js'
 import { useTablesStore } from './store.js'
 
-// ── Evaluation helpers ────────────────────────────────────────────────────────
-
-function selectionId(v) {
-	return parseInt(String(v).replace('@selection-id-', ''))
+/**
+ * @param {Array} columns parsed column instances of the view
+ * @return {object} the columns keyed by their id
+ */
+function indexColumns(columns) {
+	const index = {}
+	for (const column of columns ?? []) {
+		index[column.id] = column
+	}
+	return index
 }
 
-function sameDay(val, ref) {
-	const d = new Date(val)
-	return d.getFullYear() === ref.getFullYear()
-		&& d.getMonth() === ref.getMonth()
-		&& d.getDate() === ref.getDate()
-}
+/**
+ * Decide whether one condition holds for a row.
+ *
+ * The match is delegated to the column type, which is the same code path the view filters
+ * use, so a condition selects the rows its equivalent filter would select.
+ *
+ * @param {object} condition stored condition with columnId, operator and value
+ * @param {object} row row as delivered by the data store
+ * @param {object} columnIndex columns keyed by id
+ * @return {boolean}
+ */
+function matchesCondition(condition, row, columnIndex) {
+	const column = columnIndex[condition.columnId]
+	const operator = getFilterWithId(condition.operator)
+	if (!column || !operator) {
+		return false
+	}
 
-function sameWeek(val, ref) {
-	const d = new Date(val)
-	const mon = new Date(ref)
-	mon.setDate(ref.getDate() - ((ref.getDay() + 6) % 7))
-	mon.setHours(0, 0, 0, 0)
-	const sun = new Date(mon)
-	sun.setDate(mon.getDate() + 7)
-	return d >= mon && d < sun
-}
+	// isFilterFound marks the cell it is handed, so give it a throwaway copy
+	const cell = {
+		columnId: condition.columnId,
+		value: row.data?.find(item => item.columnId === condition.columnId)?.value ?? null,
+	}
+	const filter = { columnId: condition.columnId, operator, value: condition.value ?? '' }
+	resolveMagicValues(filter)
 
-function getCellValue(row, columnId) {
-	return row.data?.find(item => item.columnId === columnId)?.value ?? null
-}
-
-function evalCondition(cond, row) {
-	const cellVal = getCellValue(row, cond.columnId)
-	switch (cond.operator) {
-	case 'isEmpty': return cellVal === null || cellVal === '' || cellVal === undefined
-	case 'isNotEmpty': return cellVal !== null && cellVal !== '' && cellVal !== undefined
-	case 'isTrue': return cellVal === true || cellVal === 1 || cellVal === '1'
-	case 'isFalse': return cellVal === false || cellVal === 0 || cellVal === '0'
-	case 'isToday': return sameDay(cellVal, new Date())
-	case 'isThisWeek': return sameWeek(cellVal, new Date())
-	case 'eq':
-		if (cond.columnType === 'selection') return Number(cellVal) === selectionId(cond.value)
-		return String(cellVal) === String(cond.value)
-	case 'neq':
-		if (cond.columnType === 'selection') return Number(cellVal) !== selectionId(cond.value)
-		return String(cellVal) !== String(cond.value)
-	case 'gt': return Number(cellVal) > Number(cond.value)
-	case 'lt': return Number(cellVal) < Number(cond.value)
-	case 'gte': return Number(cellVal) >= Number(cond.value)
-	case 'lte': return Number(cellVal) <= Number(cond.value)
-	case 'between': return Number(cellVal) >= Number(cond.values[0]) && Number(cellVal) <= Number(cond.values[1])
-	case 'contains': return String(cellVal).toLowerCase().includes(String(cond.value).toLowerCase())
-	case 'startsWith': return String(cellVal).toLowerCase().startsWith(String(cond.value).toLowerCase())
-	case 'before': return new Date(cellVal) < new Date(cond.value)
-	case 'after': return new Date(cellVal) > new Date(cond.value)
-	case 'in':
-		if (cond.columnType === 'selection') return cond.values.some(v => Number(cellVal) === selectionId(v))
-		return cond.values.map(String).includes(String(cellVal))
-	default: return false
+	try {
+		return column.isFilterFound(cell, filter) === true
+	} catch (error) {
+		// the column type does not implement this operator, so nothing can match
+		return false
 	}
 }
 
-function evalConditionGroup(group, row) {
-	return group.conditions.every(c => evalCondition(c, row))
+/**
+ * @param {object} conditionSet groups of conditions, combined as OR of ANDs
+ * @param {object} row row to test
+ * @param {object} columnIndex columns keyed by id
+ * @return {boolean}
+ */
+function matchesConditionSet(conditionSet, row, columnIndex) {
+	return (conditionSet?.groups ?? []).some(group =>
+		(group.conditions ?? []).length > 0
+		&& group.conditions.every(condition => matchesCondition(condition, row, columnIndex)),
+	)
 }
 
-function evalConditionSet(conditionSet, row) {
-	return conditionSet.groups.some(group => evalConditionGroup(group, row))
-}
-
-export function toCSS(fmt) {
-	if (!fmt) return {}
+/**
+ * Translate a stored style into the CSS properties Vue applies to a row or a cell.
+ *
+ * @param {object} style stored style of a rule
+ * @return {object}
+ */
+export function toCSS(style) {
+	if (!style) {
+		return {}
+	}
 	return {
-		backgroundColor: fmt.backgroundColor || undefined,
-		color: fmt.textColor || undefined,
-		fontWeight: fmt.fontWeight === 'bold' ? '700' : undefined,
-		fontStyle: fmt.fontStyle === 'italic' ? 'italic' : undefined,
-		textDecoration: fmt.textDecoration === 'strikethrough'
+		backgroundColor: style.backgroundColor || undefined,
+		color: style.textColor || undefined,
+		fontWeight: style.fontWeight === 'bold' ? '700' : undefined,
+		fontStyle: style.fontStyle === 'italic' ? 'italic' : undefined,
+		textDecoration: style.textDecoration === 'strikethrough'
 			? 'line-through'
-			: fmt.textDecoration === 'underline'
+			: style.textDecoration === 'underline'
 				? 'underline'
 				: undefined,
 	}
 }
 
-function computeFmtMap(rows, ruleSets) {
-	const fmtMap = {}
+/**
+ * Resolve the style of every row and cell in one pass.
+ *
+ * @param {Array} rows rows currently loaded in the view
+ * @param {Array} ruleSets rule sets of the view
+ * @param {Array} columns parsed column instances of the view
+ * @return {object} rowId to target key ('*' for the row) to style
+ */
+function computeFmtMap(rows, ruleSets, columns) {
+	const columnIndex = indexColumns(columns)
 	const activeSets = [...ruleSets]
-		.filter(rs => rs.enabled && !rs.broken)
+		.filter(ruleSet => ruleSet.enabled && !ruleSet.broken)
 		.sort((a, b) => a.sortOrder - b.sortOrder)
 
+	const fmtMap = {}
 	for (const row of rows) {
 		fmtMap[row.id] = {}
-		for (const rs of activeSets) {
+		for (const ruleSet of activeSets) {
 			let resolved = null
-			for (const rule of rs.rules.filter(r => r.enabled && !r.broken)) {
-				if (evalConditionSet(rule.condition, row)) {
-					resolved = rs.mode === 'all-matches'
-						? { ...resolved, ...rule.format }
-						: rule.format
-					if (rs.mode === 'first-match') break
+			for (const rule of (ruleSet.rules ?? []).filter(r => r.enabled && !r.broken)) {
+				if (!matchesConditionSet(rule.condition, row, columnIndex)) {
+					continue
+				}
+				resolved = ruleSet.mode === 'all-matches' ? { ...resolved, ...rule.format } : rule.format
+				if (ruleSet.mode === 'first-match') {
+					break
 				}
 			}
-			if (!resolved) continue
-			const key = rs.targetType === 'row' ? '*' : String(rs.targetCol)
-			fmtMap[row.id][key] = { ...(fmtMap[row.id][key] ?? {}), ...resolved }
+			if (!resolved) {
+				continue
+			}
+			const target = ruleSet.targetType === 'row' ? '*' : String(ruleSet.targetCol)
+			fmtMap[row.id][target] = { ...(fmtMap[row.id][target] ?? {}), ...resolved }
 		}
 	}
 	return fmtMap
 }
-
-// ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useFormattingStore = defineStore('formatting', {
 	state: () => ({
 		viewId: null,
 		ruleSets: [],
 		fmtMap: {},
-		loading: false,
 		showFormattingManager: false,
 	}),
 
 	getters: {
-		hasRulesForColumn: (state) => (columnId) => {
-			return state.ruleSets.some(rs =>
-				rs.enabled && !rs.broken
-				&& ((rs.targetType === 'column' && rs.targetCol === columnId)
-					|| rs.targetType === 'row'),
-			)
-		},
-
 		cellStyle: (state) => (rowId, columnId) => {
-			const m = state.fmtMap[rowId] ?? {}
-			return toCSS({ ...(m['*'] ?? {}), ...(m[String(columnId)] ?? {}) })
+			const styles = state.fmtMap[rowId] ?? {}
+			return toCSS({ ...(styles['*'] ?? {}), ...(styles[String(columnId)] ?? {}) })
 		},
 
 		rowStyle: (state) => (rowId) => {
-			const m = state.fmtMap[rowId] ?? {}
-			return toCSS(m['*'] ?? {})
+			const styles = state.fmtMap[rowId] ?? {}
+			return toCSS(styles['*'] ?? {})
 		},
 	},
 
 	actions: {
 		loadForView(viewId) {
-			const tablesStore = useTablesStore()
+			// This store is the only writer of formatting rules in the client, so a reload of
+			// the view it already holds must keep them: replacing them would reset the editors
+			// and drop rules that are still being edited.
 			if (this.viewId === viewId) {
 				return
 			}
-			const view = tablesStore.getView(viewId)
+			const view = useTablesStore().getView(viewId)
 			this.viewId = viewId
 			this.ruleSets = (view?.formatting ?? []).slice()
 			this.fmtMap = {}
 		},
 
-		evaluate(rows) {
-			this.fmtMap = computeFmtMap(rows, this.ruleSets)
+		evaluate(rows, columns) {
+			this.fmtMap = computeFmtMap(rows, this.ruleSets, columns)
 		},
 
-		handleColumnDeleted(columnId) {
-			this.ruleSets = this.ruleSets.map(rs => ({
-				...rs,
-				rules: rs.rules.map(rule => {
-					const refs = rule.condition?.groups?.flatMap(g => g.conditions.map(c => c.columnId)) ?? []
-					if (refs.includes(columnId)) {
-						return { ...rule, broken: true, enabled: false }
-					}
-					return rule
-				}),
-			}))
-		},
-
-		handleColumnTypeChanged(columnId, newType) {
-			this.ruleSets = this.ruleSets.map(rs => ({
-				...rs,
-				rules: rs.rules.map(rule => {
-					const mismatch = rule.condition?.groups?.some(g =>
-						g.conditions.some(c => c.columnId === columnId && c.columnType !== newType),
-					) ?? false
-					if (mismatch) {
-						return { ...rule, broken: true, enabled: false }
-					}
-					return rule
-				}),
-			}))
+		/**
+		 * Mirror the rules into the tables store, whose copy of the view is otherwise only
+		 * refreshed on a full reload and would hand back outdated rules on the next visit.
+		 */
+		syncToTablesStore() {
+			const view = useTablesStore().getView(this.viewId)
+			if (view) {
+				view.formatting = this.ruleSets.slice()
+			}
 		},
 
 		async createRuleSet(viewId, data) {
-			this.loading = true
 			try {
 				const res = await axios.post(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets'),
 					data,
 				)
 				this.ruleSets.push(res.data)
+				this.syncToTablesStore()
 				return res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not create rule set.'))
 				return null
-			} finally {
-				this.loading = false
 			}
 		},
 
 		async updateRuleSet(viewId, id, data) {
-			this.loading = true
 			try {
 				const res = await axios.put(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets/' + id),
 					data,
 				)
-				const idx = this.ruleSets.findIndex(rs => rs.id === id)
-				if (idx !== -1) this.ruleSets.splice(idx, 1, res.data)
+				const index = this.ruleSets.findIndex(ruleSet => ruleSet.id === id)
+				if (index !== -1) {
+					this.ruleSets[index] = res.data
+				}
+				this.syncToTablesStore()
 				return res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update rule set.'))
 				return null
-			} finally {
-				this.loading = false
 			}
 		},
 
 		async deleteRuleSet(viewId, id) {
-			this.loading = true
 			try {
 				await axios.delete(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets/' + id),
 				)
-				this.ruleSets = this.ruleSets.filter(rs => rs.id !== id)
+				this.ruleSets = this.ruleSets.filter(ruleSet => ruleSet.id !== id)
+				this.syncToTablesStore()
 				return true
 			} catch (e) {
 				displayError(e, t('tables', 'Could not delete rule set.'))
 				return false
-			} finally {
-				this.loading = false
 			}
 		},
 
 		async reorder(viewId, orderedIds) {
-			// Apply locally immediately — sortOrder = position in submitted list
+			const previousOrder = this.ruleSets
 			this.ruleSets = orderedIds
-				.map((id, idx) => {
-					const rs = this.ruleSets.find(r => r.id === id)
-					return rs ? { ...rs, sortOrder: idx } : null
+				.map((id, sortOrder) => {
+					const ruleSet = this.ruleSets.find(candidate => candidate.id === id)
+					return ruleSet ? { ...ruleSet, sortOrder } : null
 				})
 				.filter(Boolean)
 
@@ -256,64 +241,68 @@ export const useFormattingStore = defineStore('formatting', {
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/reorder'),
 					{ orderedIds },
 				)
+				this.syncToTablesStore()
 			} catch (e) {
+				this.ruleSets = previousOrder
 				displayError(e, t('tables', 'Could not reorder rule sets.'))
 			}
 		},
 
 		async createRule(viewId, ruleSetId, data) {
-			this.loading = true
 			try {
+				const { format, ...rest } = data
 				const res = await axios.post(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets/' + ruleSetId + '/rules'),
-					data,
+					{ ...rest, style: format },
 				)
-				const rs = this.ruleSets.find(r => r.id === ruleSetId)
-				if (rs) rs.rules.push(res.data)
+				const ruleSet = this.ruleSets.find(candidate => candidate.id === ruleSetId)
+				if (ruleSet) {
+					ruleSet.rules.push(res.data)
+				}
+				this.syncToTablesStore()
 				return res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not create rule.'))
 				return null
-			} finally {
-				this.loading = false
 			}
 		},
 
 		async updateRule(viewId, ruleSetId, id, data) {
-			this.loading = true
 			try {
+				const { format, ...rest } = data
 				const res = await axios.put(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets/' + ruleSetId + '/rules/' + id),
-					data,
+					{ ...rest, style: format },
 				)
-				const rs = this.ruleSets.find(r => r.id === ruleSetId)
-				if (rs) {
-					const idx = rs.rules.findIndex(r => r.id === id)
-					if (idx !== -1) rs.rules.splice(idx, 1, res.data)
+				const ruleSet = this.ruleSets.find(candidate => candidate.id === ruleSetId)
+				if (ruleSet) {
+					const index = ruleSet.rules.findIndex(rule => rule.id === id)
+					if (index !== -1) {
+						ruleSet.rules[index] = res.data
+					}
 				}
+				this.syncToTablesStore()
 				return res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update rule.'))
 				return null
-			} finally {
-				this.loading = false
 			}
 		},
 
 		async deleteRule(viewId, ruleSetId, id) {
-			this.loading = true
 			try {
 				await axios.delete(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets/' + ruleSetId + '/rules/' + id),
 				)
-				const rs = this.ruleSets.find(r => r.id === ruleSetId)
-				if (rs) rs.rules = rs.rules.filter(r => r.id !== id)
+				const ruleSet = this.ruleSets.find(candidate => candidate.id === ruleSetId)
+				if (ruleSet) {
+					ruleSet.rules = ruleSet.rules.filter(rule => rule.id !== id)
+				}
+				this.syncToTablesStore()
 				return true
 			} catch (e) {
 				displayError(e, t('tables', 'Could not delete rule.'))
 				return false
-			} finally {
-				this.loading = false
 			}
 		},
 	},
