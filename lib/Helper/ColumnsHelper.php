@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Helper;
 
+use OCA\Tables\Constants\SelectionReference;
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
@@ -35,8 +36,8 @@ class ColumnsHelper {
 	}
 
 	public function resolveSearchValue(string $placeholder, string $userId, ?Column $column = null): string|array {
-		if (str_starts_with($placeholder, '@selection-id-')) {
-			return substr($placeholder, 14);
+		if (SelectionReference::isReference($placeholder)) {
+			return substr($placeholder, strlen(SelectionReference::PREFIX));
 		}
 		if (str_starts_with($placeholder, '@relation-id-')) {
 			return substr($placeholder, 13);

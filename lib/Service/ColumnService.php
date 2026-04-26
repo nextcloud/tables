@@ -381,6 +381,8 @@ class ColumnService extends SuperService {
 
 			$oldType = $item->getType();
 			$oldSubtype = $item->getSubtype();
+			$touchesSelectionOptions = $columnDto->getSelectionOptions() !== null
+				|| $columnDto->getSelectionDefault() !== null;
 			$oldSelectionOptionIds = array_column($item->getSelectionOptionsArray() ?? [], 'id');
 
 			if ($title !== null) {
@@ -438,18 +440,15 @@ class ColumnService extends SuperService {
 			try {
 				$updatedColumn = $this->mapper->update($item);
 
-				$newType = $updatedColumn->getType();
-				$newSubtype = $updatedColumn->getSubtype();
-				if ($oldType !== $newType || $oldSubtype !== $newSubtype) {
-					$fullType = $newSubtype ? $newType . '-' . $newSubtype : $newType;
-					$this->formattingService->handleColumnTypeChange($updatedColumn->getId(), $fullType);
+				if ($oldType !== $updatedColumn->getType() || $oldSubtype !== $updatedColumn->getSubtype()) {
+					$this->formattingService->handleColumnTypeChange($updatedColumn->getId());
 				}
-				$dtoOptions = $columnDto->getSelectionOptions();
-				if ($dtoOptions !== null) {
-					$newOptionIds = array_column(json_decode($dtoOptions, true) ?? [], 'id');
-					foreach (array_diff($oldSelectionOptionIds, $newOptionIds) as $deletedId) {
-						$this->formattingService->handleSelectionOptionDeletion($updatedColumn->getId(), (int)$deletedId);
-					}
+				if ($touchesSelectionOptions) {
+					$newOptionIds = array_column($updatedColumn->getSelectionOptionsArray() ?? [], 'id');
+					$this->formattingService->handleSelectionOptionDeletion(
+						$updatedColumn->getId(),
+						array_map(intval(...), array_values(array_diff($oldSelectionOptionIds, $newOptionIds))),
+					);
 				}
 
 				$this->activityManager->triggerEvent(
@@ -920,28 +919,41 @@ class ColumnService extends SuperService {
 			'columnId' => $newColumn->getId(),
 			'selectionOptionIdMap' => self::pairSelectionOptionIds(
 				$column['selectionOptions'] ?? [],
-				$newColumn->getSelectionOptionsArray(),
+				$newColumn->getSelectionOptionsArray() ?? [],
 			),
 		];
 	}
 
 	/**
-	 * Pair a column's incoming selection options with the ones it ended up with, by position.
-	 *
-	 * Option ids are assigned per column, so importing a column renumbers them and anything
-	 * that stored a reference to one — a filter, a formatting condition — has to be told what
-	 * it became. The result is only meaningful for the column it came from.
-	 *
+	 * @param list<array{id?: int|string, uuid?: string}> $schemeColumns the scheme's columns
+	 * @param array<string, Column> $columnsByUuid the columns this import produced, keyed by uuid
+	 * @return array<int, int> old column id => new column id
+	 */
+	public static function pairSchemeColumnIds(array $schemeColumns, array $columnsByUuid): array {
+		$map = [];
+		foreach ($schemeColumns as $schemeColumn) {
+			$uuid = $schemeColumn['uuid'] ?? null;
+			if ($uuid !== null && isset($schemeColumn['id'], $columnsByUuid[$uuid])) {
+				$map[(int)$schemeColumn['id']] = $columnsByUuid[$uuid]->getId();
+			}
+		}
+
+		return $map;
+	}
+
+	/**
 	 * @return array<int, int> old option id => new option id
 	 */
 	public static function pairSelectionOptionIds(array $oldOptions, array $newOptions): array {
+		$newOptions = array_values($newOptions);
 		$map = [];
-		foreach ($oldOptions as $idx => $oldOption) {
-			$oldId = $oldOption['id'] ?? null;
-			if ($oldId === null) {
+		foreach (array_values($oldOptions) as $idx => $oldOption) {
+			$oldId = is_array($oldOption) ? ($oldOption['id'] ?? null) : null;
+			$newId = $newOptions[$idx]['id'] ?? null;
+			if ($oldId === null || $newId === null) {
 				continue;
 			}
-			$map[(int)$oldId] = (int)($newOptions[$idx]['id'] ?? $oldId);
+			$map[(int)$oldId] = (int)$newId;
 		}
 
 		return $map;

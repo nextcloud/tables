@@ -334,12 +334,48 @@ class StructureService {
 			'columnSettings' => $view['columnSettings'],
 			'sort' => $view['sort'],
 			'filter' => $view['filter'],
+			'formatting' => self::comparableFormatting($view['formatting'] ?? []),
 			'layout' => ViewLayout::normalize($view['layout'] ?? null)->value,
 			'viewSettings' => [
 				'cardBackgroundSourceUuid' => $viewSettings['cardBackgroundSourceUuid'] ?? null,
 				'cardTitleSourceUuid' => $viewSettings['cardTitleSourceUuid'] ?? null,
 			],
 		];
+	}
+
+	private static function comparableFormatting(mixed $formatting): array {
+		if (!is_array($formatting)) {
+			return [];
+		}
+
+		$comparable = [];
+		foreach ($formatting as $ruleSet) {
+			if (!is_array($ruleSet)) {
+				continue;
+			}
+			$rules = [];
+			foreach (is_array($ruleSet['rules'] ?? null) ? $ruleSet['rules'] : [] as $rule) {
+				if (!is_array($rule)) {
+					continue;
+				}
+				$rules[] = [
+					'title' => $rule['title'] ?? '',
+					'enabled' => (bool)($rule['enabled'] ?? true),
+					'condition' => $rule['condition'] ?? [],
+					'format' => $rule['format'] ?? [],
+				];
+			}
+			$comparable[] = [
+				'title' => $ruleSet['title'] ?? '',
+				'targetType' => $ruleSet['targetType'] ?? null,
+				'targetCol' => $ruleSet['targetCol'] ?? null,
+				'mode' => $ruleSet['mode'] ?? null,
+				'enabled' => (bool)($ruleSet['enabled'] ?? true),
+				'rules' => $rules,
+			];
+		}
+
+		return $comparable;
 	}
 
 	protected function resolveColumnOrderChanges(array $currentSchema, array $updateSchema): void {
