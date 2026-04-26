@@ -84,10 +84,6 @@ export default {
 
 	mixins: [activityMixin],
 
-	setup() {
-		return { formattingStore: useFormattingStore() }
-	},
-
 	props: {
 		row: {
 			type: Object,
@@ -126,6 +122,11 @@ export default {
 			default: null,
 		},
 	},
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
+	},
+
 	computed: {
 		getSelection: {
 			get: () => { return this.selected },
