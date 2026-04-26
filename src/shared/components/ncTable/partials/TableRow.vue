@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<tr v-if="row" :class="{ selected }">
+	<tr v-if="row" :class="{ selected }" :style="formattingStore.rowStyle(row.id)">
 		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<NcCheckboxRadioSwitch :model-value="selected" @update:model-value="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
@@ -11,6 +11,7 @@
 			:style="{
 				...getColumnWidthStyle(col),
 				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns, columnWidths),
+				...formattingStore.cellStyle(row.id, col.id),
 			}"
 			:class="{
 				'search-result': getCell(col.id)?.searchStringFound,
@@ -75,6 +76,7 @@ import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
+import { useFormattingStore } from '../../../../store/formatting.js'
 
 export default {
 	name: 'TableRow',
@@ -88,6 +90,11 @@ export default {
 	},
 
 	mixins: [activityMixin],
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
+	},
+
 	props: {
 		row: {
 			type: Object,

@@ -157,6 +157,17 @@ export const useFormattingStore = defineStore('formatting', {
 			this.fmtMap = {}
 		},
 
+		/**
+		 * Drop everything held for the previous view. Styles are keyed by row id, and a
+		 * view's rows are its table's rows, so leaving them behind would repaint the plain
+		 * table with the view's colours.
+		 */
+		clear() {
+			this.viewId = null
+			this.ruleSets = []
+			this.fmtMap = {}
+		},
+
 		evaluate(rows) {
 			this.fmtMap = computeFmtMap(rows, this.ruleSets)
 		},
