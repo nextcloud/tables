@@ -91,10 +91,6 @@ export default {
 
 	mixins: [activityMixin],
 
-	setup() {
-		return { formattingStore: useFormattingStore() }
-	},
-
 	props: {
 		row: {
 			type: Object,
@@ -139,6 +135,11 @@ export default {
 		'edit-row',
 		'update-row-selection',
 	],
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
+	},
+
 	computed: {
 		getSelection: {
 			get: () => { return this.selected },

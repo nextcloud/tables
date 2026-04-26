@@ -18,7 +18,7 @@
 				class="rule-editor__title-input"
 				type="text"
 				:placeholder="t('tables', 'Rule name')"
-				@change="onMetaChange" />
+				@change="onMetaChange">
 
 			<NcCheckboxRadioSwitch :model-value="localEnabled"
 				@update:model-value="onEnabledChange" />

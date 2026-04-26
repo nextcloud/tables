@@ -104,10 +104,6 @@ export default {
 
 	mixins: [viewportHelper],
 
-	setup() {
-		return { formattingStore: useFormattingStore() }
-	},
-
 	props: {
 		selectedRows: {
 			type: Array,
@@ -153,6 +149,11 @@ export default {
 		'download-filtered-csv',
 		'set-search-string',
 	],
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
+	},
+
 	data() {
 		return {
 			optionsDivWidth: null,

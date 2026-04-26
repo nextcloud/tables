@@ -38,42 +38,42 @@ function generatePreviewValue(columnType, operator, value) {
 		return operator === 'isEmpty' ? null : 'example'
 	case 'isTrue':
 	case 'isFalse':
-		return operator === 'isTrue' ? true : false
-	case 'eq':    return value
-	case 'neq':   return value === 'a' ? 'b' : 'a'
-	case 'gt':    return Number(value) + 1
-	case 'lt':    return Number(value) - 1
-	case 'gte':   return Number(value)
-	case 'lte':   return Number(value)
+		return operator === 'isTrue'
+	case 'eq': return value
+	case 'neq': return value === 'a' ? 'b' : 'a'
+	case 'gt': return Number(value) + 1
+	case 'lt': return Number(value) - 1
+	case 'gte': return Number(value)
+	case 'lte': return Number(value)
 	case 'between': return value
-	case 'contains':   return value ? String(value) + ' extra' : 'example'
+	case 'contains': return value ? String(value) + ' extra' : 'example'
 	case 'startsWith': return value ? String(value) + '_suffix' : 'example'
 	case 'before': return new Date(new Date(value).getTime() - 86400000).toISOString().slice(0, 10)
-	case 'after':  return new Date(new Date(value).getTime() + 86400000).toISOString().slice(0, 10)
-	case 'in':     return Array.isArray(value) && value.length > 0 ? value[0] : 'example'
-	default:       return 'example'
+	case 'after': return new Date(new Date(value).getTime() + 86400000).toISOString().slice(0, 10)
+	case 'in': return Array.isArray(value) && value.length > 0 ? value[0] : 'example'
+	default: return 'example'
 	}
 }
 
 function generateNonMatchValue(columnType, operator, value) {
 	switch (operator) {
-	case 'isEmpty':    return 'non-empty'
+	case 'isEmpty': return 'non-empty'
 	case 'isNotEmpty': return null
-	case 'isTrue':     return false
-	case 'isFalse':    return true
-	case 'eq':    return value === 'a' ? 'b' : String(value) + '_other'
-	case 'neq':   return value
-	case 'gt':    return Number(value) - 1
-	case 'lt':    return Number(value) + 1
-	case 'gte':   return Number(value) - 1
-	case 'lte':   return Number(value) + 1
+	case 'isTrue': return false
+	case 'isFalse': return true
+	case 'eq': return value === 'a' ? 'b' : String(value) + '_other'
+	case 'neq': return value
+	case 'gt': return Number(value) - 1
+	case 'lt': return Number(value) + 1
+	case 'gte': return Number(value) - 1
+	case 'lte': return Number(value) + 1
 	case 'between': return Number(Array.isArray(value) ? value[0] : value) - 1
-	case 'contains':   return 'unrelated'
+	case 'contains': return 'unrelated'
 	case 'startsWith': return 'different'
 	case 'before': return new Date(new Date(value).getTime() + 86400000).toISOString().slice(0, 10)
-	case 'after':  return new Date(new Date(value).getTime() - 86400000).toISOString().slice(0, 10)
-	case 'in':     return 'not_in_list'
-	default:       return 'other'
+	case 'after': return new Date(new Date(value).getTime() - 86400000).toISOString().slice(0, 10)
+	case 'in': return 'not_in_list'
+	default: return 'other'
 	}
 }
 
