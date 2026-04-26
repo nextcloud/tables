@@ -41,8 +41,10 @@ import permissionsMixin from '../../../shared/components/ncTable/mixins/permissi
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
+import { useFormattingStore } from '../../../store/formatting.js'
 import { computed } from 'vue'
 import { showError } from '@nextcloud/dialogs'
+import debounce from 'debounce'
 
 export default {
 	name: 'MainWrapper',
@@ -71,7 +73,8 @@ export default {
 		// To make nested dynamic keys reactive, you need to use a computed property or watch for changes.
 		const rows = computed(() => getRows.value(props.isView, props.element.id))
 		const columns = computed(() => getColumns.value(props.isView, props.element.id))
-		return { rows, columns }
+		const formattingStore = useFormattingStore()
+		return { rows, columns, formattingStore }
 	},
 
 	data() {
@@ -93,6 +96,20 @@ export default {
 		activeRowId() {
 			this.reload()
 		},
+		rows: {
+			handler(newRows) {
+				if (this.isView) {
+					this.debouncedEvaluate(newRows)
+				}
+			},
+			deep: true,
+		},
+	},
+
+	created() {
+		this.debouncedEvaluate = debounce((rows) => {
+			this.formattingStore.evaluate(rows)
+		}, 150)
 	},
 
 	beforeMount() {
@@ -165,6 +182,10 @@ export default {
 						isView: this.isView,
 						elementId: this.element.id,
 					})
+				}
+				if (this.isView) {
+					this.formattingStore.loadForView(this.element.id)
+					this.formattingStore.evaluate(this.rows)
 				}
 				this.lastActiveElement = {
 					id: this.element.id,
