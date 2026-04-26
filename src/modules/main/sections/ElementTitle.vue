@@ -96,6 +96,7 @@ export default {
 	z-index: 15;
 	background-color: var(--color-main-background);
 	align-items: center;
+	width: var(--app-content-width, 100%);
 }
 
 .user-bubble {

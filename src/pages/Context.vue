@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="row">
+	<div class="row main-context-view">
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else-if="activeContext">
@@ -267,6 +267,15 @@ export default {
 
 <style scoped lang="scss">
 .context {
+	.row.first-row {
+		position: sticky;
+		inset-inline-start: 0;
+		top: 0;
+		z-index: 15;
+		background-color: var(--color-main-background);
+		width: var(--app-content-width, 100%);
+	}
+
 	&__title {
 		display: inline-flex;
 	}
@@ -283,14 +292,19 @@ export default {
 	}
 }
 
+.main-context-view {
+	width: max-content;
+	min-width: var(--app-content-width, 100%);
+}
+
 .resource {
 	margin: 40px 0;
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
 
 	&:deep(.row.first-row) {
-		margin-inline-start: 20px;
-		padding-inline-start: 0px;
+		margin-inline-start: 0;
+		padding-inline-start: 20px;
 	}
 }
 
