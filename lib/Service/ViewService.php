@@ -19,6 +19,7 @@ use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\FormattingRuleColMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -61,6 +62,8 @@ class ViewService extends SuperService {
 		protected IL10N $l,
 		private readonly FederationService $federationService,
 		private readonly ActivityManager $activityManager,
+		private readonly FormattingRuleColMapper $formattingRuleColMapper,
+		private readonly FormattingService $formattingService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -445,6 +448,7 @@ class ViewService extends SuperService {
 		$this->contextService->deleteNodeRel($id, Application::NODE_TYPE_VIEW);
 
 		try {
+			$this->formattingRuleColMapper->deleteByView($id);
 			$deletedView = $this->mapper->delete($view);
 
 			$event = new ViewDeletedEvent(view: $view);
@@ -486,6 +490,7 @@ class ViewService extends SuperService {
 			// delete node relations if view is in any context
 			$this->contextService->deleteNodeRel($view->getId(), Application::NODE_TYPE_VIEW);
 
+			$this->formattingRuleColMapper->deleteByView($view->getId());
 			$this->mapper->delete($view);
 
 			$event = new ViewDeletedEvent(view: $view);
@@ -788,6 +793,7 @@ class ViewService extends SuperService {
 		// explicit layout is stored as given, anything absent or unknown stays null.
 		$item->setLayout(ViewLayout::tryFromMixed($view['layout'] ?? null)?->value);
 		$item->setViewSettings(json_encode($this->createImportedViewSettings($view)));
+		$item->setFormatting(json_encode($view['formatting'] ?? []));
 		try {
 			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
@@ -800,6 +806,9 @@ class ViewService extends SuperService {
 		} catch (\Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
+		}
+		if (!empty($view['formatting'])) {
+			$this->formattingService->saveForView($item->getId(), $view['formatting']);
 		}
 	}
 
