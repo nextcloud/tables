@@ -13,36 +13,6 @@
 namespace OCA\Tables;
 
 /**
- * @psalm-type TablesView = array{
- * 	id: int,
- * 	title: string,
- * 	emoji: string|null,
- *  tableId: int,
- * 	ownership: string,
- * 	ownerDisplayName: string|null,
- * 	createdBy: string,
- * 	createdAt: string,
- * 	lastEditBy: string,
- * 	lastEditAt: string,
- *  description: string|null,
- *  columns: list<int>,
- *  columnSettings:list<array{columnId: int, order: int, readonly: bool}>,
- *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
- *  filter: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>,
- * 	isShared: bool,
- *	favorite: bool,
- * 	onSharePermissions: ?array{
- * 		read: bool,
- * 		create: bool,
- *     	update: bool,
- * 		delete: bool,
- * 		manage: bool,
- * 	},
- *  hasShares: bool,
- *  rowsCount: int,
- *  formatting: list<TablesFormattingRuleSet>,
- * }
- *
  * @psalm-type TablesFormattingCondition = array{
  *   columnId: int,
  *   columnType: string,
@@ -87,6 +57,36 @@ namespace OCA\Tables;
  *   enabled: bool,
  *   broken: bool,
  *   rules: list<TablesFormattingRule>,
+ * }
+ *
+ * @psalm-type TablesView = array{
+ * 	id: int,
+ * 	title: string,
+ * 	emoji: string|null,
+ *  tableId: int,
+ * 	ownership: string,
+ * 	ownerDisplayName: string|null,
+ * 	createdBy: string,
+ * 	createdAt: string,
+ * 	lastEditBy: string,
+ * 	lastEditAt: string,
+ *  description: string|null,
+ *  columns: list<int>,
+ *  columnSettings:list<array{columnId: int, order: int, readonly: bool}>,
+ *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
+ *  filter: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>,
+ * 	isShared: bool,
+ *	favorite: bool,
+ * 	onSharePermissions: ?array{
+ * 		read: bool,
+ * 		create: bool,
+ *     	update: bool,
+ * 		delete: bool,
+ * 		manage: bool,
+ * 	},
+ *  hasShares: bool,
+ *  rowsCount: int,
+ *  formatting: list<TablesFormattingRuleSet>,
  * }
  *
  * @psalm-type TablesTable = array{

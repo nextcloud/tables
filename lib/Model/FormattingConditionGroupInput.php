@@ -21,7 +21,7 @@ class FormattingConditionGroupInput {
 
 	private const MAX_CONDITIONS = 20;
 
-	/** @param list<array{columnId: int, columnType: string, operator: string}> $conditions */
+	/** @param list<array{columnId: int, columnType: string, operator: string, value?: scalar, values?: list<float|int|string>}> $conditions */
 	private function __construct(
 		private readonly array $conditions,
 	) {
