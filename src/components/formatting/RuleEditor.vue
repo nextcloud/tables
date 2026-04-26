@@ -148,12 +148,24 @@ export default {
 			this.localFormat = val
 		},
 
+		cleanCondition(conditionSet) {
+			const groups = (conditionSet?.groups ?? [])
+				.map(g => ({
+					...g,
+					conditions: (g.conditions ?? []).filter(
+						c => c.columnId != null && c.operator != null && c.columnType,
+					),
+				}))
+				.filter(g => g.conditions.length > 0)
+			return { groups }
+		},
+
 		async saveRule() {
 			this.saving = true
 			const data = {
 				title: this.localTitle,
 				enabled: this.localEnabled,
-				condition: this.localCondition,
+				condition: this.cleanCondition(this.localCondition),
 				format: this.localFormat,
 			}
 			let saved
