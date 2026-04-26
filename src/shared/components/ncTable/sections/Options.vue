@@ -25,6 +25,15 @@
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
 				<PaginationBlock :rows="rows" />
+				<NcButton v-if="isView && config.canEditColumns"
+					:aria-label="t('tables', 'Format rules')"
+					type="tertiary"
+					@click="formattingStore.showFormattingManager = true">
+					{{ t('tables', 'Format rules') }}
+					<template #icon>
+						<FormatPaint :size="20" />
+					</template>
+				</NcButton>
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -73,6 +82,8 @@ import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
 import PaginationBlock from './PaginationBlock.vue'
+import FormatPaint from 'vue-material-design-icons/FormatPaint.vue'
+import { useFormattingStore } from '../../../../store/formatting.js'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 
 export default {
@@ -88,9 +99,14 @@ export default {
 		Delete,
 		TrayArrowDown,
 		PaginationBlock,
+		FormatPaint,
 	},
 
 	mixins: [viewportHelper],
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
+	},
 
 	props: {
 		selectedRows: {
