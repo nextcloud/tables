@@ -32,10 +32,31 @@ import { emit } from '@nextcloud/event-bus'
 import 'cypress-downloadfile/lib/downloadFileCommand'
 
 const url = Cypress.config('baseUrl').replace(/\/index.php\/?$/g, '')
-Cypress.env('baseUrl', url)
 const silent = { log: false }
 
 addCommands()
+
+Cypress.Commands.add('createRandomUser', () => {
+	const suffix = `${Date.now()}-${Cypress._.random(1_000_000_000)}`
+	const user = {
+		userId: `tables-cypress-${suffix}`,
+		password: `tables-password-${suffix}`,
+	}
+
+	return cy.ocsRequest({ userId: 'admin', password: 'admin' }, {
+		method: 'POST',
+		url: `${url}/ocs/v2.php/cloud/users`,
+		body: {
+			userid: user.userId,
+			password: user.password,
+			displayName: user.userId,
+			email: `${user.userId}@example.com`,
+		},
+	}).then((response) => {
+		cy.log(`User ${user.userId} created.`, response.status)
+		return cy.wrap(user, silent)
+	})
+})
 
 // Copy of the new login command as long as we are blocked to upgrade @nextcloud/cypress by cypress crashes
 const login = function(user) {
