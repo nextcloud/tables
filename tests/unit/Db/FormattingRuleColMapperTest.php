@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\FormattingRuleColMapper;
+use OCP\DB\IResult;
 use OCP\DB\QueryBuilder\IExpressionBuilder;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
@@ -31,7 +32,7 @@ class FormattingRuleColMapperTest extends TestCase {
 		$qb->method('createNamedParameter')->willReturnArgument(0);
 		$qb->method('expr')->willReturn($expr);
 
-		$result = $this->createMock(\Doctrine\DBAL\Result::class);
+		$result = $this->createMock(IResult::class);
 		$result->method('fetch')->willReturn(false);
 		$qb->method('executeQuery')->willReturn($result);
 		$qb->method('executeStatement')->willReturn(1);
@@ -53,16 +54,17 @@ class FormattingRuleColMapperTest extends TestCase {
 		$mapper->syncForRule('rule-1', 5, []);
 	}
 
-	public function testSyncForRuleWithColumnIdsDeletesThenInserts(): void {
-		$qbs = array_map(fn () => $this->makeQb(), range(0, 2)); // delete + 2 inserts
+	public function testSyncForRuleBuildsOneInsertAndBindsEachColumn(): void {
+		$qbs = array_map(fn () => $this->makeQb(), range(0, 1)); // one delete, one reused insert
 		$db = $this->createMock(IDBConnection::class);
-		$db->expects($this->exactly(3))
+		$db->expects($this->exactly(2))
 			->method('getQueryBuilder')
 			->willReturnOnConsecutiveCalls(...$qbs);
 
 		$qbs[0]->expects($this->once())->method('delete');
 		$qbs[1]->expects($this->once())->method('insert');
-		$qbs[2]->expects($this->once())->method('insert');
+		$qbs[1]->expects($this->exactly(2))->method('setParameter');
+		$qbs[1]->expects($this->exactly(2))->method('executeStatement');
 
 		$mapper = new FormattingRuleColMapper($db);
 		$mapper->syncForRule('rule-1', 5, [10, 20]);
