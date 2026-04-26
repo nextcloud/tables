@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\FormattingRuleColMapper;
+use OCP\DB\IResult;
 use OCP\DB\QueryBuilder\IExpressionBuilder;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
@@ -31,7 +32,7 @@ class FormattingRuleColMapperTest extends TestCase {
 		$qb->method('createNamedParameter')->willReturnArgument(0);
 		$qb->method('expr')->willReturn($expr);
 
-		$result = $this->createMock(\Doctrine\DBAL\Result::class);
+		$result = $this->createMock(IResult::class);
 		$result->method('fetch')->willReturn(false);
 		$qb->method('executeQuery')->willReturn($result);
 		$qb->method('executeStatement')->willReturn(1);
