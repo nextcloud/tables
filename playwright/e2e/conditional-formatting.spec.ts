@@ -13,7 +13,6 @@ import {
 	createTextLineColumn,
 	createView,
 	fillInValueTextLine,
-	loadTable,
 	loadView,
 	openCreateRowModal,
 } from '../support/commands'
