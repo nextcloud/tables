@@ -241,7 +241,7 @@ class FormattingApiController extends ApiController {
 	 * @param string $title Rule title
 	 * @param bool $enabled Whether the rule is enabled
 	 * @param array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: string, value?: string|int|float|bool, values?: list<string|int|float>}>}>} $condition Condition set definition
-	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $format Style definition
+	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $style Style definition
 	 * @return DataResponse<Http::STATUS_OK, TablesFormattingRule, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rule created
@@ -262,14 +262,14 @@ class FormattingApiController extends ApiController {
 		string $title = '',
 		bool $enabled = true,
 		array $condition = ['groups' => []],
-		array $format = [],
+		array $style = [],
 	): DataResponse {
 		try {
 			$input = FormattingRuleInput::createFromInputArray([
 				'title' => $title,
 				'enabled' => $enabled,
 				'condition' => $condition,
-				'format' => $format,
+				'format' => $style,
 			]);
 		} catch (\InvalidArgumentException $e) {
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
@@ -297,7 +297,7 @@ class FormattingApiController extends ApiController {
 	 * @param string $title Rule title
 	 * @param bool $enabled Whether the rule is enabled
 	 * @param array{groups: list<array{conditions: list<array{columnId: int, columnType: string, operator: string, value?: string|int|float|bool, values?: list<string|int|float>}>}>} $condition Condition set definition
-	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $format Style definition
+	 * @param array{backgroundColor?: string, textColor?: string, fontWeight?: 'bold', fontStyle?: 'italic', textDecoration?: 'strikethrough'|'underline'} $style Style definition
 	 * @return DataResponse<Http::STATUS_OK, TablesFormattingRule, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rule updated
@@ -319,14 +319,14 @@ class FormattingApiController extends ApiController {
 		string $title = '',
 		bool $enabled = true,
 		array $condition = ['groups' => []],
-		array $format = [],
+		array $style = [],
 	): DataResponse {
 		try {
 			$input = FormattingRuleInput::createFromInputArray([
 				'title' => $title,
 				'enabled' => $enabled,
 				'condition' => $condition,
-				'format' => $format,
+				'format' => $style,
 			]);
 		} catch (\InvalidArgumentException $e) {
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
