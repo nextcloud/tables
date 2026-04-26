@@ -367,4 +367,364 @@ class TablesMigratorTest extends TestCase {
 		$this->assertArrayNotHasKey('viewSettings', $importedViews[1]);
 		$this->assertSame(21, $importedViews[1]['columnSettings'][0]['columnId']);
 	}
+
+	public function testImportRemapsFormattingColumnIds(): void {
+		$user = $this->createMock(IUser::class);
+		$importSource = $this->createMock(IImportSource::class);
+		$output = new NullOutput();
+
+		$user->method('getUID')->willReturn('user1');
+		$importSource->method('getMigratorVersion')->willReturn(1);
+
+		$formatting = [[
+			'id' => 'rs-1',
+			'title' => 'Test',
+			'targetType' => 'row',
+			'targetCol' => null,
+			'mode' => 'first-match',
+			'sortOrder' => 0,
+			'enabled' => true,
+			'broken' => false,
+			'rules' => [[
+				'id' => 'r-1',
+				'title' => 'Rule 1',
+				'sortOrder' => 0,
+				'enabled' => true,
+				'broken' => false,
+				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'number', 'operator' => 'gt', 'value' => 5]]]]],
+				'format' => ['backgroundColor' => '#ff0000'],
+			]],
+		]];
+
+		$tableData = ['id' => 1, 'title' => 'T'];
+		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
+
+		$importSource->method('getFileContents')->willReturnCallback(
+			static function (string $file) use ($tableData, $viewData): string {
+				return match ($file) {
+					'tables.json' => json_encode([$tableData]),
+					'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+					'views.json' => json_encode([$viewData]),
+					default => json_encode([]),
+				};
+			}
+		);
+
+		$newTable = new Table();
+		$this->tableService->method('importTable')->willReturn($newTable);
+		$this->columnService->method('importColumn')->willReturn(['columnId' => 99, 'selectionOptionIdMap' => []]);
+
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+		$this->tableMapper->method('update')->willReturnArgument(0);
+
+		$capturedView = null;
+		$this->viewService->expects($this->once())->method('importView')
+			->with($this->anything(), $this->callback(function (array $view) use (&$capturedView): bool {
+				$capturedView = $view;
+				return true;
+			}), $this->anything());
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertSame(99, $capturedView['formatting'][0]['rules'][0]['condition']['groups'][0]['conditions'][0]['columnId']);
+		$this->assertFalse($capturedView['formatting'][0]['rules'][0]['broken']);
+	}
+
+	public function testImportRemapsFormattingSelectionOptionIds(): void {
+		$user = $this->createMock(IUser::class);
+		$importSource = $this->createMock(IImportSource::class);
+		$output = new NullOutput();
+
+		$user->method('getUID')->willReturn('user1');
+		$importSource->method('getMigratorVersion')->willReturn(1);
+
+		$formatting = [[
+			'id' => 'rs-1',
+			'title' => 'Test',
+			'targetType' => 'row',
+			'targetCol' => null,
+			'mode' => 'first-match',
+			'sortOrder' => 0,
+			'enabled' => true,
+			'broken' => false,
+			'rules' => [[
+				'id' => 'r-1',
+				'title' => 'Rule 1',
+				'sortOrder' => 0,
+				'enabled' => true,
+				'broken' => false,
+				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'selection', 'operator' => 'eq', 'value' => '@selection-id-5']]]]],
+				'format' => ['backgroundColor' => '#ff0000'],
+			]],
+		]];
+
+		$tableData = ['id' => 1, 'title' => 'T'];
+		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
+
+		$importSource->method('getFileContents')->willReturnCallback(
+			static function (string $file) use ($tableData, $viewData): string {
+				return match ($file) {
+					'tables.json' => json_encode([$tableData]),
+					'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+					'views.json' => json_encode([$viewData]),
+					default => json_encode([]),
+				};
+			}
+		);
+
+		$newTable = new Table();
+		$this->tableService->method('importTable')->willReturn($newTable);
+		$this->columnService->method('importColumn')->willReturn(['columnId' => 10, 'selectionOptionIdMap' => [5 => 42]]);
+
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+		$this->tableMapper->method('update')->willReturnArgument(0);
+
+		$capturedView = null;
+		$this->viewService->expects($this->once())->method('importView')
+			->with($this->anything(), $this->callback(function (array $view) use (&$capturedView): bool {
+				$capturedView = $view;
+				return true;
+			}), $this->anything());
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertSame('@selection-id-42', $capturedView['formatting'][0]['rules'][0]['condition']['groups'][0]['conditions'][0]['value']);
+		$this->assertFalse($capturedView['formatting'][0]['rules'][0]['broken']);
+	}
+
+	public function testImportKeepsSelectionOptionMapsOfDifferentColumnsApart(): void {
+		$user = $this->createMock(IUser::class);
+		$importSource = $this->createMock(IImportSource::class);
+		$output = new NullOutput();
+
+		$user->method('getUID')->willReturn('user1');
+		$importSource->method('getMigratorVersion')->willReturn(1);
+
+		// Both columns own an option with id 5. Merged into one map, the first column's
+		// answer would be handed out for the second column's option as well.
+		$condition = static fn (int $columnId): array => [
+			'columnId' => $columnId,
+			'columnType' => 'selection',
+			'operator' => 'is-equal',
+			'value' => '@selection-id-5',
+		];
+		$formatting = [[
+			'id' => 'rs-1',
+			'title' => 'Test',
+			'targetType' => 'row',
+			'targetCol' => null,
+			'mode' => 'first-match',
+			'sortOrder' => 0,
+			'enabled' => true,
+			'broken' => false,
+			'rules' => [[
+				'id' => 'r-1',
+				'title' => 'Rule 1',
+				'sortOrder' => 0,
+				'enabled' => true,
+				'broken' => false,
+				'condition' => ['groups' => [['conditions' => [$condition(10), $condition(20)]]]],
+				'format' => ['backgroundColor' => '#ff0000'],
+			]],
+		]];
+
+		$tableData = ['id' => 1, 'title' => 'T'];
+		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
+
+		$importSource->method('getFileContents')->willReturnCallback(
+			static function (string $file) use ($tableData, $viewData): string {
+				return match ($file) {
+					'tables.json' => json_encode([$tableData]),
+					'columns.json' => json_encode([['id' => 10, 'tableId' => 1], ['id' => 20, 'tableId' => 1]]),
+					'views.json' => json_encode([$viewData]),
+					default => json_encode([]),
+				};
+			}
+		);
+
+		$newTable = new Table();
+		$newTable->setId(1);
+		$this->tableService->method('importTable')->willReturn($newTable);
+		$this->columnService->method('importColumn')->willReturnCallback(
+			static fn (Table $table, array $column): array => $column['id'] === 10
+				? ['columnId' => 110, 'selectionOptionIdMap' => [5 => 42]]
+				: ['columnId' => 120, 'selectionOptionIdMap' => [5 => 77]],
+		);
+
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+		$this->tableMapper->method('update')->willReturnArgument(0);
+
+		$capturedView = null;
+		$this->viewService->expects($this->once())->method('importView')
+			->with($this->anything(), $this->callback(function (array $view) use (&$capturedView): bool {
+				$capturedView = $view;
+				return true;
+			}), $this->anything());
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$conditions = $capturedView['formatting'][0]['rules'][0]['condition']['groups'][0]['conditions'];
+		$this->assertSame('@selection-id-42', $conditions[0]['value'], 'column 10 resolves against its own options');
+		$this->assertSame('@selection-id-77', $conditions[1]['value'], 'column 20 must not inherit column 10 answer');
+		$this->assertFalse($capturedView['formatting'][0]['rules'][0]['broken']);
+	}
+
+	public function testImportMarksBrokenWhenColumnIdUnresolvable(): void {
+		$user = $this->createMock(IUser::class);
+		$importSource = $this->createMock(IImportSource::class);
+		$output = new NullOutput();
+
+		$user->method('getUID')->willReturn('user1');
+		$importSource->method('getMigratorVersion')->willReturn(1);
+
+		// Rule references column 99, but columns.json is empty — columnIdMap will not contain 99
+		$formatting = [[
+			'id' => 'rs-1',
+			'title' => 'Test',
+			'targetType' => 'row',
+			'targetCol' => null,
+			'mode' => 'first-match',
+			'sortOrder' => 0,
+			'enabled' => true,
+			'broken' => false,
+			'rules' => [[
+				'id' => 'r-1',
+				'title' => 'Rule 1',
+				'sortOrder' => 0,
+				'enabled' => true,
+				'broken' => false,
+				'condition' => ['groups' => [['conditions' => [['columnId' => 99, 'columnType' => 'number', 'operator' => 'gt', 'value' => 5]]]]],
+				'format' => ['backgroundColor' => '#ff0000'],
+			]],
+		]];
+
+		$tableData = ['id' => 1, 'title' => 'T'];
+		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
+
+		$importSource->method('getFileContents')->willReturnCallback(
+			static function (string $file) use ($tableData, $viewData): string {
+				return match ($file) {
+					'tables.json' => json_encode([$tableData]),
+					'columns.json' => json_encode([]),
+					'views.json' => json_encode([$viewData]),
+					default => json_encode([]),
+				};
+			}
+		);
+
+		$newTable = new Table();
+		$this->tableService->method('importTable')->willReturn($newTable);
+
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+		$this->tableMapper->method('update')->willReturnArgument(0);
+
+		$capturedView = null;
+		$this->viewService->expects($this->once())->method('importView')
+			->with($this->anything(), $this->callback(function (array $view) use (&$capturedView): bool {
+				$capturedView = $view;
+				return true;
+			}), $this->anything());
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertTrue($capturedView['formatting'][0]['rules'][0]['broken']);
+	}
+
+	public function testImportMarksBrokenWhenSelectionOptionIdUnresolvable(): void {
+		$user = $this->createMock(IUser::class);
+		$importSource = $this->createMock(IImportSource::class);
+		$output = new NullOutput();
+
+		$user->method('getUID')->willReturn('user1');
+		$importSource->method('getMigratorVersion')->willReturn(1);
+
+		$formatting = [[
+			'id' => 'rs-1',
+			'title' => 'Test',
+			'targetType' => 'row',
+			'targetCol' => null,
+			'mode' => 'first-match',
+			'sortOrder' => 0,
+			'enabled' => true,
+			'broken' => false,
+			'rules' => [[
+				'id' => 'r-1',
+				'title' => 'Rule 1',
+				'sortOrder' => 0,
+				'enabled' => true,
+				'broken' => false,
+				// value references option 5, but selectionOptionIdMap has no entry for 5
+				'condition' => ['groups' => [['conditions' => [['columnId' => 10, 'columnType' => 'selection', 'operator' => 'eq', 'value' => '@selection-id-5']]]]],
+				'format' => ['backgroundColor' => '#ff0000'],
+			]],
+		]];
+
+		$tableData = ['id' => 1, 'title' => 'T'];
+		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
+
+		$importSource->method('getFileContents')->willReturnCallback(
+			static function (string $file) use ($tableData, $viewData): string {
+				return match ($file) {
+					'tables.json' => json_encode([$tableData]),
+					'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+					'views.json' => json_encode([$viewData]),
+					default => json_encode([]),
+				};
+			}
+		);
+
+		$newTable = new Table();
+		$this->tableService->method('importTable')->willReturn($newTable);
+		// importColumn returns no selectionOptionIdMap entries for option 5
+		$this->columnService->method('importColumn')->willReturn(['columnId' => 10, 'selectionOptionIdMap' => []]);
+
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+		$this->tableMapper->method('update')->willReturnArgument(0);
+
+		$capturedView = null;
+		$this->viewService->expects($this->once())->method('importView')
+			->with($this->anything(), $this->callback(function (array $view) use (&$capturedView): bool {
+				$capturedView = $view;
+				return true;
+			}), $this->anything());
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertTrue($capturedView['formatting'][0]['rules'][0]['broken']);
+	}
 }
