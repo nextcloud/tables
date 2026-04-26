@@ -259,9 +259,10 @@ export const useFormattingStore = defineStore('formatting', {
 		async createRule(viewId, ruleSetId, data) {
 			this.loading = true
 			try {
+				const { format, ...rest } = data
 				const res = await axios.post(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets/' + ruleSetId + '/rules'),
-					data,
+					{ ...rest, style: format },
 				)
 				const rs = this.ruleSets.find(r => r.id === ruleSetId)
 				if (rs) rs.rules.push(res.data)
@@ -277,9 +278,10 @@ export const useFormattingStore = defineStore('formatting', {
 		async updateRule(viewId, ruleSetId, id, data) {
 			this.loading = true
 			try {
+				const { format, ...rest } = data
 				const res = await axios.put(
 					generateUrl('/apps/tables/api/1/views/' + viewId + '/formatting/rulesets/' + ruleSetId + '/rules/' + id),
-					data,
+					{ ...rest, style: format },
 				)
 				const rs = this.ruleSets.find(r => r.id === ruleSetId)
 				if (rs) {
