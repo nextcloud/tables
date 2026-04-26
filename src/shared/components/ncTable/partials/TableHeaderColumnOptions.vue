@@ -63,8 +63,8 @@
 			<template v-else>
 				<NcActionButton v-if="column.id >= 0" @click="pinColumn()">
 					<template #icon>
-						<PinOffIcon v-if="pinnedColumnId === column.id" :size="20" />
-						<PinIcon v-else :size="20" />
+						<PinOffOutline v-if="pinnedColumnId === column.id" :size="20" />
+						<PinOutline v-else :size="20" />
 					</template>
 					{{ pinnedColumnId === column.id ? t('tables', 'Unpin column') : t('tables', 'Pin column') }}
 				</NcActionButton>
@@ -140,8 +140,8 @@ import EyeOffOutline from 'vue-material-design-icons/EyeOffOutline.vue'
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import FilterCogOutline from 'vue-material-design-icons/FilterCogOutline.vue'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
-import PinIcon from 'vue-material-design-icons/Pin.vue'
-import PinOffIcon from 'vue-material-design-icons/PinOff.vue'
+import PinOutline from 'vue-material-design-icons/PinOutline.vue'
+import PinOffOutline from 'vue-material-design-icons/PinOffOutline.vue'
 import {
 	NcActionButton,
 	NcActionButtonGroup,
@@ -162,8 +162,8 @@ export default {
 		ChevronLeft,
 		FilterCogOutline,
 		Magnify,
-		PinIcon,
-		PinOffIcon,
+		PinOutline,
+		PinOffOutline,
 		NcActionInput,
 		NcActionRadio,
 		NcActionCaption,
