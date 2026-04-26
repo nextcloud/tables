@@ -57,15 +57,19 @@ import { NcButton } from '@nextcloud/vue'
 import DragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import ArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import ArrowDown from 'vue-material-design-icons/ArrowDown.vue'
+import dragReorderMixin from '../../../../shared/mixins/dragReorderMixin.js'
 
 export default {
 	name: 'ColumnOrderList',
+
 	components: {
 		NcButton,
 		DragHorizontalVariant,
 		ArrowUp,
 		ArrowDown,
 	},
+
+	mixins: [dragReorderMixin],
 	props: {
 		columns: {
 			type: Array,
@@ -75,12 +79,17 @@ export default {
 	emits: [
 		'update:columnSettings',
 	],
+
 	data() {
 		return {
 			mutableColumns: this.columns ? [...this.columns] : [],
-			draggedItem: null,
-			startDragIndex: null,
 		}
+	},
+
+	computed: {
+		reorderableList() {
+			return this.mutableColumns
+		},
 	},
 	watch: {
 		columns: {
@@ -91,6 +100,7 @@ export default {
 			immediate: true,
 		},
 	},
+
 	methods: {
 		emitColumnSettings() {
 			const columnSettings = this.mutableColumns.map((column, index) => ({
@@ -101,33 +111,14 @@ export default {
 			}))
 			this.$emit('update:columnSettings', columnSettings)
 		},
-		dragStart(index) {
-			this.draggedItem = this.mutableColumns[index]
-			this.startDragIndex = index
-		},
-		dragOver(index) {
-			if (this.draggedItem === null) return
-			const draggedIndex = this.mutableColumns.indexOf(this.draggedItem)
-			if (index !== draggedIndex) {
-				this.mutableColumns.splice(draggedIndex, 1)
-				this.mutableColumns.splice(index, 0, this.draggedItem)
-			}
+		onReorderCommitted() {
+			this.emitColumnSettings()
 		},
 		moveColumn(index, direction) {
 			const item = this.mutableColumns[index]
 			this.mutableColumns.splice(index, 1)
 			this.mutableColumns.splice(index + direction, 0, item)
 			this.emitColumnSettings()
-		},
-		async dragEnd(goalIndex) {
-			if (this.draggedItem === null) return
-			const goal = goalIndex !== undefined ? goalIndex : this.mutableColumns.indexOf(this.draggedItem)
-			const start = this.startDragIndex
-			this.draggedItem = null
-			this.startDragIndex = null
-			if (start !== goal) {
-				this.emitColumnSettings()
-			}
 		},
 	},
 }

@@ -85,9 +85,11 @@ import DragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVaria
 import ArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import ArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import rowHelper from '../../../../shared/components/ncTable/mixins/rowHelper.js'
+import dragReorderMixin from '../../../../shared/mixins/dragReorderMixin.js'
 
 export default {
 	name: 'SelectedViewColumns',
+
 	components: {
 		NcActionCheckbox,
 		NcActions,
@@ -97,7 +99,7 @@ export default {
 		ArrowUp,
 		ArrowDown,
 	},
-	mixins: [rowHelper],
+	mixins: [rowHelper, dragReorderMixin],
 	props: {
 		columns: {
 			type: Array,
@@ -120,13 +122,18 @@ export default {
 			default: true,
 		},
 	},
+
 	data() {
 		return {
 			mutableColumns: this.columns,
 			mutableSelectedColumns: this.selectedColumns,
-			draggedItem: null,
-			startDragIndex: null,
 		}
+	},
+
+	computed: {
+		reorderableList() {
+			return this.mutableColumns
+		},
 	},
 	watch: {
 		columns: {
@@ -144,6 +151,7 @@ export default {
 			immediate: true,
 		},
 	},
+
 	methods: {
 		isLocallyRemoved(columnId) {
 			if (!this.viewColumnIds || !this.generatedColumnIds) return false
@@ -159,17 +167,8 @@ export default {
 		reset() {
 			this.mutableColumns = null
 		},
-		dragStart(index) {
-			this.draggedItem = this.mutableColumns[index]
-			this.startDragIndex = index
-		},
-		dragOver(index) {
-			if (this.draggedItem === null) return
-			const draggedIndex = this.columns.indexOf(this.draggedItem)
-			if (index !== draggedIndex) {
-				this.mutableColumns.splice(draggedIndex, 1)
-				this.mutableColumns.splice(index, 0, this.draggedItem)
-			}
+		onReorderCommitted() {
+			this.emitColumnSettings()
 		},
 		moveColumn(index, direction) {
 			const item = this.mutableColumns[index]
@@ -195,13 +194,6 @@ export default {
 			}
 
 			column.viewColumnInformation.mandatory = mandatory
-		},
-		async dragEnd(goalIndex) {
-			if (this.draggedItem === null) return
-			const goal = goalIndex !== undefined ? goalIndex : this.list.indexOf(this.draggedItem)
-			if (this.startDragIndex === goal) return
-			this.draggedItem = null
-			this.startDragIndex = null
 		},
 	},
 }
