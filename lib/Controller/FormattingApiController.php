@@ -268,7 +268,7 @@ class FormattingApiController extends ApiController {
 		string $ruleSetId,
 		string $title = '',
 		bool $enabled = true,
-		array $condition = [],
+		array $condition = ['groups' => []],
 		array $format = [],
 	): DataResponse {
 		try {
@@ -325,7 +325,7 @@ class FormattingApiController extends ApiController {
 		string $id,
 		string $title = '',
 		bool $enabled = true,
-		array $condition = [],
+		array $condition = ['groups' => []],
 		array $format = [],
 	): DataResponse {
 		try {
