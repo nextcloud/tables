@@ -66,6 +66,15 @@ return [
 		['name' => 'api1#importInTable', 'url' => '/api/1/import/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'api1#importInView', 'url' => '/api/1/import/views/{viewId}', 'verb' => 'POST'],
 
+		// -> formatting
+		['name' => 'FormattingApi#createRuleSet', 'url' => '/api/1/views/{viewId}/formatting/rulesets', 'verb' => 'POST'],
+		['name' => 'FormattingApi#updateRuleSet', 'url' => '/api/1/views/{viewId}/formatting/rulesets/{id}', 'verb' => 'PUT'],
+		['name' => 'FormattingApi#deleteRuleSet', 'url' => '/api/1/views/{viewId}/formatting/rulesets/{id}', 'verb' => 'DELETE'],
+		['name' => 'FormattingApi#reorder', 'url' => '/api/1/views/{viewId}/formatting/reorder', 'verb' => 'PUT'],
+		['name' => 'FormattingApi#createRule', 'url' => '/api/1/views/{viewId}/formatting/rulesets/{ruleSetId}/rules', 'verb' => 'POST'],
+		['name' => 'FormattingApi#updateRule', 'url' => '/api/1/views/{viewId}/formatting/rulesets/{ruleSetId}/rules/{id}', 'verb' => 'PUT'],
+		['name' => 'FormattingApi#deleteRule', 'url' => '/api/1/views/{viewId}/formatting/rulesets/{ruleSetId}/rules/{id}', 'verb' => 'DELETE'],
+
 		// table
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],
 		['name' => 'table#show', 'url' => '/table/{id}', 'verb' => 'GET'],
