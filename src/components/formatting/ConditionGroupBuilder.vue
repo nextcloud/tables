@@ -26,12 +26,13 @@
 			</NcButton>
 		</div>
 
-		<div v-if="mutableGroups.length > 1"
-			v-for="(_, idx) in mutableGroups.slice(1)"
-			:key="'or-' + idx"
-			class="condition-group-builder__or-separator">
-			{{ t('tables', 'OR') }}
-		</div>
+		<template v-if="mutableGroups.length > 1">
+			<div v-for="(_, idx) in mutableGroups.slice(1)"
+				:key="'or-' + idx"
+				class="condition-group-builder__or-separator">
+				{{ t('tables', 'OR') }}
+			</div>
+		</template>
 
 		<NcButton type="tertiary"
 			:aria-label="t('tables', 'Add condition group')"
