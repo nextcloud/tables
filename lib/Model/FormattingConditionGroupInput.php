@@ -10,18 +10,18 @@ declare(strict_types=1);
 namespace OCA\Tables\Model;
 
 use InvalidArgumentException;
+use OCA\Tables\Constants\FilterOperator;
 
 class FormattingConditionGroupInput {
-	private const VALID_OPERATORS = [
-		'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'between',
-		'contains', 'startsWith', 'isEmpty', 'isNotEmpty',
-		'in', 'before', 'after', 'isToday', 'isThisWeek',
-		'isTrue', 'isFalse',
-	];
-
 	private const MAX_CONDITIONS = 20;
 
-	/** @param list<array{columnId: int, columnType: string, operator: string}> $conditions */
+	/** Operators that match on the cell being set or unset and therefore carry no value. */
+	private const VALUELESS_OPERATORS = [
+		FilterOperator::IS_EMPTY,
+		FilterOperator::IS_NOT_EMPTY,
+	];
+
+	/** @param list<array{columnId: int, columnType: string, operator: string, value?: scalar|list<mixed>}> $conditions */
 	private function __construct(
 		private readonly array $conditions,
 	) {
@@ -43,20 +43,24 @@ class FormattingConditionGroupInput {
 			if (!isset($raw['columnId'], $raw['columnType'], $raw['operator'])) {
 				throw new InvalidArgumentException('Condition requires columnId, columnType and operator');
 			}
-			if (!in_array((string)$raw['operator'], self::VALID_OPERATORS, true)) {
+
+			$operator = FilterOperator::tryFrom((string)$raw['operator']);
+			if ($operator === null) {
 				throw new InvalidArgumentException('Unknown operator: ' . $raw['operator']);
+			}
+
+			$needsValue = !in_array($operator, self::VALUELESS_OPERATORS, true);
+			if ($needsValue && !array_key_exists('value', $raw)) {
+				throw new InvalidArgumentException('Operator ' . $operator->value . ' requires a value');
 			}
 
 			$condition = [
 				'columnId' => (int)$raw['columnId'],
 				'columnType' => (string)$raw['columnType'],
-				'operator' => (string)$raw['operator'],
+				'operator' => $operator->value,
 			];
-			if (array_key_exists('value', $raw)) {
-				$condition['value'] = $raw['value'];
-			}
-			if (array_key_exists('values', $raw) && is_array($raw['values'])) {
-				$condition['values'] = array_values($raw['values']);
+			if ($needsValue) {
+				$condition['value'] = is_array($raw['value']) ? array_values($raw['value']) : $raw['value'];
 			}
 			$conditions[] = $condition;
 		}
