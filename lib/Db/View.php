@@ -23,6 +23,7 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @psalm-suppress PropertyNotSetInConstructor
  *
  * @psalm-import-type TablesView from ResponseDefinitions
+ * @psalm-import-type TablesFormattingRuleSet from ResponseDefinitions
  *
  * @method getId(): int
  * @method setId(int $id)
@@ -78,6 +79,8 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setShareToken(?string $shareToken)
  * @method getSidebarOrder(): ?int
  * @method setSidebarOrder(?int $sidebarOrder)
+ * @method getFormatting(): ?string
+ * @method setFormatting(?string $formatting)
  */
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $uuid = null;
@@ -96,6 +99,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $filter = null; // json
 	protected ?string $layout = null;
 	protected ?string $viewSettings = null; // json
+	protected ?string $formatting = null; // json
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -232,6 +236,14 @@ class View extends EntitySuper implements JsonSerializable {
 		return ViewSettings::createFromStoredArray($this->getArray($this->getViewSettings()));
 	}
 
+	public function getFormattingArray(): array {
+		return $this->getArray($this->getFormatting());
+	}
+
+	public function setFormattingArray(array $array): void {
+		$this->setFormatting(\json_encode($array));
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -280,6 +292,71 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
+	 * Formatting rules on a column the recipient cannot see are dropped, as is a rule
+	 * set that targets such a column or is left with none of its rules.
+	 *
+	 * The web UI evaluates the rules against the rows it receives, and those never carry
+	 * a hidden column, so a dropped rule could not have coloured anything anyway. Keeping
+	 * it would only name the hidden column and the values it is compared against.
+	 *
+	 * @return list<TablesFormattingRuleSet>
+	 */
+	private function getFormattingArrayForOutput(): array {
+		$formatting = $this->getFormattingArray();
+		if (!$this->hidesRuleDetails()) {
+			return $formatting;
+		}
+
+		$visibleColumnIds = $this->getColumnIds();
+		$visibleRuleSets = [];
+		foreach ($formatting as $ruleSet) {
+			if (($ruleSet['targetType'] ?? null) === 'column'
+				&& !$this->isVisibleColumnId($ruleSet['targetCol'] ?? null, $visibleColumnIds)
+			) {
+				continue;
+			}
+
+			$rules = $ruleSet['rules'] ?? [];
+			$visibleRules = array_values(array_filter(
+				$rules,
+				fn (array $rule): bool => $this->conditionsOnVisibleColumns($rule, $visibleColumnIds),
+			));
+			if ($rules !== [] && $visibleRules === []) {
+				continue;
+			}
+
+			$ruleSet['rules'] = $visibleRules;
+			$visibleRuleSets[] = $ruleSet;
+		}
+
+		return $visibleRuleSets;
+	}
+
+	/**
+	 * @param list<int> $visibleColumnIds
+	 */
+	private function isVisibleColumnId(mixed $columnId, array $visibleColumnIds): bool {
+		return is_int($columnId)
+			&& (Column::isValidMetaTypeId($columnId) || in_array($columnId, $visibleColumnIds, true));
+	}
+
+	/**
+	 * @param array<string, mixed> $rule
+	 * @param list<int> $visibleColumnIds
+	 */
+	private function conditionsOnVisibleColumns(array $rule, array $visibleColumnIds): bool {
+		foreach ($rule['condition']['groups'] ?? [] as $group) {
+			foreach ($group['conditions'] ?? [] as $condition) {
+				if (!$this->isVisibleColumnId($condition['columnId'] ?? null, $visibleColumnIds)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * @psalm-return TablesView
 	 */
 	public function jsonSerialize(): array {
@@ -311,6 +388,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];
 		$serialisedJson['filter'] = $this->hidesRuleDetails() ? [] : $this->getFilterArray();
+		$serialisedJson['formatting'] = $this->getFormattingArrayForOutput();
 
 		return $serialisedJson;
 	}
