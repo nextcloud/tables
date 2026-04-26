@@ -5,6 +5,7 @@
 import { getCurrentUser } from '@nextcloud/auth'
 import Moment from '@nextcloud/moment'
 import { ColumnTypes } from './columnHandler.js'
+import { FilterIds } from './filter.js'
 import { translate as t } from '@nextcloud/l10n'
 
 class BaseMagicField {
@@ -180,4 +181,20 @@ export const MagicFields = {
 		additionalInput: AdditionalInputTypes.NUMBER,
 		additionalInputLabel: t('tables', 'Enter number of days'),
 	}),
+}
+
+/**
+ * @param {object} filter filter entry carrying an `operator` object and a `value`
+ */
+export function resolveMagicValues(filter) {
+	if (filter?.operator?.id === FilterIds.ContainsItem || typeof filter?.value !== 'string') {
+		return
+	}
+
+	Object.values(MagicFields).forEach(field => {
+		const resolvedValue = filter.value.replace('@' + field.id, field.replace)
+		if (filter.value !== resolvedValue) {
+			filter.magicValuesEnriched = resolvedValue
+		}
+	})
 }
