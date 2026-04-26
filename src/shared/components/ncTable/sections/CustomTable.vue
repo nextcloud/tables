@@ -16,6 +16,7 @@
 					:config="config"
 					:pinned-column-id="pinnedColumnId"
 					:column-widths="columnWidths"
+					:view-id="isView ? elementId : null"
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-column="col => $emit('edit-column', col)"
@@ -114,7 +115,10 @@
 <script>
 import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
+import debounce from 'debounce'
 import { useEventBusSubscriptions } from '../../../composables/useEventBusSubscriptions.js'
+import { useDataStore } from '../../../../store/data.js'
+import { useFormattingStore } from '../../../../store/formatting.js'
 import { emit } from '@nextcloud/event-bus'
 import PaginationBlock from './PaginationBlock.vue'
 import { PAGINATION_CHANGED, isSamePaginationTarget } from '../mixins/paginationScope.js'
@@ -195,7 +199,11 @@ export default {
 		'update:viewSetting',
 	],
 	setup() {
-		return { ...useEventBusSubscriptions() }
+		return {
+			...useEventBusSubscriptions(),
+			dataStore: useDataStore(),
+			formattingStore: useFormattingStore(),
+		}
 	},
 	data() {
 		return {
@@ -274,6 +282,21 @@ export default {
 	},
 
 	watch: {
+		currentPageRows() {
+			this.debouncedEvaluate()
+		},
+		'dataStore.rowsRevision'() {
+			this.debouncedEvaluate()
+		},
+		'formattingStore.ruleSets': {
+			handler() {
+				this.debouncedEvaluate()
+			},
+			deep: true,
+		},
+		columns() {
+			this.debouncedEvaluate()
+		},
 		localViewSetting() {
 			this.$emit('update:viewSetting', this.localViewSetting)
 		},
@@ -316,6 +339,13 @@ export default {
 		},
 	},
 
+	created() {
+		this.debouncedEvaluate = debounce(() => {
+			this.formattingStore.evaluate(this.currentPageRows, this.columns)
+		}, 150)
+		this.debouncedEvaluate()
+	},
+
 	mounted() {
 		// Writing the line count resizes the very title being observed, so the measurement
 		// is deferred to the next frame and the observer sees a settled layout.
@@ -331,6 +361,7 @@ export default {
 	beforeUnmount() {
 		window.cancelAnimationFrame(this.pendingTitleMeasure)
 		this.cardResizeObserver?.disconnect()
+		this.debouncedEvaluate.clear()
 	},
 
 	methods: {

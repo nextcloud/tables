@@ -31,6 +31,10 @@
 				@toggle-share="toggleShare"
 				@show-integration="showIntegration" />
 		</div>
+		<FormattingManager v-if="isView && element && formattingStore.showFormattingManager"
+			:view-id="element.id"
+			:columns="columns"
+			@close="formattingStore.showFormattingManager = false" />
 	</div>
 </template>
 
@@ -40,10 +44,12 @@ import { mapState, mapActions, storeToRefs } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
 import CustomView from './View.vue'
 import CustomTable from './Table.vue'
+import FormattingManager from '../../../components/formatting/FormattingManager.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
+import { useFormattingStore } from '../../../store/formatting.js'
 import { computed } from 'vue'
 import { showError } from '@nextcloud/dialogs'
 
@@ -53,6 +59,7 @@ export default {
 	components: {
 		CustomView,
 		CustomTable,
+		FormattingManager,
 	},
 
 	mixins: [permissionsMixin, exportTableMixin],
@@ -76,7 +83,8 @@ export default {
 		// To make nested dynamic keys reactive, you need to use a computed property or watch for changes.
 		const rows = computed(() => getRows.value(props.isView, props.element.id))
 		const columns = computed(() => getColumns.value(props.isView, props.element.id))
-		return { rows, columns, dataStore: store }
+		const formattingStore = useFormattingStore()
+		return { rows, columns, dataStore: store, formattingStore }
 	},
 
 	data() {
@@ -200,6 +208,11 @@ export default {
 						isView: this.isView,
 						elementId: this.element.id,
 					})
+				}
+				if (this.isView) {
+					this.formattingStore.loadForView(this.element.id)
+				} else {
+					this.formattingStore.clear()
 				}
 				this.lastActiveElement = {
 					id: this.element.id,

@@ -18,6 +18,7 @@
 		:can-delete-rows="canDeleteRows"
 		:can-create-columns="canCreateColumns"
 		:can-edit-columns="canEditColumns"
+		:can-manage-formatting="canManageFormatting"
 		:can-delete-columns="canDeleteColumns"
 		:can-delete-table="canDeleteTable"
 		:is-form-mode="isFormMode"
@@ -96,6 +97,10 @@ export default {
 		canEditColumns: {
 			type: Boolean,
 			default: true,
+		},
+		canManageFormatting: {
+			type: Boolean,
+			default: false,
 		},
 		canDeleteColumns: {
 			type: Boolean,
