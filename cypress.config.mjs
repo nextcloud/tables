@@ -7,11 +7,13 @@ import vitePreprocessor from 'cypress-vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import vue from '@vitejs/plugin-vue2'
 
-
-
 const baseUrl = process.env.CYPRESS_baseUrl ?? 'http://127.0.0.1:8089/index.php/'
 
 export default defineConfig({
+	allowCypressEnv: false,
+	defaultBrowser: 'chrome',
+	experimentalMemoryManagement: true,
+	numTestsKeptInMemory: 0,
 	projectId: 'ixbf9n',
 	e2e: {
 		baseUrl,
@@ -45,6 +47,7 @@ export default defineConfig({
 	},
 
 	component: {
+		supportFile: 'cypress/support/component.js',
 		devServer: {
 			framework: 'vue',
 			bundler: 'vite',
@@ -67,24 +70,6 @@ export default defineConfig({
 					global: 'globalThis',
 				},
 			},
-		},
-		setupNodeEvents(on, config) {
-			on('file:preprocessor', vitePreprocessor({
-				plugins: [vue(), nodePolyfills()],
-				configFile: false,
-				optimizeDeps: {
-					exclude: [
-						'vite-plugin-node-polyfills/shims/buffer',
-						'vite-plugin-node-polyfills/shims/global',
-						'vite-plugin-node-polyfills/shims/process'
-					],
-					force: true
-				},
-				define: {
-					global: 'globalThis',
-				},
-			}))
-			return config
 		},
 		viewportWidth: 800,
 		viewportHeight: 600,
