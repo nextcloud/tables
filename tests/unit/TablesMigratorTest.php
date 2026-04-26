@@ -332,6 +332,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 		$this->columnService->method('importColumn')->willReturn(['columnId' => 99, 'selectionOptionIdMap' => []]);
 
@@ -398,6 +399,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 		$this->columnService->method('importColumn')->willReturn(['columnId' => 10, 'selectionOptionIdMap' => [5 => 42]]);
 
@@ -465,6 +467,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 
 		$this->tableMapper->method('getDBConnection')->willReturn(new class {
@@ -530,6 +533,7 @@ class TablesMigratorTest extends TestCase {
 		);
 
 		$newTable = new Table();
+		$newTable->setId(1);
 		$this->tableService->method('importTable')->willReturn($newTable);
 		// importColumn returns no selectionOptionIdMap entries for option 5
 		$this->columnService->method('importColumn')->willReturn(['columnId' => 10, 'selectionOptionIdMap' => []]);
