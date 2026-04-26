@@ -47,6 +47,8 @@ class ColumnService extends SuperService {
 
 	private ColumnDtoValidator $columnDtoValidator;
 
+	private FormattingService $formattingService;
+
 	/** @var array<int, int[]> Per-request cache of sorted column-id order, keyed by tableId. */
 	private array $columnOrderCache = [];
 
@@ -61,6 +63,7 @@ class ColumnService extends SuperService {
 		IL10N $l,
 		UserHelper $userHelper,
 		ColumnDtoValidator $columnDtoValidator,
+		FormattingService $formattingService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -70,6 +73,7 @@ class ColumnService extends SuperService {
 		$this->l = $l;
 		$this->userHelper = $userHelper;
 		$this->columnDtoValidator = $columnDtoValidator;
+		$this->formattingService = $formattingService;
 	}
 
 
@@ -357,6 +361,10 @@ class ColumnService extends SuperService {
 			}
 			$this->columnDtoValidator->validate($columnDto);
 
+			$oldType = $item->getType();
+			$oldSubtype = $item->getSubtype();
+			$oldSelectionOptionIds = array_column($item->getSelectionOptionsArray(), 'id');
+
 			if ($columnDto->getTitle() !== null) {
 				$item->setTitle($columnDto->getTitle());
 			}
@@ -404,7 +412,23 @@ class ColumnService extends SuperService {
 			$item->setCustomSettings($columnDto->getCustomSettings());
 
 			$this->updateMetadata($item, $userId);
-			return $this->enhanceColumn($this->mapper->update($item));
+			$updated = $this->mapper->update($item);
+
+			$newType = $updated->getType();
+			$newSubtype = $updated->getSubtype();
+			if ($oldType !== $newType || $oldSubtype !== $newSubtype) {
+				$fullType = $newSubtype ? $newType . '-' . $newSubtype : $newType;
+				$this->formattingService->handleColumnTypeChange($updated->getId(), $fullType);
+			}
+			$dtoOptions = $columnDto->getSelectionOptions();
+			if ($dtoOptions !== null) {
+				$newOptionIds = array_column(json_decode($dtoOptions, true) ?? [], 'id');
+				foreach (array_diff($oldSelectionOptionIds, $newOptionIds) as $deletedId) {
+					$this->formattingService->handleSelectionOptionDeletion($updated->getId(), (int)$deletedId);
+				}
+			}
+
+			return $this->enhanceColumn($updated);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -511,6 +535,8 @@ class ColumnService extends SuperService {
 			}
 			$this->viewService->deleteColumnDataFromViews($id, $table);
 		}
+
+		$this->formattingService->handleColumnDeletion($item->getId());
 
 		try {
 			$this->mapper->delete($item);
@@ -642,11 +668,11 @@ class ColumnService extends SuperService {
 	 * @param Table $table
 	 * @param array $column
 	 *
-	 * @return int
+	 * @return array{columnId: int, selectionOptionIdMap: array<int, int>}
 	 *
 	 * @throws InternalError
 	 */
-	public function importColumn(Table $table, array $column): int {
+	public function importColumn(Table $table, array $column): array {
 		$item = new Column();
 		$item->setTableId($table->getId());
 		$item->setTitle($column['title']);
@@ -685,6 +711,18 @@ class ColumnService extends SuperService {
 			$this->logger->error('importColumn insert error: ' . $e->getMessage());
 			throw new InternalError('importColumn insert error: ' . $e->getMessage());
 		}
-		return $newColumn->getId();
+
+		$oldOptions = $column['selectionOptions'] ?? [];
+		$newOptions = $newColumn->getSelectionOptionsArray();
+		$selectionOptionIdMap = [];
+		foreach ($oldOptions as $idx => $oldOpt) {
+			$oldId = $oldOpt['id'] ?? null;
+			$newId = $newOptions[$idx]['id'] ?? $oldId;
+			if ($oldId !== null) {
+				$selectionOptionIdMap[(int)$oldId] = (int)$newId;
+			}
+		}
+
+		return ['columnId' => $newColumn->getId(), 'selectionOptionIdMap' => $selectionOptionIdMap];
 	}
 }
