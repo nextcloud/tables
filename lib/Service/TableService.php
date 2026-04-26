@@ -26,6 +26,7 @@ use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\FilterSet;
+use OCA\Tables\Model\FormattingRuleSets;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\TableScheme;
@@ -765,8 +766,12 @@ class TableService extends SuperService {
 		}
 
 		// Add new columns
+		$selectionOptionIdMap = [];
 		foreach ($columns['addColumns'] as $columnData) {
-			$this->columnService->importColumn($table, $columnData);
+			$result = $this->columnService->importColumn($table, $columnData);
+			if (isset($columnData['id'])) {
+				$selectionOptionIdMap[(int)$columnData['id']] = $result['selectionOptionIdMap'];
+			}
 		}
 
 		// Remove columns
@@ -795,6 +800,21 @@ class TableService extends SuperService {
 			$columnsMap[$column->getUuid()] = $column;
 		}
 
+		// Formatting addresses columns by id, so it needs the old-to-new mapping the other view
+		// properties get from $columnsMap. A column the scheme adds is paired through the uuid
+		// importColumn() preserves; a column that was already on this table keeps its id, so it
+		// maps to itself. The scheme's own ids win, since that is what its views refer to.
+		$columnIdMap = [];
+		foreach ($columns['addColumns'] as $columnData) {
+			$uuid = $columnData['uuid'] ?? null;
+			if ($uuid !== null && isset($columnData['id'], $columnsMap[$uuid])) {
+				$columnIdMap[(int)$columnData['id']] = $columnsMap[$uuid]->getId();
+			}
+		}
+		foreach ($updatedColumns as $column) {
+			$columnIdMap[$column->getId()] ??= $column->getId();
+		}
+
 		// Update column order
 		$columnSettings = ColumnSettings::createFromInputArray($columnOrder, $columnsMap);
 		$table->setColumnOrder(\json_encode($columnSettings->jsonSerialize()));
@@ -816,6 +836,9 @@ class TableService extends SuperService {
 			$view['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($view['columnSettings'], $columnsMap)->jsonSerialize();
 			$view['sort'] = SortRuleSet::createFromInputArray($view['sort'], $columnsMap)->jsonSerialize();
 			$view['filter'] = FilterSet::createFromInputArray($view['filter'], $columnsMap)->jsonSerialize();
+			if (isset($view['formatting']) && is_array($view['formatting'])) {
+				$view['formatting'] = FormattingRuleSets::remapIds($view['formatting'], $columnIdMap, $selectionOptionIdMap);
+			}
 			$this->viewService->importView($tableId, $view, $userId);
 		}
 

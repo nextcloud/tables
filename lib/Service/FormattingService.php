@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Service;
 
 use InvalidArgumentException;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\FormattingRuleColMapper;
 use OCA\Tables\Db\View;
@@ -19,6 +20,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Model\FormattingRuleInput;
 use OCA\Tables\Model\FormattingRuleSetInput;
+use OCA\Tables\Model\FormattingRuleSets;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use Psr\Log\LoggerInterface;
@@ -51,15 +53,63 @@ class FormattingService extends SuperService {
 	 */
 	public function saveForView(int $viewId, array $formatting): void {
 		$view = $this->loadView($viewId);
-		$this->validateViewLimits($formatting);
-		$this->persistFormatting($view, $formatting);
+		$normalised = $this->normaliseImportedFormatting($view, $formatting);
+		$this->validateViewLimits($normalised);
+		$this->persistFormatting($view, $normalised);
 
 		$this->ruleColMapper->deleteByView($viewId);
-		foreach ($formatting as $ruleSet) {
-			foreach ($ruleSet['rules'] ?? [] as $rule) {
-				$this->syncJunctionIndex($rule['id'], $viewId, $rule['condition'] ?? [], self::targetColOf($ruleSet));
+		foreach ($normalised as $ruleSet) {
+			foreach ($ruleSet['rules'] as $rule) {
+				$this->syncJunctionIndex($rule['id'], $viewId, $rule['condition'], self::targetColOf($ruleSet));
 			}
 		}
+	}
+
+	/**
+	 * Rebuild imported formatting through the same value objects the API uses.
+	 *
+	 * An archive or a posted scheme is exactly as untrusted as a request body: it chooses the
+	 * colours, operators and column references that end up stored, so it goes through the same
+	 * validation rather than around it. Ids are reissued here instead of being taken from the
+	 * payload, because a rule id addresses rows in a junction table shared by every view, and
+	 * a caller that could name one could clear another view's entries. The broken flags set
+	 * while remapping are the one thing carried over, since they describe this import.
+	 *
+	 * @throws InternalError
+	 * @throws InvalidArgumentException
+	 */
+	private function normaliseImportedFormatting(View $view, array $formatting): array {
+		$normalised = [];
+		foreach (array_values($formatting) as $sortOrder => $ruleSet) {
+			if (!is_array($ruleSet)) {
+				throw new InvalidArgumentException('Each formatting entry must be a rule set');
+			}
+
+			$input = FormattingRuleSetInput::createFromInputArray($ruleSet);
+			$this->checkColumnOwnership($view->getTableId(), $input->getTargetCol(), $input->getRules());
+
+			$storedRules = array_values(is_array($ruleSet['rules'] ?? null) ? $ruleSet['rules'] : []);
+			$rules = [];
+			foreach ($input->getRules() as $ruleSortOrder => $ruleInput) {
+				$rule = $this->buildRuleData($ruleInput, $ruleSortOrder);
+				$rule['broken'] = (bool)($storedRules[$ruleSortOrder]['broken'] ?? false);
+				$rules[] = $rule;
+			}
+
+			$normalised[] = [
+				'id' => $this->generateUuid(),
+				'title' => $input->getTitle(),
+				'targetType' => $input->getTargetType(),
+				'targetCol' => $input->getTargetCol(),
+				'mode' => $input->getMode(),
+				'sortOrder' => $sortOrder,
+				'enabled' => $input->isEnabled(),
+				'broken' => (bool)($ruleSet['broken'] ?? false),
+				'rules' => $rules,
+			];
+		}
+
+		return $normalised;
 	}
 
 	/**
@@ -370,7 +420,7 @@ class FormattingService extends SuperService {
 				return;
 			}
 
-			$magicValue = '@selection-id-' . $optionId;
+			$magicValue = FormattingRuleSets::SELECTION_VALUE_PREFIX . $optionId;
 			foreach ($this->groupByViewId($affected) as $viewId => $ruleIds) {
 				$this->markBrokenInView($viewId, $ruleIds, 'selection option deletion', $magicValue);
 			}
@@ -468,12 +518,15 @@ class FormattingService extends SuperService {
 			throw new InternalError('Failed to validate column ownership');
 		}
 
-		if ($targetCol !== null && !isset($validIds[$targetCol])) {
+		// Meta columns (creator, creation date and the like) are offered by the rule editor and
+		// are accepted on the read side by View::isVisibleColumnId(), but they are not rows of
+		// tables_columns, so they have to be allowed explicitly rather than looked up.
+		if ($targetCol !== null && !Column::isValidMetaTypeId($targetCol) && !isset($validIds[$targetCol])) {
 			throw new InvalidArgumentException('Target column ' . $targetCol . ' does not belong to this view\'s table');
 		}
 		foreach ($rules as $ruleInput) {
 			foreach ($ruleInput->getCondition()->collectColumnIds() as $columnId) {
-				if (!isset($validIds[$columnId])) {
+				if (!Column::isValidMetaTypeId($columnId) && !isset($validIds[$columnId])) {
 					throw new InvalidArgumentException('Column ' . $columnId . ' does not belong to this view\'s table');
 				}
 			}
@@ -527,6 +580,16 @@ class FormattingService extends SuperService {
 		$typeMap = $this->buildColumnTypeMap($view->getTableId());
 
 		foreach ($formatting as &$ruleSet) {
+			// A rule set is broken when the column it paints could not be resolved, which an
+			// import can do as readily as a deletion. Clearing it here is the auto-clear path
+			// for the set itself; without it a repaired set would stay invisible for good.
+			if ($ruleSet['broken'] ?? false) {
+				$paintsAColumn = ($ruleSet['targetType'] ?? null) === 'column';
+				if (!$paintsAColumn || isset($typeMap[$ruleSet['targetCol'] ?? null])) {
+					$ruleSet['broken'] = false;
+				}
+			}
+
 			if (!isset($ruleSet['rules']) || !is_array($ruleSet['rules'])) {
 				continue;
 			}
@@ -545,6 +608,9 @@ class FormattingService extends SuperService {
 
 	private function hasBrokenRule(array $formatting): bool {
 		foreach ($formatting as $ruleSet) {
+			if ($ruleSet['broken'] ?? false) {
+				return true;
+			}
 			foreach ($ruleSet['rules'] ?? [] as $rule) {
 				if ($rule['broken'] ?? false) {
 					return true;
@@ -662,8 +728,20 @@ class FormattingService extends SuperService {
 		foreach ($rule['condition']['groups'] ?? [] as $group) {
 			foreach ($group['conditions'] ?? [] as $condition) {
 				$value = $condition['value'] ?? null;
-				if (is_array($value) ? in_array($needle, $value, true) : $value === $needle) {
-					return true;
+				if (!is_array($value)) {
+					if ($value === $needle) {
+						return true;
+					}
+					continue;
+				}
+				// A contains-item condition stores whole option objects rather than the magic
+				// string, so a strict search for the string alone would never find one.
+				foreach ($value as $entry) {
+					if ($entry === $needle
+						|| (is_array($entry) && isset($entry['id']) && FormattingRuleSets::SELECTION_VALUE_PREFIX . $entry['id'] === $needle)
+					) {
+						return true;
+					}
 				}
 			}
 		}

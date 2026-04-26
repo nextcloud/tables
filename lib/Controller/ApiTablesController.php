@@ -17,11 +17,13 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\FormattingRuleSets;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\FormattingService;
 use OCA\Tables\Service\StructureService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
@@ -52,6 +54,7 @@ class ApiTablesController extends AOCSController {
 		private readonly IAppManager $appManager,
 		private readonly IDBConnection $db,
 		private readonly StructureService $structureService,
+		private readonly FormattingService $formattingService,
 		string $userId,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
@@ -149,6 +152,7 @@ class ApiTablesController extends AOCSController {
 			$this->db->beginTransaction();
 			$table = $this->service->create($title, 'custom', $emoji, $description, uuid: $uuid);
 			$colMap = [];
+			$selectionOptionIdMap = [];
 			foreach ($columns as $column) {
 				if (isset($column['uuid']) && !Uuid::isValid($column['uuid'])) {
 					throw new \InvalidArgumentException('Invalid UUID provided');
@@ -188,6 +192,10 @@ class ApiTablesController extends AOCSController {
 					)
 				);
 				$colMap[$column['id']] = $col->getId();
+				$selectionOptionIdMap[(int)$column['id']] = ColumnService::pairSelectionOptionIds(
+					$column['selectionOptions'] ?? [],
+					$col->getSelectionOptionsArray(),
+				);
 			}
 			if (!empty($columnOrder) || !empty($sort)) {
 				$remappedColumnOrder = null;
@@ -262,6 +270,15 @@ class ApiTablesController extends AOCSController {
 				}
 
 				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray($inputData));
+
+				// Formatting is persisted separately because it is not part of the view
+				// update contract.
+				if (!empty($view['formatting']) && is_array($view['formatting'])) {
+					$this->formattingService->saveForView(
+						$newView->getId(),
+						FormattingRuleSets::remapIds($view['formatting'], $colMap, $selectionOptionIdMap),
+					);
+				}
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
