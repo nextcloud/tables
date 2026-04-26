@@ -20,6 +20,7 @@ use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\FormattingRuleColMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -64,6 +65,8 @@ class ViewService extends SuperService {
 		private readonly FederationService $federationService,
 		private readonly ActivityManager $activityManager,
 		private readonly AuditLogServiceInterface $auditLogService,
+		private readonly FormattingRuleColMapper $formattingRuleColMapper,
+		private readonly FormattingService $formattingService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -465,6 +468,7 @@ class ViewService extends SuperService {
 
 		try {
 			$deletedView = $this->mapper->delete($view);
+			$this->formattingRuleColMapper->deleteByView($id);
 
 			$event = new ViewDeletedEvent(view: $view);
 
@@ -506,6 +510,7 @@ class ViewService extends SuperService {
 			$this->contextService->deleteNodeRel($view->getId(), Application::NODE_TYPE_VIEW);
 
 			$this->mapper->delete($view);
+			$this->formattingRuleColMapper->deleteByView($view->getId());
 
 			$event = new ViewDeletedEvent(view: $view);
 
@@ -752,6 +757,11 @@ class ViewService extends SuperService {
 	}
 
 	/**
+	 * Formatting is written through FormattingService once the view exists, never into the
+	 * inserted row directly. That is the only path which validates the rules against the
+	 * view's limits and columns and builds the junction index column deletion relies on, so
+	 * writing the raw blob first would leave an unvalidated one behind when it is rejected.
+	 *
 	 * @param int $tableId
 	 * @param array $view
 	 * @param string $userId
@@ -792,13 +802,22 @@ class ViewService extends SuperService {
 				$item->setTechnicalName($this->buildDefaultTechnicalName($item->getId()));
 				$importedView = $this->mapper->update($item);
 			}
-			return $importedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->handleViewPersistDbException($e, 'importView insert error');
 		} catch (\Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
+
+		if (!empty($view['formatting']) && is_array($view['formatting'])) {
+			try {
+				$this->formattingService->saveForView($importedView->getId(), $view['formatting']);
+			} catch (InvalidArgumentException|NotFoundError|InternalError $e) {
+				$this->logger->warning('Could not import formatting for view ' . $importedView->getId() . ': ' . $e->getMessage(), ['exception' => $e]);
+			}
+		}
+
+		return $importedView;
 	}
 
 	private function buildDefaultTechnicalName(int $viewId): string {
