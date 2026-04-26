@@ -98,6 +98,7 @@ class FormattingService extends SuperService {
 				'targetType' => $input->getTargetType(),
 				'targetCol' => $targetCol,
 				'mode' => $input->getMode(),
+				'marker' => $input->getMarker(),
 				'sortOrder' => $sortOrder,
 				'enabled' => $input->isEnabled(),
 				'broken' => (bool)($ruleSet['broken'] ?? false)
@@ -131,6 +132,7 @@ class FormattingService extends SuperService {
 			'targetType' => $input->getTargetType(),
 			'targetCol' => $input->getTargetCol(),
 			'mode' => $input->getMode(),
+			'marker' => $input->getMarker(),
 			'sortOrder' => count($formatting),
 			'enabled' => $input->isEnabled(),
 			'broken' => false,
@@ -189,6 +191,7 @@ class FormattingService extends SuperService {
 		$existing['targetType'] = $input->getTargetType();
 		$existing['targetCol'] = $input->getTargetCol();
 		$existing['mode'] = $input->getMode();
+		$existing['marker'] = $input->getMarker();
 		$existing['enabled'] = $input->isEnabled();
 		$existing['rules'] = [];
 		$submittedIds = [];
