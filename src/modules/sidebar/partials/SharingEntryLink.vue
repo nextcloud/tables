@@ -63,7 +63,7 @@
 							{{ t('tables', 'Share link') }}
 						</span>
 						<div class="sharing-entry-link__subtitle">
-							{{ t('tables', 'View only') }}
+							<SharePermissionSelect :share="share" @update:share="onUpdatePermissions" />
 							<LockIcon v-if="hasPassword" :size="12" />
 						</div>
 					</div>
@@ -117,11 +117,13 @@ import TrashCan from 'vue-material-design-icons/TrashCan.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
+import SharePermissionSelect from './SharePermissionSelect.vue'
 
 export default {
 	name: 'SharingEntryLink',
 
 	components: {
+		SharePermissionSelect,
 		NcActions,
 		NcActionButton,
 		NcActionInput,
@@ -213,6 +215,9 @@ export default {
 				this.loading = false
 			}
 		},
+		onUpdatePermissions(data) {
+			this.$emit('update-share', { id: this.share.id, ...data })
+		},
 		copyLink() {
 			this.copyToClipboard(this.linkShareUrl)
 				.then(() => {
@@ -279,10 +284,12 @@ export default {
 	&__row {
 		display: flex;
 		align-items: center;
-		height: 44px;
+		min-height: 44px;
+    height: auto;
 	}
 
 	&__avatar {
+    align-self: flex-start;
 		margin-inline-end: 10px;
 		flex-shrink: 0;
 	}
@@ -311,6 +318,7 @@ export default {
 	}
 
 	&__actions {
+    align-self: flex-start;
 		display: flex;
 		align-items: center;
 		flex-shrink: 0;

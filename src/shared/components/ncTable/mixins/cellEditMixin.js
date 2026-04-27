@@ -43,7 +43,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['updateRow']),
+		...mapActions(useDataStore, ['updateRow', 'updatePublicRow']),
 
 		canEditCell() {
 			// Prevent editing if row editing is globally disabled
@@ -88,12 +88,10 @@ export default {
 				value: newValue,
 			}]
 
-			const res = await this.updateRow({
-				id: this.rowId,
-				isView: this.isView,
-				elementId: this.elementId,
-				data,
-			})
+			const token = useDataStore().publicToken
+			const res = token
+				? await this.updatePublicRow({ token, rowId: this.rowId, data })
+				: await this.updateRow({ id: this.rowId, isView: this.isView, elementId: this.elementId, data })
 
 			if (!res) {
 				showError(t('tables', 'Could not update cell'))
