@@ -75,13 +75,26 @@ export default {
 	data() {
 		return {
 			mutableGroups: this.cloneGroups(this.conditionSet?.groups ?? []),
+			_syncingFromProp: false,
 		}
 	},
 
 	watch: {
+		mutableGroups: {
+			handler() {
+				if (!this._syncingFromProp) {
+					this.emitUpdate()
+				}
+			},
+			deep: true,
+		},
 		conditionSet: {
 			handler(val) {
+				this._syncingFromProp = true
 				this.mutableGroups = this.cloneGroups(val?.groups ?? [])
+				this.$nextTick(() => {
+					this._syncingFromProp = false
+				})
 			},
 			deep: true,
 		},
