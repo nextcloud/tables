@@ -123,15 +123,15 @@ export default {
 				const format = this.getDateFormat()
 
 				if (this.column.type === 'datetime-time') {
-					const timeMoment = Moment(this.value, format)
+					const timeMoment = Moment.utc(this.value, format)
 					if (timeMoment.isValid()) {
-						this.editDateTimeValue = timeMoment.toDate()
+						this.editDateTimeValue = timeMoment.local().toDate()
 					} else {
 						this.editDateTimeValue = new Date()
 					}
 				} else {
-					const parsedMoment = Moment(this.value, format)
-					this.editDateTimeValue = parsedMoment.isValid() ? parsedMoment.toDate() : null
+					const parsedMoment = Moment.utc(this.value, format)
+					this.editDateTimeValue = parsedMoment.isValid() ? parsedMoment.local().toDate() : null
 				}
 			} else if ((this.value === null || this.value === '') && this.column.datetimeDefault) {
 				if (this.column.datetimeDefault === 'now' || this.column.datetimeDefault === 'today') {
