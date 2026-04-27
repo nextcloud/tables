@@ -1,7 +1,7 @@
 {
   "name": "tables",
   "description": "Manage data within tables.",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "author": "Florian Steffens <florian.steffens@nextcloud.com",
   "bugs": {
     "url": "https://github.com/nextcloud/tables/issues"
@@ -12,7 +12,7 @@
   },
   "type": "module",
   "url": "https://github.com/nextcloud/tables/wiki",
-  "license": "agpl",
+  "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
     "build": "vite --mode production build",
