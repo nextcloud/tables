@@ -75,13 +75,30 @@ export default {
 	data() {
 		return {
 			mutableGroups: this.cloneGroups(this.conditionSet?.groups ?? []),
+			syncingFromProp: false,
 		}
 	},
 
 	watch: {
+		mutableGroups: {
+			handler() {
+				if (!this.syncingFromProp) {
+					this.emitUpdate()
+				}
+			},
+			deep: true,
+		},
 		conditionSet: {
 			handler(val) {
-				this.mutableGroups = this.cloneGroups(val?.groups ?? [])
+				const incoming = this.cloneGroups(val?.groups ?? [])
+				if (JSON.stringify(incoming) === JSON.stringify(this.mutableGroups)) {
+					return
+				}
+				this.syncingFromProp = true
+				this.mutableGroups = incoming
+				this.$nextTick(() => {
+					this.syncingFromProp = false
+				})
 			},
 			deep: true,
 		},
@@ -123,6 +140,14 @@ export default {
 		},
 
 		emitUpdate() {
+			for (const group of this.mutableGroups) {
+				for (const condition of group.conditions) {
+					const columnType = condition.columnId != null ? this.getColumnType(condition.columnId) : ''
+					if (condition.columnType !== columnType) {
+						condition.columnType = columnType
+					}
+				}
+			}
 			this.$emit('update:conditionSet', { groups: this.cloneGroups(this.mutableGroups) })
 		},
 	},
