@@ -35,6 +35,9 @@ class SortRuleSet implements JsonSerializable {
 	public static function createFromInputArray(array $data): self {
 		$sortRules = [];
 		foreach ($data as $inputSortRule) {
+			if (!is_array($inputSortRule)) {
+				throw new InvalidArgumentException('Each sort rule entry must be an array');
+			}
 			if (!isset($inputSortRule['columnId'], $inputSortRule['mode'])) {
 				throw new InvalidArgumentException('Required sort parameters are missing');
 			}
@@ -47,6 +50,9 @@ class SortRuleSet implements JsonSerializable {
 		return new self($sortRules);
 	}
 
+	/**
+	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
+	 */
 	public function jsonSerialize(): array {
 		return array_map(static fn (SortRule $s) => $s->jsonSerialize(), $this->sortRules);
 	}

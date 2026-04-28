@@ -8,15 +8,19 @@
 			<thead class="tables-list__thead">
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
-					:rows="getSearchedAndFilteredAndSortedRows"
+					:rows="rows"
 					:view-setting.sync="localViewSetting"
 					:config="config"
+					:pinned-column-id="pinnedColumnId"
+					:column-widths="columnWidths"
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-column="col => $emit('edit-column', col)"
 					@delete-column="col => $emit('delete-column', col)"
 					@download-csv="data => $emit('download-csv', data)"
-					@select-all-rows="selectAllRows">
+
+					@select-all-rows="selectAllRows"
+					@pin-column="setPinnedColumn">
 					<template #actions>
 						<slot name="actions" />
 					</template>
@@ -37,6 +41,9 @@
 					:config="config"
 					:element-id="elementId"
 					:is-view="isView"
+
+					:pinned-column-id="pinnedColumnId"
+					:column-widths="columnWidths"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</transition-group>
@@ -118,13 +125,8 @@ import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
 import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { MagicFields } from '../mixins/magicFields.js'
 import { NcButton, useIsMobile, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'pinia'
-import {
-	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
-} from '../../../constants.ts'
-import { MetaColumns } from '../mixins/metaColumns.js'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../store/store.js'
 import { generateUrl } from '@nextcloud/router'
@@ -184,6 +186,8 @@ export default {
 			pageNumber: 1,
 			rowsPerPage: 100,
 			rowAnimation: false,
+			pinnedColumnId: null,
+			columnWidths: null,
 		}
 	},
 
@@ -199,147 +203,10 @@ export default {
 			)
 		},
 		currentPageRows() {
-			return this.getSearchedAndFilteredAndSortedRows.slice((this.pageNumber - 1) * this.rowsPerPage, ((this.pageNumber - 1) * this.rowsPerPage) + this.rowsPerPage)
+			return this.rows.slice((this.pageNumber - 1) * this.rowsPerPage, ((this.pageNumber - 1) * this.rowsPerPage) + this.rowsPerPage)
 		},
 		totalPages() {
-			return Math.ceil(this.getSearchedAndFilteredAndSortedRows.length / this.rowsPerPage)
-		},
-		sorting() {
-			return this.viewSetting?.sorting
-		},
-		getSearchedAndFilteredRows() {
-			const debug = false
-			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
-				if (this.rows && this.columns) {
-					this.rows.forEach(row => {
-						if (row && row.data) {
-							this.columns.forEach(column => {
-								const cell = row.data.find(item => item && item.columnId === column.id)
-								if (cell === undefined) {
-									return
-								}
-								delete cell.searchStringFound
-								delete cell.filterFound
-							})
-						}
-					})
-				}
-				return this.rows || []
-			}
-
-			const data = []
-			const searchString = this.viewSetting?.searchString
-			if (!this.rows || !this.columns) {
-				return []
-			}
-
-			for (const row of this.rows) {
-				if (!row || !row.data) {
-					continue
-				}
-
-				if (debug) {
-					console.debug('new row ===============================================', row)
-				}
-				let filterStatusRow = null
-				let searchStatusRow = false
-
-				this.columns.forEach(column => {
-					if (debug) {
-						console.debug('new column -------------------', column)
-					}
-					let filterStatus = null
-					let searchStatus = true
-					const filters = this.getFiltersForColumn(column)
-					let cell
-					if (column.id < 0) {
-						cell = { columnId: column.id }
-						switch (column.id) {
-						case TYPE_META_ID:
-							cell.value = row.id
-							break
-						case TYPE_META_CREATED_BY:
-							cell.value = row.createdBy
-							break
-						case TYPE_META_UPDATED_BY:
-							cell.value = row.editedBy
-							break
-						case TYPE_META_CREATED_AT:
-							cell.value = row.createdAt
-							break
-						case TYPE_META_UPDATED_AT:
-							cell.value = row.editedAt
-							break
-						}
-					} else {
-						cell = row.data.find(item => item && item.columnId === column.id)
-					}
-
-					if (cell === undefined) {
-						if (searchString) {
-							searchStatus = false
-						}
-						cell = { columnId: column.id, value: null }
-					}
-					delete cell.searchStringFound
-					delete cell.filterFound
-
-					if (filters !== null) {
-						filters.forEach(fil => {
-							this.addMagicFieldsValues(fil)
-							if (filterStatus === null || filterStatus === true) {
-								filterStatus = column.isFilterFound(cell, fil)
-							}
-						})
-					}
-					if (searchString) {
-						console.debug('look for searchString', searchString)
-						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
-					}
-
-					if (debug) {
-						console.debug('filterStatus for cell', { cell: cell?.value, filterStatusCell: filterStatus, filterStatusRowBefore: filterStatusRow })
-					}
-
-					if (filterStatus !== null && (filterStatusRow || filterStatusRow === null)) {
-						filterStatusRow = filterStatus
-					}
-
-					if (debug) {
-						console.debug('new filterStatusRow', filterStatusRow)
-					}
-
-					searchStatusRow = searchStatusRow || searchStatus
-				})
-
-				if (debug) {
-					console.debug('if push row', { filterStatusRow, searchStatusRow, result: (filterStatusRow || filterStatusRow === null) && searchStatusRow })
-				}
-				if ((filterStatusRow || filterStatusRow === null) && searchStatusRow) {
-					data.push({ ...row })
-				}
-			}
-			return data
-		},
-		getSearchedAndFilteredAndSortedRows() {
-			const allColumns = this.columns.concat(MetaColumns)
-			const sort = (sortCols) => {
-				const sortColumn = allColumns.find(item => item.id === sortCols?.[0].columnId)
-				const nextSorts = []
-				for (let i = 1; i < sortCols.length; i++) {
-					const sortColumn = allColumns.find(item => item.id === sortCols[i].columnId)
-					nextSorts.push(sortColumn?.sort?.(sortCols[i].mode))
-				}
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(sortCols[0].mode, nextSorts))
-			}
-
-			if (this.viewSetting?.presetSorting) {
-				return sort(this.viewSetting.presetSorting)
-			}
-			if (this.viewSetting?.sorting) {
-				return sort(this.viewSetting.sorting)
-			}
-			return this.getSearchedAndFilteredRows
+			return Math.ceil(this.rows.length / this.rowsPerPage)
 		},
 	},
 
@@ -353,6 +220,13 @@ export default {
 		currentLayout() {
 			this.pageNumber = 1
 		},
+		pinnedColumnId(newVal) {
+			if (newVal !== null) {
+				this.$nextTick(() => this.measureColumnWidths())
+			} else {
+				this.columnWidths = null
+			}
+		},
 	},
 
 	updated() {
@@ -364,30 +238,35 @@ export default {
 	mounted() {
 		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		subscribe('tables:row:animate', this.enableRowAnimation)
+		subscribe('tables:pagination-changed', this.handlePaginationChanged)
 	},
 	beforeDestroy() {
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		unsubscribe('tables:row:animate', this.enableRowAnimation)
+		unsubscribe('tables:pagination-changed', this.handlePaginationChanged)
 	},
 
 	methods: {
 		t,
-		addMagicFieldsValues(filter) {
-			Object.values(MagicFields).forEach(field => {
-				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
-				if (filter.value !== newFilterValue) {
-					filter.magicValuesEnriched = newFilterValue
-				}
-			})
+		setPinnedColumn(columnId) {
+			this.pinnedColumnId = this.pinnedColumnId === columnId ? null : columnId
 		},
-		getFiltersForColumn(column) {
-			if (this.viewSetting?.filter?.length > 0) {
-				const columnFilter = this.viewSetting.filter.filter(item => item.columnId === column.id)
-				if (columnFilter.length > 0) {
-					return columnFilter
-				}
+		measureColumnWidths() {
+			const headerRow = this.$el.querySelector('thead tr')
+			if (!headerRow) return
+			const widths = {}
+			headerRow.querySelectorAll('th[data-col-id]').forEach(th => {
+				widths[parseInt(th.dataset.colId, 10)] = th.offsetWidth
+			})
+			if (JSON.stringify(widths) !== JSON.stringify(this.columnWidths)) {
+				this.columnWidths = widths
 			}
-			return null
+		},
+		handlePaginationChanged({ pageNumber, rowsPerPage }) {
+			this.pageNumber = pageNumber
+			if (rowsPerPage) {
+				this.rowsPerPage = rowsPerPage
+			}
 		},
 		deselectAllRows(elementId, isView) {
 			if (parseInt(elementId) === parseInt(this.elementId) && isView === this.isView) {
@@ -397,7 +276,7 @@ export default {
 		selectAllRows(value) {
 			this.selectedRows = []
 			if (value) {
-				this.getSearchedAndFilteredRows.forEach(item => { this.selectedRows.push(item.id) })
+				this.rows.forEach(item => { this.selectedRows.push(item.id) })
 			}
 			this.$emit('update-selected-rows', this.selectedRows)
 		},
@@ -504,12 +383,6 @@ export default {
 	},
 }
 </script>
-
-<style>
-.vs__dropdown-menu {
-	min-width: 95px !important;
-}
-</style>
 
 <style lang="scss" scoped>
 :deep(.text-editor__wrapper .paragraph-content:last-child) {
@@ -791,6 +664,30 @@ export default {
 		tr:focus-within > td:last-child {
 			opacity: 1;
 		}
+	}
+
+	tr > th.frozen-column,
+	tr > td.frozen-column {
+		background-color: inherit;
+		z-index: 4;
+	}
+
+	thead tr > th.frozen-column {
+		z-index: 6;
+		border-right: 1px solid transparent; // aligns inset shadow with td (which has a 1px border)
+		box-shadow: inset 0 -1px 0 var(--color-border), inset -1px 0 0 var(--color-border-dark);
+	}
+
+	tr > td.frozen-column {
+		box-shadow: inset -1px 0 0 var(--color-border-dark);
+	}
+
+	thead tr > th.frozen-column--last {
+		box-shadow: inset 0 -1px 0 var(--color-border), inset -3px 0 0 var(--color-border-dark);
+	}
+
+	tr > td.frozen-column--last {
+		box-shadow: inset -3px 0 0 var(--color-border-dark);
 	}
 
 	tr>th.sticky:first-child,tr>td.sticky:first-child {

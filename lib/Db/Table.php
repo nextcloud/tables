@@ -9,7 +9,9 @@ namespace OCA\Tables\Db;
 
 use JsonSerializable;
 use OCA\Tables\Model\Permissions;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ColumnOrderInformation;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -42,10 +44,14 @@ use OCA\Tables\ResponseDefinitions;
  * @method setRowsCount(int $rowsCount)
  * @method getColumnsCount(): int
  * @method setColumnsCount(int $columnsCount)
- * @method getViews(): ?array
+ * @method getViews(): ?array<TablesView>
  * @method setViews(array $views)
  * @method getColumns(): array
  * @method setColumns(array $columns)
+ * @method getColumnOrder(): ?string
+ * @method setColumnOrder(?string $columnOrder)
+ * @method getSort(): ?string
+ * @method setSort(?string $sort)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
@@ -65,6 +71,9 @@ class Table extends EntitySuper implements JsonSerializable {
 	protected ?string $lastEditAt = null;
 	protected bool $archived = false;
 	protected ?string $description = null;
+
+	protected ?string $columnOrder = null; // json
+	protected ?string $sort = null; // json
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -100,13 +109,18 @@ class Table extends EntitySuper implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt ?: '',
 			'archived' => $this->archived,
 			'isShared' => (bool)$this->isShared,
-			'favorite' => $this->favorite,
+			'favorite' => (bool)$this->favorite,
 			'onSharePermissions' => $this->getSharePermissions()?->jsonSerialize(),
 			'hasShares' => (bool)$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'columnsCount' => $this->columnsCount ?: 0,
-			'views' => $this->getViewsArray(),
-			'description' => $this->description ?:'',
+			'description' => $this->description ?: '',
+			'views' => array_values($this->getViewsArray()),
+			'columnOrder' => array_map(
+				static fn (ColumnOrderInformation $c) => ['columnId' => $c->getId(), 'order' => $c->getOrder()],
+				$this->getColumnOrderSettingsArray()
+			),
+			'sort' => $this->getSortArray(),
 		];
 	}
 
@@ -115,10 +129,56 @@ class Table extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return TablesView[]
 	 */
 	private function getViewsArray(): array {
 		return $this->getViews() ?: [];
+	}
+
+	/**
+	 * @return int[]
+	 */
+	public function getColumnOrderArray(): array {
+		$columnSettings = $this->getColumnOrderSettingsArray();
+		usort($columnSettings, static function (ColumnOrderInformation $a, ColumnOrderInformation $b) {
+			return $a->getOrder() - $b->getOrder();
+		});
+		/** @var list<ColumnOrderInformation> $columnSettings */
+		return array_map(static fn (ColumnOrderInformation $vci): int => $vci->getId(), $columnSettings);
+	}
+
+	/**
+	 * @return list<ColumnOrderInformation>
+	 */
+	public function getColumnOrderSettingsArray(): array {
+		$columns = $this->getArray($this->getColumnOrder());
+		if (empty($columns)) {
+			return [];
+		}
+
+		if (is_array($columns[array_key_first($columns)] ?? null)) {
+			return array_values(array_map(static fn (array $a): ColumnOrderInformation => ColumnOrderInformation::fromArray($a), $columns));
+		}
+
+		$result = [];
+		foreach ($columns as $index => $columnId) {
+			$result[] = new ColumnOrderInformation((int)$columnId, order: (int)$index + 1);
+		}
+		return $result;
+	}
+
+	/**
+	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
+	 */
+	public function getSortArray(): array {
+		$rawSortRules = $this->getArray($this->getSort());
+		return SortRuleSet::createFromInputArray($rawSortRules)->jsonSerialize();
+	}
+
+	private function getArray(?string $json): array {
+		if ($json !== '' && $json !== null && $json !== 'null') {
+			return \json_decode($json, true) ?? [];
+		}
+		return [];
 	}
 }

@@ -97,7 +97,10 @@ class RowService extends SuperService {
 				$tableColumns = $this->columnMapper->findAllByTable($tableId);
 				$showColumnIds = array_map(fn (Column $column) => $column->getId(), $tableColumns);
 
-				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, null, $userId);
+				$table = $this->tableMapper->find($tableId);
+				$sort = $table->getSortArray() ?: null;
+
+				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
 			} else {
 				throw new PermissionError('no read access to table id = ' . $tableId);
 			}
@@ -329,7 +332,15 @@ class RowService extends SuperService {
 	private function cleanupAndValidateData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId, ?int $rowId = null): RowDataInput {
 		$view = $viewId ? $this->viewMapper->find($viewId) : null;
 		$readOnlyColumns = $view ? $this->extractColumnsByProperty($view, 'isReadonly') : [];
-		$mandatoryColumns = $view ? $this->extractColumnsByProperty($view, 'isMandatory') : [];
+		$mandatoryColumns = [];
+		foreach ($columns as $column) {
+			if ($column->getMandatory()) {
+				$mandatoryColumns[$column->getId()] = true;
+			}
+		}
+		if ($view) {
+			$mandatoryColumns += $this->extractColumnsByProperty($view, 'isMandatory');
+		}
 
 		$out = new RowDataInput();
 		foreach ($data as $entry) {
@@ -369,7 +380,7 @@ class RowService extends SuperService {
 			$out->add((int)$entry['columnId'], $this->parseValueByColumnType($column, $entry['value']));
 		}
 
-		if ($viewId && !empty($mandatoryColumns)) {
+		if (!empty($mandatoryColumns)) {
 			$existingRow = null;
 			if ($rowId !== null) {
 				try {

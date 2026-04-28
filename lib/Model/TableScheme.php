@@ -23,14 +23,18 @@ class TableScheme implements JsonSerializable {
 	protected ?array $views = null;
 	protected ?string $description = null;
 	protected ?string $tablesVersion = null;
+	protected array $columnOrder = [];
+	protected array $sort = [];
 
-	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion) {
+	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion, array $columnOrder = [], array $sort = []) {
 		$this->tablesVersion = $tablesVersion;
 		$this->title = $title;
 		$this->emoji = $emoji;
 		$this->columns = $columns;
 		$this->description = $description;
 		$this->views = $view;
+		$this->columnOrder = $columnOrder;
+		$this->sort = $sort;
 	}
 
 	public function getTitle():string {
@@ -43,8 +47,10 @@ class TableScheme implements JsonSerializable {
 			'emoji' => $this->emoji,
 			'columns' => $this->columns,
 			'views' => $this->views,
-			'description' => $this->description ?:'',
+			'description' => $this->description ?: '',
 			'tablesVersion' => $this->tablesVersion,
+			'columnOrder' => $this->columnOrder,
+			'sort' => $this->sort,
 		];
 	}
 

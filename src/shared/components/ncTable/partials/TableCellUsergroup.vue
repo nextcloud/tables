@@ -161,7 +161,10 @@ export default {
 				return
 			}
 
-			let newValue = !Array.isArray(this.editValue) ? [this.editValue] : this.editValue
+			let newValue = []
+			if (this.editValue !== null) {
+				newValue = !Array.isArray(this.editValue) ? [this.editValue] : this.editValue
+			}
 			// If the column does not allow multiple items, limit to one item
 			// in case we switched from multiple to single selection
 			if (!this.column.usergroupMultipleItems) {

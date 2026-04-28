@@ -126,3 +126,10 @@ export const Filters = {
 		noSearchValue: true,
 	}),
 }
+
+export function getFiltersForColumn(column, viewSetting) {
+	if (viewSetting?.filter?.length > 0) {
+		return viewSetting.filter.filter(filter => filter.columnId === column.id)
+	}
+	return []
+}

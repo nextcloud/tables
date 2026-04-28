@@ -1132,9 +1132,22 @@ export type components = {
             readonly hasShares: boolean;
             /** Format: int64 */
             readonly rowsCount: number;
+            readonly description: string;
             readonly views: readonly components["schemas"]["View"][];
             /** Format: int64 */
             readonly columnsCount: number;
+            readonly columnOrder: readonly {
+                /** Format: int64 */
+                readonly columnId: number;
+                /** Format: int64 */
+                readonly order: number;
+            }[];
+            readonly sort: readonly {
+                /** Format: int64 */
+                readonly columnId: number;
+                /** @enum {string} */
+                readonly mode: "ASC" | "DESC";
+            }[];
         };
         readonly View: {
             /** Format: int64 */
@@ -4515,6 +4528,27 @@ export interface operations {
                      * @default null
                      */
                     readonly archived?: boolean;
+                    /**
+                     * @description Default column order settings (array or JSON string)
+                     * @default null
+                     */
+                    readonly columnSettings?: (readonly {
+                        /** Format: int64 */
+                        readonly columnId: number;
+                        /** Format: int64 */
+                        readonly order: number;
+                        readonly readonly: boolean;
+                    }[] | string) | null;
+                    /**
+                     * @description Default sort rules (array or JSON string)
+                     * @default null
+                     */
+                    readonly sort?: (readonly {
+                        /** Format: int64 */
+                        readonly columnId: number;
+                        /** @enum {string} */
+                        readonly mode: "ASC" | "DESC";
+                    }[] | string) | null;
                 };
             };
         };
@@ -4529,6 +4563,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };
@@ -4803,6 +4853,27 @@ export interface operations {
                     readonly columns: readonly components["schemas"]["Column"][];
                     /** @description views */
                     readonly views: readonly components["schemas"]["View"][];
+                    /**
+                     * @description Default column order settings
+                     * @default []
+                     */
+                    readonly columnOrder?: readonly {
+                        /** Format: int64 */
+                        readonly columnId: number;
+                        /** Format: int64 */
+                        readonly order: number;
+                        readonly readonly: boolean;
+                    }[];
+                    /**
+                     * @description Default sort rules
+                     * @default []
+                     */
+                    readonly sort?: readonly {
+                        /** Format: int64 */
+                        readonly columnId: number;
+                        /** @enum {string} */
+                        readonly mode: "ASC" | "DESC";
+                    }[];
                 };
             };
         };
@@ -4817,6 +4888,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };

@@ -41,6 +41,8 @@ OC.L10N.register(
     "Users and groups" : "Utentes e grupos",
     "Move" : "Tràmuda",
     "Metadata" : "Metadatos",
+    "Move up" : "Tràmuda fache a susu",
+    "Move down" : "Tràmuda fache a bàsciu",
     "Read only" : "letura sola",
     "Mandatory" : "Obligatòriu",
     "Views" : "Visualizatziones",

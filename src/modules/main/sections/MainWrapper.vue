@@ -42,6 +42,7 @@ import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTa
 import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	name: 'MainWrapper',
@@ -100,10 +101,23 @@ export default {
 
 	methods: {
 		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE']),
+		...mapActions(useTablesStore, ['validateExportAccess']),
 		createColumn() {
 			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
-		downloadCSV() {
+		async downloadCSV() {
+			const access = await this.validateExportAccess({
+				id: this.element.id,
+				isView: this.isView,
+			})
+
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+
 			this.downloadCsv(this.rows, this.columns, this.element.title)
 		},
 		toggleShare() {
@@ -142,7 +156,7 @@ export default {
 						cardTitleSource: this.element?.cardTitleSource ?? null,
 					}
 				}
-				if (this.isView && this.element?.sort?.length) {
+				if (this.element?.sort?.length) {
 					this.viewSetting.presetSorting = [...this.element.sort]
 				}
 

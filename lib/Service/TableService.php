@@ -21,7 +21,9 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\Permissions;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\TableScheme;
 use OCA\Tables\ResponseDefinitions;
 use OCP\App\IAppManager;
@@ -420,7 +422,7 @@ class TableService extends SuperService {
 
 		// delete all columns for that table
 		try {
-			$columns = $this->columnService->findAllByTable($id, $userId);
+			$columns = $this->columnService->findAllByTable($id, $userId, $item);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -474,7 +476,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null): Table {
+	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null, ?ColumnSettings $columnSettings = null, ?SortRuleSet $sort = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -505,6 +507,12 @@ class TableService extends SuperService {
 		}
 		if ($description !== null) {
 			$table->setDescription($description);
+		}
+		if ($columnSettings !== null) {
+			$table->setColumnOrder(\json_encode($columnSettings->jsonSerialize()));
+		}
+		if ($sort !== null) {
+			$table->setSort(\json_encode($sort->jsonSerialize()));
 		}
 		$table->setLastEditBy($userId);
 		$table->setLastEditAt($time->format('Y-m-d H:i:s'));
@@ -556,10 +564,10 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function getScheme(int $id, ?string $userId = null): TableScheme {
-		$columns = $this->columnService->findAllByTable($id);
-		$table = $this->find($id);
+		$table = $this->find($id, skipTableEnhancement: true);
+		$columns = $this->columnService->findAllByTable($id, null, $table);
 		$this->enhanceTable($table, $userId);
-		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'));
+		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'), $table->getColumnOrderSettingsArray(), $table->getSortArray());
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------

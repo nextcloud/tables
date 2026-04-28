@@ -7,12 +7,17 @@
 		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
-		<td v-for="col in visibleColumns" :key="col.id"
-			:style="getColumnWidthStyle(col)"
+		<td v-for="(col, index) in visibleColumns" :key="col.id"
+			:style="{
+				...getColumnWidthStyle(col),
+				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns, columnWidths),
+			}"
 			:class="{
 				'search-result': getCell(col.id)?.searchStringFound,
 				'filter-result': getCell(col.id)?.filterFound,
-				'fixed-width': col.customSettings?.width > 0
+				'fixed-width': col.customSettings?.width > 0,
+				'frozen-column': index <= pinnedColumnIndex,
+				'frozen-column--last': index === pinnedColumnIndex,
 			}"
 			@click="handleCellClick(col)">
 			<component :is="getTableCell(col)"
@@ -48,7 +53,7 @@ import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import TableCellUsergroup from './TableCellUsergroup.vue'
-import { ColumnTypes, getColumnWidthStyle } from './../mixins/columnHandler.js'
+import { ColumnTypes, getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
@@ -105,6 +110,14 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		pinnedColumnId: {
+			type: Number,
+			default: null,
+		},
+		columnWidths: {
+			type: Object,
+			default: null,
+		},
 	},
 	computed: {
 		getSelection: {
@@ -113,6 +126,10 @@ export default {
 		},
 		visibleColumns() {
 			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
+		},
+		pinnedColumnIndex() {
+			if (this.pinnedColumnId === null) return -1
+			return this.visibleColumns.findIndex(col => col.id === this.pinnedColumnId)
 		},
 		// column types that don't support inline editing yet
 		// to be used to trigger the edit modal instead of inline editing
@@ -124,6 +141,7 @@ export default {
 	methods: {
 		t,
 		getColumnWidthStyle,
+		getFrozenColumnStyle,
 		handleCellClick(column) {
 			// If the column type doesn't support inline editing, trigger the edit modal
 			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.config.canEditRows) {

@@ -8,20 +8,13 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service\ValueObject;
 
-use ArrayAccess;
-use JsonSerializable;
-
 /**
- * @template-implements ArrayAccess<string, bool|int>
+ * Extends ColumnOrderInformation with view-specific fields (readonly, mandatory).
  */
-class ViewColumnInformation implements ArrayAccess, JsonSerializable {
-	public const KEY_ID = 'columnId';
-	public const KEY_ORDER = 'order';
+class ViewColumnInformation extends ColumnOrderInformation {
 	public const KEY_READONLY = 'readonly';
 	public const KEY_MANDATORY = 'mandatory';
 
-	/** @var array{columnId: int, order: int, readonly?: bool, mandatory?: bool} */
-	protected array $data;
 	protected const KEYS = [
 		self::KEY_ID,
 		self::KEY_ORDER,
@@ -35,18 +28,9 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 		bool $readonly = false,
 		bool $mandatory = false,
 	) {
-		$this->offsetSet(self::KEY_ID, $columnId);
-		$this->offsetSet(self::KEY_ORDER, $order);
+		parent::__construct($columnId, $order);
 		$this->offsetSet(self::KEY_READONLY, $readonly);
 		$this->offsetSet(self::KEY_MANDATORY, $mandatory);
-	}
-
-	public function getId(): int {
-		return (int)$this->offsetGet(self::KEY_ID);
-	}
-
-	public function getOrder(): int {
-		return (int)$this->offsetGet(self::KEY_ORDER);
 	}
 
 	public function isReadonly(): bool {
@@ -58,53 +42,32 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 	}
 
 	public static function fromArray(array $data): static {
-		$vci = new static(
-			$data[self::KEY_ID],
-			$data[self::KEY_ORDER],
-			$data[self::KEY_READONLY] ?? false,
-			$data[self::KEY_MANDATORY] ?? false,
+		static::assertRequiredFields($data);
+		return new static(
+			(int)$data[self::KEY_ID],
+			(int)$data[self::KEY_ORDER],
+			(bool)($data[self::KEY_READONLY] ?? false),
+			(bool)($data[self::KEY_MANDATORY] ?? false),
 		);
-
-		return $vci;
-	}
-
-	public function offsetExists(mixed $offset): bool {
-		return in_array((string)$offset, self::KEYS);
-	}
-
-	public function offsetGet(mixed $offset): bool|int {
-		return $this->data[$offset];
-	}
-
-	public function offsetSet(mixed $offset, mixed $value): void {
-		if (!$this->offsetExists($offset)) {
-			return;
-		}
-
-		$this->data[$offset] = $this->ensureType($offset, $value);
-	}
-
-	public function offsetUnset(mixed $offset): void {
-		if (!$this->offsetExists($offset)) {
-			return;
-		}
-		unset($this->data[(string)$offset]);
 	}
 
 	/**
-	 * @return array{columnId: int, order: int, readonly?: bool, mandatory?: bool}
+	 * @return array{columnId: int, order: int, readonly: bool, mandatory: bool}
 	 */
 	public function jsonSerialize(): array {
-		return $this->data;
+		return [
+			self::KEY_ID => $this->getId(),
+			self::KEY_ORDER => $this->getOrder(),
+			self::KEY_READONLY => $this->isReadonly(),
+			self::KEY_MANDATORY => $this->isMandatory(),
+		];
 	}
 
 	protected function ensureType(string $offset, mixed $value): int|bool {
 		return match ($offset) {
-			self::KEY_ID,
-			self::KEY_ORDER => (int)$value,
 			self::KEY_READONLY => (bool)$value,
 			self::KEY_MANDATORY => (bool)$value,
-			default => throw new \InvalidArgumentException("Invalid offset: $offset"),
+			default => parent::ensureType($offset, $value),
 		};
 	}
 }

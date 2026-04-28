@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="row">
+	<div class="row main-context-view">
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else-if="activeContext">
@@ -55,6 +55,7 @@ import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	components: {
@@ -144,7 +145,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['loadContext']),
+		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE']),
 		async reload() {
 			if (!this.activeContextId) {
@@ -165,46 +166,62 @@ export default {
 
 				this.icon = await this.getContextIcon(this.activeContext.iconName)
 
-				if (this.context && this.context.nodes) {
-					for (const [, node] of Object.entries(this.context.nodes)) {
-						try {
-							const nodeType = parseInt(node.node_type)
-							if (nodeType === NODE_TYPE_TABLE) {
-								const table = this.tables.find(table => table.id === node.node_id)
-								if (table) {
-									await this.loadColumnsFromBE({
-										view: null,
-										tableId: table.id,
-									})
-									await this.loadRowsFromBE({
-										viewId: null,
-										tableId: table.id,
-									})
-									table.key = (table.id).toString()
-									table.isView = false
-									this.contextResources.push(table)
-								}
+				this.icon = await this.getContextIcon(this.activeContext.iconName)
 
-							} else if (nodeType === NODE_TYPE_VIEW) {
-								const view = this.views.find(view => view.id === node.node_id)
-								if (view) {
-									await this.loadColumnsFromBE({
-										view,
-									})
-									await this.loadRowsFromBE({
-										viewId: view.id,
-										tableId: view.tableId,
-									})
-									view.key = 'view-' + (view.id).toString()
-									view.isView = true
-									this.contextResources.push(view)
+				if (this.context && this.context.pages) {
+					const pages = Object.values(this.context.pages)
+					const startPage = pages.find(p => p.page_type === 'startpage')
+
+					if (startPage && startPage.content) {
+						const sortedContent = Object.values(startPage.content).sort((a, b) => a.order - b.order)
+
+						for (const content of sortedContent) {
+							const node = this.context.nodes[content.node_rel_id]
+							if (!node) continue
+
+							try {
+								const nodeType = parseInt(node.node_type)
+								if (nodeType === NODE_TYPE_TABLE) {
+									const table = this.tables.find(table => table.id === node.node_id)
+									if (table) {
+										await this.loadColumnsFromBE({
+											view: null,
+											tableId: table.id,
+										})
+										await this.loadRowsFromBE({
+											viewId: null,
+											tableId: table.id,
+										})
+										table.key = (table.id).toString()
+										table.isView = false
+										this.contextResources.push(table)
+									}
+
+								} else if (nodeType === NODE_TYPE_VIEW) {
+									const view = this.views.find(view => view.id === node.node_id)
+									if (view) {
+										await this.loadColumnsFromBE({
+											view,
+										})
+										await this.loadRowsFromBE({
+											viewId: view.id,
+											tableId: view.tableId,
+										})
+										view.key = 'view-' + (view.id).toString()
+										view.isView = true
+										this.contextResources.push(view)
+									}
 								}
+							} catch (err) {
+								console.error(`Failed to load resource ${node.node_id}:`, err)
+								this.errorMessage = t('tables', 'Some resources in this application could not be loaded')
 							}
-						} catch (err) {
-							console.error(`Failed to load resource ${node.node_id}:`, err)
-							this.errorMessage = t('tables', 'Some resources in this application could not be loaded')
 						}
 					}
+					// TODO: check this
+					// Fallback if no startpage or content (though unexpected for valid contexts with nodes)
+					// If nodes exist but not in startpage content, they won't be shown.
+					// This matches backend logic where nodes are added to startpage.
 				}
 			} catch (e) {
 				if (e.message === 'NOT_FOUND') {
@@ -220,7 +237,19 @@ export default {
 		createColumn(isView, element) {
 			emit('tables:column:create', { isView, element })
 		},
-		downloadCSV(element, isView) {
+		async downloadCSV(element, isView) {
+			const access = await this.validateExportAccess({
+				id: element.id,
+				isView,
+			})
+
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+
 			const rowId = this.getKey(isView, element.key)
 			const colId = this.getKey(isView, element.key)
 			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)
@@ -238,6 +267,15 @@ export default {
 
 <style scoped lang="scss">
 .context {
+	.row.first-row {
+		position: sticky;
+		inset-inline-start: 0;
+		top: 0;
+		z-index: 15;
+		background-color: var(--color-main-background);
+		width: var(--app-content-width, 100%);
+	}
+
 	&__title {
 		display: inline-flex;
 	}
@@ -254,12 +292,19 @@ export default {
 	}
 }
 
+.main-context-view {
+	width: max-content;
+	min-width: var(--app-content-width, 100%);
+}
+
 .resource {
 	margin: 40px 0;
+	width: max-content;
+	min-width: var(--app-content-width, 100%);
 
 	&:deep(.row.first-row) {
-		margin-inline-start: 20px;
-		padding-inline-start: 0px;
+		margin-inline-start: 0;
+		padding-inline-start: 20px;
 	}
 }
 

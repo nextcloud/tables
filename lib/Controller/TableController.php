@@ -9,6 +9,8 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -70,9 +72,25 @@ class TableController extends Controller {
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
-	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
-		return $this->handleError(function () use ($id, $title, $emoji, $archived) {
-			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId);
+	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null, null|array|string $columnSettings = null, null|array|string $sort = null): DataResponse {
+		if (is_string($columnSettings)) {
+			$columnSettings = json_decode($columnSettings, true) ?? null;
+		}
+		if (is_string($sort)) {
+			$sort = json_decode($sort, true) ?? null;
+		}
+		return $this->handleError(function () use ($id, $title, $emoji, $archived, $columnSettings, $sort) {
+			if ($columnSettings !== null && !is_array($columnSettings)) {
+				throw new \InvalidArgumentException('Invalid columnSettings: must be a JSON array');
+			}
+			if ($sort !== null && !is_array($sort)) {
+				throw new \InvalidArgumentException('Invalid sort: must be a JSON array');
+			}
+			return $this->service->update(
+				$id, $title, $emoji, null, $archived, $this->userId,
+				$columnSettings !== null ? ColumnSettings::createFromInputArray($columnSettings) : null,
+				$sort !== null ? SortRuleSet::createFromInputArray($sort) : null,
+			);
 		});
 	}
 }

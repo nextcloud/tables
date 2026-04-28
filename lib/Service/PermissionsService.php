@@ -425,7 +425,7 @@ class PermissionsService {
 
 	/**
 	 * @param int $elementId
-	 * @param 'table'|'view' $elementType
+	 * @param 'table'|'view'|'context' $elementType
 	 * @param string $userId
 	 * @return Permissions
 	 * @throws NotFoundError|InternalError
@@ -640,8 +640,14 @@ class PermissionsService {
 		if ($this->userIsElementOwner($element, $userId, $nodeType)) {
 			return true;
 		}
+
+		$shareNodeId = $nodeType === 'view' ? $element->getTableId() : $element->getId();
+		// Views inherit manage permissions from their parent table, while contexts
+		// must resolve against context shares to avoid cross-type ID collisions.
+		$shareNodeType = $nodeType === 'context' ? 'context' : 'table';
+
 		try {
-			$permissions = $this->getSharedPermissionsIfSharedWithMe($nodeType === 'view' ? $element->getTableId() : $element->getId(), 'table', $userId);
+			$permissions = $this->getSharedPermissionsIfSharedWithMe($shareNodeId, $shareNodeType, $userId);
 			if ($permissions->manage) {
 				return true;
 			}

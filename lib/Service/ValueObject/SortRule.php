@@ -22,6 +22,9 @@ class SortRule implements JsonSerializable {
 		}
 	}
 
+	/**
+	 * @return array{columnId: int, mode: 'ASC'|'DESC'}
+	 */
 	public function jsonSerialize(): array {
 		return [
 			'columnId' => $this->columnId,

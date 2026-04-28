@@ -35,6 +35,7 @@
     "Delete" : "Borrar",
     "Edit" : "Editar",
     "Activity" : "Actividad",
+    "Manage" : "Administrar",
     "Owner" : "Dueño",
     "Close" : "Cerrar",
     "Please select a file." : "Por favor selecciona un archivo.",
@@ -53,7 +54,6 @@
     "Copy to clipboard" : "Copiar al portapapeles",
     "Read" : "Leer",
     "Update" : "Actualizar",
-    "Manage" : "Administrar",
     "Error" : "Error",
     "Download" : "Descargar",
     "Search" : "Buscar",
@@ -66,6 +66,7 @@
     "Content" : "Contenido",
     "This month" : "Este mes",
     "This week" : "Esta semana",
+    "Now" : "Ahora",
     "ID" : "ID",
     "seconds ago" : "hace segundos"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"

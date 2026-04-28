@@ -10,7 +10,17 @@
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
 		</th>
-		<th v-for="col in visibleColumns" :key="col.id" :style="getColumnWidthStyle(col)">
+		<th v-for="(col, index) in visibleColumns"
+			:key="col.id"
+			:data-col-id="col.id"
+			:style="{
+				...getColumnWidthStyle(col),
+				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns, columnWidths),
+			}"
+			:class="{
+				'frozen-column': index <= pinnedColumnIndex,
+				'frozen-column--last': index === pinnedColumnIndex,
+			}">
 			<div class="cell-wrapper">
 				<div class="cell-options-wrapper">
 					<div class="cell">
@@ -22,10 +32,12 @@
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
 							:config="config"
 							:view-setting.sync="localViewSetting"
+							:pinned-column-id="pinnedColumnId"
 							@edit-column="col => $emit('edit-column', col)"
-							@delete-column="col => $emit('delete-column', col)" />
+							@delete-column="col => $emit('delete-column', col)"
+							@pin-column="id => $emit('pin-column', id)" />
 					</div>
-					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
+					<div v-if="getFilterForColumn(col).length > 0" class="filter-wrapper">
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
 							:id="filter.columnId + filter.operator.id+ filter.value"
 							:key="filter.columnId + filter.operator.id+ filter.value"
@@ -47,8 +59,8 @@
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
-import { getFilterWithId } from '../mixins/filter.js'
-import { getColumnWidthStyle } from '../mixins/columnHandler.js'
+import { getFilterWithId, getFiltersForColumn } from '../mixins/filter.js'
+import { getColumnWidthStyle, getFrozenColumnStyle } from '../mixins/columnHandler.js'
 
 export default {
 
@@ -79,6 +91,14 @@ export default {
 			type: Object,
 			default: null,
 		},
+		pinnedColumnId: {
+			type: Number,
+			default: null,
+		},
+		columnWidths: {
+			type: Object,
+			default: null,
+		},
 	},
 
 	data() {
@@ -99,6 +119,10 @@ export default {
 		visibleColumns() {
 			return this.columns.filter(col => !this.localViewSetting?.hiddenColumns?.includes(col.id))
 		},
+		pinnedColumnIndex() {
+			if (this.pinnedColumnId === null) return -1
+			return this.visibleColumns.findIndex(col => col.id === this.pinnedColumnId)
+		},
 	},
 	watch: {
 		localViewSetting() {
@@ -112,12 +136,13 @@ export default {
 	methods: {
 		getFilterWithId,
 		getColumnWidthStyle,
+		getFrozenColumnStyle,
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
 		},
 		getFilterForColumn(column) {
-			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
+			return getFiltersForColumn(column, this.localViewSetting)
 		},
 		hasRightHiddenNeighbor(colId) {
 			return this.localViewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
