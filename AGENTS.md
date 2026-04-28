@@ -56,8 +56,8 @@ vendor/bin/phpunit --bootstrap tests/unit/bootstrap.php tests/unit/path/to/TestF
 
 ### Code Generation
 ```bash
-composer run openapi         # Regenerate openapi.json and TS types from PHP annotations
-npm run typescript:generate  # Regenerate TS types from openapi.json only
+composer openapi            # Regenerate openapi.json and TS types from PHP annotations
+npm run typescript:generate # Regenerate TS types from openapi.json only
 ```
 
 ## Architecture
@@ -92,7 +92,7 @@ Supports PostgreSQL, MySQL, and SQLite. The unusual design detail is that row ce
 
 ### API
 
-`openapi.json` (auto-generated) is the source of truth for the REST API contract. The TypeScript types in `src/types/` are derived from it — always regenerate both together with `composer run openapi` when changing API shapes. Never edit `openapi.json` or `src/types/openapi/openapi.ts` by hand; they are generated artifacts.
+`openapi.json` (auto-generated) is the source of truth for the REST API contract. The TypeScript types in `src/types/` are derived from it — always regenerate both together with `composer openapi` when changing API shapes. Never edit `openapi.json` or `src/types/openapi/openapi.ts` by hand; they are generated artifacts.
 
 ## Commits
 
@@ -127,9 +127,9 @@ Supports PostgreSQL, MySQL, and SQLite. The unusual design detail is that row ce
 - Do not use decorative section-divider comments of any kind (e.g. `// ── Title ───`, `// ------`, `// ======`).
 - Every new file must end with exactly one empty trailing line (no more, no less).
 - After writing or modifying any PHP code, run the following checks before considering the task complete:
-  1. `composer run cs:fix` — auto-correct coding-standard violations, then verify with `composer cs:check` that no issues remain.
-  2. `composer run psalm` — static analysis; fix every reported type error or logical issue (no suppressions).
-  3. `composer run lint` — PHP syntax check across all source files.
+  1. `composer cs:fix` — auto-correct coding-standard violations, then verify with `composer cs:check` that no issues remain.
+  2. `composer psalm` — static analysis; fix every reported type error or logical issue (no suppressions).
+  3. `composer lint` — PHP syntax check across all source files.
 - After writing or modifying any frontend code (Vue, JS, TS, CSS/SCSS), run `npm run dev` to verify the frontend compiles without errors before considering the task complete.
 
 ### Clean code
@@ -162,7 +162,7 @@ Every new OCS endpoint that mutates data must carry:
 
 Every controller method must return `->jsonSerialize()` directly. Do not add a separate GET round-trip after a create/update/delete — the response body is the authoritative post-mutation state.
 
-After any of the following changes, run `composer run openapi` to regenerate `openapi.json` and the TypeScript types in `src/types/openapi/openapi.ts`. CI fails if either file is stale.
+After any of the following changes, run `composer openapi` to regenerate `openapi.json` and the TypeScript types in `src/types/openapi/openapi.ts`. CI fails if either file is stale.
 
 Triggers that require regeneration:
 - Adding, removing, or renaming a controller route
