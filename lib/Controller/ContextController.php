@@ -8,11 +8,13 @@ declare(strict_types=1);
 namespace OCA\Tables\Controller;
 
 use InvalidArgumentException;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ContextService;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -254,16 +256,20 @@ class ContextController extends AOCSController {
 	 * Non-owners archive only for themselves.
 	 *
 	 * @param int $contextId ID of the context
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Context returned with updated archived state
+	 * 403: No permissions
 	 * 404: Context not found or not available
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_CONTEXT, idParam: 'contextId')]
 	public function archiveContext(int $contextId): DataResponse {
 		try {
 			return new DataResponse($this->contextService->archiveContext($contextId, $this->userId)->jsonSerialize());
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (InternalError|Exception $e) {
@@ -278,16 +284,20 @@ class ContextController extends AOCSController {
 	 * Non-owners remove only their personal archive override.
 	 *
 	 * @param int $contextId ID of the context
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Context returned with updated archived state
+	 * 403: No permissions
 	 * 404: Context not found or not available
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_CONTEXT, idParam: 'contextId')]
 	public function unarchiveContext(int $contextId): DataResponse {
 		try {
 			return new DataResponse($this->contextService->unarchiveContext($contextId, $this->userId)->jsonSerialize());
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (InternalError|Exception $e) {
