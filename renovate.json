@@ -8,13 +8,13 @@
   "minimumReleaseAge": "7 days",
   "rebaseWhen": "conflicted",
   "ignoreUnstable": false,
-  "baseBranches": ["main", "stable1.0", "stable0.9"],
+  "baseBranches": ["main", "stable1.0"],
   "enabledManagers": ["npm", "composer", "github-actions"],
   "ignoreDeps": ["node", "npm"],
   "packageRules": [
     {
       "matchUpdateTypes": ["major", "minor"],
-      "matchBaseBranches": ["/^stable0\\.[3-8]$/"],
+      "matchBaseBranches": ["/^stable0\\.[3-9]$/"],
       "enabled": false
     },
     {
