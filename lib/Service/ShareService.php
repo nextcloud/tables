@@ -41,6 +41,7 @@ use OCP\DB\Exception;
 use OCP\IDBConnection;
 use OCP\IGroup;
 use OCP\IUserManager;
+use OCP\Share\IManager as IShareManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
 use Psr\Log\LoggerInterface;
@@ -67,6 +68,7 @@ class ShareService extends SuperService {
 		private readonly ISecureRandom $secureRandom,
 		private readonly IUserManager $userManager,
 		private readonly IHasher $hasher,
+		private readonly IShareManager $shareManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -148,8 +150,18 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
+	 * @throws PermissionError
 	 */
 	public function createLinkShare(Table|View $node, ?string $password = null): Share {
+		// check admin sharing policy for this user (allowed/excluded sharing groups)
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
+		}
+		// check global admin setting for public link sharing
+		if (!$this->shareManager->shareApiAllowLinks()) {
+			throw new PermissionError('Public link sharing is disabled by your administrator.');
+		}
+
 		for ($i = 0; $i < 3; $i++) {
 			// there is the theoretical chance, that an existing share token would be re-used,
 			// so we take up to three attempts to try to generate it.
@@ -434,6 +446,12 @@ class ShareService extends SuperService {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		// check global sharing of group restrictions for link share operations
+		if ($item->getReceiverType() === ShareReceiverType::LINK
+			&& $this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 
 		// security

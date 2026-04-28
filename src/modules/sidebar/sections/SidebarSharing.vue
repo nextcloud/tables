@@ -4,11 +4,15 @@
 -->
 <template>
 	<div v-if="activeElement" class="sharing">
-		<div v-if="canShareElement(activeElement)">
-			<ShareInternalLink :current-url="currentUrl" :is-view="isView" />
+		<div>
+			<ShareInternalLink
+				v-if="sharePolicy.canShare"
+				:current-url="currentUrl"
+				:is-view="isView" />
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 			<SharingLinkList
+				v-if="sharePolicy.canShare"
 				:shares="linkShares"
 				@create-link-share="onCreateLinkShare"
 				@delete-share="removeShare"
@@ -42,6 +46,10 @@ export default {
 	data() {
 		return {
 			loading: false,
+			sharePolicy: {
+				loaded: false,
+				canShare: true,
+			},
 
 			// shared with
 			shares: [],
@@ -67,20 +75,29 @@ export default {
 	watch: {
 		activeElement() {
 			if (this.activeElement) {
-				this.loadSharesFromBE()
+				this.loadPolicyAndShares()
 			}
 		},
 	},
 
 	mounted() {
 		if (this.activeElement) {
-			this.loadSharesFromBE()
+			this.loadPolicyAndShares()
 		}
 	},
 
 	methods: {
 		...mapActions(useTablesStore, ['setTableHasShares', 'setViewHasShares']),
 		getCurrentUser,
+		async loadPolicyAndShares() {
+			if (!this.activeElement) {
+				return
+			}
+			this.sharePolicy.loaded = false
+			const policy = await this.getSharePolicyFromBE()
+			this.sharePolicy = { loaded: true, ...policy }
+			await this.loadSharesFromBE()
+		},
 		async loadSharesFromBE() {
 			this.loading = true
 			const allShares = await this.getSharedWithFromBE()

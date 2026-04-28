@@ -100,6 +100,8 @@ class ShareOCSController extends AOCSController {
 
 		try {
 			$share = $this->shareService->createLinkShare($node, $password);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {
 			return $this->handleError($e);
 		}

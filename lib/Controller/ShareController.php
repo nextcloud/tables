@@ -14,12 +14,15 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use OCP\Share\IManager as ShareManager;
 use Psr\Log\LoggerInterface;
 
 class ShareController extends Controller {
 	private ShareService $service;
 
 	private string $userId;
+
+	private ShareManager $shareManager;
 
 	protected LoggerInterface $logger;
 
@@ -30,11 +33,20 @@ class ShareController extends Controller {
 		IRequest $request,
 		LoggerInterface $logger,
 		ShareService $service,
+		ShareManager $shareManager,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->logger = $logger;
 		$this->service = $service;
+		$this->shareManager = $shareManager;
 		$this->userId = $userId;
+	}
+
+	#[NoAdminRequired]
+	public function sharePolicy(): DataResponse {
+		return new DataResponse([
+			'canShare' => !$this->shareManager->sharingDisabledForUser($this->userId),
+		]);
 	}
 
 
