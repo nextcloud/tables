@@ -72,14 +72,15 @@ class UserArchiveMapper extends QBMapper {
 		}
 
 		$results = [];
-		foreach (array_chunk($nodeIds, 997) as $chunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('*')
-				->from($this->table)
-				->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
-				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)))
-				->andWhere($qb->expr()->in('node_id', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)));
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->in('node_id', $qb->createParameter('chunk')));
 
+		foreach (array_chunk($nodeIds, 997) as $chunk) {
+			$qb->setParameter('chunk', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			foreach ($this->findEntities($qb) as $entity) {
 				$results[$entity->getNodeId()] = $entity;
 			}
