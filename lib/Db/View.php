@@ -25,6 +25,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setId(int $id)
  * @method getTitle(): string
  * @method setTitle(string $title)
+ * @method getTechnicalName(): string
+ * @method setTechnicalName(?string $technicalName)
  * @method getTableId(): int
  * @method setTableId(int $tableId)
  * @method getColumns(): string
@@ -64,6 +66,7 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  */
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $title = null;
+	protected ?string $technicalName = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
 	protected ?string $createdAt = null;
@@ -183,6 +186,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'id' => $this->id,
 			'tableId' => ($this->tableId || $this->tableId === 0) ? $this->tableId : -1,
 			'title' => $this->title ?: '',
+			'technicalName' => $this->technicalName,
 			'description' => $this->description,
 			'emoji' => $this->emoji,
 			'ownership' => $this->ownership ?: '',
