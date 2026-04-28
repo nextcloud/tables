@@ -89,7 +89,7 @@
 		</div>
 	</NcDialog>
 
-	<NcDialog v-else
+	<NcDialog v-else-if="importResults && !importResults.async"
 		:name="t('tables', 'Import successful')"
 		:open.sync="showResultsDialog"
 		size="small">
@@ -99,7 +99,7 @@
 			</NcButton>
 		</template>
 
-		<ImportResults :results="importResults" />
+		<ImportResults :results="importResults.result" />
 	</NcDialog>
 </template>
 
@@ -115,7 +115,7 @@ import {
 
 import { generateUrl } from '@nextcloud/router'
 import { Node } from '@nextcloud/files'
-import { showError } from '@nextcloud/dialogs'
+import { showError, showInfo } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { translate as t } from '@nextcloud/l10n'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
@@ -156,7 +156,6 @@ export default {
 			},
 			existingTables: [],
 			selectedTable: null,
-
 			importResults: null,
 			showResultsDialog: true,
 		}
@@ -210,6 +209,8 @@ export default {
 
 				if (!this.importResults) {
 					showError(t('tables', 'Could not create table'))
+				} else if (this.importResults.async) {
+					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
 				}
 			} else {
 				if (!this.selectedTable) {
@@ -221,6 +222,8 @@ export default {
 
 				if (!this.importResults) {
 					showError(t('tables', 'Could not import data to table'))
+				} else if (this.importResults.async) {
+					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
 				}
 			}
 
@@ -257,7 +260,7 @@ async function insertTable(title, emoji) {
 }
 
 async function updateTable(tableId, path, createMissingColumns) {
-	const res = await axios.post(generateUrl(`/apps/tables/import/table/${tableId}`), {
+	const res = await axios.post(generateUrl(`/apps/tables/v2/import/table/${tableId}`), {
 		path,
 		createMissingColumns,
 	})
