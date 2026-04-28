@@ -15,6 +15,7 @@ namespace OCA\Tables\Db;
  * @method getNodeId(): int
  * @method setNodeId(int $value): void
  * @method setArchived(bool $value): void
+ * @method isArchived(): bool
  */
 class UserArchive extends EntitySuper {
 	protected ?string $userId = null;
@@ -27,9 +28,5 @@ class UserArchive extends EntitySuper {
 		$this->addType('node_type', 'integer');
 		$this->addType('node_id', 'integer');
 		$this->addType('archived', 'boolean');
-	}
-
-	public function isArchived(): bool {
-		return $this->archived;
 	}
 }
