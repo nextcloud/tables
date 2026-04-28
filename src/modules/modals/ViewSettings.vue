@@ -198,14 +198,25 @@ export default {
 			},
 		},
 		cardSourceOptions() {
-			return this.columns?.map(column => ({
+			if (!this.columns) return []
+			// Only show columns that are selected/accessible in the current view
+			const cols = this.selectedColumns
+				? this.columns.filter(column => this.selectedColumns.includes(column.id))
+				: this.columns
+			return cols.map(column => ({
 				id: column.id,
 				title: column.title,
-			})) ?? []
+			}))
 		},
 		backgroundSourceValue: {
 			get() {
-				return this.mutableView?.cardBackgroundSource ?? this.columns?.[0]?.id ?? null
+				const stored = this.mutableView?.cardBackgroundSource
+				// Use stored value only if the column still exists in the accessible options
+				if (stored !== null && stored !== undefined) {
+					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
+					if (exists) return stored
+				}
+				return this.cardSourceOptions[0]?.id ?? null
 			},
 			set(value) {
 				this.$set(this.mutableView, 'cardBackgroundSource', value ?? null)
@@ -213,7 +224,14 @@ export default {
 		},
 		titleSourceValue: {
 			get() {
-				return this.mutableView?.cardTitleSource ?? this.columns?.[1]?.id ?? this.columns?.[0]?.id ?? null
+				const stored = this.mutableView?.cardTitleSource
+				// Use stored value only if the column still exists in the accessible options
+				if (stored !== null && stored !== undefined) {
+					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
+					if (exists) return stored
+				}
+				// Fallback: second option if available, otherwise first
+				return this.cardSourceOptions[1]?.id ?? this.cardSourceOptions[0]?.id ?? null
 			},
 			set(value) {
 				this.$set(this.mutableView, 'cardTitleSource', value ?? null)

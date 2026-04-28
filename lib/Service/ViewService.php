@@ -260,6 +260,8 @@ class ViewService extends SuperService {
 				$view->$setterMethod($insertableValue);
 			}
 
+			$this->assertCardSourceColumnsAreValid($view);
+
 			$time = new DateTime();
 			$view->setLastEditBy($userId);
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
@@ -291,6 +293,27 @@ class ViewService extends SuperService {
 			) {
 				throw new InvalidArgumentException('Invalid column ID provided: ' . $columnInfo->getId());
 			}
+		}
+	}
+
+	/**
+	 * Ensures that cardBackgroundSource and cardTitleSource reference columns that are part of the view.
+	 * @throws InvalidArgumentException
+	 */
+	protected function assertCardSourceColumnsAreValid(View $view): void {
+		$viewColumnIds = $view->getColumnIds();
+		if (empty($viewColumnIds)) {
+			return;
+		}
+
+		$backgroundSource = $view->getCardBackgroundSource();
+		if ($backgroundSource !== null && !in_array($backgroundSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardBackgroundSource column ID: ' . $backgroundSource);
+		}
+
+		$titleSource = $view->getCardTitleSource();
+		if ($titleSource !== null && !in_array($titleSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardTitleSource column ID: ' . $titleSource);
 		}
 	}
 
