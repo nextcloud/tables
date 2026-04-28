@@ -68,6 +68,7 @@ OC.L10N.register(
     "Content" : "Contenido",
     "This month" : "Este mes",
     "This week" : "Esta semana",
+    "Now" : "Ahora",
     "ID" : "ID",
     "seconds ago" : "hace segundos"
 },
