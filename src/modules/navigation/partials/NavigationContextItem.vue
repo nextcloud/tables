@@ -42,13 +42,6 @@
 				</template>
 				{{ t('tables', 'Transfer application') }}
 			</NcActionButton>
-			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn"
-				@click="deleteContext">
-				<template #icon>
-					<DeleteOutline :size="20" />
-				</template>
-				{{ t('tables', 'Delete application') }}
-			</NcActionButton>
 			<!-- ARCHIVE -->
 			<NcActionButton v-if="!context.archived" :close-after-click="true" @click="toggleArchiveContext(true)">
 				<template #icon>
@@ -63,6 +56,14 @@
 					<ArchiveArrowUpOutline :size="20" />
 				</template>
 				{{ t('tables', 'Unarchive application') }}
+			</NcActionButton>
+
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn"
+				@click="deleteContext">
+				<template #icon>
+					<DeleteOutline :size="20" />
+				</template>
+				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
 
 			<NcActionCheckbox :model-value="showInNavigation" data-cy="navigationContextShowInNavSwitch" @change="changeDisplayMode">
