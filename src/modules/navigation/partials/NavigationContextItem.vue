@@ -38,7 +38,7 @@
 			<!-- ARCHIVE -->
 			<NcActionButton v-if="!context.archived" :close-after-click="true" @click="toggleArchiveContext(true)">
 				<template #icon>
-					<ArchiveArrowDown :size="20" />
+					<ArchiveArrowDownOutline :size="20" />
 				</template>
 				{{ t('tables', 'Archive application') }}
 			</NcActionButton>
@@ -66,7 +66,7 @@ import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import FileSwapOutline from 'vue-material-design-icons/FileSwapOutline.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
-import ArchiveArrowDown from 'vue-material-design-icons/ArchiveArrowDown.vue'
+import ArchiveArrowDownOutline from 'vue-material-design-icons/ArchiveArrowDownOutline.vue'
 import ArchiveArrowUpOutline from 'vue-material-design-icons/ArchiveArrowUpOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
@@ -82,7 +82,7 @@ export default {
 		FileSwapOutline,
 		TableIcon,
 		DeleteOutline,
-		ArchiveArrowDown,
+		ArchiveArrowDownOutline,
 		ArchiveArrowUpOutline,
 		NcIconSvgWrapper,
 		NcAppNavigationItem,
