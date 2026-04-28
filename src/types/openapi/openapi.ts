@@ -7984,6 +7984,22 @@ export interface operations {
                     };
                 };
             };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             /** @description Context not found or not available */
             readonly 404: {
                 headers: {
@@ -8056,6 +8072,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };
