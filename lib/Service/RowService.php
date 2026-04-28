@@ -131,7 +131,7 @@ class RowService extends SuperService {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
 
-				return $this->row2Mapper->findAll(
+				$rows = $this->row2Mapper->findAll(
 					$view->getColumnIds(),
 					$view->getTableId(),
 					$limit,
@@ -141,6 +141,9 @@ class RowService extends SuperService {
 					$this->resolveFilterUserId($userId, $view),
 				);
 
+				$viewColumns = $this->columnMapper->findAll($view->getColumnIds());
+				$this->attachAliasPayloads($rows, $viewColumns);
+				return $rows;
 			} else {
 				throw new PermissionError('no read access to view id = ' . $viewId);
 			}

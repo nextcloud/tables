@@ -28,6 +28,8 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setUuid(?string $uuid)
  * @method getTitle(): string
  * @method setTitle(string $title)
+ * @method getTechnicalName(): string
+ * @method setTechnicalName(?string $technicalName)
  * @method getTableId(): int
  * @method setTableId(int $tableId)
  * @method getColumns(): string
@@ -68,6 +70,7 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $uuid = null;
 	protected ?string $title = null;
+	protected ?string $technicalName = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
 	protected ?string $createdAt = null;
@@ -213,6 +216,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'uuid' => $this->uuid,
 			'tableId' => ($this->tableId || $this->tableId === 0) ? $this->tableId : -1,
 			'title' => $this->title ?: '',
+			'technicalName' => $this->technicalName,
 			'description' => $this->description,
 			'emoji' => $this->emoji,
 			'ownership' => $this->ownership ?: '',
