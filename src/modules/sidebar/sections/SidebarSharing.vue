@@ -5,9 +5,20 @@
 <template>
 	<div v-if="activeElement" class="sharing">
 		<div v-if="canShareElement(activeElement)">
-			<ShareInternalLink :current-url="currentUrl" :is-view="isView" />
-			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
-			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
+			<ShareInternalLink
+				v-if="sharePolicy.loaded && sharePolicy.canShare"
+				:current-url="currentUrl"
+				:is-view="isView" />
+			<ShareForm
+				v-if="sharePolicy.loaded && sharePolicy.canShare"
+				:shares="shares"
+				@add="addShare"
+				@update="updateShare" />
+			<ShareList
+				:shares="shares"
+				:can-share="sharePolicy.loaded && sharePolicy.canShare"
+				@remove="removeShare"
+				@update="updateShare" />
 		</div>
 	</div>
 </template>
@@ -34,8 +45,11 @@ export default {
 	data() {
 		return {
 			loading: false,
-
-			// shared with
+			sharePolicy: {
+				loaded: false,
+				canShare: false,
+				canShareLink: false,
+			},
 			shares: [],
 		}
 	},
@@ -58,25 +72,37 @@ export default {
 	watch: {
 		activeElement() {
 			if (this.activeElement) {
-				this.loadSharesFromBE()
+				this.loadPolicyAndShares()
 			}
 		},
 	},
 
 	mounted() {
 		if (this.activeElement) {
-			this.loadSharesFromBE()
+			this.loadPolicyAndShares()
 		}
 	},
 
 	methods: {
 		...mapActions(useTablesStore, ['setTableHasShares', 'setViewHasShares']),
 		getCurrentUser,
+
+		async loadPolicyAndShares() {
+			if (!this.activeElement) {
+				return
+			}
+			this.sharePolicy.loaded = false
+			const policy = await this.getSharePolicyFromBE()
+			this.sharePolicy = { loaded: true, ...policy }
+			await this.loadSharesFromBE()
+		},
+
 		async loadSharesFromBE() {
 			this.loading = true
 			this.shares = await this.getSharedWithFromBE()
 			this.loading = false
 		},
+
 		async removeShare(share) {
 			await this.removeShareFromBE(share.id)
 			await this.loadSharesFromBE()
@@ -91,6 +117,7 @@ export default {
 				}
 			}
 		},
+
 		async addShare(share) {
 			if (!this.sharePolicy.canShare) {
 				return
@@ -98,6 +125,7 @@ export default {
 			await this.sendNewShareToBE(share)
 			await this.loadSharesFromBE()
 		},
+
 		async updateShare(data) {
 			const shareId = data.id
 			delete data.id

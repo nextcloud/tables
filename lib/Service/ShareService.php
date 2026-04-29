@@ -35,6 +35,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\Share\IManager;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -60,6 +61,8 @@ class ShareService extends SuperService {
 
 	private IDBConnection $dbc;
 
+	private IManager $shareManager;
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
@@ -72,6 +75,7 @@ class ShareService extends SuperService {
 		CircleHelper $circleHelper,
 		ContextNavigationMapper $contextNavigationMapper,
 		IDBConnection $dbc,
+		IManager $shareManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
@@ -82,6 +86,7 @@ class ShareService extends SuperService {
 		$this->circleHelper = $circleHelper;
 		$this->contextNavigationMapper = $contextNavigationMapper;
 		$this->dbc = $dbc;
+		$this->shareManager = $shareManager;
 	}
 
 
@@ -246,6 +251,12 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		if ($receiverType === ShareReceiverType::GROUP && !$this->shareManager->allowGroupSharing()) {
+			throw new PermissionError('Group sharing is disabled by your administrator.');
+		}
+		$this->enforceGroupMembersOnlyPolicy($this->userId, $receiverType, $receiver);
+
 		$time = new DateTime();
 		$item = new Share();
 		$item->setSender($this->userId);
@@ -424,6 +435,10 @@ class ShareService extends SuperService {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 
 		// security
