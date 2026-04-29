@@ -285,6 +285,33 @@ class ShareService extends SuperService {
 		return $this->addReceiverDisplayName($newShare);
 	}
 
+	private function enforceGroupMembersOnlyPolicy(string $sender, string $receiverType, string $receiver): void {
+		if (!$this->shareManager->shareWithGroupMembersOnly()) {
+			return;
+		}
+
+		$senderGroupIds = $this->userHelper->getGroupIdsForUser($sender) ?? [];
+		$excludedGroups = $this->shareManager->shareWithGroupMembersOnlyExcludeGroupsList();
+		if (count(array_intersect($senderGroupIds, $excludedGroups)) > 0) {
+			return;
+		}
+
+		if ($receiverType === ShareReceiverType::USER) {
+			$receiverGroupIds = $this->userHelper->getGroupIdsForUser($receiver) ?? [];
+			if (count(array_intersect($senderGroupIds, $receiverGroupIds)) === 0) {
+				throw new PermissionError('Sharing is restricted to members of your groups by your administrator.');
+			}
+			return;
+		}
+
+		if ($receiverType === ShareReceiverType::GROUP) {
+			$userIdsInGroup = $this->groupHelper->getUserIdsInGroup($receiver);
+			if (!in_array($sender, $userIdsInGroup, true)) {
+				throw new PermissionError('Sharing is restricted to members of your groups by your administrator.');
+			}
+		}
+	}
+
 	/**
 	 * @param int $id
 	 * @param string $permission
