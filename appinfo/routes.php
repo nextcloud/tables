@@ -51,6 +51,9 @@ return [
 		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],
 		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
+		// -> relations
+		['name' => 'api1#indexTableRelations', 'url' => '/api/1/tables/{tableId}/relations', 'verb' => 'GET'],
+		['name' => 'api1#indexViewRelations', 'url' => '/api/1/views/{viewId}/relations', 'verb' => 'GET'],
 		// -> rows
 		['name' => 'api1#indexTableRowsSimple',	'url' => '/api/1/tables/{tableId}/rows/simple', 'verb' => 'GET'],
 		['name' => 'api1#indexTableRows',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'GET'],
