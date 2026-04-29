@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { test as base } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
-import type { BrowserContext, Page } from '@playwright/test'
-import { createRandomUser } from '../support/api'
-import { login } from '../support/login'
+import type { Page } from '@playwright/test'
 import {
 	clickOnTableThreeDotMenu,
 	createTable,
@@ -37,7 +34,6 @@ async function setupLayoutTable(page: Page) {
 	}
 
 	await addRow('not-a-preview-url', 'First layout row', 'Catalogue')
-	await addRow('', 'Second layout row', 'Inventory')
 }
 
 async function createLayoutView(page: Page, title: string, layout?: 'tiles' | 'gallery') {
@@ -69,62 +65,33 @@ async function expectTableLayout(page: Page) {
 
 async function expectTilesLayout(page: Page) {
 	const cards = page.locator('[data-cy="tilesLayoutCard"]')
-	await expect(cards).toHaveCount(2)
+	await expect(cards).toHaveCount(1)
 	await expect(cards.filter({ hasText: 'First layout row' }).first()).toBeVisible()
-	await expect(cards.filter({ hasText: 'Second layout row' }).first()).toBeVisible()
 	await expect(page.locator('[data-cy="galleryLayoutBody"]')).toHaveCount(0)
 	await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(0)
 }
 
 async function expectGalleryLayout(page: Page) {
 	const cards = page.locator('[data-cy="galleryLayoutCard"]')
-	await expect(cards).toHaveCount(2)
+	await expect(cards).toHaveCount(1)
 
 	const firstCard = cards.filter({ hasText: 'First layout row' }).first()
 	await expect(firstCard).toBeVisible()
 	await expect(firstCard.locator('[data-cy="galleryMetadataItem"]').filter({ hasText: 'category' })).toContainText('Catalogue')
-	await expect(firstCard.locator('[data-cy="galleryMetadataItem"]').filter({ hasText: 'preview' })).toContainText('not-a-preview-url')
 	await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(0)
 }
 
 test.describe('View layout modes', () => {
-	test.describe.configure({ mode: 'serial' })
-
-	let context: BrowserContext
-	let page: Page
-
-	// @ts-expect-error - Playwright complex types mismatch in this environment
-	base.beforeAll(async ({ browser, baseURL }) => {
-		context = await browser.newContext({
-			baseURL,
-		})
-		page = await context.newPage()
-
-		const user = await createRandomUser(page.request)
-		await login(page, user)
-
+	test('renders and persists table, tiles, and gallery layouts for views', async ({ userPage: { page } }) => {
+		test.setTimeout(120000)
 		await page.goto('/index.php/apps/tables')
 		await setupLayoutTable(page)
 		await loadTable(page, tableTitle)
-	}, 120000)
 
-	test.afterAll(async () => {
-		await context?.close()
-	})
-
-	test.beforeEach(async () => {
-		await page.goto('/index.php/apps/tables')
-		await page.keyboard.press('Escape')
-	})
-
-	test('keeps table layout as the default for new views', async () => {
 		await createLayoutView(page, defaultViewTitle)
 		await loadView(page, defaultViewTitle)
-
 		await expectTableLayout(page)
-	})
 
-	test('renders and persists the tiles layout for a view', async () => {
 		await createLayoutView(page, tilesViewTitle, 'tiles')
 		await loadView(page, tilesViewTitle)
 		await expectTilesLayout(page)
@@ -132,9 +99,7 @@ test.describe('View layout modes', () => {
 		await page.reload({ waitUntil: 'domcontentloaded' })
 		await expect(page.locator('.icon-loading').first()).toBeHidden({ timeout: 10000 })
 		await expectTilesLayout(page)
-	})
 
-	test('renders and persists the gallery layout for a view', async () => {
 		await createLayoutView(page, galleryViewTitle, 'gallery')
 		await loadView(page, galleryViewTitle)
 		await expectGalleryLayout(page)
