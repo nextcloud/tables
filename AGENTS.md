@@ -153,12 +153,48 @@ Never add `@psalm-suppress` annotations to work around a type error. A suppressi
 
 ## Architecture Patterns
 
+### Icons (Vue frontend)
+
+Always use the **outline variant** of a `vue-material-design-icons` icon. Import from e.g. `ArchiveArrowDownOutline.vue`, never the filled variant (`ArchiveArrowDown.vue`). This keeps the icon style consistent across the app.
+
+### Boolean getters on Nextcloud DB entities
+
+Do not implement an explicit `isXxx(): bool` method on a class that extends `Entity` (or `EntitySuper`). The base class handles `isXxx` calls via `__call` magic for any `protected bool $xxx` property. Instead, declare the method in the class-level `@method` docblock so that static analysis and IDE completion still work:
+
+```php
+ * @method isArchived(): bool
+```
+
+### Database queries inside loops
+
+Never build a `IQueryBuilder` query inside a loop. Construct the query once before the loop using `$qb->createParameter('name')` as a placeholder for the value that changes per iteration. Inside the loop call `$qb->setParameter('name', $value, IQueryBuilder::PARAM_*)` to bind the new value. This avoids re-parsing and re-compiling the query on every iteration.
+
+```php
+$qb = $this->db->getQueryBuilder();
+$qb->select('*')->from($this->table)
+    ->where($qb->expr()->in('node_id', $qb->createParameter('chunk')));
+
+foreach (array_chunk($ids, 997) as $chunk) {
+    $qb->setParameter('chunk', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+    // ...
+}
+```
+
+### Unit tests for services with injected dependencies
+
+When a service constructor gains a new dependency, add a corresponding `$this->createMock(NewDependency::class)` in every `setUp()` method that instantiates that service, and pass the mock as the matching constructor argument. Failing to do so causes `ArgumentCountError` at test runtime.
+
 ### New REST endpoints
 
-Every new OCS endpoint that mutates data must carry:
+Every new OCS endpoint must carry:
 - `#[NoAdminRequired]`
-- `#[RequirePermission(Application::PERMISSION_MANAGE)]` (or the appropriate permission constant)
+- `#[RequirePermission(...)]` on **every** method that accesses a resource by ID — not just mutation endpoints. Without it, access is only implicitly enforced by the mapper's SQL filter, which is correct but non-obvious and inconsistent. Use `PERMISSION_READ` for read-only or soft-state operations (e.g. archive/unarchive); use `PERMISSION_MANAGE` for mutations.
 - `#[UserRateLimit(limit: 20, period: 60)]` for mutation endpoints (see `ImportController` for the pattern)
+
+When adding or auditing a `#[RequirePermission]` attribute, also verify the method body and docblock are consistent:
+- a `PermissionError` catch block returning `$this->handlePermissionError($e)`
+- `Http::STATUS_FORBIDDEN` in the `@return` docblock union type
+- a `403: No permissions` OpenAPI annotation line
 
 Every controller method must return `->jsonSerialize()` directly. Do not add a separate GET round-trip after a create/update/delete — the response body is the authoritative post-mutation state.
 
