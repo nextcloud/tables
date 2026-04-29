@@ -24,6 +24,19 @@ export default {
 
 	methods: {
 		...mapActions('tables', ['setTableHasShares', 'setViewHasShares']),
+		async getSharePolicyFromBE() {
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/share/policy'))
+				return {
+					canShare: !!res.data?.canShare,
+					canShareLink: !!res.data?.canShareLink,
+				}
+			} catch (e) {
+				// if we cannot fetch the policy, do not show sharing UI.
+				console.error('Error fetching share policy:', e)
+				return { canShare: false, canShareLink: false }
+			}
+		},
 		async getSharedWithFromBE() {
 			try {
 				let res

@@ -43,6 +43,7 @@ use OCP\IGroup;
 use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
+use OCP\Share\IManager as IShareManager;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -67,6 +68,7 @@ class ShareService extends SuperService {
 		private readonly ISecureRandom $secureRandom,
 		private readonly IUserManager $userManager,
 		private readonly IHasher $hasher,
+		private readonly IShareManager $shareManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -148,8 +150,18 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
+	 * @throws PermissionError
 	 */
 	public function createLinkShare(Table|View $node, ?string $password = null): Share {
+		// check admin sharing policy for this user (allowed/excluded sharing groups)
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
+		}
+		// check global admin setting for public link sharing
+		if (!$this->shareManager->shareApiAllowLinks()) {
+			throw new PermissionError('Public link sharing is disabled by your administrator.');
+		}
+
 		for ($i = 0; $i < 3; $i++) {
 			// there is the theoretical chance, that an existing share token would be re-used,
 			// so we take up to three attempts to try to generate it.
@@ -278,6 +290,10 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+		if ($receiverType === ShareReceiverType::GROUP && !$this->shareManager->allowGroupSharing()) {
+			throw new PermissionError('Group sharing is disabled by your administrator.');
+		}
+		$this->enforceGroupMembersOnlyPolicy($sender, $receiverType, $receiver);
 
 		$time = new DateTime();
 		$item = new Share();
@@ -326,6 +342,33 @@ class ShareService extends SuperService {
 		return $this->addReceiverDisplayName($newShare);
 	}
 
+	private function enforceGroupMembersOnlyPolicy(string $sender, string $receiverType, string $receiver): void {
+		if (!$this->shareManager->shareWithGroupMembersOnly()) {
+			return;
+		}
+
+		$senderGroupIds = $this->userHelper->getGroupIdsForUser($sender) ?? [];
+		$excludedGroups = $this->shareManager->shareWithGroupMembersOnlyExcludeGroupsList();
+		if (count(array_intersect($senderGroupIds, $excludedGroups)) > 0) {
+			return;
+		}
+
+		if ($receiverType === ShareReceiverType::USER) {
+			$receiverGroupIds = $this->userHelper->getGroupIdsForUser($receiver) ?? [];
+			if (count(array_intersect($senderGroupIds, $receiverGroupIds)) === 0) {
+				throw new PermissionError('Sharing is restricted to members of your groups by your administrator.');
+			}
+			return;
+		}
+
+		if ($receiverType === ShareReceiverType::GROUP) {
+			$userIdsInGroup = $this->groupHelper->getUserIdsInGroup($receiver);
+			if (!in_array($sender, $userIdsInGroup, true)) {
+				throw new PermissionError('Sharing is restricted to members of your groups by your administrator.');
+			}
+		}
+	}
+
 	/**
 	 * @param int $id
 	 * @param string $permission
@@ -344,6 +387,10 @@ class ShareService extends SuperService {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 
 		// security
@@ -434,6 +481,10 @@ class ShareService extends SuperService {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 
 		// security

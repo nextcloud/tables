@@ -94,6 +94,7 @@ return [
 		// shares
 		['name' => 'share#index', 'url' => '/share/table/{tableId}', 'verb' => 'GET'],
 		['name' => 'share#indexView', 'url' => '/share/view/{viewId}', 'verb' => 'GET'],
+		['name' => 'share#sharePolicy', 'url' => '/share/policy', 'verb' => 'GET'],
 		['name' => 'share#show', 'url' => '/share/{id}', 'verb' => 'GET'],
 		['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
 		['name' => 'share#updatePermission', 'url' => '/share/{id}/permission', 'verb' => 'PUT'],
