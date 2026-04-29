@@ -51,13 +51,14 @@ import TableCellDateTime from './TableCellDateTime.vue'
 import TableCellTextLine from './TableCellTextLine.vue'
 import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
+import TableCellRelation from './TableCellRelation.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import TableCellUsergroup from './TableCellUsergroup.vue'
 import { ColumnTypes, getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
-} from '../../../../shared/constants.ts'
+} from '../../../constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
 
 export default {
@@ -76,6 +77,7 @@ export default {
 		TableCellTextLine,
 		TableCellSelection,
 		TableCellMultiSelection,
+		TableCellRelation,
 		TableCellTextRich,
 		TableCellUsergroup,
 	},
@@ -159,6 +161,7 @@ export default {
 			case ColumnTypes.Selection: return 'TableCellSelection'
 			case ColumnTypes.SelectionMulti: return 'TableCellMultiSelection'
 			case ColumnTypes.SelectionCheck: return 'TableCellYesNo'
+			case ColumnTypes.Relation: return 'TableCellRelation'
 			case ColumnTypes.Datetime: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'

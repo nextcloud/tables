@@ -2683,7 +2683,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -2943,7 +2943,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */

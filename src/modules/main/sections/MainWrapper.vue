@@ -100,7 +100,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE']),
+		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		...mapActions(useTablesStore, ['validateExportAccess']),
 		createColumn() {
 			emit('tables:column:create', { isView: this.isView, element: this.element })
@@ -155,6 +155,13 @@ export default {
 					view: this.isView ? this.element : null,
 					tableId: !this.isView ? this.element.id : null,
 				})
+
+				await this.loadRelationsFromBE({
+					viewId: this.isView ? this.element.id : null,
+					tableId: !this.isView ? this.element.id : null,
+					force: true,
+				})
+
 				if (this.canReadData(this.element)) {
 					await this.loadRowsFromBE({
 						viewId: this.isView ? this.element.id : null,
