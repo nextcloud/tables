@@ -6,13 +6,17 @@
 	<div v-if="activeElement" class="sharing">
 		<div>
 			<ShareInternalLink
-				v-if="sharePolicy.canShare"
+				v-if="sharePolicy.loaded && sharePolicy.canShare"
 				:current-url="currentUrl"
 				:is-view="isView" />
-			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
+			<ShareForm
+				v-if="sharePolicy.loaded && sharePolicy.canShare"
+				:shares="shares"
+				@add="addShare"
+				@update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 			<SharingLinkList
-				v-if="sharePolicy.canShare"
+				v-if="sharePolicy.loaded && sharePolicy.canShareLink"
 				:shares="linkShares"
 				@create-link-share="onCreateLinkShare"
 				@delete-share="removeShare"
@@ -48,7 +52,8 @@ export default {
 			loading: false,
 			sharePolicy: {
 				loaded: false,
-				canShare: true,
+				canShare: false,
+				canShareLink: false,
 			},
 
 			// shared with
@@ -131,6 +136,9 @@ export default {
 			}
 		},
 		async addShare(share) {
+			if (!this.sharePolicy.canShare) {
+				return
+			}
 			await this.sendNewShareToBE(share)
 			await this.loadSharesFromBE()
 		},
@@ -141,6 +149,9 @@ export default {
 			await this.loadSharesFromBE()
 		},
 		async onCreateLinkShare(password) {
+			if (!this.sharePolicy.canShareLink) {
+				return
+			}
 			const success = await this.createLinkShare(password)
 			if (success) {
 				await this.loadSharesFromBE()

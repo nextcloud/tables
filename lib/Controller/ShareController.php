@@ -44,8 +44,10 @@ class ShareController extends Controller {
 
 	#[NoAdminRequired]
 	public function sharePolicy(): DataResponse {
+		$canShare = !$this->shareManager->sharingDisabledForUser($this->userId);
 		return new DataResponse([
-			'canShare' => !$this->shareManager->sharingDisabledForUser($this->userId),
+			'canShare' => $canShare,
+			'canShareLink' => $canShare && $this->shareManager->shareApiAllowLinks(),
 		]);
 	}
 
