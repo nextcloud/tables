@@ -30,8 +30,7 @@ class ViewUpdateInput {
 		protected readonly ?FilterSet $filterSet = null,
 		protected readonly ?SortRuleSet $sortRuleSet = null,
 		protected readonly ?string $layout = null,
-		protected readonly ?int $cardBackgroundSource = null,
-		protected readonly ?int $cardTitleSource = null,
+		protected readonly ?ViewSettings $viewSettings = null,
 	) {
 	}
 
@@ -57,11 +56,8 @@ class ViewUpdateInput {
 		if ($this->layout !== null) {
 			yield ViewUpdatableParameters::LAYOUT => $this->layout;
 		}
-		if ($this->cardBackgroundSource !== null) {
-			yield ViewUpdatableParameters::CARD_BACKGROUND_SOURCE => $this->cardBackgroundSource;
-		}
-		if ($this->cardTitleSource !== null) {
-			yield ViewUpdatableParameters::CARD_TITLE_SOURCE => $this->cardTitleSource;
+		if ($this->viewSettings !== null) {
+			yield ViewUpdatableParameters::VIEW_SETTINGS => $this->viewSettings;
 		}
 	}
 
@@ -74,13 +70,12 @@ class ViewUpdateInput {
 	 *     columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
 	 *     layout?: 'table'|'tiles'|'gallery'|null,
-	 *     cardBackgroundSource?: int|null,
-	 *     cardTitleSource?: int|null,
+	 *     viewSettings?: array{cardBackgroundSource?: int|null, cardTitleSource?: int|null}|string,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 * } $data
 	 */
 	public static function fromInputArray(array $data): self {
-		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort']);
+		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort', 'viewSettings']);
 
 		if (isset($data['columns']) && !isset($data['columnSettings'])) {
 			$logger = Server::get(LoggerInterface::class);
@@ -96,6 +91,7 @@ class ViewUpdateInput {
 		}
 
 		$layout = self::normalizeLayout($data['layout'] ?? null);
+		$viewSettings = self::createViewSettingsFromInputData($data);
 
 		return new self(
 			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
@@ -105,11 +101,38 @@ class ViewUpdateInput {
 			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter']) : null,
 			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort']) : null,
 			layout: $layout,
-			cardBackgroundSource: array_key_exists('cardBackgroundSource', $data) && $data['cardBackgroundSource'] !== null ? (int)$data['cardBackgroundSource'] : null,
-			cardTitleSource: array_key_exists('cardTitleSource', $data) && $data['cardTitleSource'] !== null ? (int)$data['cardTitleSource'] : null,
+			viewSettings: $viewSettings,
 		);
 	}
 
+	private static function createViewSettingsFromInputData(array $data): ?ViewSettings {
+		if (array_key_exists('viewSettings', $data)) {
+			if ($data['viewSettings'] === null) {
+				return new ViewSettings();
+			}
+			if (!is_array($data['viewSettings'])) {
+				throw new \InvalidArgumentException('Invalid viewSettings value.');
+			}
+			return ViewSettings::createFromInputArray($data['viewSettings']);
+		}
+
+		$legacyKeys = ['cardBackgroundSource', 'cardTitleSource'];
+		$hasLegacySettings = false;
+		foreach ($legacyKeys as $legacyKey) {
+			if (array_key_exists($legacyKey, $data)) {
+				$hasLegacySettings = true;
+				break;
+			}
+		}
+		if (!$hasLegacySettings) {
+			return null;
+		}
+
+		return ViewSettings::createFromInputArray([
+			'cardBackgroundSource' => $data['cardBackgroundSource'] ?? null,
+			'cardTitleSource' => $data['cardTitleSource'] ?? null,
+		]);
+	}
 
 	private static function normalizeLayout(mixed $layout): ?string {
 		if ($layout === null || $layout === '') {

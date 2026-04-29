@@ -355,11 +355,11 @@ export default {
 			return String(valueObject.value)
 		},
 		getTitleColumn() {
-			const preferredColumnId = this.localViewSetting?.cardTitleSource
+			const preferredColumnId = this.localViewSetting?.viewSettings?.cardTitleSource
 			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[1] ?? this.columns[0] ?? null
 		},
 		getBackgroundColumn() {
-			const preferredColumnId = this.localViewSetting?.cardBackgroundSource
+			const preferredColumnId = this.localViewSetting?.viewSettings?.cardBackgroundSource
 			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[0] ?? null
 		},
 		getCardTitle(row) {

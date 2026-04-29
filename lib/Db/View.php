@@ -13,6 +13,7 @@ use JsonSerializable;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
@@ -47,10 +48,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setDescription(string $description)
  * @method getLayout(): ?string
  * @method setLayout(?string $layout)
- * @method getCardBackgroundSource(): ?int
- * @method setCardBackgroundSource(?int $cardBackgroundSource)
- * @method getCardTitleSource(): ?int
- * @method setCardTitleSource(?int $cardTitleSource)
+ * @method getViewSettings(): ?string
+ * @method setViewSettings(?string $viewSettings)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
  * @method getOnSharePermissions(): ?Permissions
@@ -81,8 +80,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
 	protected ?string $layout = null;
-	protected ?int $cardBackgroundSource = null;
-	protected ?int $cardTitleSource = null;
+	protected ?string $viewSettings = null; // json
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -98,8 +96,6 @@ class View extends EntitySuper implements JsonSerializable {
 	public function __construct() {
 		$this->addType('id', 'integer');
 		$this->addType('tableId', 'integer');
-		$this->addType('cardBackgroundSource', 'integer');
-		$this->addType('cardTitleSource', 'integer');
 	}
 
 	/**
@@ -186,6 +182,10 @@ class View extends EntitySuper implements JsonSerializable {
 		return in_array($this->layout, ['tiles', 'gallery'], true) ? $this->layout : 'table';
 	}
 
+	public function getViewSettingsObject(): ViewSettings {
+		return ViewSettings::createFromInputArray($this->getArray($this->getViewSettings()));
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -215,8 +215,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'layout' => $this->getLayoutNormalized(),
-			'cardBackgroundSource' => $this->cardBackgroundSource,
-			'cardTitleSource' => $this->cardTitleSource,
+			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

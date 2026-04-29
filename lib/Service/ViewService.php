@@ -28,6 +28,7 @@ use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -297,7 +298,7 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * Ensures that cardBackgroundSource and cardTitleSource reference columns that are part of the view.
+	 * Ensures that card view settings reference columns that are part of the view.
 	 * @throws InvalidArgumentException
 	 */
 	protected function assertCardSourceColumnsAreValid(View $view): void {
@@ -306,12 +307,14 @@ class ViewService extends SuperService {
 			return;
 		}
 
-		$backgroundSource = $view->getCardBackgroundSource();
+		$viewSettings = $view->getViewSettingsObject();
+
+		$backgroundSource = $viewSettings->getCardBackgroundSource();
 		if ($backgroundSource !== null && !in_array($backgroundSource, $viewColumnIds, true)) {
 			throw new InvalidArgumentException('Invalid cardBackgroundSource column ID: ' . $backgroundSource);
 		}
 
-		$titleSource = $view->getCardTitleSource();
+		$titleSource = $viewSettings->getCardTitleSource();
 		if ($titleSource !== null && !in_array($titleSource, $viewColumnIds, true)) {
 			throw new InvalidArgumentException('Invalid cardTitleSource column ID: ' . $titleSource);
 		}
@@ -638,13 +641,23 @@ class ViewService extends SuperService {
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
 		$item->setLayout(in_array($view['layout'] ?? null, ['tiles', 'gallery'], true) ? $view['layout'] : null);
-		$item->setCardBackgroundSource(isset($view['cardBackgroundSource']) ? (int)$view['cardBackgroundSource'] : null);
-		$item->setCardTitleSource(isset($view['cardTitleSource']) ? (int)$view['cardTitleSource'] : null);
+		$item->setViewSettings(json_encode($this->createImportedViewSettings($view)));
 		try {
 			$this->mapper->insert($item);
 		} catch (\Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
+	}
+
+	private function createImportedViewSettings(array $view): ViewSettings {
+		if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+			return ViewSettings::createFromInputArray($view['viewSettings']);
+		}
+
+		return ViewSettings::createFromInputArray([
+			'cardBackgroundSource' => $view['cardBackgroundSource'] ?? null,
+			'cardTitleSource' => $view['cardTitleSource'] ?? null,
+		]);
 	}
 }

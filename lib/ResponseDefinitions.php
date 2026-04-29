@@ -30,8 +30,7 @@ namespace OCA\Tables;
  *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
  *  filter: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>,
  *  layout: 'table'|'tiles'|'gallery',
- *  cardBackgroundSource: int|null,
- *  cardTitleSource: int|null,
+ *  viewSettings: array{cardBackgroundSource: int|null, cardTitleSource: int|null},
  * 	isShared: bool,
  *	favorite: bool,
  * 	onSharePermissions: ?array{

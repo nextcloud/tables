@@ -34,16 +34,9 @@ class Version1000Date20260318000000 extends SimpleMigrationStep {
 				'length' => 16,
 			]);
 		}
-		if (!$table->hasColumn('card_background_source')) {
-			$table->addColumn('card_background_source', Types::INTEGER, [
+		if (!$table->hasColumn('view_settings')) {
+			$table->addColumn('view_settings', \Doctrine\DBAL\Types\Types::JSON, [
 				'notnull' => false,
-				'unsigned' => false,
-			]);
-		}
-		if (!$table->hasColumn('card_title_source')) {
-			$table->addColumn('card_title_source', Types::INTEGER, [
-				'notnull' => false,
-				'unsigned' => false,
 			]);
 		}
 

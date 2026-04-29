@@ -17,6 +17,5 @@ enum ViewUpdatableParameters: string {
 	case FILTER = 'filter';
 	case COLUMN_SETTINGS = 'columns';
 	case LAYOUT = 'layout';
-	case CARD_BACKGROUND_SOURCE = 'cardBackgroundSource';
-	case CARD_TITLE_SOURCE = 'cardTitleSource';
+	case VIEW_SETTINGS = 'viewSettings';
 }

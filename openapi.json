@@ -913,8 +913,7 @@
                     "sort",
                     "filter",
                     "layout",
-                    "cardBackgroundSource",
-                    "cardTitleSource",
+                    "viewSettings",
                     "isShared",
                     "favorite",
                     "onSharePermissions",
@@ -1073,15 +1072,24 @@
                             "gallery"
                         ]
                     },
-                    "cardBackgroundSource": {
-                        "type": "integer",
-                        "format": "int64",
-                        "nullable": true
-                    },
-                    "cardTitleSource": {
-                        "type": "integer",
-                        "format": "int64",
-                        "nullable": true
+                    "viewSettings": {
+                        "type": "object",
+                        "required": [
+                            "cardBackgroundSource",
+                            "cardTitleSource"
+                        ],
+                        "properties": {
+                            "cardBackgroundSource": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                            },
+                            "cardTitleSource": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                            }
+                        }
                     },
                     "isShared": {
                         "type": "boolean"
@@ -2220,15 +2228,20 @@
                                                     "gallery"
                                                 ]
                                             },
-                                            "cardBackgroundSource": {
-                                                "type": "integer",
-                                                "format": "int64",
-                                                "nullable": true
-                                            },
-                                            "cardTitleSource": {
-                                                "type": "integer",
-                                                "format": "int64",
-                                                "nullable": true
+                                            "viewSettings": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "cardBackgroundSource": {
+                                                        "type": "integer",
+                                                        "format": "int64",
+                                                        "nullable": true
+                                                    },
+                                                    "cardTitleSource": {
+                                                        "type": "integer",
+                                                        "format": "int64",
+                                                        "nullable": true
+                                                    }
+                                                }
                                             },
                                             "filter": {
                                                 "type": "array",

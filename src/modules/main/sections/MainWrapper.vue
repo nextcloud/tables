@@ -152,8 +152,10 @@ export default {
 				if (this.isView) {
 					this.viewSetting = {
 						...this.viewSetting,
-						cardBackgroundSource: this.element?.cardBackgroundSource ?? null,
-						cardTitleSource: this.element?.cardTitleSource ?? null,
+						viewSettings: {
+							cardBackgroundSource: this.element?.viewSettings?.cardBackgroundSource ?? null,
+							cardTitleSource: this.element?.viewSettings?.cardTitleSource ?? null,
+						},
 					}
 				}
 				if (this.element?.sort?.length) {

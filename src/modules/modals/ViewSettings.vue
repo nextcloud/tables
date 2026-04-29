@@ -210,7 +210,7 @@ export default {
 		},
 		backgroundSourceValue: {
 			get() {
-				const stored = this.mutableView?.cardBackgroundSource
+				const stored = this.mutableView?.viewSettings?.cardBackgroundSource
 				// Use stored value only if the column still exists in the accessible options
 				if (stored !== null && stored !== undefined) {
 					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
@@ -219,12 +219,13 @@ export default {
 				return this.cardSourceOptions[0]?.id ?? null
 			},
 			set(value) {
-				this.$set(this.mutableView, 'cardBackgroundSource', value ?? null)
+				this.ensureMutableViewSettings()
+				this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', value ?? null)
 			},
 		},
 		titleSourceValue: {
 			get() {
-				const stored = this.mutableView?.cardTitleSource
+				const stored = this.mutableView?.viewSettings?.cardTitleSource
 				// Use stored value only if the column still exists in the accessible options
 				if (stored !== null && stored !== undefined) {
 					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
@@ -234,7 +235,8 @@ export default {
 				return this.cardSourceOptions[1]?.id ?? this.cardSourceOptions[0]?.id ?? null
 			},
 			set(value) {
-				this.$set(this.mutableView, 'cardTitleSource', value ?? null)
+				this.ensureMutableViewSettings()
+				this.$set(this.mutableView.viewSettings, 'cardTitleSource', value ?? null)
 			},
 		},
 		saveText() {
@@ -406,8 +408,7 @@ export default {
 					emoji: this.icon,
 					layout: this.layout,
 					columnSettings: JSON.stringify(newColumnSettings),
-					cardBackgroundSource: this.mutableView.cardBackgroundSource,
-					cardTitleSource: this.mutableView.cardTitleSource,
+					viewSettings: JSON.stringify(this.mutableView.viewSettings),
 				},
 			}
 			// Update sorting rules if they don't contain hidden rules (= rules regarding rows the user can not see) that were not overwritten
@@ -436,13 +437,26 @@ export default {
 			this.description = this.mutableView.description ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
 			this.layout = this.mutableView.layout ?? 'table'
-			this.$set(this.mutableView, 'cardBackgroundSource', this.mutableView.cardBackgroundSource ?? this.viewSetting?.cardBackgroundSource ?? this.mutableView.columnSettings?.[0]?.columnId ?? null)
-			this.$set(this.mutableView, 'cardTitleSource', this.mutableView.cardTitleSource ?? this.viewSetting?.cardTitleSource ?? this.mutableView.columnSettings?.[1]?.columnId ?? this.mutableView.columnSettings?.[0]?.columnId ?? null)
+			this.ensureMutableViewSettings()
+			const firstColumnId = this.mutableView.columnSettings?.[0]?.columnId ?? null
+			const secondColumnId = this.mutableView.columnSettings?.[1]?.columnId ?? firstColumnId
+			const backgroundSource = this.mutableView.viewSettings.cardBackgroundSource ?? this.viewSetting?.viewSettings?.cardBackgroundSource ?? firstColumnId
+			const titleSource = this.mutableView.viewSettings.cardTitleSource ?? this.viewSetting?.viewSettings?.cardTitleSource ?? secondColumnId
+			this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', backgroundSource)
+			this.$set(this.mutableView.viewSettings, 'cardTitleSource', titleSource)
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
 			this.localLoading = false
 			this.columns = null
+		},
+		ensureMutableViewSettings() {
+			if (!this.mutableView.viewSettings) {
+				this.$set(this.mutableView, 'viewSettings', {
+					cardBackgroundSource: null,
+					cardTitleSource: null,
+				})
+			}
 		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
