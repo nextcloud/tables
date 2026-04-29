@@ -92,6 +92,9 @@ export default {
 			}
 		},
 		async addShare(share) {
+			if (!this.sharePolicy.canShare) {
+				return
+			}
 			await this.sendNewShareToBE(share)
 			await this.loadSharesFromBE()
 		},
