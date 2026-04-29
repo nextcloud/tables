@@ -26,7 +26,7 @@
 				<div class="fix-col-2" style="justify-content: end;">
 					<ShareInfoPopover v-if="debug" :share="share" />
 
-					<NcActions :force-menu="true">
+					<NcActions v-if="canShare" :force-menu="true">
 						<template v-if="personHasTableManagePermission(share.receiver)" #icon>
 							<Crown :size="20" />
 						</template>
@@ -165,6 +165,10 @@ export default {
 		shares: {
 			type: Array,
 			default: () => ([]),
+		},
+		canShare: {
+			type: Boolean,
+			default: true,
 		},
 	},
 
