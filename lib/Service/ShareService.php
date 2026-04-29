@@ -41,9 +41,9 @@ use OCP\DB\Exception;
 use OCP\IDBConnection;
 use OCP\IGroup;
 use OCP\IUserManager;
-use OCP\Share\IManager as IShareManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
+use OCP\Share\IManager as IShareManager;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
