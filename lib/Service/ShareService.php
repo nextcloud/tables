@@ -389,6 +389,10 @@ class ShareService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
+		}
+
 		// security
 		if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
 			throw new PermissionError('PermissionError: can not update share with id ' . $id);
@@ -479,9 +483,7 @@ class ShareService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
-		// check global sharing of group restrictions for link share operations
-		if ($item->getReceiverType() === ShareReceiverType::LINK
-			&& $this->shareManager->sharingDisabledForUser($this->userId)) {
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
 			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 

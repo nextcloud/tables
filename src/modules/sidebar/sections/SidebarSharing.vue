@@ -14,7 +14,11 @@
 				:shares="shares"
 				@add="addShare"
 				@update="updateShare" />
-			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
+			<ShareList
+				:shares="shares"
+				:can-share="sharePolicy.canShare"
+				@remove="removeShare"
+				@update="updateShare" />
 			<SharingLinkList
 				v-if="sharePolicy.loaded && sharePolicy.canShareLink"
 				:shares="linkShares"
