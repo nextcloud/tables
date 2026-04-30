@@ -10,6 +10,7 @@ namespace OCA\Tables\Dto;
 class Column {
 	public function __construct(
 		private ?string $title = null,
+		private ?string $technicalName = null,
 		private ?string $type = null,
 		private ?string $subtype = null,
 		private ?bool $mandatory = null,
@@ -45,6 +46,7 @@ class Column {
 
 		return new self(
 			title: $data['title'] ?? null,
+			technicalName: $data['technicalName'] ?? null,
 			type: $data['type'] ?? null,
 			subtype: $data['subtype'] ?? null,
 			mandatory: $data['mandatory'] ?? null,
@@ -86,6 +88,10 @@ class Column {
 
 	public function getTitle(): ?string {
 		return $this->title;
+	}
+
+	public function getTechnicalName(): ?string {
+		return $this->technicalName;
 	}
 
 	public function getDescription(): ?string {

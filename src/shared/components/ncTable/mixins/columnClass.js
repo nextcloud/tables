@@ -18,6 +18,7 @@ export class AbstractColumn {
 		this.mandatory = data.mandatory
 		this.tableId = data.tableId
 		this.title = data.title
+		this.technicalName = data.technicalName
 		this.description = data.description
 		this.createdByDisplayName = data.createdByDisplayName
 		this.viewColumnInformation = data.viewColumnInformation

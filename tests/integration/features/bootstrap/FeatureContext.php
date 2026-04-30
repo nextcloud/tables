@@ -2956,4 +2956,27 @@ class FeatureContext implements Context {
 			);
 		}
 	}
+
+	/**
+	 * @Then the last created row has the following dataByAlias
+	 *
+	 * @param TableNode $table
+	 */
+	public function theLastCreatedRowHasTheFollowingDataByAlias(TableNode $table): void {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/' . $this->rowId,
+		);
+
+		$row = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		$dataByAlias = $row['dataByAlias'];
+
+		foreach ($table->getRows() as [$alias, $expectedValue]) {
+			Assert::assertArrayHasKey($alias, $dataByAlias, "Alias '$alias' not found in dataByAlias");
+			Assert::assertEquals($expectedValue, (string)$dataByAlias[$alias]['value'], "Value mismatch for alias '$alias'");
+			$columnId = $this->collectionManager->getByAlias('column', $alias)['id'];
+			Assert::assertEquals($columnId, $dataByAlias[$alias]['columnId'], "columnId mismatch for alias '$alias'");
+		}
+	}
 }
