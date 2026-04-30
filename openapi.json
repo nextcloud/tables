@@ -899,6 +899,7 @@
                 "required": [
                     "id",
                     "title",
+                    "technicalName",
                     "emoji",
                     "tableId",
                     "ownership",
@@ -925,6 +926,10 @@
                     },
                     "title": {
                         "type": "string"
+                    },
+                    "technicalName": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "emoji": {
                         "type": "string",

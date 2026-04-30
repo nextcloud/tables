@@ -1172,6 +1172,7 @@ export type components = {
             /** Format: int64 */
             readonly id: number;
             readonly title: string;
+            readonly technicalName: string | null;
             readonly emoji: string | null;
             /** Format: int64 */
             readonly tableId: number;

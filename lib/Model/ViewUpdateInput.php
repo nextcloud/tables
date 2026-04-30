@@ -24,6 +24,7 @@ class ViewUpdateInput {
 
 	public function __construct(
 		protected readonly ?Title $title = null,
+		protected readonly ?string $technicalName = null,
 		protected readonly ?string $description = null,
 		protected readonly ?Emoji $emoji = null,
 		protected readonly ?ColumnSettings $columnSettings = null,
@@ -35,6 +36,9 @@ class ViewUpdateInput {
 	public function updateDetail(): Generator {
 		if ($this->title) {
 			yield ViewUpdatableParameters::TITLE => $this->title;
+		}
+		if ($this->technicalName !== null) {
+			yield ViewUpdatableParameters::TECHNICAL_NAME => $this->technicalName;
 		}
 		if ($this->description) {
 			yield ViewUpdatableParameters::DESCRIPTION => $this->description;
@@ -58,6 +62,7 @@ class ViewUpdateInput {
 	 *     title?: string,
 	 *     emoji?: string,
 	 *     description?: string,
+	 *     technicalName?: string,
 	 *     columns?: list<int>,
 	 *     columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
@@ -82,6 +87,7 @@ class ViewUpdateInput {
 
 		return new self(
 			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
+			technicalName: $data['technicalName'] ?? null,
 			description: $data['description'] ?? null,
 			emoji: ($data['emoji'] ?? null) ? new Emoji($data['emoji']) : null,
 			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings']) : null,
