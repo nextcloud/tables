@@ -26,11 +26,12 @@
 				<div class="fix-col-2" style="justify-content: end;">
 					<ShareInfoPopover v-if="debug" :share="share" />
 
-					<NcActions v-if="canShare" :force-menu="true">
+					<NcActions :force-menu="true">
 						<template v-if="personHasTableManagePermission(share.receiver)" #icon>
 							<Crown :size="20" />
 						</template>
 						<template v-if="!personHasTableManagePermission(share.receiver)">
+							<template v-if="canShare">
 							<NcActionCaption :name="t('tables', 'Permissions')" />
 							<NcActionCheckbox :checked.sync="share.permissionRead"
 								:disabled="share.permissionManage || share.permissionUpdate || share.permissionDelete"
@@ -71,6 +72,7 @@
 								{{ t('tables', 'Promote to table manager') }}
 							</NcActionButton>
 							<NcActionSeparator />
+							</template>
 							<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share)">
 								{{ t('tables', 'Delete') }}
 							</NcActionButton>

@@ -27,7 +27,9 @@ use OCP\AppFramework\Services\IInitialState;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IRequest;
 use OCP\ISession;
+use OCP\IUserSession;
 use OCP\IURLGenerator;
+use OCP\Share\IManager as ShareManager;
 use OCP\Util;
 
 #[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
@@ -40,10 +42,12 @@ class PublicSharePageController extends AuthPublicShareController {
 		IRequest $request,
 		ISession $session,
 		IURLGenerator $urlGenerator,
+		private readonly IUserSession $userSession,
 		private readonly ShareService $shareService,
 		private readonly NodeService $nodeService,
 		private readonly IInitialState $initialState,
 		private readonly IEventDispatcher $eventDispatcher,
+		private readonly ShareManager $shareManager,
 	) {
 		parent::__construct($appName, $request, $session, $urlGenerator);
 		$token = $request->getParam('token');
@@ -54,6 +58,12 @@ class PublicSharePageController extends AuthPublicShareController {
 			} catch (NotFoundError) {
 				$this->share = null;
 			}
+		}
+
+		$user = $this->userSession->getUser();
+		if ($this->share !== null && ($user === null || $this->shareManager->sharingDisabledForUser($user->getUID()))) {
+			// hide the share when current user is not allowed by admin sharing restrictions.
+			$this->share = null;
 		}
 	}
 

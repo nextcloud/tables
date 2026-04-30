@@ -158,7 +158,8 @@ class ShareService extends SuperService {
 			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 		// check global admin setting for public link sharing
-		if (!$this->shareManager->shareApiAllowLinks()) {
+		$currentUser = $this->userManager->get($this->userId);
+		if (!$this->shareManager->shareApiAllowLinks($currentUser)) {
 			throw new PermissionError('Public link sharing is disabled by your administrator.');
 		}
 
@@ -420,8 +421,12 @@ class ShareService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
-		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
-			throw new PermissionError('Sharing is restricted by your administrator for your account.');
+		$isSharingDisabledForUser = $this->shareManager->sharingDisabledForUser($this->userId);
+		if ($isSharingDisabledForUser) {
+			$canDemoteManager = $permission === 'manage' && $value === false;
+			if (!$canDemoteManager) {
+				throw new PermissionError('Sharing is restricted by your administrator for your account.');
+			}
 		}
 
 		// security
@@ -484,10 +489,6 @@ class ShareService extends SuperService {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
-
-		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
-			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 
 		// security
