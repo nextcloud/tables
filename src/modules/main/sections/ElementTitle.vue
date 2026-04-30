@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="row first-row">
+	<div class="row first-row" :class="{ 'form-mode': isFormMode }">
 		<h1>
 			{{ activeElement.emoji }}&nbsp;{{ activeElement.title }}
 		</h1>
@@ -60,6 +60,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		isFormMode: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	computed: {
 		isFiltered() {
@@ -97,6 +101,11 @@ export default {
 	background-color: var(--color-main-background);
 	align-items: center;
 	width: var(--app-content-width, 100%);
+
+	&.form-mode {
+		flex-direction: column;
+		text-align: center;
+	}
 }
 
 .user-bubble {

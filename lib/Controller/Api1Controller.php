@@ -672,7 +672,7 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
 		try {
-			return new DataResponse($this->shareService->updatePermission($shareId, $permissionType, $permissionValue)->jsonSerialize());
+			return new DataResponse($this->shareService->updatePermission($shareId, [$permissionType => $permissionValue])->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

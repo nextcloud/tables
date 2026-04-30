@@ -98,6 +98,7 @@ return [
 		['name' => 'share#show', 'url' => '/share/{id}', 'verb' => 'GET'],
 		['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
 		['name' => 'share#updatePermission', 'url' => '/share/{id}/permission', 'verb' => 'PUT'],
+		['name' => 'share#updatePermissions', 'url' => '/share/{id}/permissions', 'verb' => 'PUT'],
 		['name' => 'share#updateDisplayMode', 'url' => '/share/{id}/display-mode', 'verb' => 'PUT'],
 		['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
 

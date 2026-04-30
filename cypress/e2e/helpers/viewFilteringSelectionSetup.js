@@ -81,4 +81,6 @@ const addRow = (title, selection, multiSelection, checked) => {
 
 	cy.get('[data-cy="createRowSaveButton"]').click()
 	cy.get('[data-cy="createRowModal"]').should('not.exist')
+	cy.get('.toastify.toast-success').should('be.visible')
+	cy.get('.toastify.toast-success .toast-close').click({ multiple: true })
 }

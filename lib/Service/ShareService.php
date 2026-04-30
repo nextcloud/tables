@@ -370,15 +370,46 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	private function applyPermissions(Share $item, array $permissions): Share {
+		$time = new DateTime();
+		if (isset($permissions['read'])) {
+			$item->setPermissionRead($permissions['read']);
+		}
+		if (isset($permissions['create'])) {
+			$item->setPermissionCreate($permissions['create']);
+		}
+		if (isset($permissions['update'])) {
+			$item->setPermissionUpdate($permissions['update']);
+		}
+		if (isset($permissions['delete'])) {
+			$item->setPermissionDelete($permissions['delete']);
+		}
+		if (isset($permissions['manage'])) {
+			$item->setPermissionManage($permissions['manage']);
+		}
+		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		try {
+			return $this->mapper->update($item);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+	}
+
+	/**
 	 * @param int $id
-	 * @param string $permission
-	 * @param bool $value
+	 * @param array $permissions
 	 * @return Share
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function updatePermission(int $id, string $permission, bool $value): Share {
+	public function updatePermission(int $id, array $permissions): Share {
 		try {
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
@@ -398,36 +429,8 @@ class ShareService extends SuperService {
 			throw new PermissionError('PermissionError: can not update share with id ' . $id);
 		}
 
-		$time = new DateTime();
+		$share = $this->applyPermissions($item, $permissions);
 
-		if ($permission === 'read') {
-			$item->setPermissionRead($value);
-		}
-
-		if ($permission === 'create') {
-			$item->setPermissionCreate($value);
-		}
-
-		if ($permission === 'update') {
-			$item->setPermissionUpdate($value);
-		}
-
-		if ($permission === 'delete') {
-			$item->setPermissionDelete($value);
-		}
-
-		if ($permission === 'manage') {
-			$item->setPermissionManage($value);
-		}
-
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-
-		try {
-			$share = $this->mapper->update($item);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
 		return $this->addReceiverDisplayName($share);
 	}
 

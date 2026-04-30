@@ -141,6 +141,14 @@ export default {
 			}
 		},
 
+		async updateSharePermissionsToBE(shareId, data) {
+			try {
+				await axios.put(generateUrl('/apps/tables/share/' + shareId + '/permissions'), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update share.'))
+			}
+		},
+
 		isValidShareType(shareType) {
 			return [
 				this.SHARE_TYPES.SHARE_TYPE_USER,
