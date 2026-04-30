@@ -22,8 +22,6 @@ use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class AnalyticsDatasource implements IDatasource {
-	private const COUNT_COLUMN_TITLE = 'count';
-	private const COUNT_COLUMN_VALUE = 1;
 
 	private LoggerInterface $logger;
 	private IL10N $l10n;
@@ -242,7 +240,7 @@ class AnalyticsDatasource implements IDatasource {
 		foreach ($columns as $column) {
 			$header[] = $column->getTitle();
 		}
-		$header[] = self::COUNT_COLUMN_TITLE;
+		$header[] = $this->l10n->t('Count');
 		$data[] = $header;
 
 		// now add the rows
@@ -262,7 +260,7 @@ class AnalyticsDatasource implements IDatasource {
 				}
 				$line[] = $value;
 			}
-			$line[] = self::COUNT_COLUMN_VALUE;
+			$line[] = 1; // constant 1 for the count column
 			$data[] = $line;
 		}
 		return $data;

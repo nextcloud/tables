@@ -62,7 +62,7 @@ final class AnalyticsDatasourceTest extends TestCase {
 			'user_id' => 'user1',
 		]);
 
-		self::assertSame(['Name', 'Amount', 'count'], $result['header']);
+		self::assertSame(['Name', 'Amount', 'Count'], $result['header']);
 		self::assertSame(['Name', 'Amount'], $result['dimensions']);
 		self::assertSame([
 			['Alpha', 5, 1],
@@ -80,7 +80,7 @@ final class AnalyticsDatasourceTest extends TestCase {
 			'columns' => '1,3',
 		]);
 
-		self::assertSame(['Name', 'count'], $result['header']);
+		self::assertSame(['Name', 'Count'], $result['header']);
 		self::assertSame(['Name'], $result['dimensions']);
 		self::assertSame([
 			['Alpha', 1],
