@@ -158,8 +158,7 @@ class ShareService extends SuperService {
 			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 		// check global admin setting for public link sharing
-		$currentUser = $this->userManager->get($this->userId);
-		if (!$this->shareManager->shareApiAllowLinks($currentUser)) {
+		if (!$this->shareManager->shareApiAllowLinks()) {
 			throw new PermissionError('Public link sharing is disabled by your administrator.');
 		}
 

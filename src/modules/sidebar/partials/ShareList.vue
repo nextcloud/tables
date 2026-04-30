@@ -32,46 +32,46 @@
 						</template>
 						<template v-if="!personHasTableManagePermission(share.receiver)">
 							<template v-if="canShare">
-							<NcActionCaption :name="t('tables', 'Permissions')" />
-							<NcActionCheckbox :checked.sync="share.permissionRead"
-								:disabled="share.permissionManage || share.permissionUpdate || share.permissionDelete"
-								@check="updatePermission(share, 'read', true)"
-								@uncheck="updatePermission(share, 'read', false)">
-								{{ t('tables', 'Read data') }}
-							</NcActionCheckbox>
-							<NcActionCheckbox :checked.sync="share.permissionCreate"
-								:disabled="share.permissionManage"
-								@check="updatePermission(share, 'create', true)"
-								@uncheck="updatePermission(share, 'create', false)">
-								{{ t('tables', 'Create data') }}
-							</NcActionCheckbox>
-							<NcActionCheckbox :checked.sync="share.permissionUpdate"
-								:disabled="share.permissionManage"
-								@check="updatePermission(share, 'update', true)"
-								@uncheck="updatePermission(share, 'update', false)">
-								{{ t('tables', 'Update data') }}
-							</NcActionCheckbox>
-							<NcActionCheckbox :checked.sync="share.permissionDelete"
-								:disabled="share.permissionManage"
-								@check="updatePermission(share, 'delete', true)"
-								@uncheck="updatePermission(share, 'delete', false)">
-								{{ t('tables', 'Delete data') }}
-							</NcActionCheckbox>
-							<NcActionCheckbox v-if="share.nodeType === 'view'"
-								:checked.sync="share.permissionManage"
-								@check="updatePermission(share, 'manage', true)"
-								@uncheck="updatePermission(share, 'manage', false)">
-								{{ t('tables', 'Manage view') }}
-							</NcActionCheckbox>
-							<NcActionButton v-if="!isView && !personHasTableManagePermission(share.receiver)"
-								:close-after-click="true"
-								@click="warnOnPromote(share)">
-								<template #icon>
-									<Crown :size="20" />
-								</template>
-								{{ t('tables', 'Promote to table manager') }}
-							</NcActionButton>
-							<NcActionSeparator />
+								<NcActionCaption :name="t('tables', 'Permissions')" />
+								<NcActionCheckbox :checked.sync="share.permissionRead"
+									:disabled="share.permissionManage || share.permissionUpdate || share.permissionDelete"
+									@check="updatePermission(share, 'read', true)"
+									@uncheck="updatePermission(share, 'read', false)">
+									{{ t('tables', 'Read data') }}
+								</NcActionCheckbox>
+								<NcActionCheckbox :checked.sync="share.permissionCreate"
+									:disabled="share.permissionManage"
+									@check="updatePermission(share, 'create', true)"
+									@uncheck="updatePermission(share, 'create', false)">
+									{{ t('tables', 'Create data') }}
+								</NcActionCheckbox>
+								<NcActionCheckbox :checked.sync="share.permissionUpdate"
+									:disabled="share.permissionManage"
+									@check="updatePermission(share, 'update', true)"
+									@uncheck="updatePermission(share, 'update', false)">
+									{{ t('tables', 'Update data') }}
+								</NcActionCheckbox>
+								<NcActionCheckbox :checked.sync="share.permissionDelete"
+									:disabled="share.permissionManage"
+									@check="updatePermission(share, 'delete', true)"
+									@uncheck="updatePermission(share, 'delete', false)">
+									{{ t('tables', 'Delete data') }}
+								</NcActionCheckbox>
+								<NcActionCheckbox v-if="share.nodeType === 'view'"
+									:checked.sync="share.permissionManage"
+									@check="updatePermission(share, 'manage', true)"
+									@uncheck="updatePermission(share, 'manage', false)">
+									{{ t('tables', 'Manage view') }}
+								</NcActionCheckbox>
+								<NcActionButton v-if="!isView && !personHasTableManagePermission(share.receiver)"
+									:close-after-click="true"
+									@click="warnOnPromote(share)">
+									<template #icon>
+										<Crown :size="20" />
+									</template>
+									{{ t('tables', 'Promote to table manager') }}
+								</NcActionButton>
+								<NcActionSeparator />
 							</template>
 							<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share)">
 								{{ t('tables', 'Delete') }}
