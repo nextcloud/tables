@@ -8,6 +8,7 @@
 namespace OCA\Tables\Analytics;
 
 use OCA\Analytics\Datasource\IDatasource;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -21,6 +22,9 @@ use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class AnalyticsDatasource implements IDatasource {
+	private const COUNT_COLUMN_TITLE = 'count';
+	private const COUNT_COLUMN_VALUE = 1;
+
 	private LoggerInterface $logger;
 	private IL10N $l10n;
 	private TableService $tableService;
@@ -120,9 +124,24 @@ class AnalyticsDatasource implements IDatasource {
 			$tableString = $tableString . $view->getTableId() . ':' . $view->getId() . '-' . $view->getTitle() . '/';
 		}
 		// add the tables to a dropdown in the data source settings
-		$template[] = ['id' => 'tableId', 'name' => $this->l10n->t('Select table'), 'type' => 'tf', 'placeholder' => $tableString];
-		$template[] = ['id' => 'columns', 'name' => $this->l10n->t('Select columns'), 'placeholder' => $this->l10n->t('e.g. 1,2,4 or leave empty'), 'type' => 'columnPicker'];
-		$template[] = ['id' => 'timestamp', 'name' => $this->l10n->t('Timestamp of data load'), 'placeholder' => 'false-' . $this->l10n->t('No') . '/true-' . $this->l10n->t('Yes'), 'type' => 'tf'];
+		$template[] = [
+			'id' => 'tableId',
+			'name' => $this->l10n->t('Select table'),
+			'type' => 'tf',
+			'placeholder' => $tableString
+		];
+		$template[] = [
+			'id' => 'columns',
+			'name' => $this->l10n->t('Select columns'),
+			'placeholder' => $this->l10n->t('e.g. 1,2,4 or leave empty'),
+			'type' => 'columnPicker'
+		];
+		$template[] = [
+			'id' => 'timestamp',
+			'name' => $this->l10n->t('Timestamp of data load'),
+			'placeholder' => 'false-' . $this->l10n->t('No') . '/true-' . $this->l10n->t('Yes'),
+			'type' => 'tf'
+		];
 		return $template;
 	}
 
@@ -166,7 +185,7 @@ class AnalyticsDatasource implements IDatasource {
 		// get the selected columns from the data source options
 		$selectedColumns = [];
 		if (isset($option['columns']) && strlen($option['columns']) > 0) {
-			$selectedColumns = str_getcsv($option['columns']);
+			$selectedColumns = str_getcsv($option['columns'], ',', '"', '\\');
 		}
 
 		$data = [];
@@ -183,8 +202,12 @@ class AnalyticsDatasource implements IDatasource {
 		}
 		unset($rows);
 
-		return ['header' => $header, 'dimensions' => array_slice($header, 0, count($header) - 1), 'data' => $data, //'rawdata' => $data,
-			'error' => 0,];
+		return [
+			'header' => $header,
+			'dimensions' => array_slice($header, 0, count($header) - 1),
+			'data' => $data, //'rawdata' => $data,
+			'error' => 0,
+		];
 	}
 
 	/**
@@ -219,6 +242,7 @@ class AnalyticsDatasource implements IDatasource {
 		foreach ($columns as $column) {
 			$header[] = $column->getTitle();
 		}
+		$header[] = self::COUNT_COLUMN_TITLE;
 		$data[] = $header;
 
 		// now add the rows
@@ -229,27 +253,169 @@ class AnalyticsDatasource implements IDatasource {
 				$value = '';
 				foreach ($rowData as $datum) {
 					if ($datum['columnId'] === $column->getId()) {
-						// if column type selection, the corresponding labels need to be fetched
-						if ($column->getType() === 'selection') {
-							foreach ($column->getSelectionOptionsArray() as $option) {
-								if ($option['id'] === $datum['value']) {
-									$value = $option['label'];
-								}
-							}
-						} else {
-							$value = $datum['value'];
-						}
+						$value = $this->formatValue($column, $datum['value']);
 					}
 				}
-				// Tables does not deliver any values for "blank" default columns
-				if ($value === '' && $column->getType() === 'number') {
-					$value = $column->getNumberDefault();
+				// Tables does not deliver any values for "blank" default columns.
+				if ($value === '') {
+					$value = $this->formatDefaultValue($column);
 				}
 				$line[] = $value;
 			}
+			$line[] = self::COUNT_COLUMN_VALUE;
 			$data[] = $line;
 		}
 		return $data;
+	}
+
+	private function formatValue(Column $column, mixed $value): mixed {
+		return match ($column->getType()) {
+			Column::TYPE_SELECTION => $this->formatSelectionValue($column, $value),
+			Column::TYPE_TEXT => $this->formatTextValue($column, $value),
+			Column::TYPE_USERGROUP => $this->formatUsergroupValue($value),
+			default => $value,
+		};
+	}
+
+	private function formatDefaultValue(Column $column): mixed {
+		return match ($column->getType()) {
+			Column::TYPE_NUMBER => $column->getNumberDefault() ?? '',
+			Column::TYPE_SELECTION => $this->formatSelectionValue($column, $this->parseDefaultValue($column->getSelectionDefault())),
+			Column::TYPE_TEXT => $this->formatTextValue($column, $column->getTextDefault() ?? ''),
+			Column::TYPE_DATETIME => $this->formatDatetimeDefaultValue($column),
+			Column::TYPE_USERGROUP => $this->formatUsergroupValue($this->parseDefaultValue($column->getUsergroupDefault())),
+			default => '',
+		};
+	}
+
+	private function formatSelectionValue(Column $column, mixed $value): mixed {
+		if ($column->getSubtype() === Column::SUBTYPE_SELECTION_CHECK) {
+			return $this->formatBooleanValue($value);
+		}
+
+		if ($this->isMultiSelection($column)) {
+			return implode(', ', $this->getSelectionLabels($column, $this->normalizeArrayValue($value)));
+		}
+		if ($value === null || $value === '') {
+			return '';
+		}
+
+		foreach ($column->getSelectionOptionsArray() as $option) {
+			if ((int)$option['id'] === (int)$value) {
+				return $option['label'];
+			}
+		}
+
+		return '';
+	}
+
+	private function isMultiSelection(Column $column): bool {
+		return in_array($column->getSubtype(), [Column::SUBTYPE_SELECTION_MULTI, 'multi'], true);
+	}
+
+	/**
+	 * @param list<mixed> $values
+	 * @return list<string>
+	 */
+	private function getSelectionLabels(Column $column, array $values): array {
+		$labels = [];
+		foreach ($values as $value) {
+			foreach ($column->getSelectionOptionsArray() as $option) {
+				if ((int)$option['id'] === (int)$value) {
+					$labels[] = $option['label'];
+					break;
+				}
+			}
+		}
+		return $labels;
+	}
+
+	private function formatBooleanValue(mixed $value): string {
+		if ($value === true || $value === 1 || $value === '1' || $value === 'true' || $value === 'TRUE') {
+			return 'true';
+		}
+		if ($value === false || $value === 0 || $value === '0' || $value === 'false' || $value === 'FALSE') {
+			return 'false';
+		}
+		return '';
+	}
+
+	private function formatTextValue(Column $column, mixed $value): string {
+		if ($value === null || $value === '') {
+			return '';
+		}
+
+		$value = (string)$value;
+		if ($column->getSubtype() === 'link') {
+			return $this->formatLinkValue($value);
+		}
+
+		return trim(strip_tags($value));
+	}
+
+	private function formatLinkValue(string $value): string {
+		$data = json_decode($value, true);
+		if (is_array($data)) {
+			$title = $data['title'] ?? '';
+			$link = $data['resourceUrl'] ?? $data['value'] ?? '';
+			if ($title !== '' && $link !== '') {
+				return $title . ' (' . $link . ')';
+			}
+			return $link ?: $title;
+		}
+
+		return $value;
+	}
+
+	private function formatDatetimeDefaultValue(Column $column): string {
+		return match ($column->getDatetimeDefault()) {
+			'today' => date('Y-m-d'),
+			'now' => $column->getSubtype() === Column::SUBTYPE_DATETIME_TIME ? date('H:i') : date('Y-m-d H:i'),
+			default => '',
+		};
+	}
+
+	private function formatUsergroupValue(mixed $value): string {
+		$items = $this->normalizeArrayValue($value);
+		$labels = [];
+
+		foreach ($items as $item) {
+			if (is_array($item)) {
+				$labels[] = (string)($item['displayName'] ?? $item['id'] ?? '');
+			} else {
+				$labels[] = (string)$item;
+			}
+		}
+
+		return implode(', ', array_filter($labels, static fn (string $label): bool => $label !== ''));
+	}
+
+	private function parseDefaultValue(?string $value): mixed {
+		if ($value === null || $value === '') {
+			return '';
+		}
+
+		$decoded = json_decode($value, true);
+		return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
+	}
+
+	/**
+	 * @return list<mixed>
+	 */
+	private function normalizeArrayValue(mixed $value): array {
+		if ($value === null || $value === '') {
+			return [];
+		}
+		if (is_array($value)) {
+			return array_is_list($value) ? $value : [$value];
+		}
+		if (is_string($value)) {
+			$decoded = json_decode($value, true);
+			if (json_last_error() === JSON_ERROR_NONE) {
+				return $this->normalizeArrayValue($decoded);
+			}
+		}
+		return [$value];
 	}
 
 	/**
