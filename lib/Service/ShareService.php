@@ -370,6 +370,55 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * When sharing is restricted for the acting user (admin policies), they may still clear manage rights
+	 * on a share (demote that recipient from table manager). Any other permission change is denied, but delete
+	 * still works so an existing manager can remove the share after demoting first.
+	 *
+	 * @param array<string, bool> $permissions
+	 * @throws PermissionError
+	 */
+	private function assertSharePermissionUpdateAllowedWhenSharingRestricted(Share $item, array $permissions): void {
+		if (!$this->shareManager->sharingDisabledForUser($this->userId)) {
+			return;
+		}
+
+		foreach ($permissions as $key => $requestedPermissionValue) {
+			if (!is_bool($requestedPermissionValue)) {
+				continue;
+			}
+
+			switch ($key) {
+				case 'read':
+					$currentPermissionValue = $item->getPermissionRead();
+					break;
+				case 'create':
+					$currentPermissionValue = $item->getPermissionCreate();
+					break;
+				case 'update':
+					$currentPermissionValue = $item->getPermissionUpdate();
+					break;
+				case 'delete':
+					$currentPermissionValue = $item->getPermissionDelete();
+					break;
+				case 'manage':
+					$currentPermissionValue = $item->getPermissionManage();
+					break;
+				default:
+					continue 2;
+			}
+
+			if ($currentPermissionValue === $requestedPermissionValue) {
+				continue;
+			}
+			if ($key === 'manage' && $currentPermissionValue === true && $requestedPermissionValue === false) {
+				continue;
+			}
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
+		}
+	}
+
+	/**
+	 * @param array<string, bool> $permissions
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
@@ -403,7 +452,7 @@ class ShareService extends SuperService {
 
 	/**
 	 * @param int $id
-	 * @param array $permissions
+	 * @param array<string, bool> $permissions
 	 * @return Share
 	 * @throws InternalError
 	 * @throws NotFoundError
@@ -420,9 +469,7 @@ class ShareService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
-		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
-			throw new PermissionError('Sharing is restricted by your administrator for your account.');
-		}
+		$this->assertSharePermissionUpdateAllowedWhenSharingRestricted($item, $permissions);
 
 		// security
 		if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
@@ -430,7 +477,6 @@ class ShareService extends SuperService {
 		}
 
 		$share = $this->applyPermissions($item, $permissions);
-
 		return $this->addReceiverDisplayName($share);
 	}
 
@@ -484,10 +530,6 @@ class ShareService extends SuperService {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
-
-		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
-			throw new PermissionError('Sharing is restricted by your administrator for your account.');
 		}
 
 		// security

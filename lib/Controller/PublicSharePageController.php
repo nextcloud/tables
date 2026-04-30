@@ -28,6 +28,8 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IRequest;
 use OCP\ISession;
 use OCP\IURLGenerator;
+use OCP\IUserManager;
+use OCP\Share\IManager as ShareManager;
 use OCP\Util;
 
 #[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
@@ -40,10 +42,12 @@ class PublicSharePageController extends AuthPublicShareController {
 		IRequest $request,
 		ISession $session,
 		IURLGenerator $urlGenerator,
+		private readonly IUserManager $userManager,
 		private readonly ShareService $shareService,
 		private readonly NodeService $nodeService,
 		private readonly IInitialState $initialState,
 		private readonly IEventDispatcher $eventDispatcher,
+		private readonly ShareManager $shareManager,
 	) {
 		parent::__construct($appName, $request, $session, $urlGenerator);
 		$token = $request->getParam('token');
@@ -55,6 +59,28 @@ class PublicSharePageController extends AuthPublicShareController {
 				$this->share = null;
 			}
 		}
+
+		if ($this->share === null) {
+			return;
+		}
+
+		if (!$this->canAccessPublicShare()) {
+			$this->share = null;
+		}
+	}
+
+	private function canAccessPublicShare(): bool {
+		$sender = $this->share->getSender();
+		if ($sender === null || $sender === '') {
+			return false;
+		}
+
+		$senderUser = $this->userManager->get($sender);
+		if ($senderUser === null || !$senderUser->isEnabled()) {
+			return false;
+		}
+
+		return !$this->shareManager->sharingDisabledForUser($sender);
 	}
 
 	#[PublicPage]
