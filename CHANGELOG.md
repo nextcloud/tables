@@ -5,6 +5,12 @@
 
 # Changelog
 
+## v1.0.7
+
+### Fixed
+* [stable1.0] Fix: Table sharing limitations by @backportbot[bot] in https://github.com/nextcloud/tables/pull/2552
+* [stable1.0] Fix: sharing limit on delete by @samin-z in https://github.com/nextcloud/tables/pull/2557
+
 ## v1.0.6
 
 ### Added
