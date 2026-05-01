@@ -8,10 +8,15 @@
 ## 2.1.0
 
 ### Added
-* [Feat: update loading shares of table (tables#2379)](https://github.com/nextcloud/tables/pull/2379)
+* [Reorder Application resources (tables#2245)](https://github.com/nextcloud/tables/pull/2245)
 * [🔢 Reorder and sort table columns (tables#2481)](https://github.com/nextcloud/tables/pull/2481)
+* [Feat: add permissions for public link shares (tables#2483)](https://github.com/nextcloud/tables/pull/2483)
+* [📍Option to pin a column (tables#2496)](https://github.com/nextcloud/tables/pull/2496)
+* [Mandatory column handling (tables#2511)](https://github.com/nextcloud/tables/pull/2511)
+* [🪢 Sticky header elements (tables#2527)](https://github.com/nextcloud/tables/pull/2527)
 
 ### Fixed
+* [Feat: update loading shares of table (tables#2379)](https://github.com/nextcloud/tables/pull/2379)
 * [Fix: add validation for columnDto (tables#2414)](https://github.com/nextcloud/tables/pull/2414)
 * [Fix(Share): compare group id with group id, not displayname (tables#2433)](https://github.com/nextcloud/tables/pull/2433)
 * [Fix: ensure stable column order in table view (tables#2445)](https://github.com/nextcloud/tables/pull/2445)
@@ -21,6 +26,9 @@
 * [Fix: Auto-focus input field for selecting a value via the column header (tables#2457)](https://github.com/nextcloud/tables/pull/2457)
 * [Fix layout issues in application view caused by missing width constraint (tables#2482)](https://github.com/nextcloud/tables/pull/2482)
 * [Error handling for CSV downloads (tables#2512)](https://github.com/nextcloud/tables/pull/2512)
+* [Reordering validation (tables#2505)](https://github.com/nextcloud/tables/pull/2505)
+* [Fix: Table sharing limitations (tables#2551)](https://github.com/nextcloud/tables/pull/2551)
+* [Fix/2555: share delete and public link access (tables#2556)](https://github.com/nextcloud/tables/pull/2556)
 
 ### Dependencies
 * [Fix(deps): update dependency dompurify to ^3.3.2 (main) (tables#2392)](https://github.com/nextcloud/tables/pull/2392)
@@ -38,13 +46,15 @@
 * [Chore(deps): update dependency phpunit/phpunit to v9.6.34 (tables#2500)](https://github.com/nextcloud/tables/pull/2500)
 
 ### Other
-* [Reorder Application resources (tables#2245)](https://github.com/nextcloud/tables/pull/2245)
 * [Ci(renovate): prevent incompatible nc/files updates on stable1.0 (tables#2381)](https://github.com/nextcloud/tables/pull/2381)
 * [Ci: fix wrong concurrency group (tables#2385)](https://github.com/nextcloud/tables/pull/2385)
 * [Feat(tests): Migrate some tests from Cypress to Playwright (tables#2427)](https://github.com/nextcloud/tables/pull/2427)
 * [Add an AGENTS.md for coding agents to respect (tables#2494)](https://github.com/nextcloud/tables/pull/2494)
 * [Sync actions with current workflow templates (tables#2495)](https://github.com/nextcloud/tables/pull/2495)
 * [Context changes (tables#2510)](https://github.com/nextcloud/tables/pull/2510)
+* [Add further guidelines for implementation logic and code checks (tables#2516)](https://github.com/nextcloud/tables/pull/2516)
+* [Build: disable renovate for EOL 0.9 (tables#2549)](https://github.com/nextcloud/tables/pull/2549)
+* [Add more rules, for frontend, backend, persistence and testing (tables#2550)](https://github.com/nextcloud/tables/pull/2550)
 
 ## 2.0.1
 
