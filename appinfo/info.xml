@@ -26,8 +26,8 @@ Share your tables and views with users and groups within your cloud.
 Have a good time and manage whatever you want.
 
 ]]></description>
-	<version>2.0.1</version>
-	<licence>agpl</licence>
+	<version>2.1.0</version>
+	<licence>AGPL-3.0-or-later</licence>
 	<author mail="florian.steffens@nextcloud.com">Florian Steffens</author>
 	<namespace>Tables</namespace>
 	<documentation>

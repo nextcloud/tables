@@ -5,6 +5,57 @@
 
 # Changelog
 
+## 2.1.0
+
+### Added
+* [Reorder Application resources (tables#2245)](https://github.com/nextcloud/tables/pull/2245)
+* [🔢 Reorder and sort table columns (tables#2481)](https://github.com/nextcloud/tables/pull/2481)
+* [Feat: add permissions for public link shares (tables#2483)](https://github.com/nextcloud/tables/pull/2483)
+* [📍Option to pin a column (tables#2496)](https://github.com/nextcloud/tables/pull/2496)
+* [Mandatory column handling (tables#2511)](https://github.com/nextcloud/tables/pull/2511)
+* [🪢 Sticky header elements (tables#2527)](https://github.com/nextcloud/tables/pull/2527)
+
+### Fixed
+* [Feat: update loading shares of table (tables#2379)](https://github.com/nextcloud/tables/pull/2379)
+* [Fix: add validation for columnDto (tables#2414)](https://github.com/nextcloud/tables/pull/2414)
+* [Fix(Share): compare group id with group id, not displayname (tables#2433)](https://github.com/nextcloud/tables/pull/2433)
+* [Fix: ensure stable column order in table view (tables#2445)](https://github.com/nextcloud/tables/pull/2445)
+* [Fix: reset default values for usergroup column after row creation (tables#2448)](https://github.com/nextcloud/tables/pull/2448)
+* [Fix: It is possible to open view with removed column (tables#2449)](https://github.com/nextcloud/tables/pull/2449)
+* [Fix: replace 'circle' with 'team' in CircleHelper (fixes #2249) (tables#2455)](https://github.com/nextcloud/tables/pull/2455)
+* [Fix: Auto-focus input field for selecting a value via the column header (tables#2457)](https://github.com/nextcloud/tables/pull/2457)
+* [Fix layout issues in application view caused by missing width constraint (tables#2482)](https://github.com/nextcloud/tables/pull/2482)
+* [Error handling for CSV downloads (tables#2512)](https://github.com/nextcloud/tables/pull/2512)
+* [Reordering validation (tables#2505)](https://github.com/nextcloud/tables/pull/2505)
+* [Fix: Table sharing limitations (tables#2551)](https://github.com/nextcloud/tables/pull/2551)
+* [Fix/2555: share delete and public link access (tables#2556)](https://github.com/nextcloud/tables/pull/2556)
+
+### Dependencies
+* [Fix(deps): update dependency dompurify to ^3.3.2 (main) (tables#2392)](https://github.com/nextcloud/tables/pull/2392)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.37.0 (main) (tables#2419)](https://github.com/nextcloud/tables/pull/2419)
+* [Chore(deps): update nextcloud/pr-feedback-action digest to 5227c55 (main) (tables#2431)](https://github.com/nextcloud/tables/pull/2431)
+* [Chore(deps): update shivammathur/setup-php digest to accd612 (main) (tables#2432)](https://github.com/nextcloud/tables/pull/2432)
+* [Fix: Pin cypress versions (tables#2460)](https://github.com/nextcloud/tables/pull/2460)
+* [Fix: pin stylelint-config and vue version in renovate (tables#2461)](https://github.com/nextcloud/tables/pull/2461)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.60.1 (main) (tables#2462)](https://github.com/nextcloud/tables/pull/2462)
+* [Chore(deps): update dependency @playwright/test to ^1.59.1 (main) (tables#2463)](https://github.com/nextcloud/tables/pull/2463)
+* [Chore(deps): update dependency vite to ^7.3.2 (main) (tables#2486)](https://github.com/nextcloud/tables/pull/2486)
+* [Fix(deps): update tiptap to ^3.22.3 (main) (tables#2487)](https://github.com/nextcloud/tables/pull/2487)
+* [[main] Update nextcloud/ocp dependency (tables#2491)](https://github.com/nextcloud/tables/pull/2491)
+* [[main] Fix npm audit (tables#2493)](https://github.com/nextcloud/tables/pull/2493)
+* [Chore(deps): update dependency phpunit/phpunit to v9.6.34 (tables#2500)](https://github.com/nextcloud/tables/pull/2500)
+
+### Other
+* [Ci(renovate): prevent incompatible nc/files updates on stable1.0 (tables#2381)](https://github.com/nextcloud/tables/pull/2381)
+* [Ci: fix wrong concurrency group (tables#2385)](https://github.com/nextcloud/tables/pull/2385)
+* [Feat(tests): Migrate some tests from Cypress to Playwright (tables#2427)](https://github.com/nextcloud/tables/pull/2427)
+* [Add an AGENTS.md for coding agents to respect (tables#2494)](https://github.com/nextcloud/tables/pull/2494)
+* [Sync actions with current workflow templates (tables#2495)](https://github.com/nextcloud/tables/pull/2495)
+* [Context changes (tables#2510)](https://github.com/nextcloud/tables/pull/2510)
+* [Add further guidelines for implementation logic and code checks (tables#2516)](https://github.com/nextcloud/tables/pull/2516)
+* [Build: disable renovate for EOL 0.9 (tables#2549)](https://github.com/nextcloud/tables/pull/2549)
+* [Add more rules, for frontend, backend, persistence and testing (tables#2550)](https://github.com/nextcloud/tables/pull/2550)
+
 ## 2.0.1
 
 ### Added
