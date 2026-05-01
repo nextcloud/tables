@@ -83,7 +83,7 @@ namespace OCA\Tables;
  * 	createdAt: string,
  * 	lastEditBy: string,
  * 	lastEditAt: string,
- *  data: ?array{columnId: int, value: mixed},
+ *  data: ?array{columnId: int, columnName: string, value: mixed},
  * }
  *
  * @psalm-type TablesPublicRow = array{
