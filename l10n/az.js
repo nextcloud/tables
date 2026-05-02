@@ -45,6 +45,7 @@ OC.L10N.register(
     "Copy" : "Kopyala",
     "Favorites" : "Sevimlilər",
     "group" : "qrup",
+    "Custom permissions" : "Xüsusi icazələr",
     "Read" : "Oxu",
     "Update" : "Yenilənmə",
     "Sharing" : "Paylaşılır",

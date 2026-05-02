@@ -36,6 +36,7 @@ OC.L10N.register(
     "Save" : "Guardar",
     "Title" : "Título",
     "Resources" : "Recursos",
+    "Submit" : "Enviar",
     "Cancel" : "Cancelar",
     "Delete" : "Borrar",
     "Edit" : "Editar",
