@@ -50,10 +50,10 @@ export default {
 		localValue: {
 			get() {
 				if (this.value !== null && this.value !== 'none') {
-					return Moment(this.value, 'HH:mm').toDate()
+					return Moment.utc(this.value, 'HH:mm').local().toDate()
 				} else if (this.value === null && this.column.datetimeDefault === 'now') {
 					const dt = Moment()
-					this.$emit('update:value', dt.format('HH:mm'))
+					this.$emit('update:value', dt.clone().utc().format('HH:mm'))
 					return dt.toDate()
 				} else {
 					return new Date()
