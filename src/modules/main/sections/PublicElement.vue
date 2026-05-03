@@ -18,14 +18,22 @@
 				:can-delete-columns="false"
 				:can-delete-table="false"
 				:is-form-mode="isFormMode">
-				<template #actions>
+				<template #actions="{ isFiltered, onExportFiltered }">
 					<NcActions :force-menu="true" type="tertiary">
 						<NcActionButton :close-after-click="true" data-cy="dataTableExportBtn"
 							@click="$emit('download-csv')">
 							<template #icon>
 								<TrayArrowDown :size="20" decorative />
 							</template>
-							{{ t('tables', 'Export as CSV') }}
+							{{ t('tables', 'Export all rows') }}
+						</NcActionButton>
+						<NcActionButton v-if="isFiltered" :close-after-click="true"
+							data-cy="dataTableExportFilteredBtn"
+							@click="onExportFiltered">
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export filtered rows') }}
 						</NcActionButton>
 					</NcActions>
 				</template>
@@ -66,6 +74,7 @@ import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import EditRow from '../../modals/EditRow.vue'
 import DeleteRows from '../../modals/DeleteRows.vue'
 import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'PublicElement',
@@ -127,6 +136,10 @@ export default {
 		unsubscribe('tables:row:create')
 		unsubscribe('tables:row:edit')
 		unsubscribe('tables:row:delete')
+	},
+
+	methods: {
+		t,
 	},
 }
 </script>
