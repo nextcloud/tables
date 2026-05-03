@@ -61,6 +61,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setOwnerDisplayName(string $ownerDisplayName)
  * @method getOwnership(): ?string
  * @method setOwnership(string $ownership)
+ * @method getFormatting(): ?string
+ * @method setFormatting(?string $formatting)
  */
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $title = null;
@@ -74,6 +76,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+	protected ?string $formatting = null; // json
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -171,6 +174,14 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
+	public function getFormattingArray(): array {
+		return $this->getArray($this->getFormatting());
+	}
+
+	public function setFormattingArray(array $array): void {
+		$this->setFormatting(\json_encode($array));
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -201,6 +212,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'ownerDisplayName' => $this->ownerDisplayName,
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
+		$serialisedJson['formatting'] = $this->getFormattingArray();
 
 		return $serialisedJson;
 	}

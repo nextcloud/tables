@@ -187,6 +187,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 		$tableIdMap = [];
 		$contextIdMap = [];
 		$columnIdMap = [];
+		$selectionOptionIdMap = [];
 		$rowIdMap = [];
 		$userId = $user->getUID();
 		$connection = $this->tableMapper->getDBConnection();
@@ -198,7 +199,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 
 				$this->importFavorites($importSource, $newTable, $table);
 
-				$columnIdMap = $this->importColumns($importSource, $newTable, $table, $columnIdMap);
+				[$columnIdMap, $selectionOptionIdMap] = $this->importColumns($importSource, $newTable, $table, $columnIdMap, $selectionOptionIdMap);
 
 				$needsUpdate = false;
 				if (!empty($table['columnOrder'])) {
@@ -231,7 +232,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				$tableIdMap[$table['id']] = $newTable->getId();
 			}
 
-			$this->importViews($importSource, $tableIdMap, $columnIdMap, $userId);
+			$this->importViews($importSource, $tableIdMap, $columnIdMap, $selectionOptionIdMap, $userId);
 			$this->importShares($importSource, $tableIdMap, $contextIdMap, $userId);
 
 			$this->importRowCells(
@@ -339,11 +340,12 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	 * @param IImportSource $importSource
 	 * @param array $tableIdMap
 	 * @param array $columnIdMap
+	 * @param array $selectionOptionIdMap
 	 * @param string $userId
 	 *
 	 * @return void
 	 */
-	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, string $userId): void {
+	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, array $selectionOptionIdMap, string $userId): void {
 		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($views as $view) {
 			if (isset($tableIdMap[$view['tableId']])) {
@@ -355,6 +357,9 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 						}
 					}
 					unset($setting);
+				}
+				if (!empty($view['formatting'])) {
+					$view['formatting'] = $this->remapFormattingIds($view['formatting'], $columnIdMap, $selectionOptionIdMap);
 				}
 				$this->viewService->importView($newTableId, $view, $userId);
 			}
@@ -382,18 +387,20 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	 * @param Table $newTable
 	 * @param array $table
 	 * @param array $columnIdMap
+	 * @param array $selectionOptionIdMap
 	 *
-	 * @return array
+	 * @return array{array, array} [$columnIdMap, $selectionOptionIdMap]
 	 */
-	private function importColumns(IImportSource $importSource, Table $newTable, array $table, array $columnIdMap): array {
+	private function importColumns(IImportSource $importSource, Table $newTable, array $table, array $columnIdMap, array $selectionOptionIdMap): array {
 		$columns = json_decode($importSource->getFileContents(self::FILE_COLUMNS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($columns as $column) {
 			if ($table['id'] === $column['tableId']) {
-				$newColumnId = $this->columnService->importColumn($newTable, $column);
-				$columnIdMap[$column['id']] = $newColumnId;
+				$result = $this->columnService->importColumn($newTable, $column);
+				$columnIdMap[$column['id']] = $result['columnId'];
+				$selectionOptionIdMap += $result['selectionOptionIdMap'];
 			}
 		}
-		return $columnIdMap;
+		return [$columnIdMap, $selectionOptionIdMap];
 	}
 
 	/**
@@ -449,5 +456,59 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				$this->shareService->importShare($contextIdMap[$share['nodeId']], $share, $userId);
 			}
 		}
+	}
+
+	private function remapFormattingIds(array $ruleSets, array $columnIdMap, array $selectionOptionIdMap): array {
+		foreach ($ruleSets as &$rs) {
+			if ($rs['targetCol'] !== null) {
+				if (isset($columnIdMap[$rs['targetCol']])) {
+					$rs['targetCol'] = $columnIdMap[$rs['targetCol']];
+				} else {
+					$rs['broken'] = true;
+				}
+			}
+			foreach ($rs['rules'] as &$rule) {
+				$rule['condition'] = $this->remapConditionSet($rule['condition'], $columnIdMap, $selectionOptionIdMap, $rule);
+			}
+			unset($rule);
+		}
+		unset($rs);
+		return $ruleSets;
+	}
+
+	private function remapConditionSet(array $conditionSet, array $columnIdMap, array $selectionOptionIdMap, array &$rule): array {
+		foreach ($conditionSet['groups'] as &$group) {
+			foreach ($group['conditions'] as &$c) {
+				if (isset($columnIdMap[$c['columnId']])) {
+					$c['columnId'] = $columnIdMap[$c['columnId']];
+				} else {
+					$rule['broken'] = true;
+				}
+				if (isset($c['value']) && str_starts_with((string)$c['value'], '@selection-id-')) {
+					$oldId = (int)str_replace('@selection-id-', '', (string)$c['value']);
+					if (isset($selectionOptionIdMap[$oldId])) {
+						$c['value'] = '@selection-id-' . $selectionOptionIdMap[$oldId];
+					} else {
+						$rule['broken'] = true;
+					}
+				}
+				if (!empty($c['values'])) {
+					foreach ($c['values'] as &$v) {
+						if (str_starts_with((string)$v, '@selection-id-')) {
+							$oldId = (int)str_replace('@selection-id-', '', (string)$v);
+							if (isset($selectionOptionIdMap[$oldId])) {
+								$v = '@selection-id-' . $selectionOptionIdMap[$oldId];
+							} else {
+								$rule['broken'] = true;
+							}
+						}
+					}
+					unset($v);
+				}
+			}
+			unset($c);
+		}
+		unset($group);
+		return $conditionSet;
 	}
 }
