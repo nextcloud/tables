@@ -8,7 +8,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 import { uploadFile } from '../support/api'
-import { createTable, createTextLinkColumn, loadTable } from '../support/commands'
+import { createTable, createTextLinkColumn, loadTable, openRowActionMenu } from '../support/commands'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 test.describe('Test column text-link', () => {
@@ -44,7 +44,9 @@ test.describe('Test column text-link', () => {
 		await expect(page.locator('tr td a').filter({ hasText: 'nextcloud' }).first()).toBeVisible()
 		await expect(page.locator('tr td a').filter({ hasText: 'NC_server_test' }).first()).toBeVisible()
 
-		await page.locator('[data-cy="ncTable"] [data-cy="editRowBtn"]').first().click({ force: true })
+		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
+		await openRowActionMenu(page, firstRow)
+		await page.locator('[data-cy="editRowBtn"]').click()
 		const editDialog = page.getByRole('dialog', { name: 'Edit row' })
 		await editDialog.waitFor({ state: 'visible' })
 

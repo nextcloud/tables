@@ -5,7 +5,7 @@
 
 import { test, expect } from '../support/fixtures'
 import { createRandomUser } from '../support/api'
-import { createTable, createUsergroupColumn, loadTable } from '../support/commands'
+import { createTable, createUsergroupColumn, loadTable, openRowActionMenu } from '../support/commands'
 
 const columnTitle = 'usergroup'
 const tableTitlePrefix = 'Test usergroup'
@@ -59,7 +59,9 @@ test.describe('Test column ' + columnTitle, () => {
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: user.userId }).first()).toBeVisible()
 
-		await page.locator('[data-cy="ncTable"] [data-cy="editRowBtn"]').first().click()
+		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
+		await openRowActionMenu(page, firstRow)
+		await page.locator('[data-cy="editRowBtn"]').click()
 		// deselect all
 		const deselectButtons = await page.locator('[data-cy="usergroupRowSelect"] .vs__deselect').all()
 		for (const button of deselectButtons) {

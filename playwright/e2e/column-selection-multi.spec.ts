@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from '../support/fixtures'
-import { createSelectionMultiColumn, createTable, loadTable, removeColumn } from '../support/commands'
+import { createSelectionMultiColumn, createTable, loadTable, openRowActionMenu, removeColumn } from '../support/commands'
 
 const columnTitle = 'multi selection'
 const tableTitle = 'Test number column'
@@ -42,15 +42,17 @@ test.describe('Test column ' + columnTitle, () => {
 		await expect(page.locator('.custom-table table tr td .cell-multi-selection').filter({ hasText: 'third option' }).first()).toBeVisible()
 
 		// delete first row
-		await page.locator('.NcTable tr td button').first().click()
-		await page.locator('button').filter({ hasText: 'Delete' }).click()
-		await page.locator('button').filter({ hasText: /I really/ }).click({ force: true })
+		await openRowActionMenu(page, page.locator('[data-cy="customTableRow"]').first())
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(1, { timeout: 10000 })
 
 		await expect(page.locator('.custom-table table tr td .cell-multi-selection', { hasText: 'first option' })).toBeHidden()
 		await expect(page.locator('.custom-table table tr td .cell-multi-selection', { hasText: 'second option' })).toBeHidden()
 
 		// edit second row (which is now first row)
-		await page.locator('.NcTable tr td button').first().click()
+		await openRowActionMenu(page, page.locator('[data-cy="customTableRow"]').first())
+		await page.locator('[data-cy="editRowBtn"]').click()
 		await page.locator('.modal__content .slot input').first().click()
 		await page.locator('ul.vs__dropdown-menu li span[title="first option"]').first().click()
 		await page.locator('.modal__content .title').first().click()
@@ -60,9 +62,10 @@ test.describe('Test column ' + columnTitle, () => {
 		await expect(page.locator('.custom-table table tr td .cell-multi-selection').filter({ hasText: 'third option' }).first()).toBeVisible()
 
 		// delete first row
-		await page.locator('.NcTable tr td button').first().click()
-		await page.locator('button').filter({ hasText: 'Delete' }).click()
-		await page.locator('button').filter({ hasText: /I really/ }).click({ force: true })
+		await openRowActionMenu(page, page.locator('[data-cy="customTableRow"]').first())
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(0, { timeout: 10000 })
 
 		await removeColumn(page, columnTitle)
 	})
@@ -79,6 +82,6 @@ test.describe('Test column ' + columnTitle, () => {
 		await page.locator('button').filter({ hasText: 'Save' }).click()
 
 		await expect(page.locator('.custom-table table tr td .cell-multi-selection').first()).toBeVisible()
-		await expect(page.locator('.NcTable tr td button').first()).toBeVisible()
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toBeVisible()
 	})
 })

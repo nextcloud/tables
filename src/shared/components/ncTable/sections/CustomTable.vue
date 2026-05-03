@@ -45,7 +45,9 @@
 					:pinned-column-id="pinnedColumnId"
 					:column-widths="columnWidths"
 					@update-row-selection="updateRowSelection"
-					@edit-row="rowId => $emit('edit-row', rowId)" />
+					@edit-row="rowId => $emit('edit-row', rowId)"
+					@copy-row="rowId => $emit('copy-row', rowId)"
+					@delete-row="rowId => $emit('delete-row', rowId)" />
 			</transition-group>
 		</table>
 	</div>
