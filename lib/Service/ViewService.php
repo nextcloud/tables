@@ -28,6 +28,7 @@ use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -193,7 +194,7 @@ class ViewService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null): View {
+	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null, ?string $layout = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -209,6 +210,7 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
+		$item->setLayout(in_array($layout, ['tiles', 'gallery'], true) ? $layout : null);
 		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -251,13 +253,15 @@ class ViewService extends SuperService {
 					$this->assertInputColumnsAreValid($view, $userId, $value);
 				}
 
-				if ($value instanceof JsonSerializable) {
-					$insertableValue = json_encode($value);
-				}
+				$insertableValue = $value instanceof JsonSerializable
+					? json_encode($value)
+					: $value;
 
 				$setterMethod = 'set' . ucfirst($parameter->value);
-				$view->$setterMethod($insertableValue ?? $value);
+				$view->$setterMethod($insertableValue);
 			}
+
+			$this->assertCardSourceColumnsAreValid($view);
 
 			$time = new DateTime();
 			$view->setLastEditBy($userId);
@@ -290,6 +294,29 @@ class ViewService extends SuperService {
 			) {
 				throw new InvalidArgumentException('Invalid column ID provided: ' . $columnInfo->getId());
 			}
+		}
+	}
+
+	/**
+	 * Ensures that card view settings reference columns that are part of the view.
+	 * @throws InvalidArgumentException
+	 */
+	protected function assertCardSourceColumnsAreValid(View $view): void {
+		$viewColumnIds = $view->getColumnIds();
+		if (empty($viewColumnIds)) {
+			return;
+		}
+
+		$viewSettings = $view->getViewSettingsObject();
+
+		$backgroundSource = $viewSettings->getCardBackgroundSource();
+		if ($backgroundSource !== null && !in_array($backgroundSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardBackgroundSource column ID: ' . $backgroundSource);
+		}
+
+		$titleSource = $viewSettings->getCardTitleSource();
+		if ($titleSource !== null && !in_array($titleSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardTitleSource column ID: ' . $titleSource);
 		}
 	}
 
@@ -613,11 +640,24 @@ class ViewService extends SuperService {
 		$item->setColumns(json_encode($view['columnSettings']));
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
+		$item->setLayout(in_array($view['layout'] ?? null, ['tiles', 'gallery'], true) ? $view['layout'] : null);
+		$item->setViewSettings(json_encode($this->createImportedViewSettings($view)));
 		try {
 			$this->mapper->insert($item);
 		} catch (\Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
+	}
+
+	private function createImportedViewSettings(array $view): ViewSettings {
+		if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+			return ViewSettings::createFromInputArray($view['viewSettings']);
+		}
+
+		return ViewSettings::createFromInputArray([
+			'cardBackgroundSource' => $view['cardBackgroundSource'] ?? null,
+			'cardTitleSource' => $view['cardTitleSource'] ?? null,
+		]);
 	}
 }

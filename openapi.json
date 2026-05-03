@@ -912,6 +912,8 @@
                     "columnSettings",
                     "sort",
                     "filter",
+                    "layout",
+                    "viewSettings",
                     "isShared",
                     "favorite",
                     "onSharePermissions",
@@ -1059,6 +1061,33 @@
                                         ]
                                     }
                                 }
+                            }
+                        }
+                    },
+                    "layout": {
+                        "type": "string",
+                        "enum": [
+                            "table",
+                            "tiles",
+                            "gallery"
+                        ]
+                    },
+                    "viewSettings": {
+                        "type": "object",
+                        "required": [
+                            "cardBackgroundSource",
+                            "cardTitleSource"
+                        ],
+                        "properties": {
+                            "cardBackgroundSource": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                            },
+                            "cardTitleSource": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
                             }
                         }
                     },
@@ -1883,6 +1912,12 @@
                                         "type": "string",
                                         "nullable": true,
                                         "description": "Emoji for the view"
+                                    },
+                                    "layout": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Layout for the view with 'table', 'tiles', 'gallery' or null"
                                     }
                                 }
                             }
@@ -2181,6 +2216,30 @@
                                                                 "DESC"
                                                             ]
                                                         }
+                                                    }
+                                                }
+                                            },
+                                            "layout": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "enum": [
+                                                    "table",
+                                                    "tiles",
+                                                    "gallery"
+                                                ]
+                                            },
+                                            "viewSettings": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "cardBackgroundSource": {
+                                                        "type": "integer",
+                                                        "format": "int64",
+                                                        "nullable": true
+                                                    },
+                                                    "cardTitleSource": {
+                                                        "type": "integer",
+                                                        "format": "int64",
+                                                        "nullable": true
                                                     }
                                                 }
                                             },

@@ -213,6 +213,8 @@ export default {
 						columnSettings: JSON.stringify(this.view.columnSettings),
 						filter: JSON.stringify(this.view.filter),
 						sort: JSON.stringify(this.view.sort),
+						layout: this.view.layout,
+						viewSettings: JSON.stringify(this.view.viewSettings ?? {}),
 					},
 				}
 				const res = await this.updateView({ id: newViewId, data })

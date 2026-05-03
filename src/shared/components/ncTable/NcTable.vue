@@ -456,6 +456,16 @@ export default {
 	padding-top: 4px; // fix to show buttons completely
 	padding-bottom: 4px; // to make it nice with the padding-top
 }
+
+.custom-table.row {
+	width: var(--app-content-width, 100%);
+	min-width: 0;
+}
+
+.custom-table.row > * {
+	width: 100%;
+	min-width: 0;
+}
 </style>
 
 <style lang="scss" scoped>
