@@ -43,8 +43,9 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 <template>
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
-			<Options :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
-				:selected-rows="localSelectedRows" :show-options="parsedColumns.length !== 0"
+			<Options :rows="rows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
+				:selected-rows="localSelectedRows" :filtered-rows="getSearchedAndFilteredAndSortedRows"
+				:show-options="parsedColumns.length !== 0"
 				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row')"
 				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
 				@set-search-string="str => setSearchString(str)"
@@ -61,7 +62,9 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, parsedColumns, table)">
 				<template #actions>
-					<slot name="actions" />
+					<slot name="actions"
+						:is-filtered="isFilteredComputed"
+						:on-export-filtered="() => downloadCsv(getSearchedAndFilteredAndSortedRows, parsedColumns, downloadTitle)" />
 				</template>
 			</CustomTable>
 			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
@@ -244,6 +247,9 @@ export default {
 		},
 		emptyStateButtonLabel() {
 			return this.isFormMode ? t('tables', 'Fill form') : t('tables', 'Create row')
+		},
+		isFilteredComputed() {
+			return (this.localViewSetting?.filter?.length > 0) || !!this.localViewSetting?.searchString
 		},
 
 		sorting() {
