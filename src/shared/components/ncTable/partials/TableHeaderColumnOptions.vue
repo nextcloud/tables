@@ -355,7 +355,7 @@ export default {
 		changeFilterOperator(op) {
 			this.selectedOperator = op
 			this.selectOperator = false
-			if (op.id === FilterIds.IsEmpty) {
+			if (op.noSearchValue) {
 				this.createFilter()
 			} else {
 				this.selectValue = true
