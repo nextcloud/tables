@@ -24,6 +24,7 @@ use OCA\Tables\Service\ViewService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -361,6 +362,62 @@ class ApiTablesController extends AOCSController {
 	public function destroy(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->delete($id)->jsonSerialize());
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Archive a table for the requesting user
+	 *
+	 * Owners archive the table for all users (clears per-user overrides).
+	 * Non-owners archive only for themselves.
+	 *
+	 * @param int $id Table ID
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Table returned with updated archived state
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	public function archiveTable(int $id): DataResponse {
+		try {
+			return new DataResponse($this->service->archiveTable($id, $this->userId)->jsonSerialize());
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Unarchive a table for the requesting user
+	 *
+	 * Owners unarchive the table for all users (clears per-user overrides).
+	 * Non-owners remove only their personal archive override.
+	 *
+	 * @param int $id Table ID
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Table returned with updated archived state
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	public function unarchiveTable(int $id): DataResponse {
+		try {
+			return new DataResponse($this->service->unarchiveTable($id, $this->userId)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {
