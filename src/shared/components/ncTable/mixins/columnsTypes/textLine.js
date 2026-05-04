@@ -44,7 +44,7 @@ export default class TextLineColumn extends AbstractTextColumn {
 	isFilterFound(cell, filter) {
 		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
 		const cellValue = cell.value?.toLowerCase()
-		if (!cellValue & filter.operator.id !== FilterIds.IsEmpty) return false
+		if (!cellValue && filter.operator.id !== FilterIds.IsEmpty) return false
 		const filterMethod = {
 			[FilterIds.Contains]() { return cellValue.includes(filterValue) },
 			[FilterIds.DoesNotContain]() { return !cellValue.includes(filterValue) },
@@ -53,6 +53,7 @@ export default class TextLineColumn extends AbstractTextColumn {
 			[FilterIds.IsEqual]() { return cellValue === filterValue },
 			[FilterIds.IsNotEqual]() { return cellValue !== filterValue },
 			[FilterIds.IsEmpty]() { return !cellValue },
+			[FilterIds.IsNotEmpty]() { return !!cellValue },
 		}[filter.operator.id]
 
 		return super.isFilterFound(filterMethod, cell)

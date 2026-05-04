@@ -568,6 +568,17 @@ class Row2Mapper {
 					$filterExpression = $qb->expr()->isNull('value');
 				}
 				break;
+			case 'is-not-empty':
+				$includeDefault = !empty($defaultValue);
+				if ($column->getType() === Column::TYPE_TEXT) {
+					$filterExpression = $qb2->expr()->andX(
+						$qb->expr()->isNotNull('value'),
+						$qb->expr()->neq('value', $qb->createNamedParameter('', $paramType))
+					);
+				} else {
+					$filterExpression = $qb->expr()->isNotNull('value');
+				}
+				break;
 			default:
 				throw new InternalError('Operator ' . $operator . ' is not supported.');
 		}
@@ -636,6 +647,7 @@ class Row2Mapper {
 			'is-lower-than' => $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType)),
 			'is-lower-than-or-equal' => $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType)),
 			'is-empty' => $qb->expr()->isNull($columnName),
+			'is-not-empty' => $qb->expr()->isNotNull($columnName),
 			default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
 		};
 	}

@@ -20,4 +20,5 @@ enum FilterOperator: string {
 	case IS_LESS_THAN = 'is-lower-than';
 	case IS_LESS_THAN_OR_EQUAL = 'is-lower-than-or-equal';
 	case IS_EMPTY = 'is-empty';
+	case IS_NOT_EMPTY = 'is-not-empty';
 }
