@@ -56,6 +56,7 @@ export default class DatetimeDateColumn extends AbstractDatetimeColumn {
 			[FilterIds.IsLowerThan]() { return filterDate.isAfter(valueDate) },
 			[FilterIds.IsLowerThanOrEqual]() { return filterDate.isSameOrAfter(valueDate) },
 			[FilterIds.IsEmpty]() { return !cell.value },
+			[FilterIds.IsNotEmpty]() { return !!cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

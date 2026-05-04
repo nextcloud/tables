@@ -4,6 +4,7 @@
  */
 import { AbstractUsergroupColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
+import { FilterIds } from '../filter.js'
 
 export default class UsergroupColumn extends AbstractUsergroupColumn {
 
@@ -42,6 +43,19 @@ export default class UsergroupColumn extends AbstractUsergroupColumn {
 
 	isSearchStringFound(cell, searchString) {
 		return super.isSearchStringFound(this.getValueString(cell), cell, searchString)
+	}
+
+	isFilterFound(cell, filter) {
+		const valueString = this.getValueString(cell)
+		const filterMethod = {
+			[FilterIds.Contains]() { return valueString?.toLowerCase().includes(filter.value?.toLowerCase()) },
+			[FilterIds.DoesNotContain]() { return !valueString?.toLowerCase().includes(filter.value?.toLowerCase()) },
+			[FilterIds.IsEqual]() { return valueString === filter.value },
+			[FilterIds.IsNotEqual]() { return valueString !== filter.value },
+			[FilterIds.IsEmpty]() { return !valueString },
+			[FilterIds.IsNotEmpty]() { return !!valueString },
+		}[filter.operator.id]
+		return super.isFilterFound(filterMethod, cell)
 	}
 
 }
