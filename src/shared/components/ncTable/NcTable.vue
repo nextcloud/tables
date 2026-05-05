@@ -114,7 +114,7 @@ import {
 } from '../../constants.ts'
 import { MetaColumns } from './mixins/metaColumns.js'
 import { MagicFields } from './mixins/magicFields.js'
-import { getFiltersForColumn } from './mixins/filter.js'
+import { FilterIds, getFiltersForColumn } from './mixins/filter.js'
 
 export default {
 	name: 'NcTable',
@@ -250,7 +250,6 @@ export default {
 			return this.viewSetting?.sorting
 		},
 		getSearchedAndFilteredRows() {
-			const debug = false
 			// if we don't have to search and/or filter
 			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
 				// cleanup markers
@@ -282,18 +281,11 @@ export default {
 				if (!row || !row.data) {
 					continue
 				}
-
-				if (debug) {
-					console.debug('new row ===============================================', row)
-				}
 				let filterStatusRow = null
 				let searchStatusRow = false
 
 				// each column in a row => cell
 				this.columns.forEach(column => {
-					if (debug) {
-						console.debug('new column -------------------', column)
-					}
 					let filterStatus = null
 					let searchStatus = true
 					const filters = getFiltersForColumn(column, this.viewSetting)
@@ -341,12 +333,7 @@ export default {
 					})
 					// if we should search
 					if (searchString) {
-						console.debug('look for searchString', searchString)
 						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
-					}
-
-					if (debug) {
-						console.debug('filterStatus for cell', { cell: cell?.value, filterStatusCell: filterStatus, filterStatusRowBefore: filterStatusRow })
 					}
 
 					// if filterStatus is null, this result should be ignored
@@ -354,17 +341,10 @@ export default {
 						filterStatusRow = filterStatus
 					}
 
-					if (debug) {
-						console.debug('new filterStatusRow', filterStatusRow)
-					}
-
 					// filterStatusRow = filterStatus
 					searchStatusRow = searchStatusRow || searchStatus
 				})
 
-				if (debug) {
-					console.debug('if push row', { filterStatusRow, searchStatusRow, result: (filterStatusRow || filterStatusRow === null) && searchStatusRow })
-				}
 				if ((filterStatusRow || filterStatusRow === null) && searchStatusRow) {
 					data.push({ ...row })
 				}
@@ -434,6 +414,10 @@ export default {
 			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 		},
 		addMagicFieldsValues(filter) {
+			if (FilterIds.ContainsItem === filter.operator.id) {
+				return
+			}
+
 			Object.values(MagicFields).forEach(field => {
 				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
 				if (filter.value !== newFilterValue) {
