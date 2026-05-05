@@ -266,6 +266,7 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->userId);
+			$this->attachAliasPayload($insertedRow, $columns);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 			$this->activityManager->triggerEvent(
@@ -694,6 +695,7 @@ class RowService extends SuperService {
 		}
 
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
+		$this->attachAliasPayload($updatedRow, $columns);
 
 		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
@@ -782,6 +784,7 @@ class RowService extends SuperService {
 
 		try {
 			$deletedRow = $this->row2Mapper->delete($item);
+			$this->attachAliasPayload($item);
 
 			$event = new RowDeletedEvent($item, $item->getData());
 

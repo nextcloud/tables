@@ -6,9 +6,9 @@
 	<NcDialog size="large"
 		:name="t('tables', 'Edit column')"
 		@closing="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content create-column">
 			<div v-if="loading" class="icon-loading" />
-			<div class="row space-L">
+			<div class="row">
 				<div class="col-2">
 					<MainForm :description.sync="editColumn.description"
 						:mandatory.sync="editColumn.mandatory"

@@ -4,23 +4,16 @@
 -->
 <template>
 	<div class="row space-R">
+		<h3 class="section-heading">
+			{{ t('tables', 'Title') }}
+		</h3>
+
 		<!-- title -->
 		<div class="fix-col-4 mandatory title space-T" :class="{error: titleMissingError}">
 			{{ t('tables', 'Title') }}
 		</div>
 		<div class="fix-col-4" :class="{error: titleMissingError}">
 			<input v-model="localTitle" data-cy="columnTypeFormInput" :placeholder="t('tables', 'Enter a column title')">
-		</div>
-
-		<!-- technical name -->
-		<div class="fix-col-4 title space-T" :class="{error: technicalNameInvalidError}">
-			{{ t('tables', 'Technical name') }}
-		</div>
-		<div class="fix-col-4" :class="{error: technicalNameInvalidError}">
-			<input
-				v-model="localTechnicalName"
-				data-cy="columnTechnicalNameInput"
-				:placeholder="t('tables', 'Optional, e.g. customer_name')">
 		</div>
 
 		<!-- description -->
@@ -37,20 +30,6 @@
 		</div>
 		<div class="fix-col-4">
 			<NcCheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
-		</div>
-
-		<!-- column width -->
-		<div class="fix-col-4 mandatory title space-T" :class="{error: widthInvalidError}">
-			{{ t('tables', 'Column width') }}
-		</div>
-		<div class="fix-col-4" :class="{error: widthInvalidError}">
-			<input
-				v-model.number="localColumnWidth"
-				type="number"
-				pattern="\d+"
-				:min="COLUMN_WIDTH_MIN"
-				:max="COLUMN_WIDTH_MAX"
-				:placeholder="t('tables', 'Enter a column width between {min} and {max}', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX })">
 		</div>
 
 		<!-- add to views -->
@@ -80,11 +59,48 @@
 				</template>
 			</NcSelect>
 		</div>
+
+		<h3 class="section-heading">
+			{{ t('tables', 'Advanced settings') }}
+		</h3>
+
+		<!-- technical name -->
+		<div class="fix-col-4 title space-T" :class="{error: technicalNameInvalidError}">
+			{{ t('tables', 'Technical name') }}
+		</div>
+		<div class="fix-col-4" :class="{error: technicalNameInvalidError}">
+			<input
+				v-model="localTechnicalName"
+				data-cy="columnTechnicalNameInput"
+				:placeholder="t('tables', 'Optional, e.g. customer_name')">
+		</div>
+
+		<!-- warning for technical name changes -->
+		<div v-if="editColumn" class="fix-col-4 space-T">
+			<NcNoteCard type="warning">
+				<p>{{ t('tables', 'Changing the technical name affects integrations and API. Make sure to update your services accordingly.') }}</p>
+			</NcNoteCard>
+		</div>
+
+		<!-- column width -->
+		<div class="fix-col-4 mandatory title space-T" :class="{error: widthInvalidError}">
+			{{ t('tables', 'Column width') }}
+		</div>
+		<div class="fix-col-4" :class="{error: widthInvalidError}">
+			<input
+				v-model.number="localColumnWidth"
+				type="number"
+				pattern="\d+"
+				:min="COLUMN_WIDTH_MIN"
+				:max="COLUMN_WIDTH_MAX"
+				:placeholder="t('tables', 'Enter a column width between {min} and {max}', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX })">
+		</div>
+
 	</div>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
+import { NcCheckboxRadioSwitch, NcNoteCard, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../../../store/store.js'
@@ -94,6 +110,7 @@ export default {
 	name: 'MainForm',
 	components: {
 		NcCheckboxRadioSwitch,
+		NcNoteCard,
 		NcSelect,
 	},
 	props: {
@@ -205,5 +222,12 @@ export default {
 
 .error input {
 	border-color: var(--color-error);
+}
+
+.section-heading {
+	margin: calc(var(--default-grid-baseline) * 2) 0 var(--default-grid-baseline) 0;
+	font-size: 20px;
+	font-weight: 600;
+	width: 100%;
 }
 </style>
