@@ -10,6 +10,7 @@ namespace OCA\Tables\Service\ValueObject;
 
 use InvalidArgumentException;
 use Stringable;
+
 class ShareToken implements Stringable {
 	public const MIN_LENGTH = 16;
 	public const MAX_LENGTH = 255;
