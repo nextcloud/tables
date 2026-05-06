@@ -33,6 +33,6 @@ class Version1000Date20260324000000 extends SimpleMigrationStep {
 			->set('permission_manage', $qb->createNamedParameter(0))
 			->where($qb->expr()->eq('node_type', $qb->createNamedParameter('context')));
 		$affected = $qb->executeStatement();
-		$output->info('Version001100Date20260121180000: Rows affected: ' . $affected);
+		$output->info('Version1000Date20260324000000: Rows affected: ' . $affected);
 	}
 }

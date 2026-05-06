@@ -31,7 +31,6 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ShareCreate;
-use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -267,7 +266,6 @@ class ShareService extends SuperService {
 			$dto->getPermissionDelete(),
 			$dto->getPermissionManage(),
 			$dto->getPassword(),
-			$dto->getShareToken(),
 		);
 	}
 
@@ -321,7 +319,6 @@ class ShareService extends SuperService {
 	 * @param bool $permissionDelete
 	 * @param bool $permissionManage
 	 * @param ?string $password
-	 * @param ?ShareToken $shareToken
 	 *
 	 * @throws InternalError
 	 *
@@ -338,7 +335,6 @@ class ShareService extends SuperService {
 		bool $permissionDelete,
 		bool $permissionManage,
 		?string $password,
-		?ShareToken $shareToken = null,
 	): Share {
 		$item = $this->buildBaseShare($nodeId, $nodeType, $receiver, $receiverType);
 		$item->setPermissionRead($permissionRead);
@@ -346,10 +342,6 @@ class ShareService extends SuperService {
 		$item->setPermissionUpdate($permissionUpdate);
 		$item->setPermissionDelete($permissionDelete);
 		$item->setPermissionManage($permissionManage);
-
-		if ($shareToken) {
-			$item->setToken((string)$shareToken);
-		}
 
 		if ($password) {
 			$item->setPassword($this->hasher->hash($password));

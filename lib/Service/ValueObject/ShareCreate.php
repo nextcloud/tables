@@ -22,7 +22,6 @@ class ShareCreate {
 		private bool $permissionManage,
 		private int $displayMode,
 		private ?string $password = null,
-		private ?ShareToken $shareToken = null,
 	) {
 	}
 
@@ -68,9 +67,5 @@ class ShareCreate {
 
 	public function getPassword(): ?string {
 		return $this->password;
-	}
-
-	public function getShareToken(): ?ShareToken {
-		return $this->shareToken;
 	}
 }

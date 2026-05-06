@@ -11,7 +11,6 @@ use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareCreate;
-use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
@@ -91,14 +90,12 @@ class ShareController extends Controller {
 		bool $permissionManage = false,
 		int $displayMode = Application::NAV_ENTRY_MODE_ALL,
 		?string $password = null,
-		?string $shareToken = null,
 	): DataResponse {
-		$shareTokenObject = $shareToken !== null ? new ShareToken($shareToken) : null;
 		$dto = new ShareCreate(
 			$nodeId, $nodeType, $receiver, $receiverType,
 			$permissionRead, $permissionCreate, $permissionUpdate,
 			$permissionDelete, $permissionManage, $displayMode,
-			$password, $shareTokenObject,
+			$password,
 		);
 
 		return $this->handleError(function () use ($dto) {
