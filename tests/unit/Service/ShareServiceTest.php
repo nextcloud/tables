@@ -25,6 +25,7 @@ use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
+use OCP\Share\IManager as IShareManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -42,6 +43,7 @@ class ShareServiceTest extends TestCase {
 	private $secureRandom;
 	private $userManager;
 	private $hasher;
+	private $shareManager;
 	protected $shareService;
 
 	protected function setUp(): void {
@@ -59,6 +61,7 @@ class ShareServiceTest extends TestCase {
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->hasher = $this->createMock(IHasher::class);
+		$this->shareManager = $this->createMock(IShareManager::class);
 
 		$this->shareService = new ShareService(
 			$this->permissionsService,
@@ -74,7 +77,8 @@ class ShareServiceTest extends TestCase {
 			$this->dbc,
 			$this->secureRandom,
 			$this->userManager,
-			$this->hasher
+			$this->hasher,
+			$this->shareManager
 		);
 	}
 
@@ -108,6 +112,6 @@ class ShareServiceTest extends TestCase {
 		$this->mapper->method('find')->willReturn($share);
 
 		$this->expectException(PermissionError::class);
-		$this->shareService->updatePermission(1, 'manage', true);
+		$this->shareService->updatePermission(1, ['manage' => true]);
 	}
 }
