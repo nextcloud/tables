@@ -30,11 +30,14 @@ use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ShareCreate;
+use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\Security\IHasher;
 use OCP\Share\IManager;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -63,6 +66,8 @@ class ShareService extends SuperService {
 
 	private IManager $shareManager;
 
+	private IHasher $hasher;
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
@@ -76,6 +81,7 @@ class ShareService extends SuperService {
 		ContextNavigationMapper $contextNavigationMapper,
 		IDBConnection $dbc,
 		IManager $shareManager,
+		IHasher $hasher,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
@@ -87,6 +93,7 @@ class ShareService extends SuperService {
 		$this->contextNavigationMapper = $contextNavigationMapper;
 		$this->dbc = $dbc;
 		$this->shareManager = $shareManager;
+		$this->hasher = $hasher;
 	}
 
 
@@ -233,25 +240,58 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @param ShareCreate $dto
+	 *
+	 * @return Share
+	 *
+	 * @throws InternalError
+	 */
+	public function create(ShareCreate $dto): Share {
+		if ($dto->getNodeType() === 'context') {
+			return $this->createContextShare(
+				$dto->getNodeId(),
+				$dto->getReceiver(),
+				$dto->getReceiverType(),
+				$dto->getDisplayMode()
+			);
+		}
+
+		return $this->createNodeShare(
+			$dto->getNodeId(),
+			$dto->getNodeType(),
+			$dto->getReceiver(),
+			$dto->getReceiverType(),
+			$dto->getPermissionRead(),
+			$dto->getPermissionCreate(),
+			$dto->getPermissionUpdate(),
+			$dto->getPermissionDelete(),
+			$dto->getPermissionManage(),
+			$dto->getPassword(),
+			$dto->getShareToken(),
+		);
+	}
+
+	/**
 	 * @param int $nodeId
 	 * @param string $nodeType
 	 * @param string $receiver
 	 * @param string $receiverType
-	 * @param bool $permissionRead
-	 * @param bool $permissionCreate
-	 * @param bool $permissionUpdate
-	 * @param bool $permissionDelete
-	 * @param bool $permissionManage
-	 * @return Share
+	 *
 	 * @throws InternalError
+	 *
+	 * @return Share
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode):Share {
+	private function buildBaseShare(
+		int $nodeId,
+		string $nodeType,
+		string $receiver,
+		string $receiverType,
+	): Share {
 		if (!$this->userId) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
-
 		if ($receiverType === ShareReceiverType::GROUP && !$this->shareManager->allowGroupSharing()) {
 			throw new PermissionError('Group sharing is disabled by your administrator.');
 		}
@@ -306,8 +346,15 @@ class ShareService extends SuperService {
 		$item->setPermissionUpdate($permissionUpdate);
 		$item->setPermissionDelete($permissionDelete);
 		$item->setPermissionManage($permissionManage);
-		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		if ($shareToken) {
+			$item->setToken((string)$shareToken);
+		}
+
+		if ($password) {
+			$item->setPassword($this->hasher->hash($password));
+		}
+
 		try {
 			$newShare = $this->mapper->insert($item);
 		} catch (Exception $e) {
