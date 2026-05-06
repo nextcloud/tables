@@ -22,9 +22,6 @@ use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCP\IDBConnection;
-use OCP\IUserManager;
-use OCP\Security\IHasher;
-use OCP\Security\ISecureRandom;
 use OCP\Share\IManager as IShareManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -40,9 +37,6 @@ class ShareServiceTest extends TestCase {
 	private $circleHelper;
 	private $contextNavigationMapper;
 	private $dbc;
-	private $secureRandom;
-	private $userManager;
-	private $hasher;
 	private $shareManager;
 	protected $shareService;
 
@@ -58,9 +52,6 @@ class ShareServiceTest extends TestCase {
 		$this->circleHelper = $this->createMock(CircleHelper::class);
 		$this->contextNavigationMapper = $this->createMock(ContextNavigationMapper::class);
 		$this->dbc = $this->createMock(IDBConnection::class);
-		$this->secureRandom = $this->createMock(ISecureRandom::class);
-		$this->userManager = $this->createMock(IUserManager::class);
-		$this->hasher = $this->createMock(IHasher::class);
 		$this->shareManager = $this->createMock(IShareManager::class);
 
 		$this->shareService = new ShareService(
@@ -75,9 +66,6 @@ class ShareServiceTest extends TestCase {
 			$this->circleHelper,
 			$this->contextNavigationMapper,
 			$this->dbc,
-			$this->secureRandom,
-			$this->userManager,
-			$this->hasher,
 			$this->shareManager
 		);
 	}
