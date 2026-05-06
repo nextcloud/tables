@@ -69,8 +69,8 @@ class ShareServiceTest extends TestCase {
 			$this->circleHelper,
 			$this->contextNavigationMapper,
 			$this->dbc,
+			$this->shareManager,
 			$this->hasher,
-			$this->shareManager
 		);
 	}
 
