@@ -10,18 +10,17 @@ namespace OCA\Tables\Service\ValueObject;
 
 use InvalidArgumentException;
 use Stringable;
-
 class ShareToken implements Stringable {
 	public const MIN_LENGTH = 16;
 	public const MAX_LENGTH = 255;
 	public const CHARACTER_REGEX = '/[^A-Za-z0-9]/';
+	private string $token;
 
 	/**
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct(
-		private readonly string $token,
-	) {
+	public function __construct(string $token) {
+		$this->token = $token;
 		$lengthInBytes = strlen($this->token);
 		if ($lengthInBytes < self::MIN_LENGTH
 			|| $lengthInBytes > self::MAX_LENGTH
