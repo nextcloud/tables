@@ -147,6 +147,30 @@ class PermissionsService {
 		return false;
 	}
 
+	public function isNodeOwnerById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		try {
+			$userId = $this->preCheckUserId($userId, false);
+		} catch (InternalError) {
+			return false;
+		}
+
+		try {
+			if ($nodeType === Application::NODE_TYPE_TABLE) {
+				$table = $this->tableMapper->find($nodeId);
+				return $table->getOwnership() === $userId;
+			}
+
+			if ($nodeType === Application::NODE_TYPE_VIEW) {
+				$view = $this->viewMapper->find($nodeId);
+				return $view->getOwnership() === $userId;
+			}
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception) {
+			return false;
+		}
+
+		return false;
+	}
+
 	public function canManageContextById(int $contextId, ?string $userId = null): bool {
 		try {
 			$context = $this->contextMapper->findById($contextId, $userId);

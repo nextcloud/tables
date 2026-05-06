@@ -59,6 +59,7 @@ class Application extends App implements IBootstrap {
 	public const PERMISSION_UPDATE = 4;
 	public const PERMISSION_DELETE = 8;
 	public const PERMISSION_MANAGE = 16;
+	public const PERMISSION_OWNER = 32;
 	public const PERMISSION_ALL = 31;
 
 	public function __construct() {

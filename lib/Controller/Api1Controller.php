@@ -28,6 +28,7 @@ use OCA\Tables\Service\ImportService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -594,7 +595,7 @@ class Api1Controller extends ApiController {
 	): DataResponse {
 		try {
 			return new DataResponse(
-				$this->shareService->create(
+				$this->shareService->create(new ShareCreate(
 					$nodeId,
 					$nodeType,
 					$receiver,
@@ -605,7 +606,7 @@ class Api1Controller extends ApiController {
 					$permissionDelete,
 					$permissionManage,
 					$displayMode
-				)->jsonSerialize()
+				))->jsonSerialize()
 			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
@@ -1567,7 +1568,7 @@ class Api1Controller extends ApiController {
 	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
 		try {
 			return new DataResponse(
-				$this->shareService->create(
+				$this->shareService->create(new ShareCreate(
 					$tableId,
 					'table',
 					$receiver,
@@ -1578,7 +1579,7 @@ class Api1Controller extends ApiController {
 					$permissionDelete,
 					$permissionManage,
 					Application::NAV_ENTRY_MODE_ALL
-				)->jsonSerialize()
+				))->jsonSerialize()
 			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);

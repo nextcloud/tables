@@ -33,6 +33,7 @@ use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -166,7 +167,7 @@ class ShareService extends SuperService {
 			// there is the theoretical chance, that an existing share token would be re-used,
 			// so we take up to three attempts to try to generate it.
 			try {
-				return $this->create(
+				return $this->create(new ShareCreate(
 					$node->getId(),
 					ConversionHelper::object2String($node),
 					'',
@@ -177,9 +178,9 @@ class ShareService extends SuperService {
 					false,
 					false,
 					Application::NAV_ENTRY_MODE_HIDDEN,
-					$this->generateShareToken(),
 					$password,
-				);
+					$this->generateShareToken(),
+				));
 			} catch (InternalError $e) {
 			}
 		}
@@ -281,11 +282,54 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @param ShareCreate $dto
+	 *
+	 * @return Share
+	 *
 	 * @throws InternalError
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode, ?ShareToken $shareToken = null, ?string $password = null, ?string $sender = null): Share {
-		$sender = $sender ?? $this->userId;
-		if (!$sender) {
+	public function create(ShareCreate $dto): Share {
+		if ($dto->getNodeType() === 'context') {
+			return $this->createContextShare(
+				$dto->getNodeId(),
+				$dto->getReceiver(),
+				$dto->getReceiverType(),
+				$dto->getDisplayMode()
+			);
+		}
+
+		return $this->createNodeShare(
+			$dto->getNodeId(),
+			$dto->getNodeType(),
+			$dto->getReceiver(),
+			$dto->getReceiverType(),
+			$dto->getPermissionRead(),
+			$dto->getPermissionCreate(),
+			$dto->getPermissionUpdate(),
+			$dto->getPermissionDelete(),
+			$dto->getPermissionManage(),
+			$dto->getPassword(),
+			$dto->getShareToken(),
+		);
+	}
+
+	/**
+	 * @param int $nodeId
+	 * @param string $nodeType
+	 * @param string $receiver
+	 * @param string $receiverType
+	 *
+	 * @throws InternalError
+	 *
+	 * @return Share
+	 */
+	private function buildBaseShare(
+		int $nodeId,
+		string $nodeType,
+		string $receiver,
+		string $receiverType,
+	): Share {
+		if (!$this->userId) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -293,26 +337,62 @@ class ShareService extends SuperService {
 		if ($receiverType === ShareReceiverType::GROUP && !$this->shareManager->allowGroupSharing()) {
 			throw new PermissionError('Group sharing is disabled by your administrator.');
 		}
-		$this->enforceGroupMembersOnlyPolicy($sender, $receiverType, $receiver);
+		$this->enforceGroupMembersOnlyPolicy($this->userId, $receiverType, $receiver);
 
 		$time = new DateTime();
 		$item = new Share();
-		$item->setSender($sender);
+		$item->setSender($this->userId);
 		$item->setReceiver($receiver);
 		$item->setReceiverType($receiverType);
 		$item->setNodeId($nodeId);
 		$item->setNodeType($nodeType);
+		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
+		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		return $item;
+	}
+
+	/**
+	 * @param int $nodeId
+	 * @param string $nodeType
+	 * @param string $receiver
+	 * @param string $receiverType
+	 * @param bool $permissionRead
+	 * @param bool $permissionCreate
+	 * @param bool $permissionUpdate
+	 * @param bool $permissionDelete
+	 * @param bool $permissionManage
+	 * @param ?string $password
+	 * @param ?ShareToken $shareToken
+	 *
+	 * @throws InternalError
+	 *
+	 * @return Share
+	 */
+	private function createNodeShare(
+		int $nodeId,
+		string $nodeType,
+		string $receiver,
+		string $receiverType,
+		bool $permissionRead,
+		bool $permissionCreate,
+		bool $permissionUpdate,
+		bool $permissionDelete,
+		bool $permissionManage,
+		?string $password,
+		?ShareToken $shareToken = null,
+	): Share {
+		$item = $this->buildBaseShare($nodeId, $nodeType, $receiver, $receiverType);
 		$item->setPermissionRead($permissionRead);
 		$item->setPermissionCreate($permissionCreate);
 		$item->setPermissionUpdate($permissionUpdate);
 		$item->setPermissionDelete($permissionDelete);
 		$item->setPermissionManage($permissionManage);
-		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 
 		if ($shareToken) {
 			$item->setToken((string)$shareToken);
 		}
+
 		if ($password) {
 			$item->setPassword($this->hasher->hash($password));
 		}
@@ -324,19 +404,49 @@ class ShareService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 
-		if ($nodeType === 'context') {
-			// set the default visibility of the nav bar item for Application shares
-			$navigationItem = new ContextNavigation();
-			$navigationItem->setShareId($item->getId());
-			$navigationItem->setUserId('');
-			$navigationItem->setDisplayMode($displayMode);
+		return $this->addReceiverDisplayName($newShare);
+	}
 
-			try {
-				$this->contextNavigationMapper->insert($navigationItem);
-			} catch (Exception $e) {
-				$this->logger->error($e->getMessage());
-				throw new InternalError($e->getMessage());
-			}
+	/**
+	 * @param int $nodeId
+	 * @param string $receiver
+	 * @param string $receiverType
+	 * @param int $displayMode
+	 *
+	 * @throws InternalError
+	 *
+	 * @return Share
+	 */
+	private function createContextShare(
+		int $nodeId,
+		string $receiver,
+		string $receiverType,
+		int $displayMode,
+	): Share {
+		$item = $this->buildBaseShare($nodeId, 'context', $receiver, $receiverType);
+		$item->setPermissionRead(false);
+		$item->setPermissionCreate(false);
+		$item->setPermissionUpdate(false);
+		$item->setPermissionDelete(false);
+		$item->setPermissionManage(false);
+
+		try {
+			$newShare = $this->mapper->insert($item);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+
+		$navigationItem = new ContextNavigation();
+		$navigationItem->setShareId($item->getId());
+		$navigationItem->setUserId('');
+		$navigationItem->setDisplayMode($displayMode);
+
+		try {
+			$this->contextNavigationMapper->insert($navigationItem);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
 		}
 
 		return $this->addReceiverDisplayName($newShare);
@@ -730,7 +840,6 @@ class ShareService extends SuperService {
 		$permissionManage = $share['permissionManage'] ?? false;
 		$displayMode = $share['displayMode'] ?? 0;
 		$password = $share['password'] ?? null;
-		$sender = $userId;
 		$shareToken = null;
 
 		if (!empty($share['token'])) {
@@ -742,7 +851,7 @@ class ShareService extends SuperService {
 		}
 
 		try {
-			$this->create(
+			$this->create(new ShareCreate(
 				$nodeId,
 				$nodeType,
 				$receiver,
@@ -753,10 +862,9 @@ class ShareService extends SuperService {
 				$permissionDelete,
 				$permissionManage,
 				$displayMode,
-				$shareToken,
 				$password,
-				$sender
-			);
+				$shareToken,
+			));
 		} catch (Throwable $e) {
 			$this->logger->error('Failed to import share: ' . $e->getMessage(), ['exception' => $e, 'share' => $share]);
 		}
