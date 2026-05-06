@@ -14,10 +14,13 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\PermissionsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Middleware;
+use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCSController;
 use OCP\AppFramework\Utility\IControllerMethodReflector;
 use OCP\IRequest;
 
@@ -26,18 +29,21 @@ class PermissionMiddleware extends Middleware {
 	private PermissionsService $permissionsService;
 	private ?string $userId;
 	private IRequest $request;
+	private ContextService $contextService;
 
 	public function __construct(
 		IControllerMethodReflector $reflector,
 		PermissionsService $permissionsService,
 		IRequest $request,
 		?string $userId,
+		ContextService $contextService,
 	) {
 
 		$this->reflector = $reflector;
 		$this->permissionsService = $permissionsService;
 		$this->userId = $userId;
 		$this->request = $request;
+		$this->contextService = $contextService;
 	}
 
 	/**
@@ -74,7 +80,7 @@ class PermissionMiddleware extends Middleware {
 		}
 		$nodeId = (int)$nodeId;
 
-		$nodeType = $attribute->getType() ?? $this->request->getParam($attribute->getTypeParam());
+		$nodeType = $attribute->getType() ?? $this->request->getParam($attribute->getTypeParam()) ?? $attribute->getTypeParam();
 		$isContext = false;
 		if (!is_numeric($nodeType)) {
 			if ($nodeType === 'context') {
@@ -108,6 +114,7 @@ class PermissionMiddleware extends Middleware {
 		match ($attribute->getPermission()) {
 			Application::PERMISSION_READ => true, // this is guaranteed in the pre-test ^
 			Application::PERMISSION_MANAGE => $this->assertManagePermission($isContext, $nodeType, $nodeId),
+			Application::PERMISSION_OWNER => $this->assertOwnerPermission($isContext, $nodeType, $nodeId),
 			Application::PERMISSION_CREATE => $this->assertCreatePermissions($nodeType, $nodeId),
 			Application::PERMISSION_UPDATE => $this->assertUpdatePermissions($nodeType, $nodeId),
 			Application::PERMISSION_DELETE => $this->assertDeletePermissions($nodeType, $nodeId),
@@ -182,6 +189,27 @@ class PermissionMiddleware extends Middleware {
 
 	/**
 	 * @throws PermissionError
+	 */
+	private function assertOwnerPermission(bool $isContext, int $nodeType, int $nodeId): bool {
+		if ($isContext) {
+			$context = $this->contextService->findById($nodeId, $this->userId);
+			if ($context->getOwnerId() !== $this->userId) {
+				throw new PermissionError(sprintf('User %s is not the owner of context %d',
+					$this->userId, $nodeId
+				));
+			}
+		} else {
+			if (!$this->permissionsService->isNodeOwnerById($nodeType, $nodeId, $this->userId)) {
+				throw new PermissionError(sprintf('User %s is not the owner of node %d (type %d)',
+					$this->userId, $nodeId, $nodeType
+				));
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @throws PermissionError
 	 * @throws InternalError
 	 */
 	protected function assertCanManageNode(): void {
@@ -231,6 +259,9 @@ class PermissionMiddleware extends Middleware {
 
 	public function afterException($controller, $methodName, \Exception $exception) {
 		if ($exception instanceof PermissionError) {
+			if ($controller instanceof OCSController) {
+				throw new OCSForbiddenException($exception->getMessage(), $exception);
+			}
 			return new Http\DataResponse(['message' => $exception->getMessage()], Http::STATUS_FORBIDDEN);
 		}
 		if ($exception instanceof NotFoundError) {

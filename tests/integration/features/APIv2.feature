@@ -552,6 +552,18 @@ Feature: APIv2
     Then the reported status is "404"
 
   @api2 @contexts @contexts-ownership
+  Scenario: Transfer a shared context as a sharee with manage permission
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2" with permissions "read,create,update,delete,manage"
+    When user "participant2-v2" transfers the Context "c1" to "participant3-v2"
+    Then the reported status is "403" 
+    
+  @api2 @contexts @contexts-ownership
   Scenario: Transfer an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2

@@ -366,6 +366,36 @@ Feature: APIv1
       | node  | table:t1:read,create,update  |
       | node  | table:t2:read                |
 
+@api1 @contexts @contexts-sharing
+  Scenario: Share a context with a user does not grant permissions
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1" as "t2" via v2
+    And user "participant1" creates the Context "c1" with name "NoPermContext" with icon "tennis" and description "No permissions" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant1" shares the Context "c1" to "user" "participant2"
+    Then the reported status is "200"
+    Then user "participant2" has the following context permissions for "c1"
+      | read    | 0 |
+      | create  | 0 |
+      | update  | 0 |
+      | delete  | 0 |
+      | manage  | 0 |
+
+  @api1 @contexts @contexts-sharing
+  Scenario: Setting permissions on a context share is forbidden
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1" as "t2" via v2
+    And user "participant1" creates the Context "c1" with name "NoPermContext" with icon "tennis" and description "No permissions" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant1" shares the Context "c1" to "user" "participant2"
+    Then the reported status is "200"
+    When user "participant1" tries to set permission "manage" to 1 for context "c1" and user "participant2"
+    Then the reported status is "403"
+  
   @api1 @contexts @contexts-sharing
   Scenario: Share an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1" as "t1" via v2
