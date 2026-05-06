@@ -37,6 +37,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\Security\IHasher;
 use OCP\Share\IManager;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -64,6 +65,7 @@ class ShareService extends SuperService {
 	private IDBConnection $dbc;
 
 	private IManager $shareManager;
+	private IHasher $hasher;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -78,6 +80,8 @@ class ShareService extends SuperService {
 		ContextNavigationMapper $contextNavigationMapper,
 		IDBConnection $dbc,
 		IManager $shareManager,
+		IHasher $hasher,
+
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
@@ -89,6 +93,7 @@ class ShareService extends SuperService {
 		$this->contextNavigationMapper = $contextNavigationMapper;
 		$this->dbc = $dbc;
 		$this->shareManager = $shareManager;
+		$this->hasher = $hasher;
 	}
 
 
