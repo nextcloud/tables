@@ -345,6 +345,7 @@ OC.L10N.register(
     "Back" : "Back",
     "Select operator" : "Select operator",
     "Search for value" : "Search for value",
+    "Select options" : "Select options",
     "Keyword and submit" : "Keyword and submit",
     "Or use magic values" : "Or use magic values",
     "Sorting" : "مرتب سازی",

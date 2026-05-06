@@ -490,6 +490,7 @@ OC.L10N.register(
     "Back" : "上星期",
     "Select operator" : "選擇操作",
     "Search for value" : "搜尋數值",
+    "Select options" : "選擇選項",
     "Keyword and submit" : "關鍵字與遞交",
     "Or use magic values" : "或使用魔術值",
     "Unpin column" : "取消釘選直欄",

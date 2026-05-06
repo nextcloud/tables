@@ -477,6 +477,7 @@ OC.L10N.register(
     "Back" : "قايتىش",
     "Select operator" : "تىجارەتچىنى تاللاڭ",
     "Search for value" : "قىممەت ئىزدەڭ",
+    "Select options" : "تاللاشلارنى تاللاڭ",
     "Keyword and submit" : "ئاچقۇچلۇق سۆز ۋە يوللاش",
     "Or use magic values" : "ياكى سېھىرلىك قىممەتلەرنى ئىشلىتىڭ",
     "Sorting" : "تەرتىپلەش",

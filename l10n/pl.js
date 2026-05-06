@@ -229,6 +229,7 @@ OC.L10N.register(
     "Url" : "URL",
     "Options" : "Opcje",
     "Back" : "Poprzednia",
+    "Select options" : "Wybierz opcje",
     "Sorting" : "Sortuj",
     "Redo" : "Powtórzenie",
     "Bold" : "Tekst pogrubiony",

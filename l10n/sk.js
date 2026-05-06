@@ -476,6 +476,7 @@ OC.L10N.register(
     "Back" : "Späť",
     "Select operator" : "Vyberte funkciu",
     "Search for value" : "Hľadať hodnotu",
+    "Select options" : "Vyberte možnosti",
     "Keyword and submit" : "Kľúčové slovo a odoslať",
     "Or use magic values" : "Alebo použite magické hodnoty",
     "Sorting" : "Triedenie",

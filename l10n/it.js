@@ -305,6 +305,7 @@ OC.L10N.register(
     "Url" : "Url",
     "Options" : "Opzioni",
     "Back" : "Indietro",
+    "Select options" : "Seleziona opzioni",
     "Sorting" : "Ordina",
     "Sort asc" : "Ordina per ascendente",
     "Sort desc" : "Ordina per discendente",

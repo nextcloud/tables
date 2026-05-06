@@ -271,6 +271,7 @@ OC.L10N.register(
     "This option is outdated." : "Esta opción está desactualizada.",
     "Options" : "Opciones",
     "Back" : "Regresar",
+    "Select options" : "Seleccionar opciones",
     "Keyword and submit" : "Palabra clave y enviar",
     "Or use magic values" : "O usa valores mágicos",
     "Sorting" : "Ordenar",

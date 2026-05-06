@@ -312,6 +312,7 @@ OC.L10N.register(
     "This option is outdated." : "Ta možnost je zastarela.",
     "Options" : "Možnosti",
     "Back" : "Nazaj",
+    "Select options" : "Izbor možnosti",
     "Sorting" : "Razvrščanje",
     "Sort asc" : "Razvrsti naraščajoče",
     "Sort desc" : "Razvrsti padajoče",

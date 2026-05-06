@@ -401,6 +401,7 @@ OC.L10N.register(
     "Url" : "Url",
     "Options" : "选项",
     "Back" : "返回",
+    "Select options" : "选择选项",
     "Sorting" : "正在排序",
     "Undo" : "撤消",
     "Redo" : "重做",

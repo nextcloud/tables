@@ -428,6 +428,7 @@ OC.L10N.register(
     "Back" : "Tilbake",
     "Select operator" : "Velg operatør",
     "Search for value" : "Søk etter verdi",
+    "Select options" : "Velg alternativer",
     "Keyword and submit" : "Nøkkelord og send inn",
     "Or use magic values" : "Eller bruk magiske verdier",
     "Sorting" : "Sorter",

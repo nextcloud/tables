@@ -496,6 +496,7 @@ OC.L10N.register(
     "Back" : "Ar ais",
     "Select operator" : "Roghnaigh oibreoir",
     "Search for value" : "Cuardaigh luach",
+    "Select options" : "Roghnaigh roghanna",
     "Keyword and submit" : "Eochairfhocal agus cuir isteach",
     "Or use magic values" : "Nó luachanna draíochta a úsáid",
     "Unpin column" : "Díphionáil an colún",

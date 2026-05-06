@@ -134,6 +134,7 @@ OC.L10N.register(
     "Options" : "Chaguzi",
     "Back" : "Rudi",
     "Select operator" : "Select operator",
+    "Select options" : "Chagua machaguo",
     "Sorting" : "Sorting",
     "Sort asc" : "Sort asc",
     "Sort desc" : "Sort desc",

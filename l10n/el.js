@@ -460,6 +460,7 @@ OC.L10N.register(
     "Back" : "Επιστροφή",
     "Select operator" : "Επιλέξτε τελεστή",
     "Search for value" : "Αναζήτηση τιμής",
+    "Select options" : "Επιλογή επιλογών",
     "Keyword and submit" : "Λέξη-κλειδί και υποβολή",
     "Or use magic values" : "Ή χρησιμοποιήστε μαγικές τιμές",
     "Sorting" : "Ταξινόμηση",

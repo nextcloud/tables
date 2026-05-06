@@ -477,6 +477,7 @@ OC.L10N.register(
     "Back" : "Назад",
     "Select operator" : "Изаберите оператор",
     "Search for value" : "Претрага вредности",
+    "Select options" : "Изаберите опције",
     "Keyword and submit" : "Кључна реч и предајте",
     "Or use magic values" : "Или употребите магчине вредности",
     "Sorting" : "Сортирање",

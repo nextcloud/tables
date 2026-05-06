@@ -124,6 +124,7 @@ OC.L10N.register(
     "Url" : "Url",
     "Options" : "Mogućnosti",
     "Back" : "Natrag",
+    "Select options" : "Odaberi opcije",
     "Sorting" : "Razvrstavanje",
     "Bold" : "Podebljano",
     "Italic" : "U kurzivu",

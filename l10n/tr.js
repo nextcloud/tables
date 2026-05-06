@@ -485,6 +485,7 @@ OC.L10N.register(
     "Back" : "Geri",
     "Select operator" : "İşlem seçin",
     "Search for value" : "Değer ara",
+    "Select options" : "Seçenekleri seçin",
     "Keyword and submit" : "Anahtar sözcük ve gönder",
     "Or use magic values" : "Ya da sihirli değerleri kullanın",
     "Sorting" : "Sıralama",

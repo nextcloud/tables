@@ -496,6 +496,7 @@ OC.L10N.register(
     "Back" : "Zurück",
     "Select operator" : "Operator auswählen",
     "Search for value" : "Nach Wert suchen",
+    "Select options" : "Optionen auswählen",
     "Keyword and submit" : "Schlagwort und übermitteln",
     "Or use magic values" : "Oder verwenden Sie magische Werte",
     "Unpin column" : "Spalte ablösen",

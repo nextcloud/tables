@@ -484,6 +484,7 @@ OC.L10N.register(
     "Back" : "Tagasi",
     "Select operator" : "Vali tehtemärk",
     "Search for value" : "Vali väärtus",
+    "Select options" : "Vali eelistused",
     "Keyword and submit" : "Märksõna ja saada",
     "Or use magic values" : "Või kasuta maagilisi väärtusi",
     "Sorting" : "Järjestus",

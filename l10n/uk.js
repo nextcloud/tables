@@ -490,6 +490,7 @@ OC.L10N.register(
     "Back" : "Назад",
     "Select operator" : "Виберіть оператор",
     "Search for value" : "Пошук значення",
+    "Select options" : "Виберіть",
     "Keyword and submit" : "Ключове слово та підтвердження",
     "Or use magic values" : "Або використовуйте чарівні значення",
     "Unpin column" : "Відкріпити стовпець",

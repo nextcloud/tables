@@ -202,6 +202,7 @@ OC.L10N.register(
     "Url" : "Url",
     "Options" : "Opties",
     "Back" : "Terug",
+    "Select options" : "Selecteer opties",
     "Sorting" : "Sorteren",
     "Bold" : "Vet",
     "Italic" : "Cursief",

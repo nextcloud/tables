@@ -350,6 +350,7 @@ OC.L10N.register(
     "Back" : "Vissza",
     "Select operator" : "Válasszon kezelőt",
     "Search for value" : "Érték keresése",
+    "Select options" : "Beállítások kiválasztása",
     "Keyword and submit" : "Kulcsszó és elküldés",
     "Or use magic values" : "Vagy mágikus értékek használata",
     "Sorting" : "Rendezés",

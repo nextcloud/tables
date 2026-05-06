@@ -301,6 +301,7 @@ OC.L10N.register(
     "Options" : "Aukerak",
     "Back" : "Itzuli",
     "Select operator" : "Hautatu operadorea",
+    "Select options" : "Hautatu aukerak",
     "Sorting" : "Antolaketa",
     "Sort asc" : "Ordenatu goranzkoan",
     "Sort desc" : "Ordenatu beheranzkoan",

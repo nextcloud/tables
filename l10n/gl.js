@@ -485,6 +485,7 @@ OC.L10N.register(
     "Back" : "Atras",
     "Select operator" : "Seleccionar operador",
     "Search for value" : "Busca de valores",
+    "Select options" : "Seleccione as opcións",
     "Keyword and submit" : "Palabra clave e enviar",
     "Or use magic values" : "Ou use valores máxicos",
     "Sorting" : "Ordenación",

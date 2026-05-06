@@ -251,6 +251,7 @@ OC.L10N.register(
     "Url" : "Url",
     "Options" : "Opcions",
     "Back" : "Torna",
+    "Select options" : "Selecciona opcions",
     "Sorting" : "Ordenació",
     "Undo" : "Desfés",
     "Redo" : "Refer",

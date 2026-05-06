@@ -104,6 +104,7 @@ OC.L10N.register(
     "URL" : "Адреса",
     "Options" : "Опции",
     "Back" : "Назад",
+    "Select options" : "Изберете опции",
     "Sorting" : "Сортирање",
     "Undo" : "Назад",
     "Redo" : "Напред",

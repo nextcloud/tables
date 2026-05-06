@@ -485,6 +485,7 @@ OC.L10N.register(
     "Back" : "Zpět",
     "Select operator" : "Vyberte operátor",
     "Search for value" : "Hledat hodnotu",
+    "Select options" : "Vyberte volby",
     "Keyword and submit" : "Klíčové slovo a odeslat",
     "Or use magic values" : "Nebo použijte magické hodnoty",
     "Sorting" : "Řazení",
