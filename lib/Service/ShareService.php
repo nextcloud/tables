@@ -337,7 +337,7 @@ class ShareService extends SuperService {
 		if ($receiverType === ShareReceiverType::GROUP && !$this->shareManager->allowGroupSharing()) {
 			throw new PermissionError('Group sharing is disabled by your administrator.');
 		}
-		$this->enforceGroupMembersOnlyPolicy($sender, $receiverType, $receiver);
+		$this->enforceGroupMembersOnlyPolicy($this->userId, $receiverType, $receiver);
 
 		$time = new DateTime();
 		$item = new Share();
