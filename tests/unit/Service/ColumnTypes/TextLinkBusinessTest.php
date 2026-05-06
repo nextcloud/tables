@@ -8,6 +8,7 @@
 namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
+use OCP\IL10N;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -18,7 +19,8 @@ class TextLinkBusinessTest extends TestCase {
 
 	public function setUp(): void {
 		$this->textLinkBusiness = new TextLinkBusiness(
-			$this->createMock(LoggerInterface::class)
+			$this->createMock(LoggerInterface::class),
+			$this->createMock(IL10N::class)
 		);
 
 		$this->column = $this->createMock(Column::class);
@@ -89,5 +91,32 @@ class TextLinkBusinessTest extends TestCase {
 			'value' => 'https://nextcloud.com',
 			'providerId' => 'url',
 		]), $column));
+	}
+
+	public function testValidateValue() {
+		// Assert that no exception is thrown for valid values
+		try {
+			$this->textLinkBusiness->validateValue(json_encode([
+				'title' => 'Test link',
+				'value' => 'https://nextcloud.com',
+				'providerId' => 'url',
+			]), $this->column, 'userId', 1, null);
+		} catch (\Exception $e) {
+			$this->fail('validateValue threw an exception for valid input: ' . $e->getMessage());
+		}
+
+		// Assert that exception is thrown for invalid values
+		$this->expectException(\OCA\Tables\Errors\BadRequestError::class);
+		$this->textLinkBusiness->validateValue(json_encode([
+			'title' => 'Test link',
+			'value' => 'invalidurl',
+			'providerId' => 'url',
+		]), $this->column, 'userId', 1, null);
+		$this->expectException(\OCA\Tables\Errors\BadRequestError::class);
+		$this->textLinkBusiness->validateValue(json_encode([
+			'title' => 'Test link',
+			'value' => 'javascript:https://nextcloud.com',
+			'providerId' => 'url',
+		]), $this->column, 'userId', 1, null);
 	}
 }
