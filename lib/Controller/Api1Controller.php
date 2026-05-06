@@ -584,7 +584,8 @@ class Api1Controller extends ApiController {
 					$permissionDelete,
 					$permissionManage,
 					$displayMode
-				)->jsonSerialize());
+				))->jsonSerialize()
+			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
