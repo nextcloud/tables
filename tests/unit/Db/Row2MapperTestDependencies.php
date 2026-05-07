@@ -15,6 +15,7 @@ use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\ColumnsHelper;
+use OCA\Tables\Helper\TimezoneHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -65,7 +66,8 @@ trait Row2MapperTestDependencies {
 			$this->userHelper,
 			$this->rowSleeveMapper,
 			$this->columnsHelper,
-			$this->columnMapper
+			$this->columnMapper,
+			$this->createMock(TimezoneHelper::class)
 		);
 
 		if (!self::$testDataInitialized) {

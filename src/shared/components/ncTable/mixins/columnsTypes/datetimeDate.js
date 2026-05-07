@@ -15,7 +15,7 @@ export default class DatetimeDateColumn extends AbstractDatetimeColumn {
 	}
 
 	formatValue(value) {
-		return Moment.utc(value, 'YYYY-MM-DD HH:mm:ss').local().format('ll')
+		return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('ll')
 	}
 
 	sort(mode, nextSorts) {
