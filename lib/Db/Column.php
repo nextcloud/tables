@@ -161,7 +161,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	protected ?string $lastEditByDisplayName = null;
 	protected ?ViewColumnInformation $viewColumnInformation = null;
 
-	protected const VIRTUAL_PROPERTIES = ['createdByDisplayName', 'lastEditByDisplayName', 'viewColumnInformation'];
+	protected const VIRTUAL_PROPERTIES = ['createdByDisplayName', 'lastEditByDisplayName', 'viewColumnInformation', 'columnName'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
