@@ -171,10 +171,7 @@ export default {
 				newValue = 'none'
 			} else {
 				const format = this.getDateFormat()
-				const editDateTimeMoment = Moment(this.editDateTimeValue)
-				newValue = this.column.type === 'datetime-date'
-					? editDateTimeMoment.format(format)
-					: editDateTimeMoment.utc().format(format)
+				newValue = Moment(this.editDateTimeValue).utc().format(format)
 			}
 
 			if (newValue === this.value) {
