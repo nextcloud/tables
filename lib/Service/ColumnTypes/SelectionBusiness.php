@@ -24,7 +24,7 @@ class SelectionBusiness extends SuperBusiness {
 
 		foreach ($column->getSelectionOptionsArray() as $option) {
 			if ($option['id'] === $intValue) {
-				return json_encode($option['id']);
+				return json_encode((string)$option['id']);
 			}
 		}
 
