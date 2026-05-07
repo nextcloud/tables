@@ -591,6 +591,7 @@ OC.L10N.register(
     "Could not update share." : "Freigabe konnte nicht aktualisiert werden.",
     "Could not update cell" : "Zelle konnte nicht aktualisiert werden",
     "Filter operator" : "Filteroperator",
+    "Contains items" : "Enthält Elemente",
     "Contains" : "Enthält",
     "Does not contain" : "Enthält nicht",
     "Begins with" : "Beginnt mit",

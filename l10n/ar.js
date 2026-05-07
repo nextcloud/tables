@@ -451,6 +451,7 @@ OC.L10N.register(
     "Back" : "عودة",
     "Select operator" : "إختَر المُعامِل operator",
     "Search for value" : "إختَر القيمة",
+    "Select options" : "تحديد الخيارات",
     "Keyword and submit" : "حدّد الكلمات الدلالية و أرسِلها",
     "Or use magic values" : "أو استخدم القيم السحرية",
     "Sorting" : "ترتيب",

@@ -591,6 +591,7 @@ OC.L10N.register(
     "Could not update share." : "無法更新分享。",
     "Could not update cell" : "無法更新儲存格",
     "Filter operator" : "過濾條件運算子",
+    "Contains items" : "包含項目",
     "Contains" : "包含",
     "Does not contain" : "不包含",
     "Begins with" : "開始於",
