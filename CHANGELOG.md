@@ -5,6 +5,11 @@
 
 # Changelog
 
+## 0.9.11
+
+### Fixed
+* [stable0.9] Fix ownership by @backportbot[bot] in https://github.com/nextcloud/tables/pull/2577
+
 ## 0.9.10
 
 ### Fixed
