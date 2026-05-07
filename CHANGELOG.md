@@ -5,6 +5,12 @@
 
 # Changelog
 
+## v1.0.8
+
+### Fixed
+* [stable1.0] Update URL validation for text-link column by @backportbot[bot] in https://github.com/nextcloud/tables/pull/2575
+* [stable1.0] Fix ownership by @backportbot[bot] in https://github.com/nextcloud/tables/pull/2576
+
 ## v1.0.7
 
 ### Fixed
