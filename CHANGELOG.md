@@ -5,6 +5,17 @@
 
 # Changelog
 
+## 2.1.1
+
+### Added
+* [Add possibility filter select/multiselect columns with dropdown(tables#2387)](https://github.com/nextcloud/tables/pull/2387)
+
+
+### Fixed
+* [Fix: Adjust date formatting(tables#2573)](https://github.com/nextcloud/tables/pull/2573)
+* [Update URL validation for text-link column(tables#2452)](https://github.com/nextcloud/tables/pull/2452)
+* [Fix: ownership(tables#2574)](https://github.com/nextcloud/tables/pull/2574)
+
 ## 2.1.0
 
 ### Added
