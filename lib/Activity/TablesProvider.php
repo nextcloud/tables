@@ -12,6 +12,7 @@ use OCP\Activity\IEvent;
 use OCP\Activity\IProvider;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
+use Psr\Log\LoggerInterface;
 
 class TablesProvider implements IProvider {
 
@@ -20,6 +21,7 @@ class TablesProvider implements IProvider {
 		private IURLGenerator $urlGenerator,
 		private ActivityManager $activityManager,
 		private IUserManager $userManager,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -40,7 +42,7 @@ class TablesProvider implements IProvider {
 		$user = $this->userManager->get($author);
 
 		if ($user !== null) {
-			$params = [
+			$subjectParameters = [
 				'user' => [
 					'type' => 'user',
 					'id' => $author,
@@ -49,7 +51,7 @@ class TablesProvider implements IProvider {
 			];
 			$event->setAuthor($author);
 		} else {
-			$params = [
+			$subjectParameters = [
 				'user' => [
 					'type' => 'user',
 					'id' => 'deleted_users',
@@ -65,7 +67,7 @@ class TablesProvider implements IProvider {
 				'name' => $event->getObjectName(),
 				'link' => $this->tablesUrl('/table/' . $event->getObjectId()),
 			];
-			$params['table'] = $table;
+			$subjectParameters['table'] = $table;
 			$event->setLink($this->tablesUrl('/table/' . $event->getObjectId()));
 		}
 
@@ -76,19 +78,19 @@ class TablesProvider implements IProvider {
 				'name' => (string)$subjectParams['table']['title'],
 				'link' => $this->tablesUrl('/table/' . $subjectParams['table']['id']),
 			];
-			$params['table'] = $table;
+			$subjectParameters['table'] = $table;
 			$row = [
 				'type' => 'highlight',
 				'id' => (string)$event->getObjectId(),
 				'name' => '#' . $event->getObjectId(),
 				'link' => $this->tablesUrl('/table/' . $subjectParams['table']['id'] . '/row/' . $event->getObjectId()),
 			];
-			$params['row'] = $row;
+			$subjectParameters['row'] = $row;
 			$event->setLink($this->tablesUrl('/table/' . $subjectParams['table']['id'] . '/row/' . $event->getObjectId()));
 
 			if ($event->getSubject() === ActivityManager::SUBJECT_ROW_UPDATE) {
 				foreach ($subjectParams['changeCols'] as $changeCol) {
-					$params['col-' . $changeCol['id']] = [
+					$subjectParameters['col-' . $changeCol['id']] = [
 						'type' => 'highlight',
 						'id' => (string)$changeCol['id'],
 						'name' => $changeCol['name'] ?? '',
@@ -98,7 +100,7 @@ class TablesProvider implements IProvider {
 		}
 
 		if (array_key_exists('before', $subjectParams) && is_string($subjectParams['before'])) {
-			$params['before'] = [
+			$subjectParameters['before'] = [
 				'type' => 'highlight',
 				'id' => $subjectParams['before'],
 				'name' => $subjectParams['before'] ?? ''
@@ -106,17 +108,30 @@ class TablesProvider implements IProvider {
 		}
 
 		if (array_key_exists('after', $subjectParams)) {
-			$params['after'] = [
+			$subjectParameters['after'] = [
 				'type' => 'highlight',
 				'id' => (string)$subjectParams['after'],
 				'name' => $subjectParams['after'] ?? ''
 			];
 		}
 
+		$messageParameters = [];
+		if ($event->getSubject() === ActivityManager::SUBJECT_IMPORT_FINISHED) {
+			$messageParameters['{foundColumnsCount}'] = $subjectParams['importStats']['foundColumnsCount'];
+			$messageParameters['{matchingColumnsCount}'] = $subjectParams['importStats']['matchingColumnsCount'];
+			$messageParameters['{createdColumnsCount}'] = $subjectParams['importStats']['createdColumnsCount'];
+			$messageParameters['{insertedRowsCount}'] = $subjectParams['importStats']['insertedRowsCount'];
+			$messageParameters['{updatedRowsCount}'] = $subjectParams['importStats']['updatedRowsCount'];
+			$messageParameters['{errorsParsingCount}'] = $subjectParams['importStats']['errorsParsingCount'];
+			$messageParameters['{errorsCount}'] = $subjectParams['importStats']['errorsCount'];
+		}
+
 		try {
-			$subject = $this->activityManager->getActivityFormat($language, $subjectIdentifier, $subjectParams, $ownActivity);
-			$this->setSubjects($event, $subject, $params);
+			$subject = $this->activityManager->getActivitySubject($language, $subjectIdentifier, $subjectParams, $ownActivity);
+			$message = $this->activityManager->getActivityMessage($language, $subjectIdentifier);
+			$this->parseEvent($event, $subject, $subjectParameters, $message, $messageParameters);
 		} catch (\Exception $e) {
+			$this->logger->warning('Could not parse activity: ' . $e->getMessage(), ['exception' => $e]);
 		}
 
 		return $event;
@@ -144,10 +159,10 @@ class TablesProvider implements IProvider {
 		return $this->urlGenerator->linkToRouteAbsolute('tables.page.index') . '#/' . trim($endpoint, '/');
 	}
 
-	private function setSubjects(IEvent $event, $subject, array $parameters) {
+	private function parseEvent(IEvent $event, string $subject, array $subjectParameters, ?string $message, array $messageParameters = []) {
 		$placeholders = $replacements = $richParameters = [];
 
-		foreach ($parameters as $placeholder => $parameter) {
+		foreach ($subjectParameters as $placeholder => $parameter) {
 			$placeholders[] = '{' . $placeholder . '}';
 			if (is_array($parameter) && array_key_exists('name', $parameter)) {
 				$replacements[] = $parameter['name'];
@@ -157,8 +172,12 @@ class TablesProvider implements IProvider {
 			}
 		}
 
-		$event->setParsedSubject(str_replace($placeholders, $replacements, $subject))
+		$event->setSubject($subject, $subjectParameters)
+			->setParsedSubject(str_replace($placeholders, $replacements, $subject))
 			->setRichSubject($subject, $richParameters);
-		$event->setSubject($subject, $parameters);
+
+		if ($message) {
+			$event->setParsedMessage(strtr($message, $messageParameters));
+		}
 	}
 }

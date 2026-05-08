@@ -37,7 +37,7 @@ describe('Manage a table', () => {
 	})
 
 	it('Create with import', () => {
-		cy.uploadFile('test-import.csv', 'text/csv')
+		cy.uploadFile('test-import-small.csv', 'text/csv')
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		// should type before selecting the table type tile
@@ -47,11 +47,11 @@ describe('Manage a table', () => {
 		cy.contains('h2', 'Import').should('be.visible')
 
 		cy.get('.modal__content button').contains('Select from Files').click()
-		cy.get('.file-picker__files').contains('test-import').click()
+		cy.get('.file-picker__files').contains('test-import-small').click()
 		cy.get('.file-picker button span').contains('Import').click()
 		cy.get('.modal__content button').contains('Preview').click()
 		cy.get('.file_import__preview tbody tr').should('have.length', 4)
-		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*' }).as('importUploadReq')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/v2/import/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').scrollIntoView().click()
 		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
