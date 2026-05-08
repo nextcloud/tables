@@ -44,6 +44,7 @@
     "Column width must be between %1$s and %2$s." : "欄寬必須在 %1$s 到 %2$s 間。",
     "This column was automatically created by the import service." : "此欄為自動從匯入服務建立。",
     "Column \"%s\" contains a non-unique value." : "「%s」欄包含非唯一值。",
+    "Column \"%s\" contains an invalid protocol. Only http and https are allowed." : "欄位「%s」包含無效的協定。僅允許 http 與 https。",
     "Welcome to %s Tables!" : "歡迎使用 %s 表格！",
     "ToDo list" : "待辦列表",
     "Setup a simple todo-list." : "設定一個簡單的待辦事項列表。",

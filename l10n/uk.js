@@ -46,6 +46,7 @@ OC.L10N.register(
     "Column width must be between %1$s and %2$s." : "Ширина стовпця має бути між %1$s та %2$s.",
     "This column was automatically created by the import service." : "Цей стовпець було автоматично створено під час імпорту.",
     "Column \"%s\" contains a non-unique value." : "Стовпець \"%s\" містить неунікальне значення.",
+    "Column \"%s\" contains an invalid protocol. Only http and https are allowed." : "Стовпець \"%s\" містить недійсний протокол. Дозволено лише http або https.",
     "Welcome to %s Tables!" : "Вітання у %s Таблицях!",
     "ToDo list" : "Список завдань",
     "Setup a simple todo-list." : "Створюйте прості списки завдань.",

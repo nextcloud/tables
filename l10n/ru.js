@@ -285,6 +285,7 @@ OC.L10N.register(
     "Password" : "Пароль",
     "Share link" : "Поделиться ссылкой",
     "Delete link" : "Удалить ссылку",
+    "Public links" : "Общедоступные ссылки",
     "From {ownerName}" : "От {ownerName}",
     "Created at" : "Время создания:",
     "Ownership" : "Владелец:",

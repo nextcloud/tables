@@ -46,6 +46,7 @@ OC.L10N.register(
     "Column width must be between %1$s and %2$s." : "Spaltenbreite muss zwischen %1$s und %2$s liegen.",
     "This column was automatically created by the import service." : "Diese Spalte wurde automatisch vom Importdienst erstellt.",
     "Column \"%s\" contains a non-unique value." : "Spalte \"%s\" enthält einen nicht eindeutigen Wert.",
+    "Column \"%s\" contains an invalid protocol. Only http and https are allowed." : "Spalte \"%s\" enthält ein ungültiges Protokoll. Nur http und https sind erlaubt.",
     "Welcome to %s Tables!" : "Willkommen zu %s-Tabellen!",
     "ToDo list" : "To-do-Liste",
     "Setup a simple todo-list." : "Erstelle eine einfache Todo-Liste",
