@@ -49,6 +49,18 @@ class PermissionsService {
 
 	private ContextMapper $contextMapper;
 
+	/** @var array<string, list<string>> Per-request group IDs keyed by user ID. */
+	private array $groupIdsByUserId = [];
+
+	/** @var array<string, list<string>> Per-request circle IDs keyed by user ID. */
+	private array $circleIdsByUserId = [];
+
+	/** @var array<string, Permissions|null> Per-request shared permissions keyed by node and user. */
+	private array $sharedPermissionsByNode = [];
+
+	/** @var array<string, int|null> Per-request context permissions keyed by node and user. */
+	private array $contextPermissionsByNode = [];
+
 	public function __construct(
 		LoggerInterface $logger,
 		?string $userId,
@@ -449,9 +461,18 @@ class PermissionsService {
 	 * @throws NotFoundError|InternalError
 	 */
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType, string $userId): Permissions {
+		$cacheKey = $this->buildPermissionCacheKey($elementId, $elementType, $userId);
+		if (array_key_exists($cacheKey, $this->sharedPermissionsByNode)) {
+			$permissions = $this->sharedPermissionsByNode[$cacheKey];
+			if ($permissions === null) {
+				throw new NotFoundError('No share for ' . $elementType . ' and given user ID found.');
+			}
+			return clone $permissions;
+		}
+
 		try {
-			$groupIds = $this->userHelper->getGroupIdsForUser($userId) ?? [];
-			$userCircleIds = $this->circleHelper->getCircleIdsForUser($userId) ?? [];
+			$groupIds = $this->getGroupIdsForUser($userId);
+			$userCircleIds = $this->getCircleIdsForUser($userId);
 			$shares = $this->shareMapper->findAllSharesForNodeTo($elementType, $elementId, $userId, $groupIds, $userCircleIds);
 		} catch (Exception|InternalError $e) {
 			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
@@ -514,23 +535,32 @@ class PermissionsService {
 				|| ($table && $this->canReadTable($table, $userId))
 			);
 
-			return new Permissions(
+			$permissions = new Permissions(
 				read: $read,
 				create: $create,
 				update: $update,
 				delete: $delete,
 				manage: $manage,
 			);
+			$this->sharedPermissionsByNode[$cacheKey] = clone $permissions;
+			return $permissions;
 		}
+		$this->sharedPermissionsByNode[$cacheKey] = null;
 		throw new NotFoundError('No share for ' . $elementType . ' and given user ID found.');
 	}
-
-	//  private methods ==========================================================================
-
 	/**
 	 * @throws NotFoundError
 	 */
 	public function getPermissionIfAvailableThroughContext(int $nodeId, string $nodeType, string $userId): int {
+		$cacheKey = $this->buildPermissionCacheKey($nodeId, $nodeType, $userId);
+		if (array_key_exists($cacheKey, $this->contextPermissionsByNode)) {
+			$permissions = $this->contextPermissionsByNode[$cacheKey];
+			if ($permissions === null) {
+				throw new NotFoundError('Node not found in any context');
+			}
+			return $permissions;
+		}
+
 		$permissions = 0;
 		$found = false;
 		$iNodeType = ConversionHelper::stringNodeType2Const($nodeType);
@@ -541,6 +571,7 @@ class PermissionsService {
 				&& $context->getOwnerId() === $userId) {
 				// Making someone owner of a context, makes this person also having manage permissions on the node.
 				// This is sort of an intended "privilege escalation".
+				$this->contextPermissionsByNode[$cacheKey] = Application::PERMISSION_ALL;
 				return Application::PERMISSION_ALL;
 			}
 			foreach ($context->getNodes() as $nodeRelation) {
@@ -548,8 +579,10 @@ class PermissionsService {
 			}
 		}
 		if (!$found) {
+			$this->contextPermissionsByNode[$cacheKey] = null;
 			throw new NotFoundError('Node not found in any context');
 		}
+		$this->contextPermissionsByNode[$cacheKey] = $permissions;
 		return $permissions;
 	}
 
@@ -570,6 +603,42 @@ class PermissionsService {
 	public function setPublicContext(): void {
 		$this->userId = '';
 		$this->isPublicContext = true;
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	private function getGroupIdsForUser(string $userId): array {
+		if (!array_key_exists($userId, $this->groupIdsByUserId)) {
+			$groupIds = [];
+			foreach ($this->userHelper->getGroupIdsForUser($userId) ?? [] as $groupId) {
+				if (is_string($groupId)) {
+					$groupIds[] = $groupId;
+				}
+			}
+			$this->groupIdsByUserId[$userId] = $groupIds;
+		}
+		return $this->groupIdsByUserId[$userId];
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	private function getCircleIdsForUser(string $userId): array {
+		if (!array_key_exists($userId, $this->circleIdsByUserId)) {
+			$circleIds = [];
+			foreach ($this->circleHelper->getCircleIdsForUser($userId) ?? [] as $circleId) {
+				if (is_string($circleId)) {
+					$circleIds[] = $circleId;
+				}
+			}
+			$this->circleIdsByUserId[$userId] = $circleIds;
+		}
+		return $this->circleIdsByUserId[$userId];
+	}
+
+	private function buildPermissionCacheKey(int $nodeId, string $nodeType, string $userId): string {
+		return $nodeType . ':' . $nodeId . ':' . $userId;
 	}
 
 	private function hasPermission(int $existingPermissions, string $permissionName): bool {

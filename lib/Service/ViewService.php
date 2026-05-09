@@ -173,7 +173,7 @@ class ViewService extends SuperService {
 				) {
 					continue;
 				}
-				$sharedViews[$node['node_id']] = $this->find($node['node_id'], false, $userId);
+				$sharedViews[$node['node_id']] = $this->find($node['node_id'], true, $userId);
 			}
 		}
 
