@@ -192,6 +192,7 @@ OC.L10N.register(
     "Delete table" : "Выдаліць табліцу",
     "Copy" : "Капіяваць",
     "Favorites" : "Абранае",
+    "Applications" : "Праграмы",
     "Clear filter" : "Ачысціць фільтр",
     "User, group or team …" : "Карыстальнік, група або каманда …",
     "User or group …" : "Карыстальнік або група …",
