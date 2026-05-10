@@ -7,7 +7,7 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else>
-			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" />
+			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
 		</div>
 	</div>
 </template>
@@ -94,6 +94,9 @@ export default {
 
 		downloadCSV() {
 			this.downloadCsv(this.rows, this.columns, 'public-export')
+		},
+		downloadFilteredCSV(rows) {
+			this.downloadCsv(rows, this.columns, 'public-export')
 		},
 	},
 }

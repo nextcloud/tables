@@ -87,7 +87,8 @@
 				:can-create-columns="canManageTable(table)"
 				:can-edit-columns="canManageTable(table)"
 				:can-delete-columns="canManageTable(table)"
-				:can-delete-table="canManageTable(table)">
+				:can-delete-table="canManageTable(table)"
+				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)">
 				<template #actions="{ isFiltered, onExportFiltered }">
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 						<NcActionCaption v-if="canManageElement(table)" :name="t('tables', 'Manage table')" />

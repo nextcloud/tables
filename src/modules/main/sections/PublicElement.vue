@@ -17,7 +17,8 @@
 				:can-edit-columns="false"
 				:can-delete-columns="false"
 				:can-delete-table="false"
-				:is-form-mode="isFormMode">
+				:is-form-mode="isFormMode"
+				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)">
 				<template #actions="{ isFiltered, onExportFiltered }">
 					<NcActions :force-menu="true" type="tertiary">
 						<NcActionButton :close-after-click="true" data-cy="dataTableExportBtn"

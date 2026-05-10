@@ -24,12 +24,14 @@
 					<div v-if="!resource.isView" class="resource">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
-							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)" />
+							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
+							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 					</div>
 					<div v-else-if="resource.isView" class="resource">
 						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSetting" @create-column="createColumn(true, resource)"
-							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)" />
+							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
+							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
 					</div>
 				</div>
 			</div>
@@ -253,6 +255,22 @@ export default {
 			const rowId = this.getKey(isView, element.key)
 			const colId = this.getKey(isView, element.key)
 			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)
+		},
+		async downloadFilteredCSV(rows, element, isView) {
+			const access = await this.validateExportAccess({
+				id: element.id,
+				isView,
+			})
+
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+
+			const colId = this.getKey(isView, element.key)
+			this.downloadCsv(rows, this.columns[colId], element.title)
 		},
 		getKey(isView, id) {
 			return isView ? 'view-' + id : id

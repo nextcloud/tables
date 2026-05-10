@@ -25,7 +25,8 @@
 		@delete-column="deleteColumn"
 		@create-row="createRow"
 		@edit-row="editRow"
-		@delete-selected-rows="deleteSelectedRows">
+		@delete-selected-rows="deleteSelectedRows"
+		@download-filtered-csv="rows => $emit('download-filtered-csv', rows)">
 		<template #actions="slotProps">
 			<slot name="actions" v-bind="slotProps" />
 		</template>

@@ -176,10 +176,10 @@ export default {
 			this.optionsDivWidth = this.$el?.offsetWidth
 		},
 		exportFiltered() {
-			this.$emit('download-csv', this.filteredRows)
+			this.$emit('download-filtered-csv', this.filteredRows)
 		},
 		exportSelected() {
-			this.$emit('download-csv', this.getSelectedRows)
+			this.$emit('download-filtered-csv', this.getSelectedRows)
 		},
 		getRowById(rowId) {
 			const index = this.allRows.findIndex(row => row.id === rowId)

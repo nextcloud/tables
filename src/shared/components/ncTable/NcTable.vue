@@ -47,7 +47,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:selected-rows="localSelectedRows" :filtered-rows="getSearchedAndFilteredAndSortedRows"
 				:show-options="parsedColumns.length !== 0"
 				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
+				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)"
 				@set-search-string="str => setSearchString(str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
@@ -64,7 +64,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				<template #actions>
 					<slot name="actions"
 						:is-filtered="isFilteredComputed"
-						:on-export-filtered="() => downloadCsv(getSearchedAndFilteredAndSortedRows, parsedColumns, downloadTitle)" />
+						:on-export-filtered="() => $emit('download-filtered-csv', getSearchedAndFilteredAndSortedRows)" />
 				</template>
 			</CustomTable>
 			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"

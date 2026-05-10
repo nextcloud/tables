@@ -15,6 +15,7 @@
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV"
+				@download-filtered-csv="downloadFilteredCSV"
 				@toggle-share="toggleShare"
 				@show-integration="showIntegration" />
 			<CustomTable v-else
@@ -25,6 +26,7 @@
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV"
+				@download-filtered-csv="downloadFilteredCSV"
 				@toggle-share="toggleShare"
 				@show-integration="showIntegration" />
 		</div>
@@ -119,6 +121,21 @@ export default {
 			}
 
 			this.downloadCsv(this.rows, this.columns, this.element.title)
+		},
+		async downloadFilteredCSV(rows) {
+			const access = await this.validateExportAccess({
+				id: this.element.id,
+				isView: this.isView,
+			})
+
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+
+			this.downloadCsv(rows, this.columns, this.element.title)
 		},
 		toggleShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
