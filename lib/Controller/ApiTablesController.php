@@ -216,6 +216,7 @@ class ApiTablesController extends AOCSController {
 					$this->userId,
 					technicalName: $view['technicalName'] ?? null,
 					uuid: $view['uuid'] ?? null,
+					layout: $view['layout'] ?? null,
 				);
 
 				$inputColumnsArray = [];
@@ -250,6 +251,7 @@ class ApiTablesController extends AOCSController {
 						'description' => $view['description'] ?? '',
 						'sort' => $newSort,
 						'filter' => $newFilter,
+						'layout' => $view['layout'] ?? null,
 					])
 				));
 			}

@@ -13,6 +13,7 @@ use JsonSerializable;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
@@ -50,6 +51,10 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setEmoji(string $emoji)
  * @method getDescription(): string
  * @method setDescription(string $description)
+ * @method getLayout(): ?string
+ * @method setLayout(?string $layout)
+ * @method getViewSettings(): ?string
+ * @method setViewSettings(?string $viewSettings)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
  * @method getOnSharePermissions(): ?Permissions
@@ -88,6 +93,8 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+	protected ?string $layout = null;
+	protected ?string $viewSettings = null; // json
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -212,6 +219,14 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
+	public function getLayoutNormalized(): string {
+		return in_array($this->layout, ['tiles', 'gallery'], true) ? $this->layout : 'table';
+	}
+
+	public function getViewSettingsObject(): ViewSettings {
+		return ViewSettings::createFromInputArray($this->getArray($this->getViewSettings()));
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -244,6 +259,8 @@ class View extends EntitySuper implements JsonSerializable {
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'isFederated' => $this->isFederated(),
 			'sidebarOrder' => $this->sidebarOrder,
+			'layout' => $this->getLayoutNormalized(),
+			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

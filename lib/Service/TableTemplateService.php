@@ -822,7 +822,7 @@ class TableTemplateService {
 	private function createView(Table $table, array $data): void {
 		try {
 			$inputData = ViewUpdateInput::fromInputArray($data);
-			$view = $this->viewService->create($data['title'], $data['emoji'], $table);
+			$view = $this->viewService->create($data['title'], $data['emoji'], $table, layout: $data['layout'] ?? null);
 			$this->viewService->update($view->getId(), $inputData);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create view, permission denied: ' . $e->getMessage());

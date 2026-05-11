@@ -53,6 +53,48 @@
 				:generated-filters="viewSetting ? generatedView.filter : null"
 				:columns="allColumns" />
 		</NcAppSettingsSection>
+
+		<NcAppSettingsSection v-if="columns != null" id="layout" :name="t('tables', 'Layout')">
+			<table class="layout-options" role="presentation">
+				<tbody>
+					<tr class="layout-options__selection">
+						<td colspan="3">
+							<NcRadioGroup v-model="layout" :label="t('tables', 'Layout')" hide-label>
+								<NcRadioGroupButton :label="t('tables', 'Table')" value="table" data-cy="viewLayoutTable" />
+								<NcRadioGroupButton :label="t('tables', 'Tile')" value="tiles" data-cy="viewLayoutTiles" />
+								<NcRadioGroupButton :label="t('tables', 'Gallery')" value="gallery" data-cy="viewLayoutGallery" />
+							</NcRadioGroup>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="layout-source-settings">
+				<div class="layout-source-settings__item">
+					<div class="layout-source-settings__label">
+						{{ t('tables', 'Background source') }}
+					</div>
+					<NcSelect
+						v-model="backgroundSourceValue"
+						:options="cardSourceOptions"
+						:clearable="false"
+						label="title"
+						:reduce="option => option.id"
+						:aria-label-combobox="t('tables', 'Background source')" />
+				</div>
+				<div class="layout-source-settings__item">
+					<div class="layout-source-settings__label">
+						{{ t('tables', 'Title source') }}
+					</div>
+					<NcSelect
+						v-model="titleSourceValue"
+						:options="cardSourceOptions"
+						:clearable="false"
+						label="title"
+						:reduce="option => option.id"
+						:aria-label-combobox="t('tables', 'Title source')" />
+				</div>
+			</div>
+		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="sort" :name="t('tables', 'Sort')">
 			<SortForm
@@ -116,7 +158,7 @@
 </template>
 
 <script>
-import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcNoteCard } from '@nextcloud/vue'
+import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcNoteCard, NcRadioGroup, NcRadioGroupButton, NcSelect } from '@nextcloud/vue'
 import ChevronDown from 'vue-material-design-icons/ChevronDown.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
@@ -142,6 +184,9 @@ export default {
 		NcNoteCard,
 		ChevronDown,
 		NotificationsSettings,
+		NcRadioGroup,
+		NcRadioGroupButton,
+		NcSelect,
 		FilterForm,
 		SelectedViewColumns,
 		SortForm,
@@ -181,6 +226,7 @@ export default {
 			technicalName: '',
 			originalTechnicalName: '',
 			technicalNameInvalidError: false,
+			layout: 'table',
 			errorTitle: false,
 			selectedColumns: [],
 			allColumns: [],
@@ -205,6 +251,48 @@ export default {
 		showTechnicalNameWarning() {
 			return !this.createView && this.technicalName !== this.originalTechnicalName
 		},
+		cardSourceOptions() {
+			if (!this.columns) return []
+			// Only show columns that are selected/accessible in the current view
+			const cols = this.selectedColumns
+				? this.columns.filter(column => this.selectedColumns.includes(column.id))
+				: this.columns
+			return cols.map(column => ({
+				id: column.id,
+				title: column.title,
+			}))
+		},
+		backgroundSourceValue: {
+			get() {
+				const stored = this.mutableView?.viewSettings?.cardBackgroundSource
+				// Use stored value only if the column still exists in the accessible options
+				if (stored !== null && stored !== undefined) {
+					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
+					if (exists) return stored
+				}
+				return this.cardSourceOptions[0]?.id ?? null
+			},
+			set(value) {
+				this.ensureMutableViewSettings()
+				this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', value ?? null)
+			},
+		},
+		titleSourceValue: {
+			get() {
+				const stored = this.mutableView?.viewSettings?.cardTitleSource
+				// Use stored value only if the column still exists in the accessible options
+				if (stored !== null && stored !== undefined) {
+					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
+					if (exists) return stored
+				}
+				// Fallback: second option if available, otherwise first
+				return this.cardSourceOptions[1]?.id ?? this.cardSourceOptions[0]?.id ?? null
+			},
+			set(value) {
+				this.ensureMutableViewSettings()
+				this.$set(this.mutableView.viewSettings, 'cardTitleSource', value ?? null)
+			},
+		},
 		saveText() {
 			if (this.createView) {
 				return t('tables', 'Create View')
@@ -227,6 +315,7 @@ export default {
 					mergedViewSettings.columnSettings = this.view.columnSettings
 				}
 			}
+			mergedViewSettings.layout = this.view.layout ?? 'table'
 			if (this.viewSetting.sorting) {
 				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
 			} else {
@@ -365,6 +454,7 @@ export default {
 				description: this.description,
 				emoji: this.icon,
 				technicalName: normalizeTechnicalName(this.technicalName),
+				layout: this.layout,
 			}
 			return await this.insertNewView({ data })
 		},
@@ -383,7 +473,9 @@ export default {
 					description: this.description,
 					emoji: this.icon,
 					technicalName: normalizeTechnicalName(this.technicalName),
+					layout: this.layout,
 					columnSettings: JSON.stringify(newColumnSettings),
+					viewSettings: JSON.stringify(this.mutableView.viewSettings),
 				},
 			}
 			// Update sorting rules if they don't contain hidden rules (= rules regarding rows the user can not see) that were not overwritten
@@ -409,11 +501,27 @@ export default {
 			this.technicalName = this.mutableView?.technicalName ?? ''
 			this.originalTechnicalName = this.mutableView?.technicalName ?? ''
 			this.technicalNameInvalidError = false
+			this.layout = this.mutableView?.layout ?? 'table'
+			this.ensureMutableViewSettings()
+			const firstColumnId = this.mutableView.columnSettings?.[0]?.columnId ?? null
+			const secondColumnId = this.mutableView.columnSettings?.[1]?.columnId ?? firstColumnId
+			const backgroundSource = this.mutableView.viewSettings.cardBackgroundSource ?? this.viewSetting?.viewSettings?.cardBackgroundSource ?? firstColumnId
+			const titleSource = this.mutableView.viewSettings.cardTitleSource ?? this.viewSetting?.viewSettings?.cardTitleSource ?? secondColumnId
+			this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', backgroundSource)
+			this.$set(this.mutableView.viewSettings, 'cardTitleSource', titleSource)
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
 			this.localLoading = false
 			this.columns = null
+		},
+		ensureMutableViewSettings() {
+			if (!this.mutableView.viewSettings) {
+				this.$set(this.mutableView, 'viewSettings', {
+					cardBackgroundSource: null,
+					cardTitleSource: null,
+				})
+			}
 		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
@@ -442,6 +550,39 @@ export default {
 :deep(.element-description) {
 	padding-inline: 0 !important;
 	max-width: 100%;
+}
+
+.layout-options {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: separate;
+	border-spacing: 12px 8px;
+}
+
+.layout-options td {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.layout-options__selection :deep(.checkbox-radio-switch) {
+	display: inline-flex;
+}
+
+.layout-source-settings {
+	display: grid;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.layout-source-settings__label {
+	margin-bottom: 6px;
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
+}
+
+.layout-options__title td {
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
 }
 
 .sticky {
