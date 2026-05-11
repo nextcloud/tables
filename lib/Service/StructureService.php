@@ -287,32 +287,34 @@ class StructureService {
 			$viewB = $viewB->jsonSerialize();
 		}
 
-		$jsonViewA = json_encode(
-			[
-				'title' => $viewA['title'],
-				'technicalName' => $viewA['technicalName'],
-				'description' => $viewA['description'],
-				'emoji' => $viewA['emoji'],
-				'columns' => $viewA['columns'],
-				'columnSettings' => $viewA['columnSettings'],
-				'sort' => $viewA['sort'],
-				'filter' => $viewA['filter'],
-			]
-		);
-		$jsonViewB = json_encode(
-			[
-				'title' => $viewB['title'],
-				'technicalName' => $viewB['technicalName'],
-				'description' => $viewB['description'],
-				'emoji' => $viewB['emoji'],
-				'columns' => $viewB['columns'],
-				'columnSettings' => $viewB['columnSettings'],
-				'sort' => $viewB['sort'],
-				'filter' => $viewB['filter'],
-			]
-		);
+		return $this->comparableView($viewA) !== $this->comparableView($viewB);
+	}
 
-		return $jsonViewA !== $jsonViewB;
+	/**
+	 * The comparable form of a view.
+	 *
+	 * A scheme written before the layout existed, or by hand, carries neither key. Both
+	 * sides are normalised so such a view does not read as modified on every import,
+	 * which would cost a write, an activity entry and a federation notification each.
+	 */
+	private function comparableView(array $view): array {
+		$viewSettings = is_array($view['viewSettings'] ?? null) ? $view['viewSettings'] : [];
+
+		return [
+			'title' => $view['title'],
+			'technicalName' => $view['technicalName'],
+			'description' => $view['description'],
+			'emoji' => $view['emoji'],
+			'columns' => $view['columns'],
+			'columnSettings' => $view['columnSettings'],
+			'sort' => $view['sort'],
+			'filter' => $view['filter'],
+			'layout' => in_array($view['layout'] ?? null, ['tiles', 'gallery'], true) ? $view['layout'] : 'table',
+			'viewSettings' => [
+				'cardBackgroundSource' => $viewSettings['cardBackgroundSource'] ?? null,
+				'cardTitleSource' => $viewSettings['cardTitleSource'] ?? null,
+			],
+		];
 	}
 
 	protected function resolveColumnOrderChanges(array $currentSchema, array $updateSchema): void {

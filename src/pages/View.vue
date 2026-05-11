@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="main-view-view">
+	<div class="main-view-view" :class="{ 'main-view-view--cards': isCardLayout }">
 		<div v-if="!activeView && !errorMessage">
 			<div class="icon-loading" />
 		</div>
@@ -42,6 +42,9 @@ export default {
 
 	computed: {
 		...mapState(useTablesStore, ['activeViewId', 'activeView']),
+		isCardLayout() {
+			return ['tiles', 'gallery'].includes(this.activeView?.layout)
+		},
 	},
 
 	watch: {
@@ -80,6 +83,11 @@ export default {
 .main-view-view {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
+}
+
+.main-view-view--cards {
+	width: var(--app-content-width, 100%);
+	max-width: var(--app-content-width, 100%);
 }
 
 :deep(h1) {
