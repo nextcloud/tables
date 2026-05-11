@@ -32,4 +32,30 @@ class StructureServiceTest extends TestCase {
 		$this->assertSame([], $this->service->removedColumns());
 		$this->assertSame([], $this->service->modifiedColumns());
 	}
+
+	/**
+	 * The current state comes from View::jsonSerialize(), which always carries layout and
+	 * viewSettings; a scheme written before they existed carries neither.
+	 */
+	public function testViewsWithoutLayoutKeysAreNotModified(): void {
+		$current = $this->originalSchema;
+		foreach ($current['views'] as &$view) {
+			$view['layout'] = 'table';
+			$view['viewSettings'] = ['cardBackgroundSource' => null, 'cardTitleSource' => null];
+		}
+		unset($view);
+
+		$this->service->resolveChanges($current, $this->originalSchema);
+
+		$this->assertSame([], $this->service->modifiedViews());
+	}
+
+	public function testAChangedLayoutMarksTheViewModified(): void {
+		$update = $this->originalSchema;
+		$update['views'][0]['layout'] = 'gallery';
+
+		$this->service->resolveChanges($this->originalSchema, $update);
+
+		$this->assertCount(1, $this->service->modifiedViews());
+	}
 }
