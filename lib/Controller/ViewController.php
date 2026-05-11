@@ -56,8 +56,10 @@ class ViewController extends Controller {
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
-	public function create(int $tableId, string $title, ?string $emoji): DataResponse {
-		return $this->handleError(fn () => $this->service->create($title, $emoji, $this->getTable($tableId, true)));
+	public function create(int $tableId, string $title, ?string $emoji, ?string $layout = null): DataResponse {
+		return $this->handleError(function () use ($tableId, $title, $emoji, $layout) {
+			return $this->service->create($title, $emoji, $this->getTable($tableId, true), null, layout: $layout);
+		});
 	}
 
 	#[NoAdminRequired]
