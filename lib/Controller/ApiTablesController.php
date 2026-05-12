@@ -10,6 +10,7 @@ namespace OCA\Tables\Controller;
 use Exception;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -18,12 +19,15 @@ use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ApplySchemeService;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\StructureDiffService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -41,6 +45,8 @@ class ApiTablesController extends AOCSController {
 	private ViewService $viewService;
 	private IAppManager $appManager;
 	private IDBConnection $db;
+	private StructureDiffService $structureDiffService;
+	private ApplySchemeService $applySchemeService;
 
 	public function __construct(
 		IRequest $request,
@@ -51,6 +57,8 @@ class ApiTablesController extends AOCSController {
 		IL10N $n,
 		IAppManager $appManager,
 		IDBConnection $db,
+		StructureDiffService $structureDiffService,
+		ApplySchemeService $applySchemeService,
 		string $userId) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->service = $service;
@@ -58,6 +66,8 @@ class ApiTablesController extends AOCSController {
 		$this->appManager = $appManager;
 		$this->viewService = $viewService;
 		$this->db = $db;
+		$this->structureDiffService = $structureDiffService;
+		$this->applySchemeService = $applySchemeService;
 	}
 
 	/**
@@ -119,6 +129,70 @@ class ApiTablesController extends AOCSController {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {
 			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Compute a structural diff between the current table state and an incoming scheme
+	 *
+	 * @param int $id Table ID
+	 * @param array $scheme Incoming scheme JSON
+	 * @return DataResponse<Http::STATUS_OK, array, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Diff returned
+	 * 400: Bad request
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	#[UserRateLimit(limit: 20, period: 60)]
+	public function schemeDiff(int $id, array $scheme = []): DataResponse {
+		try {
+			return new DataResponse($this->structureDiffService->computeDiff($id, $scheme));
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Apply selected structural changes from a scheme to an existing table atomically
+	 *
+	 * @param int $id Table ID
+	 * @param array $scheme Incoming scheme JSON
+	 * @param array $selection Selection payload describing which changes to apply
+	 * @return DataResponse<Http::STATUS_OK, array, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Updated scheme returned
+	 * 400: Bad request
+	 * 403: No permissions
+	 * 404: Not found
+	 * 500: Internal error (failedStep included in response body)
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	#[UserRateLimit(limit: 20, period: 60)]
+	public function applyScheme(int $id, array $scheme = [], array $selection = []): DataResponse {
+		try {
+			return new DataResponse($this->applySchemeService->apply($id, $scheme, $selection));
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			$this->logger->error('Failed to apply scheme: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(
+				['message' => $e->getMessage(), 'failedStep' => $e->getMessage()],
+				Http::STATUS_INTERNAL_SERVER_ERROR,
+			);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		}

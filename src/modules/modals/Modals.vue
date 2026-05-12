@@ -45,6 +45,16 @@
 			:show-modal="showImportScheme"
 			:title="importSchemeTitle"
 			@close="showImportScheme = false" />
+		<ImportStructure
+			:show-modal="importStructurePickTableId !== null"
+			:table-id="importStructurePickTableId"
+			@close="importStructurePickTableId = null" />
+		<ImportStructurePreview
+			:show-modal="importStructureData !== null"
+			:table-id="importStructureData && importStructureData.tableId"
+			:scheme="importStructureData && importStructureData.scheme"
+			:diff="importStructureData && importStructureData.diff"
+			@close="importStructureData = null" />
 		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
 		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
@@ -73,6 +83,8 @@ import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
 import TransferContext from './TransferContext.vue'
 import DeleteContext from './DeleteContext.vue'
+import ImportStructurePreview from './ImportStructurePreview.vue'
+import ImportStructure from './ImportStructure.vue'
 
 export default {
 	components: {
@@ -94,6 +106,8 @@ export default {
 		EditContext,
 		TransferContext,
 		DeleteContext,
+		ImportStructurePreview,
+		ImportStructure,
 	},
 
 	data() {
@@ -118,6 +132,8 @@ export default {
 			tableToTransfer: null,
 			contextToTransfer: null,
 			contextToDelete: null,
+			importStructurePickTableId: null,
+			importStructureData: null,
 		}
 	},
 
@@ -155,6 +171,8 @@ export default {
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
 		subscribe('tables:modal:scheme', title => { this.importSchemeTitle = title; this.showImportScheme = true })
+		subscribe('tables:modal:importStructure', data => { this.importStructureData = data })
+		subscribe('tables:modal:importStructure:pick', ({ tableId }) => { this.importStructurePickTableId = tableId })
 
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
@@ -183,6 +201,8 @@ export default {
 		})
 		unsubscribe('tables:table:create', () => { this.showModalCreateTable = true })
 		unsubscribe('tables:modal:import', element => { this.importToElement = element })
+		unsubscribe('tables:modal:importStructure', data => { this.importStructureData = data })
+		unsubscribe('tables:modal:importStructure:pick', ({ tableId }) => { this.importStructurePickTableId = tableId })
 		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
 		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })

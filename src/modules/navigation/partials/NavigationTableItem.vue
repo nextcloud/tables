@@ -60,6 +60,15 @@
 				</template>
 			</NcActionButton>
 
+			<!-- IMPORT STRUCTURE -->
+			<NcActionButton v-if="canManageElement(table)" :close-after-click="true"
+				@click="actionImportStructure">
+				{{ t('tables', 'Import structure') }}
+				<template #icon>
+					<TableArrowDown :size="20" />
+				</template>
+			</NcActionButton>
+
 			<!-- EXPORT -->
 			<NcActionButton @click="exportFile">
 				{{ t('tables', 'Export') }}
@@ -139,6 +148,7 @@ import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '
 import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
+import { generateUrl } from '@nextcloud/router'
 import { useTablesStore } from '../../../store/store.js'
 import Table from 'vue-material-design-icons/Table.vue'
 import Star from 'vue-material-design-icons/Star.vue'
@@ -152,11 +162,11 @@ import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import Export from 'vue-material-design-icons/Export.vue'
+import TableArrowDown from 'vue-material-design-icons/TableArrowDown.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/RenameOutline.vue'
 import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
-import { generateUrl } from '@nextcloud/router'
 
 export default {
 
@@ -170,6 +180,7 @@ export default {
 		ArchiveArrowUpOutline,
 		Import,
 		Export,
+		TableArrowDown,
 		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
@@ -269,6 +280,9 @@ export default {
 		},
 		async actionShowImport(table) {
 			emit('tables:modal:import', { element: table, isView: false })
+		},
+		actionImportStructure() {
+			emit('tables:modal:importStructure:pick', { tableId: this.table.id })
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
