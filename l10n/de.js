@@ -126,7 +126,7 @@ OC.L10N.register(
     "Target" : "Ziel",
     "Date, time or whatever" : "Datum, Uhrzeit oder was auch immer",
     "Progress" : "Fortschritt",
-    "Proofed" : "Nachgewiesen",
+    "Proofed" : "Geprüft",
     "Create initial milestones" : "Erste Meilensteine erstellen",
     "Create some milestones to structure the project." : "Meilensteine erstellen um das Projekt zu strukturieren.",
     "Plan to discuss for the kickoff meeting." : "Diskussion für das Kickoff-Meeting planen.",
