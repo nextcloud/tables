@@ -43,8 +43,8 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 <template>
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
-			<Options :rows="rows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
-				:selected-rows="localSelectedRows" :filtered-rows="getSearchedAndFilteredAndSortedRows"
+			<Options :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
+				:selected-rows="localSelectedRows"
 				:show-options="parsedColumns.length !== 0"
 				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row')"
 				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)"

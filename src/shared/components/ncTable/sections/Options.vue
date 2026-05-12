@@ -121,10 +121,6 @@ export default {
 			type: Array,
 			default: null,
 		},
-		filteredRows: {
-			type: Array,
-			default: () => [],
-		},
 		viewSetting: {
 			type: Object,
 			default: null,
@@ -176,7 +172,7 @@ export default {
 			this.optionsDivWidth = this.$el?.offsetWidth
 		},
 		exportFiltered() {
-			this.$emit('download-filtered-csv', this.filteredRows)
+			this.$emit('download-filtered-csv', this.rows)
 		},
 		exportSelected() {
 			this.$emit('download-filtered-csv', this.getSelectedRows)
