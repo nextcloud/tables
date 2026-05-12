@@ -252,8 +252,8 @@ export default {
 				return
 			}
 
-			const rowId = this.getKey(isView, element.key)
-			const colId = this.getKey(isView, element.key)
+			const rowId = this.getKey(isView, element.id)
+			const colId = this.getKey(isView, element.id)
 			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)
 		},
 		async downloadFilteredCSV(rows, element, isView) {
@@ -269,7 +269,7 @@ export default {
 				return
 			}
 
-			const colId = this.getKey(isView, element.key)
+			const colId = this.getKey(isView, element.id)
 			this.downloadCsv(rows, this.columns[colId], element.title)
 		},
 		getKey(isView, id) {
