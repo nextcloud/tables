@@ -488,6 +488,114 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Create a new formatting rule set for a view
+         * @description This endpoint allows CORS requests
+         */
+        readonly post: operations["formatting_api-create-rule-set"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /**
+         * Update a formatting rule set (replaces the full rules array)
+         * @description This endpoint allows CORS requests
+         */
+        readonly put: operations["formatting_api-update-rule-set"];
+        readonly post?: never;
+        /**
+         * Delete a formatting rule set
+         * @description This endpoint allows CORS requests
+         */
+        readonly delete: operations["formatting_api-delete-rule-set"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/formatting/reorder": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /**
+         * Reorder formatting rule sets for a view
+         * @description This endpoint allows CORS requests
+         */
+        readonly put: operations["formatting_api-reorder"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets/{ruleSetId}/rules": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Create a new rule within a rule set
+         * @description This endpoint allows CORS requests
+         */
+        readonly post: operations["formatting_api-create-rule"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets/{ruleSetId}/rules/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /**
+         * Update an existing rule
+         * @description This endpoint allows CORS requests
+         */
+        readonly put: operations["formatting_api-update-rule"];
+        readonly post?: never;
+        /**
+         * Delete an existing rule
+         * @description This endpoint allows CORS requests
+         */
+        readonly delete: operations["formatting_api-delete-rule"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/ocs/v2.php/apps/tables/api/2/init": {
         readonly parameters: {
             readonly query?: never;
@@ -1003,6 +1111,55 @@ export type components = {
             readonly displayMode: number;
             readonly userId: string;
         };
+        readonly FormattingCondition: {
+            /** Format: int64 */
+            readonly columnId: number;
+            readonly columnType: string;
+            readonly operator: string;
+            readonly value?: string | number | boolean;
+            readonly values?: readonly (string | number)[];
+        };
+        readonly FormattingConditionGroup: {
+            readonly conditions: readonly components["schemas"]["FormattingCondition"][];
+        };
+        readonly FormattingConditionSet: {
+            readonly groups: readonly components["schemas"]["FormattingConditionGroup"][];
+        };
+        readonly FormattingRule: {
+            readonly id: string;
+            readonly title: string;
+            /** Format: int64 */
+            readonly sortOrder: number;
+            readonly enabled: boolean;
+            readonly broken: boolean;
+            readonly condition: components["schemas"]["FormattingConditionSet"];
+            readonly format: components["schemas"]["FormattingStyle"];
+        };
+        readonly FormattingRuleSet: {
+            readonly id: string;
+            readonly title: string;
+            /** @enum {string} */
+            readonly targetType: "row" | "column";
+            /** Format: int64 */
+            readonly targetCol: number | null;
+            /** @enum {string} */
+            readonly mode: "first-match" | "all-matches";
+            /** Format: int64 */
+            readonly sortOrder: number;
+            readonly enabled: boolean;
+            readonly broken: boolean;
+            readonly rules: readonly components["schemas"]["FormattingRule"][];
+        };
+        readonly FormattingStyle: {
+            readonly backgroundColor?: string;
+            readonly textColor?: string;
+            /** @enum {string} */
+            readonly fontWeight?: "bold";
+            /** @enum {string} */
+            readonly fontStyle?: "italic";
+            /** @enum {string} */
+            readonly textDecoration?: "strikethrough" | "underline";
+        };
         readonly ImportState: {
             /** Format: int64 */
             readonly found_columns_count: number;
@@ -1215,6 +1372,7 @@ export type components = {
             readonly hasShares: boolean;
             /** Format: int64 */
             readonly rowsCount: number;
+            readonly formatting: readonly components["schemas"]["FormattingRuleSet"][];
         };
     };
     responses: never;
@@ -4203,6 +4361,755 @@ export interface operations {
                     };
                 };
             };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "formatting_api-create-rule-set": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description Rule set title
+                     * @default
+                     */
+                    readonly title?: string;
+                    /**
+                     * @description Target type: 'row' or 'column'
+                     * @default
+                     */
+                    readonly targetType?: string;
+                    /**
+                     * Format: int64
+                     * @description Target column ID (required when targetType is 'column')
+                     * @default null
+                     */
+                    readonly targetCol?: number | null;
+                    /**
+                     * @description Evaluation mode: 'first-match' or 'all-matches'
+                     * @default
+                     */
+                    readonly mode?: string;
+                    /**
+                     * @description Whether the rule set is enabled
+                     * @default true
+                     */
+                    readonly enabled?: boolean;
+                    /**
+                     * @description List of rule definitions
+                     * @default []
+                     */
+                    readonly rules?: readonly {
+                        readonly title?: string;
+                        readonly enabled?: boolean;
+                        readonly condition?: {
+                            readonly groups: readonly {
+                                readonly conditions: readonly {
+                                    /** Format: int64 */
+                                    readonly columnId: number;
+                                    readonly columnType: string;
+                                    readonly operator: string;
+                                    readonly value?: string | number | boolean;
+                                    readonly values?: readonly (string | number)[];
+                                }[];
+                            }[];
+                        };
+                        readonly format?: {
+                            readonly backgroundColor?: string;
+                            readonly textColor?: string;
+                            /** @enum {string} */
+                            readonly fontWeight?: "bold";
+                            /** @enum {string} */
+                            readonly fontStyle?: "italic";
+                            /** @enum {string} */
+                            readonly textDecoration?: "strikethrough" | "underline";
+                        };
+                    }[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Rule set created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["FormattingRuleSet"];
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description View not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "formatting_api-update-rule-set": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+                /** @description Rule set ID */
+                readonly id: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description Rule set title
+                     * @default
+                     */
+                    readonly title?: string;
+                    /**
+                     * @description Target type: 'row' or 'column'
+                     * @default
+                     */
+                    readonly targetType?: string;
+                    /**
+                     * Format: int64
+                     * @description Target column ID
+                     * @default null
+                     */
+                    readonly targetCol?: number | null;
+                    /**
+                     * @description Evaluation mode: 'first-match' or 'all-matches'
+                     * @default
+                     */
+                    readonly mode?: string;
+                    /**
+                     * @description Whether the rule set is enabled
+                     * @default true
+                     */
+                    readonly enabled?: boolean;
+                    /**
+                     * @description Replacement list of rule definitions
+                     * @default []
+                     */
+                    readonly rules?: readonly {
+                        readonly title?: string;
+                        readonly enabled?: boolean;
+                        readonly condition?: {
+                            readonly groups: readonly {
+                                readonly conditions: readonly {
+                                    /** Format: int64 */
+                                    readonly columnId: number;
+                                    readonly columnType: string;
+                                    readonly operator: string;
+                                    readonly value?: string | number | boolean;
+                                    readonly values?: readonly (string | number)[];
+                                }[];
+                            }[];
+                        };
+                        readonly format?: {
+                            readonly backgroundColor?: string;
+                            readonly textColor?: string;
+                            /** @enum {string} */
+                            readonly fontWeight?: "bold";
+                            /** @enum {string} */
+                            readonly fontStyle?: "italic";
+                            /** @enum {string} */
+                            readonly textDecoration?: "strikethrough" | "underline";
+                        };
+                    }[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Rule set updated */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["FormattingRuleSet"];
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Rule set not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "formatting_api-delete-rule-set": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+                /** @description Rule set ID */
+                readonly id: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Rule set deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": Record<string, never>;
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Rule set not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "formatting_api-reorder": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description Rule set IDs in the desired order
+                     * @default []
+                     */
+                    readonly orderedIds?: readonly string[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Rule sets reordered */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": Record<string, never>;
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Rule set not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "formatting_api-create-rule": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+                /** @description Rule set ID */
+                readonly ruleSetId: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description Rule title
+                     * @default
+                     */
+                    readonly title?: string;
+                    /**
+                     * @description Whether the rule is enabled
+                     * @default true
+                     */
+                    readonly enabled?: boolean;
+                    /**
+                     * @description Condition set definition
+                     * @default {}
+                     */
+                    readonly condition?: {
+                        readonly groups: readonly {
+                            readonly conditions: readonly {
+                                /** Format: int64 */
+                                readonly columnId: number;
+                                readonly columnType: string;
+                                readonly operator: string;
+                                readonly value?: string | number | boolean;
+                                readonly values?: readonly (string | number)[];
+                            }[];
+                        }[];
+                    };
+                    /**
+                     * @description Style definition
+                     * @default {}
+                     */
+                    readonly format?: {
+                        readonly backgroundColor?: string;
+                        readonly textColor?: string;
+                        /** @enum {string} */
+                        readonly fontWeight?: "bold";
+                        /** @enum {string} */
+                        readonly fontStyle?: "italic";
+                        /** @enum {string} */
+                        readonly textDecoration?: "strikethrough" | "underline";
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Rule created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["FormattingRule"];
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Rule set not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "formatting_api-update-rule": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+                /** @description Rule set ID */
+                readonly ruleSetId: string;
+                /** @description Rule ID */
+                readonly id: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description Rule title
+                     * @default
+                     */
+                    readonly title?: string;
+                    /**
+                     * @description Whether the rule is enabled
+                     * @default true
+                     */
+                    readonly enabled?: boolean;
+                    /**
+                     * @description Condition set definition
+                     * @default {}
+                     */
+                    readonly condition?: {
+                        readonly groups: readonly {
+                            readonly conditions: readonly {
+                                /** Format: int64 */
+                                readonly columnId: number;
+                                readonly columnType: string;
+                                readonly operator: string;
+                                readonly value?: string | number | boolean;
+                                readonly values?: readonly (string | number)[];
+                            }[];
+                        }[];
+                    };
+                    /**
+                     * @description Style definition
+                     * @default {}
+                     */
+                    readonly format?: {
+                        readonly backgroundColor?: string;
+                        readonly textColor?: string;
+                        /** @enum {string} */
+                        readonly fontWeight?: "bold";
+                        /** @enum {string} */
+                        readonly fontStyle?: "italic";
+                        /** @enum {string} */
+                        readonly textDecoration?: "strikethrough" | "underline";
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Rule updated */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["FormattingRule"];
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Rule not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "formatting_api-delete-rule": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+                /** @description Rule set ID */
+                readonly ruleSetId: string;
+                /** @description Rule ID */
+                readonly id: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Rule deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": Record<string, never>;
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Rule not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
             readonly 500: {
                 headers: {
                     readonly [name: string]: unknown;

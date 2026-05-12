@@ -315,6 +315,213 @@
                     }
                 }
             },
+            "FormattingCondition": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "operator"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string"
+                    },
+                    "operator": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ]
+                    },
+                    "values": {
+                        "type": "array",
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                {
+                                    "type": "number",
+                                    "format": "double"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "FormattingConditionGroup": {
+                "type": "object",
+                "required": [
+                    "conditions"
+                ],
+                "properties": {
+                    "conditions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FormattingCondition"
+                        }
+                    }
+                }
+            },
+            "FormattingConditionSet": {
+                "type": "object",
+                "required": [
+                    "groups"
+                ],
+                "properties": {
+                    "groups": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FormattingConditionGroup"
+                        }
+                    }
+                }
+            },
+            "FormattingRule": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "sortOrder",
+                    "enabled",
+                    "broken",
+                    "condition",
+                    "format"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "sortOrder": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "broken": {
+                        "type": "boolean"
+                    },
+                    "condition": {
+                        "$ref": "#/components/schemas/FormattingConditionSet"
+                    },
+                    "format": {
+                        "$ref": "#/components/schemas/FormattingStyle"
+                    }
+                }
+            },
+            "FormattingRuleSet": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "targetType",
+                    "targetCol",
+                    "mode",
+                    "sortOrder",
+                    "enabled",
+                    "broken",
+                    "rules"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "targetType": {
+                        "type": "string",
+                        "enum": [
+                            "row",
+                            "column"
+                        ]
+                    },
+                    "targetCol": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "mode": {
+                        "type": "string",
+                        "enum": [
+                            "first-match",
+                            "all-matches"
+                        ]
+                    },
+                    "sortOrder": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "broken": {
+                        "type": "boolean"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FormattingRule"
+                        }
+                    }
+                }
+            },
+            "FormattingStyle": {
+                "type": "object",
+                "properties": {
+                    "backgroundColor": {
+                        "type": "string"
+                    },
+                    "textColor": {
+                        "type": "string"
+                    },
+                    "fontWeight": {
+                        "type": "string",
+                        "enum": [
+                            "bold"
+                        ]
+                    },
+                    "fontStyle": {
+                        "type": "string",
+                        "enum": [
+                            "italic"
+                        ]
+                    },
+                    "textDecoration": {
+                        "type": "string",
+                        "enum": [
+                            "strikethrough",
+                            "underline"
+                        ]
+                    }
+                }
+            },
             "ImportState": {
                 "type": "object",
                 "required": [
@@ -916,7 +1123,8 @@
                     "favorite",
                     "onSharePermissions",
                     "hasShares",
-                    "rowsCount"
+                    "rowsCount",
+                    "formatting"
                 ],
                 "properties": {
                     "id": {
@@ -1102,6 +1310,12 @@
                     "rowsCount": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "formatting": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FormattingRuleSet"
+                        }
                     }
                 }
             }
@@ -6254,6 +6468,1528 @@
                     },
                     "404": {
                         "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets": {
+            "post": {
+                "operationId": "formatting_api-create-rule-set",
+                "summary": "Create a new formatting rule set for a view",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "formatting_api"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Rule set title"
+                                    },
+                                    "targetType": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Target type: 'row' or 'column'"
+                                    },
+                                    "targetCol": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Target column ID (required when targetType is 'column')"
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Evaluation mode: 'first-match' or 'all-matches'"
+                                    },
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Whether the rule set is enabled"
+                                    },
+                                    "rules": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "List of rule definitions",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "condition": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "groups"
+                                                    ],
+                                                    "properties": {
+                                                        "groups": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "conditions"
+                                                                ],
+                                                                "properties": {
+                                                                    "conditions": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "type": "object",
+                                                                            "required": [
+                                                                                "columnId",
+                                                                                "columnType",
+                                                                                "operator"
+                                                                            ],
+                                                                            "properties": {
+                                                                                "columnId": {
+                                                                                    "type": "integer",
+                                                                                    "format": "int64"
+                                                                                },
+                                                                                "columnType": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "operator": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "value": {
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "integer",
+                                                                                            "format": "int64"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number",
+                                                                                            "format": "double"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "boolean"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                "values": {
+                                                                                    "type": "array",
+                                                                                    "items": {
+                                                                                        "anyOf": [
+                                                                                            {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            {
+                                                                                                "type": "integer",
+                                                                                                "format": "int64"
+                                                                                            },
+                                                                                            {
+                                                                                                "type": "number",
+                                                                                                "format": "double"
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "format": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "backgroundColor": {
+                                                            "type": "string"
+                                                        },
+                                                        "textColor": {
+                                                            "type": "string"
+                                                        },
+                                                        "fontWeight": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "bold"
+                                                            ]
+                                                        },
+                                                        "fontStyle": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "italic"
+                                                            ]
+                                                        },
+                                                        "textDecoration": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "strikethrough",
+                                                                "underline"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rule set created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FormattingRuleSet"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "View not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets/{id}": {
+            "put": {
+                "operationId": "formatting_api-update-rule-set",
+                "summary": "Update a formatting rule set (replaces the full rules array)",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "formatting_api"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Rule set title"
+                                    },
+                                    "targetType": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Target type: 'row' or 'column'"
+                                    },
+                                    "targetCol": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Target column ID"
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Evaluation mode: 'first-match' or 'all-matches'"
+                                    },
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Whether the rule set is enabled"
+                                    },
+                                    "rules": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "Replacement list of rule definitions",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "condition": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "groups"
+                                                    ],
+                                                    "properties": {
+                                                        "groups": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "conditions"
+                                                                ],
+                                                                "properties": {
+                                                                    "conditions": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "type": "object",
+                                                                            "required": [
+                                                                                "columnId",
+                                                                                "columnType",
+                                                                                "operator"
+                                                                            ],
+                                                                            "properties": {
+                                                                                "columnId": {
+                                                                                    "type": "integer",
+                                                                                    "format": "int64"
+                                                                                },
+                                                                                "columnType": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "operator": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "value": {
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "integer",
+                                                                                            "format": "int64"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number",
+                                                                                            "format": "double"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "boolean"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                "values": {
+                                                                                    "type": "array",
+                                                                                    "items": {
+                                                                                        "anyOf": [
+                                                                                            {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            {
+                                                                                                "type": "integer",
+                                                                                                "format": "int64"
+                                                                                            },
+                                                                                            {
+                                                                                                "type": "number",
+                                                                                                "format": "double"
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "format": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "backgroundColor": {
+                                                            "type": "string"
+                                                        },
+                                                        "textColor": {
+                                                            "type": "string"
+                                                        },
+                                                        "fontWeight": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "bold"
+                                                            ]
+                                                        },
+                                                        "fontStyle": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "italic"
+                                                            ]
+                                                        },
+                                                        "textDecoration": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "strikethrough",
+                                                                "underline"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Rule set ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rule set updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FormattingRuleSet"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule set not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "formatting_api-delete-rule-set",
+                "summary": "Delete a formatting rule set",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "formatting_api"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Rule set ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rule set deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule set not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/views/{viewId}/formatting/reorder": {
+            "put": {
+                "operationId": "formatting_api-reorder",
+                "summary": "Reorder formatting rule sets for a view",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "formatting_api"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "orderedIds": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "Rule set IDs in the desired order",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rule sets reordered",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule set not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets/{ruleSetId}/rules": {
+            "post": {
+                "operationId": "formatting_api-create-rule",
+                "summary": "Create a new rule within a rule set",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "formatting_api"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Rule title"
+                                    },
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Whether the rule is enabled"
+                                    },
+                                    "condition": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Condition set definition",
+                                        "required": [
+                                            "groups"
+                                        ],
+                                        "properties": {
+                                            "groups": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "conditions"
+                                                    ],
+                                                    "properties": {
+                                                        "conditions": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "columnId",
+                                                                    "columnType",
+                                                                    "operator"
+                                                                ],
+                                                                "properties": {
+                                                                    "columnId": {
+                                                                        "type": "integer",
+                                                                        "format": "int64"
+                                                                    },
+                                                                    "columnType": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "operator": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "value": {
+                                                                        "anyOf": [
+                                                                            {
+                                                                                "type": "string"
+                                                                            },
+                                                                            {
+                                                                                "type": "integer",
+                                                                                "format": "int64"
+                                                                            },
+                                                                            {
+                                                                                "type": "number",
+                                                                                "format": "double"
+                                                                            },
+                                                                            {
+                                                                                "type": "boolean"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "values": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "anyOf": [
+                                                                                {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                {
+                                                                                    "type": "integer",
+                                                                                    "format": "int64"
+                                                                                },
+                                                                                {
+                                                                                    "type": "number",
+                                                                                    "format": "double"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "format": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Style definition",
+                                        "properties": {
+                                            "backgroundColor": {
+                                                "type": "string"
+                                            },
+                                            "textColor": {
+                                                "type": "string"
+                                            },
+                                            "fontWeight": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "bold"
+                                                ]
+                                            },
+                                            "fontStyle": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "italic"
+                                                ]
+                                            },
+                                            "textDecoration": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "strikethrough",
+                                                    "underline"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "ruleSetId",
+                        "in": "path",
+                        "description": "Rule set ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rule created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FormattingRule"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule set not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/views/{viewId}/formatting/rulesets/{ruleSetId}/rules/{id}": {
+            "put": {
+                "operationId": "formatting_api-update-rule",
+                "summary": "Update an existing rule",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "formatting_api"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Rule title"
+                                    },
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Whether the rule is enabled"
+                                    },
+                                    "condition": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Condition set definition",
+                                        "required": [
+                                            "groups"
+                                        ],
+                                        "properties": {
+                                            "groups": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "conditions"
+                                                    ],
+                                                    "properties": {
+                                                        "conditions": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "columnId",
+                                                                    "columnType",
+                                                                    "operator"
+                                                                ],
+                                                                "properties": {
+                                                                    "columnId": {
+                                                                        "type": "integer",
+                                                                        "format": "int64"
+                                                                    },
+                                                                    "columnType": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "operator": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "value": {
+                                                                        "anyOf": [
+                                                                            {
+                                                                                "type": "string"
+                                                                            },
+                                                                            {
+                                                                                "type": "integer",
+                                                                                "format": "int64"
+                                                                            },
+                                                                            {
+                                                                                "type": "number",
+                                                                                "format": "double"
+                                                                            },
+                                                                            {
+                                                                                "type": "boolean"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "values": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "anyOf": [
+                                                                                {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                {
+                                                                                    "type": "integer",
+                                                                                    "format": "int64"
+                                                                                },
+                                                                                {
+                                                                                    "type": "number",
+                                                                                    "format": "double"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "format": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Style definition",
+                                        "properties": {
+                                            "backgroundColor": {
+                                                "type": "string"
+                                            },
+                                            "textColor": {
+                                                "type": "string"
+                                            },
+                                            "fontWeight": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "bold"
+                                                ]
+                                            },
+                                            "fontStyle": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "italic"
+                                                ]
+                                            },
+                                            "textDecoration": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "strikethrough",
+                                                    "underline"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "ruleSetId",
+                        "in": "path",
+                        "description": "Rule set ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Rule ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rule updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FormattingRule"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "formatting_api-delete-rule",
+                "summary": "Delete an existing rule",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "formatting_api"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "ruleSetId",
+                        "in": "path",
+                        "description": "Rule set ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Rule ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rule deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
                         "content": {
                             "application/json": {
                                 "schema": {

@@ -25,6 +25,15 @@
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
 				<PaginationBlock :rows="rows" />
+				<NcButton v-if="isView && config.canEditColumns"
+					:aria-label="t('tables', 'Format rules')"
+					type="tertiary"
+					@click="formattingStore.showFormattingManager = true">
+					{{ t('tables', 'Format rules') }}
+					<template #icon>
+						<FormatPaint :size="20" />
+					</template>
+				</NcButton>
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -54,6 +63,10 @@
 			</div>
 			<div v-else class="selected-rows-placeholder" />
 		</div>
+		<FormattingManager v-if="isView && formattingStore.showFormattingManager"
+			:view-id="elementId"
+			:columns="columns || []"
+			@close="formattingStore.showFormattingManager = false" />
 	</div>
 </template>
 
@@ -64,9 +77,12 @@ import Plus from 'vue-material-design-icons/Plus.vue'
 import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
 import Export from 'vue-material-design-icons/Export.vue'
+import FormatPaint from 'vue-material-design-icons/FormatPaint.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
 import PaginationBlock from './PaginationBlock.vue'
+import FormattingManager from '../../../../components/formatting/FormattingManager.vue'
+import { useFormattingStore } from '../../../../store/formatting.js'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
@@ -82,6 +98,8 @@ export default {
 		Delete,
 		Export,
 		PaginationBlock,
+		FormatPaint,
+		FormattingManager,
 	},
 
 	mixins: [viewportHelper],
@@ -123,6 +141,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+	},
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
 	},
 
 	data() {
