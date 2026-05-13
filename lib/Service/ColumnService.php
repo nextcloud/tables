@@ -27,6 +27,7 @@ use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Validation\ColumnDtoValidator;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
@@ -745,6 +746,15 @@ class ColumnService extends SuperService {
 	 */
 	public function importColumn(Table $table, array $column): int {
 		$item = new Column();
+		if (isset($column['uuid'])) {
+			$uuid = (string)$column['uuid'];
+			if ($uuid === '') {
+				$uuid = null;
+			} elseif (!Uuid::isValid($uuid)) {
+				throw new \InvalidArgumentException('Invalid UUID provided');
+			}
+		}
+		$item->setUuid($uuid ?? null);
 		$item->setTableId($table->getId());
 		$item->setTitle($column['title']);
 		$item->setTechnicalName($column['technicalName'] ?? null);
