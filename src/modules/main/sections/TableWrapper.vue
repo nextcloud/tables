@@ -10,6 +10,7 @@
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
 			@download-csv="$emit('download-csv')"
+			@download-filtered-csv="rows => $emit('download-filtered-csv', rows)"
 			@toggle-share="$emit('toggle-share')"
 			@show-integration="$emit('show-integration')"
 			@create-view="createView" />
