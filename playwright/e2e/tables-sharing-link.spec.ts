@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from '../support/fixtures'
-import type { Page } from '@playwright/test'
+import type { Page, Response } from '@playwright/test'
 import { loadTable } from '../support/commands'
 
 async function setupPublicShareTable(page: Page, title: string) {
@@ -55,6 +55,9 @@ async function createPublicLinkShare(page: Page, options: { password?: string, p
 	return shareToken as string
 }
 
+const isPermissionsPut = (r: Response) =>
+	r.url().includes('/share/') && r.url().includes('/permissions') && r.request().method() === 'PUT'
+
 async function setSharePermissions(page: Page, permissions: { read?: boolean, create?: boolean, update?: boolean, delete?: boolean }) {
 	const isCanEdit = permissions.read && permissions.create && permissions.update && permissions.delete
 	const isViewOnly = permissions.read && !permissions.create && !permissions.update && !permissions.delete
@@ -62,9 +65,14 @@ async function setSharePermissions(page: Page, permissions: { read?: boolean, cr
 	await page.locator('.share-permission-select .action-item__menutoggle').click()
 
 	if (isCanEdit) {
+		// Register listener before click to avoid missing the response on fast servers
+		const permResponse = page.waitForResponse(isPermissionsPut)
 		await page.locator('button[role="menuitemradio"]').filter({ hasText: 'Can edit' }).click()
+		await permResponse
 	} else if (isViewOnly) {
+		const permResponse = page.waitForResponse(isPermissionsPut)
 		await page.locator('button[role="menuitemradio"]').filter({ hasText: 'View only' }).click()
+		await permResponse
 	} else {
 		await page.locator('button[role="menuitemradio"]').filter({ hasText: 'Custom permissions' }).click()
 		for (const [key, value] of Object.entries(permissions)) {
@@ -72,15 +80,13 @@ async function setSharePermissions(page: Page, permissions: { read?: boolean, cr
 			const checkbox = page.locator(`[data-cy="sharePermission${key.charAt(0).toUpperCase() + key.slice(1)}"] input[type="checkbox"]`)
 			const isChecked = await checkbox.isChecked()
 			if (isChecked !== value) {
+				const permResponse = page.waitForResponse(isPermissionsPut)
 				await checkbox.click({ force: true })
-				await page.waitForResponse(r => r.url().includes('/share/') && r.url().includes('/permissions') && r.request().method() === 'PUT')
+				await permResponse
 				await page.waitForResponse(r => r.url().includes('/apps/tables/share/') && r.request().method() === 'GET')
 			}
 		}
-		return
 	}
-
-	await page.waitForResponse(r => r.url().includes('/share/') && r.url().includes('/permissions') && r.request().method() === 'PUT')
 }
 
 test.describe('Public link sharing', () => {
