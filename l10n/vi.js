@@ -132,7 +132,6 @@ OC.L10N.register(
     "Edit table" : "Chỉnh sửa bảng",
     "Create column" : "Tạo cột",
     "Import" : "Nhập vào",
-    "Export as CSV" : "Xuất ra dưới dạng CSV",
     "No columns" : "Không có cột ",
     "We need at least one column, please be so kind and create one." : "Chúng tôi cần ít nhất một cột, vui lòng tạo một cột.",
     "No columns selected" : "Không có cột nào được chọn",

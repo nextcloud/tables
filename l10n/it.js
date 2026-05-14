@@ -123,7 +123,6 @@ OC.L10N.register(
     "Edit table" : "Modifica tabella",
     "Create column" : "Crea colonna",
     "Import" : "Importa",
-    "Export as CSV" : "Esporta come CSV",
     "No columns" : "Nessuna colonna",
     "We need at least one column, please be so kind and create one." : "Abbiamo bisogno di almeno una colonna, per favore siate così gentili da crearne una.",
     "No columns selected" : "Nessuna colonna selezionata",

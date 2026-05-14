@@ -182,7 +182,6 @@ OC.L10N.register(
     "Edit table" : "编辑表",
     "Create column" : "创建列",
     "Import" : "导入",
-    "Export as CSV" : "导出为CSV",
     "Filtered view" : "过滤视图",
     "Reset local adjustments" : "重置本地设置",
     "No columns" : "没有列",

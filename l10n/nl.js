@@ -123,7 +123,6 @@ OC.L10N.register(
     "Edit table" : "Bewerk tabel",
     "Create column" : "Aanmaken kolom",
     "Import" : "Import",
-    "Export as CSV" : "Exporteer als CSV",
     "Sorry, something went wrong." : "Sorry, er is iets fout gegaan.",
     "Type" : "Type",
     "Simple text" : "Verkorte tekst",
