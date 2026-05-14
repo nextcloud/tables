@@ -22,12 +22,12 @@ describe('Test context navigation hidden context', () => {
 	it('Create context that is hidden in nav by default', () => {
 		cy.createContext(contextTitle, false)
 		cy.visit('apps/tables')
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('not.exist')
+		cy.getAppMenuEntry(contextTitle).should('not.exist')
 
 		cy.get(`[data-cy="navigationContextItem"]:contains("${contextTitle}")`).find('button').click({ force: true })
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('not.be.checked')
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').click({ force: true })
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('be.checked')
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('exist')
+		cy.getAppMenuEntry(contextTitle).should('exist')
 	})
 })
