@@ -28,7 +28,7 @@ describe('Test context navigation shared context', () => {
 		cy.createContext(contextTitle, true)
 		cy.visit('apps/tables')
 
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('exist')
+		cy.getAppMenuEntry(contextTitle).should('exist')
 
 		cy.loadContext(contextTitle)
 		cy.get('[data-cy="context-title"]').should('be.visible')
@@ -42,10 +42,10 @@ describe('Test context navigation shared context', () => {
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('be.checked')
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').click({ force: true })
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('not.be.checked')
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('not.exist')
+		cy.getAppMenuEntry(contextTitle).should('not.exist')
 
 		cy.login(nonLocalUser)
 		cy.visit('apps/tables')
-		cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('exist')
+		cy.getAppMenuEntry(contextTitle).should('exist')
 	})
 })
