@@ -4,12 +4,23 @@
  */
 
 import { test, expect } from '../support/fixtures'
+import type { Page } from '@playwright/test'
 import { createContext, ensureNavigationOpen } from '../support/commands'
 
-function appMenuEntry(page: import('@playwright/test').Page, contextTitle: string) {
-	return page
-		.locator('nav[aria-label="Applications menu"]')
-		.locator(`[title="${contextTitle}"]`)
+// Returns the locator for an app menu entry, opening the NC34 waffle popover first if needed.
+async function getAppMenuEntry(page: Page, contextTitle: string) {
+	const waffleBtn = page.locator('button.app-menu__waffle')
+	if (await waffleBtn.isVisible().catch(() => false)) {
+		// NC34+: app entries live inside a popover opened by the waffle button
+		const isExpanded = await waffleBtn.getAttribute('aria-expanded').catch(() => null)
+		if (isExpanded !== 'true') {
+			await waffleBtn.click()
+			await page.waitForTimeout(300)
+		}
+		return page.locator(`.app-menu__grid .app-item[title="${contextTitle}"]`)
+	}
+	// NC33: entries are always visible inline in the header nav
+	return page.locator('nav[aria-label="Applications menu"]').locator(`[title="${contextTitle}"]`)
 }
 
 test.describe('Test context navigation', () => {
@@ -21,7 +32,7 @@ test.describe('Test context navigation', () => {
 		await createContext(page, contextTitle, false)
 		await page.reload({ waitUntil: 'domcontentloaded' })
 		await ensureNavigationOpen(page)
-		await expect(appMenuEntry(page, contextTitle)).toBeHidden()
+		await expect(await getAppMenuEntry(page, contextTitle)).toBeHidden()
 
 		const contextButton = page
 			.locator('[data-cy="navigationContextItem"]')
@@ -49,6 +60,6 @@ test.describe('Test context navigation', () => {
 			page.locator('[data-cy="navigationContextShowInNavSwitch"] input'),
 		).toBeChecked()
 
-		await expect(appMenuEntry(page, contextTitle)).toBeVisible()
+		await expect(await getAppMenuEntry(page, contextTitle)).toBeVisible()
 	})
 })
