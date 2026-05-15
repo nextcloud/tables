@@ -164,7 +164,7 @@ jobs:
           cat data/nextcloud.log
 
       - name: Upload test failure screenshots ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: Upload screenshots ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
@@ -172,7 +172,7 @@ jobs:
           retention-days: 5
 
       - name: Upload nextcloud logs ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: Upload nextcloud log ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
