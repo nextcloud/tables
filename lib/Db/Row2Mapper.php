@@ -485,7 +485,7 @@ class Row2Mapper {
 							$qb->expr()->eq('value_type', $qb->createNamedParameter(UsergroupType::CIRCLE, IQueryBuilder::PARAM_INT))
 						);
 					}
-					$filterExpression = $qb2->expr()->andX(...$filterExpressions);
+					$filterExpression = $qb2->expr()->orX(...$filterExpressions);
 					$includeDefault = false;
 
 					break;
