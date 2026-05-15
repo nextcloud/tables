@@ -47,7 +47,7 @@ jobs:
     steps:
 
       - name: Checkout server
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
@@ -60,7 +60,7 @@ jobs:
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
       - name: Checkout viewer
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           repository: nextcloud/viewer
           ref: ${{ matrix.server-versions }}
@@ -87,7 +87,7 @@ jobs:
           ref: ${{ matrix.server-versions }}
 
       - name: Checkout app
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           path: apps/${{ env.APP_NAME }}
 
@@ -112,7 +112,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Set up php ${{ matrix.php-versions }}
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, zip, zlib, sqlite, pdo_sqlite, apcu, pgsql, pdo_pgsql,mysql, pdo_mysql
