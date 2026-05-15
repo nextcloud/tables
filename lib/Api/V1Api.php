@@ -29,7 +29,6 @@ class V1Api {
 	 * @param int $nodeId
 	 * @param int|null $limit
 	 * @param int|null $offset
-	 * @param string|null $userId
 	 * @param string|null $nodeType
 	 * @return array
 	 * @throws DoesNotExistException
@@ -38,10 +37,7 @@ class V1Api {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function getData(int $nodeId, ?int $limit, ?int $offset, ?string $userId, ?string $nodeType = null): array {
-		if ($userId) {
-			$this->userId = $userId;
-		}
+	public function getData(int $nodeId, ?int $limit, ?int $offset, ?string $nodeType = null): array {
 		if ($nodeType === 'view') {
 			$columns = $this->columnService->findAllByView($nodeId, $this->userId);
 			$rows = $this->rowService->findAllByView($nodeId, $this->userId, $limit, $offset);
