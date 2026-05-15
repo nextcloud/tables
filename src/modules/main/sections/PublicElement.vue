@@ -46,7 +46,8 @@
 			:element-id="element.id"
 			:is-form-mode="isFormMode"
 			:show-modal="showCreateRow"
-			@close="showCreateRow = false" />
+			:prefill-data="prefillData"
+			@close="showCreateRow = false; prefillData = null" />
 		<DeleteRows
 			v-if="rowsToDelete"
 			:rows-to-delete="rowsToDelete?.rows"
@@ -110,6 +111,7 @@ export default {
 	data() {
 		return {
 			showCreateRow: false,
+			prefillData: null,
 			editRow: null,
 			rowsToDelete: null,
 		}
@@ -125,6 +127,10 @@ export default {
 		subscribe('tables:row:create', () => {
 			this.showCreateRow = true
 		})
+		subscribe('tables:row:copy', rowInfo => {
+			this.prefillData = rowInfo.row?.data
+			this.showCreateRow = true
+		})
 		subscribe('tables:row:edit', rowInfo => {
 			this.editRow = rowInfo
 		})
@@ -135,6 +141,7 @@ export default {
 
 	unmounted() {
 		unsubscribe('tables:row:create')
+		unsubscribe('tables:row:copy')
 		unsubscribe('tables:row:edit')
 		unsubscribe('tables:row:delete')
 	},
