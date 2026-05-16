@@ -289,6 +289,7 @@ OC.L10N.register(
     "Set password" : "Nastavi geslo",
     "Password" : "Geslo",
     "Share link" : "Povezava za souporabo",
+    "Public links" : "Javne povezave",
     "From {ownerName}" : "Priprava: {ownerName}",
     "Created at" : "Ustvarjeno",
     "Ownership" : "Lastništvo",
