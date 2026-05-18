@@ -33,9 +33,9 @@ class SelectionBusinessTest extends TestCase {
 
 	public function parseValueProvider(): array {
 		return [
-			'valid integer value' => [2, '2'],
-			'valid string value' => ['2', '2'],
-			'valid string value for numeric option' => ['4', '4'],
+			'valid integer value' => [2, '"2"'],
+			'valid string value' => ['2', '"2"'],
+			'valid string value for numeric option' => ['4', '"4"'],
 			'invalid value' => [5, ''],
 			'null value' => [null, ''],
 			'empty string' => ['', ''],
