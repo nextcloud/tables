@@ -31,7 +31,7 @@
 		<td v-if="config.showActions && (config.canEditRows || config.canDeleteRows || config.canCreateRows)"
 			:class="{sticky: config.showActions}">
 			<NcActions data-cy="rowActionMenu">
-				<NcActionButton v-if="config.canEditRows || config.canDeleteRows"
+				<NcActionButton v-if="config.canEditRows"
 					data-cy="editRowBtn"
 					:close-after-click="true"
 					@click="$emit('edit-row', row.id)">
