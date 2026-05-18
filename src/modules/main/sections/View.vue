@@ -77,7 +77,7 @@
 							@click="$emit('show-integration')">
 							{{ t('tables', 'Integration') }}
 							<template #icon>
-								<Connection :size="20" />
+								<ListBoxOutline :size="20" />
 							</template>
 						</NcActionButton>
 					</NcActions>
@@ -98,7 +98,7 @@ import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
-import Connection from 'vue-material-design-icons/Connection.vue'
+import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
 import ElementTitle from './ElementTitle.vue'
 import TableDescription from './TableDescription.vue'
 
@@ -114,7 +114,7 @@ export default {
 		NcActionButton,
 		TableColumnPlusAfter,
 		NcActionCaption,
-		Connection,
+		ListBoxOutline,
 		ElementTitle,
 	},
 

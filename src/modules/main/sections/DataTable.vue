@@ -64,7 +64,7 @@
 							@click="$emit('show-integration')">
 							{{ t('tables', 'Integration') }}
 							<template #icon>
-								<Connection :size="20" />
+								<ListBoxOutline :size="20" />
 							</template>
 						</NcActionButton>
 					</NcActions>
@@ -155,7 +155,7 @@
 							@click="$emit('show-integration')">
 							{{ t('tables', 'Integration') }}
 							<template #icon>
-								<Connection :size="20" />
+								<ListBoxOutline :size="20" />
 							</template>
 						</NcActionButton>
 					</NcActions>
@@ -173,7 +173,7 @@ import IconRename from 'vue-material-design-icons/RenameOutline.vue'
 import IconTool from 'vue-material-design-icons/TableCog.vue'
 import TableView from '../partials/TableView.vue'
 import EmptyTable from './EmptyTable.vue'
-import Connection from 'vue-material-design-icons/Connection.vue'
+import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
 import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import { NcActionButton, NcActions, NcActionCaption } from '@nextcloud/vue'
@@ -186,7 +186,7 @@ export default {
 		IconTool,
 		TableView,
 		NcActionButton,
-		Connection,
+		ListBoxOutline,
 		TrayArrowDown,
 		NcActionCaption,
 		NcActions,
