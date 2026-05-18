@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Activity;
 
+use OCP\Activity\Exceptions\UnknownActivityException;
 use OCP\Activity\IEvent;
 use OCP\Activity\IProvider;
 use OCP\IURLGenerator;
@@ -25,9 +26,12 @@ class TablesProvider implements IProvider {
 	) {
 	}
 
+	/**
+	 * @throws UnknownActivityException
+	 */
 	public function parse($language, IEvent $event, ?IEvent $previousEvent = null): IEvent {
 		if ($event->getApp() !== 'tables') {
-			throw new \InvalidArgumentException();
+			throw new UnknownActivityException();
 		}
 
 		$event = $this->setIcon($event);
