@@ -628,6 +628,8 @@ class Row2Mapper {
 				return $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
 			case 'contains':
 				return $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+			case 'does-not-contain':
+				return $qb->expr()->notLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 			case 'is-equal':
 				return $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType));
 			case 'is-not-equal':
