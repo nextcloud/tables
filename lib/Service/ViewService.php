@@ -13,6 +13,8 @@ use DateTime;
 use Exception;
 use InvalidArgumentException;
 use JsonSerializable;
+use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
@@ -55,6 +57,7 @@ class ViewService extends SuperService {
 	private ContextService $contextService;
 
 	protected IEventDispatcher $eventDispatcher;
+	private ActivityManager $activityManager;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -68,6 +71,7 @@ class ViewService extends SuperService {
 		IEventDispatcher $eventDispatcher,
 		ContextService $contextService,
 		IL10N $l,
+		ActivityManager $activityManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
@@ -78,6 +82,7 @@ class ViewService extends SuperService {
 		$this->favoritesService = $favoritesService;
 		$this->eventDispatcher = $eventDispatcher;
 		$this->contextService = $contextService;
+		$this->activityManager = $activityManager;
 	}
 
 	/**
@@ -225,6 +230,14 @@ class ViewService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_VIEW,
+			object: $newItem,
+			subject: ActivityManager::SUBJECT_VIEW_CREATE,
+			additionalParams: [],
+			author: $userId,
+		);
+
 		return $newItem;
 	}
 
@@ -238,6 +251,7 @@ class ViewService extends SuperService {
 
 		try {
 			$view = $this->mapper->find($id);
+			$changes = new ChangeSet($view);
 
 			// security
 			if (!$this->permissionsService->canManageView($view, $userId)) {
@@ -266,6 +280,12 @@ class ViewService extends SuperService {
 			if (!$skipTableEnhancement) {
 				$this->enhanceView($view, $userId);
 			}
+			$changes->setAfter($view);
+			$this->activityManager->triggerUpdateEvents(
+				objectType: ActivityManager::TABLES_OBJECT_VIEW,
+				changeSet: $changes,
+				subject: ActivityManager::SUBJECT_VIEW_UPDATE,
+			);
 			return $view;
 		} catch (InvalidArgumentException $e) {
 			throw $e;
@@ -329,6 +349,13 @@ class ViewService extends SuperService {
 			$event = new ViewDeletedEvent(view: $view);
 
 			$this->eventDispatcher->dispatchTyped($event);
+			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_VIEW,
+				object: $view,
+				subject: ActivityManager::SUBJECT_VIEW_DELETE,
+				additionalParams: [],
+				author: $userId,
+			);
 
 			return $deletedView;
 		} catch (\OCP\DB\Exception $e) {

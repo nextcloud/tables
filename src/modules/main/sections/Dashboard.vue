@@ -61,13 +61,13 @@
 								<NcActions>
 									<NcActionButton v-if="canManageElement(table)"
 										type="secondary"
-										:aria-label="t('tables', 'Edit view')"
+										:aria-label="t('tables', 'View settings')"
 										:close-after-click="true"
 										@click="emit('tables:view:edit', { view })">
 										<template #icon>
 											<PlaylistEditIcon :size="20" />
 										</template>
-										{{ t('tables', 'Edit view') }}
+										{{ t('tables', 'View settings') }}
 									</NcActionButton>
 									<NcActionButton v-if="canShareElement(table)"
 										icon="icon-share"

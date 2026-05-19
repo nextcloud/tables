@@ -3,12 +3,12 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" data-cy="viewSettingsDialog" :title="createView ? t('tables', 'Create view') : t('tables', 'Edit view')">
+	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" data-cy="viewSettingsDialog" :title="createView ? t('tables', 'Create view') : t('tables', 'View settings')">
 		<NcAppSettingsSection v-if="columns === null" id="loading" name="">
 			<div class="icon-loading" />
 		</NcAppSettingsSection>
 		<!--title & emoji-->
-		<NcAppSettingsSection v-if="columns != null" id="title" :name="t('tables', 'Title')" data-cy="viewSettingsDialogSection">
+		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="title" :name="t('tables', 'Title')" data-cy="viewSettingsDialogSection">
 			<div class="row">
 				<div class="col-4" style="display: inline-flex;">
 					<NcEmojiPicker :close-on-select="true" @select="setIcon">
@@ -37,7 +37,7 @@
 			</div>
 		</NcAppSettingsSection>
 		<!--columns & order-->
-		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :name="t('tables', 'Columns')">
+		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="columns-and-order" :name="t('tables', 'Columns')">
 			<SelectedViewColumns
 				:columns="allColumns"
 				:selected-columns="selectedColumns"
@@ -54,7 +54,7 @@
 				:columns="allColumns" />
 		</NcAppSettingsSection>
 		<!--sorting-->
-		<NcAppSettingsSection v-if="columns != null" id="sort" :name="t('tables', 'Sort')">
+		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="sort" :name="t('tables', 'Sort')">
 			<SortForm
 				:sort="mutableView.sort"
 				:view-sort="viewSetting ? view.sort : null"
@@ -62,7 +62,7 @@
 				:columns="allColumns" />
 		</NcAppSettingsSection>
 
-		<div class="row sticky">
+		<div v-if="canManageTable(view)" class="row sticky">
 			<div class="fix-col-4 space-T end">
 				<div style="padding-right: var(--default-grid-baseline);">
 					<NcButton v-if="!localLoading && !createView" type="secondary" :aria-label="createNewViewText" @click="createNewView()">
@@ -74,6 +74,11 @@
 				</NcButton>
 			</div>
 		</div>
+
+		<!--notifications-->
+		<NcAppSettingsSection v-if="view?.id" id="notifications" :name="t('tables', 'Notifications')">
+			<NotificationsSettings :is-view="true" :element-id="view.id" />
+		</NcAppSettingsSection>
 	</NcAppSettingsDialog>
 </template>
 
@@ -85,6 +90,7 @@ import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../main/partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../main/partials/editViewPartials/SelectedViewColumns.vue'
 import TableDescription from '../main/sections/TableDescription.vue'
+import NotificationsSettings from './sections/NotificationsSettings.vue'
 import { MetaColumns } from '../../shared/components/ncTable/mixins/metaColumns.js'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { mapActions } from 'pinia'
@@ -98,6 +104,7 @@ export default {
 		NcAppSettingsSection,
 		NcEmojiPicker,
 		NcButton,
+		NotificationsSettings,
 		FilterForm,
 		SelectedViewColumns,
 		SortForm,
