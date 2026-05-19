@@ -9,6 +9,7 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
+use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
@@ -21,6 +22,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -48,6 +50,10 @@ class ColumnService extends SuperService {
 
 	private ColumnDtoValidator $columnDtoValidator;
 
+	private ActivityManager $activityManager;
+
+	private NotificationHelper $notificationHelper;
+
 	/** @var array<int, int[]> Per-request cache of sorted column-id order, keyed by tableId. */
 	private array $columnOrderCache = [];
 
@@ -59,6 +65,8 @@ class ColumnService extends SuperService {
 		TableMapper $tableMapper,
 		ViewService $viewService,
 		RowService $rowService,
+		ActivityManager $activityManager,
+		NotificationHelper $notificationHelper,
 		IL10N $l,
 		UserHelper $userHelper,
 		ColumnDtoValidator $columnDtoValidator,
@@ -68,6 +76,8 @@ class ColumnService extends SuperService {
 		$this->tableMapper = $tableMapper;
 		$this->viewService = $viewService;
 		$this->rowService = $rowService;
+		$this->activityManager = $activityManager;
+		$this->notificationHelper = $notificationHelper;
 		$this->l = $l;
 		$this->userHelper = $userHelper;
 		$this->columnDtoValidator = $columnDtoValidator;
@@ -345,6 +355,20 @@ class ColumnService extends SuperService {
 
 			$this->viewService->addColumnToView($view, $entity, $userId);
 		}
+
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $entity,
+			subject: ActivityManager::SUBJECT_COLUMN_CREATE,
+			author: $userId ?? $this->userId,
+		);
+		$this->notificationHelper->sendNotification(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $entity,
+			subject: ActivityManager::SUBJECT_COLUMN_CREATE,
+			author: $userId ?? $this->userId,
+		);
+
 		return $this->enhanceColumn($entity);
 	}
 
@@ -425,7 +449,22 @@ class ColumnService extends SuperService {
 
 			$this->updateMetadata($item, $userId);
 			try {
-				return $this->enhanceColumn($this->mapper->update($item));
+				$updatedColumn = $this->mapper->update($item);
+
+				$this->activityManager->triggerEvent(
+					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+					object: $updatedColumn,
+					subject: ActivityManager::SUBJECT_COLUMN_UPDATE,
+					author: $userId ?? $this->userId,
+				);
+				$this->notificationHelper->sendNotification(
+					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+					object: $updatedColumn,
+					subject: ActivityManager::SUBJECT_COLUMN_UPDATE,
+					author: $userId ?? $this->userId,
+				);
+
+				return $this->enhanceColumn($updatedColumn);
 			} catch (\OCP\DB\Exception $e) {
 				$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
 			}
@@ -550,7 +589,6 @@ class ColumnService extends SuperService {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
-			$this->viewService->deleteColumnDataFromViews($id, $table);
 		}
 
 		try {
@@ -559,6 +597,24 @@ class ColumnService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $item,
+			subject: ActivityManager::SUBJECT_COLUMN_DELETE,
+			author: $userId ?? $this->userId,
+		);
+		$this->notificationHelper->sendNotification(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $item,
+			subject: ActivityManager::SUBJECT_COLUMN_DELETE,
+			author: $userId ?? $this->userId,
+		);
+
+		if (!$skipRowCleanup) {
+			$this->viewService->deleteColumnDataFromViews($id, $table);
+		}
+
 		return $this->enhanceColumn($item);
 	}
 

@@ -230,6 +230,12 @@ namespace OCA\Tables;
  *     displayMode: int,
  *     userId: string,
  * }
+ *
+ * @psalm-type TablesNotifyConfig = array{
+ *     notify-assigned: bool,
+ *     notify-column: bool,
+ *     notify-row: bool,
+ * }
  */
 class ResponseDefinitions {
 }

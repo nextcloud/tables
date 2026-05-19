@@ -60,10 +60,7 @@ export default {
 		async loadActivity() {
 			const params = new URLSearchParams()
 			params.append('format', 'json')
-			params.append('type', this.type)
 			params.append('since', this.since)
-			params.append('object_type', this.objectType)
-			params.append('object_id', '' + this.objectId)
 			params.append('limit', ACTIVITY_FETCH_LIMIT)
 
 			const response = await axios.get(
@@ -81,14 +78,17 @@ export default {
 			}
 
 			let activities = response.data.ocs.data
-			if (this.objectType === 'tables_row') {
+			if (this.objectType === 'table') {
 				activities = activities.filter((activity) => {
-					return (activity.object_type === 'tables_row' && activity.object_id === this.objectId)
+					return (activity.subject_rich[1]?.table?.id === this.objectId.toString() && !activity.subject_rich[1]?.view)
 				})
-			} else {
+			} else if (this.objectType === 'view') {
 				activities = activities.filter((activity) => {
-					return (activity.object_type === 'tables_table' && activity.object_id === this.objectId)
-							|| (activity.object_type === 'tables_row' && activity.subject_rich[1].table.id === this.objectId.toString())
+					return (activity.subject_rich[1]?.view?.id === this.objectId.toString())
+				})
+			} else if (this.objectType === 'row') {
+				activities = activities.filter((activity) => {
+					return (activity.subject_rich[1]?.row?.id === this.objectId.toString())
 				})
 			}
 			this.activities.push(...activities)

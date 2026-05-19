@@ -20,7 +20,7 @@
 							<template #icon>
 								<IconRename :size="20" decorative />
 							</template>
-							{{ t('tables', 'Edit table') }}
+							{{ t('tables', 'Table settings') }}
 						</NcActionButton>
 						<NcActionButton v-if="canManageElement(table)"
 							:close-after-click="true" @click="$emit('create-view')">
@@ -99,7 +99,7 @@
 							<template #icon>
 								<IconRename :size="20" decorative />
 							</template>
-							{{ t('tables', 'Edit table') }}
+							{{ t('tables', 'Table settings') }}
 						</NcActionButton>
 						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
