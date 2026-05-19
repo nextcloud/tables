@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from '../support/fixtures'
-import { createDatetimeColumn, createTable, loadTable, removeColumn } from '../support/commands'
+import { createDatetimeColumn, createTable, loadTable, openRowActionMenu, removeColumn } from '../support/commands'
 
 const columnTitle = 'date and time'
 const tableTitle = 'Test datetime'
@@ -32,9 +32,10 @@ test.describe('Test column ' + columnTitle, () => {
 		await expect(page.locator('.custom-table table tr td div').filter({ hasText: '5:15' }).first()).toBeVisible()
 
 		// delete row
-		await page.locator('.NcTable tr td button').first().click()
-		await page.locator('button').filter({ hasText: 'Delete' }).click()
-		await page.locator('button').filter({ hasText: /I really/ }).click({ force: true })
+		await openRowActionMenu(page, page.locator('[data-cy="customTableRow"]').first())
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(0, { timeout: 10000 })
 
 		await removeColumn(page, columnTitle)
 	})

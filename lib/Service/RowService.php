@@ -182,7 +182,7 @@ class RowService extends SuperService {
 		if ($userId) {
 			$this->userId = $userId;
 		}
-		if ($this->userId === null || $this->userId === '') {
+		if ($this->userId === null || ($this->userId === '' && !$this->isPublicContext)) {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -571,7 +571,7 @@ class RowService extends SuperService {
 		if ($userId) {
 			$this->userId = $userId;
 		}
-		if ($this->userId === null || $this->userId === '') {
+		if ($this->userId === null || ($this->userId === '' && !$this->isPublicContext)) {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());

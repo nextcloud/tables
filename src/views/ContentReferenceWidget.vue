@@ -21,14 +21,31 @@
 				:rows="filteredRows"
 				:columns="richObject.columns"
 				v-bind="tablePermissions"
-				@edit-row="editRow" />
+				@edit-row="editRow"
+				@copy-row="copyRow"
+				@delete-row="deleteRow" />
 		</div>
+		<CreateRow
+			:columns="richObject.columns"
+			:is-view="Boolean(richObject.type)"
+			:element-id="richObject.id"
+			:show-modal="showCopyRow"
+			:prefill-data="copyPrefillData"
+			@close="showCopyRow = false; copyPrefillData = null" />
+		<DeleteRows
+			v-if="rowToDelete !== null"
+			:rows-to-delete="[rowToDelete]"
+			:element-id="richObject.id"
+			:is-view="Boolean(richObject.type)"
+			@cancel="rowToDelete = null" />
 	</div>
 </template>
 
 <script>
 import NcTable from '../shared/components/ncTable/NcTable.vue'
 import Options from '../shared/components/ncTable/sections/Options.vue'
+import CreateRow from '../modules/modals/CreateRow.vue'
+import DeleteRows from '../modules/modals/DeleteRows.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { NcLoadingIcon } from '@nextcloud/vue'
 import { useResizeObserver } from '@vueuse/core'
@@ -41,6 +58,8 @@ export default {
 	components: {
 		NcTable,
 		Options,
+		CreateRow,
+		DeleteRows,
 		NcLoadingIcon,
 	},
 
@@ -65,6 +84,9 @@ export default {
 		return {
 			searchExp: null,
 			localRows: [], // Keep as fallback only
+			showCopyRow: false,
+			copyPrefillData: null,
+			rowToDelete: null,
 			tablesStore: null,
 			dataStore: null,
 		}
@@ -84,7 +106,7 @@ export default {
 				canSelectRows: false,
 				canHideColumns: false,
 				canFilter: false,
-				showActions: this.canManageElement(this.richObject),
+				showActions: this.canCreateRowInElement(this.richObject) || this.canUpdateData(this.richObject) || this.canDeleteData(this.richObject),
 			}
 		},
 		filteredRows() {
@@ -180,11 +202,17 @@ export default {
 				isView: Boolean(this.richObject.type),
 				element: this.richObject,
 			}, async () => {
-				// Reload rows from the backend to get the latest data
 				await this.dataStore.loadRowsFromBE({
 					tableId: this.richObject.id,
 				})
 			})
+		},
+		copyRow(rowId) {
+			this.copyPrefillData = this.getRow(rowId)?.data
+			this.showCopyRow = true
+		},
+		deleteRow(rowId) {
+			this.rowToDelete = rowId
 		},
 		getRow(rowId) {
 			return this.rows.find(row => row.id === rowId)

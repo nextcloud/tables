@@ -15,6 +15,7 @@ import {
 	loadContext,
 	loadTable,
 	openContextEditModal,
+	openRowActionMenu,
 } from '../support/commands'
 import { login } from '../support/login'
 
@@ -300,9 +301,11 @@ test.describe('Manage a context', () => {
 
 		await expect(page.locator('[data-cy="ncTable"] table').filter({ hasText: 'first row' })).toBeVisible()
 
-		await page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'first row' }).locator('[data-cy="editRowBtn"]').click()
-		await page.locator('[data-cy="editRowDeleteButton"]').click()
-		await page.locator('[data-cy="editRowDeleteConfirmButton"]').click()
+		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'first row' }).first()
+		await openRowActionMenu(page, firstRow)
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await page.locator('[data-cy="confirmDialog"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {})
 
 		await expect(page.locator('[data-cy="ncTable"] table', { hasText: 'first row' })).toBeHidden()
 	})

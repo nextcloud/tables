@@ -305,6 +305,10 @@ export default {
 		justify-content: end;
 	}
 
+	:where(.justify-between) {
+		justify-content: space-between;
+	}
+
 	:where(.slot.fix-col-2) {
 		min-width: 50%;
 	}
