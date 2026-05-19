@@ -115,7 +115,7 @@ import {
 
 import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
-import LockIcon from 'vue-material-design-icons/Lock.vue'
+import LockIcon from 'vue-material-design-icons/LockOutline.vue'
 import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
 import SharePermissionSelect from './SharePermissionSelect.vue'
 

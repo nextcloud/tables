@@ -80,7 +80,7 @@
 										@click="actionShowIntegration(view)">
 										{{ t('tables', 'Integration') }}
 										<template #icon>
-											<Connection :size="20" />
+											<ListBoxOutline :size="20" />
 										</template>
 									</NcActionButton>
 									<NcActionButton v-if="canManageElement(table)"
@@ -121,7 +121,7 @@ import permissionsMixin from '../../../shared/components/ncTable/mixins/permissi
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import Moment from '@nextcloud/moment'
-import Connection from 'vue-material-design-icons/Connection.vue'
+import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../../../shared/utils/displayError.js'
@@ -135,7 +135,7 @@ export default {
 	components: {
 		NcLoadingIcon,
 		NcActionButton,
-		Connection,
+		ListBoxOutline,
 		NcActions,
 		NcButton,
 		NcAvatar,

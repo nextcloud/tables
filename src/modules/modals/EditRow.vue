@@ -27,7 +27,8 @@
 					wide
 					@click="activeTabId = 'activity'">
 					<template #icon>
-						<ActivityIcon />
+						<ActivityIcon v-if="activeTabId === 'activity'" />
+						<ActivityOutlineIcon v-else />
 					</template>
 					{{ t('tables', 'Activity') }}
 				</NcButton>
@@ -96,6 +97,7 @@ import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { ALLOWED_PROTOCOLS } from '../../shared/constants.ts'
 import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
+import ActivityOutlineIcon from 'vue-material-design-icons/LightningBoltOutline.vue'
 import HomeIcon from 'vue-material-design-icons/Home.vue'
 import HomeOutlineIcon from 'vue-material-design-icons/HomeOutline.vue'
 import ActivityList from '../../shared/components/ActivityList.vue'
@@ -110,6 +112,7 @@ export default {
 		ColumnFormComponent,
 		NcNoteCard,
 		ActivityIcon,
+		ActivityOutlineIcon,
 		HomeIcon,
 		HomeOutlineIcon,
 	},

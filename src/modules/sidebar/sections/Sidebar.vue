@@ -36,7 +36,8 @@
 				:name="t('tables', 'Integration')">
 				<SidebarIntegration />
 				<template #icon>
-					<Connection :size="20" />
+					<ListBox v-if="activeSidebarTab === 'integration'" :size="20" />
+					<ListBoxOutline v-else :size="20" />
 				</template>
 			</NcAppSidebarTab>
 			<NcAppSidebarTab v-if="isActivityEnabled"
@@ -44,15 +45,19 @@
 				:order="1"
 				:name="t('tables', 'Activity')">
 				<template #icon>
-					<ActivityIcon :size="20" />
+					<ActivityIcon v-if="activeSidebarTab === 'activity'" :size="20" />
+					<LightningBoltOutline v-else :size="20" />
 				</template>
 				<SidebarActivity />
 			</NcAppSidebarTab>
 			<NcAppSidebarTab v-if="activeElement && canShareElement(activeElement)"
 				id="sharing"
-				icon="icon-share"
 				:order="0"
 				:name="t('tables', 'Sharing')">
+				<template #icon>
+					<NcIconSvgWrapper v-if="activeSidebarTab === 'sharing'" :svg="IconPersonAdd" />
+					<NcIconSvgWrapper v-else :svg="IconPersonAddOutline" />
+				</template>
 				<SidebarSharing />
 			</NcAppSidebarTab>
 		</NcAppSidebar>
@@ -64,10 +69,14 @@ import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import SidebarActivity from './SidebarActivity.vue'
 import SidebarSharing from './SidebarSharing.vue'
 import SidebarIntegration from './SidebarIntegration.vue'
-import { NcAppSidebar, NcAppSidebarTab, NcUserBubble } from '@nextcloud/vue'
+import { NcAppSidebar, NcAppSidebarTab, NcUserBubble, NcIconSvgWrapper } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
-import Connection from 'vue-material-design-icons/Connection.vue'
+import LightningBoltOutline from 'vue-material-design-icons/LightningBoltOutline.vue'
+import ListBox from 'vue-material-design-icons/ListBox.vue'
+import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
+import IconPersonAdd from '@material-symbols/svg-400/outlined/person_add-fill.svg?raw'
+import IconPersonAddOutline from '@material-symbols/svg-400/outlined/person_add.svg?raw'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import activityMixin from '../../../shared/mixins/activityMixin.js'
 import Moment from '@nextcloud/moment'
@@ -75,6 +84,9 @@ import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	name: 'Sidebar',
+	setup() {
+		return { IconPersonAdd, IconPersonAddOutline }
+	},
 	components: {
 		NcUserBubble,
 		SidebarActivity,
@@ -83,7 +95,10 @@ export default {
 		NcAppSidebar,
 		NcAppSidebarTab,
 		ActivityIcon,
-		Connection,
+		LightningBoltOutline,
+		ListBox,
+		ListBoxOutline,
+		NcIconSvgWrapper,
 	},
 
 	filters: {
