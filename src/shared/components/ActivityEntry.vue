@@ -5,7 +5,7 @@
 <template>
 	<div v-if="activity" class="activity">
 		<div class="activity--header">
-			<img :src="activity.icon" class="activity--icon">
+			<img :src="activity.icon" class="activity--icon" :class="{ 'activity--icon--monochrome': isMonochromeIcon }">
 			<NcRichText class="activity--subject" :text="message.subject" :arguments="message.parameters" />
 			<div class="activity--timestamp" :name="formatReadableDate(activity.datetime)">
 				{{ relativeDate(activity.datetime) }}
@@ -99,6 +99,10 @@ export default {
 			return DOMPurify.sanitize(this.activity.message, { ALLOWED_TAGS: ['ins', 'del'], ALLOWED_ATTR: ['class'] })
 		},
 
+		isMonochromeIcon() {
+			return !this.activity.icon.endsWith('-color.svg')
+		},
+
 	},
 }
 </script>
@@ -116,6 +120,11 @@ export default {
 			height: 16px;
 			flex-shrink: 0;
 			flex-grow: 0;
+
+			&--monochrome {
+				opacity: 0.8;
+				filter: var(--background-invert-if-dark);
+			}
 		}
 		.activity--subject {
 			margin-inline-start: 10px;
