@@ -522,6 +522,7 @@ OC.L10N.register(
     "Manage column" : "Керування стовпцями",
     "Column manage actions" : "Дії з керування стовпцями",
     "Hide column" : "Приховати стовпець",
+    "Copy row" : "Копіювати рядок",
     "Undo" : "Скасувати",
     "Redo" : "Повторити",
     "Bold" : "Грубий",

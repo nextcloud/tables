@@ -522,6 +522,7 @@ OC.L10N.register(
     "Manage column" : "Bainistigh colún",
     "Column manage actions" : "Colún gníomhartha a bhainistiú",
     "Hide column" : "Folaigh colún",
+    "Copy row" : "Cóipeáil an tsraith",
     "Undo" : "Cealaigh",
     "Redo" : "Athdhéan",
     "Bold" : "Trom",

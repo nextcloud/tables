@@ -522,6 +522,7 @@ OC.L10N.register(
     "Manage column" : "Spalte verwalten",
     "Column manage actions" : "Spaltenverwaltungsaktionen",
     "Hide column" : "Spalte verstecken",
+    "Copy row" : "Zeile kopieren",
     "Undo" : "Rückgängig",
     "Redo" : "Wiederholen",
     "Bold" : "Fett",

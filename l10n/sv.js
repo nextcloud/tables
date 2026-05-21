@@ -490,6 +490,7 @@ OC.L10N.register(
     "Manage column" : "Hantera kolumn",
     "Column manage actions" : "Hantera kolumnåtgärder",
     "Hide column" : "Dölj kolumn",
+    "Copy row" : "Kopiera rad",
     "Undo" : "Ångra",
     "Redo" : "Gör om",
     "Bold" : "Fet",

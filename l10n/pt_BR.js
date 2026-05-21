@@ -522,6 +522,7 @@ OC.L10N.register(
     "Manage column" : "Gerenciar coluna",
     "Column manage actions" : "Ações de gerenciamento de coluna",
     "Hide column" : "Ocultar coluna",
+    "Copy row" : "Copiar linha",
     "Undo" : "Desfazer",
     "Redo" : "Refazer",
     "Bold" : "Negrito",
