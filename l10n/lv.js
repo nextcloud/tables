@@ -115,6 +115,7 @@ OC.L10N.register(
     "This month" : "Šis mēnesis",
     "This week" : "Šonedēļ",
     "Now" : "Tagad",
-    "seconds ago" : "pirms vairākām sekundēm"
+    "seconds ago" : "pirms vairākām sekundēm",
+    "Back to %s" : "Atgriezties %s"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

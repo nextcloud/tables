@@ -522,6 +522,7 @@ OC.L10N.register(
     "Manage column" : "管理直欄",
     "Column manage actions" : "直欄管理操作",
     "Hide column" : "隱藏直欄",
+    "Copy row" : "複製行",
     "Undo" : "撤消",
     "Redo" : "重做",
     "Bold" : "粗體",

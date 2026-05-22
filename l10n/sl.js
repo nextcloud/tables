@@ -263,6 +263,7 @@ OC.L10N.register(
     "Copy" : "Kopiraj",
     "Duplicate view" : "Podvoji pogled",
     "Favorites" : "Priljubljeno",
+    "Applications" : "Programi",
     "Your results are filtered." : "Rezultati so filtrirani.",
     "Clear filter" : "Počisti filter",
     "No recommendations. Start typing." : "Ni priporočil; začnite z vpisovanjem",
