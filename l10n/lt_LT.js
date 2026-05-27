@@ -522,6 +522,7 @@ OC.L10N.register(
     "Manage column" : "Tvarkyti stulpelį",
     "Column manage actions" : "Stulpelių tvarkymo veiksmai",
     "Hide column" : "Slėpti stulpelį",
+    "Copy row" : "Kopijuoti eilutę",
     "Undo" : "Atšaukti",
     "Redo" : "Grąžinti",
     "Bold" : "Paryškinta",
