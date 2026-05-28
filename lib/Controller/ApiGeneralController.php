@@ -41,7 +41,6 @@ class ApiGeneralController extends AOCSController {
 		$this->viewService = $viewService;
 	}
 
-
 	/**
 	 * [api v2] Returns all main resources
 	 *

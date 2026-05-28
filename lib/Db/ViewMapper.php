@@ -169,7 +169,6 @@ class ViewMapper extends QBMapper {
 			));
 		}
 
-
 		if ($limit !== null) {
 			$qb->setMaxResults($limit);
 		}

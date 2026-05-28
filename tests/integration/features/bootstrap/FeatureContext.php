@@ -469,7 +469,6 @@ class FeatureContext implements Context {
 
 	// (((((((((((((((((((((((((((( END API v2 )))))))))))))))))))))))))))))))))))
 
-
 	/**
 	 * @Given user :user uploads file :file
 	 */
@@ -1236,7 +1235,6 @@ class FeatureContext implements Context {
 		Assert::assertEquals($shareToVerify['permissionDelete'], $permissions['permissionDelete']);
 		Assert::assertEquals($shareToVerify['permissionManage'], $permissions['permissionManage']);
 	}
-
 
 	private function getShareById(int $shareId): array {
 		$this->sendRequest(

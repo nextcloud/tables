@@ -72,7 +72,6 @@ class Api1Controller extends ApiController {
 
 	use Errors;
 
-
 	public function __construct(
 		IRequest $request,
 		TableService $service,

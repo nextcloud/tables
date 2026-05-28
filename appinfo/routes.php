@@ -7,7 +7,6 @@
 
 return [
 	'routes' => [
-
 		// enable CORS for api calls
 		['name' => 'api1#preflighted_cors', 'url' => '/api/1/{path}',
 			'verb' => 'OPTIONS', 'requirements' => ['path' => '.+']],

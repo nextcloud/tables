@@ -132,7 +132,6 @@ class ContextService {
 		$context->setOwnerId($ownerId);
 		$context->setOwnerType($ownerType);
 
-
 		$this->atomic(function () use ($context, $nodes) {
 			$this->contextMapper->insert($context);
 

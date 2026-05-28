@@ -31,7 +31,6 @@ use Psr\Log\LoggerInterface;
  */
 class ApiColumnsController extends ACommonColumnsOCSController {
 
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,

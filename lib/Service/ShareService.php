@@ -10,7 +10,6 @@
 namespace OCA\Tables\Service;
 
 use DateTime;
-
 use InvalidArgumentException;
 use OCA\Circles\Model\Circle;
 use OCA\Tables\AppInfo\Application;
