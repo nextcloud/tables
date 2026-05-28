@@ -9,12 +9,25 @@ namespace OCA\Tables\Validation;
 
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Service\ValueObject\Title;
 
 class ColumnDtoValidator {
 	/**
 	 * @throws BadRequestError
 	 */
-	public function validate(ColumnDto $columnDto): void {
+	public function validate(ColumnDto $columnDto, bool $requiresTitle = false): void {
+		$title = $columnDto->getTitle();
+		if ($requiresTitle && $title === null) {
+			throw new BadRequestError('Title is missing.');
+		}
+		if ($title !== null) {
+			try {
+				new Title($title);
+			} catch (\InvalidArgumentException $e) {
+				throw new BadRequestError($e->getMessage(), 0, $e);
+			}
+		}
+
 		$textMaxLength = $columnDto->getTextMaxLength();
 		if ($textMaxLength !== null && $textMaxLength < 0) {
 			throw new BadRequestError('Maximum text length must be greater than or equal to 0.');

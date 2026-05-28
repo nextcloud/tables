@@ -289,7 +289,8 @@ export default {
 			return str.charAt(0).toUpperCase() + str.slice(1)
 		},
 		async actionConfirm() {
-			if (!this.column.title) {
+			const title = this.column.title?.trim() ?? ''
+			if (!title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
 				this.titleMissingError = true
 			} else if (this.column.customSettings?.width
@@ -301,6 +302,7 @@ export default {
 				showInfo(t('tables', 'You need to select a type for the new column.'))
 				this.typeMissingError = true
 			} else {
+				this.column.title = title
 				this.$emit('save', this.prepareSubmitData())
 				if (this.isCustomSave) {
 					this.reset()

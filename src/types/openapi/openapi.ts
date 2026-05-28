@@ -1298,6 +1298,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["Table"];
                 };
             };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -1426,6 +1437,17 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Table"];
+                };
+            };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description Current user is not logged in */
@@ -4371,6 +4393,22 @@ export interface operations {
                     };
                 };
             };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -5338,6 +5376,22 @@ export interface operations {
                     };
                 };
             };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -5488,6 +5542,22 @@ export interface operations {
                     };
                 };
             };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -5624,6 +5694,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };
@@ -5765,6 +5851,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };
@@ -5922,6 +6024,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };

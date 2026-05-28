@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Command;
 
+use InvalidArgumentException;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\TableService;
@@ -78,7 +79,7 @@ class AddTable extends Command {
 			unset($arr['rowsCount']);
 			unset($arr['ownerDisplayName']);
 			$output->writeln(json_encode($arr, JSON_PRETTY_PRINT));
-		} catch (InternalError|PermissionError|Exception $e) {
+		} catch (InternalError|PermissionError|Exception|InvalidArgumentException $e) {
 			$output->writeln('Error occurred: ' . $e->getMessage());
 			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;

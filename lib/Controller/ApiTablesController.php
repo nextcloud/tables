@@ -10,6 +10,7 @@ namespace OCA\Tables\Controller;
 use Exception;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -263,6 +264,13 @@ class ApiTablesController extends AOCSController {
 			}
 			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		} catch (BadRequestError $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			return $this->handleBadRequestError($e);
 		} catch (InternalError|Exception $e) {
 			try {
 				$this->db->rollBack();
@@ -281,14 +289,18 @@ class ApiTablesController extends AOCSController {
 	 * @param string|null $description Description for the table
 	 * @param string $template Template to use if wanted
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
 	public function create(string $title, ?string $emoji, ?string $description, string $template = 'custom'): DataResponse {
 		try {
 			return new DataResponse($this->service->create($title, $template, $emoji, $description)->jsonSerialize());
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
 			return $this->handleError($e);
 		}

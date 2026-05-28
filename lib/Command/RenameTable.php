@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Command;
 
+use InvalidArgumentException;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\TableService;
 use Psr\Log\LoggerInterface;
@@ -84,7 +85,7 @@ class RenameTable extends Command {
 			unset($arr['rowsCount']);
 			unset($arr['ownerDisplayName']);
 			$output->writeln(json_encode($arr, JSON_PRETTY_PRINT));
-		} catch (InternalError $e) {
+		} catch (InternalError|InvalidArgumentException $e) {
 			$output->writeln('Error occurred: ' . $e->getMessage());
 			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;
