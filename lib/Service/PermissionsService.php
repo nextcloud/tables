@@ -71,7 +71,6 @@ class PermissionsService {
 		$this->circleHelper = $circleHelper;
 	}
 
-
 	/**
 	 * @param string|null $userId
 	 * @param bool $canBeEmpty
@@ -98,7 +97,6 @@ class PermissionsService {
 		}
 		return $userId;
 	}
-
 
 	// ***** TABLES permissions *****
 
@@ -278,7 +276,6 @@ class PermissionsService {
 		return $this->canManageView($view, $userId);
 	}
 
-
 	// ***** COLUMNS permissions *****
 
 	public function canReadColumnsByViewId(int $viewId, ?string $userId = null): bool {
@@ -318,9 +315,7 @@ class PermissionsService {
 		return $this->canManageTableById($tableId, $userId);
 	}
 
-
 	// ***** ROWS permissions *****
-
 
 	/**
 	 * @param int $elementId
@@ -397,9 +392,7 @@ class PermissionsService {
 			return false;
 		}
 		return $this->checkPermissionById($tableId, 'table', 'delete', $userId);
-
 	}
-
 
 	// ***** SHARE permissions *****
 
@@ -422,7 +415,6 @@ class PermissionsService {
 			$this->logger->warning('Cannot check manage permissions, permission denied');
 			return false;
 		}
-
 
 		if ($share->getSender() === $userId) {
 			return true;

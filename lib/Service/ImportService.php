@@ -474,7 +474,6 @@ class ImportService extends SuperService {
 		);
 	}
 
-
 	/**
 	 * @param string $userId
 	 * @param ?int $tableId

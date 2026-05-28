@@ -72,7 +72,6 @@ class ColumnService extends SuperService {
 		$this->columnDtoValidator = $columnDtoValidator;
 	}
 
-
 	/**
 	 * @throws InternalError
 	 * @throws PermissionError

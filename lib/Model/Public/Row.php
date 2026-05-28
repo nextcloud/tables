@@ -34,7 +34,6 @@ final class Row implements JsonSerializable {
 	) {
 	}
 
-
 	/**
 	 * @return array{"tableId": int, "rowId": int, "previousValues": null|array<int, mixed>, "values": null|array<int, mixed>}
 	 *

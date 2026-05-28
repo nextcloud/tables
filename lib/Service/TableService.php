@@ -228,7 +228,6 @@ class TableService extends SuperService {
 		}
 	}
 
-
 	/**
 	 * @param int $id
 	 * @param string|null $userId
@@ -435,7 +434,6 @@ class TableService extends SuperService {
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		}
-
 
 		// delete all shares for that table
 		$this->shareService->deleteAllForTable($item);
