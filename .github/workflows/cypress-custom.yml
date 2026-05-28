@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         databases: [ 'mysql' ]
-        server-versions: [ 'stable33', 'master' ]
+        server-versions: [ 'stable33', 'stable34', 'master' ]
         include:
           - php-versions: 8.2
 
@@ -184,4 +184,3 @@ jobs:
     steps:
       - name: Summary status
         run: if ${{ needs.cypress.result != 'success' && needs.cypress.result != 'skipped' }}; then exit 1; fi
-
