@@ -250,8 +250,8 @@ export const useDataStore = defineStore('data', {
 			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.rows[stateId]) {
 				const row = res.data
-				const index = this.rows[stateId].findIndex(r => r.id === row.id)
-				set(this.rows[stateId], index, row)
+				const updatedRows = this.rows[stateId].map(r => r.id === row.id ? row : r)
+				set(this.rows, stateId, updatedRows)
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 			}
 
@@ -378,6 +378,13 @@ export const useDataStore = defineStore('data', {
 			if (rowInView === false) {
 				emit('tables:row:animate')
 				this.rows[stateId] = this.rows[stateId].filter(r => r.id !== rowId)
+			}
+		},
+
+		seedRows({ isView, elementId, rows }) {
+			const stateId = genStateKey(isView, elementId)
+			if (stateId) {
+				set(this.rows, stateId, rows)
 			}
 		},
 	},

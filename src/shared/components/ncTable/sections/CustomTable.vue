@@ -375,6 +375,7 @@ export default {
 		width: 55px;
 		background-color: inherit;
 		padding-inline-end: 16px;
+		z-index: 5;
 	}
 
 	tr>td.sticky:last-child {

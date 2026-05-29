@@ -20,6 +20,8 @@
 			<NcTable
 				:rows="filteredRows"
 				:columns="richObject.columns"
+				:element-id="richObject.id"
+				:is-view="Boolean(richObject.type)"
 				v-bind="tablePermissions"
 				@edit-row="editRow"
 				@copy-row="copyRow"
@@ -222,6 +224,11 @@ export default {
 
 			if (this.richObject.rows) {
 				this.localRows = this.richObject.rows
+				this.dataStore.seedRows({
+					isView: Boolean(this.richObject.type),
+					elementId: this.richObject.id,
+					rows: this.richObject.rows,
+				})
 				return
 			}
 
