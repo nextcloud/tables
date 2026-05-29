@@ -14,8 +14,12 @@ import {
 } from '@nextcloud/e2e-test-server/docker'
 import { readFileSync } from 'fs'
 import { execSync } from 'node:child_process'
+import { createServer } from 'node:http'
 
 const TEXT_REPOSITORY = 'https://github.com/nextcloud/text.git'
+const READY_HOST = '127.0.0.1'
+const READY_PORT = Number.parseInt(process.env.PLAYWRIGHT_READY_PORT ?? '18089', 10)
+let readyServer = null
 
 async function start() {
 	let branch = process.env.SERVER_BRANCH || 'stable33'
@@ -91,9 +95,41 @@ async function installVendoredText(vendoredBranch) {
 
 async function stop() {
 	process.stderr.write('Stopping Nextcloud server…\n')
+	await closeReadyServer()
 	await stopNextcloud()
 	// eslint-disable-next-line n/no-process-exit
 	process.exit(0)
+}
+
+async function startReadyServer() {
+	await new Promise((resolve, reject) => {
+		readyServer = createServer((request, response) => {
+			if (request.url === '/ready') {
+				response.writeHead(200, { 'content-type': 'text/plain' })
+				response.end('ready')
+				return
+			}
+
+			response.writeHead(404, { 'content-type': 'text/plain' })
+			response.end('not found')
+		})
+		readyServer.once('error', reject)
+		readyServer.listen(READY_PORT, READY_HOST, () => {
+			readyServer.off('error', reject)
+			resolve()
+		})
+	})
+}
+
+async function closeReadyServer() {
+	if (!readyServer) {
+		return
+	}
+
+	await new Promise((resolve) => {
+		readyServer.close(() => resolve())
+	})
+	readyServer = null
 }
 
 process.on('SIGINT', stop)
@@ -108,9 +144,8 @@ const vendoredBranch = serverBranch === 'master' ? 'main' : serverBranch
 
 await configureNextcloud(['tables'], vendoredBranch)
 await installVendoredText(vendoredBranch)
+await startReadyServer()
 process.stdout.write('Tables Playwright environment is ready\n')
 
 // Idle to wait for shutdown
-while (true) {
-	await new Promise((resolve) => setTimeout(resolve, 5000))
-}
+await new Promise(() => {})

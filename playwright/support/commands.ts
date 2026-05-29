@@ -123,6 +123,12 @@ export async function ensureNavigationOpen(page: Page) {
 		await collapsedToggle.click({ force: true })
 		await page.waitForTimeout(250)
 	}
+
+	await page
+		.locator('[data-cy="navigationCreateTableIcon"], [data-cy="createContextIcon"]')
+		.first()
+		.waitFor({ state: 'visible', timeout: 10000 })
+		.catch(() => {})
 }
 
 export async function openCreateRowModal(page: Page) {
@@ -150,16 +156,25 @@ export async function createTable(page: Page, title: string) {
 	await expect(page.locator('.icon-loading').first()).toBeHidden({
 		timeout: 10000,
 	})
-	const createButton = page.getByRole('button', { name: /^Create table$/ }).first()
-	if (!(await createButton.isVisible().catch(() => false))) {
-		await ensureNavigationOpen(page)
-	}
-	await createButton.waitFor({ state: 'visible', timeout: 10000 })
-	// Wait for any lingering toasts/overlays to clear
-	await page.locator('.toastify').first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
-	await createButton.click()
 
 	const createDialog = page.getByRole('dialog', { name: /^Create table$/ })
+	const navCreateButton = page.locator('[data-cy="navigationCreateTableIcon"]').first()
+	const homeCreateButton = page.getByRole('button', { name: /^Create new table$/ }).first()
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		const createButton = await firstVisible(navCreateButton, 5000) ?? await firstVisible(homeCreateButton, 5000)
+		if (!createButton) {
+			await ensureNavigationOpen(page)
+			await page.waitForTimeout(attempt * 250)
+			continue
+		}
+
+		await page.locator('.toastify').first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
+		await createButton.click({ force: true })
+		if (await createDialog.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false)) {
+			break
+		}
+	}
+
 	await expect(createDialog).toBeVisible({
 		timeout: 10000,
 	})
@@ -361,6 +376,43 @@ export async function clickOnTableThreeDotMenu(page: Page, optionName: string) {
 	}
 
 	throw new Error(`Could not find table action menu item: ${optionName}`)
+}
+
+export async function clickOnNavigationTableMenu(page: Page, tableTitle: string, optionName: string) {
+	await ensureNavigationOpen(page)
+	const tableItem = page
+		.locator('[data-cy="navigationTableItem"]')
+		.filter({ hasText: tableTitle })
+		.first()
+	await tableItem.waitFor({ state: 'visible', timeout: 10000 })
+
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		await tableItem.scrollIntoViewIfNeeded()
+		await tableItem.hover()
+		await page.locator('.toastify').first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
+		const menuButton = tableItem.getByRole('button', { name: /Actions|Open menu/i }).first()
+		await menuButton.waitFor({ state: 'visible', timeout: 5000 })
+		await menuButton.click({ force: true })
+
+		const menuItem = await firstVisible(page.getByRole('menuitem', { name: optionName }), 5000)
+		if (menuItem) {
+			await menuItem.click({ force: true })
+			return
+		}
+
+		const fallbackItem = await firstVisible(page
+			.locator('[role="menu"] button, [role="menu"] a, [role="menu"] li, .v-popper__popper button, .v-popper__popper a, .v-popper__popper li')
+			.filter({ hasText: new RegExp(`^${escapeRegExp(optionName)}$`, 'i') }), 5000)
+		if (fallbackItem) {
+			await fallbackItem.click({ force: true })
+			return
+		}
+
+		await page.keyboard.press('Escape').catch(() => {})
+		await page.waitForTimeout(attempt * 250)
+	}
+
+	throw new Error(`Could not find navigation table menu item: ${optionName}`)
 }
 
 export async function sortTableColumn(
