@@ -126,7 +126,15 @@ class RowService extends SuperService {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
 
-				return $this->row2Mapper->findAll($view->getColumnIds(), $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
+				return $this->row2Mapper->findAll(
+					$view->getColumnIds(),
+					$view->getTableId(),
+					$limit,
+					$offset,
+					$view->getFilterArray(),
+					$view->getSortArray(),
+					$this->resolveFilterUserId($userId, $view),
+				);
 			} else {
 				throw new PermissionError('no read access to view id = ' . $viewId);
 			}
@@ -134,6 +142,18 @@ class RowService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+	}
+
+	/**
+	 * resolve  userid used for field placeholders in view filters.
+	 * if the request is made in a public and no userid is provided,use the view created_by id as fallback
+	 */
+	private function resolveFilterUserId(string $userId, View $view): string {
+		if ($userId === '' && $this->isPublicContext) {
+			return $view->getCreatedBy() ?? '';
+		}
+
+		return $userId;
 	}
 
 	/**
