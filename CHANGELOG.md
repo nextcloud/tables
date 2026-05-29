@@ -5,6 +5,35 @@
 
 # Changelog
 
+## v1.0.9
+
+### Fixed
+* [[stable1.0] Error handling for CSV downloads (tables#2647)](https://github.com/nextcloud/tables/pull/2647)
+* [[stable1.0] Mandatory column handling (tables#2648)](https://github.com/nextcloud/tables/pull/2648)
+* [[stable1.0] Context changes (tables#2649)](https://github.com/nextcloud/tables/pull/2649)
+* [[stable1.0] fix: handle first option select (tables#2668)](https://github.com/nextcloud/tables/pull/2668)
+
+### Dependencies
+* [Chore(deps): pin dependencies (stable1.0) (tables#2618)](https://github.com/nextcloud/tables/pull/2618)
+* [Chore(deps): update nextcloud/pr-feedback-action digest to 5227c55 (stable1.0) (tables#2619)](https://github.com/nextcloud/tables/pull/2619)
+* [Chore(deps): update svenstaro/upload-release-action digest to 29e53e9 (stable1.0) (tables#2621)](https://github.com/nextcloud/tables/pull/2621)
+* [Chore(deps): update actions/checkout action to v5.0.1 (stable1.0) (tables#2622)](https://github.com/nextcloud/tables/pull/2622)
+* [Chore(deps): update dependency staabm/annotate-pull-request-from-checkstyle to ^1.8.7 (stable1.0) (tables#2624)](https://github.com/nextcloud/tables/pull/2624)
+* [Chore(deps): update icewind1991/nextcloud-version-matrix action to v1.3.2 (stable1.0) (tables#2627)](https://github.com/nextcloud/tables/pull/2627)
+* [Fix(deps): update tiptap to ^3.23.1 (stable1.0) (tables#2629)](https://github.com/nextcloud/tables/pull/2629)
+* [Chore(deps): update andstor/file-existence-action action to v3.1.0 (stable1.0) (tables#2630)](https://github.com/nextcloud/tables/pull/2630)
+* [Chore(deps): update dependency cypress-vite to ^1.10.0 (stable1.0) (tables#2631)](https://github.com/nextcloud/tables/pull/2631)
+* [Chore(deps): update actions/github-script action to v9 (stable1.0) (tables#2636)](https://github.com/nextcloud/tables/pull/2636)
+* [Chore(deps): update actions/setup-node action to v6 (stable1.0) (tables#2637)](https://github.com/nextcloud/tables/pull/2637)
+* [Chore(deps): update actions/upload-artifact action to v7 (stable1.0) (tables#2638)](https://github.com/nextcloud/tables/pull/2638)
+* [Chore(deps): update cypress-io/github-action action to v7 (stable1.0) (tables#2639)](https://github.com/nextcloud/tables/pull/2639)
+* [Chore(deps): update dorny/paths-filter action to v4 (stable1.0) (tables#2640)](https://github.com/nextcloud/tables/pull/2640)
+* [Chore(deps): update fsfe/reuse-action action to v6 (stable1.0) (tables#2641)](https://github.com/nextcloud/tables/pull/2641)
+* [Chore(deps): update hmarr/auto-approve-action action to v4 (stable1.0) - autoclosed (tables#2642)](https://github.com/nextcloud/tables/pull/2642)
+* [Chore(deps): update peter-evans/create-pull-request action to v8 (stable1.0) (tables#2643)](https://github.com/nextcloud/tables/pull/2643)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.60.4 (stable1.0) (tables#2659)](https://github.com/nextcloud/tables/pull/2659)
+* [Chore(deps): update shivammathur/setup-php action to v2.37.1 (stable1.0) (tables#2660)](https://github.com/nextcloud/tables/pull/2660)
+
 ## v1.0.8
 
 ### Fixed
