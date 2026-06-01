@@ -116,7 +116,6 @@ class TableMapper extends QBMapper {
 			));
 		}
 
-
 		if ($limit !== null) {
 			$qb->setMaxResults($limit);
 		}

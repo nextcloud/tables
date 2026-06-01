@@ -164,7 +164,6 @@ class ColumnMapper extends QBMapper {
 		return $out;
 	}
 
-
 	/**
 	 * @param int $tableId
 	 * @return int

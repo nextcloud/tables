@@ -117,7 +117,6 @@ class RowService extends SuperService {
 		}
 	}
 
-
 	/**
 	 * @param int $rowId
 	 * @return Row2

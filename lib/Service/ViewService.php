@@ -189,7 +189,6 @@ class ViewService extends SuperService {
 		return array_values($allViews);
 	}
 
-
 	/**
 	 * @param string $title
 	 * @param string|null $emoji
@@ -342,7 +341,6 @@ class ViewService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
-
 
 	/**
 	 * @param View $view

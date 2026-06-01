@@ -29,7 +29,6 @@ class ShareController extends Controller {
 
 	use Errors;
 
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
@@ -42,7 +41,6 @@ class ShareController extends Controller {
 		$this->userId = $userId;
 		$this->shareManager = $shareManager;
 	}
-
 
 	#[NoAdminRequired]
 	public function sharePolicy(): DataResponse {
