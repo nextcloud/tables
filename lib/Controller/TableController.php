@@ -25,7 +25,6 @@ class TableController extends Controller {
 
 	use Errors;
 
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
@@ -36,7 +35,6 @@ class TableController extends Controller {
 		$this->service = $service;
 		$this->userId = $userId;
 	}
-
 
 	#[NoAdminRequired]
 	public function index(): DataResponse {

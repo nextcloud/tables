@@ -8,7 +8,6 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
-
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\ResponseDefinitions;

@@ -23,7 +23,6 @@ class NumberBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return json_encode(floatval($value));
 	}
 
-
 	/**
 	 * @param mixed $value (int|float|string|null)
 	 * @param Column|null $column

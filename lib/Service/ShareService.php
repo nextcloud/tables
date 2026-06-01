@@ -10,7 +10,6 @@
 namespace OCA\Tables\Service;
 
 use DateTime;
-
 use InvalidArgumentException;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
@@ -80,7 +79,6 @@ class ShareService extends SuperService {
 		IDBConnection $dbc,
 		IManager $shareManager,
 		IHasher $hasher,
-
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
@@ -94,7 +92,6 @@ class ShareService extends SuperService {
 		$this->shareManager = $shareManager;
 		$this->hasher = $hasher;
 	}
-
 
 	/**
 	 * @throws InternalError
@@ -220,7 +217,6 @@ class ShareService extends SuperService {
 		}
 		return $returnArray;
 	}
-
 
 	/**
 	 * @param int $elementId

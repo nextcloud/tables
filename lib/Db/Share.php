@@ -8,7 +8,6 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
-
 use OCA\Tables\ResponseDefinitions;
 
 /**

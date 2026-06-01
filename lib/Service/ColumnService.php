@@ -63,7 +63,6 @@ class ColumnService extends SuperService {
 		$this->userHelper = $userHelper;
 	}
 
-
 	/**
 	 * @throws InternalError
 	 * @throws PermissionError

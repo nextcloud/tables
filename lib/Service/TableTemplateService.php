@@ -240,7 +240,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Description'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['description'] = $this->createColumn($table->id, $params);
 
@@ -248,7 +247,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Contact information'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['contactInformation'] = $this->createColumn($table->id, $params);
 
@@ -265,7 +263,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Comment'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
 
@@ -340,7 +337,6 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'line',
 			'mandatory' => true,
-
 		];
 		$columns['employee'] = $this->createColumn($table->id, $params);
 
@@ -350,7 +346,6 @@ class TableTemplateService {
 			'type' => 'datetime',
 			'subtype' => 'date',
 			'mandatory' => true,
-
 		];
 		$columns['from'] = $this->createColumn($table->id, $params);
 
@@ -360,7 +355,6 @@ class TableTemplateService {
 			'type' => 'datetime',
 			'subtype' => 'date',
 			'mandatory' => true,
-
 		];
 		$columns['to'] = $this->createColumn($table->id, $params);
 
@@ -371,7 +365,6 @@ class TableTemplateService {
 			'numberMin' => 0,
 			'numberMax' => 100,
 			'mandatory' => true,
-
 		];
 		$columns['workingDays'] = $this->createColumn($table->id, $params);
 
@@ -381,7 +374,6 @@ class TableTemplateService {
 			'subtype' => 'date',
 			'mandatory' => true,
 			'datetimeDefault' => 'today',
-
 		];
 		$columns['dateRequest'] = $this->createColumn($table->id, $params);
 
@@ -389,7 +381,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Approved'),
 			'type' => 'selection',
 			'subtype' => 'check',
-
 		];
 		$columns['approved'] = $this->createColumn($table->id, $params);
 
@@ -397,7 +388,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Approve date'),
 			'type' => 'datetime',
 			'subtype' => 'date',
-
 		];
 		$columns['dateApprove'] = $this->createColumn($table->id, $params);
 
@@ -405,16 +395,13 @@ class TableTemplateService {
 			'title' => $this->l->t('Approved by'),
 			'type' => 'text',
 			'subtype' => 'line',
-
 		];
 		$columns['approveBy'] = $this->createColumn($table->id, $params);
-
 
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
 
@@ -462,7 +449,6 @@ class TableTemplateService {
 			$columns['workingDays']->getId() => 8,
 			$columns['dateRequest']->getId() => '2023-01-30',
 		]);
-
 
 		// let's add views
 		$this->createView($table,
@@ -535,7 +521,6 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'line',
 			'mandatory' => true,
-
 		];
 		$columns['name'] = $this->createColumn($table->id, $params);
 
@@ -543,7 +528,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Position'),
 			'type' => 'text',
 			'subtype' => 'line',
-
 		];
 		$columns['position'] = $this->createColumn($table->id, $params);
 
@@ -551,7 +535,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Skills'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['skills'] = $this->createColumn($table->id, $params);
 
@@ -559,7 +542,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Birthday'),
 			'type' => 'datetime',
 			'subtype' => 'date',
-
 		];
 		$columns['birthday'] = $this->createColumn($table->id, $params);
 
@@ -567,7 +549,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
 
@@ -601,7 +582,6 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'line',
 			'mandatory' => true,
-
 		];
 		$columns['task'] = $this->createColumn($table->id, $params);
 
@@ -611,7 +591,6 @@ class TableTemplateService {
 			'subtype' => $this->textRichColumnTypeName,
 			'description' => $this->l->t('Title or short description'),
 			'textMultiline' => true,
-
 		];
 		$columns['description'] = $this->createColumn($table->id, $params);
 
@@ -620,7 +599,6 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
 			'description' => $this->l->t('Date, time or whatever'),
-
 		];
 		$columns['target'] = $this->createColumn($table->id, $params);
 
@@ -637,7 +615,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['comments'] = $this->createColumn($table->id, $params);
 
@@ -645,7 +622,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Proofed'),
 			'type' => 'selection',
 			'subtype' => 'check',
-
 		];
 		$columns['proofed'] = $this->createColumn($table->id, $params);
 
@@ -695,7 +671,6 @@ class TableTemplateService {
 		]);
 	}
 
-
 	/**
 	 * @psalm-suppress PossiblyNullReference
 	 * @param Table $table
@@ -713,7 +688,6 @@ class TableTemplateService {
 			'title' => $this->l->t('What'),
 			'type' => 'text',
 			'subtype' => 'line',
-
 		];
 		$columns['what'] = $this->createColumn($table->id, $params);
 
@@ -721,7 +695,6 @@ class TableTemplateService {
 			'title' => $this->l->t('How to do'),
 			'type' => 'text',
 			'subtype' => $this->textRichColumnTypeName,
-
 		];
 		$columns['how'] = $this->createColumn($table->id, $params);
 
@@ -729,7 +702,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Ease of use'),
 			'type' => 'number',
 			'subtype' => 'stars',
-
 		];
 		$columns['ease'] = $this->createColumn($table->id, $params);
 
@@ -738,10 +710,8 @@ class TableTemplateService {
 			'title' => $this->l->t('Done'),
 			'type' => 'selection',
 			'subtype' => 'check',
-
 		];
 		$columns['done'] = $this->createColumn($table->id, $params);
-
 
 		// let's add some example rows
 		$this->createRow($table, [
