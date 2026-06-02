@@ -130,9 +130,10 @@ class Api1Controller extends ApiController {
 	 * @param string|null $emoji Emoji for the table
 	 * @param string $template Template to use if wanted
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
@@ -141,6 +142,10 @@ class Api1Controller extends ApiController {
 	public function createTable(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
 		try {
 			return new DataResponse($this->tableService->create($title, $template, $emoji)->jsonSerialize());
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -231,9 +236,10 @@ class Api1Controller extends ApiController {
 	 * @param string|null $title New table title
 	 * @param string|null $emoji New table emoji
 	 * @param bool $archived Whether the table is archived
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -245,6 +251,10 @@ class Api1Controller extends ApiController {
 	public function updateTable(int $tableId, ?string $title = null, ?string $emoji = null, ?bool $archived = false): DataResponse {
 		try {
 			return new DataResponse($this->tableService->update($tableId, $title, $emoji, null, $archived, $this->userId)->jsonSerialize());
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

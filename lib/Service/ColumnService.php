@@ -22,6 +22,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Validation\ColumnDtoValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -223,6 +224,7 @@ class ColumnService extends SuperService {
 	 * @param array $selectedViewIds
 	 * @return Column
 	 *
+	 * @throws BadRequestError
 	 * @throws InternalError
 	 * @throws PermissionError|NotFoundError
 	 */
@@ -236,7 +238,12 @@ class ColumnService extends SuperService {
 		if (ColumnType::tryFrom($columnDto->getType()) === null) {
 			throw new BadRequestError('Column type ' . $columnDto->getType() . ' does not exist.');
 		}
-		$this->columnDtoValidator->validate($columnDto);
+		$this->columnDtoValidator->validate($columnDto, true);
+		$columnTitle = $this->normalizeTitle($columnDto->getTitle(), true);
+		if ($columnTitle === null) {
+			throw new BadRequestError('Title is missing.');
+		}
+
 		// security
 		if ($viewId) {
 			try {
@@ -280,7 +287,7 @@ class ColumnService extends SuperService {
 		// Add number to title to avoid duplicate
 		$columns = $this->mapper->findAllByTable($table->getId());
 		$i = 1;
-		$newTitle = $columnDto->getTitle();
+		$newTitle = $columnTitle;
 		while (true) {
 			$found = false;
 			foreach ($columns as $column) {
@@ -292,7 +299,7 @@ class ColumnService extends SuperService {
 			if (!$found) {
 				break;
 			}
-			$newTitle = $columnDto->getTitle() . ' (' . $i . ')';
+			$newTitle = $columnTitle . ' (' . $i . ')';
 			$i++;
 		}
 
@@ -338,6 +345,7 @@ class ColumnService extends SuperService {
 	 * @param string|null $userId
 	 * @param ColumnDto $columnDto
 	 * @return Column
+	 * @throws BadRequestError
 	 * @throws InternalError
 	 */
 	public function update(
@@ -354,9 +362,10 @@ class ColumnService extends SuperService {
 				throw new PermissionError('update column id = ' . $columnId . ' is not allowed.');
 			}
 			$this->columnDtoValidator->validate($columnDto);
+			$title = $this->normalizeTitle($columnDto->getTitle(), false);
 
-			if ($columnDto->getTitle() !== null) {
-				$item->setTitle($columnDto->getTitle());
+			if ($title !== null) {
+				$item->setTitle($title);
 			}
 			if ($columnDto->getType() !== null) {
 				$item->setType($columnDto->getType());
@@ -403,6 +412,8 @@ class ColumnService extends SuperService {
 
 			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));
+		} catch (BadRequestError $e) {
+			throw $e;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -436,6 +447,21 @@ class ColumnService extends SuperService {
 					$translatedMessage
 				);
 			}
+		}
+	}
+
+	private function normalizeTitle(?string $title, bool $required): ?string {
+		if ($title === null) {
+			if ($required) {
+				throw new BadRequestError('Title is missing.');
+			}
+			return null;
+		}
+
+		try {
+			return (string)new Title($title);
+		} catch (\InvalidArgumentException $e) {
+			throw new BadRequestError($e->getMessage(), 0, $e);
 		}
 	}
 

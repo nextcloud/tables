@@ -165,11 +165,13 @@ export default {
 			this.$emit('close')
 		},
 		async saveColumn() {
-			if (this.editColumn.title === '') {
+			const title = this.editColumn.title?.trim() ?? ''
+			if (title === '') {
 				showError(t('tables', 'Cannot update column. Title is missing.'))
 				this.editErrorTitle = true
 				return
 			}
+			this.editColumn.title = title
 
 			if (this.editColumn.customSettings?.width
 				&& (this.editColumn.customSettings?.width < COLUMN_WIDTH_MIN || this.editColumn.customSettings?.width > COLUMN_WIDTH_MAX)) {

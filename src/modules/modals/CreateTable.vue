@@ -184,10 +184,12 @@ export default {
 				this.actionCancel()
 				return
 			}
-			if (this.title === '') {
+			const title = this.title.trim()
+			if (title === '') {
 				showError(t('tables', 'Cannot create new table. Title is missing.'))
 				this.errorTitle = true
 			} else {
+				this.title = title
 				const newTableId = await this.sendNewTableToBE(this.templateChoice)
 				if (newTableId) {
 					await this.$router.push('/table/' + newTableId)

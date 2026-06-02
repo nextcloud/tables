@@ -129,11 +129,12 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
-	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
+	 *     array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
 	 *
 	 *
 	 * 200: Column created
+	 * 400: Invalid request data
 	 * 403: No permission
 	 * 404: Not found
 	 * @throws InternalError
@@ -146,26 +147,30 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
-		$column = $this->service->create(
-			$this->userId,
-			$tableId,
-			$viewId,
-			new ColumnDto(
-				title: $title,
-				type: ColumnType::NUMBER->value,
-				subtype: $subtype,
-				mandatory: $mandatory,
-				description: $description,
-				numberDefault: $numberDefault,
-				numberMin: $numberMin,
-				numberMax: $numberMax,
-				numberDecimals: $numberDecimals,
-				numberPrefix: $numberPrefix,
-				numberSuffix: $numberSuffix,
-				customSettings: json_encode($customSettings),
-			),
-			$selectedViewIds
-		);
+		try {
+			$column = $this->service->create(
+				$this->userId,
+				$tableId,
+				$viewId,
+				new ColumnDto(
+					title: $title,
+					type: ColumnType::NUMBER->value,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					numberDefault: $numberDefault,
+					numberMin: $numberMin,
+					numberMax: $numberMax,
+					numberDecimals: $numberDecimals,
+					numberPrefix: $numberPrefix,
+					numberSuffix: $numberSuffix,
+					customSettings: json_encode($customSettings),
+				),
+				$selectedViewIds
+			);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
 		return new DataResponse($column->jsonSerialize());
 	}
 
@@ -192,11 +197,12 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 * @param array<string, mixed> $customSettings Custom settings for the
 	 *                                             column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
-	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
+	 *     array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
 	 *
 	 *
 	 * 200: Column created
+	 * 400: Invalid request data
 	 * 403: No permission
 	 * 404: Not found
 	 * @throws InternalError
@@ -209,24 +215,28 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?bool $textUnique = false, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
-		$column = $this->service->create(
-			$this->userId,
-			$tableId,
-			$viewId,
-			new ColumnDto(
-				title: $title,
-				type: ColumnType::TEXT->value,
-				subtype: $subtype,
-				mandatory: $mandatory,
-				description: $description,
-				textDefault: $textDefault,
-				textAllowedPattern: $textAllowedPattern,
-				textMaxLength: $textMaxLength,
-				textUnique: $textUnique,
-				customSettings: json_encode($customSettings),
-			),
-			$selectedViewIds
-		);
+		try {
+			$column = $this->service->create(
+				$this->userId,
+				$tableId,
+				$viewId,
+				new ColumnDto(
+					title: $title,
+					type: ColumnType::TEXT->value,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					textDefault: $textDefault,
+					textAllowedPattern: $textAllowedPattern,
+					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
+					customSettings: json_encode($customSettings),
+				),
+				$selectedViewIds
+			);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
 		return new DataResponse($column->jsonSerialize());
 	}
 
@@ -255,11 +265,12 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
-	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
+	 *     array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
 	 *
 	 *
 	 * 200: Column created
+	 * 400: Invalid request data
 	 * 403: No permission
 	 * 404: Not found
 	 * @throws InternalError
@@ -272,22 +283,26 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	public function createSelectionColumn(int $baseNodeId, string $title, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
-		$column = $this->service->create(
-			$this->userId,
-			$tableId,
-			$viewId,
-			new ColumnDto(
-				title: $title,
-				type: ColumnType::SELECTION->value,
-				subtype: $subtype,
-				mandatory: $mandatory,
-				description: $description,
-				selectionOptions: $selectionOptions,
-				selectionDefault: $selectionDefault,
-				customSettings: json_encode($customSettings),
-			),
-			$selectedViewIds
-		);
+		try {
+			$column = $this->service->create(
+				$this->userId,
+				$tableId,
+				$viewId,
+				new ColumnDto(
+					title: $title,
+					type: ColumnType::SELECTION->value,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					selectionOptions: $selectionOptions,
+					selectionDefault: $selectionDefault,
+					customSettings: json_encode($customSettings),
+				),
+				$selectedViewIds
+			);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
 		return new DataResponse($column->jsonSerialize());
 	}
 
@@ -313,11 +328,12 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
-	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
+	 *     array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
 	 *
 	 *
 	 * 200: Column created
+	 * 400: Invalid request data
 	 * 403: No permission
 	 * 404: Not found
 	 * @throws InternalError
@@ -330,21 +346,25 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
-		$column = $this->service->create(
-			$this->userId,
-			$tableId,
-			$viewId,
-			new ColumnDto(
-				title: $title,
-				type: ColumnType::DATETIME->value,
-				subtype: $subtype,
-				mandatory: $mandatory,
-				description: $description,
-				datetimeDefault: $datetimeDefault,
-				customSettings: json_encode($customSettings),
-			),
-			$selectedViewIds
-		);
+		try {
+			$column = $this->service->create(
+				$this->userId,
+				$tableId,
+				$viewId,
+				new ColumnDto(
+					title: $title,
+					type: ColumnType::DATETIME->value,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					datetimeDefault: $datetimeDefault,
+					customSettings: json_encode($customSettings),
+				),
+				$selectedViewIds
+			);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
 		return new DataResponse($column->jsonSerialize());
 	}
 
@@ -373,11 +393,12 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
-	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
+	 *     array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
 	 *
 	 *
 	 * 200: Column created
+	 * 400: Invalid request data
 	 * 403: No permission
 	 * 404: Not found
 	 * @throws InternalError
@@ -390,25 +411,29 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
-		$column = $this->service->create(
-			$this->userId,
-			$tableId,
-			$viewId,
-			new ColumnDto(
-				title: $title,
-				type: ColumnType::PEOPLE->value,
-				mandatory: $mandatory,
-				description: $description,
-				usergroupDefault: $usergroupDefault,
-				usergroupMultipleItems: $usergroupMultipleItems,
-				usergroupSelectUsers: $usergroupSelectUsers,
-				usergroupSelectGroups: $usergroupSelectGroups,
-				usergroupSelectTeams: $usergroupSelectTeams,
-				showUserStatus: $showUserStatus,
-				customSettings: json_encode($customSettings),
-			),
-			$selectedViewIds
-		);
+		try {
+			$column = $this->service->create(
+				$this->userId,
+				$tableId,
+				$viewId,
+				new ColumnDto(
+					title: $title,
+					type: ColumnType::PEOPLE->value,
+					mandatory: $mandatory,
+					description: $description,
+					usergroupDefault: $usergroupDefault,
+					usergroupMultipleItems: $usergroupMultipleItems,
+					usergroupSelectUsers: $usergroupSelectUsers,
+					usergroupSelectGroups: $usergroupSelectGroups,
+					usergroupSelectTeams: $usergroupSelectTeams,
+					showUserStatus: $showUserStatus,
+					customSettings: json_encode($customSettings),
+				),
+				$selectedViewIds
+			);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
 		return new DataResponse($column->jsonSerialize());
 	}
 }
