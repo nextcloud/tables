@@ -17,6 +17,9 @@
 ### Fixed
 * [Fix monochrome icon coloring for activities (tables#2675)](https://github.com/nextcloud/tables/pull/2675)
 * [Fix: handle first option select (tables#2582)](https://github.com/nextcloud/tables/pull/2582)
+* [Fix: Prevent editing when clicking on links in TableCellLink (tables#2587)](https://github.com/nextcloud/tables/pull/2587)
+* [Fix: smartpicker fix row actions and action button z-index (tables#2679)](https://github.com/nextcloud/tables/pull/2679)
+* [Fix: view filter (tables#2688)](https://github.com/nextcloud/tables/pull/2688)
 
 ### Dependencies
 * [Chore(deps): update actions/checkout action to v5.0.1 (main) (tables#2560)](https://github.com/nextcloud/tables/pull/2560)
@@ -55,6 +58,7 @@
 * [Fix(deps): update dependency dompurify to ^3.4.5 (main) (tables#2673)](https://github.com/nextcloud/tables/pull/2673)
 * [Chore(deps): update dependency @playwright/test to ^1.60.0 (main) (tables#2674)](https://github.com/nextcloud/tables/pull/2674)
 * [Fix(deps): update tiptap to ^3.23.4 (main) (tables#2676)](https://github.com/nextcloud/tables/pull/2676)
+* [Chore(deps): update dependency nextcloud/coding-standard to ^v1.5.0 (main) (tables#2677)](https://github.com/nextcloud/tables/pull/2677)
 * [Fix(deps): update dependency @nextcloud/dialogs to ^7.4.0 (main) (tables#2678)](https://github.com/nextcloud/tables/pull/2678)
 * [[main] Update nextcloud/ocp dependency (tables#2683)](https://github.com/nextcloud/tables/pull/2683)
 
@@ -63,6 +67,7 @@
 * [Test(context): Update nav bar test for 34+ update (tables#2602)](https://github.com/nextcloud/tables/pull/2602)
 * [Test(context): Update nav bar test for 34+ update (tables#2645)](https://github.com/nextcloud/tables/pull/2645)
 * [Chore(CI): Adjust testing matrix for Nextcloud 34 on main (tables#2652)](https://github.com/nextcloud/tables/pull/2652)
+* [Fix(workflows): update server versions to include stable34 in matrix (tables#2685)](https://github.com/nextcloud/tables/pull/2685)
 
 ## 2.1.1
 
