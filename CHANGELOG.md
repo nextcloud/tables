@@ -12,6 +12,7 @@
 * [[stable1.0] Mandatory column handling (tables#2648)](https://github.com/nextcloud/tables/pull/2648)
 * [[stable1.0] Context changes (tables#2649)](https://github.com/nextcloud/tables/pull/2649)
 * [[stable1.0] fix: handle first option select (tables#2668)](https://github.com/nextcloud/tables/pull/2668)
+* [[stable1.0] fix: view filter (tables#2692)](https://github.com/nextcloud/tables/pull/2692)
 
 ### Dependencies
 * [Chore(deps): pin dependencies (stable1.0) (tables#2618)](https://github.com/nextcloud/tables/pull/2618)
