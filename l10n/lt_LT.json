@@ -557,7 +557,7 @@
     "You can set a default value by clicking on one of the radio buttons next to the label fields." : "Numatytąją reikšmę galite nustatyti spustelėdami vieną iš radijo mygtukų šalia etikečių laukų.",
     "Click here to unset default selection." : "Spustelėkite čia, jei norite atšaukti numatytąjį pasirinkimą.",
     "You can set default values by marking the checkboxes next to the label fields." : "Numatytąsias reikšmes galite nustatyti pažymėdami žymimuosius langelius šalia etikečių laukų.",
-    "Allowed pattern (regex)" : "Leidžiamas modelis (regex)",
+    "Allowed pattern (regex)" : "Leidžiamas šablonas (reguliarioji išraiška)",
     "Maximum text length" : "Maksimalus teksto ilgis",
     "Unique value" : "Unikali reikšmė",
     "Could not load link providers." : "Nepavyko įkelti nuorodų teikėjų.",

@@ -281,6 +281,7 @@ OC.L10N.register(
     "Could not configure new view" : "Could not configure new view",
     "Duplicate view" : "Duplicate view",
     "Favorites" : "مورد علاقه‌ها",
+    "Applications" : "برنامه‌ها",
     "Your results are filtered." : "Your results are filtered.",
     "Clear filter" : "پاک کردن پالایه",
     "Share with accounts or groups" : "هم‌رسانی با حساب‌ها یا گروه‌ها",
