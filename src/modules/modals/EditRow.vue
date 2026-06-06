@@ -163,12 +163,15 @@ export default {
 		},
 	},
 	watch: {
-		row() {
-			if (this.row) {
+		row(newRow, oldRow) {
+			if (newRow) {
+				if (oldRow?.id === newRow.id && this.localRow !== null) {
+					return
+				}
 				if (this.$router.currentRoute.path.includes('/row/')) {
 					this.$router.replace(this.$router.currentRoute.path.split('/row/')[0])
 				}
-				this.$router.push(this.$router.currentRoute.path + '/row/' + this.row.id)
+				this.$router.push(this.$router.currentRoute.path + '/row/' + newRow.id)
 				this.setActiveRowId(null)
 				this.loadValues()
 			}
@@ -212,8 +215,9 @@ export default {
 			this.$emit('close')
 		},
 		async actionConfirm() {
+			const rowData = this.buildRowData()
 			this.localLoading = true
-			const success = await this.sendRowToBE()
+			const success = await this.sendRowToBE(rowData)
 			this.localLoading = false
 			// If the row was not created, we don't want to close the modal
 			if (!success) {
@@ -221,9 +225,7 @@ export default {
 			}
 			this.actionCancel()
 		},
-		async sendRowToBE() {
-			await this.loadStore()
-
+		buildRowData() {
 			const data = []
 			for (const [key, value] of Object.entries(this.localRow)) {
 				data.push({
@@ -231,6 +233,11 @@ export default {
 					value: value ?? '',
 				})
 			}
+
+			return data
+		},
+		async sendRowToBE(data) {
+			await this.loadStore()
 
 			const token = useDataStore().publicToken
 			if (token) {

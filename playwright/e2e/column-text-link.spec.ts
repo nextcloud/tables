@@ -44,15 +44,35 @@ test.describe('Test column text-link', () => {
 		await expect(page.locator('tr td a').filter({ hasText: 'nextcloud' }).first()).toBeVisible()
 		await expect(page.locator('tr td a').filter({ hasText: 'NC_server_test' }).first()).toBeVisible()
 
+		const saveEditRow = async () => {
+			const editRowReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'PUT')
+			await page.locator('[data-cy="editRowSaveButton"]').click()
+			const editRowResponse = await editRowReqPromise
+			expect(editRowResponse.ok()).toBeTruthy()
+			await expect(page.locator('[data-cy="editRowModal"]')).toBeHidden()
+		}
+
 		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
 		await openRowActionMenu(page, firstRow)
 		await page.locator('[data-cy="editRowBtn"]').click()
-		const editDialog = page.getByRole('dialog', { name: 'Edit row' })
+		let editDialog = page.getByRole('dialog', { name: 'Edit row' })
 		await editDialog.waitFor({ state: 'visible' })
 
-		const urlInput = editDialog.getByRole('textbox', { name: 'URL' })
-		await urlInput.click({ clickCount: 3 })
-		await page.keyboard.insertText('https://github.com')
+		const urlInput = editDialog
+			.locator('.row.space-T', { hasText: 'Test plain url' })
+			.locator('input[placeholder="URL"]')
+			.first()
+		await urlInput.fill('https://github.com')
+		await expect(urlInput).toHaveValue('https://github.com')
+
+		await saveEditRow()
+		await expect(page.locator('tr td a').filter({ hasText: 'github' }).first()).toBeVisible()
+
+		const editedRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
+		await openRowActionMenu(page, editedRow)
+		await page.locator('[data-cy="editRowBtn"]').click()
+		editDialog = page.getByRole('dialog', { name: 'Edit row' })
+		await editDialog.waitFor({ state: 'visible' })
 
 		const editFilesResultsReqPromise = page.waitForResponse(r => r.url().includes('/search/providers/files/') && r.request().method() === 'GET')
 		const fileCombobox = editDialog.getByRole('combobox', { name: 'Link providers' })
@@ -61,7 +81,7 @@ test.describe('Test column text-link', () => {
 		await editFilesResultsReqPromise
 		await page.getByRole('option', { name: /photo-test/i }).first().click()
 
-		await page.locator('[data-cy="editRowSaveButton"]').click()
+		await saveEditRow()
 
 		await expect(page.locator('tr td a').filter({ hasText: 'github' }).first()).toBeVisible()
 		await expect(page.locator('tr td a').filter({ hasText: 'photo' }).first()).toBeVisible()

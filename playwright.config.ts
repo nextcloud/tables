@@ -5,6 +5,8 @@
 
 import { defineConfig, devices } from "@playwright/test";
 
+const readyPort = process.env.PLAYWRIGHT_READY_PORT ?? "18089";
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -46,12 +48,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     stderr: "pipe",
     stdout: "pipe",
-    url: "http://127.0.0.1:8089",
+    url: `http://127.0.0.1:${readyPort}/ready`,
     timeout: 5 * 60 * 1000, // max. 5 minutes for creating the container
-    wait: {
-      // Only continue once all bootstrap work, including vendored apps, is finished.
-      stdout: /Tables Playwright environment is ready/,
-    },
   },
 
   projects: [

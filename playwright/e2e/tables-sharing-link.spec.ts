@@ -56,15 +56,25 @@ async function createPublicLinkShare(page: Page, options: { password?: string, p
 }
 
 async function setSharePermissions(page: Page, permissions: { read?: boolean, create?: boolean, update?: boolean, delete?: boolean }) {
-	const isCanEdit = permissions.read && permissions.create && permissions.update && permissions.delete
-	const isViewOnly = permissions.read && !permissions.create && !permissions.update && !permissions.delete
+	const isCanEdit = permissions.read === true && permissions.create === true && permissions.update === true && permissions.delete === true
+	const isViewOnly = permissions.read === true && permissions.create === false && permissions.update === false && permissions.delete === false
+	const waitForPermissionsUpdate = async (action: () => Promise<void>) => {
+		const updateReqPromise = page.waitForResponse(r => r.url().includes('/share/') && r.url().includes('/permissions') && r.request().method() === 'PUT')
+		await action()
+		const updateResponse = await updateReqPromise
+		expect(updateResponse.ok()).toBeTruthy()
+	}
 
 	await page.locator('.share-permission-select .action-item__menutoggle').click()
 
 	if (isCanEdit) {
-		await page.locator('button[role="menuitemradio"]').filter({ hasText: 'Can edit' }).click()
+		await waitForPermissionsUpdate(async () => {
+			await page.locator('button[role="menuitemradio"]').filter({ hasText: 'Can edit' }).click()
+		})
 	} else if (isViewOnly) {
-		await page.locator('button[role="menuitemradio"]').filter({ hasText: 'View only' }).click()
+		await waitForPermissionsUpdate(async () => {
+			await page.locator('button[role="menuitemradio"]').filter({ hasText: 'View only' }).click()
+		})
 	} else {
 		await page.locator('button[role="menuitemradio"]').filter({ hasText: 'Custom permissions' }).click()
 		for (const [key, value] of Object.entries(permissions)) {
@@ -72,15 +82,14 @@ async function setSharePermissions(page: Page, permissions: { read?: boolean, cr
 			const checkbox = page.locator(`[data-cy="sharePermission${key.charAt(0).toUpperCase() + key.slice(1)}"] input[type="checkbox"]`)
 			const isChecked = await checkbox.isChecked()
 			if (isChecked !== value) {
-				await checkbox.click({ force: true })
-				await page.waitForResponse(r => r.url().includes('/share/') && r.url().includes('/permissions') && r.request().method() === 'PUT')
-				await page.waitForResponse(r => r.url().includes('/apps/tables/share/') && r.request().method() === 'GET')
+				const reloadReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/share/') && r.request().method() === 'GET')
+				await waitForPermissionsUpdate(async () => {
+					await checkbox.click({ force: true })
+				})
+				await reloadReqPromise
 			}
 		}
-		return
 	}
-
-	await page.waitForResponse(r => r.url().includes('/share/') && r.url().includes('/permissions') && r.request().method() === 'PUT')
 }
 
 test.describe('Public link sharing', () => {
