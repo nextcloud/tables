@@ -47,8 +47,12 @@ describe('ContentReferenceWidget', () => {
 		// Load a fixture used to reply to the create row request
 		cy.fixture('widgets/createRow.json')
 			.then((rowData) => {
-				cy.reply('**/ocs/v2.php/apps/tables/api/2/tables/*/rows', rowData)
-				
+				cy.reply('**/ocs/v2.php/apps/tables/api/2/tables/*/rows', {
+					ocs: {
+						data: rowData,
+					},
+				})
+
 				// Also mock the reload rows endpoint to return updated rows including the new one
 				const updatedRows = [...richObject.rows, rowData]
 				cy.reply('**/apps/tables/row/table/*', updatedRows)
@@ -78,6 +82,9 @@ describe('ContentReferenceWidget', () => {
 		cy.fixture('widgets/editRow.json')
 			.then((rowData) => {
 				cy.reply('**/index.php/apps/tables/row/*', rowData)
+
+				const updatedRows = richObject.rows.map(row => row.id === rowData.id ? rowData : row)
+				cy.reply('**/apps/tables/row/table/*', updatedRows)
 			})
 
 		// Open the row action menu on the first row, then click Edit
