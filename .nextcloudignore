@@ -45,6 +45,8 @@
 .l10nignore
 .php-cs-fixer.dist.php
 .tx
+AGENTS.md
+CLAUDE.md
 phpunit.integration.xml
 phpunit.xml
 psalm.xml
