@@ -70,6 +70,9 @@ class FeatureContext implements Context {
 	// use CommandLineTrait;
 	private CollectionManager $collectionManager;
 
+	/** @var array|null Decoded relations response data, stored to allow multiple assertion steps */
+	private ?array $relationsData = null;
+
 	/**
 	 * FeatureContext constructor.
 	 */
@@ -2500,6 +2503,169 @@ class FeatureContext implements Context {
 	 */
 	public function theReportedStatusIs(int $statusCode): void {
 		Assert::assertEquals($statusCode, $this->response->getStatusCode());
+	}
+
+	// RELATIONS --------------------------
+
+	/**
+	 * @Then relation column :title exists on table :tableName pointing to table :targetTableName using label column :labelColumnName
+	 */
+	public function createRelationColumnToTable(string $title, string $tableName, string $targetTableName, string $labelColumnName): void {
+		$targetId = $this->tableIds[$targetTableName];
+		$labelColumnId = $this->collectionManager->getByAlias('column', $labelColumnName)['id'];
+
+		$props = [
+			'title' => $title,
+			'type' => 'relation',
+			'mandatory' => 0,
+			'customSettings' => [
+				'relationType' => 'table',
+				'targetId' => $targetId,
+				'labelColumn' => $labelColumnId,
+			],
+		];
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
+			$props
+		);
+
+		$newColumn = $this->getDataFromResponse($this->response);
+		$this->columnId = $newColumn['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($title, $newColumn['title']);
+		Assert::assertEquals('relation', $newColumn['type']);
+
+		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+	}
+
+	/**
+	 * @Then relation column :title exists on table :tableName pointing to table :targetTableName using label column :labelColumnName added to view :viewName
+	 */
+	public function createRelationColumnToTableAddedToView(string $title, string $tableName, string $targetTableName, string $labelColumnName, string $viewName): void {
+		$targetId = $this->tableIds[$targetTableName];
+		$labelColumnId = $this->collectionManager->getByAlias('column', $labelColumnName)['id'];
+		$viewId = $this->viewIds[$viewName];
+
+		$props = [
+			'title' => $title,
+			'type' => 'relation',
+			'mandatory' => 0,
+			'selectedViewIds' => [$viewId],
+			'customSettings' => [
+				'relationType' => 'table',
+				'targetId' => $targetId,
+				'labelColumn' => $labelColumnId,
+			],
+		];
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
+			$props
+		);
+
+		$newColumn = $this->getDataFromResponse($this->response);
+		$this->columnId = $newColumn['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($title, $newColumn['title']);
+		Assert::assertEquals('relation', $newColumn['type']);
+
+		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+	}
+
+	/**
+	 * @Then relation column :title exists on table :tableName pointing to view :targetViewName using label column :labelColumnName
+	 */
+	public function createRelationColumnToView(string $title, string $tableName, string $targetViewName, string $labelColumnName): void {
+		$targetId = $this->viewIds[$targetViewName];
+		$labelColumnId = $this->collectionManager->getByAlias('column', $labelColumnName)['id'];
+
+		$props = [
+			'title' => $title,
+			'type' => 'relation',
+			'mandatory' => 0,
+			'customSettings' => [
+				'relationType' => 'view',
+				'targetId' => $targetId,
+				'labelColumn' => $labelColumnId,
+			],
+		];
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
+			$props
+		);
+
+		$newColumn = $this->getDataFromResponse($this->response);
+		$this->columnId = $newColumn['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($title, $newColumn['title']);
+		Assert::assertEquals('relation', $newColumn['type']);
+
+		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+	}
+
+	/**
+	 * @When user :user fetches relations for table :tableName
+	 */
+	public function userFetchesRelationsForTable(string $user, string $tableName): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/relations'
+		);
+		$this->relationsData = $this->response->getStatusCode() === 200
+			? $this->getDataFromResponse($this->response)
+			: null;
+	}
+
+	/**
+	 * @When user :user fetches relations for view :viewName
+	 */
+	public function userFetchesRelationsForView(string $user, string $viewName): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/views/' . $this->viewIds[$viewName] . '/relations'
+		);
+		$this->relationsData = $this->response->getStatusCode() === 200
+			? $this->getDataFromResponse($this->response)
+			: null;
+	}
+
+	/**
+	 * @Then the relations response contains :count entries for column :columnName
+	 */
+	public function theRelationsResponseContainsEntriesForColumn(int $count, string $columnName): void {
+		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
+		$columnId = (int)$this->collectionManager->getByAlias('column', $columnName)['id'];
+		Assert::assertArrayHasKey($columnId, $this->relationsData, 'Column "' . $columnName . '" (id=' . $columnId . ') not found in relations response');
+		Assert::assertCount($count, $this->relationsData[$columnId], 'Expected ' . $count . ' entries for column "' . $columnName . '"');
+	}
+
+	/**
+	 * @Then the relations response for column :columnName has an entry with label :label
+	 */
+	public function theRelationsResponseForColumnHasEntryWithLabel(string $columnName, string $label): void {
+		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
+		$columnId = (int)$this->collectionManager->getByAlias('column', $columnName)['id'];
+		Assert::assertArrayHasKey($columnId, $this->relationsData, 'Column "' . $columnName . '" not found in relations response');
+		$labels = array_column($this->relationsData[$columnId], 'label');
+		Assert::assertContains($label, $labels, 'Label "' . $label . '" not found in relations for column "' . $columnName . '"');
+	}
+
+	/**
+	 * @Then the relations response is empty
+	 */
+	public function theRelationsResponseIsEmpty(): void {
+		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
+		Assert::assertEmpty($this->relationsData, 'Expected empty relations response');
 	}
 
 	/**
