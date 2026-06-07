@@ -467,7 +467,7 @@ class PermissionsService {
 			if ($permissions === null) {
 				throw new NotFoundError('No share for ' . $elementType . ' and given user ID found.');
 			}
-			return clone $permissions;
+			return $permissions;
 		}
 
 		try {
@@ -542,7 +542,7 @@ class PermissionsService {
 				delete: $delete,
 				manage: $manage,
 			);
-			$this->sharedPermissionsByNode[$cacheKey] = clone $permissions;
+			$this->sharedPermissionsByNode[$cacheKey] = $permissions;
 			return $permissions;
 		}
 		$this->sharedPermissionsByNode[$cacheKey] = null;
