@@ -15,6 +15,18 @@ namespace OCA\Analytics\Datasource {
     }
 }
 
+namespace OCA\ShareReview\Sources {
+    class SourceEvent extends \OCP\EventDispatcher\Event {
+        abstract public function registerSource(string $source): void {}
+    }
+
+    interface ISource {
+        public function getName(): string;
+        public function getShares(): array;
+        public function deleteShare(string $shareId): bool;
+    }
+}
+
 namespace OCA\Circles\Model {
 	class Circle {
 		abstract public function getSingleId(): string {}

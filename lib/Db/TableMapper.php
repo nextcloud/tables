@@ -176,4 +176,31 @@ class TableMapper extends QBMapper {
 	public function getDbConnection() {
 		return $this->db;
 	}
+
+	/**
+	 * Fetch a map of id → title for the given table IDs.
+	 *
+	 * @param int[] $ids
+	 * @return array<int, string>
+	 * @throws Exception
+	 */
+	public function findIdToTitleMap(array $ids): array {
+		if ($ids === []) {
+			return [];
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id', 'title')
+			->from($this->table)
+			->where($qb->expr()->in('id', $qb->createParameter('ids')));
+		$map = [];
+		foreach (array_chunk($ids, 1_000) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$result = $qb->executeQuery();
+			foreach ($result->fetchAll() as $row) {
+				$map[(int)$row['id']] = (string)$row['title'];
+			}
+			$result->closeCursor();
+		}
+		return $map;
+	}
 }
