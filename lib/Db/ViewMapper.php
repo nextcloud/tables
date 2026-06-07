@@ -19,6 +19,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<View> */
 class ViewMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_views';
 
 	protected CappedMemoryCache $cache;
@@ -177,5 +179,32 @@ class ViewMapper extends QBMapper {
 		}
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Fetch a map of id → title for the given view IDs.
+	 *
+	 * @param int[] $ids
+	 * @return array<int, string>
+	 * @throws Exception
+	 */
+	public function findIdToTitleMap(array $ids): array {
+		if ($ids === []) {
+			return [];
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id', 'title')
+			->from($this->table)
+			->where($qb->expr()->in('id', $qb->createParameter('ids')));
+		$map = [];
+		foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$result = $qb->executeQuery();
+			foreach ($result->fetchAll() as $row) {
+				$map[(int)$row['id']] = (string)$row['title'];
+			}
+			$result->closeCursor();
+		}
+		return $map;
 	}
 }

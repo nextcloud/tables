@@ -19,6 +19,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Context> */
 class ContextMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_contexts_context';
 
 	public function __construct(
@@ -277,6 +279,33 @@ class ContextMapper extends QBMapper {
 		}
 
 		return $resultEntities;
+	}
+
+	/**
+	 * Fetch a map of id → name for the given context IDs.
+	 *
+	 * @param int[] $ids
+	 * @return array<int, string>
+	 * @throws Exception
+	 */
+	public function findIdToNameMap(array $ids): array {
+		if ($ids === []) {
+			return [];
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id', 'name')
+			->from($this->table)
+			->where($qb->expr()->in('id', $qb->createParameter('ids')));
+		$map = [];
+		foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$result = $qb->executeQuery();
+			foreach ($result->fetchAll() as $row) {
+				$map[(int)$row['id']] = (string)$row['name'];
+			}
+			$result->closeCursor();
+		}
+		return $map;
 	}
 
 	protected function applyOwnedOrSharedQuery(IQueryBuilder $qb, string $userId): void {

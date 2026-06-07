@@ -237,6 +237,54 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
+	 * Yield all shares as raw associative arrays, ordered by id.
+	 *
+	 * Implemented as a generator so the full share list is never held in
+	 * memory alongside whatever the consumer builds from it.
+	 *
+	 * @return \Generator<int, array<string, mixed>>
+	 * @throws Exception
+	 */
+	public function findAllRaw(): \Generator {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select(
+			'id', 'sender', 'receiver', 'receiver_type', 'node_id', 'node_type',
+			'token', 'password',
+			'permission_read', 'permission_create', 'permission_update',
+			'permission_delete', 'permission_manage',
+			'created_at', 'last_edit_at'
+		)->from($this->table)
+			->orderBy('id', 'ASC');
+		$result = $qb->executeQuery();
+		try {
+			while (($row = $result->fetch()) !== false) {
+				yield $row;
+			}
+		} finally {
+			$result->closeCursor();
+		}
+	}
+
+	/**
+	 * Fetch the distinct node IDs that have shares, grouped by node type.
+	 *
+	 * @return array<string, list<int>>
+	 * @throws Exception
+	 */
+	public function findSharedNodeIdsByType(): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->selectDistinct(['node_id', 'node_type'])
+			->from($this->table);
+		$result = $qb->executeQuery();
+		$nodeIdsByType = [];
+		while (($row = $result->fetch()) !== false) {
+			$nodeIdsByType[(string)$row['node_type']][] = (int)$row['node_id'];
+		}
+		$result->closeCursor();
+		return $nodeIdsByType;
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function changeReceiverForNode(string $nodeType, int $nodeId, string $newReceiver, string $oldReceiver, string $sender): void {
