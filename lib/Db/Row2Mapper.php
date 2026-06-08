@@ -30,6 +30,8 @@ use Throwable;
 class Row2Mapper {
 	use TTransactional;
 
+	private const DB_CHUNK_SIZE = 1_000;
+
 	private RowSleeveMapper $rowSleeveMapper;
 	private ?string $userId;
 	private IDBConnection $db;
@@ -202,10 +204,10 @@ class Row2Mapper {
 		}
 
 		$allRows = [];
-		foreach (array_chunk($rowIds, 999) as $rowIdChunk) {
-			$allRows = array_merge($allRows, $this->getRowsChunk($rowIdChunk, $columnIds));
+		foreach (array_chunk($rowIds, self::DB_CHUNK_SIZE) as $rowIdChunk) {
+			$allRows[] = $this->getRowsChunk($rowIdChunk, $columnIds);
 		}
-		return $allRows;
+		return array_merge(...$allRows);
 	}
 
 	/**
