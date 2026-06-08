@@ -197,6 +197,24 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getRows(array $rowIds, array $columnIds): array {
+		if (empty($rowIds) || empty($columnIds)) {
+			return [];
+		}
+
+		$allRows = [];
+		foreach (array_chunk($rowIds, 999) as $rowIdChunk) {
+			$allRows = array_merge($allRows, $this->getRowsChunk($rowIdChunk, $columnIds));
+		}
+		return $allRows;
+	}
+
+	/**
+	 * @param array $rowIds
+	 * @param array $columnIds
+	 * @return Row2[]
+	 * @throws InternalError
+	 */
+	private function getRowsChunk(array $rowIds, array $columnIds): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qbSqlForColumnTypes = null;
