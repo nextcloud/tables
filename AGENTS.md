@@ -195,15 +195,23 @@ Do not implement an explicit `isXxx(): bool` method on a class that extends `Ent
 
 Never build a `IQueryBuilder` query inside a loop. Construct the query once before the loop using `$qb->createParameter('name')` as a placeholder for the value that changes per iteration. Inside the loop call `$qb->setParameter('name', $value, IQueryBuilder::PARAM_*)` to bind the new value. This avoids re-parsing and re-compiling the query on every iteration.
 
+IN clauses must be chunked to at most 1 000 items for Oracle compatibility. Use a named constant (`DB_CHUNK_SIZE = 1_000`) rather than a magic number. When collecting results across chunks, accumulate into an array and spread with `array_merge(...$results)` after the loop — never call `array_merge` inside a loop, as that rebuilds the array on every iteration.
+
 ```php
+private const DB_CHUNK_SIZE = 1_000;
+
+// ...
+
 $qb = $this->db->getQueryBuilder();
 $qb->select('*')->from($this->table)
     ->where($qb->expr()->in('node_id', $qb->createParameter('chunk')));
 
-foreach (array_chunk($ids, 997) as $chunk) {
+$results = [];
+foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
     $qb->setParameter('chunk', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
-    // ...
+    $results[] = $this->findEntities($qb);
 }
+return array_merge(...$results);
 ```
 
 ### Unit tests for services with injected dependencies
