@@ -372,6 +372,7 @@ OC.L10N.register(
     "This year" : "Letos",
     "This month" : "Zadnji mesec",
     "This week" : "še ta teden",
+    "Now" : "Zdaj",
     "Select a date" : "Izbor datuma",
     "ID" : "ID",
     "Clipboard is not available" : "Odložišče ni na voljo",
