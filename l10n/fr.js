@@ -387,7 +387,7 @@ OC.L10N.register(
     "Archive table" : "Archiver le tableau",
     "Unarchive table" : "Désarchiver le tableau",
     "Delete table" : "Supprimer le tableau",
-    "Copy" : "Copier",
+    "Copy" : "Copie",
     "Could not configure new view" : "Impossible de configurer la nouvelle vue",
     "Duplicate view" : "Dupliquer la vue",
     "Filter items" : "Filtrer les éléments",
