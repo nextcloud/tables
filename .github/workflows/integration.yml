@@ -54,7 +54,7 @@ jobs:
       fail-fast: false
       matrix:
         server-versions: ['stable33', 'stable34', 'master']
-        php-versions: ['8.2']
+        php-versions: ['8.3']
         databases: ['mysql']
         include:
           - server-versions: 'stable33'
@@ -152,7 +152,7 @@ jobs:
           cat data/nextcloud.log
 
       - name: Query count
-        if: ${{ matrix.databases == 'mysql' && matrix.php-versions == '8.2' && matrix.server-versions == 'master' && github.event_name == 'pull_request' }}
+        if: ${{ matrix.databases == 'mysql' && matrix.php-versions == '8.3' && matrix.server-versions == 'master' && github.event_name == 'pull_request' }}
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
