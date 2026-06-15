@@ -33,7 +33,7 @@ jobs:
         databases: [ 'mysql' ]
         server-versions: [ 'stable33', 'stable34', 'master' ]
         include:
-          - php-versions: 8.2
+          - php-versions: 8.3
 
     services:
       mysql:
