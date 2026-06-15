@@ -132,15 +132,13 @@ export const useDataStore = defineStore('data', {
 				displayError(e, t('tables', 'Could not load columns.'))
 				return []
 			}
-			
 			const columns = [...res.data.ocs.data]
-        		.sort((a, b) => {
-            		const orderA = a.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
-            		const orderB = b.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
-            	return orderA - orderB
-       		})
-        	.map(col => parseCol(col))
-			
+				.sort((a, b) => {
+					const orderA = a.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
+					const orderB = b.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
+				return orderA - orderB
+			})
+			.map(col => parseCol(col))
 			set(this.columns, stateId, columns)
 			this.loading[stateId] = false
 			return columns
