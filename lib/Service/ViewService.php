@@ -173,7 +173,8 @@ class ViewService extends SuperService {
 				) {
 					continue;
 				}
-				$sharedViews[$node['node_id']] = $this->find($node['node_id'], false, $userId);
+				// All shared views are enhanced once in the final loop below.
+				$sharedViews[$node['node_id']] = $this->find($node['node_id'], true, $userId);
 			}
 		}
 
@@ -433,20 +434,26 @@ class ViewService extends SuperService {
 						$permissions = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getId(), 'view', $userId);
 					}
 					$view->setIsShared(true);
+					$canManageTable = false;
 					try {
 						try {
 							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
 						} catch (NotFoundError) {
 							$manageTableShare = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getTableId(), 'table', $userId);
 						}
-						if ($manageTableShare->manage) {
-							$permissions->manageTable = true;
-						}
+						$canManageTable = $manageTableShare->manage;
 					} catch (NotFoundError $e) {
 					} catch (\Exception $e) {
 						throw new InternalError($e->getMessage());
 					}
-					$view->setOnSharePermissions($permissions);
+					$view->setOnSharePermissions(new Permissions(
+						read: $permissions->read,
+						create: $permissions->create,
+						update: $permissions->update,
+						delete: $permissions->delete,
+						manage: $permissions->manage,
+						manageTable: $canManageTable,
+					));
 				} catch (NotFoundError $e) {
 				} catch (\Exception $e) {
 					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
