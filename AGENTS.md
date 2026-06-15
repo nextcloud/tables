@@ -124,24 +124,23 @@ Supports PostgreSQL, MySQL, and SQLite. The unusual design detail is that row ce
 
 - All commits must be signed off (`git commit -s`) per the Developer Certificate of Origin (DCO). All PRs target `master`. Backports use `/backport to stable-X.Y` in a PR comment.
 
-- Commit messages must follow the [Conventional Commits v1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/#specification) — e.g. `feat(chat): add voice message playback`, `fix(call): handle MCU disconnect gracefully`.
+- Commit messages must follow the [Conventional Commits v1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/#specification) — e.g. `feat(import): support remapping selection options`, `fix(rows): handle empty cell values on export`.
 
-- Every commit made with AI assistance must include an `AI-assistant` trailer identifying the coding agent, its version, and the model(s) used:
-
-  ```
-  AI-assistant: Claude Code 2.1.80 (Claude Sonnet 4.6)
-  AI-assistant: Copilot 1.0.6 (Claude Sonnet 4.6)
-  ```
-
-  General pattern: `AI-assistant: <coding-agent> <agent-version> (<model-name> <model-version>)`
-
-  If multiple models are used for different roles, extend the trailer with named roles:
+- Every commit made with AI assistance must include the `Assisted-by` trailer mandated by the [AI Contribution Policy](https://github.com/nextcloud/.github/blob/master/AI_POLICY.md) (see "What this agent must always do" above):
 
   ```
-  AI-assistant: OpenCode v1.0.203 (plan: Claude Opus 4.5, edit: Claude Sonnet 4.5)
+  Assisted-by: ClaudeCode:claude-sonnet-4-6
+  Assisted-by: Copilot:gpt-4o
   ```
 
-  Pattern with roles: `AI-assistant: <coding-agent> <agent-version> (<role>: <model-name> <model-version>, <role>: <model-name> <model-version>)`
+  General pattern: `Assisted-by: AGENT_NAME:MODEL_VERSION`
+
+  If multiple agents or models contributed to a commit, add one trailer per agent/model combination:
+
+  ```
+  Assisted-by: OpenCode:claude-opus-4-5
+  Assisted-by: OpenCode:claude-sonnet-4-5
+  ```
 
 ## Pull Requests
 
