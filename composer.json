@@ -2,7 +2,7 @@
   "name": "nextcloud/tables",
   "description": "This app is for managing data in tables.",
   "type": "project",
-  "license": "AGPL",
+  "license": "AGPL-3.0-or-later",
   "authors": [
     {
       "name": "Florian Steffens",
