@@ -100,7 +100,7 @@ final class AnalyticsDatasourceTest extends TestCase {
 					['id' => 1, 'label' => 'Open'],
 					['id' => 2, 'label' => 'Closed'],
 				]),
-				$this->createSelectionColumn(4, 'Tags', 'multi', [
+				$this->createSelectionColumn(4, 'Tags', 'selection-multi', [
 					['id' => 1, 'label' => 'Important'],
 					['id' => 2, 'label' => 'Later'],
 				]),
