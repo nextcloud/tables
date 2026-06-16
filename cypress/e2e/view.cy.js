@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const firstTitle = 'Test view'
 const secondTitle = 'Test view 2'
 const thirdTitle = 'Test view 3'
@@ -19,10 +20,9 @@ describe('Interact with views', () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
 
-	it('Setup table', () => {
-		cy.createTable('View test table')
+		tableTitle = `View test table ${Date.now()}`
+		cy.createTable(tableTitle)
 		cy.createTextLineColumn('title', null, null, true)
 		cy.createSelectionColumn('selection', ['sel1', 'sel2', 'sel3', 'sel4'], null, false)
 
@@ -45,25 +45,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="createRowSaveButton"]').click()
 	})
 
-	// cleanup after all tests
-	after(function() {
-		// delete table (with view)
-		cy.get('[data-cy="navigationTableItem"]').contains('View test table').click({ force: true })
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableEditTableBtn"]').contains('Edit table').click()
-		cy.get('[data-cy="editTableModal"]').should('be.visible')
-		cy.get('[data-cy="editTableModal"] [data-cy="editTableDeleteBtn"]').click()
-		cy.get('[data-cy="editTableModal"] [data-cy="editTableConfirmDeleteBtn"]').click()
-		cy.wait(10).get('.toastify.toast-success').should('be.visible')
-		cy.get('[data-cy="navigationTableItem"]').contains(firstTitle).should('not.exist')
-		cy.get('[data-cy="navigationTableItem"]').contains(secondTitle).should('not.exist')
-		cy.get('[data-cy="navigationTableItem"]').contains(thirdTitle).should('not.exist')
-		cy.get('[data-cy="navigationTableItem"]').contains(fourthTitle).should('not.exist')
-	})
-
 	it('Create view and insert rows in the view', () => {
-		cy.loadTable('View test table')
-
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
@@ -95,8 +77,10 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="createRowBtn"]').contains('Create row').click()
 		cy.fillInValueTextLine('title', 'new row')
 		cy.fillInValueSelection('selection', 'sel2')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/api/2/**/rows' }).as('createRow')
 		cy.get('[data-cy="createRowSaveButton"]').contains('Save').click()
 
+		cy.wait('@createRow')
 		expected.push('new row')
 		expected.forEach(item => {
 			cy.get('[data-cy="customTableRow"] td div').contains(item).should('be.visible')
@@ -104,8 +88,6 @@ describe('Interact with views', () => {
 	})
 
 	it('Create view and update rows in the view', () => {
-		cy.loadTable('View test table')
-
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
@@ -120,18 +102,22 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="navigationViewItem"]').contains(secondTitle).should('exist')
 
 		// Update rows in the view
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('updateRow')
 		cy.get('[data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
-		cy.get('[data-cy="editRowModal"] input').first().clear().type('Changed row')
+		cy.get('[data-cy="editRowModal"] [data-cy="title"] .slot input')
+			.clear()
+			.type('Changed row')
+			.should('have.value', 'Changed row')
 		cy.get('[data-cy="editRowSaveButton"]').contains('Save').click()
 
+		// wait for the row to be persisted before asserting the table re-render
+		cy.wait('@updateRow')
 		cy.get('[data-cy="editRowModal"]').should('not.exist')
-		cy.get('[data-cy="customTableRow"]').contains('first row').should('not.exist')
 		cy.get('[data-cy="customTableRow"]').contains('Changed row').should('exist')
+		cy.get('[data-cy="customTableRow"]').contains('first row').should('not.exist')
 	})
 
 	it('Create view and make column readonly in the view', () => {
-		cy.loadTable('View test table')
-
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
@@ -157,8 +143,6 @@ describe('Interact with views', () => {
 	})
 
 	it('Create view and delete rows in the view', () => {
-		cy.loadTable('View test table')
-
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
@@ -179,7 +163,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="editRowModal"] [data-cy="editRowDeleteConfirmButton"]').click()
 
 		cy.get('[data-cy="editRowModal"]').should('not.exist')
-		// Verify one row was deleted by checking the count decreased
-		cy.get('[data-cy="customTableRow"]').should('have.length.lessThan', 4)
+		// Verify one row was deleted by checking the count decreased (3 rows created in setup)
+		cy.get('[data-cy="customTableRow"]').should('have.length.lessThan', 3)
 	})
 })

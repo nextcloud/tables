@@ -492,11 +492,19 @@ describe('Filtering in a view by selection columns', () => {
 	})
 
 	it('Filter view remove row when it no longer matches filter', () => {
-		cy.loadTable('View filtering test table')
+		const suffix = Date.now()
+		const tableName = `Check filter table ${suffix}`
+		const checkedRow = `checked row ${suffix}`
+		const uncheckedRow = `unchecked row ${suffix}`
+		const inlineRow = `inline row ${suffix}`
+
+		cy.createTable(tableName)
+		cy.createTextLineColumn('title', null, null, true)
+		cy.createSelectionCheckColumn('check', null, false)
 
 		// # create view with filter
 		// ## create view and set title
-		const title = 'Filter for check enabled'
+		const title = `Filter for check enabled ${suffix}`
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.v-popper__popper li button span').contains('Create view').click({ force: true })
 		cy.get('.modal-container #settings-section_title input').type(title)
@@ -518,61 +526,49 @@ describe('Filtering in a view by selection columns', () => {
 		cy.wait('@updateView')
 		cy.contains('.app-navigation-entry-link span', title).should('exist')
 
-		// # insert a checked row
+		// # insert a checked row -> matches the filter, so it appears in the view.
+		// We wait on the deterministic create POST and assert the UI outcome instead
+		// of racing the shared /present GET (which could latch onto a stale response).
 		cy.get('[data-cy="createRowBtn"]').click()
-		cy.fillInValueTextLine('title', 'checked row')
+		cy.fillInValueTextLine('title', checkedRow)
 		cy.fillInValueSelectionCheck('check')
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/api/2/**/rows' }).as('createRow')
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.wait('@createRow')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).scrollIntoView().should('be.visible')
 
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.be.true
-		})
-
-		// ## check if row is visible
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('be.visible')
-
-		// # insert a unchecked row
+		// # insert an unchecked row -> does not match the filter, so it is not shown
 		cy.get('[data-cy="createRowBtn"]').click()
-		cy.fillInValueTextLine('title', 'unchecked row')
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.fillInValueTextLine('title', uncheckedRow)
+		cy.intercept({ method: 'POST', url: '**/apps/tables/api/2/**/rows' }).as('createRow')
 		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.wait('@createRow')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', uncheckedRow).should('not.exist')
 
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.be.false
-		})
-
-		// ## check if row does not exist
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'unchecked row').should('not.exist')
-
-		// # edit checked row
-		// ## uncheck
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
+		// # edit the checked row to uncheck it -> it should drop out of the view
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .checkbox-radio-switch').click()
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('updateRow')
 		cy.get('[data-cy="editRowSaveButton"]').click()
-
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.be.false
-		})
-
-		// ## check if row does not exist
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('not.exist')
+		cy.wait('@updateRow')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).should('not.exist')
 
 		// # inline edit row
-		// ## uncheck row
-		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').closest('[data-cy="customTableRow"]').find('.inline-editing-container input').click({ force: true })
+		// ## create a dedicated checked row to toggle
+		cy.get('[data-cy="createRowBtn"]').click()
+		cy.fillInValueTextLine('title', inlineRow)
+		cy.fillInValueSelectionCheck('check')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/api/2/**/rows' }).as('createRow')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.wait('@createRow')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).scrollIntoView().should('be.visible')
 
-		// ## check server response for /view/{viewId}/row/{id}/present
-		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
-			expect(present).to.be.false
-		})
-
-		// ## check if row does not exist
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').should('not.exist')
+		// ## uncheck row inline -> it should drop out of the view
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/row/*' }).as('updateRow')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).closest('[data-cy="customTableRow"]').find('.inline-editing-container input')
+			.should('be.checked')
+			.click({ force: true })
+		cy.wait('@updateRow')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).should('not.exist')
 	})
 })
