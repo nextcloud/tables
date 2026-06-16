@@ -12,6 +12,7 @@ use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use ValueError;
 
 /**
@@ -19,6 +20,7 @@ use ValueError;
  *
  * @psalm-import-type TablesColumn from ResponseDefinitions
  *
+ * @method string getUuid()
  * @method getTitle(): string
  * @method setTitle(string $title)
  * @method getTableId(): int
@@ -58,13 +60,11 @@ use ValueError;
  * @method setTextDefault(?string $textDefault)
  * @method getTextAllowedPattern(): string
  * @method setTextAllowedPattern(?string $textAllowedPattern)
- * @method getTextAllowedPattern(): ?string
  * @method getTextMaxLength(): int
  * @method setTextMaxLength(?int $textMaxLength)
  * @method getTextUnique(): bool
  * @method setTextUnique(?bool $textUnique)
  * @method getSelectionOptions(): string
- * @method getSelectionDefault(): string
  * @method setSelectionOptions(?string $selectionOptionsArray)
  * @method setSelectionDefault(?string $selectionDefault)
  * @method getSelectionDefault(): ?string
@@ -113,6 +113,7 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public const META_ID_TITLE = 'id';
 
+	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
@@ -164,6 +165,7 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('uuid', 'string');
 		$this->addType('tableId', 'integer');
 		$this->addType('mandatory', 'boolean');
 
@@ -197,8 +199,23 @@ class Column extends EntitySuper implements JsonSerializable {
 		], true);
 	}
 
+	private function assignUuid(): void {
+		if ($this->uuid !== null) {
+			throw new \RuntimeException('This column already has a UUID, they are immutable');
+		}
+		$this->uuid = Uuid::v7()->toRfc4122();
+	}
+
+	protected function setUuid(string $uuid): void {
+		if ($this->uuid !== null) {
+			throw new \RuntimeException('This column already has a UUID, they are immutable');
+		}
+		$this->uuid = $uuid;
+	}
+
 	public static function fromDto(ColumnDto $data): self {
 		$column = new self();
+		$column->assignUuid();
 		$column->setTitle($data->getTitle());
 		$column->setType($data->getType());
 		$column->setSubtype($data->getSubtype() ?? '');
@@ -261,6 +278,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
+			'uuid' => $this->uuid,
 			'tableId' => $this->tableId,
 			'title' => $this->title,
 			'createdBy' => $this->createdBy,

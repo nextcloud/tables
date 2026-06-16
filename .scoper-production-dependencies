@@ -7,3 +7,5 @@ psr/http-client
 psr/http-factory
 psr/http-message
 psr/simple-cache
+symfony/uid
+symfony/polyfill-uuid

@@ -66,6 +66,7 @@
   "require": {
     "phpoffice/phpspreadsheet": "^5.1",
     "ext-json": "*",
-    "bamarni/composer-bin-plugin": "^1.9.1"
+    "bamarni/composer-bin-plugin": "^1.9.1",
+    "symfony/uid": "^6.4"
   }
 }
