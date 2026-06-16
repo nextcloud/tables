@@ -13,6 +13,13 @@ export default defineConfig({
 	projectId: 'ixbf9n',
 	e2e: {
 		baseUrl: 'http://nextcloud.local/index.php/',
+		retries: {
+			runMode: 2,
+			openMode: 0,
+		},
+		defaultCommandTimeout: 20000,
+		requestTimeout: 20000,
+		responseTimeout: 60000,
 		setupNodeEvents(on, config) {
 			on('file:preprocessor', vitePreprocessor({
 				plugins: [vue(), nodePolyfills()],

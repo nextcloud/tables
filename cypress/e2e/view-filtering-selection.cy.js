@@ -494,9 +494,16 @@ describe('Filtering in a view by selection columns', () => {
 	it('Filter view remove row when it no longer matches filter', () => {
 		cy.loadTable('View filtering test table')
 
+		// Shared DB state is not reset between retries/attempts, so use unique
+		// per-run row/view names to keep this test idempotent.
+		const suffix = Date.now()
+		const checkedRow = `checked row ${suffix}`
+		const uncheckedRow = `unchecked row ${suffix}`
+		const inlineRow = `inline row ${suffix}`
+
 		// # create view with filter
 		// ## create view and set title
-		const title = 'Filter for check enabled'
+		const title = `Filter for check enabled ${suffix}`
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.v-popper__popper li button span').contains('Create view').click({ force: true })
 		cy.get('.modal-container #settings-section_title input').type(title)
@@ -520,7 +527,7 @@ describe('Filtering in a view by selection columns', () => {
 
 		// # insert a checked row
 		cy.get('[data-cy="createRowBtn"]').click()
-		cy.fillInValueTextLine('title', 'checked row')
+		cy.fillInValueTextLine('title', checkedRow)
 		cy.fillInValueSelectionCheck('check')
 		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
 		cy.get('[data-cy="createRowSaveButton"]').click()
@@ -531,11 +538,11 @@ describe('Filtering in a view by selection columns', () => {
 		})
 
 		// ## check if row is visible
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('be.visible')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).should('be.visible')
 
 		// # insert a unchecked row
 		cy.get('[data-cy="createRowBtn"]').click()
-		cy.fillInValueTextLine('title', 'unchecked row')
+		cy.fillInValueTextLine('title', uncheckedRow)
 		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
 		cy.get('[data-cy="createRowSaveButton"]').click()
 
@@ -545,11 +552,11 @@ describe('Filtering in a view by selection columns', () => {
 		})
 
 		// ## check if row does not exist
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'unchecked row').should('not.exist')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', uncheckedRow).should('not.exist')
 
 		// # edit checked row
 		// ## uncheck
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] .checkbox-radio-switch').click()
 		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
 		cy.get('[data-cy="editRowSaveButton"]').click()
@@ -560,12 +567,25 @@ describe('Filtering in a view by selection columns', () => {
 		})
 
 		// ## check if row does not exist
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('not.exist')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).should('not.exist')
 
 		// # inline edit row
-		// ## uncheck row
+		// ## create a dedicated checked row to toggle (keeps the step retry-safe)
+		cy.get('[data-cy="createRowBtn"]').click()
+		cy.fillInValueTextLine('title', inlineRow)
+		cy.fillInValueSelectionCheck('check')
 		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').closest('[data-cy="customTableRow"]').find('.inline-editing-container input').click({ force: true })
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
+			expect(present).to.be.true
+		})
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).should('be.visible')
+
+		// ## uncheck row inline
+		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).closest('[data-cy="customTableRow"]').find('.inline-editing-container input')
+			.should('be.checked')
+			.click({ force: true })
 
 		// ## check server response for /view/{viewId}/row/{id}/present
 		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
@@ -573,6 +593,6 @@ describe('Filtering in a view by selection columns', () => {
 		})
 
 		// ## check if row does not exist
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').should('not.exist')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).should('not.exist')
 	})
 })

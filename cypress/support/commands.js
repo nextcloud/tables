@@ -101,7 +101,9 @@ Cypress.Commands.add('deleteTable', (title) => {
 Cypress.Commands.add('deleteRow', (rowIndex) => {
 	cy.get('[data-cy="ncTable"] [data-cy="editRowBtn"]').eq(rowIndex).click()
 	cy.get('[data-cy="editRowDeleteButton"]').click({ force: true })
+	cy.intercept({ method: 'DELETE', url: '**/row/*' }).as('deleteRow')
 	cy.get('[data-cy="editRowDeleteConfirmButton"]').click({ force: true })
+	cy.wait('@deleteRow')
 })
 
 Cypress.Commands.add('createView', (title) => {

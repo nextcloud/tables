@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const columnTitle = 'multi selection'
-const tableTitle = 'Test number column'
 
 describe('Test column ' + columnTitle, () => {
 
@@ -18,14 +18,11 @@ describe('Test column ' + columnTitle, () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
+		tableTitle = `Test number column ${Date.now()}`
 		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows', () => {
-		cy.loadTable(tableTitle)
 		cy.createSelectionMultiColumn(columnTitle, ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], ['second option', 'first option'], true)
 
 		// check if default value is set on row creation
@@ -69,12 +66,9 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.NcTable tr td button').first().click()
 		cy.get('button').contains('Delete').click()
 		cy.get('button').contains('I really').click()
-
-		cy.removeColumn(columnTitle)
 	})
 
 	it('Test empty selection', () => {
-		cy.loadTable(tableTitle)
 		cy.createSelectionMultiColumn(columnTitle, ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], null, true)
 
 		// check if default value is set on row creation

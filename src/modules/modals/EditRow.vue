@@ -34,7 +34,7 @@
 			</div>
 
 			<div v-if="activeTabId === 'edit'" class="row">
-				<div v-for="column in nonMetaColumns" :key="column.id">
+				<div v-for="column in nonMetaColumns" :key="column.id" :data-cy="column.title">
 					<ColumnFormComponent
 						:column="column"
 						:value.sync="localRow[column.id]" />
