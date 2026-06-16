@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const columnTitle = 'date'
-const tableTitle = 'Test datetime date'
 
 describe('Test column ' + columnTitle, () => {
 
@@ -18,14 +18,12 @@ describe('Test column ' + columnTitle, () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
+		
+		tableTitle = `Test datetime date ${Date.now()}`
 		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows', () => {
-		cy.loadTable(tableTitle)
 		cy.createDatetimeDateColumn(columnTitle, null, true)
 
 		// insert row with int value
@@ -41,12 +39,9 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.NcTable tr td button').first().click()
 		cy.get('button').contains('Delete').click()
 		cy.get('button').contains('I really').click()
-
-		cy.removeColumn(columnTitle)
 	})
 
 	it('Insert and test rows - default now', () => {
-		cy.loadTable(tableTitle)
 		cy.createDatetimeDateColumn(columnTitle, true, true)
 
 		// insert row with int value

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 
 describe('Test column text line', () => {
 
@@ -16,18 +17,13 @@ describe('Test column text line', () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
-		cy.createTable('Test text line column')
-		cy.loadTable('Test text line column')
-
+		// Each test gets its own fresh table + column so tests stay isolated and retry-safe.
+		tableTitle = `Test text line column ${Date.now()}`
+		cy.createTable(tableTitle)
 		cy.createTextLineColumn('text line', 'test', '12', true)
 	})
 
 	it('Insert and test rows', () => {
-		cy.loadTable('Test text line column')
-
 		// check if default value is set on row creation
 		cy.get('button').contains('Create row').click()
 		cy.get('.modal-container__content h2').contains('Create row').should('be.visible')

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const columnTitle = 'progress'
-const tableTitle = 'Test number progress'
 
 describe('Test column progress', () => {
 
@@ -18,14 +18,12 @@ describe('Test column progress', () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
+		
+		tableTitle = `Test number progress ${Date.now()}`
 		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows - default values', () => {
-		cy.loadTable(tableTitle)
 		cy.createNumberProgressColumn(columnTitle, 23, true)
 		cy.createNumberProgressColumn(columnTitle, null, false)
 
