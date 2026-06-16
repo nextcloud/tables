@@ -2,7 +2,7 @@
   "name": "nextcloud/tables",
   "description": "This app is for managing data in tables.",
   "type": "project",
-  "license": "AGPL",
+  "license": "AGPL-3.0-or-later",
   "authors": [
     {
       "name": "Florian Steffens",
@@ -25,7 +25,7 @@
     "optimize-autoloader": true,
     "classmap-authoritative": true,
     "platform": {
-      "php": "8.1"
+      "php": "8.2"
     },
     "allow-plugins": {
       "bamarni/composer-bin-plugin": true
