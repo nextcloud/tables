@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const columnTitle = 'num1'
-const tableTitle = 'Test number column'
 
 describe('Test column number', () => {
 
@@ -18,14 +18,12 @@ describe('Test column number', () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
+		
+		tableTitle = `Test number column ${Date.now()}`
 		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows - default values', () => {
-		cy.loadTable(tableTitle)
 		cy.createNumberColumn(columnTitle, null, null, null, null, null, null, true)
 
 		// insert row with int value
@@ -58,11 +56,9 @@ describe('Test column number', () => {
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('21.40').should('be.visible')
 		*/
-		cy.removeColumn(columnTitle)
 	})
 
 	it('Insert and test rows - individual column settings', () => {
-		cy.loadTable('Test number column')
 		cy.createNumberColumn(columnTitle, 3.5, 1, 2, 20, 'PRE', 'SUF', true)
 
 		// insert row with default values

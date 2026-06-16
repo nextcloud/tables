@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const columnTitle = 'check'
-const tableTitle = 'Test selection check'
 
 describe('Test column ' + columnTitle, () => {
 
@@ -18,14 +18,12 @@ describe('Test column ' + columnTitle, () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
+		
+		tableTitle = `Test selection check ${Date.now()}`
 		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows - default value unchecked', () => {
-		cy.loadTable(tableTitle)
 		cy.createSelectionCheckColumn(columnTitle, null, true)
 
 		// insert row
@@ -38,12 +36,9 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div .checkbox-radio-switch--checked').should('be.visible')
-
-		cy.removeColumn(columnTitle)
 	})
 
 	it('Insert and test rows - default value checked', () => {
-		cy.loadTable(tableTitle)
 		cy.createSelectionCheckColumn(columnTitle, true, true)
 
 		// insert row
@@ -56,8 +51,6 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div .checkbox-radio-switch--checked').should('be.visible')
-
-		cy.removeColumn(columnTitle)
 	})
 
 })

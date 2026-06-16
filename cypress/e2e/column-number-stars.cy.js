@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const columnTitle = 'stars'
-const tableTitle = 'Test number stars'
 
 describe('Test column stars', () => {
 
@@ -18,11 +18,12 @@ describe('Test column stars', () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
+		
+		tableTitle = `Test number stars ${Date.now()}`
 		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows - default values', () => {
-		cy.loadTable(tableTitle)
 		cy.createNumberStarsColumn(columnTitle, 2, true)
 
 		// insert default value row

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
+let tableTitle
 const columnTitle = 'single selection'
-const tableTitle = 'Test number column'
 
 describe('Test column ' + columnTitle, () => {
 
@@ -18,11 +18,12 @@ describe('Test column ' + columnTitle, () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
+		
+		tableTitle = `Test single selection ${Date.now()}`
 		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows', () => {
-		cy.loadTable(tableTitle)
 		cy.createSelectionColumn(columnTitle, ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], 'second option', true)
 
 		// check if default value is set on row creation
@@ -52,12 +53,9 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('[data-cy="ncTable"] tr td div').contains('first option').should('be.visible')
 
 		cy.deleteRow(0)
-
-		cy.deleteTable(tableTitle)
 	})
 
 	it('Test empty selection', () => {
-		cy.loadTable(tableTitle)
 		cy.createSelectionColumn(columnTitle, ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], null, true)
 
 		// check if default value is set on row creation
