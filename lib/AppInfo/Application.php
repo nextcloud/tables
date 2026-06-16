@@ -9,6 +9,7 @@ namespace OCA\Tables\AppInfo;
 
 use Exception;
 use OCA\Analytics\Datasource\DatasourceEvent;
+use OCA\Circles\Events\CircleDestroyedEvent;
 use OCA\Tables\Capabilities;
 use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\TableDeletedEvent;
@@ -18,6 +19,7 @@ use OCA\Tables\Listener\AddMissingIndicesListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\BeforeTemplateRenderedListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
+use OCA\Tables\Listener\ReceiverCleanupListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Listener\WhenRowDeletedAuditLogListener;
@@ -39,6 +41,7 @@ use OCP\AppFramework\IAppContainer;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\DB\Events\AddMissingIndicesEvent;
+use OCP\Group\Events\BeforeGroupDeletedEvent;
 use OCP\User\Events\BeforeUserDeletedEvent;
 
 class Application extends App implements IBootstrap {
@@ -85,6 +88,9 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(RowDeletedEvent::class, WhenRowDeletedAuditLogListener::class);
 		$context->registerEventListener(TableOwnershipTransferredEvent::class, WhenTableTransferredAuditLogListener::class);
 		$context->registerEventListener(AddMissingIndicesEvent::class, AddMissingIndicesListener::class);
+		$context->registerEventListener(UserDeletedEvent::class, ReceiverCleanupListener::class);
+		$context->registerEventListener(BeforeGroupDeletedEvent::class, ReceiverCleanupListener::class);
+		$context->registerEventListener(CircleDestroyedEvent::class, ReceiverCleanupListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
