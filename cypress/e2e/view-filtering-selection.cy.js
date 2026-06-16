@@ -492,14 +492,15 @@ describe('Filtering in a view by selection columns', () => {
 	})
 
 	it('Filter view remove row when it no longer matches filter', () => {
-		cy.loadTable('View filtering test table')
-
-		// Shared DB state is not reset between retries/attempts, so use unique
-		// per-run row/view names to keep this test idempotent.
 		const suffix = Date.now()
+		const tableName = `Check filter table ${suffix}`
 		const checkedRow = `checked row ${suffix}`
 		const uncheckedRow = `unchecked row ${suffix}`
 		const inlineRow = `inline row ${suffix}`
+
+		cy.createTable(tableName)
+		cy.createTextLineColumn('title', null, null, true)
+		cy.createSelectionCheckColumn('check', null, false)
 
 		// # create view with filter
 		// ## create view and set title
@@ -538,7 +539,7 @@ describe('Filtering in a view by selection columns', () => {
 		})
 
 		// ## check if row is visible
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).should('be.visible')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', checkedRow).scrollIntoView().should('be.visible')
 
 		// # insert a unchecked row
 		cy.get('[data-cy="createRowBtn"]').click()
@@ -579,7 +580,7 @@ describe('Filtering in a view by selection columns', () => {
 		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
 			expect(present).to.be.true
 		})
-		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).should('be.visible')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', inlineRow).scrollIntoView().should('be.visible')
 
 		// ## uncheck row inline
 		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
