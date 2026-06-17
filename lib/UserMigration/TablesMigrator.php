@@ -356,9 +356,33 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 					}
 					unset($setting);
 				}
+				$view = $this->remapViewCardSources($view, $columnIdMap);
 				$this->viewService->importView($newTableId, $view, $userId);
 			}
 		}
+	}
+
+	private function remapViewCardSources(array $view, array $columnIdMap): array {
+		if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+			foreach (['cardBackgroundSource', 'cardTitleSource'] as $sourceKey) {
+				$view['viewSettings'] = $this->remapViewCardSource($view['viewSettings'], $sourceKey, $columnIdMap);
+			}
+			return $view;
+		}
+
+		foreach (['cardBackgroundSource', 'cardTitleSource'] as $sourceKey) {
+			$view = $this->remapViewCardSource($view, $sourceKey, $columnIdMap);
+		}
+
+		return $view;
+	}
+
+	private function remapViewCardSource(array $data, string $sourceKey, array $columnIdMap): array {
+		if (isset($data[$sourceKey]) && isset($columnIdMap[$data[$sourceKey]])) {
+			$data[$sourceKey] = $columnIdMap[$data[$sourceKey]];
+		}
+
+		return $data;
 	}
 
 	/**

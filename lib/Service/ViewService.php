@@ -551,10 +551,22 @@ class ViewService extends SuperService {
 				columnSettings: new ColumnSettings($applicableViewColumnInformationRecords),
 				filterSet: FilterSet::createFromInputArray($applicableFilterArray),
 				sortRuleSet: SortRuleSet::createFromInputArray($filteredSortingRules),
+				viewSettings: $this->removeColumnFromViewSettings($view->getViewSettingsObject(), $columnId),
 			);
 
 			$this->update($view->getId(), $viewUpdateInput);
 		}
+	}
+
+	private function removeColumnFromViewSettings(ViewSettings $viewSettings, int $columnId): ViewSettings {
+		return new ViewSettings(
+			cardBackgroundSource: $viewSettings->getCardBackgroundSource() === $columnId
+				? null
+				: $viewSettings->getCardBackgroundSource(),
+			cardTitleSource: $viewSettings->getCardTitleSource() === $columnId
+				? null
+				: $viewSettings->getCardTitleSource(),
+		);
 	}
 
 	protected function removeColumnFromFilters(array $originalFilterSetArray, int $columnId): array {
