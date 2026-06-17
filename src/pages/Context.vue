@@ -23,14 +23,14 @@
 				<div v-for="resource in contextResources" :key="resource.key">
 					<div v-if="!resource.isView" class="resource">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
+							:view-setting.sync="resourceViewSettings[resource.key]" @create-column="createColumn(false, resource)"
 							@import-scheme="openImportSchemeModal(resource)"
 							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 					</div>
 					<div v-else-if="resource.isView" class="resource">
 						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSetting" @create-column="createColumn(true, resource)"
+							:view-setting.sync="resourceViewSettings[resource.key]" @create-column="createColumn(true, resource)"
 							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
 					</div>
@@ -80,7 +80,7 @@ export default {
 		return {
 			loading: true,
 			icon: null,
-			viewSetting: {},
+			resourceViewSettings: {},
 			context: null,
 			contextResources: [],
 			errorMessage: null,
@@ -175,6 +175,7 @@ export default {
 			this.isReloading = true
 			this.loading = true
 			this.contextResources = []
+			this.resourceViewSettings = {}
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -223,6 +224,7 @@ export default {
 										})
 										table.key = (table.id).toString()
 										table.isView = false
+										this.$set(this.resourceViewSettings, table.key, this.createViewSetting(false, table))
 										this.contextResources.push(table)
 									}
 
@@ -242,6 +244,7 @@ export default {
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
+										this.$set(this.resourceViewSettings, view.key, this.createViewSetting(true, view))
 										this.contextResources.push(view)
 									}
 								}
@@ -270,6 +273,24 @@ export default {
 		},
 		createColumn(isView, element) {
 			emit('tables:column:create', { isView, element })
+		},
+		createViewSetting(isView, element) {
+			const viewSetting = {
+				layout: isView ? (element?.layout ?? 'table') : 'table',
+			}
+
+			if (isView) {
+				viewSetting.viewSettings = {
+					cardBackgroundSource: element?.viewSettings?.cardBackgroundSource ?? null,
+					cardTitleSource: element?.viewSettings?.cardTitleSource ?? null,
+				}
+			}
+
+			if (element?.sort?.length) {
+				viewSetting.presetSorting = [...element.sort]
+			}
+
+			return viewSetting
 		},
 		async downloadCSV(element, isView) {
 			const access = await this.validateExportAccess({
