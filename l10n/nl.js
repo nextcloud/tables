@@ -108,6 +108,7 @@ OC.L10N.register(
     "Mandatory" : "Verplicht",
     "Column" : "Kolom",
     "Operator" : "Operator",
+    "Delete filter" : "Filter verwijderen",
     "Ascending" : "Oplopend",
     "Descending" : "Aflopend",
     "Views" : "Bekeken",
