@@ -210,13 +210,7 @@ export default {
 		},
 		backgroundSourceValue: {
 			get() {
-				const stored = this.mutableView?.viewSettings?.cardBackgroundSource
-				// Use stored value only if the column still exists in the accessible options
-				if (stored !== null && stored !== undefined) {
-					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
-					if (exists) return stored
-				}
-				return this.cardSourceOptions[0]?.id ?? null
+				return this.resolveCardSourceValue(this.mutableView?.viewSettings?.cardBackgroundSource, 0)
 			},
 			set(value) {
 				this.ensureMutableViewSettings()
@@ -225,14 +219,7 @@ export default {
 		},
 		titleSourceValue: {
 			get() {
-				const stored = this.mutableView?.viewSettings?.cardTitleSource
-				// Use stored value only if the column still exists in the accessible options
-				if (stored !== null && stored !== undefined) {
-					const exists = this.cardSourceOptions.some(opt => opt.id === stored)
-					if (exists) return stored
-				}
-				// Fallback: second option if available, otherwise first
-				return this.cardSourceOptions[1]?.id ?? this.cardSourceOptions[0]?.id ?? null
+				return this.resolveCardSourceValue(this.mutableView?.viewSettings?.cardTitleSource, 1)
 			},
 			set(value) {
 				this.ensureMutableViewSettings()
@@ -401,6 +388,7 @@ export default {
 					readonly: col.viewColumnInformation?.readonly,
 					mandatory: col.viewColumnInformation?.mandatory ?? false,
 				}))
+			this.persistCardSourceFallbacks()
 			const data = {
 				data: {
 					title: this.title,
@@ -457,6 +445,19 @@ export default {
 					cardTitleSource: null,
 				})
 			}
+		},
+		resolveCardSourceValue(stored, fallbackIndex) {
+			if (stored !== null && stored !== undefined) {
+				const exists = this.cardSourceOptions.some(option => option.id === stored)
+				if (exists) return stored
+			}
+
+			return this.cardSourceOptions[fallbackIndex]?.id ?? this.cardSourceOptions[0]?.id ?? null
+		},
+		persistCardSourceFallbacks() {
+			this.ensureMutableViewSettings()
+			this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', this.resolveCardSourceValue(this.mutableView.viewSettings.cardBackgroundSource, 0))
+			this.$set(this.mutableView.viewSettings, 'cardTitleSource', this.resolveCardSourceValue(this.mutableView.viewSettings.cardTitleSource, 1))
 		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']

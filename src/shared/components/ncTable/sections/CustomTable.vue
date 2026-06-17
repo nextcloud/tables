@@ -60,9 +60,7 @@
 						:src="getPreviewUrl(row)"
 						:alt="getCardTitle(row)"
 						class="layout-card__image">
-					<div v-else class="layout-card__no-image">
-						{{ t('tables', 'No image') }}
-					</div>
+					<div v-else class="layout-card__no-image" />
 					<div class="layout-card__title-banner">
 						{{ getCardTitle(row) }}
 					</div>
