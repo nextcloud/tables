@@ -7,48 +7,42 @@
 
 namespace OCA\Tables\Listener;
 
-use OCA\Circles\CirclesManager;
 use OCA\Circles\Events\CircleDestroyedEvent;
-use OCA\Circles\Model\Member;
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\ShareMapper;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Group\Events\BeforeGroupDeletedEvent;
 use OCP\User\Events\UserDeletedEvent;
+use Psr\Log\LoggerInterface;
 
 /** @template-implements IEventListener<Event|UserDeletedEvent|BeforeGroupDeletedEvent|CircleDestroyedEvent> */
 class ReceiverCleanupListener implements IEventListener {
 	public function __construct(
 		private ShareMapper $shareMapper,
-		private CirclesManager $circlesManager,
+		private LoggerInterface $logger,
 	) {
 	}
 
 	public function handle(Event $event): void {
 		if ($event instanceof UserDeletedEvent) {
-			$this->cleanupByParticipant('user', $event->getUser()->getUID());
+			$this->cleanupByParticipant(ShareReceiverType::USER, $event->getUser()->getUID());
 		} elseif ($event instanceof BeforeGroupDeletedEvent) {
-			$this->cleanupGroupShares($event->getGroup()->getGID());
+			$this->cleanupByParticipant(ShareReceiverType::GROUP, $event->getGroup()->getGID());
 		} elseif ($event instanceof CircleDestroyedEvent) {
-			$this->cleanupByParticipant('circle', $event->getCircle()->getSingleId());
+			$this->cleanupByParticipant(ShareReceiverType::CIRCLE, $event->getCircle()->getSingleId());
 		}
-	}
-
-	private function cleanupGroupShares(string $gid): void {
-		$this->cleanupByParticipant('group', $gid);
-
-		try {
-			$singleId = $this->circlesManager
-				->getFederatedUser($gid, Member::TYPE_GROUP)
-				->getSingleId();
-		} catch (\Throwable) {
-			return;
-		}
-
-		$this->cleanupByParticipant('group', $singleId);
 	}
 
 	private function cleanupByParticipant(string $type, string $participant): void {
-		$this->shareMapper->deleteByReceiver($participant, $type);
+		try {
+			$this->shareMapper->deleteByReceiver($participant, $type);
+		} catch (\Throwable $e) {
+			$this->logger->warning('cleanup table shares for deleted receiver has failed: ' . $e->getMessage(), [
+				'exception' => $e,
+				'receiver_type' => $type,
+				'receiver' => $participant,
+			]);
+		}
 	}
 }

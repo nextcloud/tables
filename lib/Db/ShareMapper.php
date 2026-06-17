@@ -251,7 +251,6 @@ class ShareMapper extends QBMapper {
 			->executeStatement();
 	}
 
-
 	/**
 	 * @throws Exception
 	 */
