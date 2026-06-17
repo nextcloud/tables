@@ -133,10 +133,10 @@ export const useDataStore = defineStore('data', {
 				return []
 			}
 			const columns = [...res.data.ocs.data]
-        		.sort((a, b) => {
-            		const orderA = a.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
-            		const orderB = b.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
-            	return orderA - orderB
+				.sort((a, b) => {
+					const orderA = a.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
+					const orderB = b.viewColumnInformation?.order ?? Number.MAX_SAFE_INTEGER
+					return orderA - orderB
 				})
 				.map(col => parseCol(col))
 			set(this.columns, stateId, columns)
