@@ -17,6 +17,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
@@ -251,14 +252,17 @@ class ApiTablesController extends AOCSController {
 					return $filter;
 				}, $filters), $view['filter']);
 
-				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray(
-					array_merge($inputColumnsArray, [
-						'description' => $view['description'] ?? '',
-						'sort' => $newSort,
-						'filter' => $newFilter,
-						'layout' => $schemeLayout,
-					])
-				));
+				$inputData = array_merge($inputColumnsArray, [
+					'description' => $view['description'] ?? '',
+					'sort' => $newSort,
+					'filter' => $newFilter,
+					'layout' => $schemeLayout,
+				]);
+				if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+					$inputData['viewSettings'] = ViewSettings::remapSources($view['viewSettings'], $colMap);
+				}
+
+				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray($inputData));
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());

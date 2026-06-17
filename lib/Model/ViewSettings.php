@@ -13,6 +13,8 @@ use InvalidArgumentException;
 use JsonSerializable;
 
 class ViewSettings implements JsonSerializable {
+	public const SOURCE_KEYS = ['cardBackgroundSource', 'cardTitleSource'];
+
 	public function __construct(
 		protected readonly ?int $cardBackgroundSource = null,
 		protected readonly ?int $cardTitleSource = null,
@@ -57,5 +59,29 @@ class ViewSettings implements JsonSerializable {
 		}
 
 		return $data[$key];
+	}
+
+	/**
+	 * Card sources rewritten through a map of old to new column id.
+	 *
+	 * A source that does not resolve is dropped rather than carried over: the same id
+	 * addresses a different column once the data has moved, so keeping it would point
+	 * the card at unrelated content.
+	 *
+	 * @param array<int, int> $columnIdMap
+	 */
+	public static function remapSources(array $viewSettings, array $columnIdMap): array {
+		foreach (self::SOURCE_KEYS as $sourceKey) {
+			if (!array_key_exists($sourceKey, $viewSettings) || $viewSettings[$sourceKey] === null) {
+				continue;
+			}
+
+			$sourceId = $viewSettings[$sourceKey];
+			$viewSettings[$sourceKey] = is_int($sourceId) && $sourceId > 0
+				? ($columnIdMap[$sourceId] ?? null)
+				: null;
+		}
+
+		return $viewSettings;
 	}
 }
