@@ -12,7 +12,7 @@ OC.L10N.register(
     "Missing a temporary folder" : "Trūkst pagaidu mapes",
     "Could not write file to disk" : "Nevarēja ierakstīt datni diskā",
     "A PHP extension stopped the file upload" : "PHP paplašinājums apturēja datnes augšupielādi",
-    "Members" : "Biedri",
+    "Members" : "Dalībnieki",
     "Date" : "Datums",
     "Comments" : "Piebildes",
     "Name" : "Nosaukums",
@@ -55,6 +55,7 @@ OC.L10N.register(
     "Delete" : "Izdzēst",
     "Edit" : "Labot",
     "Activity" : "Darbības",
+    "Owner" : "Īpašnieks",
     "Close" : "Aizvērt",
     "Please select a file." : "Lūgums atlasīt datni.",
     "Select from Files" : "Atlasīt no Datnēm",
@@ -115,6 +116,7 @@ OC.L10N.register(
     "This month" : "Šis mēnesis",
     "This week" : "Šonedēļ",
     "Now" : "Tagad",
-    "seconds ago" : "pirms vairākām sekundēm"
+    "seconds ago" : "pirms vairākām sekundēm",
+    "Back to %s" : "Atgriezties %s"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

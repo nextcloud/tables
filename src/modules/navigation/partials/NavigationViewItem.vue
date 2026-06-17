@@ -71,7 +71,7 @@
 				@click="actionShowIntegration">
 				{{ t('tables', 'Integration') }}
 				<template #icon>
-					<Connection :size="20" />
+					<ListBoxOutline :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -81,7 +81,7 @@
 				@click="toggleFavoriteView(true)">
 				{{ t('tables', 'Add to favorites') }}
 				<template #icon>
-					<Star :size="20" />
+					<StarOutline :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -91,7 +91,7 @@
 				@click="toggleFavoriteView(false)">
 				{{ t('tables', 'Remove from favorites') }}
 				<template #icon>
-					<StarOutline :size="20" />
+					<Star :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -119,7 +119,7 @@ import Star from 'vue-material-design-icons/Star.vue'
 import StarOutline from 'vue-material-design-icons/StarOutline.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
-import Connection from 'vue-material-design-icons/Connection.vue'
+import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
 import PlaylistPlay from 'vue-material-design-icons/PlaylistPlay.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
@@ -137,7 +137,7 @@ export default {
 		NcAppNavigationItem,
 		NcCounterBubble,
 		NcActionButton,
-		Connection,
+		ListBoxOutline,
 		NcAvatar,
 		PlaylistPlay,
 		Import,

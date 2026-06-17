@@ -36,7 +36,6 @@ class ViewController extends Controller {
 
 	use Errors;
 
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
@@ -51,7 +50,6 @@ class ViewController extends Controller {
 		$this->tableService = $tableService;
 		$this->userId = $userId;
 	}
-
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]

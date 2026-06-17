@@ -21,7 +21,7 @@
 
 <script>
 import { NcEmptyContent } from '@nextcloud/vue'
-import Alert from 'vue-material-design-icons/Alert.vue'
+import Alert from 'vue-material-design-icons/AlertOutline.vue'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {

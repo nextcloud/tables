@@ -165,6 +165,9 @@ describe('Import csv from Files file action', () => {
 			cy.login(localUser)
 			cy.uploadFile('test-import-small.csv', 'text/csv')
 			cy.uploadFile('test-import-large.csv', 'text/csv')
+			cy.visit('apps/tables')
+			cy.get('[data-cy="navigationTableItem"] a[title="Welcome to Nextcloud Tables!"]', { timeout: 20000 })
+				.should('exist')
 		})
 	})
 
@@ -209,7 +212,9 @@ describe('Import csv from Files file action', () => {
 
 		cy.get('.modal__content [data-cy="importAsNewTableSwitch"] input').uncheck({ force: true })
 		cy.get('[data-cy="selectExistingTableDropdown"]').type('Welcome to Nextcloud Tables!')
-		cy.get('.name-parts').click()
+		cy.get('.vs__dropdown-menu li')
+			.contains('Welcome to Nextcloud Tables!', { timeout: 20000 })
+			.click()
 
 		cy.intercept({
 			method: 'POST',

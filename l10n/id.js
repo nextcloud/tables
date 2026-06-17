@@ -56,7 +56,6 @@ OC.L10N.register(
     "Total" : "Total",
     "Data" : "Data",
     "Import" : "Impor",
-    "Export as CSV" : "Ekspor sebagai CSV",
     "Type" : "tipe",
     "Simple text" : "Teks sederhana",
     "Rich text" : "Teks kaya",

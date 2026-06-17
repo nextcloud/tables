@@ -170,10 +170,12 @@ export default {
 			this.open = false
 		},
 		async submit() {
-			if (this.title === '') {
+			const title = this.title.trim()
+			if (title === '') {
 				showError(t('tables', 'Cannot update table. Title is missing.'))
 				this.errorTitle = true
 			} else {
+				this.title = title
 				const res = await this.updateTable({ id: this.tableId, data: { title: this.title, emoji: this.icon, description: this.localTable.description, columnSettings: this.localColumnSettings, sort: this.localSortRules } })
 				if (res) {
 					showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: this.icon ? this.icon + ' ' : '', table: this.title }))

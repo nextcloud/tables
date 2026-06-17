@@ -5,10 +5,18 @@
 
 import { test, expect } from '../support/fixtures'
 import { createRandomUser } from '../support/api'
-import { createTable, createUsergroupColumn, loadTable } from '../support/commands'
+import { createTable, createUsergroupColumn, loadTable, openRowActionMenu } from '../support/commands'
 
 const columnTitle = 'usergroup'
 const tableTitlePrefix = 'Test usergroup'
+
+const saveEditRow = async (page) => {
+	const editRowReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'PUT')
+	await page.locator('[data-cy="editRowSaveButton"]').click()
+	const editRowResponse = await editRowReqPromise
+	expect(editRowResponse.ok()).toBeTruthy()
+	await expect(page.locator('[data-cy="editRowModal"]')).toBeHidden()
+}
 
 test.describe('Test column ' + columnTitle, () => {
 
@@ -59,17 +67,23 @@ test.describe('Test column ' + columnTitle, () => {
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: user.userId }).first()).toBeVisible()
 
-		await page.locator('[data-cy="ncTable"] [data-cy="editRowBtn"]').first().click()
-		// deselect all
-		const deselectButtons = await page.locator('[data-cy="usergroupRowSelect"] .vs__deselect').all()
-		for (const button of deselectButtons) {
-			await button.click({ force: true })
-		}
+		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
+		await openRowActionMenu(page, firstRow)
+		await page.locator('[data-cy="editRowBtn"]').click()
+		await expect(page.locator('[data-cy="editRowModal"]')).toBeVisible()
 
-		await page.locator('[data-cy="usergroupRowSelect"] input').clear()
-		await page.locator('[data-cy="usergroupRowSelect"] input').pressSequentially(nonLocalUser.userId)
+		const usergroupSelect = page.locator('[data-cy="editRowModal"] [data-cy="usergroupRowSelect"]')
+		await expect(usergroupSelect.locator('.vs__selected').filter({ hasText: user.userId }).first()).toBeVisible()
+
+		await usergroupSelect.locator('input').pressSequentially(nonLocalUser.userId)
 		await page.locator(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
-		await page.locator('[data-cy="editRowSaveButton"]').click()
+		await expect(usergroupSelect.locator('.vs__selected').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
+
+		const localUserSelection = usergroupSelect.locator('.vs__selected').filter({ hasText: user.userId }).first()
+		await localUserSelection.locator('.vs__deselect').click({ force: true })
+		await expect(usergroupSelect.locator('.vs__selected').filter({ hasText: user.userId })).toBeHidden()
+
+		await saveEditRow(page)
 
 		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name', { hasText: user.userId })).toBeHidden()
 		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()

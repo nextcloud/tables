@@ -80,6 +80,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		prefillData: {
+			type: Array,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -112,6 +116,13 @@ export default {
 	watch: {
 		showModal() {
 			if (this.showModal) {
+				if (this.prefillData) {
+					const prefilled = {}
+					this.prefillData.forEach(item => {
+						prefilled[item.columnId] = item.value
+					})
+					this.row = prefilled
+				}
 				this.$nextTick(() => {
 					this.$el.querySelector('input')?.focus()
 				})
@@ -127,8 +138,9 @@ export default {
 			this.$emit('close')
 		},
 		async actionConfirm() {
+			const rowData = this.buildRowData()
 			this.localLoading = true
-			const success = await this.sendNewRowToBE()
+			const success = await this.sendNewRowToBE(rowData)
 			this.localLoading = false
 			// If the row was not created, we don't want to close the modal
 			if (!success) {
@@ -146,18 +158,21 @@ export default {
 				this.reset()
 			}
 		},
-		async sendNewRowToBE() {
+		buildRowData() {
+			const data = {}
+			for (const [key, value] of Object.entries(this.row)) {
+				data[key] = value
+			}
+
+			return data
+		},
+		async sendNewRowToBE(data) {
 			if (!this.tablesStore) {
 				const { default: store } = await import('../../store/store.js')
 				this.tablesStore = store
 			}
 
 			try {
-				const data = {}
-				for (const [key, value] of Object.entries(this.row)) {
-					data[key] = value
-				}
-
 				const token = useDataStore().publicToken
 				if (token) {
 					return await this.insertPublicRow({ token, data })

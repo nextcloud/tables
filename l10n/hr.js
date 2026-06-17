@@ -62,7 +62,6 @@ OC.L10N.register(
     "Total" : "Ukupno",
     "Data" : "Podaci",
     "Import" : "Uvezi",
-    "Export as CSV" : "Izvezi kao CSV",
     "Type" : "Vrsta",
     "Simple text" : "Jednostavan tekst",
     "Rich text" : "Bogat tekst",

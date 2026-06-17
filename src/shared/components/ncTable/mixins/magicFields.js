@@ -45,14 +45,14 @@ export const MagicFields = {
 		id: 'me',
 		label: t('tables', 'Me (user ID)'),
 		icon: 'icon-user',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink, ColumnTypes.Usergroup],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink, ColumnTypes.Usergroup, ColumnTypes.Relation],
 		replace: getCurrentUser()?.uid,
 	}),
 	MyName: new MagicField({
 		id: 'my-name',
 		label: t('tables', 'Me (name)'),
 		icon: 'icon-user',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink, ColumnTypes.Usergroup],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink, ColumnTypes.Usergroup, ColumnTypes.Relation],
 		replace: getCurrentUser()?.displayName,
 	}),
 	Checked: new MagicField({

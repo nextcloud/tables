@@ -49,7 +49,6 @@ OC.L10N.register(
     "Integration" : "Интеграција",
     "Total" : "Вкупно",
     "Import" : "Увези",
-    "Export as CSV" : "Извези како CSV",
     "Type" : "Вид",
     "Rich text" : "Богат текст",
     "Time" : "Време",

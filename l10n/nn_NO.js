@@ -12,6 +12,7 @@ OC.L10N.register(
     "from" : "frå",
     "to" : "til",
     "Birthday" : "Bursdag",
+    "Done" : "Ferdig",
     "Today" : "I dag",
     "Create" : "Lag",
     "Link" : "Lenkje",

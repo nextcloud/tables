@@ -72,7 +72,8 @@
 						</div>
 					</div>
 					<div class="row no-padding-on-mobile space-L" :data-cy="getColumnForm">
-						<component :is="getColumnForm" :column="column" />
+						<component :is="getColumnForm" :column="column"
+							@update:customSettings="onUpdateCustomSettings" />
 					</div>
 				</div>
 			</div>
@@ -113,6 +114,7 @@ import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
+import RelationForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationForm.vue'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
@@ -139,6 +141,7 @@ export default {
 		SelectionForm,
 		SelectionMultiForm,
 		UsergroupForm,
+		RelationForm,
 	},
 	props: {
 		showModal: {
@@ -209,6 +212,7 @@ export default {
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
 				{ id: 'usergroup', label: t('tables', 'Users and groups') },
+				{ id: 'relation', label: t('tables', 'Relation') },
 			],
 		}
 	},
@@ -289,7 +293,8 @@ export default {
 			return str.charAt(0).toUpperCase() + str.slice(1)
 		},
 		async actionConfirm() {
-			if (!this.column.title) {
+			const title = this.column.title?.trim() ?? ''
+			if (!title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
 				this.titleMissingError = true
 			} else if (this.column.customSettings?.width
@@ -300,7 +305,14 @@ export default {
 				this.titleMissingError = false
 				showInfo(t('tables', 'You need to select a type for the new column.'))
 				this.typeMissingError = true
+			} else if (this.column.type === ColumnTypes.Relation && !this.column.customSettings?.relationType) {
+				showInfo(t('tables', 'Please select a relation type.'))
+			} else if (this.column.type === ColumnTypes.Relation && !this.column.customSettings?.targetId) {
+				showInfo(t('tables', 'Please select a target.'))
+			} else if (this.column.type === ColumnTypes.Relation && !this.column.customSettings?.labelColumn) {
+				showInfo(t('tables', 'Please select a value selection label.'))
 			} else {
+				this.column.title = title
 				this.$emit('save', this.prepareSubmitData())
 				if (this.isCustomSave) {
 					this.reset()
@@ -319,6 +331,9 @@ export default {
 		actionCancel() {
 			this.reset()
 			this.$emit('close')
+		},
+		onUpdateCustomSettings(customSettings) {
+			this.column.customSettings = { ...this.column.customSettings, ...customSettings }
 		},
 		prepareSubmitData() {
 			const data = {
@@ -366,6 +381,10 @@ export default {
 					data.numberPrefix = this.column.numberPrefix
 					data.numberSuffix = this.column.numberSuffix
 				}
+			} else if (this.column.type === ColumnTypes.Relation) {
+				data.customSettings.relationType = this.column.customSettings.relationType
+				data.customSettings.targetId = this.column.customSettings.targetId
+				data.customSettings.labelColumn = this.column.customSettings.labelColumn
 			}
 			return data
 		},

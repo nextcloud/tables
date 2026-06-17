@@ -5,23 +5,29 @@
 
 import { defineConfig, devices } from "@playwright/test";
 
+const isCi = !!process.env.CI;
+const readyPort = process.env.PLAYWRIGHT_READY_PORT ?? "18089";
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
   testDir: "./playwright",
-  timeout: 60000,
+  timeout: isCi ? 120000 : 60000,
 
-  /* Run tests in files in parallel */
-  fullyParallel: true,
+  /* Run tests within files in parallel locally only; CI shares one Nextcloud container. */
+  fullyParallel: !isCi,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
+  forbidOnly: isCi,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: 4,
+  retries: isCi ? 2 : 0,
+  /* Keep CI below the point where the shared Nextcloud container saturates. */
+  workers: isCi ? 2 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI ? [["github"], ["line"]] : "list",
+  reporter: isCi ? [["github"], ["line"]] : "list",
+  expect: {
+    timeout: isCi ? 30000 : 5000,
+  },
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('./')`. */
@@ -46,12 +52,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     stderr: "pipe",
     stdout: "pipe",
-    url: "http://127.0.0.1:8089",
+    url: `http://127.0.0.1:${readyPort}/ready`,
     timeout: 5 * 60 * 1000, // max. 5 minutes for creating the container
-    wait: {
-      // Only continue once all bootstrap work, including vendored apps, is finished.
-      stdout: /Tables Playwright environment is ready/,
-    },
   },
 
   projects: [

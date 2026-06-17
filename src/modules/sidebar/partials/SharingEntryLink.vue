@@ -87,7 +87,7 @@
 						<!-- Delete -->
 						<NcActionButton data-cy="sharingEntryLinkDeleteButton" @click="onDelete">
 							<template #icon>
-								<TrashCan :size="20" />
+								<TrashCanOutline :size="20" />
 							</template>
 							{{ t('tables', 'Delete link') }}
 						</NcActionButton>
@@ -113,9 +113,9 @@ import {
 	NcAvatar,
 } from '@nextcloud/vue'
 
-import TrashCan from 'vue-material-design-icons/TrashCan.vue'
+import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
-import LockIcon from 'vue-material-design-icons/Lock.vue'
+import LockIcon from 'vue-material-design-icons/LockOutline.vue'
 import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
 import SharePermissionSelect from './SharePermissionSelect.vue'
 
@@ -130,7 +130,7 @@ export default {
 		NcActionCheckbox,
 		NcButton,
 		NcAvatar,
-		TrashCan,
+		TrashCanOutline,
 		ContentCopy,
 		LockIcon,
 		DotsHorizontal,

@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from '../support/fixtures'
-import { createNumberColumn, createTable, loadTable, removeColumn } from '../support/commands'
+import { createNumberColumn, createTable, loadTable, openRowActionMenu, removeColumn } from '../support/commands'
 
 const columnTitle = 'num1'
 const tableTitle = 'Test number column'
@@ -26,9 +26,10 @@ test.describe('Test column number', () => {
 		await expect(page.locator('.custom-table table tr td div').filter({ hasText: '21.00' }).first()).toBeVisible()
 
 		// delete row
-		await page.locator('.NcTable tr td button').first().click()
-		await page.locator('button').filter({ hasText: 'Delete' }).click()
-		await page.locator('button').filter({ hasText: /I really/ }).click({ force: true })
+		await openRowActionMenu(page, page.locator('[data-cy="customTableRow"]').first())
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(0, { timeout: 10000 })
 
 		// insert row with float value
 		await page.locator('button').filter({ hasText: 'Create row' }).click()
@@ -38,9 +39,10 @@ test.describe('Test column number', () => {
 		await expect(page.locator('.custom-table table tr td div').filter({ hasText: '21.30' }).first()).toBeVisible()
 
 		// delete row
-		await page.locator('.NcTable tr td button').first().click()
-		await page.locator('button').filter({ hasText: 'Delete' }).click()
-		await page.locator('button').filter({ hasText: /I really/ }).click({ force: true })
+		await openRowActionMenu(page, page.locator('[data-cy="customTableRow"]').first())
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(0, { timeout: 10000 })
 
 		await removeColumn(page, columnTitle)
 	})

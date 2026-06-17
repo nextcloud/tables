@@ -26,6 +26,7 @@ use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\TableScheme;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\Title;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -228,7 +229,6 @@ class TableService extends SuperService {
 		}
 	}
 
-
 	/**
 	 * @param int $id
 	 * @param string|null $userId
@@ -271,10 +271,12 @@ class TableService extends SuperService {
 	 * @param string|null $userId
 	 * @return Table
 	 * @throws InternalError
+	 * @throws \InvalidArgumentException
 	 * @noinspection DuplicatedCode
 	 */
 	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // we can assume that the $userId is set
+		$title = (string)new Title($title);
 
 		$time = new DateTime();
 		$item = new Table();
@@ -436,7 +438,6 @@ class TableService extends SuperService {
 			}
 		}
 
-
 		// delete all shares for that table
 		$this->shareService->deleteAllForTable($item);
 
@@ -475,6 +476,7 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @throws \InvalidArgumentException
 	 */
 	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null, ?ColumnSettings $columnSettings = null, ?SortRuleSet $sort = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
@@ -497,6 +499,7 @@ class TableService extends SuperService {
 		$changes = new ChangeSet($table);
 		$time = new DateTime();
 		if ($title !== null) {
+			$title = (string)new Title($title);
 			$table->setTitle($title);
 		}
 		if ($emoji !== null) {

@@ -106,7 +106,6 @@ class Clean extends Command {
 		}
 	}
 
-
 	/**
 	 * Take each data set from all rows and check if the column (mapped by id) exists
 	 *

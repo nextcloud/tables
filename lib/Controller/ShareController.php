@@ -30,7 +30,6 @@ class ShareController extends Controller {
 
 	use Errors;
 
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
@@ -52,7 +51,6 @@ class ShareController extends Controller {
 			'canShareLink' => $canShare && $this->shareManager->shareApiAllowLinks(),
 		]);
 	}
-
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
