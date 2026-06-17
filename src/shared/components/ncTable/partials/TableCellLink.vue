@@ -212,6 +212,11 @@ export default {
 		t,
 
 		handleStartEditing(event) {
+			if (event?.target?.closest?.('a')) {
+				event.stopPropagation()
+				return
+			}
+
 			if (event && (event.ctrlKey || event.metaKey)) {
 				return
 			}

@@ -65,7 +65,7 @@
 import { translate as t } from '@nextcloud/l10n'
 import { NcButton, NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
 import { mapState, mapActions } from 'pinia'
-import PencilIcon from 'vue-material-design-icons/Pencil.vue'
+import PencilIcon from 'vue-material-design-icons/PencilOutline.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import { emit } from '@nextcloud/event-bus'
 import { useTablesStore } from '../../store/store.js'
@@ -211,6 +211,8 @@ export default {
 			case ColumnTypes.DatetimeDate:
 			case ColumnTypes.DatetimeTime:
 				return t('tables', 'Date and time')
+			case ColumnTypes.Relation:
+				return t('tables', 'Relation')
 			default:
 				return ''
 			}

@@ -5,7 +5,7 @@
 
 import { test, expect } from '../support/fixtures'
 import { createRandomUser } from '../support/api'
-import { createTable, createTextLineColumn, deleteTable, loadTable } from '../support/commands'
+import { clickOnNavigationTableMenu, clickOnTableThreeDotMenu, createTable, createTextLineColumn, deleteTable, loadTable } from '../support/commands'
 import { login } from '../support/login'
 
 test.describe('Manage a table', () => {
@@ -37,9 +37,7 @@ test.describe('Manage a table', () => {
 		await createTable(page, 'to do list update desc')
 		await loadTable(page, 'to do list update desc')
 		await expect(page.locator('.icon-loading').first()).toBeHidden()
-		const tableItem = page.locator('[data-cy="navigationTableItem"]').filter({ hasText: 'to do list update desc' }).first()
-		await tableItem.getByRole('button', { name: /Actions|Open menu/i }).click({ force: true })
-		await page.getByRole('menuitem', { name: 'Edit table' }).click()
+		await clickOnNavigationTableMenu(page, 'to do list update desc', 'Edit table')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 		await page.locator('#description-editor .tiptap.ProseMirror').fill('Updated ToDo List description')
@@ -86,8 +84,7 @@ test.describe('Manage a table', () => {
 		await page.locator('[data-cy="createTableSubmitBtn"]').click()
 
 		await loadTable(page, 'test table')
-		await page.locator('[data-cy="customTableAction"] button').click()
-		await page.locator('[data-cy="dataTableEditTableBtn"]').click()
+		await clickOnTableThreeDotMenu(page, 'Edit table')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 		await page.locator('[data-cy="editTableModal"] button').filter({ hasText: 'Change owner' }).click()
@@ -117,9 +114,7 @@ test.describe('Manage a table', () => {
 		await createTextLineColumn(page, 'colFirst', '', '', true)
 		await createTextLineColumn(page, 'colSecond', '', '', false)
 
-		const tableItem = page.locator('[data-cy="navigationTableItem"]').filter({ hasText: 'Column order test table' }).first()
-		await tableItem.getByRole('button', { name: /Actions|Open menu/i }).click({ force: true })
-		await page.getByRole('menuitem', { name: 'Edit table' }).click()
+		await clickOnTableThreeDotMenu(page, 'Edit table')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 
@@ -155,9 +150,7 @@ test.describe('Manage a table', () => {
 		await createTable(page, 'Default sort test table')
 		await createTextLineColumn(page, 'name', '', '', true)
 
-		const tableItem = page.locator('[data-cy="navigationTableItem"]').filter({ hasText: 'Default sort test table' }).first()
-		await tableItem.getByRole('button', { name: /Actions|Open menu/i }).click({ force: true })
-		await page.getByRole('menuitem', { name: 'Edit table' }).click()
+		await clickOnTableThreeDotMenu(page, 'Edit table')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 

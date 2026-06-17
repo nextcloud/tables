@@ -28,19 +28,46 @@
 				:is-view="isView"
 				:can-edit="config.canEditRows" />
 		</td>
-		<td v-if="config.showActions" :class="{sticky: config.showActions}">
-			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
-				<template #icon>
-					<Fullscreen :size="20" />
-				</template>
-			</NcButton>
+		<td v-if="config.showActions && (config.canEditRows || config.canDeleteRows || config.canCreateRows)"
+			:class="{sticky: config.showActions}">
+			<NcActions data-cy="rowActionMenu">
+				<NcActionButton v-if="config.canEditRows"
+					data-cy="editRowBtn"
+					:close-after-click="true"
+					@click="$emit('edit-row', row.id)">
+					<template #icon>
+						<Pencil :size="20" />
+					</template>
+					{{ t('tables', 'Edit row') }}
+				</NcActionButton>
+				<NcActionButton v-if="config.canCreateRows"
+					data-cy="copyRowBtn"
+					:close-after-click="true"
+					@click="$emit('copy-row', row.id)">
+					<template #icon>
+						<ContentCopy :size="20" />
+					</template>
+					{{ t('tables', 'Copy row') }}
+				</NcActionButton>
+				<NcActionButton v-if="config.canDeleteRows"
+					data-cy="deleteRowBtn"
+					:close-after-click="true"
+					@click="$emit('delete-row', row.id)">
+					<template #icon>
+						<TrashCanOutline :size="20" />
+					</template>
+					{{ t('tables', 'Delete row') }}
+				</NcActionButton>
+			</NcActions>
 		</td>
 	</tr>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
-import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
+import { NcCheckboxRadioSwitch, NcActions, NcActionButton } from '@nextcloud/vue'
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
+import Pencil from 'vue-material-design-icons/PencilOutline.vue'
+import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -51,13 +78,14 @@ import TableCellDateTime from './TableCellDateTime.vue'
 import TableCellTextLine from './TableCellTextLine.vue'
 import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
+import TableCellRelation from './TableCellRelation.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import TableCellUsergroup from './TableCellUsergroup.vue'
 import { ColumnTypes, getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
-} from '../../../../shared/constants.ts'
+} from '../../../constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
 
 export default {
@@ -69,13 +97,17 @@ export default {
 		TableCellLink,
 		TableCellProgress,
 		TableCellHtml,
-		NcButton,
-		Fullscreen,
+		NcActions,
+		NcActionButton,
+		ContentCopy,
+		Pencil,
+		TrashCanOutline,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
 		TableCellSelection,
 		TableCellMultiSelection,
+		TableCellRelation,
 		TableCellTextRich,
 		TableCellUsergroup,
 	},
@@ -159,6 +191,7 @@ export default {
 			case ColumnTypes.Selection: return 'TableCellSelection'
 			case ColumnTypes.SelectionMulti: return 'TableCellMultiSelection'
 			case ColumnTypes.SelectionCheck: return 'TableCellYesNo'
+			case ColumnTypes.Relation: return 'TableCellRelation'
 			case ColumnTypes.Datetime: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'

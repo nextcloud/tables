@@ -34,7 +34,6 @@ class SearchController extends Controller {
 		$this->logger = $logger;
 	}
 
-
 	#[NoAdminRequired]
 	public function all(string $term = ''): DataResponse {
 		return $this->handleError(function () use ($term) {

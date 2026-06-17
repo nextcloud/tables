@@ -277,7 +277,6 @@ class ActivityManager {
 					$l->t('Row creation errors: {errorsCount}'),
 				];
 				return implode("\n", $lines);
-
 			default:
 				return null;
 		}

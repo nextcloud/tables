@@ -25,9 +25,12 @@
 		@delete-column="deleteColumn"
 		@create-row="createRow"
 		@edit-row="editRow"
-		@delete-selected-rows="deleteSelectedRows">
-		<template #actions>
-			<slot name="actions" />
+		@copy-row="copyRow"
+		@delete-row="deleteRow"
+		@delete-selected-rows="deleteSelectedRows"
+		@download-filtered-csv="rows => $emit('download-filtered-csv', rows)">
+		<template #actions="slotProps">
+			<slot name="actions" v-bind="slotProps" />
 		</template>
 	</NcTable>
 </template>
@@ -134,6 +137,12 @@ export default {
 		},
 		editRow(rowId) {
 			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns, isView: this.isView, element: this.element })
+		},
+		copyRow(rowId) {
+			emit('tables:row:copy', { row: this.rows.find(r => r.id === rowId), columns: this.columns, isView: this.isView, elementId: this.element.id })
+		},
+		deleteRow(rowId) {
+			emit('tables:row:delete', { rows: [rowId], isView: this.isView, elementId: this.element.id })
 		},
 		deleteSelectedRows(rows) {
 			emit('tables:row:delete', { rows, isView: this.isView, elementId: this.element.id })

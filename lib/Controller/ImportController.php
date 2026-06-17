@@ -214,7 +214,6 @@ class ImportController extends Controller {
 		}
 	}
 
-
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]

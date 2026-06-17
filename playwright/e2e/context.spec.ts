@@ -15,6 +15,7 @@ import {
 	loadContext,
 	loadTable,
 	openContextEditModal,
+	openRowActionMenu,
 } from '../support/commands'
 import { login } from '../support/login'
 
@@ -56,6 +57,7 @@ async function expectSelectedShare(page: Page, userId: string) {
 }
 
 test.describe('Manage a context', () => {
+	test.describe.configure({ mode: 'serial' })
 
 	test('Update and add resources', async ({ userPage: { page } }) => {
 		const contextTitle = 'test application update'
@@ -173,16 +175,24 @@ test.describe('Manage a context', () => {
 
 		// verify that context was deleted from current user
 		const contextNavItem = page.locator('[data-cy="navigationContextItem"]').filter({ hasText: contextTitle }).first()
+		const contextHref = await contextNavItem.locator('a').first().getAttribute('href')
+		const contextId = contextHref?.match(/\/application\/(\d+)/)?.[1]
+		if (!contextId) {
+			throw new Error(`Could not find context id for ${contextTitle}`)
+		}
 		await contextNavItem.hover()
 		await contextNavItem.getByRole('button', { name: /Actions|Open menu/i }).first().click({ force: true })
 		await page.locator('[data-cy="navigationContextDeleteBtn"]').filter({ hasText: 'Delete application' }).waitFor({ state: 'visible', timeout: 5000 })
 
 		await page.locator('[data-cy="navigationContextDeleteBtn"]').filter({ hasText: 'Delete application' }).click({ force: true })
-		await expect(page.locator('[data-cy="deleteContextModal"]')).toBeVisible()
+		const deleteDialog = page.getByRole('dialog', { name: 'Confirm application deletion' })
+		await expect(deleteDialog).toBeVisible()
 
-		const deleteResponse = page.waitForResponse(r => r.url().includes('/apps/tables/') && r.request().method() === 'DELETE')
-		await page.locator('[data-cy="deleteContextModal"] button').filter({ hasText: 'Delete' }).click()
-		await deleteResponse
+		const deleteResponsePromise = page.waitForResponse(r => r.url().includes(`/apps/tables/api/2/contexts/${contextId}`) && r.request().method() === 'DELETE')
+		await deleteDialog.getByRole('button', { name: 'Delete' }).click()
+		const deleteResponse = await deleteResponsePromise
+		expect(deleteResponse.ok()).toBeTruthy()
+		await expect(deleteDialog).toBeHidden({ timeout: 10000 })
 
 		// Wait for the navigation item to be hidden
 		await expect(page.locator('[data-cy="navigationContextItem"]').filter({ hasText: contextTitle })).toBeHidden({ timeout: 15000 })
@@ -300,9 +310,11 @@ test.describe('Manage a context', () => {
 
 		await expect(page.locator('[data-cy="ncTable"] table').filter({ hasText: 'first row' })).toBeVisible()
 
-		await page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'first row' }).locator('[data-cy="editRowBtn"]').click()
-		await page.locator('[data-cy="editRowDeleteButton"]').click()
-		await page.locator('[data-cy="editRowDeleteConfirmButton"]').click()
+		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'first row' }).first()
+		await openRowActionMenu(page, firstRow)
+		await page.locator('[data-cy="deleteRowBtn"]').click()
+		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
+		await page.locator('[data-cy="confirmDialog"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {})
 
 		await expect(page.locator('[data-cy="ncTable"] table', { hasText: 'first row' })).toBeHidden()
 	})

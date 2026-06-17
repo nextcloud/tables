@@ -172,7 +172,7 @@ Cypress.Commands.add('openContextEditModal', (title) => {
 
 Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
 	cy.get('[data-cy="customTableAction"] button').click()
-	cy.get('[data-cy="dataTableExportBtn"]').contains(optionName).click({ force: true })
+	cy.get('.v-popper__popper button, [role="menuitem"]').contains(optionName).click({ force: true })
 })
 
 Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {
@@ -477,6 +477,21 @@ Cypress.Commands.add('uploadFile', (fileName, mimeType, target) => {
 					return cy.wrap(fileId)
 				})
 		})
+})
+
+Cypress.Commands.add('getAppMenuEntry', (title) => {
+	return cy.get('body').then($body => {
+		if ($body.find('.app-menu__waffle').length > 0) {
+			// NC34+: open the waffle popover if not already open, then check the grid
+			return cy.get('.app-menu__waffle').then($btn => {
+				if ($btn.attr('aria-expanded') !== 'true') {
+					return cy.wrap($btn).click()
+				}
+			}).then(() => cy.get(`.app-menu__grid .app-item[title="${title}"]`))
+		}
+		// NC33: entries are always visible inline in the header
+		return cy.get(`#header .app-menu-entry [title="${title}"]`)
+	})
 })
 
 Cypress.Commands.add('ocsRequest', (user, options) => {

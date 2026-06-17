@@ -44,9 +44,10 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
-				:selected-rows="localSelectedRows" :show-options="parsedColumns.length !== 0"
+				:selected-rows="localSelectedRows"
+				:show-options="parsedColumns.length !== 0"
 				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
+				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)"
 				@set-search-string="str => setSearchString(str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
@@ -55,13 +56,17 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:rows="getSearchedAndFilteredAndSortedRows" :is-view="isView" :element-id="elementId" :view-setting.sync="localViewSetting"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
+				@copy-row="rowId => $emit('copy-row', rowId)"
+				@delete-row="rowId => $emit('delete-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-column="col => $emit('edit-column', col)"
 				@delete-column="col => $emit('delete-column', col)"
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, parsedColumns, table)">
 				<template #actions>
-					<slot name="actions" />
+					<slot name="actions"
+						:is-filtered="isFilteredComputed"
+						:on-export-filtered="() => $emit('download-filtered-csv', getSearchedAndFilteredAndSortedRows)" />
 				</template>
 			</CustomTable>
 			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
@@ -244,6 +249,9 @@ export default {
 		},
 		emptyStateButtonLabel() {
 			return this.isFormMode ? t('tables', 'Fill form') : t('tables', 'Create row')
+		},
+		isFilteredComputed() {
+			return (this.localViewSetting?.filter?.length > 0) || !!this.localViewSetting?.searchString
 		},
 
 		sorting() {

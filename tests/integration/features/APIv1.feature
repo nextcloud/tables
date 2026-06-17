@@ -395,7 +395,7 @@ Feature: APIv1
     Then the reported status is "200"
     When user "participant1" tries to set permission "manage" to 1 for context "c1" and user "participant2"
     Then the reported status is "403"
-  
+
   @api1 @contexts @contexts-sharing
   Scenario: Share an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1" as "t1" via v2
@@ -552,3 +552,100 @@ Feature: APIv1
     Then view "general-tasks" has exactly the following rows
       | task             |
       | New general task |
+
+  @api1 @relation
+  Scenario: Create a relation column and fetch relations for a table
+    Given table "Products" with emoji "📦" exists for user "participant1" as "products"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then row exists with following values
+      | name | Apple  |
+    Then row exists with following values
+      | name | Banana |
+    Then row exists with following values
+      | name | Cherry |
+    Given table "Orders" with emoji "🛒" exists for user "participant1" as "orders"
+    Then relation column "product" exists on table "orders" pointing to table "products" using label column "name"
+    When user "participant1" fetches relations for table "orders"
+    Then the reported status is "200"
+    Then the relations response contains 3 entries for column "product"
+    Then the relations response for column "product" has an entry with label "Apple"
+    Then the relations response for column "product" has an entry with label "Banana"
+    Then the relations response for column "product" has an entry with label "Cherry"
+
+  @api1 @relation
+  Scenario: Fetch relations for a table with no relation columns returns empty response
+    Given table "Simple Table" with emoji "📋" exists for user "participant1" as "simple"
+    Then column "title" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    When user "participant1" fetches relations for table "simple"
+    Then the reported status is "200"
+    Then the relations response is empty
+
+  @api1 @relation
+  Scenario: Fetch relations for a view filters rows according to view filter
+    Given table "Fruits" with emoji "🍎" exists for user "participant1" as "fruits"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then column "available" exists with following properties
+      | type      | selection |
+      | subtype   | check     |
+      | mandatory | 0         |
+    Then row exists with following values
+      | name      | Apple  |
+      | available | true   |
+    Then row exists with following values
+      | name      | Banana |
+      | available | false  |
+    Then row exists with following values
+      | name      | Cherry |
+      | available | true   |
+    When user "participant1" create view "Available Fruits" with emoji "✅" for "fruits" as "available-fruits"
+    And user "participant1" sets filter to view "available-fruits"
+      | column    | operator | value |
+      | available | is-equal | true  |
+    Given table "Smoothies" with emoji "🥤" exists for user "participant1" as "smoothies"
+    Then relation column "ingredient" exists on table "smoothies" pointing to view "available-fruits" using label column "name"
+    When user "participant1" fetches relations for table "smoothies"
+    Then the reported status is "200"
+    Then the relations response contains 2 entries for column "ingredient"
+    Then the relations response for column "ingredient" has an entry with label "Apple"
+    Then the relations response for column "ingredient" has an entry with label "Cherry"
+
+  @api1 @relation
+  Scenario: Fetch relations for a view node
+    Given table "Categories" with emoji "🗂" exists for user "participant1" as "categories"
+    Then column "label" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then row exists with following values
+      | label | Alpha |
+    Then row exists with following values
+      | label | Beta  |
+    Given table "Items" with emoji "📌" exists for user "participant1" as "items"
+    When user "participant1" create view "Items View" with emoji "👁" for "items" as "items-view"
+    Then relation column "category" exists on table "items" pointing to table "categories" using label column "label" added to view "items-view"
+    When user "participant1" fetches relations for view "items-view"
+    Then the reported status is "200"
+    Then the relations response contains 2 entries for column "category"
+    Then the relations response for column "category" has an entry with label "Alpha"
+    Then the relations response for column "category" has an entry with label "Beta"
+
+  @api1 @relation @table-sharing
+  Scenario: Unauthorized user cannot fetch relations for a table
+    Given table "Secret Products" with emoji "🔒" exists for user "participant1" as "secret-products"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Given table "Secret Orders" with emoji "🛒" exists for user "participant1" as "secret-orders"
+    Then relation column "product" exists on table "secret-orders" pointing to table "secret-products" using label column "name"
+    When user "participant2" fetches relations for table "secret-orders"
+    Then the reported status is "404"

@@ -16,6 +16,7 @@
 		<CreateRow :columns="columnsForRow?.columns"
 			:is-view="columnsForRow?.isView"
 			:element-id="columnsForRow?.elementId"
+			:prefill-data="columnsForRow?.prefillData ?? null"
 			:show-modal="columnsForRow !== null"
 			@close="columnsForRow = null" />
 		<EditRow :columns="editRow?.columns"
@@ -147,6 +148,7 @@ export default {
 
 		// rows
 		subscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
+		subscribe('tables:row:copy', rowInfo => { this.columnsForRow = { columns: rowInfo.columns, isView: rowInfo.isView, elementId: rowInfo.elementId, prefillData: rowInfo.row?.data } })
 		subscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
 		subscribe('tables:row:delete', tableInfo => {
 			this.rowsToDelete = tableInfo
@@ -169,6 +171,7 @@ export default {
 		unsubscribe('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
 		unsubscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
 		unsubscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
+		unsubscribe('tables:row:copy', rowInfo => { this.columnsForRow = { columns: rowInfo.columns, isView: rowInfo.isView, elementId: rowInfo.elementId, prefillData: rowInfo.row?.data } })
 		unsubscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
 		unsubscribe('tables:row:delete', tableInfo => {
 			this.rowsToDelete = tableInfo

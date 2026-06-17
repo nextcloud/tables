@@ -25,6 +25,7 @@ use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ImportService;
+use OCA\Tables\Service\RelationService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
@@ -61,6 +62,7 @@ class Api1Controller extends ApiController {
 	private RowService $rowService;
 	private ImportService $importService;
 	private ViewService $viewService;
+	private RelationService $relationService;
 	private ViewMapper $viewMapper;
 	private IL10N $l10N;
 
@@ -72,7 +74,6 @@ class Api1Controller extends ApiController {
 
 	use Errors;
 
-
 	public function __construct(
 		IRequest $request,
 		TableService $service,
@@ -81,6 +82,7 @@ class Api1Controller extends ApiController {
 		RowService $rowService,
 		ImportService $importService,
 		ViewService $viewService,
+		RelationService $relationService,
 		ViewMapper $viewMapper,
 		V1Api $v1Api,
 		LoggerInterface $logger,
@@ -94,6 +96,7 @@ class Api1Controller extends ApiController {
 		$this->rowService = $rowService;
 		$this->importService = $importService;
 		$this->viewService = $viewService;
+		$this->relationService = $relationService;
 		$this->viewMapper = $viewMapper;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
@@ -131,9 +134,10 @@ class Api1Controller extends ApiController {
 	 * @param string|null $emoji Emoji for the table
 	 * @param string $template Template to use if wanted
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
@@ -142,6 +146,10 @@ class Api1Controller extends ApiController {
 	public function createTable(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
 		try {
 			return new DataResponse($this->tableService->create($title, $template, $emoji)->jsonSerialize());
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -232,9 +240,10 @@ class Api1Controller extends ApiController {
 	 * @param string|null $title New table title
 	 * @param string|null $emoji New table emoji
 	 * @param bool $archived Whether the table is archived
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 400: Invalid request data
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -246,6 +255,10 @@ class Api1Controller extends ApiController {
 	public function updateTable(int $tableId, ?string $title = null, ?string $emoji = null, ?bool $archived = false): DataResponse {
 		try {
 			return new DataResponse($this->tableService->update($tableId, $title, $emoji, null, $archived, $this->userId)->jsonSerialize());
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -821,12 +834,76 @@ class Api1Controller extends ApiController {
 	}
 
 	/**
+	 * Get all relation data for a table
+	 *
+	 * @param int $tableId Table ID
+	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Relation data returned
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	public function indexTableRelations(int $tableId): DataResponse {
+		try {
+			return new DataResponse($this->relationService->getRelationsForTable($tableId));
+		} catch (PermissionError $e) {
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (InternalError $e) {
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		} catch (NotFoundError $e) {
+			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		}
+	}
+
+	/**
+	 * Get all relation data for a view
+	 *
+	 * @param int $viewId View ID
+	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Relation data returned
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	public function indexViewRelations(int $viewId): DataResponse {
+		try {
+			return new DataResponse($this->relationService->getRelationsForView($viewId));
+		} catch (PermissionError $e) {
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (InternalError $e) {
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		} catch (NotFoundError $e) {
+			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		}
+	}
+
+	/**
 	 * Create a column
 	 *
 	 * @param int|null $tableId Table ID
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1604,7 +1681,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description

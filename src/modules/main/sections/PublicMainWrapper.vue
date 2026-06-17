@@ -7,7 +7,7 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else>
-			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" />
+			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
 		</div>
 	</div>
 </template>
@@ -17,8 +17,11 @@ import { mapActions, storeToRefs } from 'pinia'
 import PublicElement from './PublicElement.vue'
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 import { useDataStore } from '../../../store/data.js'
+import { useTablesStore } from '../../../store/store.js'
 import { computed } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
+import { showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
 
 const nodeData = loadState('tables', 'nodeData', null)
 const sharePermissions = loadState('tables', 'sharePermissions', null)
@@ -77,6 +80,7 @@ export default {
 
 	methods: {
 		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'setPublicToken']),
+		...mapActions(useTablesStore, ['validatePublicExportAccess']),
 
 		async loadData() {
 			this.loading = true
@@ -92,8 +96,25 @@ export default {
 			}
 		},
 
-		downloadCSV() {
+		async downloadCSV() {
+			const access = await this.validatePublicExportAccess(this.token)
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
 			this.downloadCsv(this.rows, this.columns, 'public-export')
+		},
+		async downloadFilteredCSV(rows) {
+			const access = await this.validatePublicExportAccess(this.token)
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+			this.downloadCsv(rows, this.columns, 'public-export')
 		},
 	},
 }

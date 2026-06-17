@@ -87,7 +87,6 @@ class RowCellMapperSuper extends QBMapper {
 		$qb->executeStatement();
 	}
 
-
 	/**
 	 * @throws Exception
 	 */

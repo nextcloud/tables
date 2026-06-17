@@ -17,12 +17,24 @@
 				:can-edit-columns="false"
 				:can-delete-columns="false"
 				:can-delete-table="false"
-				:is-form-mode="isFormMode">
-				<template #actions>
+				:is-form-mode="isFormMode"
+				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)">
+				<template #actions="{ isFiltered, onExportFiltered }">
 					<NcActions :force-menu="true" type="tertiary">
-						<NcActionButton :close-after-click="true" icon="icon-download" data-cy="dataTableExportBtn"
+						<NcActionButton :close-after-click="true" data-cy="dataTableExportBtn"
 							@click="$emit('download-csv')">
-							{{ t('tables', 'Export as CSV') }}
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export all rows') }}
+						</NcActionButton>
+						<NcActionButton v-if="isFiltered" :close-after-click="true"
+							data-cy="dataTableExportFilteredBtn"
+							@click="onExportFiltered">
+							<template #icon>
+								<TrayArrowDown :size="20" decorative />
+							</template>
+							{{ t('tables', 'Export filtered rows') }}
 						</NcActionButton>
 					</NcActions>
 				</template>
@@ -34,7 +46,8 @@
 			:element-id="element.id"
 			:is-form-mode="isFormMode"
 			:show-modal="showCreateRow"
-			@close="showCreateRow = false" />
+			:prefill-data="prefillData"
+			@close="showCreateRow = false; prefillData = null" />
 		<DeleteRows
 			v-if="rowsToDelete"
 			:rows-to-delete="rowsToDelete?.rows"
@@ -62,6 +75,8 @@ import CreateRow from '../../modals/CreateRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import EditRow from '../../modals/EditRow.vue'
 import DeleteRows from '../../modals/DeleteRows.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'PublicElement',
@@ -70,6 +85,7 @@ export default {
 		DeleteRows,
 		EditRow,
 		EmptyView,
+		TrayArrowDown,
 		TableView,
 		NcActions,
 		NcActionButton,
@@ -95,6 +111,7 @@ export default {
 	data() {
 		return {
 			showCreateRow: false,
+			prefillData: null,
 			editRow: null,
 			rowsToDelete: null,
 		}
@@ -110,6 +127,10 @@ export default {
 		subscribe('tables:row:create', () => {
 			this.showCreateRow = true
 		})
+		subscribe('tables:row:copy', rowInfo => {
+			this.prefillData = rowInfo.row?.data
+			this.showCreateRow = true
+		})
 		subscribe('tables:row:edit', rowInfo => {
 			this.editRow = rowInfo
 		})
@@ -120,8 +141,13 @@ export default {
 
 	unmounted() {
 		unsubscribe('tables:row:create')
+		unsubscribe('tables:row:copy')
 		unsubscribe('tables:row:edit')
 		unsubscribe('tables:row:delete')
+	},
+
+	methods: {
+		t,
 	},
 }
 </script>

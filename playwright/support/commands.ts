@@ -5,6 +5,10 @@
 
 import { expect, type Locator, type Page } from '@playwright/test'
 
+const IS_CI = !!process.env.CI
+const ACTION_TIMEOUT = IS_CI ? 30000 : 10000
+const APP_LOAD_TIMEOUT = IS_CI ? 45000 : 10000
+
 function escapeRegExp(value: string) {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -48,7 +52,7 @@ async function firstVisible(locator: Locator, timeout: number = 0) {
 }
 
 async function navigateViaNavLink(page: Page, link: Locator) {
-	await link.waitFor({ state: 'visible', timeout: 10000 })
+	await link.waitFor({ state: 'visible', timeout: ACTION_TIMEOUT })
 	await link.scrollIntoViewIfNeeded()
 
 	const href = await link.getAttribute('href')
@@ -59,23 +63,27 @@ async function navigateViaNavLink(page: Page, link: Locator) {
 	}
 }
 
+async function waitForAppToFinishLoading(page: Page) {
+	await expect(page.locator('.icon-loading').first()).toBeHidden({
+		timeout: APP_LOAD_TIMEOUT,
+	})
+}
+
 async function openTableActionsMenu(page: Page) {
 	await waitForTransientModalsToClose(page)
-	await expect(page.locator('.icon-loading').first()).toBeHidden({
-		timeout: 10000,
-	})
+	await waitForAppToFinishLoading(page)
 
 	const menuButton = page.locator('[data-cy="customTableAction"] button').first()
 	const anyMenuAction = page.locator(
-		'[data-cy="dataTableEditTableBtn"], [data-cy="dataTableCreateViewBtn"], [data-cy="dataTableCreateColumnBtn"], [data-cy="dataTableShareBtn"], [data-cy="dataTableExportBtn"]',
+		'[data-cy="dataTableEditTableBtn"], [data-cy="dataTableCreateViewBtn"], [data-cy="dataTableCreateColumnBtn"], [data-cy="dataTableShareBtn"], [data-cy="dataTableExportAllBtn"]',
 	)
 
 	for (let attempt = 1; attempt <= 3; attempt++) {
-		await menuButton.waitFor({ state: 'visible', timeout: 10000 })
+		await menuButton.waitFor({ state: 'visible', timeout: ACTION_TIMEOUT })
 		await menuButton.scrollIntoViewIfNeeded()
 		await page.locator('.toastify').first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
 		await menuButton.click()
-		if (await firstVisible(anyMenuAction, 10000)) {
+		if (await firstVisible(anyMenuAction, ACTION_TIMEOUT)) {
 			return
 		}
 
@@ -97,9 +105,11 @@ function getTableActionLocator(page: Page, optionName: string) {
 	case 'Share':
 		return page.locator('[data-cy="dataTableShareBtn"]')
 	case 'Import':
-		return page.locator('[data-cy="dataTableExportBtn"]').filter({ hasText: /^Import$/ })
-	case 'Export as CSV':
-		return page.locator('[data-cy="dataTableExportBtn"]').filter({ hasText: /^Export as CSV$/ })
+		return page.locator('[data-cy="dataTableImportBtn"]')
+	case 'Export all rows':
+		return page.locator('[data-cy="dataTableExportAllBtn"]')
+	case 'Export filtered rows':
+		return page.locator('[data-cy="dataTableExportFilteredBtn"]')
 	default:
 		return null
 	}
@@ -121,12 +131,16 @@ export async function ensureNavigationOpen(page: Page) {
 		await collapsedToggle.click({ force: true })
 		await page.waitForTimeout(250)
 	}
+
+	await page
+		.locator('[data-cy="navigationCreateTableIcon"], [data-cy="createContextIcon"]')
+		.first()
+		.waitFor({ state: 'visible', timeout: 10000 })
+		.catch(() => {})
 }
 
 export async function openCreateRowModal(page: Page) {
-	await expect(page.locator('.icon-loading').first()).toBeHidden({
-		timeout: 10000,
-	})
+	await waitForAppToFinishLoading(page)
 
 	const createRowButton = page.locator('[data-cy="createRowBtn"]').filter({ hasText: 'Create row' }).first()
 	for (let attempt = 1; attempt <= 2; attempt++) {
@@ -145,19 +159,26 @@ export async function openCreateRowModal(page: Page) {
 
 export async function createTable(page: Page, title: string) {
 	await ensureNavigationOpen(page)
-	await expect(page.locator('.icon-loading').first()).toBeHidden({
-		timeout: 10000,
-	})
-	const createButton = page.getByRole('button', { name: /^Create table$/ }).first()
-	if (!(await createButton.isVisible().catch(() => false))) {
-		await ensureNavigationOpen(page)
-	}
-	await createButton.waitFor({ state: 'visible', timeout: 10000 })
-	// Wait for any lingering toasts/overlays to clear
-	await page.locator('.toastify').first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
-	await createButton.click()
+	await waitForAppToFinishLoading(page)
 
 	const createDialog = page.getByRole('dialog', { name: /^Create table$/ })
+	const navCreateButton = page.locator('[data-cy="navigationCreateTableIcon"]').first()
+	const homeCreateButton = page.getByRole('button', { name: /^Create new table$/ }).first()
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		const createButton = await firstVisible(navCreateButton, 5000) ?? await firstVisible(homeCreateButton, 5000)
+		if (!createButton) {
+			await ensureNavigationOpen(page)
+			await page.waitForTimeout(attempt * 250)
+			continue
+		}
+
+		await page.locator('.toastify').first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
+		await createButton.click({ force: true })
+		if (await createDialog.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false)) {
+			break
+		}
+	}
+
 	await expect(createDialog).toBeVisible({
 		timeout: 10000,
 	})
@@ -202,36 +223,29 @@ export async function deleteTable(page: Page, title: string) {
 	).not.toBeVisible()
 }
 
+export async function openRowActionMenu(page: Page, rowLocator: Locator) {
+	await rowLocator.hover()
+	await rowLocator.locator('[data-cy="rowActionMenu"] button').click()
+}
+
 export async function deleteRow(page: Page, rowIndex: number) {
 	const deleteResponse = page.waitForResponse(
 		(response) =>
 			/\/apps\/tables\/(row|view\/\d+\/row)\//.test(response.url())
       && response.request().method() === 'DELETE',
 	).catch(() => null)
-	await page
-		.locator('[data-cy="ncTable"] [data-cy="editRowBtn"]')
-		.nth(rowIndex)
-		.click()
-	await page.locator('[data-cy="editRowDeleteButton"]').click({ force: true })
-	const confirmDeleteButton = page.locator('[data-cy="editRowDeleteConfirmButton"]')
-	if (await confirmDeleteButton.isVisible().catch(() => false)) {
-		await confirmDeleteButton.click({ force: true })
-	}
+	const row = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').nth(rowIndex)
+	await openRowActionMenu(page, row)
+	const deleteBtn = page.locator('[data-cy="deleteRowBtn"]')
+	await deleteBtn.waitFor({ state: 'visible', timeout: 5000 })
+	await deleteBtn.click()
+	await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()
 	await deleteResponse
-	await page
-		.locator('[data-cy="editRowModal"]')
-		.waitFor({ state: 'hidden', timeout: 10000 })
-		.catch(async () => {
-			if (await page.locator('[data-cy="editRowModal"]').isVisible().catch(() => false)) {
-				await page.locator('[data-cy="editRowModal"] button[aria-label="Close"]').click().catch(() => {})
-			}
-		})
+	await page.locator('[data-cy="confirmDialog"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {})
 }
 
 export async function createView(page: Page, title: string) {
-	await expect(page.locator('.icon-loading').first()).toBeHidden({
-		timeout: 10000,
-	})
+	await waitForAppToFinishLoading(page)
 	await openTableActionsMenu(page)
 	const createViewBtn = page
 		.locator('[data-cy="dataTableCreateViewBtn"]')
@@ -264,9 +278,7 @@ export async function openCreateColumnModal(
 	page: Page,
 	isFirstColumn: boolean,
 ) {
-	await expect(page.locator('.icon-loading').first()).toBeHidden({
-		timeout: 10000,
-	})
+	await waitForAppToFinishLoading(page)
 	if (isFirstColumn) {
 		const createBtn = page
 			.locator('.button-vue__text')
@@ -366,14 +378,49 @@ export async function clickOnTableThreeDotMenu(page: Page, optionName: string) {
 	throw new Error(`Could not find table action menu item: ${optionName}`)
 }
 
+export async function clickOnNavigationTableMenu(page: Page, tableTitle: string, optionName: string) {
+	await ensureNavigationOpen(page)
+	const tableItem = page
+		.locator('[data-cy="navigationTableItem"]')
+		.filter({ hasText: tableTitle })
+		.first()
+	await tableItem.waitFor({ state: 'visible', timeout: 10000 })
+
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		await tableItem.scrollIntoViewIfNeeded()
+		await tableItem.hover()
+		await page.locator('.toastify').first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
+		const menuButton = tableItem.getByRole('button', { name: /Actions|Open menu/i }).first()
+		await menuButton.waitFor({ state: 'visible', timeout: 5000 })
+		await menuButton.click({ force: true })
+
+		const menuItem = await firstVisible(page.getByRole('menuitem', { name: optionName }), 5000)
+		if (menuItem) {
+			await menuItem.click({ force: true })
+			return
+		}
+
+		const fallbackItem = await firstVisible(page
+			.locator('[role="menu"] button, [role="menu"] a, [role="menu"] li, .v-popper__popper button, .v-popper__popper a, .v-popper__popper li')
+			.filter({ hasText: new RegExp(`^${escapeRegExp(optionName)}$`, 'i') }), 5000)
+		if (fallbackItem) {
+			await fallbackItem.click({ force: true })
+			return
+		}
+
+		await page.keyboard.press('Escape').catch(() => {})
+		await page.waitForTimeout(attempt * 250)
+	}
+
+	throw new Error(`Could not find navigation table menu item: ${optionName}`)
+}
+
 export async function sortTableColumn(
 	page: Page,
 	columnTitle: string,
 	mode: 'ASC' | 'DESC' = 'ASC',
 ) {
-	await expect(page.locator('.icon-loading').first()).toBeHidden({
-		timeout: 10000,
-	})
+	await waitForAppToFinishLoading(page)
 	const th = page.locator('th').filter({ hasText: columnTitle })
 	await th.hover()
 	await th.getByRole('button', { name: 'Actions' }).click()
@@ -394,7 +441,10 @@ export async function loadTable(page: Page, name: string) {
 		.locator(`[data-cy="navigationTableItem"] a[title="${name}"]`)
 		.last()
 	await navigateViaNavLink(page, tableLink)
-	await expect(page.locator('.icon-loading').first()).toBeHidden()
+	await waitForAppToFinishLoading(page)
+	await expect(page.locator('h1').filter({ hasText: name }).first()).toBeVisible({
+		timeout: APP_LOAD_TIMEOUT,
+	})
 }
 
 export async function getTutorialTableName(page: Page) {
@@ -409,7 +459,10 @@ export async function loadView(page: Page, name: string) {
 		page,
 		page.locator(`[data-cy="navigationViewItem"] a[title="${name}"]`),
 	)
-	await expect(page.locator('.icon-loading').first()).toBeHidden()
+	await waitForAppToFinishLoading(page)
+	await expect(page.locator('h1').filter({ hasText: name }).first()).toBeVisible({
+		timeout: APP_LOAD_TIMEOUT,
+	})
 }
 
 export async function loadContext(page: Page, title: string) {
@@ -418,11 +471,14 @@ export async function loadContext(page: Page, title: string) {
 		.locator('[data-cy="navigationContextItem"]')
 		.filter({ hasText: title })
 		.first()
-	await contextItem.waitFor({ state: 'visible', timeout: 10000 })
+	await contextItem.waitFor({ state: 'visible', timeout: ACTION_TIMEOUT })
 	await contextItem.scrollIntoViewIfNeeded()
 	const contextLink = contextItem.locator('a').first()
 	await navigateViaNavLink(page, contextLink)
-	await expect(page.locator('.icon-loading').first()).toBeHidden()
+	await waitForAppToFinishLoading(page)
+	await expect(page.locator('h1').filter({ hasText: title }).first()).toBeVisible({
+		timeout: APP_LOAD_TIMEOUT,
+	})
 }
 
 export async function unifiedSearch(page: Page, term: string) {

@@ -64,14 +64,14 @@
 			<NcActionButton @click="exportFile">
 				{{ t('tables', 'Export') }}
 				<template #icon>
-					<Export :size="20" />
+					<TrayArrowDown :size="20" />
 				</template>
 			</NcActionButton>
 			<!-- INTEGRATION -->
 			<NcActionButton :close-after-click="true" @click="actionShowIntegration">
 				{{ t('tables', 'Integration') }}
 				<template #icon>
-					<Connection :size="20" />
+					<ListBoxOutline :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -89,7 +89,7 @@
 				@click="toggleFavoriteTable(true)">
 				{{ t('tables', 'Add to favorites') }}
 				<template #icon>
-					<Star :size="20" />
+					<StarOutline :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -97,7 +97,7 @@
 			<NcActionButton v-if="table.favorite" :close-after-click="true" @click="toggleFavoriteTable(false)">
 				{{ t('tables', 'Remove from favorites') }}
 				<template #icon>
-					<StarOutline :size="20" />
+					<Star :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -106,7 +106,7 @@
 				:close-after-click="true" @click="toggleArchiveTable(true)">
 				{{ t('tables', 'Archive table') }}
 				<template #icon>
-					<ArchiveArrowDown :size="20" />
+					<ArchiveArrowDownOutline :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -143,19 +143,19 @@ import { useTablesStore } from '../../../store/store.js'
 import Table from 'vue-material-design-icons/Table.vue'
 import Star from 'vue-material-design-icons/Star.vue'
 import StarOutline from 'vue-material-design-icons/StarOutline.vue'
-import ArchiveArrowDown from 'vue-material-design-icons/ArchiveArrowDown.vue'
+import ArchiveArrowDownOutline from 'vue-material-design-icons/ArchiveArrowDownOutline.vue'
 import ArchiveArrowUpOutline from 'vue-material-design-icons/ArchiveArrowUpOutline.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import activityMixin from '../../../shared/mixins/activityMixin.js'
 import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
-import Connection from 'vue-material-design-icons/Connection.vue'
+import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
 import Import from 'vue-material-design-icons/Import.vue'
-import Export from 'vue-material-design-icons/Export.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/RenameOutline.vue'
-import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
+import ActivityIcon from 'vue-material-design-icons/LightningBoltOutline.vue'
 import { generateUrl } from '@nextcloud/router'
 
 export default {
@@ -166,16 +166,16 @@ export default {
 		Table,
 		Star,
 		StarOutline,
-		ArchiveArrowDown,
+		ArchiveArrowDownOutline,
 		ArchiveArrowUpOutline,
 		Import,
-		Export,
+		TrayArrowDown,
 		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
 		NcCounterBubble,
 		NcAvatar,
-		Connection,
+		ListBoxOutline,
 		PlaylistPlus,
 		DeleteOutline,
 		ActivityIcon,

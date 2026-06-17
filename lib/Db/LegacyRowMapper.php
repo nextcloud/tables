@@ -193,7 +193,6 @@ class LegacyRowMapper extends QBMapper {
 		}
 	}
 
-
 	public function getRowIdsOfView(View $view, $userId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('t1.id')
@@ -217,7 +216,6 @@ class LegacyRowMapper extends QBMapper {
 			$result->closeCursor();
 		}
 	}
-
 
 	private function addFilterToQuery(IQueryBuilder $qb, View $view, array $neededColumnTypes, string $userId): void {
 		$enrichedFilters = $view->getFilterArray();
@@ -275,7 +273,6 @@ class LegacyRowMapper extends QBMapper {
 		$qb->select('t1.*')
 			->from($this->table, 't1')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
-
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
 		$neededColumnsTypes = $this->columnMapper->getColumnTypes($neededColumnIds);

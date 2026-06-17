@@ -10,6 +10,32 @@ This file provides guidance to all AI agents (Claude, Codex, Gemini, etc.) worki
 
 **Nextcloud Tables** is a Nextcloud app (PHP backend + Vue.js frontend) that lets users create and manage custom data tables with typed columns, views, sharing, and import/export. It ships a full OCS REST API and integrates with the Nextcloud event, activity, search, and reference systems.
 
+## Nextcloud Contribution Policy
+
+All contributions generated or assisted by this agent must fully comply with:
+
+- **[AI Contribution Policy](https://github.com/nextcloud/.github/blob/master/AI_POLICY.md)** - the primary reference for AI-specific rules, covering disclosure, author accountability, communication, security, licensing, code quality, and autonomous agent behavior.
+- **[Contribution Guidelines](https://github.com/nextcloud/.github/blob/master/CONTRIBUTING.md)** - covering testing requirements, the Developer Certificate of Origin (DCO), license headers, conventional commits, and translations. These apply in full to all contributions regardless of how they were produced.
+
+### What this agent must always do
+
+- Add an `Assisted-by: AGENT_NAME:MODEL_VERSION` git trailer to every commit containing AI-assisted content.
+- Ensure every pull request includes a disclosure of AI tool use in the PR description.
+- Produce focused, scoped pull requests that address exactly one concern. Do not touch unrelated files or introduce incidental refactors.
+- Verify all dependencies against actual package registries before suggesting them. Do not use hallucinated or unverified package names.
+- Explicitly inform the contributor when any action they are about to take, or have taken, would violate the AI Contribution Policy or the Contribution Guidelines. Do not silently proceed. State which rule is at risk and what the contributor should do instead.
+- Warn the contributor if a pull request is growing too large. A PR approaching several thousand lines of changed code is a signal that it should be split into smaller, focused PRs. Suggest a logical split before the PR is opened, not after.
+- Recommend opening a ticket for discussion before starting implementation whenever a feature or change is sufficiently complex - for example when it touches multiple subsystems, requires architectural decisions, or the right approach is not yet clear. A ticket allows maintainers and the contributor to align on direction before code is written, avoiding wasted effort on a PR that may be rejected or require fundamental rework.
+
+### What this agent must never do
+
+- Open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be reviewed and submitted by a human.
+- Add `Signed-off-by` tags to commits. Only the human contributor can certify the Developer Certificate of Origin.
+- Generate or submit security reports without independent human verification. Report verified vulnerabilities via [HackerOne](https://hackerone.com/nextcloud), not as GitHub issues.
+- Write PR descriptions, review comments, or issue reports on behalf of the contributor. These must be in the contributor's own words.
+- Fully automate the resolution of issues labeled [`good first issue`](https://github.com/issues?q=org%3Anextcloud+label%3A%22good+first+issue%22) or similar beginner-friendly labels.
+- Submit code that has not been reviewed and cleaned up by the contributor. Dead code, redundant logic, excessive comments, and unrelated changes must be removed before submission.
+
 ## Development Setup
 
 ```bash
@@ -98,24 +124,23 @@ Supports PostgreSQL, MySQL, and SQLite. The unusual design detail is that row ce
 
 - All commits must be signed off (`git commit -s`) per the Developer Certificate of Origin (DCO). All PRs target `master`. Backports use `/backport to stable-X.Y` in a PR comment.
 
-- Commit messages must follow the [Conventional Commits v1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/#specification) — e.g. `feat(chat): add voice message playback`, `fix(call): handle MCU disconnect gracefully`.
+- Commit messages must follow the [Conventional Commits v1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/#specification) — e.g. `feat(import): support remapping selection options`, `fix(rows): handle empty cell values on export`.
 
-- Every commit made with AI assistance must include an `AI-assistant` trailer identifying the coding agent, its version, and the model(s) used:
-
-  ```
-  AI-assistant: Claude Code 2.1.80 (Claude Sonnet 4.6)
-  AI-assistant: Copilot 1.0.6 (Claude Sonnet 4.6)
-  ```
-
-  General pattern: `AI-assistant: <coding-agent> <agent-version> (<model-name> <model-version>)`
-
-  If multiple models are used for different roles, extend the trailer with named roles:
+- Every commit made with AI assistance must include the `Assisted-by` trailer mandated by the [AI Contribution Policy](https://github.com/nextcloud/.github/blob/master/AI_POLICY.md) (see "What this agent must always do" above):
 
   ```
-  AI-assistant: OpenCode v1.0.203 (plan: Claude Opus 4.5, edit: Claude Sonnet 4.5)
+  Assisted-by: ClaudeCode:claude-sonnet-4-6
+  Assisted-by: Copilot:gpt-4o
   ```
 
-  Pattern with roles: `AI-assistant: <coding-agent> <agent-version> (<role>: <model-name> <model-version>, <role>: <model-name> <model-version>)`
+  General pattern: `Assisted-by: AGENT_NAME:MODEL_VERSION`
+
+  If multiple agents or models contributed to a commit, add one trailer per agent/model combination:
+
+  ```
+  Assisted-by: OpenCode:claude-opus-4-5
+  Assisted-by: OpenCode:claude-sonnet-4-5
+  ```
 
 ## Pull Requests
 
@@ -169,15 +194,23 @@ Do not implement an explicit `isXxx(): bool` method on a class that extends `Ent
 
 Never build a `IQueryBuilder` query inside a loop. Construct the query once before the loop using `$qb->createParameter('name')` as a placeholder for the value that changes per iteration. Inside the loop call `$qb->setParameter('name', $value, IQueryBuilder::PARAM_*)` to bind the new value. This avoids re-parsing and re-compiling the query on every iteration.
 
+IN clauses must be chunked to at most 1 000 items for Oracle compatibility. Use a named constant (`DB_CHUNK_SIZE = 1_000`) rather than a magic number. When collecting results across chunks, accumulate into an array and spread with `array_merge(...$results)` after the loop — never call `array_merge` inside a loop, as that rebuilds the array on every iteration.
+
 ```php
+private const DB_CHUNK_SIZE = 1_000;
+
+// ...
+
 $qb = $this->db->getQueryBuilder();
 $qb->select('*')->from($this->table)
     ->where($qb->expr()->in('node_id', $qb->createParameter('chunk')));
 
-foreach (array_chunk($ids, 997) as $chunk) {
+$results = [];
+foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
     $qb->setParameter('chunk', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
-    // ...
+    $results[] = $this->findEntities($qb);
 }
+return array_merge(...$results);
 ```
 
 ### Unit tests for services with injected dependencies
