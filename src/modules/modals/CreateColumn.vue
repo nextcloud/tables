@@ -310,7 +310,7 @@ export default {
 			} else if (this.column.type === ColumnTypes.Relation && !this.column.customSettings?.targetId) {
 				showInfo(t('tables', 'Please select a target.'))
 			} else if (this.column.type === ColumnTypes.Relation && !this.column.customSettings?.labelColumn) {
-				showInfo(t('tables', 'Please select a value selection label.'))
+				showInfo(t('tables', 'Please select a label for relation selection.'))
 			} else {
 				this.column.title = title
 				this.$emit('save', this.prepareSubmitData())

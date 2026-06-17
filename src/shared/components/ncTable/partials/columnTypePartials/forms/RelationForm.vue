@@ -38,14 +38,14 @@
 
 		<div class="row space-T">
 			<div class="fix-col-4 title">
-				{{ t('tables', 'Value selection label') }}
+				{{ t('tables', 'Label for relation selection') }}
 			</div>
 			<div class="fix-col-4">
 				<NcSelect v-model="customSettings.labelColumn"
 					:options="availableLabelColumns"
 					:reduce="(option) => option.id"
 					:loading="loadingColumns"
-					:aria-label-combobox="t('tables', 'Select value selection label')"
+					:aria-label-combobox="t('tables', 'Select label for relation selection')"
 					required
 					:clearable="false"
 					@input="onLabelColumnChange" />
