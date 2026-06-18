@@ -42,18 +42,20 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		$cell->setValueWrapper($data);
 	}
 
-	public function formatEntity(Column $column, RowCellSuper $cell) {
-		$displayName = $cell->getValue();
-		if ($cell->getValueType() === UsergroupType::USER) {
-			$displayName = $this->userManager->getDisplayName($cell->getValue()) ?? $cell->getValue();
-		} elseif ($cell->getValueType() === UsergroupType::CIRCLE) {
-			$displayName = $this->circleHelper->getCircleDisplayName($cell->getValue(), ($this->userSession->getUser()?->getUID() ?: '')) ?: $cell->getValue();
-		} elseif ($cell->getValueType() === UsergroupType::GROUP) {
-			$displayName = $this->groupHelper->getGroupDisplayName($cell->getValue()) ?: $cell->getValue();
+	public function formatRowData(Column $column, array $row) {
+		$value = $row['value'];
+		$valueType = (int)$row['value_type'];
+		$displayName = $value;
+		if ($valueType === UsergroupType::USER) {
+			$displayName = $this->userManager->getDisplayName($value) ?? $value;
+		} elseif ($valueType === UsergroupType::CIRCLE) {
+			$displayName = $this->circleHelper->getCircleDisplayName($value, ($this->userSession->getUser()?->getUID() ?: '')) ?: $value;
+		} elseif ($valueType === UsergroupType::GROUP) {
+			$displayName = $this->groupHelper->getGroupDisplayName($value) ?: $value;
 		}
 		return [
-			'id' => $cell->getValue(),
-			'type' => $cell->getValueType(),
+			'id' => $value,
+			'type' => $valueType,
 			'displayName' => $displayName,
 		];
 	}
