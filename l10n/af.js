@@ -38,6 +38,7 @@ OC.L10N.register(
     "Submit" : "Dien in",
     "Cancel" : "Kanselleer",
     "Delete" : "Skrap",
+    "Close" : "Close",
     "Please select a file." : "Kies asb. ’n lêer.",
     "Select from Files" : "Kies uit Lêers",
     "Filter" : "Filter",

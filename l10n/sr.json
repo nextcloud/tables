@@ -22,6 +22,7 @@
     "Timestamp of data load" : "Временска ознака учитавања података",
     "No" : "Не",
     "Yes" : "Да",
+    "Count" : "Бројач",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Дошло је до неочекиване грешке. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите администрацији.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Дошло је до грешке у вези са дозволама. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите администрацији.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Дошло је до грешке непостојања. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите администрацији.",

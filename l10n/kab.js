@@ -4,6 +4,7 @@ OC.L10N.register(
     "Tables" : "Tifelwa",
     "No" : "Uhu",
     "Yes" : "Ih",
+    "Count" : "Amḍan amatu",
     "The file was uploaded" : "Ulac afaylu yettwaznen",
     "The file was only partially uploaded" : "Afaylu, cwiṭ kan i yettwaznen segs",
     "No file was uploaded" : "Ulac afaylu i d-yettwasulin",

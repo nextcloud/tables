@@ -7,6 +7,7 @@
     "Timestamp of data load" : "Marca de tiempo de la carga de datos",
     "No" : "No",
     "Yes" : "Sí",
+    "Count" : "Recuento",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocurrió un error inesperado. Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocurrió un error de permisos. Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocurrió un error de \"no encontrado\". Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",

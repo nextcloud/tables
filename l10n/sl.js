@@ -9,6 +9,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Časovni žig podatkovnega nabora",
     "No" : "Ne",
     "Yes" : "Da",
+    "Count" : "Števec",
     "Could not create row." : "Vrstice ni mogoče ustvariti.",
     "Could not update row." : "Vrstice ni mogoče posodobiti.",
     "The file was uploaded" : "Datoteka je uspešno poslana.",

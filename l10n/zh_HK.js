@@ -33,6 +33,7 @@ OC.L10N.register(
     "Timestamp of data load" : "數據加載時間戳",
     "No" : "否",
     "Yes" : "是",
+    "Count" : "次數",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "發生了意料之外的錯誤。可在紀錄檔中找到更多詳細資訊。請聯絡您的管理員。",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "發生了權限錯誤。可在紀錄檔中找到更多詳細資訊。請聯絡您的管理員。",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "發生了找不到的錯誤。可在紀錄檔中找到更多詳細資訊。請聯絡您的管理員。",

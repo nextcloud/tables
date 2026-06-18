@@ -6,6 +6,7 @@
     "Timestamp of data load" : "Marca de temps de càrrega de dades",
     "No" : "No",
     "Yes" : "Sí",
+    "Count" : "Recompte",
     "Could not update row." : "No s'ha pogut actualitzar la fila.",
     "The file was uploaded" : "S'ha pujat el fitxer",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "El fitxer pujat excedeix la directiva upload_max_filesize del fitxer php.ini",

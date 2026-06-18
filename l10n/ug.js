@@ -24,6 +24,7 @@ OC.L10N.register(
     "Timestamp of data load" : "سانلىق مەلۇمات يۈكلەش ۋاقتى",
     "No" : "ياق",
     "Yes" : "ھەئە",
+    "Count" : "ساناپ بېقىڭ",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "ئويلىمىغان خاتالىق يۈز بەردى. تېخىمۇ كۆپ تەپسىلاتلارنى خاتىرىلەردىن تاپقىلى بولىدۇ. باشقۇرغۇچىڭىز بىلەن ئالاقىلىشىڭ.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "ئىجازەت خاتالىقى كۆرۈلدى. تېخىمۇ كۆپ تەپسىلاتلارنى خاتىرىلەردىن تاپقىلى بولىدۇ. باشقۇرغۇچىڭىز بىلەن ئالاقىلىشىڭ.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "تېپىلمىغان خاتالىق كۆرۈلدى. تېخىمۇ كۆپ تەپسىلاتلارنى خاتىرىلەردىن تاپقىلى بولىدۇ. باشقۇرغۇچىڭىز بىلەن ئالاقىلىشىڭ.",

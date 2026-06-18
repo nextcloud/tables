@@ -31,6 +31,7 @@
     "Timestamp of data load" : "Duomenų įkėlimo laiko žyma",
     "No" : "Ne",
     "Yes" : "Taip",
+    "Count" : "Suskaičiuoti",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Įvyko netikėta klaida. Daugiau informacijos rasite žurnaluose. Susisiekite su savo administracija.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Įvyko leidimo klaida. Daugiau informacijos rasite žurnaluose. Susisiekite su savo administracija.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Įvyko klaida „nerasta“. Daugiau informacijos rasite žurnaluose. Susisiekite su savo administracija.",

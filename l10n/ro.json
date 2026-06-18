@@ -3,6 +3,7 @@
     "Timestamp of data load" : "Marca temporală a încărcării datelor",
     "No" : "Nu",
     "Yes" : "Da",
+    "Count" : "Număr",
     "The file was uploaded" : "Fișierul a fost încărcat",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Fișierul încărcat depășește directiva upload_max_filesize din php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Fișierul încărcat depășește directiva MAX_FILE_SIZE specificată în formularul HTML",

@@ -2,6 +2,7 @@
     "Timestamp of data load" : "Өгөгдөл ачаалсан цагийн тэмдэг",
     "No" : "Үгүй",
     "Yes" : "Тийм",
+    "Count" : "Тоо",
     "The file was uploaded" : "Файл байршуулагдлаа",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Байршуулсан файл php.ini дахь upload_max_filesize хязгаараас хэтэрсэн",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Байршуулсан файл HTML маягтад заасан MAX_FILE_SIZE хязгаараас хэтэрсэн байна",

@@ -9,6 +9,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Datu-kargaren denbora-zigilua",
     "No" : "Ez",
     "Yes" : "Bai",
+    "Count" : "Kantitatea",
     "Could not update row." : "Ezin izan da orain eguneratu.",
     "The file was uploaded" : "Fitxategia igo da",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Igotako fitxategiak php.ini fitxategiko upload_max_filesize direktiban zehazturikoa gainditzen du",

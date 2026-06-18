@@ -22,6 +22,7 @@
     "Timestamp of data load" : "ເວລາທີ່ຂໍ້ມູນຖືກໂຫຼດ",
     "No" : "ບໍ່",
     "Yes" : "ແມ່ນ",
+    "Count" : "ຈຳນວນ",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "ເກີດຂໍ້ຜິດພາດທີ່ບໍ່ຄາດຄິດ. ສາມາດເບິ່ງລາຍລະອຽດເພີ່ມເຕີມໄດ້ໃນບັນທຶກ. ກະລຸນາຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຂອງທ່ານ.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "ເກີດຂໍ້ຜິດພາດດ້ານການອະນຸຍາດ. ສາມາດເບິ່ງລາຍລະອຽດເພີ່ມເຕີມໄດ້ໃນບັນທຶກ. ກະລຸນາຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຂອງທ່ານ.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "ເກີດຂໍ້ຜິດພາດຊອກບໍ່ພົບ. ສາມາດເບິ່ງລາຍລະອຽດເພີ່ມເຕີມໄດ້ໃນບັນທຶກ. ກະລຸນາຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຂອງທ່ານ.",

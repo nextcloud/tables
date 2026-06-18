@@ -8,6 +8,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Ma'lumotlarni yuklash vaqt belgisi",
     "No" : "No",
     "Yes" : "Yes",
+    "Count" : "Hisoblash",
     "The file was uploaded" : "Fayl yuklangan edi",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Yuklangan fayl php.ini dagi php-dagi upload_max_filesize direktivasidan oshadi",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Yuklangan fayl HTML shaklida ko'rsatilgan MAX_FILE_SIZE direktivasidan oshadi",

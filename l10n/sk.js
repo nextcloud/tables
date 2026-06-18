@@ -24,6 +24,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Časové razítko načítaných údajov",
     "No" : "Nie",
     "Yes" : "Áno",
+    "Count" : "Počet",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Vyskytla sa neočakávaná chyba. Viac podrobností nájdete v protokole. Obráťte sa na svojho administrátora.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Vyskytla sa chyba oprávnenia. Viac podrobností nájdete v protokole. Obráťte sa na svojho administrátora.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Vyskytla sa neočakávaná chyba. Viac podrobností nájdete v protokole. Obráťte sa na svojho administrátora.",

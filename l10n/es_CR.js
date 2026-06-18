@@ -46,6 +46,7 @@ OC.L10N.register(
     "Activity" : "Actividad",
     "Manage" : "Administrar",
     "Owner" : "Dueño",
+    "Close" : "Close",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Select from Files" : "Seleccionar desde Archivos",
     "Preview" : "Previsualizar",

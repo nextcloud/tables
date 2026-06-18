@@ -9,6 +9,7 @@ OC.L10N.register(
     "Timestamp of data load" : "데이터 로드 시 타임스탬프",
     "No" : "아니오",
     "Yes" : "예",
+    "Count" : "총수",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "알 수 없는 오류가 발생했습니다. 더 자세한 정보는 로그를 참조하세요. 관리자에게 문의하십시오.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "권한 오류가 발생했습니다. 더 자세한 정보는 로그를 참조하세요. 관리자에게 문의하십시오.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "'찾을 수 없음' 오류가 발생했습니다. 더 자세한 정보는 로그를 참조하세요. 관리자에게 문의하십시오.",

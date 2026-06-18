@@ -33,6 +33,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Veri yüklemesinin zaman damgası",
     "No" : "Hayır",
     "Yes" : "Evet",
+    "Count" : "Sayı",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Beklenmeyen bir sorun çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticiniz ile görüşün.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Bir izin sorunu çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticiniz ile görüşün.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Bir bulunamama sorunu çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticiniz ile görüşün.",

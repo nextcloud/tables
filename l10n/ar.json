@@ -7,6 +7,7 @@
     "Timestamp of data load" : "الختم الزمني Timestamp  لحِمل البيانات",
     "No" : "لا",
     "Yes" : "نعم",
+    "Count" : "عدّاد",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "حدث خطأ غير متوقع. تفاصيل أكثر يمكن الاطلاع عليها في سجل الحركات. تواصل رجاءً مع مشرف النظام عندك.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "حدث خطأ بسبب عدم كفاية الأذونات. تفاصيل أكثر يمكن الاطلاع عليها في سجل الحركات. تواصل رجاءً مع مشرف النظام عندك.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "حدث خطأ في إيجاد المطلوب. تفاصيل أكثر يمكن الاطلاع عليها في سجل الحركات. تواصل رجاءً مع مشرف النظام عندك.",

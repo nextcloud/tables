@@ -6,6 +6,7 @@
     "Timestamp of data load" : "Печат за време на зареждането на данни",
     "No" : "Не",
     "Yes" : "Да",
+    "Count" : "Брой",
     "Could not update row." : "Редът не можа да се актуализира.",
     "The file was uploaded" : "Файлът е качен",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Размерът на каченият файл надвишава директивата upload_max_filesize в php.ini",

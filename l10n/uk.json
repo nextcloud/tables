@@ -31,6 +31,7 @@
     "Timestamp of data load" : "Мітка часу завантаження даних",
     "No" : "Ні",
     "Yes" : "Так",
+    "Count" : "Лічильник",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Сталася неочікувана помилка. Докладну інформацію можна знайти в журналі. Будь ласка, зверніться до вашого адміністратора.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Виникла помилка з доступом. Докладну інформацію можна знайти в журналі. Будь ласка, зверніться до вашого адміністратора.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Сталася помилка відсутніх даних. Докладну інформацію можна знайти в журналі. Будь ласка, зверніться до вашого адміністратора.",

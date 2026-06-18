@@ -9,6 +9,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Znacznik czasu ładowania danych",
     "No" : "Nie",
     "Yes" : "Tak",
+    "Count" : "Ilość pobrań",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Wystąpił nieoczekiwany błąd. Więcej szczegółów można odnaleźć w logach. Skontaktuj się z administratorem.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Wystąpił błąd z uprawnieniami. Więcej szczegółów można odnaleźć w logach. Skontaktuj się z administratorem.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Wystąpił błąd: nie znaleziono. Więcej szczegółów można odnaleźć w logach. Skontaktuj się z administratorem.",

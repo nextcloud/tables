@@ -10,6 +10,7 @@
     "Timestamp of data load" : "Marca temporale del caricamento dati",
     "No" : "No",
     "Yes" : "Sì",
+    "Count" : "Conto",
     "The file was uploaded" : "Il file è stato caricato",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Il file caricato supera la direttiva upload_max_filesize in php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Il file caricato supera la direttiva MAX_FILE_SIZE specificata nel modulo HTML",

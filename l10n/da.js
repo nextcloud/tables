@@ -9,6 +9,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Tidsstempel for dataindlæsning",
     "No" : "Nej",
     "Yes" : "Ja",
+    "Count" : "Antal",
     "Could not update row." : "Rækken kunne ikke opdateres.",
     "The file was uploaded" : "Filen blev uploadet",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Den uploadede fil overstiger upload_max_filesize-direktivet i php.ini",

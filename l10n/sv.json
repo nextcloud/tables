@@ -31,6 +31,7 @@
     "Timestamp of data load" : "Tidstämpel för datainläsning",
     "No" : "Nej",
     "Yes" : "Ja",
+    "Count" : "Antal",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Ett oväntat fel inträffade. Mer information finns i loggarna. Kontakta din administratör.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "En behörighetsfel uppstod. Mer information finns i loggarna. Kontakta din administratör.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Ett inte hitta-fel uppstod. Mer information finns i loggarna. Kontakta din administratör.",

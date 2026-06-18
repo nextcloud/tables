@@ -33,6 +33,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Timestamp of data load",
     "No" : "No",
     "Yes" : "Yes",
+    "Count" : "Count",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "A permission error occurred. More details can be found in the logs. Please reach out to your administration.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "A not found error occurred. More details can be found in the logs. Please reach out to your administration.",

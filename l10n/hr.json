@@ -3,6 +3,7 @@
     "Timestamp of data load" : "Vremenska oznaka učitavanja podataka",
     "No" : "Ne",
     "Yes" : "Da",
+    "Count" : "Broj",
     "The file was uploaded" : "Datoteka je otpremljena",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Otpremljena datoteka premašuje postavku upload_max_filesize u datoteci php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Otpremljena datoteka premašuje postavku MAX_FILE_SIZE koja je navedena u obrascu HTML-a",

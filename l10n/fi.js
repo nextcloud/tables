@@ -19,6 +19,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Tietojen lataamisen aikaleima",
     "No" : "Ei",
     "Yes" : "Kyllä",
+    "Count" : "Määrä",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Tapahtui odottamaton virhe. Lisätietoja on lokitiedostoissa. Ota yhteyttä pääkäyttäjään.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Tapahtui käyttöoikeusvirhe. Lisätietoja on lokitiedostoissa. Ota yhteyttä pääkäyttäjään.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Tapahtui 'ei löytynyt' - virhe, jota ei löydy. Lisätietoja on lokitiedostoissa. Ota yhteyttä pääkäyttäjään.",

@@ -6,6 +6,7 @@
     "Timestamp of data load" : "Χρονική σήμανση φόρτωσης δεδομένων",
     "No" : "Όχι",
     "Yes" : "Ναι",
+    "Count" : "Πλήθος",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Εμφανίστηκε ένα απροσδόκητο σφάλμα. Περισσότερες λεπτομέρειες μπορείτε να βρείτε στα αρχεία καταγραφής. Παρακαλούμε επικοινωνήστε με τους διαχειριστές σας.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Εμφανίστηκε σφάλμα άδειας. Περισσότερες λεπτομέρειες μπορείτε να βρείτε στα αρχεία καταγραφής. Παρακαλούμε επικοινωνήστε με τους διαχειριστές σας.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Εμφανίστηκε σφάλμα μη εντοπισμού. Περισσότερες λεπτομέρειες μπορείτε να βρείτε στα αρχεία καταγραφής. Παρακαλούμε επικοινωνήστε με τους διαχειριστές σας.",

@@ -7,6 +7,7 @@
     "Timestamp of data load" : "数据加载时间戳",
     "No" : "否",
     "Yes" : "是",
+    "Count" : "计数",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "一个意料之外的问题发生了。 更多详细信息可以在日志中找到。 请联系您的管理部门。",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "发生权限错误。 更多详细信息可以在日志中找到。 请联系您的管理部门。",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "发生未找到错误。 更多详细信息可以在日志中找到。 请联系您的管理部门。",

@@ -33,6 +33,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Marca temporal do carregamento dos dados",
     "No" : "Não",
     "Yes" : "Sim",
+    "Count" : "Número",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Um erro inesperado ocorreu. Mais detalhes podem ser encontrados nos logs. Entre em contato com sua administração.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocorreu um erro de permissão. Mais detalhes podem ser encontrados nos logs. Entre em contato com sua administração.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocorreu um erro não encontrado. Mais detalhes podem ser encontrados nos logs. Entre em contato com sua administração.",

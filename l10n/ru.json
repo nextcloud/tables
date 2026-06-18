@@ -7,6 +7,7 @@
     "Timestamp of data load" : "Время загрузки данных",
     "No" : "Нет",
     "Yes" : "Да",
+    "Count" : "Количество",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Произошла непредвиденная ошибка. Более подробную информацию можно найти в журналах. Пожалуйста, обратитесь к своему администратору.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Произошла ошибка разрешения. Более подробную информацию можно найти в журналах. Пожалуйста, обратитесь к своему администратору.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Произошла ошибка «не найдено». Более подробную информацию можно найти в журналах. Обратитесь к своей администрации.",

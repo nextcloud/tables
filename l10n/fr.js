@@ -24,6 +24,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Horodatage du chargement de données",
     "No" : "Non",
     "Yes" : "Oui",
+    "Count" : "Nombre",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Une erreur inattendue est survenue. Davantage de détails peuvent être trouvés dans les logs. Veuillez contacter votre administrateur. ",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Une erreur de permissions est survenue. Davantage de détails peuvent être trouvés dans les logs. Veuillez contacter votre administrateur.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Une erreur \"Non trouvé\" est survenue. Davantage de détails peuvent être trouvés dans les logs. Veuillez contacter votre administrateur.",

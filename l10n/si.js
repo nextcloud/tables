@@ -20,6 +20,7 @@ OC.L10N.register(
     "Time" : "වේලාව",
     "Save" : "සුරකින්න",
     "Cancel" : "අවලංගු කරන්න",
+    "Delete" : "Delete",
     "Edit" : "සංස්කරණය",
     "Activity" : "ක්‍රියාකාරකම",
     "Owner" : "හිමිකරු",
