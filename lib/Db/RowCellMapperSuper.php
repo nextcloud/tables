@@ -133,6 +133,18 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
+	 * @throws Exception
+	 * @return RowCellSuper[]
+	 */
+	public function findAllForRow(int $rowId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)));
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 * @throws Exception

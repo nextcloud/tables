@@ -17,7 +17,7 @@ use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
-class Version001010Date20251229000000 extends SimpleMigrationStep {
+class Version2030Date20260620000000 extends SimpleMigrationStep {
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
@@ -30,8 +30,8 @@ class Version001010Date20251229000000 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 
 		$table = $schema->getTable('tables_row_sleeves');
-		if (!$table->hasColumn('tables_row_sleeves')) {
-			$table->addColumn('cached_cells', Types::JSON, [
+		if (!$table->hasColumn('cached_cells')) {
+			$table->addColumn('cached_cells', Types::TEXT, [
 				'notnull' => false,
 			]);
 		}
