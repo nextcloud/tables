@@ -80,7 +80,7 @@
     "@vue/tsconfig": "^0.5.1",
     "cypress": "^15.17.0",
     "cypress-downloadfile": "^1.2.4",
-    "cypress-vite": "^1.10.0",
+    "cypress-vite": "^1.10.1",
     "openapi-typescript": "^7.13.0",
     "typescript": "^5.3.3",
     "vite": "^7.3.5"
