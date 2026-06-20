@@ -668,7 +668,6 @@ class Row2Mapper {
 		try {
 			$sleeve = $this->rowSleeveMapper->find($row->getId());
 			$this->updateMetaData($sleeve);
-			$this->rowSleeveMapper->update($sleeve);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());

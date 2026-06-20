@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -81,7 +83,6 @@ class CacheSleeveCells implements IRepairStep {
 			->select('id')
 			->from('tables_tables')
 			->orderBy('id')
-			->setMaxResults(PHP_INT_MAX)
 			->executeQuery()
 			->fetchAll(\PDO::FETCH_COLUMN);
 
