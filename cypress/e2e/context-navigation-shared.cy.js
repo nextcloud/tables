@@ -30,6 +30,13 @@ describe('Test context navigation shared context', () => {
 
 		cy.getAppMenuEntry(contextTitle).should('exist')
 
+		// Close the app-menu waffle popover so it doesn't cover the context title
+		cy.get('body').then($body => {
+			if ($body.find('.app-menu__waffle[aria-expanded="true"]').length > 0) {
+				cy.get('.app-menu__waffle').click()
+			}
+		})
+
 		cy.loadContext(contextTitle)
 		cy.get('[data-cy="context-title"]').should('be.visible')
 		cy.openContextEditModal(contextTitle)
