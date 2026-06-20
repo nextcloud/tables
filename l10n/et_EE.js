@@ -507,7 +507,7 @@ OC.L10N.register(
     "Invalid protocol. Allowed: {allowed}" : "Vigane protokoll. Lubatud on: {allowed}",
     "Link providers" : "Linkide teenusepakkujad",
     "This option is outdated." : "See valik on aegunud.",
-    "Options" : "Sätted",
+    "Options" : "Valikud",
     "This relation does not exist anymore." : "Seda relatsiooni pole enam olemas.",
     "Select relation value" : "Vali relatsiooni väärtus",
     "Set {star} stars" : "Lisa {star} tärni",
