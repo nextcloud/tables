@@ -9,6 +9,7 @@
   "rebaseWhen": "conflicted",
   "ignoreUnstable": false,
   "baseBranches": ["main", "stable1.0"],
+  "useBaseBranchConfig": "merge",
   "enabledManagers": ["npm", "composer", "github-actions"],
   "ignoreDeps": ["node", "npm"],
   "packageRules": [
