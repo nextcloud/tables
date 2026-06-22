@@ -10,6 +10,7 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Model\SelectionOptions;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
@@ -64,8 +65,8 @@ use ValueError;
  * @method setTextMaxLength(?int $textMaxLength)
  * @method getTextUnique(): bool
  * @method setTextUnique(?bool $textUnique)
- * @method getSelectionOptions(): string
- * @method setSelectionOptions(?string $selectionOptionsArray)
+ * @method string getSelectionOptions()
+ * @method setSelectionOptions(?string $selectionOptions)
  * @method setSelectionDefault(?string $selectionDefault)
  * @method getSelectionDefault(): ?string
  * @method getDatetimeDefault(): string
@@ -187,6 +188,8 @@ class Column extends EntitySuper implements JsonSerializable {
 		$this->addType('showUserStatus', 'boolean');
 
 		$this->addType('customSettings', 'string');
+
+		$this->addType('selectionOptions', 'string');
 	}
 
 	public static function isValidMetaTypeId(int $metaTypeId): bool {
@@ -231,8 +234,7 @@ class Column extends EntitySuper implements JsonSerializable {
 		$column->setNumberDecimals($data->getNumberDecimals());
 		$column->setNumberPrefix($data->getNumberPrefix() ?? '');
 		$column->setNumberSuffix($data->getNumberSuffix() ?? '');
-		$column->setSelectionOptions($data->getSelectionOptions());
-		$column->setSelectionDefault($data->getSelectionDefault());
+		$column->setSelectionOptionsCollection(SelectionOptions::createFromInputJsonString($data->getSelectionOptions() ?? '[]', $data->getSelectionDefault()));
 		$column->setDatetimeDefault($data->getDatetimeDefault());
 		$column->setUsergroupDefault($data->getUsergroupDefault());
 		$column->setUsergroupMultipleItems($data->getUsergroupMultipleItems());
@@ -258,18 +260,17 @@ class Column extends EntitySuper implements JsonSerializable {
 		$this->setUsergroup($json);
 	}
 
-	public function getSelectionOptionsArray(): array {
-		$options = $this->getSelectionOptions();
-		if ($options !== '' && $options !== null && $options !== 'null') {
-			return \json_decode($options, true);
-		} else {
-			return [];
-		}
+	public function getSelectionOptionsCollection(): SelectionOptions {
+		return SelectionOptions::createFromInputJsonString($this->getSelectionOptions() ?? '[]', $this->getSelectionDefault());
 	}
 
-	public function setSelectionOptionsArray(array $array):void {
-		$json = \json_encode($array);
-		$this->setSelectionOptions($json);
+	public function setSelectionOptionsCollection(SelectionOptions $selectionOptions): void {
+		$this->setSelectionOptions(json_encode($selectionOptions->jsonSerialize()));
+		$this->setSelectionDefault($selectionOptions->defaultSerialized());
+	}
+
+	public function getSelectionOptionsArray(): ?array {
+		return $this->getSelectionOptionsCollection()->jsonSerialize();
 	}
 
 	/**
