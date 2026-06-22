@@ -72,6 +72,7 @@
                 "type": "object",
                 "required": [
                     "id",
+                    "uuid",
                     "title",
                     "technicalName",
                     "tableId",
@@ -112,6 +113,9 @@
                     "id": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "uuid": {
+                        "type": "string"
                     },
                     "title": {
                         "type": "string"

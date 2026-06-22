@@ -22,6 +22,7 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 	private const TARGET_TABLE = 'tables_columns';
 	private const COL_ID = 'id';
 	private const COL_UUID = 'uuid';
+	private const INDEX_NAME = 'tables_col_uuid_uniq';
 
 	public function __construct(
 		private readonly IDBConnection $db,
@@ -30,6 +31,7 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 
 	#[Override]
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
+		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
 		if (!$schema->hasTable(self::TARGET_TABLE)) {
@@ -44,6 +46,9 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 				'length' => 36,
 				'comment' => 'UUIDv7 identifier to support structural updates across instances',
 			]);
+		}
+		if (!$columnsTable->hasUniqueConstraint(self::INDEX_NAME)) {
+			$columnsTable->addUniqueIndex(['table_id', self::COL_UUID], self::INDEX_NAME);
 		}
 
 		return $schema;
