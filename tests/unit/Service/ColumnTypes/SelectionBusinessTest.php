@@ -8,6 +8,8 @@
 namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Model\SelectionOption;
+use OCA\Tables\Model\SelectionOptions;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -21,14 +23,16 @@ class SelectionBusinessTest extends TestCase {
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->selectionBusiness = new SelectionBusiness($this->logger);
 
+		$selectionOptions = new SelectionOptions([
+			new SelectionOption(1, 'Option 1'),
+			new SelectionOption(2, 'Option 2'),
+			new SelectionOption(3, 'Option 3'),
+			new SelectionOption(4, '1'),
+		], null);
+
 		$this->column = $this->createMock(Column::class);
-		$this->column->method('getSelectionOptionsArray')
-			->willReturn([
-				['id' => 1, 'label' => 'Option 1'],
-				['id' => 2, 'label' => 'Option 2'],
-				['id' => 3, 'label' => 'Option 3'],
-				['id' => 4, 'label' => '1'],
-			]);
+		$this->column->method('getSelectionOptionsCollection')
+			->willReturn($selectionOptions);
 	}
 
 	public function parseValueProvider(): array {

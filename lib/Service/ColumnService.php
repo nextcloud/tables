@@ -22,6 +22,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\SelectionOptions;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
@@ -85,6 +86,7 @@ class ColumnService extends SuperService {
 	}
 
 	/**
+	 * @return Column[]
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
@@ -152,7 +154,7 @@ class ColumnService extends SuperService {
 	/**
 	 * @param int $viewId
 	 * @param string|null $userId
-	 * @return array
+	 * @return Column[]
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws InternalError
@@ -429,11 +431,10 @@ class ColumnService extends SuperService {
 			$item->setNumberMin($columnDto->getNumberMin());
 			$item->setNumberMax($columnDto->getNumberMax());
 			$item->setNumberDecimals($columnDto->getNumberDecimals());
-			if ($columnDto->getSelectionOptions() !== null) {
-				$item->setSelectionOptions($columnDto->getSelectionOptions());
-			}
-			if ($columnDto->getSelectionDefault() !== null) {
-				$item->setSelectionDefault($columnDto->getSelectionDefault());
+			if ($columnDto->getSelectionOptions() !== null || $columnDto->getSelectionDefault() !== null) {
+				$item->setSelectionOptionsCollection(SelectionOptions::createFromInputJsonString(
+					$columnDto->getSelectionOptions(), $columnDto->getSelectionDefault())
+				);
 			}
 			$item->setDatetimeDefault($columnDto->getDatetimeDefault());
 
@@ -776,8 +777,7 @@ class ColumnService extends SuperService {
 		$item->setTextAllowedPattern($column['textAllowedPattern']);
 		$item->setTextMaxLength($column['textMaxLength']);
 		$item->setTextUnique($column['textUnique']);
-		$item->setSelectionOptions(json_encode($column['selectionOptions']));
-		$item->setSelectionDefault($column['selectionDefault']);
+		$item->setSelectionOptionsCollection(SelectionOptions::createFromInputArray($column['selectionOptions'], $column['selectionDefault']));
 		$item->setDatetimeDefault($column['datetimeDefault']);
 		$item->setUsergroupDefault(json_encode($column['usergroupDefault']));
 		$item->setUsergroupMultipleItems($column['usergroupMultipleItems']);
