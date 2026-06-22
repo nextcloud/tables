@@ -11,15 +11,16 @@ namespace OCA\Tables\ShareReview;
 
 use OCA\ShareReview\Sources\ISource;
 use OCA\Tables\Db\ContextMapper;
-use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Service\ShareService;
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\Constants;
 use OCP\DB\Exception;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
+use OCP\Share\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
@@ -33,12 +34,13 @@ class ShareReviewSource implements ISource {
 
 	public function __construct(
 		private ShareMapper $shareMapper,
-		private ContextNavigationMapper $contextNavigationMapper,
 		private TableMapper $tableMapper,
 		private ViewMapper $viewMapper,
 		private ContextMapper $contextMapper,
 		private IL10N $l10n,
 		private LoggerInterface $logger,
+		private readonly ShareService $shareService,
+		private readonly IEventDispatcher $eventDispatcher,
 	) {
 	}
 
@@ -88,33 +90,26 @@ class ShareReviewSource implements ISource {
 	}
 
 	public function deleteShare(string $shareId): bool {
-		$this->logger->info('Tables ShareReview: deleting share {id}', ['id' => $shareId]);
-
-		try {
-			$share = $this->shareMapper->find((int)$shareId);
-		} catch (DoesNotExistException) {
-			$this->logger->warning('Tables ShareReview: share {id} not found', ['id' => $shareId]);
+		if (!is_numeric($shareId)) {
 			return false;
-		} catch (MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->error('Tables ShareReview: failed to find share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
+		}
+
+		$event = new ShareReviewAccessCheckEvent('Tables', $shareId);
+		$this->eventDispatcher->dispatchTyped($event);
+
+		if (!$event->isHandled() || !$event->isGranted()) {
 			return false;
 		}
 
 		try {
-			$this->shareMapper->delete($share);
+			$this->shareService->deleteForShareReview((int)$shareId);
+			return true;
+		} catch (DoesNotExistException) {
+			return false;
 		} catch (Exception $e) {
 			$this->logger->error('Tables ShareReview: failed to delete share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
 			return false;
 		}
-
-		if ($share->getNodeType() === self::NODE_TYPE_CONTEXT) {
-			try {
-				$this->contextNavigationMapper->deleteByShareId((int)$shareId);
-			} catch (Exception $e) {
-				$this->logger->error('Tables ShareReview: failed to clean up context navigation for share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
-			}
-		}
-		return true;
 	}
 
 	/**
