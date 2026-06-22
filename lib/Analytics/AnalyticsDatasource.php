@@ -298,9 +298,9 @@ class AnalyticsDatasource implements IDatasource {
 			return '';
 		}
 
-		foreach ($column->getSelectionOptionsArray() as $option) {
-			if ((int)$option['id'] === (int)$value) {
-				return $option['label'];
+		foreach ($column->getSelectionOptionsCollection() as $option) {
+			if ($option->key() === (int)$value) {
+				return $option->label();
 			}
 		}
 
@@ -318,9 +318,9 @@ class AnalyticsDatasource implements IDatasource {
 	private function getSelectionLabels(Column $column, array $values): array {
 		$labels = [];
 		foreach ($values as $value) {
-			foreach ($column->getSelectionOptionsArray() as $option) {
-				if ((int)$option['id'] === (int)$value) {
-					$labels[] = $option['label'];
+			foreach ($column->getSelectionOptionsCollection() as $option) {
+				if ($option->key() === (int)$value) {
+					$labels[] = $option->label();
 					break;
 				}
 			}
