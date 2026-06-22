@@ -21,7 +21,8 @@ use ValueError;
  *
  * @psalm-import-type TablesColumn from ResponseDefinitions
  *
- * @method string getUuid()
+ * @method string|null getUuid()
+ * @method setUuid(?string $uuid)
  * @method getTitle(): string
  * @method setTitle(string $title)
  * @method getTableId(): int
@@ -202,18 +203,36 @@ class Column extends EntitySuper implements JsonSerializable {
 		], true);
 	}
 
+	public function setter (string $name, array $args): void {
+		if ($name === 'uuid') {
+			$this->setOrAssignUuid((string)$args[0]);
+			return;
+		}
+
+		parent::setter($name, $args);
+	}
+
 	private function assignUuid(): void {
 		if ($this->uuid !== null) {
 			throw new \RuntimeException('This column already has a UUID, they are immutable');
 		}
-		$this->uuid = Uuid::v7()->toRfc4122();
+		$this->applyUuid(Uuid::v7()->toRfc4122());
 	}
 
-	protected function setUuid(string $uuid): void {
+	private function setOrAssignUuid(?string $uuid): void {
 		if ($this->uuid !== null) {
 			throw new \RuntimeException('This column already has a UUID, they are immutable');
 		}
+		if ($uuid === null) {
+			$this->assignUuid();
+			return;
+		}
+		$this->applyUuid($uuid);
+	}
+
+	private function applyUuid(string $uuid): void {
 		$this->uuid = $uuid;
+		$this->markFieldUpdated('uuid');
 	}
 
 	public static function fromDto(ColumnDto $data): self {
