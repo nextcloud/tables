@@ -97,7 +97,7 @@ class ShareService extends SuperService {
 	 * @return TablesShare[]
 	 */
 	public function formatShares(array $items): array {
-		return array_map(static fn (Share $item) => $item->jsonSerialize(), $items);
+		return array_map(fn (Share $item) => $this->formatForOutput($item)->jsonSerialize(), $items);
 	}
 
 	public function formatForOutput(Share $share): Share {
