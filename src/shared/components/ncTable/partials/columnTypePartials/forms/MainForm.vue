@@ -64,51 +64,74 @@
 			{{ t('tables', 'Advanced settings') }}
 		</h3>
 
-		<!-- technical name -->
-		<div class="fix-col-4 title space-T" :class="{error: technicalNameInvalidError}">
-			{{ t('tables', 'Technical name') }}
-		</div>
-		<div class="fix-col-4" :class="{error: technicalNameInvalidError}">
-			<input
-				v-model="localTechnicalName"
-				data-cy="columnTechnicalNameInput"
-				:placeholder="t('tables', 'Optional, e.g. customer_name')">
-		</div>
-
-		<!-- warning for technical name changes -->
-		<div v-if="editColumn" class="fix-col-4 space-T">
-			<NcNoteCard type="warning">
-				<p>{{ t('tables', 'Changing the technical name affects integrations and API. Make sure to update your services accordingly.') }}</p>
-			</NcNoteCard>
+		<div class="fix-col-4">
+			<NcButton
+				type="tertiary"
+				data-cy="columnAdvancedSettingsToggle"
+				:aria-expanded="showAdvanced"
+				:aria-label="advancedToggleLabel"
+				@click="showAdvanced = !showAdvanced">
+				<template #icon>
+					<ChevronUp v-if="showAdvanced" :size="20" />
+					<ChevronDown v-else :size="20" />
+				</template>
+				{{ advancedToggleLabel }}
+			</NcButton>
 		</div>
 
-		<!-- column width -->
-		<div class="fix-col-4 mandatory title space-T" :class="{error: widthInvalidError}">
-			{{ t('tables', 'Column width') }}
-		</div>
-		<div class="fix-col-4" :class="{error: widthInvalidError}">
-			<input
-				v-model.number="localColumnWidth"
-				type="number"
-				pattern="\d+"
-				:min="COLUMN_WIDTH_MIN"
-				:max="COLUMN_WIDTH_MAX"
-				:placeholder="t('tables', 'Enter a column width between {min} and {max}', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX })">
-		</div>
+		<template v-if="showAdvanced">
+			<!-- technical name -->
+			<div class="fix-col-4 title space-T" :class="{error: technicalNameInvalidError}">
+				{{ t('tables', 'Technical name') }}
+			</div>
+			<div class="fix-col-4" :class="{error: technicalNameInvalidError}">
+				<input
+					v-model="localTechnicalName"
+					type="text"
+					data-cy="columnTechnicalNameInput"
+					:placeholder="t('tables', 'Optional, e.g. customer_name')">
+			</div>
+
+			<!-- warning for technical name changes -->
+			<div class="fix-col-4 space-T">
+				<NcNoteCard type="warning">
+					<p>{{ t('tables', 'Changing the technical name affects integrations and API. Make sure to update your services accordingly.') }}</p>
+				</NcNoteCard>
+			</div>
+
+			<!-- column width -->
+			<div class="fix-col-4 mandatory title space-T" :class="{error: widthInvalidError}">
+				{{ t('tables', 'Column width') }}
+			</div>
+			<div class="fix-col-4" :class="{error: widthInvalidError}">
+				<input
+					v-model.number="localColumnWidth"
+					type="number"
+					pattern="\d+"
+					:min="COLUMN_WIDTH_MIN"
+					:max="COLUMN_WIDTH_MAX"
+					:placeholder="t('tables', 'Enter a column width between {min} and {max}', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX })">
+			</div>
+		</template>
 
 	</div>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcNoteCard, NcSelect } from '@nextcloud/vue'
+import { NcButton, NcCheckboxRadioSwitch, NcNoteCard, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import { translate as t } from '@nextcloud/l10n'
+import ChevronDown from 'vue-material-design-icons/ChevronDown.vue'
+import ChevronUp from 'vue-material-design-icons/ChevronUp.vue'
 import { useTablesStore } from '../../../../../../store/store.js'
 import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../../../../constants.js'
 
 export default {
 	name: 'MainForm',
 	components: {
+		ChevronDown,
+		ChevronUp,
+		NcButton,
 		NcCheckboxRadioSwitch,
 		NcNoteCard,
 		NcSelect,
@@ -161,10 +184,20 @@ export default {
 		return {
 			COLUMN_WIDTH_MIN,
 			COLUMN_WIDTH_MAX,
+			showAdvanced: false,
 		}
+	},
+	watch: {
+		technicalNameInvalidError: 'expandAdvancedOnError',
+		widthInvalidError: 'expandAdvancedOnError',
 	},
 	computed: {
 		...mapState(useTablesStore, ['views', 'activeElement', 'isView']),
+		advancedToggleLabel() {
+			return this.showAdvanced
+				? t('tables', 'Hide advanced settings')
+				: t('tables', 'Show advanced settings')
+		},
 		localTitle: {
 			get() { return this.title },
 			set(title) { this.$emit('update:title', title) },
@@ -202,7 +235,12 @@ export default {
 	},
 
 	mounted() {
-		if (this.editColumn) return
+		if (this.editColumn) {
+			if (this.technicalName || this.customSettings?.width) {
+				this.showAdvanced = true
+			}
+			return
+		}
 		if (!this.isView) {
 			this.localSelectedViews = this.viewsForTable
 		} else {
@@ -211,6 +249,11 @@ export default {
 	},
 	methods: {
 		t,
+		expandAdvancedOnError(show) {
+			if (show) {
+				this.showAdvanced = true
+			}
+		},
 	},
 }
 </script>
