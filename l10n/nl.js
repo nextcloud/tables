@@ -90,6 +90,7 @@ OC.L10N.register(
     "Plan to discuss for the kickoff meeting." : "Plan een discussie over de kickoff vergadering.",
     "Kickoff meeting" : "Kickoff vergadering",
     "We will have a kickoff meeting in person." : "We zullen een persoonlijke kickoff vergadering hebben",
+    "What" : "Wat",
     "Done" : "Klaar",
     "Table" : "Tabel",
     "View" : "Bekijken",

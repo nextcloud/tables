@@ -76,6 +76,7 @@ OC.L10N.register(
     "Remove from favorites" : "Remover dos favoritos",
     "Copy" : "copiar",
     "Favorites" : "Favoritos",
+    "Applications" : "Aplicativos",
     "Clear filter" : "Limpar filtro",
     "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
     "Copy internal link to clipboard" : "Copiar ligação interna para a área de transferência",
