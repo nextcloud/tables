@@ -42,7 +42,7 @@ use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\DB\Events\AddMissingIndicesEvent;
-use OCP\Group\Events\BeforeGroupDeletedEvent;
+use OCP\Group\Events\GroupDeletedEvent;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use Psr\Container\ContainerInterface;
@@ -92,7 +92,7 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(TableOwnershipTransferredEvent::class, WhenTableTransferredAuditLogListener::class);
 		$context->registerEventListener(AddMissingIndicesEvent::class, AddMissingIndicesListener::class);
 		$context->registerEventListener(UserDeletedEvent::class, ReceiverCleanupListener::class);
-		$context->registerEventListener(BeforeGroupDeletedEvent::class, ReceiverCleanupListener::class);
+		$context->registerEventListener(GroupDeletedEvent::class, ReceiverCleanupListener::class);
 		$context->registerEventListener(CircleDestroyedEvent::class, ReceiverCleanupListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
