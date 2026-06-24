@@ -12,11 +12,11 @@ use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\ShareMapper;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
-use OCP\Group\Events\BeforeGroupDeletedEvent;
+use OCP\Group\Events\GroupDeletedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use Psr\Log\LoggerInterface;
 
-/** @template-implements IEventListener<Event|UserDeletedEvent|BeforeGroupDeletedEvent|CircleDestroyedEvent> */
+/** @template-implements IEventListener<Event|UserDeletedEvent|GroupDeletedEvent|CircleDestroyedEvent> */
 class ReceiverCleanupListener implements IEventListener {
 	public function __construct(
 		private ShareMapper $shareMapper,
@@ -27,7 +27,7 @@ class ReceiverCleanupListener implements IEventListener {
 	public function handle(Event $event): void {
 		if ($event instanceof UserDeletedEvent) {
 			$this->cleanupByParticipant(ShareReceiverType::USER, $event->getUser()->getUID());
-		} elseif ($event instanceof BeforeGroupDeletedEvent) {
+		} elseif ($event instanceof GroupDeletedEvent) {
 			$this->cleanupByParticipant(ShareReceiverType::GROUP, $event->getGroup()->getGID());
 		} elseif ($event instanceof CircleDestroyedEvent) {
 			$this->cleanupByParticipant(ShareReceiverType::CIRCLE, $event->getCircle()->getSingleId());
