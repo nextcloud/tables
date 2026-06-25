@@ -1172,6 +1172,7 @@ export type components = {
             /** Format: int64 */
             readonly id: number;
             readonly title: string;
+            readonly technicalName: string | null;
             readonly emoji: string | null;
             /** Format: int64 */
             readonly tableId: number;
@@ -1711,6 +1712,11 @@ export interface operations {
                     readonly title: string;
                     /** @description Emoji for the view */
                     readonly emoji?: string | null;
+                    /**
+                     * @description Technical name for the view
+                     * @default null
+                     */
+                    readonly technicalName?: string | null;
                 };
             };
         };
@@ -1722,6 +1728,17 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["View"];
+                };
+            };
+            /** @description Bad request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description Current user is not logged in */

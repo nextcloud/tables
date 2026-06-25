@@ -553,6 +553,48 @@ Feature: APIv1
       | task             |
       | New general task |
 
+  @api1 @views @technical-name
+  Scenario: Create and update view with technical name
+    Given table "View technical name test" with emoji "🔧" exists for user "participant1" as "tech-name-table"
+    When user "participant1" create view "Customer View" with emoji "👥" and technical name "customer_view" for "tech-name-table" as "customer-view"
+    Then table "tech-name-table" has the following views for user "participant1"
+      | Customer View |
+    When user "participant1" update view "customer-view" with title "Updated Customer View", emoji "👤" and technical name "updated_customer_view"
+    Then table "tech-name-table" has the following views for user "participant1"
+      | Updated Customer View |
+    When user "participant1" deletes view "customer-view"
+
+  @api1 @views @technical-name
+  Scenario: Create view with invalid technical name should fail
+    Given table "View invalid name test" with emoji "❌" exists for user "participant1" as "invalid-name-table"
+    When user "participant1" attempts to create view "Invalid View" with emoji "🚫" and technical name "InvalidName" for "invalid-name-table" as "invalid-view"
+    Then the reported status is "400"
+
+  @api1 @views @technical-name
+  Scenario: Create view with valid technical name patterns
+    Given table "View patterns test" with emoji "🔢" exists for user "participant1" as "patterns-table"
+    When user "participant1" create view "Valid Pattern 1" with emoji "✅" and technical name "valid_view" for "patterns-table" as "valid-pattern-1"
+    When user "participant1" create view "Valid Pattern 2" with emoji "✅" and technical name "view123" for "patterns-table" as "valid-pattern-2"
+    When user "participant1" create view "Valid Pattern 3" with emoji "✅" and technical name "view_with_underscores" for "patterns-table" as "valid-pattern-3"
+    When user "participant1" create view "Valid Pattern 4" with emoji "✅" and technical name "view_123_abc" for "patterns-table" as "valid-pattern-4"
+    Then table "patterns-table" has the following views for user "participant1"
+      | Valid Pattern 1 |
+      | Valid Pattern 2 |
+      | Valid Pattern 3 |
+      | Valid Pattern 4 |
+    When user "participant1" deletes view "valid-pattern-1"
+    When user "participant1" deletes view "valid-pattern-2"
+    When user "participant1" deletes view "valid-pattern-3"
+    When user "participant1" deletes view "valid-pattern-4"
+
+  @api1 @views @technical-name
+  Scenario: Update view with invalid technical name should fail
+    Given table "View update invalid test" with emoji "❌" exists for user "participant1" as "update-invalid-table"
+    When user "participant1" create view "Update Test View" with emoji "🔄" for "update-invalid-table" as "update-test-view"
+    When user "participant1" attempts to update view "update-test-view" with title "Updated View", emoji "🔄" and technical name "InvalidName"
+    Then the reported status is "400"
+    When user "participant1" deletes view "update-test-view"
+
   @api1 @relation
   Scenario: Create a relation column and fetch relations for a table
     Given table "Products" with emoji "📦" exists for user "participant1" as "products"
