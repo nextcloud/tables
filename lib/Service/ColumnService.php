@@ -9,6 +9,7 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
@@ -304,6 +305,9 @@ class ColumnService extends SuperService {
 		}
 
 		$this->validateCustomSettings($columnDto->getCustomSettings());
+		if ($columnDto->getType() === Column::TYPE_RELATION) {
+			$this->validateRelationTargetAccess($columnDto->getCustomSettings(), $userId);
+		}
 
 		$item = Column::fromDto($columnDto);
 		$item->setTitle($newTitle);
@@ -408,6 +412,9 @@ class ColumnService extends SuperService {
 			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
 			$this->validateCustomSettings($columnDto->getCustomSettings());
+			if ($columnDto->getType() === Column::TYPE_RELATION || $item->getType() === Column::TYPE_RELATION) {
+				$this->validateRelationTargetAccess($columnDto->getCustomSettings(), $userId);
+			}
 			$item->setCustomSettings($columnDto->getCustomSettings());
 
 			$this->updateMetadata($item, $userId);
@@ -447,6 +454,41 @@ class ColumnService extends SuperService {
 					$translatedMessage
 				);
 			}
+		}
+	}
+
+	/**
+	 * Ensure the user configuring a relation column can actually read the target
+	 *
+	 * @param string|null $customSettings
+	 * @throws BadRequestError
+	 */
+	private function validateRelationTargetAccess(?string $customSettings, ?string $userId): void {
+		if ($customSettings === null) {
+			return;
+		}
+		$settings = json_decode($customSettings, true);
+		if (!is_array($settings)) {
+			return;
+		}
+
+		$relationType = $settings[Column::RELATION_TYPE] ?? null;
+		$targetId = isset($settings[Column::RELATION_TARGET_ID]) ? (int)$settings[Column::RELATION_TARGET_ID] : null;
+		if (empty($relationType) || empty($targetId)) {
+			return;
+		}
+
+		if ($relationType === Application::NODE_TYPE_NAME_VIEW) {
+			$canRead = $this->permissionsService->canReadColumnsByViewId($targetId, $userId);
+		} elseif ($relationType === Application::NODE_TYPE_NAME_TABLE) {
+			$canRead = $this->permissionsService->canReadColumnsByTableId($targetId, $userId);
+		} else {
+			$canRead = false;
+		}
+
+		if (!$canRead) {
+			$translatedMessage = $this->l->t('You can only link to a table or view that you have access to.');
+			throw new BadRequestError($translatedMessage, 0, null, $translatedMessage);
 		}
 	}
 

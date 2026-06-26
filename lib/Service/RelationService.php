@@ -7,9 +7,11 @@
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -20,11 +22,17 @@ class RelationService {
 	/** @var array<string, array> Cache for relation data */
 	private array $cacheRelationData = [];
 
+	/** @var array<string, bool> Cache for manager accessibility decisions, keyed by host table + target */
+	private array $cacheManagerAccess = [];
+
 	public function __construct(
 		private ColumnMapper $columnMapper,
 		private ViewMapper $viewMapper,
+		private TableMapper $tableMapper,
 		private Row2Mapper $row2Mapper,
 		private ColumnService $columnService,
+		private PermissionsService $permissionsService,
+		private ShareService $shareService,
 		private ?string $userId,
 	) {
 	}
@@ -83,9 +91,10 @@ class RelationService {
 		foreach ($groupedColumns as $target => $columns) {
 			$relationData = $this->getRelationDataForTarget($target, $columns[0]);
 
-			// Assign the same data to all columns with this target
+			// Assign the same data to all columns with this target, but only when
+			// the relation is still backed by a manager of the hosting table.
 			foreach ($columns as $column) {
-				$result[$column->getId()] = $relationData;
+				$result[$column->getId()] = $this->isTargetAccessibleByManager($column) ? $relationData : [];
 			}
 		}
 
@@ -133,9 +142,70 @@ class RelationService {
 			return [];
 		}
 
+		if (!$this->isTargetAccessibleByManager($column)) {
+			return [];
+		}
+
 		$target = sprintf('%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn']);
 
 		return $this->getRelationDataForTarget($target, $column);
+	}
+
+	public function isTargetAccessibleByManager(Column $relationColumn): bool {
+		$settings = $relationColumn->getCustomSettingsArray();
+		$relationType = $settings[Column::RELATION_TYPE] ?? null;
+		$targetId = isset($settings[Column::RELATION_TARGET_ID]) ? (int)$settings[Column::RELATION_TARGET_ID] : null;
+		if (empty($relationType) || empty($targetId)) {
+			return false;
+		}
+
+		$hostTableId = $relationColumn->getTableId();
+		$cacheKey = sprintf('%s_%s_%s', $hostTableId, $relationType, $targetId);
+		if (isset($this->cacheManagerAccess[$cacheKey])) {
+			return $this->cacheManagerAccess[$cacheKey];
+		}
+
+		$candidateUserIds = [];
+		try {
+			$hostTable = $this->tableMapper->find($hostTableId);
+			if ($hostTable->getOwnership() !== null && $hostTable->getOwnership() !== '') {
+				$candidateUserIds[] = $hostTable->getOwnership();
+			}
+		} catch (DoesNotExistException|\OCP\AppFramework\Db\MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+			// host table gone, so nothing to expose
+			$this->cacheManagerAccess[$cacheKey] = false;
+			return false;
+		}
+
+		try {
+			$candidateUserIds = array_unique(array_merge(
+				$candidateUserIds,
+				$this->shareService->findManagerUserIds($hostTableId, Application::NODE_TYPE_NAME_TABLE),
+			));
+		} catch (InternalError $e) {
+			// fall back to the owner only
+		}
+
+		$accessible = false;
+		foreach ($candidateUserIds as $candidateUserId) {
+			if ($candidateUserId === null || $candidateUserId === '') {
+				continue;
+			}
+			if ($relationType === Application::NODE_TYPE_NAME_VIEW) {
+				$canRead = $this->permissionsService->canReadColumnsByViewId($targetId, $candidateUserId);
+			} elseif ($relationType === Application::NODE_TYPE_NAME_TABLE) {
+				$canRead = $this->permissionsService->canReadColumnsByTableId($targetId, $candidateUserId);
+			} else {
+				$canRead = false;
+			}
+			if ($canRead) {
+				$accessible = true;
+				break;
+			}
+		}
+
+		$this->cacheManagerAccess[$cacheKey] = $accessible;
+		return $accessible;
 	}
 
 	/**
@@ -159,7 +229,7 @@ class RelationService {
 			return [];
 		}
 
-		$isView = $settings[Column::RELATION_TYPE] === 'view';
+		$isView = $settings[Column::RELATION_TYPE] === Application::NODE_TYPE_NAME_VIEW;
 		$targetId = $settings[Column::RELATION_TARGET_ID] ?? null;
 
 		try {
