@@ -5,8 +5,7 @@
   "license": "AGPL-3.0-or-later",
   "authors": [
     {
-      "name": "Florian Steffens",
-      "email": "florian@nextcloud.com"
+      "name": "Nextcloud GmbH and Nextcloud contributors"
     }
   ],
   "autoload": {
