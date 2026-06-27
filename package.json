@@ -32,7 +32,7 @@
     "start:nextcloud": "node playwright/start-nextcloud-server.mjs"
   },
   "dependencies": {
-    "@material-symbols/svg-400": "^0.45.1",
+    "@material-symbols/svg-400": "^0.45.2",
     "@mdi/svg": "^7.4.47",
     "@nextcloud/auth": "^2.6.0",
     "@nextcloud/axios": "^2.6.0",
