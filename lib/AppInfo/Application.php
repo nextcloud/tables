@@ -49,6 +49,10 @@ class Application extends App implements IBootstrap {
 	public const NODE_TYPE_TABLE = 0;
 	public const NODE_TYPE_VIEW = 1;
 
+	public const NODE_TYPE_NAME_TABLE = 'table';
+	public const NODE_TYPE_NAME_VIEW = 'view';
+	public const NODE_TYPE_NAME_CONTEXT = 'context';
+
 	public const OWNER_TYPE_USER = 0;
 
 	public const NAV_ENTRY_MODE_HIDDEN = 0;
