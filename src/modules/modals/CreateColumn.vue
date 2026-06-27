@@ -115,6 +115,7 @@ import TextRichForm from '../../shared/components/ncTable/partials/columnTypePar
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
 import RelationForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationForm.vue'
+import RelationLookupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationLookupForm.vue'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
@@ -142,6 +143,7 @@ export default {
 		SelectionMultiForm,
 		UsergroupForm,
 		RelationForm,
+		RelationLookupForm,
 	},
 	props: {
 		showModal: {
@@ -311,6 +313,10 @@ export default {
 				showInfo(t('tables', 'Please select a target.'))
 			} else if (this.column.type === ColumnTypes.Relation && !this.column.customSettings?.labelColumn) {
 				showInfo(t('tables', 'Please select a label for relation selection.'))
+			} else if (this.column.type === ColumnTypes.RelationLookup && !this.column.customSettings?.relationColumnId) {
+				showInfo(t('tables', 'Please select a relation column.'))
+			} else if (this.column.type === ColumnTypes.RelationLookup && !this.column.customSettings?.targetColumnId) {
+				showInfo(t('tables', 'Please select a target column.'))
 			} else {
 				this.column.title = title
 				this.$emit('save', this.prepareSubmitData())
@@ -385,6 +391,9 @@ export default {
 				data.customSettings.relationType = this.column.customSettings.relationType
 				data.customSettings.targetId = this.column.customSettings.targetId
 				data.customSettings.labelColumn = this.column.customSettings.labelColumn
+			} else if (this.column.type === ColumnTypes.RelationLookup) {
+				data.customSettings.relationColumnId = this.column.customSettings.relationColumnId
+				data.customSettings.targetColumnId = this.column.customSettings.targetColumnId
 			}
 			return data
 		},

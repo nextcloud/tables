@@ -90,7 +90,7 @@ export default {
 		},
 		relationOptions() {
 			const activeElement = this.activeView || this.activeTable
-			if (activeElement) {
+			if (activeElement && !this.loading) {
 				return Object.values(this.allRelations || {})
 			}
 			return []

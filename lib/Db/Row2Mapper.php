@@ -60,6 +60,9 @@ class Row2Mapper {
 		$this->db->beginTransaction();
 		try {
 			foreach ($this->columnsHelper->columns as $columnType) {
+				if ($this->isVirtualColumn($columnType)) {
+					continue;
+				}
 				$this->getCellMapperFromType($columnType)->deleteAllForRow($row->getId());
 			}
 			$this->rowSleeveMapper->deleteById($row->getId());
@@ -219,6 +222,8 @@ class Row2Mapper {
 	private function getRowsChunk(array $rowIds, array $columnIds): array {
 		$qb = $this->db->getQueryBuilder();
 
+		$columnIds = $this->addRelationColumnIdsForSupplementColumns($columnIds);
+
 		$qbSqlForColumnTypes = null;
 		foreach ($this->columnsHelper->columns as $columnType) {
 			$qbTmp = $this->db->getQueryBuilder();
@@ -234,6 +239,9 @@ class Row2Mapper {
 				$qbTmp->selectAlias($qbTmp->createFunction('NULL'), 'value_type');
 			}
 
+			if ($this->isVirtualColumn($columnType)) {
+				continue;
+			}
 			$qbTmp
 				->from('tables_row_cells_' . $columnType)
 				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
@@ -839,6 +847,10 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
+
 		// insert new cell
 		$cellMapper = $this->getCellMapper($column);
 
@@ -877,6 +889,10 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value, Column $column): void {
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
+
 		$this->getCellMapper($column)->applyDataToEntity($column, $cell, $value);
 		$this->updateMetaData($cell);
 		$mapper->updateWrapper($cell);
@@ -887,6 +903,9 @@ class Row2Mapper {
 	 */
 	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
 		$column = $this->columnMapper->find($columnId);
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
 		$cellMapper = $this->getCellMapper($column);
 		try {
 			if ($cellMapper->hasMultipleValues()) {
@@ -913,6 +932,9 @@ class Row2Mapper {
 	}
 
 	private function getCellMapperFromType(string $columnType): RowCellMapperSuper {
+		if ($this->isVirtualColumn($columnType)) {
+			throw new InternalError('Virtual columns do not have cell mappers');
+		}
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
 		/** @var RowCellMapperSuper $cellMapper */
 		try {
@@ -934,6 +956,9 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function deleteDataForColumn(Column $column): void {
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
 		try {
 			$this->getCellMapper($column)->deleteAllForColumn($column->getId());
 		} catch (Exception $e) {
@@ -1002,6 +1027,9 @@ class Row2Mapper {
 			case Column::TYPE_USERGROUP:
 				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault());
 				break;
+			case Column::TYPE_RELATION_LOOKUP:
+				$defaultValue = null;
+				break;
 		}
 		return $defaultValue;
 	}
@@ -1029,4 +1057,29 @@ class Row2Mapper {
 
 		return $sortedRows;
 	}
+
+	public function isVirtualColumn(string $columnType): bool {
+		return $columnType === Column::TYPE_RELATION_LOOKUP;
+	}
+
+	/**
+	 * @param int[] $columnIds
+	 * @return int[]
+	 */
+	public function addRelationColumnIdsForSupplementColumns(array $columnIds): array {
+		$allColumns = $this->columnMapper->findAll($columnIds);
+		foreach ($allColumns as $column) {
+			if ($column->getType() !== Column::TYPE_RELATION_LOOKUP) {
+				continue;
+			}
+
+			$customSettings = $column->getCustomSettingsArray();
+			$relationColumnId = $customSettings['relationColumnId'] ?? null;
+			if ($relationColumnId && !in_array($relationColumnId, $columnIds)) {
+				$columnIds[] = $relationColumnId;
+			}
+		}
+		return $columnIds;
+	}
+
 }

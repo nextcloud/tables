@@ -3723,7 +3723,8 @@
                                             "datetime",
                                             "select",
                                             "usergroup",
-                                            "relation"
+                                            "relation",
+                                            "relation_lookup"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -4152,7 +4153,8 @@
                                             "datetime",
                                             "select",
                                             "usergroup",
-                                            "relation"
+                                            "relation",
+                                            "relation_lookup"
                                         ],
                                         "description": "Column main type"
                                     },

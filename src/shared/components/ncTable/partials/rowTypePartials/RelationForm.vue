@@ -57,8 +57,8 @@ export default {
 		relationOptions() {
 			const dataStore = useDataStore()
 			const activeElement = this.activeView || this.activeTable
-			if (activeElement) {
-				const columnRelations = dataStore.getRelations(this.column.id)
+			if (activeElement && !this.loading) {
+				const columnRelations = dataStore.getRelations(this.column.id).data
 				return Object.values(columnRelations)
 			}
 			return []
