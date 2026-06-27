@@ -246,70 +246,70 @@ export default {
 </script>
 <style lang="scss" scoped>
 
-	.tables-content-widget {
-		min-height: max(50vh, 200px);
-		height: 50vh;
-		overflow: scroll;
+.tables-content-widget {
+    min-height: max(50vh, 200px);
+    height: 50vh;
+    overflow: auto;
 
-		& .header {
-			position: sticky;
-			top: 0;
-			inset-inline-start: 0;
-			z-index: 1;
+    & .header {
+        position: static;
+        top: auto;
+        inset-inline-start: auto;
+        z-index: auto;
 
-			:where(.options) {
-				position: sticky;
-				top: 57px;
-				z-index: 1;
-				padding-bottom: 10px;
-				background-color: var(--color-main-background);
-			}
+        :where(.options) {
+            position: static;
+            top: auto;
+            z-index: auto;
+            padding-bottom: 10px;
+            background-color: var(--color-main-background);
+        }
 
-			h2 {
-				position: sticky;
-				top: 0;
-				min-width: var(--widget-content-width);
-				z-index: 1;
-				background-color: var(--color-main-background);
-				margin: 0 !important;
-				padding: calc(var(--default-grid-baseline) * 4);
+        h2 {
+            position: static;
+            top: auto;
+            min-width: var(--widget-content-width);
+            z-index: auto;
+            background-color: var(--color-main-background);
+            margin: 0 !important;
+            padding: calc(var(--default-grid-baseline) * 4);
 
-				& .loading-icon {
-					display: inline-block;
-					vertical-align: middle;
-				}
-			}
-		}
+            & .loading-icon {
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
+    }
 
-		.nc-table {
-			min-width: var(--widget-content-width);
+    .nc-table {
+        min-width: var(--widget-content-width);
 
-			:where(.options.row) {
-				display: none;
-			}
+        :where(.options.row) {
+            display: none;
+        }
 
-			:where(thead) {
-				position: sticky;
-				top: 117px;
+        :where(thead) {
+            position: static;
+            top: auto;
 
-				:where(.cell-wrapper) {
-					min-width: 150px;
-					max-width: 200px;
-				}
+            :where(.cell-wrapper) {
+                min-width: 150px;
+                max-width: 200px;
+            }
 
-				:where(.sticky) {
-					background: transparent !important;
-				}
-			}
-		}
+            :where(.sticky) {
+                background: transparent !important;
+            }
+        }
+    }
 
-		& :deep(.options.row) {
-			width: calc(var(--widget-content-width, 100%) - 12px);
-		}
+    & :deep(.options.row) {
+        width: calc(var(--widget-content-width, 100%) - 12px);
+    }
 
-		& :deep(td) {
-			vertical-align: middle !important;
-		}
-	}
+    & :deep(td) {
+        vertical-align: middle !important;
+    }
+}
 
 </style>
