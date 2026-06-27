@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabelas",
     "No" : "Não",
     "Yes" : "Sim",
     "The file was uploaded" : "O ficheiro foi carregado",
@@ -69,6 +70,7 @@ OC.L10N.register(
     "Please select a file." : "Por favor, selecione um ficheiro.",
     "Select from Files" : "Selecione dos ficheiros",
     "Preview" : "Pré-visualizar",
+    "Failed" : "Falhou",
     "Transfer" : "Transfere",
     "Filter" : "Filtro",
     "Sort" : "Ordenar",
@@ -85,6 +87,7 @@ OC.L10N.register(
     "Delete data" : "Apagar dados",
     "View only" : "Visualizar apenas",
     "Can edit" : "Pode editar",
+    "Custom permissions" : "Permissões personalizadas",
     "Read" : "Ler",
     "Update" : "Atualizar",
     "Link copied to clipboard" : "Ligação copiada para a área de transferência",
