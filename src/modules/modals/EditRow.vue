@@ -77,7 +77,7 @@
 			<div v-else-if="activeTabId === 'activity'">
 				<ActivityList filter="tables"
 					:object-id="row.id"
-					object-type="tables_row"
+					object-type="row"
 					type="tables" />
 			</div>
 		</div>

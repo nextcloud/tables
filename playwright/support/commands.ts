@@ -96,7 +96,7 @@ async function openTableActionsMenu(page: Page) {
 
 function getTableActionLocator(page: Page, optionName: string) {
 	switch (optionName) {
-	case 'Edit table':
+	case 'Table settings':
 		return page.locator('[data-cy="dataTableEditTableBtn"]')
 	case 'Create view':
 		return page.locator('[data-cy="dataTableCreateViewBtn"]')
