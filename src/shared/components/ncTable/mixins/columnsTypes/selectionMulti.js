@@ -83,6 +83,7 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 			[FilterIds.IsEqual]() { return valueString === filterValue },
 			[FilterIds.IsNotEqual]() { return valueString !== filterValue },
 			[FilterIds.IsEmpty]() { return !valueString },
+			[FilterIds.IsNotEmpty]() { return !!valueString },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

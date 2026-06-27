@@ -87,6 +87,7 @@ export default class RelationColumn extends AbstractColumn {
 			[FilterIds.IsEqual]() { return cellLabel === filterValue },
 			[FilterIds.IsNotEqual]() { return cellLabel !== filterValue },
 			[FilterIds.IsEmpty]() { return !cellLabel },
+			[FilterIds.IsNotEmpty]() { return !!cellLabel },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
