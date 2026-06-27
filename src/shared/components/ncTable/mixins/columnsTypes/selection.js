@@ -51,12 +51,12 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 	}
 
 	isFilterFound(cell, filter) {
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		const cellLabel = this.getLabel(cell.value)
+		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
+		const cellLabel = this.getLabel(cell.value)?.toLowerCase()
 		const filterMethod = {
 			[FilterIds.ContainsItem]() { return filterValue.map(option => option.id).includes(cell.value) },
-			[FilterIds.Contains]() { return cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
-			[FilterIds.DoesNotContain]() { return !cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
+			[FilterIds.Contains]() { return cellLabel.includes(filterValue) },
+			[FilterIds.DoesNotContain]() { return !cellLabel?.includes(filterValue) },
 			[FilterIds.BeginsWith]() { return cellLabel?.startsWith(filterValue) },
 			[FilterIds.EndsWith]() { return cellLabel?.endsWith(filterValue) },
 			[FilterIds.IsEqual]() { return cellLabel === filterValue },
