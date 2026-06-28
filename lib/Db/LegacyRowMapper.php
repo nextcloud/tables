@@ -82,7 +82,7 @@ class LegacyRowMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	private function buildFilterByColumnType($qb, array $filter, string $filterId): ?IQueryFunction {
+	private function buildFilterByColumnType(IQueryBuilder $qb, array $filter, string $filterId): ?IQueryFunction {
 		try {
 			$columnQbClassName = 'OCA\Tables\Db\ColumnTypes\\';
 			$type = explode('-', (string)$filter['columnType'])[0];

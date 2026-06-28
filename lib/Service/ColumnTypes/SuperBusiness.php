@@ -21,13 +21,17 @@ class SuperBusiness implements IColumnTypeBusiness {
 	/**
 	 * @param mixed $value
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		return json_encode($value);
 	}
 
-	public function parseDisplayValue($value, Column $column): string {
+	/**
+	 * @return false|string
+	 */
+	public function parseDisplayValue($value, Column $column): string|false {
 		return $this->parseValue($value, $column);
 	}
 

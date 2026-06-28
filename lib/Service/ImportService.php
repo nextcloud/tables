@@ -562,7 +562,10 @@ class ImportService extends SuperService {
 	/*
 	 * @return string Stringified value
 	 */
-	private function parseValueByColumnType(string $value, Column $column, IColumnTypeBusiness $columnBusiness): string {
+	/**
+	 * @return false|string
+	 */
+	private function parseValueByColumnType(string $value, Column $column, IColumnTypeBusiness $columnBusiness): string|false {
 		try {
 			if (!$columnBusiness->canBeParsedDisplayValue($value, $column)) {
 				$this->logger->warning('Value ' . $value . ' could not be parsed for column ' . $column->getTitle());
@@ -692,7 +695,10 @@ class ImportService extends SuperService {
 		}
 	}
 
-	private function valueToDateTimeImmutable(mixed $value): ?DateTimeImmutable {
+	/**
+	 * @param null|string $value
+	 */
+	private function valueToDateTimeImmutable(?string $value): ?DateTimeImmutable {
 		if (
 			$value === false
 			|| $value === null
