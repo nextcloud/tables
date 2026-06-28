@@ -14,23 +14,15 @@ use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
 class UserHelper {
-	private IUserManager $userManager;
-
-	private LoggerInterface $logger;
-
-	private IGroupManager $groupManager;
-
-	public function __construct(IUserManager $userManager, LoggerInterface $logger, IGroupManager $groupManager) {
-		$this->userManager = $userManager;
-		$this->logger = $logger;
-		$this->groupManager = $groupManager;
-	}
+	public function __construct(private readonly IUserManager $userManager, private readonly LoggerInterface $logger, private readonly IGroupManager $groupManager)
+    {
+    }
 
 	public function getUserDisplayName(string $userId): string {
 		try {
 			$user = $this->getUser($userId);
-			return $user->getDisplayName() ? $user->getDisplayName() : $userId;
-		} catch (InternalError $e) {
+			return $user->getDisplayName() ?: $userId;
+		} catch (InternalError) {
 			$this->logger->info('no user given, will return userId');
 			return $userId;
 		}
@@ -55,7 +47,7 @@ class UserHelper {
 		try {
 			$user = $this->getUser($userId);
 			return $this->groupManager->getUserGroupIds($user);
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			return null;
 		}
 	}

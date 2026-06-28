@@ -21,19 +21,12 @@ use function json_decode;
 use function json_encode;
 
 class ShowContext extends Base {
-	protected ContextService $contextService;
-	protected LoggerInterface $logger;
-	private IConfig $config;
-
 	public function __construct(
-		ContextService $contextService,
-		LoggerInterface $logger,
-		IConfig $config,
+		protected ContextService $contextService,
+		protected LoggerInterface $logger,
+		private readonly IConfig $config,
 	) {
 		parent::__construct();
-		$this->contextService = $contextService;
-		$this->logger = $logger;
-		$this->config = $config;
 	}
 
 	protected function configure(): void {
@@ -55,13 +48,13 @@ class ShowContext extends Base {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$contextId = trim($input->getArgument('context-id'));
+		$contextId = trim((string) $input->getArgument('context-id'));
 		if ($contextId === '' || !is_numeric($contextId)) {
 			$output->writeln('<error>Invalid Context ID</error>');
 			return 1;
 		}
 
-		$userId = trim($input->getArgument('user-id'));
+		$userId = trim((string) $input->getArgument('user-id'));
 		if ($userId === '') {
 			$userId = null;
 		}

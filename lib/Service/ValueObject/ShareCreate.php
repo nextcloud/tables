@@ -11,18 +11,18 @@ namespace OCA\Tables\Service\ValueObject;
 
 class ShareCreate {
 	public function __construct(
-		private int $nodeId,
-		private string $nodeType,
-		private string $receiver,
-		private string $receiverType,
-		private bool $permissionRead,
-		private bool $permissionCreate,
-		private bool $permissionUpdate,
-		private bool $permissionDelete,
-		private bool $permissionManage,
-		private int $displayMode,
-		private ?string $password = null,
-		private ?ShareToken $shareToken = null,
+		private readonly int $nodeId,
+		private readonly string $nodeType,
+		private readonly string $receiver,
+		private readonly string $receiverType,
+		private readonly bool $permissionRead,
+		private readonly bool $permissionCreate,
+		private readonly bool $permissionUpdate,
+		private readonly bool $permissionDelete,
+		private readonly bool $permissionManage,
+		private readonly int $displayMode,
+		private readonly ?string $password = null,
+		private readonly ?ShareToken $shareToken = null,
 	) {
 	}
 

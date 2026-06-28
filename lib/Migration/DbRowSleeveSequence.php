@@ -20,6 +20,7 @@ class DbRowSleeveSequence implements IRepairStep {
 		protected IDBConnection $db,
 		protected IConfig $config,
 		protected LoggerInterface $logger,
+        private readonly \OCP\IAppConfig $appConfig,
 	) {
 	}
 
@@ -34,31 +35,29 @@ class DbRowSleeveSequence implements IRepairStep {
 	 * @inheritDoc
 	 */
 	public function run(IOutput $output) {
-		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', 'false') === 'true';
-		$sequenceRepairComplete = $this->config->getAppValue('tables', 'sequenceRepairComplete', 'false') === 'true';
+		$legacyRowTransferRunComplete = $this->appConfig->getValue('tables', 'legacyRowTransferRunComplete', 'false') === 'true';
+		$sequenceRepairComplete = $this->appConfig->getValue('tables', 'sequenceRepairComplete', 'false') === 'true';
 		if (!$legacyRowTransferRunComplete || $sequenceRepairComplete) {
 			return;
 		}
 
 		$platform = $this->db->getDatabasePlatform();
 		if (!$platform->supportsSequences()) {
-			$this->config->setAppValue('tables', 'sequenceRepairComplete', 'true');
+			$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
 			return;
 		}
 
 		$newSequenceOffset = $this->getNewOffset();
 		if ($newSequenceOffset === null) {
 			// no data, no op
-			$this->config->setAppValue('tables', 'sequenceRepairComplete', 'true');
+			$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
 			return;
 		}
 
 		$schema = $this->db->createSchema();
 		$sequences = $schema->getSequences();
 
-		$candidates = array_filter($sequences, function (string $sequenceName): bool {
-			return str_contains($sequenceName, 'tables_row_sleeves');
-		}, ARRAY_FILTER_USE_KEY);
+		$candidates = array_filter($sequences, fn(string $sequenceName): bool => str_contains($sequenceName, 'tables_row_sleeves'), ARRAY_FILTER_USE_KEY);
 
 		if (count($candidates) > 1) {
 			$this->logger->error('Unexpected number of sequences, aborting.', [
@@ -68,14 +67,14 @@ class DbRowSleeveSequence implements IRepairStep {
 			throw new \LogicException('Failed to find the correct sequence.');
 		} elseif (count($candidates) === 0) {
 			// 🤷
-			$this->config->setAppValue('tables', 'sequenceRepairComplete', 'true');
+			$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
 			return;
 		}
 		/** @var Sequence $sequence */
 		$sequence = $candidates[array_key_first($candidates)];
 
 		$this->db->executeStatement(sprintf('ALTER SEQUENCE %s RESTART START WITH %d', $sequence->getName(), $newSequenceOffset));
-		$this->config->setAppValue('tables', 'sequenceRepairComplete', 'true');
+		$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
 	}
 
 	protected function getNewOffset(): ?int {
@@ -95,7 +94,7 @@ class DbRowSleeveSequence implements IRepairStep {
 			->from($tableName)
 			->executeQuery();
 
-		$row = $result->fetch();
+		$row = $result->fetchAssociative();
 		$result->closeCursor();
 
 		return $row ? (int)$row[array_key_first($row)] : null;

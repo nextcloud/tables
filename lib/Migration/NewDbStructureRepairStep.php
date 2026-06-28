@@ -23,21 +23,9 @@ use Throwable;
 
 class NewDbStructureRepairStep implements IRepairStep {
 
-	protected LoggerInterface $logger;
-	protected TableService $tableService;
-	protected LegacyRowMapper $legacyRowMapper;
-	protected Row2Mapper $rowMapper;
-	protected ColumnService $columnService;
-	protected IConfig $config;
-
-	public function __construct(LoggerInterface $logger, TableService $tableService, ColumnService $columnService, LegacyRowMapper $legacyRowMapper, Row2Mapper $rowMapper, IConfig $config) {
-		$this->logger = $logger;
-		$this->tableService = $tableService;
-		$this->columnService = $columnService;
-		$this->legacyRowMapper = $legacyRowMapper;
-		$this->rowMapper = $rowMapper;
-		$this->config = $config;
-	}
+	public function __construct(protected LoggerInterface $logger, protected TableService $tableService, protected ColumnService $columnService, protected LegacyRowMapper $legacyRowMapper, protected Row2Mapper $rowMapper, protected IConfig $config, private readonly \OCP\IAppConfig $appConfig)
+    {
+    }
 
 	/**
 	 * Returns the step's name
@@ -50,7 +38,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 * @param IOutput $output
 	 */
 	public function run(IOutput $output) {
-		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', 'false');
+		$legacyRowTransferRunComplete = $this->appConfig->getValue('tables', 'legacyRowTransferRunComplete', 'false');
 
 		if ($legacyRowTransferRunComplete === 'true') {
 			return;
@@ -60,12 +48,12 @@ class NewDbStructureRepairStep implements IRepairStep {
 		try {
 			$tables = $this->tableService->findAll('', true, true, false);
 			$output->info('Found ' . count($tables) . ' table(s)');
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			$output->warning('Error while fetching tables. Will aboard.');
 			return;
 		}
 		$this->transferDataForTables($tables, $output);
-		$this->config->setAppValue('tables', 'legacyRowTransferRunComplete', 'true');
+		$this->appConfig->setValue('tables', 'legacyRowTransferRunComplete', 'true');
 	}
 
 	/**

@@ -11,13 +11,9 @@ use OCP\IGroupManager;
 use Psr\Log\LoggerInterface;
 
 class GroupHelper {
-	private LoggerInterface $logger;
-	private IGroupManager $groupManager;
-
-	public function __construct(LoggerInterface $logger, IGroupManager $groupManager) {
-		$this->logger = $logger;
-		$this->groupManager = $groupManager;
-	}
+	public function __construct(private readonly LoggerInterface $logger, private readonly IGroupManager $groupManager)
+    {
+    }
 
 	public function getGroupDisplayName(string $groupId): string {
 		if ($group = $this->groupManager->get($groupId)) {

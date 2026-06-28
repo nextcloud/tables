@@ -19,12 +19,12 @@ use OCP\IUserSession;
 class ImportTableJob extends QueuedJob {
 	public function __construct(
 		ITimeFactory $time,
-		private IUserManager $userManager,
-		private IUserSession $userSession,
-		private ImportService $importService,
-		private ActivityManager $activityManager,
-		private TableMapper $tableMapper,
-		private ViewMapper $viewMapper,
+		private readonly IUserManager $userManager,
+		private readonly IUserSession $userSession,
+		private readonly ImportService $importService,
+		private readonly ActivityManager $activityManager,
+		private readonly TableMapper $tableMapper,
+		private readonly ViewMapper $viewMapper,
 	) {
 		parent::__construct($time);
 	}

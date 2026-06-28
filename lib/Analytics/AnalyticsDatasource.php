@@ -23,32 +23,9 @@ use Psr\Log\LoggerInterface;
 
 class AnalyticsDatasource implements IDatasource {
 
-	private LoggerInterface $logger;
-	private IL10N $l10n;
-	private TableService $tableService;
-	private ViewService $viewService;
-	private RowService $rowService;
-	private ColumnService $columnService;
-
-	protected ?string $userId;
-
-	public function __construct(
-		IL10N $l10n,
-		LoggerInterface $logger,
-		TableService $tableService,
-		ViewService $viewService,
-		ColumnService $columnService,
-		RowService $rowService,
-		?string $userId,
-	) {
-		$this->l10n = $l10n;
-		$this->logger = $logger;
-		$this->tableService = $tableService;
-		$this->viewService = $viewService;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->userId = $userId;
-	}
+	public function __construct(private readonly IL10N $l10n, private readonly LoggerInterface $logger, private readonly TableService $tableService, private readonly ViewService $viewService, private readonly ColumnService $columnService, private readonly RowService $rowService, protected ?string $userId)
+    {
+    }
 
 	/**
 	 * @return string Display Name of the datasource
@@ -110,7 +87,7 @@ class AnalyticsDatasource implements IDatasource {
 					// concatenate the option-string. The format is tableId:viewId-title
 					$tableString = $tableString . $table->getId() . ':' . $view->getId() . '-' . $view->getTitle() . '/';
 				}
-			} catch (PermissionError $e) {
+			} catch (PermissionError) {
 				// this is a shared table without shared views;
 				continue;
 			}
@@ -164,7 +141,7 @@ class AnalyticsDatasource implements IDatasource {
 	 */
 	public function readData($option): array {
 		// get the ids which come in the format tableId:viewId
-		$ids = explode(':', $option['tableId']);
+		$ids = explode(':', (string) $option['tableId']);
 		$this->userId = $option['user_id'];
 
 		if (count($ids) === 1) {

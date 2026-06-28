@@ -28,7 +28,7 @@ class SelectionMultiBusiness extends SuperBusiness {
 
 		$wasString = false;
 		if (is_string($value)) {
-			$value = array_map('trim', explode(',', $value));
+			$value = array_map(trim(...), explode(',', $value));
 			$wasString = true;
 		}
 
@@ -80,7 +80,7 @@ class SelectionMultiBusiness extends SuperBusiness {
 
 		$wasString = false;
 		if (is_string($value)) {
-			$value = array_map('trim', explode(',', $value));
+			$value = array_map(trim(...), explode(',', $value));
 			$wasString = true;
 		}
 
