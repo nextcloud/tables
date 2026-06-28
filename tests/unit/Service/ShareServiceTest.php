@@ -83,7 +83,7 @@ class ShareServiceTest extends TestCase {
 	}
 
 	public function testCreateContextShareSetsAllPermissionsFalse(): void {
-		$this->mapper->method('insert')->willReturnCallback(fn(Share $share) => $share);
+		$this->mapper->method('insert')->willReturnCallback(fn (Share $share) => $share);
 
 		$share = $this->shareService->create(
 			new ShareCreate(

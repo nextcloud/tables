@@ -25,30 +25,31 @@ class TableController extends Controller {
 		IRequest $request,
 		protected LoggerInterface $logger,
 		private TableService $service,
-		private string $userId) {
+		private string $userId,
+	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
 	#[NoAdminRequired]
 	public function index(): DataResponse {
-		return $this->handleError(fn() => $this->service->findAll($this->userId));
+		return $this->handleError(fn () => $this->service->findAll($this->userId));
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function show(int $id): DataResponse {
-		return $this->handleError(fn() => $this->service->find($id));
+		return $this->handleError(fn () => $this->service->find($id));
 	}
 
 	#[NoAdminRequired]
 	public function create(string $title, string $template, string $emoji): DataResponse {
-		return $this->handleError(fn() => $this->service->create($title, $template, $emoji));
+		return $this->handleError(fn () => $this->service->create($title, $template, $emoji));
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function destroy(int $id): DataResponse {
-		return $this->handleError(fn() => $this->service->delete($id));
+		return $this->handleError(fn () => $this->service->delete($id));
 	}
 
 	#[NoAdminRequired]

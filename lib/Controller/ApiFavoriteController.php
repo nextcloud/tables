@@ -33,7 +33,8 @@ class ApiFavoriteController extends AOCSController {
 		LoggerInterface $logger,
 		private readonly FavoritesService $service,
 		IL10N $n,
-		string $userId) {
+		string $userId,
+	) {
 		parent::__construct($request, $logger, $n, $userId);
 	}
 

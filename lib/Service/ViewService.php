@@ -232,7 +232,7 @@ class ViewService extends SuperService {
 					$insertableValue = json_encode($value);
 				}
 
-				$setterMethod = 'set' . ucfirst((string) $parameter->value);
+				$setterMethod = 'set' . ucfirst((string)$parameter->value);
 				$view->$setterMethod($insertableValue ?? $value);
 			}
 
@@ -483,14 +483,14 @@ class ViewService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 		foreach ($views as $view) {
-			$filteredSortingRules = array_filter($view->getSortArray(), static fn(array $sort) => $sort['columnId'] !== $columnId);
+			$filteredSortingRules = array_filter($view->getSortArray(), static fn (array $sort) => $sort['columnId'] !== $columnId);
 			$filteredSortingRules = array_values($filteredSortingRules);
 
 			$applicableFilterArray = $this->removeColumnFromFilters($view->getFilterArray(), $columnId);
 
 			$applicableViewColumnInformationRecords = array_filter(
 				$view->getColumnsSettingsArray(),
-				static fn(ViewColumnInformation $viewColumnInformation): bool => $viewColumnInformation->getId() !== $columnId
+				static fn (ViewColumnInformation $viewColumnInformation): bool => $viewColumnInformation->getId() !== $columnId
 			);
 
 			$viewUpdateInput = new ViewUpdateInput(

@@ -20,7 +20,10 @@ use Psr\Log\LoggerInterface;
 class ShareMapper extends QBMapper {
 	protected string $table = 'tables_shares';
 
-	public function __construct(protected LoggerInterface $logger, IDBConnection $db) {
+	public function __construct(
+		protected LoggerInterface $logger,
+		IDBConnection $db,
+	) {
 		parent::__construct($db, $this->table, Share::class);
 	}
 

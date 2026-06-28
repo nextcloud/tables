@@ -16,9 +16,10 @@ use OCP\Migration\SimpleMigrationStep;
 use Override;
 
 class Version1000Date20260324000000 extends SimpleMigrationStep {
-	public function __construct(private readonly IDBConnection $connection)
-    {
-    }
+	public function __construct(
+		private readonly IDBConnection $connection,
+	) {
+	}
 
 	#[Override]
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {

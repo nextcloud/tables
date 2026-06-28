@@ -18,9 +18,11 @@ use Psr\Log\LoggerInterface;
  * @template-implements IEventListener<Event|BeforeUserDeletedEvent>
  */
 class UserDeletedListener implements IEventListener {
-	public function __construct(private readonly TableService $tableService, private readonly LoggerInterface $logger)
-    {
-    }
+	public function __construct(
+		private readonly TableService $tableService,
+		private readonly LoggerInterface $logger,
+	) {
+	}
 
 	public function handle(Event $event): void {
 		if (!($event instanceof BeforeUserDeletedEvent)) {

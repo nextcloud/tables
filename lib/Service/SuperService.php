@@ -12,9 +12,12 @@ use Psr\Log\LoggerInterface;
 class SuperService {
 	protected bool $isPublicContext = false;
 
-	public function __construct(protected LoggerInterface $logger, protected ?string $userId, protected PermissionsService $permissionsService)
-    {
-    }
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected ?string $userId,
+		protected PermissionsService $permissionsService,
+	) {
+	}
 
 	public function setPublicContext(): void {
 		$this->userId = '';

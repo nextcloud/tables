@@ -43,9 +43,18 @@ class PermissionsService {
 	/** @var array<string, int|null> Per-request context permissions keyed by node and user. */
 	private array $contextPermissionsByNode = [];
 
-	public function __construct(protected LoggerInterface $logger, protected ?string $userId, private readonly TableMapper $tableMapper, private readonly ViewMapper $viewMapper, private readonly ShareMapper $shareMapper, private readonly ContextMapper $contextMapper, private readonly UserHelper $userHelper, private readonly CircleHelper $circleHelper, protected bool $isCli)
-    {
-    }
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected ?string $userId,
+		private readonly TableMapper $tableMapper,
+		private readonly ViewMapper $viewMapper,
+		private readonly ShareMapper $shareMapper,
+		private readonly ContextMapper $contextMapper,
+		private readonly UserHelper $userHelper,
+		private readonly CircleHelper $circleHelper,
+		protected bool $isCLI,
+	) {
+	}
 
 	/**
 	 * @param string|null $userId
@@ -66,7 +75,7 @@ class PermissionsService {
 			throw new InternalError($error);
 		}
 
-		if ($userId === '' && !$this->isCli && !$canBeEmpty) {
+		if ($userId === '' && !$this->isCLI && !$canBeEmpty) {
 			$error = 'Try to set no user in context, but request is not allowed.';
 			$this->logger->warning($error);
 			throw new InternalError($error);
@@ -461,31 +470,31 @@ class PermissionsService {
 			// be fetched specifically.
 
 			$manage = (
-				array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionManage()), false)
+				array_reduce($shares, static fn (bool $carry, Share $share): bool => $carry || ($share->getPermissionManage()), false)
 				|| ($table && $this->canManageTable($table, $userId))
 			);
 
 			$create = (
 				$manage
-				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionCreate()), false)
+				|| array_reduce($shares, static fn (bool $carry, Share $share): bool => $carry || ($share->getPermissionCreate()), false)
 				|| ($table && $this->canCreateRows($table, 'table', $userId))
 			);
 
 			$update = (
 				$manage
-				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionUpdate()), false)
+				|| array_reduce($shares, static fn (bool $carry, Share $share): bool => $carry || ($share->getPermissionUpdate()), false)
 				|| ($table && $this->canUpdateTable($table, $userId))
 			);
 
 			$delete = (
 				$manage
-				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionDelete()), false)
+				|| array_reduce($shares, static fn (bool $carry, Share $share): bool => $carry || ($share->getPermissionDelete()), false)
 				|| ($table && $this->canDeleteRowsByTableId($table->getId(), $userId))
 			);
 
 			$read = (
 				$manage || $update || $delete
-				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionRead()), false)
+				|| array_reduce($shares, static fn (bool $carry, Share $share): bool => $carry || ($share->getPermissionRead()), false)
 				|| ($table && $this->canReadTable($table, $userId))
 			);
 
@@ -680,7 +689,7 @@ class PermissionsService {
 		}
 
 		if ($userId === '') {
-			return $this->isCli || $this->isPublicContext;
+			return $this->isCLI || $this->isPublicContext;
 		}
 
 		if ($this->userIsElementOwner($element, $userId, $nodeType)) {

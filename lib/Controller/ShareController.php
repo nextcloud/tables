@@ -27,7 +27,8 @@ class ShareController extends Controller {
 		protected LoggerInterface $logger,
 		private ShareService $service,
 		private ShareManager $shareManager,
-		private string $userId) {
+		private string $userId,
+	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
@@ -60,7 +61,7 @@ class ShareController extends Controller {
 
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
-		return $this->handleError(fn() => $this->service->formatForOutput($this->service->find($id)));
+		return $this->handleError(fn () => $this->service->formatForOutput($this->service->find($id)));
 	}
 
 	#[NoAdminRequired]
@@ -87,12 +88,12 @@ class ShareController extends Controller {
 			$password, $shareTokenObject,
 		);
 
-		return $this->handleError(fn() => $this->service->create($dto));
+		return $this->handleError(fn () => $this->service->create($dto));
 	}
 
 	#[NoAdminRequired]
 	public function updatePermission(int $id, string $permission, bool $value): DataResponse {
-		return $this->handleError(fn() => $this->service->updatePermission($id, [$permission => $value]));
+		return $this->handleError(fn () => $this->service->updatePermission($id, [$permission => $value]));
 	}
 
 	#[NoAdminRequired]
@@ -103,12 +104,12 @@ class ShareController extends Controller {
 		bool $permissionUpdate = false,
 		bool $permissionDelete = false,
 	): DataResponse {
-		return $this->handleError(fn() => $this->service->updatePermission($id, [
-				'read' => $permissionRead,
-				'create' => $permissionCreate,
-				'update' => $permissionUpdate && $permissionRead,
-				'delete' => $permissionDelete && $permissionRead,
-			]));
+		return $this->handleError(fn () => $this->service->updatePermission($id, [
+			'read' => $permissionRead,
+			'create' => $permissionCreate,
+			'update' => $permissionUpdate && $permissionRead,
+			'delete' => $permissionDelete && $permissionRead,
+		]));
 	}
 
 	/**
@@ -132,6 +133,6 @@ class ShareController extends Controller {
 
 	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
-		return $this->handleError(fn() => $this->service->delete($id));
+		return $this->handleError(fn () => $this->service->delete($id));
 	}
 }

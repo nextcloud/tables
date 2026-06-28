@@ -16,9 +16,10 @@ use Psr\Log\LoggerInterface;
 class SuperColumnQB implements IColumnTypeQB {
 	protected int $platform;
 
-	public function __construct(protected LoggerInterface $logger)
-    {
-    }
+	public function __construct(
+		protected LoggerInterface $logger,
+	) {
+	}
 
 	public function setPlatform(int $platform): void {
 		$this->platform = $platform;
@@ -61,17 +62,17 @@ class SuperColumnQB implements IColumnTypeQB {
 	 */
 	private function sqlFilterOperation(string $operator, string $formattedCellValue, string $searchValuePlaceHolder) : string {
 		return match ($operator) {
-            'begins-with', 'ends-with', 'contains' => $formattedCellValue . ' LIKE :' . $searchValuePlaceHolder,
-            'does-not-contain' => $formattedCellValue . ' NOT LIKE :' . $searchValuePlaceHolder,
-            'is-equal' => $formattedCellValue . ' = :' . $searchValuePlaceHolder,
-            'is-not-equal' => $formattedCellValue . ' != :' . $searchValuePlaceHolder,
-            'is-greater-than' => $formattedCellValue . ' > :' . $searchValuePlaceHolder,
-            'is-greater-than-or-equal' => $formattedCellValue . ' >= :' . $searchValuePlaceHolder,
-            'is-lower-than' => $formattedCellValue . ' < :' . $searchValuePlaceHolder,
-            'is-lower-than-or-equal' => $formattedCellValue . ' <= :' . $searchValuePlaceHolder,
-            'is-empty' => $formattedCellValue . ' = \'\' OR ' . $formattedCellValue . ' IS NULL',
-            default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
-        };
+			'begins-with', 'ends-with', 'contains' => $formattedCellValue . ' LIKE :' . $searchValuePlaceHolder,
+			'does-not-contain' => $formattedCellValue . ' NOT LIKE :' . $searchValuePlaceHolder,
+			'is-equal' => $formattedCellValue . ' = :' . $searchValuePlaceHolder,
+			'is-not-equal' => $formattedCellValue . ' != :' . $searchValuePlaceHolder,
+			'is-greater-than' => $formattedCellValue . ' > :' . $searchValuePlaceHolder,
+			'is-greater-than-or-equal' => $formattedCellValue . ' >= :' . $searchValuePlaceHolder,
+			'is-lower-than' => $formattedCellValue . ' < :' . $searchValuePlaceHolder,
+			'is-lower-than-or-equal' => $formattedCellValue . ' <= :' . $searchValuePlaceHolder,
+			'is-empty' => $formattedCellValue . ' = \'\' OR ' . $formattedCellValue . ' IS NULL',
+			default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
+		};
 	}
 
 	private function getFormattedDataCellValue(string $columnPlaceHolder, int $columnId): string {
@@ -93,13 +94,13 @@ class SuperColumnQB implements IColumnTypeQB {
 	 */
 	public static function getMetaColumnName(int $metaId): string {
 		return match ($metaId) {
-            Column::TYPE_META_ID => 'id',
-            Column::TYPE_META_CREATED_BY => 'created_by',
-            Column::TYPE_META_UPDATED_BY => 'last_edit_by',
-            Column::TYPE_META_CREATED_AT => 'created_at',
-            Column::TYPE_META_UPDATED_AT => 'last_edit_at',
-            default => throw new InternalError('No meta data column exists with id ' . $metaId),
-        };
+			Column::TYPE_META_ID => 'id',
+			Column::TYPE_META_CREATED_BY => 'created_by',
+			Column::TYPE_META_UPDATED_BY => 'last_edit_by',
+			Column::TYPE_META_CREATED_AT => 'created_at',
+			Column::TYPE_META_UPDATED_AT => 'last_edit_at',
+			default => throw new InternalError('No meta data column exists with id ' . $metaId),
+		};
 	}
 
 	/**

@@ -15,9 +15,12 @@ use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
 class UserHelper {
-	public function __construct(private readonly IUserManager $userManager, private readonly LoggerInterface $logger, private readonly IGroupManager $groupManager)
-    {
-    }
+	public function __construct(
+		private readonly IUserManager $userManager,
+		private readonly LoggerInterface $logger,
+		private readonly IGroupManager $groupManager,
+	) {
+	}
 
 	public function getUserDisplayName(string $userId): string {
 		try {
@@ -61,7 +64,7 @@ class UserHelper {
 			return null;
 		}
 
-		$groupArray = array_map(fn(IGroup $group) => $group->getGID(), $userGroups);
+		$groupArray = array_map(fn (IGroup $group) => $group->getGID(), $userGroups);
 		return $groupArray;
 	}
 }

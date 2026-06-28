@@ -70,7 +70,7 @@ class ActivityManager {
 
 		if ($previousEntity !== null) {
 			foreach ($entity->getUpdatedFields() as $field => $value) {
-				$getter = 'get' . ucfirst((string) $field);
+				$getter = 'get' . ucfirst((string)$field);
 				$subjectComplete = $subject . '_' . $field;
 				$changes = [
 					'before' => $previousEntity->$getter(),

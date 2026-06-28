@@ -313,7 +313,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	}
 
 	public function getCustomSettingsArray(): array {
-		return json_decode((string) $this->customSettings, true) ?: [];
+		return json_decode((string)$this->customSettings, true) ?: [];
 	}
 
 	/**

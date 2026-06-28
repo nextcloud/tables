@@ -14,7 +14,10 @@ use OCP\Collaboration\Reference\IReferenceProvider;
 class ContentReferenceProvider implements IReferenceProvider {
 	private readonly ReferenceManager $referenceManager;
 
-	public function __construct(private readonly ContentReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
+	public function __construct(
+		private readonly ContentReferenceHelper $referenceHelper,
+		ReferenceManager $referenceManager,
+	) {
 		$this->referenceManager = $referenceManager;
 	}
 

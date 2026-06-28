@@ -19,7 +19,10 @@ use Psr\Log\LoggerInterface;
 class RowSleeveMapper extends QBMapper {
 	protected string $table = 'tables_row_sleeves';
 
-	public function __construct(IDBConnection $db, protected LoggerInterface $logger) {
+	public function __construct(
+		IDBConnection $db,
+		protected LoggerInterface $logger,
+	) {
 		parent::__construct($db, $this->table, RowSleeve::class);
 	}
 

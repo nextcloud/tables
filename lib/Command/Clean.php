@@ -36,7 +36,13 @@ class Clean extends Command {
 
 	private OutputInterface $output;
 
-	public function __construct(protected LoggerInterface $logger, protected ColumnService $columnService, protected RowService $rowService, protected TableService $tableService, protected Row2Mapper $rowMapper) {
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected ColumnService $columnService,
+		protected RowService $rowService,
+		protected TableService $tableService,
+		protected Row2Mapper $rowMapper,
+	) {
 		parent::__construct();
 	}
 

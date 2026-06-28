@@ -42,7 +42,7 @@ class RelationService {
 		// Check table permissions through ColumnService
 		$columns = $this->columnService->findAllByTable($tableId);
 
-		$relationColumns = array_filter($columns, fn($column) => $column->getType() === Column::TYPE_RELATION);
+		$relationColumns = array_filter($columns, fn ($column) => $column->getType() === Column::TYPE_RELATION);
 
 		return $this->getRelationsForColumns($relationColumns);
 	}
@@ -60,7 +60,7 @@ class RelationService {
 		// Check view permissions through ColumnService
 		$columns = $this->columnService->findAllByView($viewId);
 
-		$relationColumns = array_filter($columns, fn($column) => $column->getType() === Column::TYPE_RELATION);
+		$relationColumns = array_filter($columns, fn ($column) => $column->getType() === Column::TYPE_RELATION);
 
 		return $this->getRelationsForColumns($relationColumns);
 	}
@@ -190,7 +190,7 @@ class RelationService {
 		$result = [];
 		foreach ($rows as $row) {
 			$data = $row->getData();
-			$displayFieldData = array_filter($data, fn($item) => $item['columnId'] === (int)$settings[Column::RELATION_LABEL_COLUMN]);
+			$displayFieldData = array_filter($data, fn ($item) => $item['columnId'] === (int)$settings[Column::RELATION_LABEL_COLUMN]);
 			$value = reset($displayFieldData)['value'] ?? null;
 
 			// Structure compatible with Row2 format: {id: int, label: string}

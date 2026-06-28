@@ -23,9 +23,16 @@ use Throwable;
 
 class NewDbStructureRepairStep implements IRepairStep {
 
-	public function __construct(protected LoggerInterface $logger, protected TableService $tableService, protected ColumnService $columnService, protected LegacyRowMapper $legacyRowMapper, protected Row2Mapper $rowMapper, protected IConfig $config, private readonly \OCP\IAppConfig $appConfig)
-    {
-    }
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected TableService $tableService,
+		protected ColumnService $columnService,
+		protected LegacyRowMapper $legacyRowMapper,
+		protected Row2Mapper $rowMapper,
+		protected IConfig $config,
+		private readonly \OCP\IAppConfig $appConfig,
+	) {
+	}
 
 	/**
 	 * Returns the step's name

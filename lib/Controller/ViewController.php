@@ -32,31 +32,32 @@ class ViewController extends Controller {
 		private ViewService $service,
 		private ViewMapper $mapper,
 		private TableService $tableService,
-		private string $userId) {
+		private string $userId,
+	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
-		return $this->handleError(fn() => $this->service->findAll($this->getTable($tableId), $this->userId));
+		return $this->handleError(fn () => $this->service->findAll($this->getTable($tableId), $this->userId));
 	}
 
 	#[NoAdminRequired]
 	public function indexSharedWithMe(): DataResponse {
-		return $this->handleError(fn() => $this->service->findSharedViewsWithMe($this->userId));
+		return $this->handleError(fn () => $this->service->findSharedViewsWithMe($this->userId));
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function show(int $id): DataResponse {
-		return $this->handleError(fn() => $this->service->find($id));
+		return $this->handleError(fn () => $this->service->find($id));
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function create(int $tableId, string $title, ?string $emoji): DataResponse {
-		return $this->handleError(fn() => $this->service->create($title, $emoji, $this->getTable($tableId, true)));
+		return $this->handleError(fn () => $this->service->create($title, $emoji, $this->getTable($tableId, true)));
 	}
 
 	#[NoAdminRequired]
@@ -71,7 +72,7 @@ class ViewController extends Controller {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function destroy(int $id): DataResponse {
-		return $this->handleError(fn() => $this->service->delete($id));
+		return $this->handleError(fn () => $this->service->delete($id));
 	}
 
 	/**

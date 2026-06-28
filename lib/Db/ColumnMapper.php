@@ -21,7 +21,10 @@ class ColumnMapper extends QBMapper {
 	protected string $table = 'tables_columns';
 	private readonly CappedMemoryCache $cacheColumn;
 
-	public function __construct(IDBConnection $db, private readonly LoggerInterface $logger) {
+	public function __construct(
+		IDBConnection $db,
+		private readonly LoggerInterface $logger,
+	) {
 		parent::__construct($db, $this->table, Column::class);
 		$this->cacheColumn = new CappedMemoryCache();
 	}

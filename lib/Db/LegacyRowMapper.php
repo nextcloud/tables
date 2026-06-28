@@ -85,7 +85,7 @@ class LegacyRowMapper extends QBMapper {
 	private function buildFilterByColumnType($qb, array $filter, string $filterId): ?IQueryFunction {
 		try {
 			$columnQbClassName = 'OCA\Tables\Db\ColumnTypes\\';
-			$type = explode('-', (string) $filter['columnType'])[0];
+			$type = explode('-', (string)$filter['columnType'])[0];
 
 			$columnQbClassName .= ucfirst($type) . 'ColumnQB';
 
@@ -297,7 +297,7 @@ class LegacyRowMapper extends QBMapper {
 		}
 		$rows = $this->findEntities($qb);
 		foreach ($rows as &$row) {
-			$row->setDataArray(array_filter($row->getDataArray(), fn($item) => in_array($item['columnId'], $view->getColumnIds())));
+			$row->setDataArray(array_filter($row->getDataArray(), fn ($item) => in_array($item['columnId'], $view->getColumnIds())));
 		}
 		return $rows;
 	}
@@ -405,7 +405,7 @@ class LegacyRowMapper extends QBMapper {
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$row = $this->findEntity($qb);
 
-		$row->setDataArray(array_filter($row->getDataArray(), fn($item) => in_array($item['columnId'], $view->getColumnIds())));
+		$row->setDataArray(array_filter($row->getDataArray(), fn ($item) => in_array($item['columnId'], $view->getColumnIds())));
 
 		return $row;
 	}

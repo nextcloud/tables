@@ -21,7 +21,7 @@ class FixContextsDefaults implements IRepairStep {
 	public function __construct(
 		protected IConfig $config,
 		protected IDBConnection $dbc,
-        private readonly \OCP\IAppConfig $appConfig,
+		private readonly \OCP\IAppConfig $appConfig,
 	) {
 	}
 

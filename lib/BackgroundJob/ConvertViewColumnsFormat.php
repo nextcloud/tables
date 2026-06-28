@@ -67,7 +67,7 @@ class ConvertViewColumnsFormat extends TimedJob {
 		}
 
 		// Parse existing columns JSON
-		$columns = json_decode((string) $view['columns'], true);
+		$columns = json_decode((string)$view['columns'], true);
 		if (!is_array($columns)) {
 			return;
 		}
