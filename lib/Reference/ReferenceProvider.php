@@ -18,7 +18,12 @@ use OCP\IURLGenerator;
 class ReferenceProvider extends ADiscoverableReferenceProvider implements ISearchableReferenceProvider {
 	private readonly ReferenceManager $referenceManager;
 
-	public function __construct(private readonly IL10N $l10n, private readonly IURLGenerator $urlGenerator, private readonly ReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
+	public function __construct(
+		private readonly IL10N $l10n,
+		private readonly IURLGenerator $urlGenerator,
+		private readonly ReferenceHelper $referenceHelper,
+		ReferenceManager $referenceManager,
+	) {
 		$this->referenceManager = $referenceManager;
 	}
 

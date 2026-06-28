@@ -38,7 +38,13 @@ class CleanLegacy extends Command {
 
 	private OutputInterface $output;
 
-	public function __construct(protected LoggerInterface $logger, protected ColumnService $columnService, protected RowService $rowService, protected TableService $tableService, protected LegacyRowMapper $rowMapper) {
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected ColumnService $columnService,
+		protected RowService $rowService,
+		protected TableService $tableService,
+		protected LegacyRowMapper $rowMapper,
+	) {
 		parent::__construct();
 	}
 
@@ -119,9 +125,9 @@ class CleanLegacy extends Command {
 			if (is_array($date->value)) {
 				$date->value = json_encode($date->value);
 			}
-			$suffix = strlen((string) $date->value) > $this->truncateLength ? '...': '';
+			$suffix = strlen((string)$date->value) > $this->truncateLength ? '...': '';
 			$this->print('');
-			$this->print('columnId: ' . $date->columnId . ' -> ' . substr((string) $date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
+			$this->print('columnId: ' . $date->columnId . ' -> ' . substr((string)$date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
 
 			try {
 				$this->columnService->find($date->columnId, '');

@@ -206,7 +206,7 @@ class ImportService extends SuperService {
 					'numberPrefix' => $this->rawColumnDataTypes[$colIndex]['number_prefix'] ?? '',
 					'numberSuffix' => $this->rawColumnDataTypes[$colIndex]['number_suffix'] ?? '',
 				];
-				if (mb_strtolower((string) $title) === Column::META_ID_TITLE) {
+				if (mb_strtolower((string)$title) === Column::META_ID_TITLE) {
 					$column['id'] = Column::TYPE_META_ID;
 				}
 
@@ -749,7 +749,7 @@ class ImportService extends SuperService {
 				$dataType = $this->parseColumnDataType($secondRowCellIterator->current());
 				$shouldImport = true;
 
-				if (!$this->columnsConfig && mb_strtolower((string) $title) === Column::META_ID_TITLE) {
+				if (!$this->columnsConfig && mb_strtolower((string)$title) === Column::META_ID_TITLE) {
 					$this->idColumnIndex = $index;
 				} elseif (isset($this->columnsConfig[$index])) {
 					if ($this->columnsConfig[$index]['action'] === 'ignore') {

@@ -228,7 +228,7 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 		if ($reflection->hasProperty('table')) {
 			$tableProperty = $reflection->getProperty('table');
 			if (PHP_VERSION_ID < 80200) {
-            }
+			}
 
 			// Create instance to get table name
 			$instance = $reflection->newInstanceWithoutConstructor();
@@ -246,7 +246,7 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 			if ($mapperReflection->hasProperty('table')) {
 				$tableProperty = $mapperReflection->getProperty('table');
 				if (PHP_VERSION_ID < 80200) {
-                }
+				}
 
 				// Create mapper instance to get table name
 				$mapperInstance = $mapperReflection->newInstanceWithoutConstructor();

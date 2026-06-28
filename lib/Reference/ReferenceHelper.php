@@ -29,7 +29,8 @@ class ReferenceHelper {
 	protected const RICH_OBJECT_TYPE = Application::APP_ID . '_link';
 	protected LinkReferenceProvider $linkReferenceProvider;
 
-	public function __construct(protected IURLGenerator $urlGenerator,
+	public function __construct(
+		protected IURLGenerator $urlGenerator,
 		protected ViewService $viewService,
 		protected TableService $tableService,
 		protected ColumnService $columnService,
@@ -37,7 +38,8 @@ class ReferenceHelper {
 		LinkReferenceProvider $linkReferenceProvider,
 		protected ?string $userId,
 		protected IConfig $config,
-		protected LoggerInterface $logger) {
+		protected LoggerInterface $logger,
+	) {
 		$this->linkReferenceProvider = $linkReferenceProvider;
 	}
 

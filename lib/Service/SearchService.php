@@ -14,7 +14,14 @@ use Psr\Log\LoggerInterface;
 
 class SearchService extends SuperService {
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId, private readonly RowService $rowService, private readonly TableService $tableService, private readonly ViewService $viewService) {
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		private readonly RowService $rowService,
+		private readonly TableService $tableService,
+		private readonly ViewService $viewService,
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
 

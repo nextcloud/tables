@@ -32,9 +32,16 @@ class Row2Mapper {
 
 	private const DB_CHUNK_SIZE = 1_000;
 
-	public function __construct(private ?string $userId, private IDBConnection $db, private LoggerInterface $logger, protected UserHelper $userHelper, private RowSleeveMapper $rowSleeveMapper, private ColumnsHelper $columnsHelper, protected ColumnMapper $columnMapper)
-    {
-    }
+	public function __construct(
+		private ?string $userId,
+		private IDBConnection $db,
+		private LoggerInterface $logger,
+		protected UserHelper $userHelper,
+		private RowSleeveMapper $rowSleeveMapper,
+		private ColumnsHelper $columnsHelper,
+		protected ColumnMapper $columnMapper,
+	) {
+	}
 
 	/**
 	 * @param Row2 $row
@@ -335,7 +342,7 @@ class Row2Mapper {
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
-				if (str_starts_with((string) $filter['value'], '@')) {
+				if (str_starts_with((string)$filter['value'], '@')) {
 					$columnId = (int)($filter['columnId'] ?? 0);
 					$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
 					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId, $column);
@@ -426,11 +433,11 @@ class Row2Mapper {
 
 		switch ($operator) {
 			case 'begins-with':
-				$includeDefault = str_starts_with((string)($defaultValue ?? ''), (string) $value);
+				$includeDefault = str_starts_with((string)($defaultValue ?? ''), (string)$value);
 				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'ends-with':
-				$includeDefault = str_ends_with((string)($defaultValue ?? ''), (string) $value);
+				$includeDefault = str_ends_with((string)($defaultValue ?? ''), (string)$value);
 				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
 				break;
 			case 'contains':
@@ -458,7 +465,7 @@ class Row2Mapper {
 					break;
 				}
 
-				$includeDefault = str_contains((string)($defaultValue ?? ''), (string) $value);
+				$includeDefault = str_contains((string)($defaultValue ?? ''), (string)$value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->orX(
@@ -503,7 +510,7 @@ class Row2Mapper {
 							$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
 						);
 				}
-				$includeDefault = !str_contains((string)($defaultValue ?? ''), (string) $value);
+				$includeDefault = !str_contains((string)($defaultValue ?? ''), (string)$value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->andX(
@@ -584,13 +591,13 @@ class Row2Mapper {
 		$qb2->from('tables_row_sleeves');
 
 		match ($columnId) {
-            Column::TYPE_META_ID => $qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT)),
-            Column::TYPE_META_CREATED_BY => $qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR)),
-            Column::TYPE_META_CREATED_AT => $qb2->where($this->getSqlOperator($operator, $qb, 'created_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE)),
-            Column::TYPE_META_UPDATED_BY => $qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR)),
-            Column::TYPE_META_UPDATED_AT => $qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE)),
-            default => $qb2,
-        };
+			Column::TYPE_META_ID => $qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT)),
+			Column::TYPE_META_CREATED_BY => $qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR)),
+			Column::TYPE_META_CREATED_AT => $qb2->where($this->getSqlOperator($operator, $qb, 'created_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE)),
+			Column::TYPE_META_UPDATED_BY => $qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR)),
+			Column::TYPE_META_UPDATED_AT => $qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE)),
+			default => $qb2,
+		};
 		return $qb2;
 	}
 
@@ -605,19 +612,19 @@ class Row2Mapper {
 	 */
 	private function getSqlOperator(string $operator, IQueryBuilder $qb, string $columnName, $value, $paramType): string {
 		return match ($operator) {
-            'begins-with' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType)),
-            'ends-with' => $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType)),
-            'contains' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
-            'does-not-contain' => $qb->expr()->notLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
-            'is-equal' => $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType)),
-            'is-not-equal' => $qb->expr()->neq($columnName, $qb->createNamedParameter($value, $paramType)),
-            'is-greater-than' => $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType)),
-            'is-greater-than-or-equal' => $qb->expr()->gte($columnName, $qb->createNamedParameter($value, $paramType)),
-            'is-lower-than' => $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType)),
-            'is-lower-than-or-equal' => $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType)),
-            'is-empty' => $qb->expr()->isNull($columnName),
-            default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
-        };
+			'begins-with' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType)),
+			'ends-with' => $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType)),
+			'contains' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
+			'does-not-contain' => $qb->expr()->notLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
+			'is-equal' => $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType)),
+			'is-not-equal' => $qb->expr()->neq($columnName, $qb->createNamedParameter($value, $paramType)),
+			'is-greater-than' => $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType)),
+			'is-greater-than-or-equal' => $qb->expr()->gte($columnName, $qb->createNamedParameter($value, $paramType)),
+			'is-lower-than' => $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType)),
+			'is-lower-than-or-equal' => $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType)),
+			'is-empty' => $qb->expr()->isNull($columnName),
+			default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
+		};
 	}
 
 	/**
@@ -951,13 +958,13 @@ class Row2Mapper {
 	private function getFormattedDefaultValue(Column $column) {
 		$defaultValue = null;
 		$defaultValue = match ($column->getType()) {
-            Column::TYPE_SELECTION => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getSelectionDefault()),
-            Column::TYPE_DATETIME => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getDatetimeDefault()),
-            Column::TYPE_NUMBER => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault()),
-            Column::TYPE_TEXT => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault()),
-            Column::TYPE_USERGROUP => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault()),
-            default => $defaultValue,
-        };
+			Column::TYPE_SELECTION => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getSelectionDefault()),
+			Column::TYPE_DATETIME => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getDatetimeDefault()),
+			Column::TYPE_NUMBER => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault()),
+			Column::TYPE_TEXT => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault()),
+			Column::TYPE_USERGROUP => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault()),
+			default => $defaultValue,
+		};
 		return $defaultValue;
 	}
 

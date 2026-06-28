@@ -24,7 +24,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TransferLegacyRows extends Command {
-	public function __construct(protected TableService $tableService, protected LoggerInterface $logger, protected LegacyRowMapper $legacyRowMapper, protected Row2Mapper $rowMapper, protected ColumnService $columnService) {
+	public function __construct(
+		protected TableService $tableService,
+		protected LoggerInterface $logger,
+		protected LegacyRowMapper $legacyRowMapper,
+		protected Row2Mapper $rowMapper,
+		protected ColumnService $columnService,
+	) {
 		parent::__construct();
 	}
 

@@ -21,12 +21,13 @@ class TableTemplateController extends Controller {
 	public function __construct(
 		IRequest $request,
 		protected LoggerInterface $logger,
-		private TableTemplateService $service) {
+		private TableTemplateService $service,
+	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
 	#[NoAdminRequired]
 	public function list(): DataResponse {
-		return $this->handleError(fn() => $this->service->getTemplateList());
+		return $this->handleError(fn () => $this->service->getTemplateList());
 	}
 }

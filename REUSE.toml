@@ -30,6 +30,12 @@ SPDX-FileCopyrightText = "2025 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
+path = ["vendor-bin/rector/composer.json", "vendor-bin/rector/composer.lock"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
 path = ["img/app-dark.svg", "img/app.svg", "img/view.svg", "img/view-dark.svg", "img/material/*.svg"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2018-2024 Google LLC"

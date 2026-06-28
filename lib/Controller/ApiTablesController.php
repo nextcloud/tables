@@ -50,7 +50,8 @@ class ApiTablesController extends AOCSController {
 		private readonly IAppManager $appManager,
 		private readonly IDBConnection $db,
 		private readonly StructureService $structureService,
-		string $userId) {
+		string $userId,
+	) {
 		parent::__construct($request, $logger, $n, $userId);
 	}
 
@@ -226,7 +227,7 @@ class ApiTablesController extends AOCSController {
 					}, $view['columnSettings']);
 					$inputColumnsArray['columnSettings'] = $newColumns;
 				} else {
-					$newColumns = array_map(static fn(int $colId): int => $colId > 0 ? $colMap[$colId] : $colId, $view['columns']);
+					$newColumns = array_map(static fn (int $colId): int => $colId > 0 ? $colMap[$colId] : $colId, $view['columns']);
 					$inputColumnsArray['columns'] = $newColumns;
 				}
 
@@ -237,12 +238,12 @@ class ApiTablesController extends AOCSController {
 					return $sort;
 				}, $view['sort']);
 
-				$newFilter = array_map(static fn(array $filters): array => array_map(static function (array $filter) use ($colMap): array {
-						if ($filter['columnId'] > 0) {
-							$filter['columnId'] = $colMap[$filter['columnId']];
-						}
-						return $filter;
-					}, $filters), $view['filter']);
+				$newFilter = array_map(static fn (array $filters): array => array_map(static function (array $filter) use ($colMap): array {
+					if ($filter['columnId'] > 0) {
+						$filter['columnId'] = $colMap[$filter['columnId']];
+					}
+					return $filter;
+				}, $filters), $view['filter']);
 
 				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray(
 					array_merge($inputColumnsArray, [

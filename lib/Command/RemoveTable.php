@@ -18,7 +18,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class RemoveTable extends Command {
-	public function __construct(protected TableService $tableService, protected LoggerInterface $logger) {
+	public function __construct(
+		protected TableService $tableService,
+		protected LoggerInterface $logger,
+	) {
 		parent::__construct();
 	}
 

@@ -14,9 +14,12 @@ use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
 class UserHelper {
-	public function __construct(private readonly IUserManager $userManager, private readonly LoggerInterface $logger, private readonly IGroupManager $groupManager)
-    {
-    }
+	public function __construct(
+		private readonly IUserManager $userManager,
+		private readonly LoggerInterface $logger,
+		private readonly IGroupManager $groupManager,
+	) {
+	}
 
 	public function getUserDisplayName(string $userId): string {
 		try {

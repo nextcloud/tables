@@ -48,13 +48,13 @@ class ShowContext extends Base {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$contextId = trim((string) $input->getArgument('context-id'));
+		$contextId = trim((string)$input->getArgument('context-id'));
 		if ($contextId === '' || !is_numeric($contextId)) {
 			$output->writeln('<error>Invalid Context ID</error>');
 			return 1;
 		}
 
-		$userId = trim((string) $input->getArgument('user-id'));
+		$userId = trim((string)$input->getArgument('user-id'));
 		if ($userId === '') {
 			$userId = null;
 		}

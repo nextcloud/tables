@@ -103,7 +103,7 @@ class CircleHelper {
 			return null;
 		}
 
-		$circleIds = array_map(fn(Circle $circle) => $circle->getSingleId(), $this->getUserCircles($userId));
+		$circleIds = array_map(fn (Circle $circle) => $circle->getSingleId(), $this->getUserCircles($userId));
 		return $circleIds;
 	}
 

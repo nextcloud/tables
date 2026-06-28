@@ -23,13 +23,14 @@ class SearchController extends Controller {
 		IRequest $request,
 		private LoggerInterface $logger,
 		private SearchService $service,
-		private string $userId) {
+		private string $userId,
+	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
 	#[NoAdminRequired]
 	public function all(string $term = ''): DataResponse {
-		return $this->handleError(fn() => $this->service->all($term));
+		return $this->handleError(fn () => $this->service->all($term));
 	}
 
 }

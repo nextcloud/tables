@@ -493,9 +493,9 @@ class TableTemplateService {
 	 * @return list<array{columnId: int, order: int}>
 	 */
 	private function columnsToInputArray(array $columns): array {
-		$columns = array_filter($columns, static fn($item) => $item instanceof Column);
+		$columns = array_filter($columns, static fn ($item) => $item instanceof Column);
 		return array_map(
-			static fn(Column $column, int $index): array => ['columnId' => $column->getId(), 'order' => $index],
+			static fn (Column $column, int $index): array => ['columnId' => $column->getId(), 'order' => $index],
 			array_values($columns), array_keys(array_values($columns))
 		);
 	}

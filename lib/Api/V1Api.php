@@ -16,9 +16,12 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 class V1Api {
-	public function __construct(private readonly ColumnService $columnService, private readonly RowService $rowService, private ?string $userId)
-    {
-    }
+	public function __construct(
+		private readonly ColumnService $columnService,
+		private readonly RowService $rowService,
+		private ?string $userId,
+	) {
+	}
 
 	/**
 	 * @param int $nodeId

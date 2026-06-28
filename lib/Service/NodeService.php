@@ -59,7 +59,7 @@ class NodeService {
 	private function publicDataOfTable(int $id): array {
 		$table = $this->tableService->find($id, false, '');
 		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int} */
-		return array_filter($table->jsonSerialize(), static fn(string $key): bool => in_array($key, self::PUBLIC_NODE_KEYS, true), ARRAY_FILTER_USE_KEY);
+		return array_filter($table->jsonSerialize(), static fn (string $key): bool => in_array($key, self::PUBLIC_NODE_KEYS, true), ARRAY_FILTER_USE_KEY);
 	}
 
 	/**
@@ -71,6 +71,6 @@ class NodeService {
 	private function publicDataOfView(int $id): array {
 		$view = $this->viewService->find($id, false, '');
 		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int} */
-		return array_filter($view->jsonSerialize(), static fn(string $key): bool => in_array($key, self::PUBLIC_NODE_KEYS, true), ARRAY_FILTER_USE_KEY);
+		return array_filter($view->jsonSerialize(), static fn (string $key): bool => in_array($key, self::PUBLIC_NODE_KEYS, true), ARRAY_FILTER_USE_KEY);
 	}
 }

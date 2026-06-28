@@ -20,7 +20,7 @@ class DbRowSleeveSequence implements IRepairStep {
 		protected IDBConnection $db,
 		protected IConfig $config,
 		protected LoggerInterface $logger,
-        private readonly \OCP\IAppConfig $appConfig,
+		private readonly \OCP\IAppConfig $appConfig,
 	) {
 	}
 
@@ -57,7 +57,7 @@ class DbRowSleeveSequence implements IRepairStep {
 		$schema = $this->db->createSchema();
 		$sequences = $schema->getSequences();
 
-		$candidates = array_filter($sequences, fn(string $sequenceName): bool => str_contains($sequenceName, 'tables_row_sleeves'), ARRAY_FILTER_USE_KEY);
+		$candidates = array_filter($sequences, fn (string $sequenceName): bool => str_contains($sequenceName, 'tables_row_sleeves'), ARRAY_FILTER_USE_KEY);
 
 		if (count($candidates) > 1) {
 			$this->logger->error('Unexpected number of sequences, aborting.', [

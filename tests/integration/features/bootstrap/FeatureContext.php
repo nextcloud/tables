@@ -515,7 +515,7 @@ class FeatureContext implements Context {
 	private function tableNodeToCsv(TableNode $node) {
 		$resource = fopen('php://temp', 'rb+');
 		foreach ($node->getRows() as $row) {
-			$fields = array_map(fn($cell) => str_replace('{rowId}', $this->rowId, $cell), $row);
+			$fields = array_map(fn ($cell) => str_replace('{rowId}', $this->rowId, $cell), $row);
 			fputcsv($resource, $fields);
 		}
 
@@ -1398,7 +1398,7 @@ class FeatureContext implements Context {
 		$props = ['title' => $title];
 		foreach ($properties->getRows() as [$key, $value]) {
 			if ($key === 'customSettings') {
-				$value = json_decode((string) $value, true);
+				$value = json_decode((string)$value, true);
 			}
 			$props[$key] = $value;
 		}
@@ -1430,7 +1430,7 @@ class FeatureContext implements Context {
 			}
 
 			$value = match (true) {
-				$key === 'customSettings' => json_decode((string) $value, true),
+				$key === 'customSettings' => json_decode((string)$value, true),
 				$value === 'true' => true,
 				$value === 'false' => false,
 				$value === 'null' => null,
@@ -2077,7 +2077,7 @@ class FeatureContext implements Context {
 	 * @return string
 	 */
 	private function extractRequestTokenFromResponse(ResponseInterface $response): string {
-		return substr((string) preg_replace('/(.*)data-requesttoken="(.*)">(.*)/sm', '\2', $response->getBody()->getContents()), 0, 89);
+		return substr((string)preg_replace('/(.*)data-requesttoken="(.*)">(.*)/sm', '\2', $response->getBody()->getContents()), 0, 89);
 	}
 
 	/**
@@ -2353,7 +2353,7 @@ class FeatureContext implements Context {
 					Assert::assertEquals($value, $actualData['iconName']);
 					break;
 				case 'node':
-					[$strType, $alias, $strPermission] = explode(':', (string) $value);
+					[$strType, $alias, $strPermission] = explode(':', (string)$value);
 					$nodeType = $strType === 'table' ? 0 : 1;
 					$nodeId = $nodeType === 0 ? $this->tableIds[$alias] : $this->viewIds[$alias];
 					$permissions = $this->humanReadablePermissionToInt($strPermission);
@@ -2366,7 +2366,7 @@ class FeatureContext implements Context {
 					Assert::assertTrue($found);
 					break;
 				case 'page':
-					[$pageType, $contentNodesCount] = explode(':', (string) $value);
+					[$pageType, $contentNodesCount] = explode(':', (string)$value);
 					$found = false;
 					foreach ($actualData['pages'] as $actualPageData) {
 						$found = $found || ($actualPageData['type'] === $pageType
@@ -2393,7 +2393,7 @@ class FeatureContext implements Context {
 					Assert::assertNotEquals($value, $actualData['iconName']);
 					break;
 				case 'node':
-					[$strType, $alias, $strPermission] = explode(':', (string) $value);
+					[$strType, $alias, $strPermission] = explode(':', (string)$value);
 					$nodeType = $strType === 'table' ? 0 : 1;
 					$nodeId = $nodeType === 0 ? $this->tableIds[$alias] : $this->viewIds[$alias];
 					$permissions = $this->humanReadablePermissionToInt($strPermission);
@@ -2406,7 +2406,7 @@ class FeatureContext implements Context {
 					Assert::assertFalse($found);
 					break;
 				case 'page':
-					[$pageType, $contentNodesCount] = explode(':', (string) $value);
+					[$pageType, $contentNodesCount] = explode(':', (string)$value);
 					$found = false;
 					foreach ($actualData['pages'] as $actualPageData) {
 						$found = $found || ($actualPageData['type'] === $pageType
@@ -2475,7 +2475,7 @@ class FeatureContext implements Context {
 		$receivedContexts = $this->getDataFromResponse($this->response)['ocs']['data'];
 
 		$aliases = $contextAliasList === '' ? [] : explode(',', $contextAliasList);
-		$expectedContextIds = array_map(fn(string $alias) => $this->collectionManager->getByAlias('context', trim($alias))['id'], $aliases);
+		$expectedContextIds = array_map(fn (string $alias) => $this->collectionManager->getByAlias('context', trim($alias))['id'], $aliases);
 		sort($expectedContextIds);
 
 		$actualContextIds = [];

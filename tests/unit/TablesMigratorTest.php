@@ -254,11 +254,11 @@ class TablesMigratorTest extends TestCase {
 			'sort' => [['columnId' => 10, 'mode' => 'ASC']],
 		];
 
-		$importSource->method('getFileContents')->willReturnCallback(static fn(string $file): string => match ($file) {
-				'tables.json' => json_encode([$tableData]),
-				'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
-				default => json_encode([]),
-			});
+		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
+			'tables.json' => json_encode([$tableData]),
+			'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+			default => json_encode([]),
+		});
 
 		$newTable = new Table();
 		$this->tableService->method('importTable')->willReturn($newTable);
