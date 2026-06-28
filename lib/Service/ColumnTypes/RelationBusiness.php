@@ -24,9 +24,10 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	/**
 	 * @param mixed $value (array|string|null)
 	 * @param Column|null $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
+	public function parseValue($value, ?Column $column = null): string|false {
 		if (!$column) {
 			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . self::class, ['exception' => new \Exception()]);
 			return '';

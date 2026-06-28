@@ -16,9 +16,10 @@ class SelectionCheckBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		$found = in_array($value, self::PATTERN_POSITIVE, true);
 		return json_encode($found ? 'true' : 'false');
 	}

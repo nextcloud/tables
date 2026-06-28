@@ -14,9 +14,10 @@ class DatetimeTimeBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value (string|null)
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		return json_encode($this->isValidDate((string)$value, 'H:i') ? $value : '');
 	}
 

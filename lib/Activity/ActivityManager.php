@@ -81,7 +81,16 @@ class ActivityManager {
 	) {
 	}
 
-	public function triggerEvent($objectType, $object, $subject, $additionalParams = [], $author = null) {
+	/**
+	 * @param Row2|Table $object
+	 * @param \OCA\Tables\Model\ImportStats[]|null|string $additionalParams
+	 * @param (array|null)[]|null|string $author
+	 *
+	 * @psalm-param 'tables_row'|'tables_table' $objectType
+	 * @psalm-param array{importStats?: \OCA\Tables\Model\ImportStats}|null|string $additionalParams
+	 * @psalm-param array{before: array|null, after: array|null}|null|string $author
+	 */
+	public function triggerEvent(string $objectType, Table|Row2 $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
 		if ($author === null) {
 			$author = $this->userId;
 		}
@@ -97,7 +106,11 @@ class ActivityManager {
 		}
 	}
 
-	public function triggerUpdateEvents($objectType, ChangeSet $changeSet, $subject) {
+	/**
+	 * @psalm-param 'tables_table' $objectType
+	 * @psalm-param 'table_update' $subject
+	 */
+	public function triggerUpdateEvents(string $objectType, ChangeSet $changeSet, string $subject) {
 		$previousEntity = $changeSet->getBefore();
 		$entity = $changeSet->getAfter();
 		$events = [];
@@ -134,7 +147,14 @@ class ActivityManager {
 		}
 	}
 
-	private function createEvent($objectType, $object, $subject, $additionalParams = [], $author = null) {
+	/**
+	 * @psalm-param array{before?: mixed, after?: mixed} $additionalParams
+	 * @psalm-param 'tables_row'|'tables_table' $objectType
+	 * @psalm-param array{before: array|null, after: array|null}|null|string $author
+	 *
+	 * @param (array|null)[]|null|string $author
+	 */
+	private function createEvent(string $objectType, Row2|Table $object, string $subject, array $additionalParams = [], array|string|null $author = null) {
 		if ($object instanceof Table) {
 			$objectTitle = $object->getTitle();
 			$table = $object;
@@ -295,7 +315,7 @@ class ActivityManager {
 		];
 	}
 
-	private function sendToUsers(IEvent $event, $object) {
+	private function sendToUsers(IEvent $event, Row2|Table $object) {
 		// Handle share events with restricted recipients
 		$subject = $event->getSubject();
 		if (in_array($subject, [self::SUBJECT_SHARE_CREATE, self::SUBJECT_SHARE_UPDATE, self::SUBJECT_SHARE_DELETE], true)) {
@@ -539,7 +559,7 @@ class ActivityManager {
 		return $columnIds;
 	}
 
-	public function getActivitySubject($language, $subjectIdentifier, $subjectParams = [], $ownActivity = false) {
+	public function getActivitySubject(string $language, $subjectIdentifier, array $subjectParams = [], bool $ownActivity = false) {
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 		$isViewContext = $subjectParams['isViewContext'] ?? false;
 		$isViewObject = ($subjectParams['objectType'] ?? null) === self::TABLES_OBJECT_VIEW;
@@ -766,7 +786,7 @@ class ActivityManager {
 		return is_array($sharedWith) && ($sharedWith['type'] ?? null) === ShareReceiverType::LINK;
 	}
 
-	public function getActivityMessage($language, $subjectIdentifier) {
+	public function getActivityMessage(string $language, $subjectIdentifier) {
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 
 		switch ($subjectIdentifier) {
