@@ -156,13 +156,31 @@ export default {
 
 	.non-edit-mode {
 		cursor: pointer;
-		min-height: 20px;
+		display: flex;
+		align-items: center;
+		min-height: var(--default-clickable-area);
+		padding-inline:
+			calc(var(--vs-border-width, 2px) + 5px + (var(--default-grid-baseline) / 2) + 12px)
+			calc(var(--vs-border-width, 2px) + 5px + 8px);
 	}
 }
 
 :deep(.vs__dropdown-toggle) {
     border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);
     border-radius: var(--vs-border-radius);
+}
+
+:deep(.v-select.vs--open) {
+	.vs__selected {
+		max-width: 100%;
+		width: 100%;
+	}
+
+	.vs__selected ~ .vs__search {
+		position: absolute;
+		inset-inline-end: var(--default-clickable-area);
+		width: auto;
+	}
 }
 
 .edit-mode {
