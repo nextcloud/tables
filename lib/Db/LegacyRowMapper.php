@@ -36,25 +36,25 @@ class LegacyRowMapper extends QBMapper {
 
 	public function __construct(
 		IDBConnection $db,
-		private LoggerInterface $logger,
-		private TextColumnQB $textColumnQB,
-		private SelectionColumnQB $selectionColumnQB,
-		private NumberColumnQB $numberColumnQB,
-		private DatetimeColumnQB $datetimeColumnQB,
-		private SuperColumnQB $genericColumnQB,
-		private ColumnMapper $columnMapper,
-		private ColumnsHelper $columnsHelper,
-		private UserHelper $userHelper,
-		private Row2Mapper $rowMapper,
+		private readonly LoggerInterface $logger,
+		private readonly TextColumnQB $textColumnQB,
+		private readonly SelectionColumnQB $selectionColumnQB,
+		private readonly NumberColumnQB $numberColumnQB,
+		private readonly DatetimeColumnQB $datetimeColumnQB,
+		private readonly SuperColumnQB $genericColumnQB,
+		private readonly ColumnMapper $columnMapper,
+		private readonly ColumnsHelper $columnsHelper,
+		private readonly UserHelper $userHelper,
+		private readonly Row2Mapper $rowMapper,
 	) {
 		parent::__construct($db, $this->table, LegacyRow::class);
 		$this->setPlatform();
 	}
 
 	private function setPlatform() {
-		if (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'postgres')) {
+		if (str_contains(strtolower($this->db->getDatabasePlatform()::class), 'postgres')) {
 			$this->platform = IColumnTypeQB::DB_PLATFORM_PGSQL;
-		} elseif (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'sqlite')) {
+		} elseif (str_contains(strtolower($this->db->getDatabasePlatform()::class), 'sqlite')) {
 			$this->platform = IColumnTypeQB::DB_PLATFORM_SQLITE;
 		} else {
 			$this->platform = IColumnTypeQB::DB_PLATFORM_MYSQL;
@@ -85,14 +85,14 @@ class LegacyRowMapper extends QBMapper {
 	private function buildFilterByColumnType($qb, array $filter, string $filterId): ?IQueryFunction {
 		try {
 			$columnQbClassName = 'OCA\Tables\Db\ColumnTypes\\';
-			$type = explode('-', $filter['columnType'])[0];
+			$type = explode('-', (string) $filter['columnType'])[0];
 
 			$columnQbClassName .= ucfirst($type) . 'ColumnQB';
 
 			/** @var IColumnTypeQB $columnQb */
 			$columnQb = Server::get($columnQbClassName);
 			return $columnQb->addWhereFilterExpression($qb, $filter, $filterId);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
 			$this->logger->debug('Column type query builder class not found');
 		}
 		return null;
@@ -139,7 +139,7 @@ class LegacyRowMapper extends QBMapper {
 			if ($sortRule['columnId'] < 0) {
 				try {
 					$orderString = SuperColumnQB::getMetaColumnName($sortRule['columnId']);
-				} catch (InternalError $e) {
+				} catch (InternalError) {
 					return;
 				}
 			} else {
@@ -208,7 +208,7 @@ class LegacyRowMapper extends QBMapper {
 		$result = $qb->executeQuery();
 		try {
 			$ids = [];
-			while ($row = $result->fetch()) {
+			while ($row = $result->fetchAssociative()) {
 				$ids[] = $row['id'];
 			}
 			return $ids;
@@ -297,9 +297,7 @@ class LegacyRowMapper extends QBMapper {
 		}
 		$rows = $this->findEntities($qb);
 		foreach ($rows as &$row) {
-			$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-				return in_array($item['columnId'], $view->getColumnIds());
-			}));
+			$row->setDataArray(array_filter($row->getDataArray(), fn($item) => in_array($item['columnId'], $view->getColumnIds())));
 		}
 		return $rows;
 	}
@@ -407,9 +405,7 @@ class LegacyRowMapper extends QBMapper {
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$row = $this->findEntity($qb);
 
-		$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-			return in_array($item['columnId'], $view->getColumnIds());
-		}));
+		$row->setDataArray(array_filter($row->getDataArray(), fn($item) => in_array($item['columnId'], $view->getColumnIds())));
 
 		return $row;
 	}

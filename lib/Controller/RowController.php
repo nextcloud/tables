@@ -31,24 +31,18 @@ class RowController extends Controller {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->findAllByTable($tableId, $this->userId));
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexView(int $viewId): DataResponse {
-		return $this->handleError(function () use ($viewId) {
-			return $this->service->findAllByView($viewId, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->findAllByView($viewId, $this->userId));
 	}
 
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->find($id);
-		});
+		return $this->handleError(fn() => $this->service->find($id));
 	}
 
 	#[NoAdminRequired]
@@ -58,14 +52,7 @@ class RowController extends Controller {
 		?int $viewId,
 		string $data,
 	): DataResponse {
-		return $this->handleError(function () use (
-			$id,
-			$viewId,
-			$columnId,
-			$data
-		) {
-			return $this->service->updateSet($id, $viewId, ['columnId' => $columnId, 'value' => $data], $this->userId, null);
-		});
+		return $this->handleError(fn() => $this->service->updateSet($id, $viewId, ['columnId' => $columnId, 'value' => $data], $this->userId, null));
 	}
 
 	#[NoAdminRequired]
@@ -74,26 +61,16 @@ class RowController extends Controller {
 		?int $viewId,
 		array $data,
 	): DataResponse {
-		return $this->handleError(function () use (
-			$id,
-			$viewId,
-			$data
-		) {
-			return $this->service->updateSet($id, $viewId, $data, $this->userId, null);
-		});
+		return $this->handleError(fn() => $this->service->updateSet($id, $viewId, $data, $this->userId, null));
 	}
 
 	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id, null, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->delete($id, null, $this->userId));
 	}
 	#[NoAdminRequired]
 	public function destroyByView(int $id, int $viewId): DataResponse {
-		return $this->handleError(function () use ($id, $viewId) {
-			return $this->service->delete($id, $viewId, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->delete($id, $viewId, $this->userId));
 	}
 
 	#[NoAdminRequired]

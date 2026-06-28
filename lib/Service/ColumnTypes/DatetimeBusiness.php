@@ -53,7 +53,7 @@ class DatetimeBusiness extends SuperBusiness {
 
 		try {
 			new DateTime($value);
-		} catch (Exception $e) {
+		} catch (Exception) {
 			return false;
 		}
 		return true;

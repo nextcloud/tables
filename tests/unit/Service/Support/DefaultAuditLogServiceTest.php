@@ -30,9 +30,7 @@ final class DefaultAuditLogServiceTest extends TestCase {
 		$this->eventDispatcher
 			->expects($this->once())
 			->method('dispatchTyped')
-			->with($this->callback(function (CriticalActionPerformedEvent $event) use ($message, $context) {
-				return $event->getLogMessage() === $message && $event->getParameters() === $context;
-			}));
+			->with($this->callback(fn(CriticalActionPerformedEvent $event) => $event->getLogMessage() === $message && $event->getParameters() === $context));
 
 		$this->service->log($message, $context);
 	}

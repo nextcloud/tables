@@ -154,7 +154,7 @@ class ContextMapper extends QBMapper {
 		$qb = $this->getFindContextBaseQuery($userId);
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		$contextIds = [];
 		foreach ($r as $row) {
@@ -204,7 +204,7 @@ class ContextMapper extends QBMapper {
 		));
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		$contextIds = [];
 		foreach ($r as $row) {
@@ -236,7 +236,7 @@ class ContextMapper extends QBMapper {
 		$qb->andWhere($qb->expr()->eq('c.id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		if (empty($r)) {
 			throw new NotFoundError('Context does not exist');
@@ -256,7 +256,7 @@ class ContextMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('r.node_type', $qb->createNamedParameter($nodeType)));
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		$contextIds = [];
 		foreach ($r as $row) {

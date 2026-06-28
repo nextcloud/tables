@@ -25,26 +25,9 @@ use OCP\AppFramework\Utility\IControllerMethodReflector;
 use OCP\IRequest;
 
 class PermissionMiddleware extends Middleware {
-	private IControllerMethodReflector $reflector;
-	private PermissionsService $permissionsService;
-	private ?string $userId;
-	private IRequest $request;
-	private ContextService $contextService;
-
-	public function __construct(
-		IControllerMethodReflector $reflector,
-		PermissionsService $permissionsService,
-		IRequest $request,
-		?string $userId,
-		ContextService $contextService,
-	) {
-
-		$this->reflector = $reflector;
-		$this->permissionsService = $permissionsService;
-		$this->userId = $userId;
-		$this->request = $request;
-		$this->contextService = $contextService;
-	}
+	public function __construct(private readonly IControllerMethodReflector $reflector, private readonly PermissionsService $permissionsService, private readonly IRequest $request, private readonly ?string $userId, private readonly ContextService $contextService)
+    {
+    }
 
 	/**
 	 * @throws PermissionError

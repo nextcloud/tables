@@ -21,11 +21,11 @@ class RelationService {
 	private array $cacheRelationData = [];
 
 	public function __construct(
-		private ColumnMapper $columnMapper,
-		private ViewMapper $viewMapper,
-		private Row2Mapper $row2Mapper,
-		private ColumnService $columnService,
-		private ?string $userId,
+		private readonly ColumnMapper $columnMapper,
+		private readonly ViewMapper $viewMapper,
+		private readonly Row2Mapper $row2Mapper,
+		private readonly ColumnService $columnService,
+		private readonly ?string $userId,
 	) {
 	}
 
@@ -42,9 +42,7 @@ class RelationService {
 		// Check table permissions through ColumnService
 		$columns = $this->columnService->findAllByTable($tableId);
 
-		$relationColumns = array_filter($columns, function ($column) {
-			return $column->getType() === Column::TYPE_RELATION;
-		});
+		$relationColumns = array_filter($columns, fn($column) => $column->getType() === Column::TYPE_RELATION);
 
 		return $this->getRelationsForColumns($relationColumns);
 	}
@@ -62,9 +60,7 @@ class RelationService {
 		// Check view permissions through ColumnService
 		$columns = $this->columnService->findAllByView($viewId);
 
-		$relationColumns = array_filter($columns, function ($column) {
-			return $column->getType() === Column::TYPE_RELATION;
-		});
+		$relationColumns = array_filter($columns, fn($column) => $column->getType() === Column::TYPE_RELATION);
 
 		return $this->getRelationsForColumns($relationColumns);
 	}
@@ -186,7 +182,7 @@ class RelationService {
 					$this->userId
 				);
 			}
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->cacheRelationData[$cacheKey] = [];
 			return [];
 		}
@@ -194,9 +190,7 @@ class RelationService {
 		$result = [];
 		foreach ($rows as $row) {
 			$data = $row->getData();
-			$displayFieldData = array_filter($data, function ($item) use ($settings) {
-				return $item['columnId'] === (int)$settings[Column::RELATION_LABEL_COLUMN];
-			});
+			$displayFieldData = array_filter($data, fn($item) => $item['columnId'] === (int)$settings[Column::RELATION_LABEL_COLUMN]);
 			$value = reset($displayFieldData)['value'] ?? null;
 
 			// Structure compatible with Row2 format: {id: int, label: string}

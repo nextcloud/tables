@@ -19,12 +19,10 @@ use Psr\Log\LoggerInterface;
 /** @template-extends QBMapper<Column> */
 class ColumnMapper extends QBMapper {
 	protected string $table = 'tables_columns';
-	private LoggerInterface $logger;
-	private CappedMemoryCache $cacheColumn;
+	private readonly CappedMemoryCache $cacheColumn;
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger) {
+	public function __construct(IDBConnection $db, private readonly LoggerInterface $logger) {
 		parent::__construct($db, $this->table, Column::class);
-		$this->logger = $logger;
 		$this->cacheColumn = new CappedMemoryCache();
 	}
 
@@ -126,7 +124,7 @@ class ColumnMapper extends QBMapper {
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableID)));
 		$result = $qb->executeQuery();
 		$ids = [];
-		while ($row = $result->fetch()) {
+		while ($row = $result->fetchAssociative()) {
 			$ids[] = $row['id'];
 		}
 		return $ids;
@@ -155,7 +153,7 @@ class ColumnMapper extends QBMapper {
 		];
 		$result = $qb->executeQuery();
 		try {
-			while ($row = $result->fetch()) {
+			while ($row = $result->fetchAssociative()) {
 				$out[$row['id']] = $row['type'] . ($row['subtype'] ? '-' . $row['subtype']: '');
 			}
 		} finally {

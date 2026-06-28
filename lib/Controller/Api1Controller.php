@@ -56,52 +56,24 @@ use ValueError;
  * @psalm-import-type TablesContextNavigation from ResponseDefinitions
  */
 class Api1Controller extends ApiController {
-	private TableService $tableService;
-	private ShareService $shareService;
-	private ColumnService $columnService;
-	private RowService $rowService;
-	private ImportService $importService;
-	private ViewService $viewService;
-	private RelationService $relationService;
-	private ViewMapper $viewMapper;
-	private IL10N $l10N;
-
-	private V1Api $v1Api;
-
-	private ?string $userId;
-
-	protected LoggerInterface $logger;
-
 	use Errors;
 
 	public function __construct(
 		IRequest $request,
-		TableService $service,
-		ShareService $shareService,
-		ColumnService $columnService,
-		RowService $rowService,
-		ImportService $importService,
-		ViewService $viewService,
-		RelationService $relationService,
-		ViewMapper $viewMapper,
-		V1Api $v1Api,
-		LoggerInterface $logger,
-		IL10N $l10N,
-		?string $userId,
+		private TableService $tableService,
+		private ShareService $shareService,
+		private ColumnService $columnService,
+		private RowService $rowService,
+		private ImportService $importService,
+		private ViewService $viewService,
+		private RelationService $relationService,
+		private ViewMapper $viewMapper,
+		private V1Api $v1Api,
+		protected LoggerInterface $logger,
+		private IL10N $l10N,
+		private ?string $userId,
 	) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->tableService = $service;
-		$this->shareService = $shareService;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->importService = $importService;
-		$this->viewService = $viewService;
-		$this->relationService = $relationService;
-		$this->viewMapper = $viewMapper;
-		$this->userId = $userId;
-		$this->v1Api = $v1Api;
-		$this->logger = $logger;
-		$this->l10N = $l10N;
 	}
 
 	// Tables

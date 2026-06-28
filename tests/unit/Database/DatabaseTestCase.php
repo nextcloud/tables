@@ -95,15 +95,13 @@ abstract class DatabaseTestCase extends TestCase {
 			$table = substr($table, strpos($table, '.') + 1);
 			return str_replace($this->connection->getPrefix(), '', $table);
 		}, $tables);
-		$tablesToClean = array_filter($tablesToClean, function ($table) {
-			return strpos($table, 'tables_') === 0;
-		});
+		$tablesToClean = array_filter($tablesToClean, fn($table) => str_starts_with((string) $table, 'tables_'));
 
 		// Sort tables by deletion priority due to foreign key constraints
 		usort($tablesToClean, function ($tableA, $tableB) {
 			$getPriority = function ($table) {
 				// 1. row_cells tables (depend on row_sleeves and columns) - highest priority
-				if (strpos($table, 'tables_row_cells_') === 0) {
+				if (str_starts_with($table, 'tables_row_cells_')) {
 					return 1;
 				}
 				// 2. row_sleeves (depend on tables)

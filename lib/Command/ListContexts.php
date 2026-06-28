@@ -21,19 +21,12 @@ use function json_decode;
 use function json_encode;
 
 class ListContexts extends Base {
-	protected ContextService $contextService;
-	protected LoggerInterface $logger;
-	private IConfig $config;
-
 	public function __construct(
-		ContextService $contextService,
-		LoggerInterface $logger,
-		IConfig $config,
+		protected ContextService $contextService,
+		protected LoggerInterface $logger,
+		private readonly IConfig $config,
 	) {
 		parent::__construct();
-		$this->contextService = $contextService;
-		$this->logger = $logger;
-		$this->config = $config;
 	}
 
 	protected function configure(): void {

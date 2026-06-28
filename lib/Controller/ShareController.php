@@ -20,27 +20,15 @@ use OCP\Share\IManager as ShareManager;
 use Psr\Log\LoggerInterface;
 
 class ShareController extends Controller {
-	private ShareService $service;
-
-	private string $userId;
-
-	private ShareManager $shareManager;
-
-	protected LoggerInterface $logger;
-
 	use Errors;
 
 	public function __construct(
 		IRequest $request,
-		LoggerInterface $logger,
-		ShareService $service,
-		ShareManager $shareManager,
-		string $userId) {
+		protected LoggerInterface $logger,
+		private ShareService $service,
+		private ShareManager $shareManager,
+		private string $userId) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->logger = $logger;
-		$this->service = $service;
-		$this->shareManager = $shareManager;
-		$this->userId = $userId;
 	}
 
 	#[NoAdminRequired]
@@ -57,7 +45,7 @@ class ShareController extends Controller {
 	public function index(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
 			$shares = $this->service->findAll('table', $tableId);
-			return array_map([$this->service, 'formatForOutput'], $shares);
+			return array_map($this->service->formatForOutput(...), $shares);
 		});
 	}
 
@@ -66,15 +54,13 @@ class ShareController extends Controller {
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
 			$shares = $this->service->findAll('view', $viewId);
-			return array_map([$this->service, 'formatForOutput'], $shares);
+			return array_map($this->service->formatForOutput(...), $shares);
 		});
 	}
 
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->formatForOutput($this->service->find($id));
-		});
+		return $this->handleError(fn() => $this->service->formatForOutput($this->service->find($id)));
 	}
 
 	#[NoAdminRequired]
@@ -101,16 +87,12 @@ class ShareController extends Controller {
 			$password, $shareTokenObject,
 		);
 
-		return $this->handleError(function () use ($dto) {
-			return $this->service->create($dto);
-		});
+		return $this->handleError(fn() => $this->service->create($dto));
 	}
 
 	#[NoAdminRequired]
 	public function updatePermission(int $id, string $permission, bool $value): DataResponse {
-		return $this->handleError(function () use ($id, $permission, $value) {
-			return $this->service->updatePermission($id, [$permission => $value]);
-		});
+		return $this->handleError(fn() => $this->service->updatePermission($id, [$permission => $value]));
 	}
 
 	#[NoAdminRequired]
@@ -121,14 +103,12 @@ class ShareController extends Controller {
 		bool $permissionUpdate = false,
 		bool $permissionDelete = false,
 	): DataResponse {
-		return $this->handleError(function () use ($id, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete) {
-			return $this->service->updatePermission($id, [
+		return $this->handleError(fn() => $this->service->updatePermission($id, [
 				'read' => $permissionRead,
 				'create' => $permissionCreate,
 				'update' => $permissionUpdate && $permissionRead,
 				'delete' => $permissionDelete && $permissionRead,
-			]);
-		});
+			]));
 	}
 
 	/**
@@ -152,8 +132,6 @@ class ShareController extends Controller {
 
 	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id);
-		});
+		return $this->handleError(fn() => $this->service->delete($id));
 	}
 }

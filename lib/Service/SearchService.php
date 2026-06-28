@@ -14,15 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class SearchService extends SuperService {
 
-	private RowService $rowService;
-	private TableService $tableService;
-	private ViewService $viewService;
-
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId, RowService $rowService, TableService $tableService, ViewService $viewService) {
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId, private readonly RowService $rowService, private readonly TableService $tableService, private readonly ViewService $viewService) {
 		parent::__construct($logger, $userId, $permissionsService);
-		$this->rowService = $rowService;
-		$this->tableService = $tableService;
-		$this->viewService = $viewService;
 	}
 
 	public function all(string $term = ''): array {

@@ -17,8 +17,8 @@ class TextLineBusiness extends SuperBusiness {
 
 	public function __construct(
 		LoggerInterface $logger,
-		private Row2Mapper $row2Mapper,
-		private IL10N $n,
+		private readonly Row2Mapper $row2Mapper,
+		private readonly IL10N $n,
 	) {
 		parent::__construct($logger);
 	}

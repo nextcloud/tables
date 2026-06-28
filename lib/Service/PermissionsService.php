@@ -29,25 +29,7 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 class PermissionsService {
-	private TableMapper $tableMapper;
-
-	private ViewMapper $viewMapper;
-
-	private ShareMapper $shareMapper;
-
-	private UserHelper $userHelper;
-
-	private CircleHelper $circleHelper;
-
-	protected LoggerInterface $logger;
-
-	protected ?string $userId = null;
-
-	protected bool $isCli = false;
-
 	private bool $isPublicContext = false;
-
-	private ContextMapper $contextMapper;
 
 	/** @var array<string, list<string>> Per-request group IDs keyed by user ID. */
 	private array $groupIdsByUserId = [];
@@ -61,27 +43,9 @@ class PermissionsService {
 	/** @var array<string, int|null> Per-request context permissions keyed by node and user. */
 	private array $contextPermissionsByNode = [];
 
-	public function __construct(
-		LoggerInterface $logger,
-		?string $userId,
-		TableMapper $tableMapper,
-		ViewMapper $viewMapper,
-		ShareMapper $shareMapper,
-		ContextMapper $contextMapper,
-		UserHelper $userHelper,
-		CircleHelper $circleHelper,
-		bool $isCLI,
-	) {
-		$this->tableMapper = $tableMapper;
-		$this->viewMapper = $viewMapper;
-		$this->shareMapper = $shareMapper;
-		$this->userHelper = $userHelper;
-		$this->logger = $logger;
-		$this->userId = $userId;
-		$this->isCli = $isCLI;
-		$this->contextMapper = $contextMapper;
-		$this->circleHelper = $circleHelper;
-	}
+	public function __construct(protected LoggerInterface $logger, protected ?string $userId, private readonly TableMapper $tableMapper, private readonly ViewMapper $viewMapper, private readonly ShareMapper $shareMapper, private readonly ContextMapper $contextMapper, private readonly UserHelper $userHelper, private readonly CircleHelper $circleHelper, protected bool $isCli)
+    {
+    }
 
 	/**
 	 * @param string|null $userId
@@ -97,7 +61,7 @@ class PermissionsService {
 
 		if ($userId === null) {
 			$e = new \Exception();
-			$error = 'PreCheck for userId failed, requested in ' . get_class($this) . '.';
+			$error = 'PreCheck for userId failed, requested in ' . static::class . '.';
 			$this->logger->debug($error, ['exception' => new \Exception()]);
 			throw new InternalError($error);
 		}
@@ -124,7 +88,7 @@ class PermissionsService {
 	public function canUpdateTable(Table $table, ?string $userId = null): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			return false;
 		}
 
@@ -184,10 +148,10 @@ class PermissionsService {
 	public function canManageContextById(int $contextId, ?string $userId = null): bool {
 		try {
 			$context = $this->contextMapper->findById($contextId, $userId);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->logger->warning('Context does not exist');
 			return false;
-		} catch (MultipleObjectsReturnedException $e) {
+		} catch (MultipleObjectsReturnedException) {
 			$this->logger->warning('Multiple contexts found for this ID');
 			return false;
 		} catch (Exception $e) {
@@ -210,7 +174,7 @@ class PermissionsService {
 		try {
 			$this->contextMapper->findById($contextId, $userId ?? $this->userId);
 			return true;
-		} catch (NotFoundError $e) {
+		} catch (NotFoundError) {
 			return false;
 		}
 	}
@@ -259,10 +223,10 @@ class PermissionsService {
 	public function canManageTableById(int $tableId, ?string $userId = null): bool {
 		try {
 			$table = $this->tableMapper->find($tableId);
-		} catch (MultipleObjectsReturnedException $e) {
+		} catch (MultipleObjectsReturnedException) {
 			$this->logger->warning('Multiple tables were found for this id');
 			return false;
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->logger->warning('No table was found for this id');
 			return false;
 		} catch (Exception $e) {
@@ -275,10 +239,10 @@ class PermissionsService {
 	public function canManageViewById(int $viewId, ?string $userId = null): bool {
 		try {
 			$view = $this->viewMapper->find($viewId);
-		} catch (MultipleObjectsReturnedException $e) {
+		} catch (MultipleObjectsReturnedException) {
 			$this->logger->warning('Multiple tables were found for this id');
 			return false;
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->logger->warning('No table was found for this id');
 			return false;
 		} catch (InternalError|Exception $e) {
@@ -497,41 +461,31 @@ class PermissionsService {
 			// be fetched specifically.
 
 			$manage = (
-				array_reduce($shares, static function (bool $carry, Share $share): bool {
-					return $carry || ($share->getPermissionManage());
-				}, false)
+				array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionManage()), false)
 				|| ($table && $this->canManageTable($table, $userId))
 			);
 
 			$create = (
 				$manage
-				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
-					return $carry || ($share->getPermissionCreate());
-				}, false)
+				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionCreate()), false)
 				|| ($table && $this->canCreateRows($table, 'table', $userId))
 			);
 
 			$update = (
 				$manage
-				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
-					return $carry || ($share->getPermissionUpdate());
-				}, false)
+				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionUpdate()), false)
 				|| ($table && $this->canUpdateTable($table, $userId))
 			);
 
 			$delete = (
 				$manage
-				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
-					return $carry || ($share->getPermissionDelete());
-				}, false)
+				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionDelete()), false)
 				|| ($table && $this->canDeleteRowsByTableId($table->getId(), $userId))
 			);
 
 			$read = (
 				$manage || $update || $delete
-				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
-					return $carry || ($share->getPermissionRead());
-				}, false)
+				|| array_reduce($shares, static fn(bool $carry, Share $share): bool => $carry || ($share->getPermissionRead()), false)
 				|| ($table && $this->canReadTable($table, $userId))
 			);
 
@@ -743,7 +697,7 @@ class PermissionsService {
 			if ($permissions->manage) {
 				return true;
 			}
-		} catch (NotFoundError $e) {
+		} catch (NotFoundError) {
 			return false;
 		}
 		return false;

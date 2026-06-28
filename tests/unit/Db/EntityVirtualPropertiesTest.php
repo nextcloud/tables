@@ -112,7 +112,7 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 				}
 				$parentClass = $parentClass->getParentClass();
 			}
-		} catch (\ReflectionException $e) {
+		} catch (\ReflectionException) {
 			// Class doesn't exist or can't be loaded
 			return false;
 		}
@@ -228,8 +228,7 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 		if ($reflection->hasProperty('table')) {
 			$tableProperty = $reflection->getProperty('table');
 			if (PHP_VERSION_ID < 80200) {
-				$tableProperty->setAccessible(true);
-			}
+            }
 
 			// Create instance to get table name
 			$instance = $reflection->newInstanceWithoutConstructor();
@@ -247,8 +246,7 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 			if ($mapperReflection->hasProperty('table')) {
 				$tableProperty = $mapperReflection->getProperty('table');
 				if (PHP_VERSION_ID < 80200) {
-					$tableProperty->setAccessible(true);
-				}
+                }
 
 				// Create mapper instance to get table name
 				$mapperInstance = $mapperReflection->newInstanceWithoutConstructor();
@@ -299,7 +297,7 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 				}
 				$parentClass = $parentClass->getParentClass();
 			}
-		} catch (\Exception $e) {
+		} catch (\Exception) {
 			// If we can't get VIRTUAL_PROPERTIES, return empty array
 		}
 

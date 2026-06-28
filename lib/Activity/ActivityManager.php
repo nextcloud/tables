@@ -58,7 +58,7 @@ class ActivityManager {
 			if ($event !== null) {
 				$this->sendToUsers($event, $object);
 			}
-		} catch (\Exception $e) {
+		} catch (\Exception) {
 			// Ignore exception for undefined activities on update events
 		}
 	}
@@ -70,7 +70,7 @@ class ActivityManager {
 
 		if ($previousEntity !== null) {
 			foreach ($entity->getUpdatedFields() as $field => $value) {
-				$getter = 'get' . ucfirst($field);
+				$getter = 'get' . ucfirst((string) $field);
 				$subjectComplete = $subject . '_' . $field;
 				$changes = [
 					'before' => $previousEntity->$getter(),
@@ -82,7 +82,7 @@ class ActivityManager {
 						if ($event !== null) {
 							$events[] = $event;
 						}
-					} catch (\Exception $e) {
+					} catch (\Exception) {
 						// Ignore exception for undefined activities on update events
 					}
 				}
@@ -90,7 +90,7 @@ class ActivityManager {
 		} else {
 			try {
 				$events = [$this->createEvent($objectType, $entity, $subject)];
-			} catch (\Exception $e) {
+			} catch (\Exception) {
 				// Ignore exception for undefined activities on update events
 			}
 		}
@@ -118,7 +118,7 @@ class ActivityManager {
 		 */
 		$eventType = 'tables';
 		$subjectParams = [
-			'author' => $author === null ? $this->userId : $author,
+			'author' => $author ?? $this->userId,
 			'table' => $table
 		];
 		switch ($subject) {

@@ -127,9 +127,7 @@ class Row2 implements JsonSerializable {
 	 * @param int[] $columns
 	 */
 	public function filterDataByColumns(array $columns): array {
-		$this->data = array_values(array_filter($this->data, function ($entry) use ($columns) {
-			return in_array($entry['columnId'], $columns);
-		}));
+		$this->data = array_values(array_filter($this->data, fn($entry) => in_array($entry['columnId'], $columns)));
 		return $this->data;
 	}
 

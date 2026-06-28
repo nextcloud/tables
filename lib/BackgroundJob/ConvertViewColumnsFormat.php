@@ -44,7 +44,7 @@ class ConvertViewColumnsFormat extends TimedJob {
 
 		$maxId = 0;
 		// Update each view
-		while ($view = $result->fetch()) {
+		while ($view = $result->fetchAssociative()) {
 			$this->processView($view, $updateQb);
 			$maxId = max($maxId, (int)$view['id']);
 		}
@@ -67,7 +67,7 @@ class ConvertViewColumnsFormat extends TimedJob {
 		}
 
 		// Parse existing columns JSON
-		$columns = json_decode($view['columns'], true);
+		$columns = json_decode((string) $view['columns'], true);
 		if (!is_array($columns)) {
 			return;
 		}

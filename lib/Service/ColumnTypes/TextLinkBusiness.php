@@ -18,7 +18,7 @@ class TextLinkBusiness extends SuperBusiness {
 
 	public function __construct(
 		LoggerInterface $logger,
-		private IL10N $n,
+		private readonly IL10N $n,
 	) {
 		parent::__construct($logger);
 	}
@@ -44,7 +44,7 @@ class TextLinkBusiness extends SuperBusiness {
 		}
 
 		// if is json (this is the default case, other formats are backward compatibility
-		$data = json_decode($value, true);
+		$data = json_decode((string) $value, true);
 		if ($data !== null) {
 			if (isset($data['resourceUrl'])) {
 				return json_encode(json_encode([
@@ -63,7 +63,7 @@ class TextLinkBusiness extends SuperBusiness {
 		}
 
 		// if is just a url (old implementation)
-		preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', $value, $matches);
+		preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', (string) $value, $matches);
 		if (empty($matches)) {
 			return '';
 		}
@@ -83,12 +83,12 @@ class TextLinkBusiness extends SuperBusiness {
 		if (!$value) {
 			return true;
 		}
-		preg_match('/(.*) \((http.*)\)/', $value, $matches);
+		preg_match('/(.*) \((http.*)\)/', (string) $value, $matches);
 		if (!empty($matches) && $matches[0] && $matches[1]) {
 			return true;
 		}
 
-		$data = json_decode($value, true);
+		$data = json_decode((string) $value, true);
 		if ($data !== null) {
 			if (!isset($data['resourceUrl']) && !isset($data['value'])) {
 				$this->logger->error('Value ' . $value . ' cannot be parsed as the column ' . $column->getId() . ' as it contains incomplete data');
@@ -105,12 +105,12 @@ class TextLinkBusiness extends SuperBusiness {
 			return true;
 		}
 
-		preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', $value, $matches);
+		preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', (string) $value, $matches);
 		return !empty($matches);
 	}
 
 	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
-		$data = json_decode($value, true);
+		$data = json_decode((string) $value, true);
 
 		// Only allow URLs that start with http or https
 		if (isset($data['value']) && !$this->isValidUrlProtocol($data['value'])) {

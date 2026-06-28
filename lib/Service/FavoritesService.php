@@ -19,20 +19,14 @@ use OCP\IDBConnection;
 
 class FavoritesService {
 
-	private IDBConnection $connection;
-	private PermissionsService $permissionsService;
-	private ?string $userId;
 	private bool $cached = false;
-	private CappedMemoryCache $cache;
+	private readonly CappedMemoryCache $cache;
 
 	public function __construct(
-		IDBConnection $connection,
-		PermissionsService $permissionsService,
-		?string $userId,
+		private readonly IDBConnection $connection,
+		private readonly PermissionsService $permissionsService,
+		private readonly ?string $userId,
 	) {
-		$this->connection = $connection;
-		$this->permissionsService = $permissionsService;
-		$this->userId = $userId;
 		// The cache usage is currently not unique to the user id as only a memory cache is used
 		$this->cache = new CappedMemoryCache();
 	}
@@ -49,7 +43,7 @@ class FavoritesService {
 				->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
 
 			$result = $qb->executeQuery();
-			while ($row = $result->fetch()) {
+			while ($row = $result->fetchAssociative()) {
 				$this->cache->set(sprintf('%d_%d', $row['node_type'], $row['node_id']), true);
 			}
 		}
@@ -133,7 +127,7 @@ class FavoritesService {
 
 		$result = $qb->executeQuery();
 		$rows = [];
-		while ($row = $result->fetch()) {
+		while ($row = $result->fetchAssociative()) {
 			$rows[] = $row;
 		}
 		return $rows;
