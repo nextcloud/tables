@@ -30,10 +30,18 @@ class SelectionOptions implements JsonSerializable, Iterator {
 				}
 			}
 		}
+
+		if (is_string($this->default)) {
+			$this->default = \json_decode($this->default(), true);
+		}
+
 		if (is_int($this->default)) {
 			$this->applyIntDefault();
-		} elseif (is_string($this->default)) {
-			$this->applyStringDefault();
+		} elseif (is_bool($this->default)) {
+			// does not need any further handling
+			return;
+		} elseif (is_array($this->default)) {
+			$this->applyArrayDefault();
 		}
 	}
 
@@ -48,17 +56,9 @@ class SelectionOptions implements JsonSerializable, Iterator {
 		$this->default = null;
 	}
 
-	private function applyStringDefault(): void {
-		// default value is a JSON string targeting multiple keys
-
-		$workDefault = \json_decode($this->default(), true);
-		if (!is_array($workDefault)) {
-			$this->default = null;
-			return;
-		}
-
+	private function applyArrayDefault(): void {
 		$confirmedOptions = [];
-		foreach ($workDefault as $defaultOption) {
+		foreach ($this->default as $defaultOption) {
 			$normalizedDefaultOption = (int)$defaultOption;
 			foreach ($this->selectionOptions as $selectionOption) {
 				if ($selectionOption->key() === $normalizedDefaultOption) {
