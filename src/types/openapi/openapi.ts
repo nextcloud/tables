@@ -1025,10 +1025,11 @@ export type paths = {
             readonly cookie?: never;
         };
         /**
-         * [api v2] get a number of rows from a table or view
-         * @description When reading from views, the specified filter is added to each existing filter group.
-         *     The filter definitions provided are all AND-connected.
-         *     Sort orders on the other hand do overwrite the view's default sort order. Only when `null` is passed the default sort order will be used.
+         * [api v2] Get a number of rows from a table or view
+         * @description Both `filter` and `sort` are passed as JSON encoded strings.
+         *     The filter is a list of filter groups, each group being a list of single filter definitions. Definitions within a group are AND-connected, while the groups themselves are OR-connected.
+         *     When reading from a view, the provided filter is added to each of the view's existing filter groups, so the view's base rules are always enforced.
+         *     A provided sort order overrides the view's default sort order. The view's default sort order is only used when no sort order is provided.
          */
         readonly get: operations["rowocs-get-rows"];
         readonly put?: never;
@@ -8503,22 +8504,17 @@ export interface operations {
                 readonly limit?: number | null;
                 /** @description Offset of the rows to be returned (optional) */
                 readonly offset?: number | null;
-                /** @description Additional row filter as JSON-encoded filter groups (optional) */
+                /** @description JSON encoded list of filter groups. Definitions within a group are AND-connected, groups are OR-connected, e.g. `[[{"columnId":1,"operator":"contains","value":"foo"}]]` (optional) */
                 readonly filter?: string | null;
-                /** @description Custom sort order (optional) */
-                readonly "sort[]"?: readonly {
-                    /** Format: int64 */
-                    readonly columnId: number;
-                    /** @enum {string} */
-                    readonly mode: "ASC" | "DESC";
-                }[] | null;
+                /** @description JSON encoded list of sort rules, e.g. `[{"columnId":1,"mode":"ASC"}]` (optional) */
+                readonly sort?: string | null;
             };
             readonly header: {
                 /** @description Required to be true for the API request to pass */
                 readonly "OCS-APIRequest": boolean;
             };
             readonly path: {
-                /** @description Indicates whether to get rows from a table or view */
+                /** @description Indicates whether to read from a table or a view */
                 readonly nodeCollection: "tables" | "views";
                 /** @description The ID of the table or view */
                 readonly nodeId: number;

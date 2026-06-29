@@ -14,6 +14,7 @@ use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\RowQuery;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -87,46 +88,37 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @throws MultipleObjectsReturnedException
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 * @throws InternalError
+	 * Fetch rows for a table or view, applying the given filter and sort rules.
+	 *
+	 * When reading from a view, the provided filter is added to each of the
+	 * view's filter groups so that the view's base rules are always enforced.
+	 * A provided sort order overrides the view's default sort order; the view
+	 * default is only used when no sort order is given.
+	 *
 	 * @return Row2[]
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws InternalError
 	 */
 	public function findAllByQuery(RowQuery $rowQuery): array {
 		$tableId = $rowQuery->getNodeId();
 		$columns = null;
+		$userId = $rowQuery->getUserId() ?? $this->userId ?? '';
+		$filter = $rowQuery->getFilter();
+		$sort = $rowQuery->getSort();
 
 		if ($rowQuery->getNodeType() === Application::NODE_TYPE_VIEW) {
 			$view = $this->viewMapper->find($rowQuery->getNodeId());
 			$tableId = $view->getTableId();
 			$columns = $this->columnMapper->findAll($view->getColumnsArray());
 
-			$userId = $this->resolveFilterUserId($rowQuery->getUserId() ?? $this->userId ?? '', $view);
-			$rowQuery->setUserId($userId);
+			$userId = $this->resolveFilterUserId($userId, $view);
+			$filter = $this->mergeFilterWithViewFilter($filter, $view->getFilterArray());
 
-			if ($rowQuery->getFilter() !== null) {
-				$baseFilterGroups = $view->getFilterArray();
-				if (empty($baseFilterGroups)) {
-					$baseFilterGroups = $rowQuery->getFilter();
-				} else {
-					$additionalFilterRules = array_merge(...$rowQuery->getFilter());
-					foreach ($baseFilterGroups as &$baseFilterGroup) {
-						array_push($baseFilterGroup, ...$additionalFilterRules);
-					}
-					unset($baseFilterGroup);
-				}
-				$rowQuery->setFilter($baseFilterGroups);
-			} else {
-				$rowQuery->setFilter($view->getFilterArray());
-			}
-
-			if ($rowQuery->getSort() === null) {
-				$rowQuery->setSort($view->getSortArray());
-			}
-		} elseif ($rowQuery->getSort() === null) {
+			$sort ??= $view->getSortArray();
+		} elseif ($sort === null) {
 			$table = $this->tableMapper->find($tableId);
-			$rowQuery->setSort($table->getSortArray() ?: null);
+			$sort = $table->getSortArray() ?: null;
 		}
 
 		$tableColumns = $this->columnMapper->findAllByTable($tableId);
@@ -138,12 +130,40 @@ class RowService extends SuperService {
 			$tableId,
 			$rowQuery->getLimit(),
 			$rowQuery->getOffset(),
-			$rowQuery->getFilter(),
-			$rowQuery->getSort(),
-			$rowQuery->getUserId() ?? $this->userId ?? '',
+			$filter,
+			$sort,
+			$userId,
 		);
 		$this->attachAliasPayloads($rows, $columns);
 		return $rows;
+	}
+
+	/**
+	 * Combine a user supplied filter with a view's base filter.
+	 *
+	 * A filter is a list of OR-connected groups, each group being a list of
+	 * AND-connected conditions. To enforce the view's rules while also applying
+	 * the user's filter, the user's conditions are appended to every base
+	 * group, resulting in (group AND userFilter) OR ... When the view has no
+	 * base filter, the user's filter is used as-is.
+	 *
+	 * @param list<list<array{columnId: int, operator: string, value: mixed}>>|null $filter
+	 * @param list<list<array{columnId: int, operator: string, value: mixed}>> $viewFilter
+	 * @return list<list<array{columnId: int, operator: string, value: mixed}>>
+	 */
+	private function mergeFilterWithViewFilter(?array $filter, array $viewFilter): array {
+		if ($filter === null || $filter === []) {
+			return $viewFilter;
+		}
+		if ($viewFilter === []) {
+			return $filter;
+		}
+		$userConditions = array_merge(...$filter);
+		$merged = [];
+		foreach ($viewFilter as $group) {
+			$merged[] = array_merge($group, $userConditions);
+		}
+		return $merged;
 	}
 
 	/**
@@ -722,9 +742,7 @@ class RowService extends SuperService {
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
-			if ($tableId === null) {
-				$tableId = $item->getTableId();
-			}
+			$tableId ??= $item->getTableId();
 			if ($tableId !== $item->getTableId()) {
 				$e = new \Exception('Row does not belong to table with id ' . $tableId);
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -910,9 +928,6 @@ class RowService extends SuperService {
 	 * This deletes all data for a column, eg if the columns gets removed
 	 *
 	 * >>> SECURITY <<<
-	 * We do not check if you are allowed to remove this data. That has to be
-	 * done before! Why? Mostly this check will have be run before and we can
-	 * pass this here due to performance reasons.
 	 * We do not check if you are allowed to remove this data. That has to be
 	 * done before! Why? Mostly this check will have be run before and we can
 	 * pass this here due to performance reasons.

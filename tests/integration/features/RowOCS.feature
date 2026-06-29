@@ -139,7 +139,7 @@ Feature: RowOCS
     And 15 rows have been loaded
 
   @tables @views
-  Scenario Outline: Get rows from a table or view With Offset
+  Scenario Outline: Get rows from a table or view with an out-of-bounds offset
     Given as user "<user>"
     When the current user fetches rows from "<type>" "<alias>" with those parameters
       | offset | <offset> |
@@ -154,7 +154,7 @@ Feature: RowOCS
     | participant3-v2 |  view |    v1 |    200 |          200 |            0  |
 
   @tables @views
-  Scenario Outline: Get rows from a table or view With Offset
+  Scenario Outline: Get rows from a table or view with an offset
     Given as user "<user>"
     When the current user fetches rows from "<type>" "<alias>" with those parameters
       | offset | 5 |
@@ -168,7 +168,7 @@ Feature: RowOCS
       | participant3-v2 |  view |    v1 |
 
   @tables @views
-  Scenario Outline: Get rows from a table or view With Offset
+  Scenario Outline: Get rows from a table or view with an out-of-bounds limit
     Given as user "<user>"
     When the current user fetches rows from "<type>" "<alias>" with those parameters
       | limit | <limit> |
@@ -185,7 +185,7 @@ Feature: RowOCS
       | participant3-v2 |  view |    v1 |   555 |          400 |            0  |
 
   @tables @views
-  Scenario Outline: Get rows from a table or view With Offset
+  Scenario Outline: Get rows from a table or view with a limit
     Given as user "<user>"
     When the current user fetches rows from "<type>" "<alias>" with those parameters
       | limit | 5 |
@@ -198,16 +198,101 @@ Feature: RowOCS
       | participant2-v2 | table |    t1 |
       | participant3-v2 |  view |    v1 |
 
-  @tables @views @current
-  Scenario Outline: Get rows from a table or view with a filter
+  @tables @views
+  Scenario Outline: Get rows from a table or view with a text filter
     Given as user "<user>"
     When the current user fetches rows from "<type>" "<alias>" with those parameters
       | filter | one,contains,t |
     Then the reported status is 200
     And 8 rows have been loaded
-    And rows "r6,r7,r8,r9,r10,r11,r12,r13,r14,r15" are not included in the response
+    And rows "r2,r3,r8,r10,r12,r13,r14,r15" are included in the response
+    And rows "r1,r4,r5,r6,r7,r9,r11" are not included in the response
 
     Examples:
       | user            | type  | alias |
       | participant2-v2 | table |    t1 |
       | participant3-v2 |  view |    v1 |
+
+  @tables @views
+  Scenario Outline: Get rows from a table or view with a numeric filter
+    Given as user "<user>"
+    When the current user fetches rows from "<type>" "<alias>" with those parameters
+      | filter | two,is-greater-than,2000 |
+    Then the reported status is 200
+    And 5 rows have been loaded
+    And rows "r11,r12,r13,r14,r15" are included in the response
+    And rows "r1,r2,r3,r4,r5,r6,r7,r8,r9,r10" are not included in the response
+
+    Examples:
+      | user            | type  | alias |
+      | participant2-v2 | table |    t1 |
+      | participant3-v2 |  view |    v1 |
+
+  @tables @views
+  Scenario Outline: Get rows from a table or view sorted descending
+    Given as user "<user>"
+    When the current user fetches rows from "<type>" "<alias>" with those parameters
+      | sort  | two,DESC |
+      | limit | 3        |
+    Then the reported status is 200
+    And 3 rows have been loaded
+    And the rows are returned in the order "r15,r14,r13"
+
+    Examples:
+      | user            | type  | alias |
+      | participant2-v2 | table |    t1 |
+      | participant3-v2 |  view |    v1 |
+
+  @tables @views
+  Scenario Outline: Get rows from a table or view sorted ascending
+    Given as user "<user>"
+    When the current user fetches rows from "<type>" "<alias>" with those parameters
+      | sort  | two,ASC |
+      | limit | 3       |
+    Then the reported status is 200
+    And 3 rows have been loaded
+    And the rows are returned in the order "r1,r2,r3"
+
+    Examples:
+      | user            | type  | alias |
+      | participant2-v2 | table |    t1 |
+      | participant3-v2 |  view |    v1 |
+
+  @tables @views
+  Scenario Outline: Reject an invalid filter operator
+    Given as user "<user>"
+    When the current user fetches rows from "<type>" "<alias>" with those parameters
+      | filter | one,not-an-operator,t |
+    Then the reported status is 400
+
+    Examples:
+      | user            | type  | alias |
+      | participant2-v2 | table |    t1 |
+      | participant3-v2 |  view |    v1 |
+
+  @tables @views
+  Scenario Outline: Reject an invalid sort mode
+    Given as user "<user>"
+    When the current user fetches rows from "<type>" "<alias>" with those parameters
+      | sort | two,SIDEWAYS |
+    Then the reported status is 400
+
+    Examples:
+      | user            | type  | alias |
+      | participant2-v2 | table |    t1 |
+      | participant3-v2 |  view |    v1 |
+
+  @views
+  Scenario: A view's base filter is combined with the request filter
+    Given user "participant1-v2" create view "v2" with emoji "🔎" for "t1" as "v2"
+    And user "participant1-v2" sets filter to view "v2"
+      | column | operator        | value |
+      | two    | is-greater-than | 1700  |
+    And user "participant1-v2" shares view "v2" with "participant3-v2"
+    And as user "participant3-v2"
+    When the current user fetches rows from "view" "v2" with those parameters
+      | filter | one,contains,t |
+    Then the reported status is 200
+    And 6 rows have been loaded
+    And rows "r8,r10,r12,r13,r14,r15" are included in the response
+    And rows "r2,r3" are not included in the response

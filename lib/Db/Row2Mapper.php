@@ -173,6 +173,7 @@ class Row2Mapper {
 
 			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
 
+			// Get rows without SQL sorting
 			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
 
 			// Sort rows in PHP to preserve the order from getWantedRowIds
@@ -669,9 +670,7 @@ class Row2Mapper {
 
 			$column = $this->columnMapper->find($rowData['column_id']);
 			$columnType = $column->getType();
-			if (!isset($cellMapperCache[$columnType])) {
-				$cellMapperCache[$columnType] = $this->getCellMapperFromType($columnType);
-			}
+			$cellMapperCache[$columnType] ??= $this->getCellMapperFromType($columnType);
 			$value = $cellMapperCache[$columnType]->formatRowData($column, $rowData);
 			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
 			if ($cellMapperCache[$columnType]->hasMultipleValues()) {

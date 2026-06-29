@@ -18,7 +18,6 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
-use OCA\Tables\Model\FilterInput;
 use OCA\Tables\Model\RowDataInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\FederationService;
@@ -118,26 +117,28 @@ class RowOCSController extends AOCSController {
 	}
 
 	/**
-	 * [api v2] get a number of rows from a table or view
+	 * [api v2] Get a number of rows from a table or view
 	 *
-	 * When reading from views, the specified filter is added to each existing
-	 * filter group.
+	 * Both `filter` and `sort` are passed as JSON encoded strings.
 	 *
-	 * The filter definitions provided are all AND-connected.
+	 * The filter is a list of filter groups, each group being a list of single
+	 * filter definitions. Definitions within a group are AND-connected, while
+	 * the groups themselves are OR-connected.
 	 *
-	 * Sort orders on the other hand do overwrite the view's default sort order.
-	 * Only when `null` is passed the default sort order will be used.
+	 * When reading from a view, the provided filter is added to each of the
+	 * view's existing filter groups, so the view's base rules are always
+	 * enforced.
 	 *
-	 * @param 'tables'|'views' $nodeCollection Indicates whether to get rows
-	 *                                         from a table or view
+	 * A provided sort order overrides the view's default sort order. The view's
+	 * default sort order is only used when no sort order is provided.
+	 *
+	 * @param 'tables'|'views' $nodeCollection Indicates whether to read from a table or a view
 	 * @psalm-param int<0,max> $nodeId The ID of the table or view
 	 * @psalm-param ?int<1,500> $limit Number of rows to return between 1 and 500, fetches all by default (optional)
 	 * @psalm-param ?int<0,max> $offset Offset of the rows to be returned (optional)
-	 * @param ?string $filter Additional row filter as JSON-encoded filter groups (optional)
-	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}>|null $sort Custom sort order (optional)
-	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>,
-	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR,
-	 *     array{message: string}, array{}>
+	 * @param ?string $filter JSON encoded list of filter groups. Definitions within a group are AND-connected, groups are OR-connected, e.g. `[[{"columnId":1,"operator":"contains","value":"foo"}]]` (optional)
+	 * @param ?string $sort JSON encoded list of sort rules, e.g. `[{"columnId":1,"mode":"ASC"}]` (optional)
+	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rows returned
 	 * 400: Invalid request parameters
@@ -150,14 +151,9 @@ class RowOCSController extends AOCSController {
 	#[ApiRoute(
 		verb: 'GET',
 		url: '/api/2/{nodeCollection}/{nodeId}/rows',
-		requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)']
+		requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\\d+)']
 	)]
-	public function getRows(string $nodeCollection, int $nodeId, ?int $limit, ?int $offset, mixed $filter = null, ?array $sort = null): DataResponse {
-		$queryData = new RowQuery(
-			nodeType: $nodeCollection === 'tables' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW,
-			nodeId: $nodeId,
-		);
-
+	public function getRows(string $nodeCollection, int $nodeId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null): DataResponse {
 		try {
 			if (($limit !== null && ($limit <= 0 || $limit > 500))
 				|| ($offset !== null && $offset < 0)
@@ -165,36 +161,28 @@ class RowOCSController extends AOCSController {
 				throw new InvalidArgumentException('Offset or limit parameter is out of bounds');
 			}
 
-			$filterInput = FilterInput::fromRequestValue($filter);
-			$filterGroups = $filterInput->filter ?: null;
-			if ($filterGroups) {
-				foreach ($filterGroups as $filterGroup) {
-					foreach ($filterGroup as $singleFilter) {
-						$this->assertFilterValue($singleFilter);
-					}
-				}
-			}
-			if ($sort) {
-				foreach ($sort as $singleSortRule) {
-					$this->assertSortValue($singleSortRule);
-				}
-			}
+			$queryData = new RowQuery(
+				nodeType: $nodeCollection === 'tables' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW,
+				nodeId: $nodeId,
+			);
 			$queryData->setLimit($limit)
 				->setOffset($offset)
-				->setFilter($filterGroups)
-				->setSort($sort)
+				// the provided filter is set here; any filter defined on a view
+				// is merged in on the service level
+				->setFilter($this->parseFilter($filter))
+				->setSort($this->parseSort($sort))
 				->setUserId($this->userId);
 
 			$rows = $this->rowService->findAllByQuery($queryData);
 			return new DataResponse($this->rowService->formatRows($rows));
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
-		} catch (InternalError|Exception $e) {
-			return $this->handleError($e);
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		} catch (MultipleObjectsReturnedException|InvalidArgumentException $e) {
 			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		} catch (InternalError|Exception $e) {
+			return $this->handleError($e);
 		}
 	}
 
@@ -293,20 +281,70 @@ class RowOCSController extends AOCSController {
 	}
 
 	/**
-	 * @param array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty',value: string|int|float} $filter
+	 * Decode and validate the JSON encoded filter parameter.
+	 *
+	 * @return list<list<array{columnId: int, operator: string, value: string|int|float}>>|null
+	 * @throws InvalidArgumentException
 	 */
-	protected function assertFilterValue(array $filter): void {
-		if (!isset($filter['columnId'], $filter['operator'], $filter['value'])
+	protected function parseFilter(?string $filter): ?array {
+		if ($filter === null || $filter === '') {
+			return null;
+		}
+		$filterInput = FilterInput::fromRequestValue($filter);
+		$decoded = $filterInput->filter;
+		if (!is_array($decoded)) {
+			throw new InvalidArgumentException('Invalid filter supplied');
+		}
+		foreach ($decoded as $filterGroup) {
+			if (!is_array($filterGroup)) {
+				throw new InvalidArgumentException('Invalid filter supplied');
+			}
+			foreach ($filterGroup as $singleFilter) {
+				$this->assertFilterValue($singleFilter);
+			}
+		}
+		return $decoded;
+	}
+
+	/**
+	 * Decode and validate the JSON encoded sort parameter.
+	 *
+	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>|null
+	 * @throws InvalidArgumentException
+	 */
+	protected function parseSort(?string $sort): ?array {
+		if ($sort === null || $sort === '') {
+			return null;
+		}
+		$decoded = json_decode($sort, true);
+		if (!is_array($decoded)) {
+			throw new InvalidArgumentException('Invalid sort data supplied');
+		}
+		foreach ($decoded as $singleSortRule) {
+			$this->assertSortValue($singleSortRule);
+		}
+		return $decoded;
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	protected function assertFilterValue(mixed $filter): void {
+		if (!is_array($filter)
+			|| !isset($filter['columnId'], $filter['operator'], $filter['value'])
 			|| count($filter) !== 3
 		) {
 			throw new InvalidArgumentException('Invalid filter supplied');
 		}
+		// values higher than PHP_INT_MAX will be capped to PHP_INT_MAX on cast,
+		// checking it roughly is sufficient.
+		// the lower value boundary is the lowest meta column id in \OCA\Tables\Db\Column
 		$maxDigits = strlen((string)PHP_INT_MAX);
 		if (!is_numeric($filter['columnId'])
 			|| (int)$filter['columnId'] < -5
-			|| !preg_match('/^\d{0,' . $maxDigits . '}$/', (string)$filter['columnId'])
+			|| !preg_match('/^-?\\d{0,' . $maxDigits . '}$/', (string)$filter['columnId'])
 		) {
-			throw new InvalidArgumentException(sprintf('Invalid column id supplied: %d', $filter['columnId']));
+			throw new InvalidArgumentException(sprintf('Invalid column id supplied: %s', (string)$filter['columnId']));
 		}
 		if (!in_array($filter['operator'], [
 			'begins-with',
@@ -326,18 +364,22 @@ class RowOCSController extends AOCSController {
 	}
 
 	/**
-	 * @param array{columnId: int, mode: 'ASC'|'DESC'} $sort
+	 * @throws InvalidArgumentException
 	 */
-	protected function assertSortValue(array $sort): void {
-		if (!isset($sort['columnId'], $sort['mode'])
+	protected function assertSortValue(mixed $sort): void {
+		if (!is_array($sort)
+			|| !isset($sort['columnId'], $sort['mode'])
 			|| count($sort) !== 2
 		) {
 			throw new InvalidArgumentException('Invalid sort data supplied');
 		}
+		// values higher than PHP_INT_MAX will be capped to PHP_INT_MAX on cast,
+		// checking it roughly is sufficient.
+		// the lower value boundary is the lowest meta column id in \OCA\Tables\Db\Column
 		$maxDigits = strlen((string)PHP_INT_MAX);
 		if (!is_numeric($sort['columnId'])
 			|| (int)$sort['columnId'] < -5
-			|| !preg_match('/^\d{0,' . $maxDigits . '}$/', (string)$sort['columnId'])
+			|| !preg_match('/^-?\\d{0,' . $maxDigits . '}$/', (string)$sort['columnId'])
 		) {
 			throw new InvalidArgumentException('Invalid column id supplied');
 		}

@@ -16034,8 +16034,8 @@
             },
             "get": {
                 "operationId": "rowocs-get-rows",
-                "summary": "[api v2] get a number of rows from a table or view",
-                "description": "When reading from views, the specified filter is added to each existing filter group.\nThe filter definitions provided are all AND-connected.\nSort orders on the other hand do overwrite the view's default sort order. Only when `null` is passed the default sort order will be used.",
+                "summary": "[api v2] Get a number of rows from a table or view",
+                "description": "Both `filter` and `sort` are passed as JSON encoded strings.\nThe filter is a list of filter groups, each group being a list of single filter definitions. Definitions within a group are AND-connected, while the groups themselves are OR-connected.\nWhen reading from a view, the provided filter is added to each of the view's existing filter groups, so the view's base rules are always enforced.\nA provided sort order overrides the view's default sort order. The view's default sort order is only used when no sort order is provided.",
                 "tags": [
                     "rowocs"
                 ],
@@ -16051,7 +16051,7 @@
                     {
                         "name": "nodeCollection",
                         "in": "path",
-                        "description": "Indicates whether to get rows from a table or view",
+                        "description": "Indicates whether to read from a table or a view",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -16081,6 +16081,7 @@
                             "type": "integer",
                             "format": "int64",
                             "nullable": true,
+                            "default": null,
                             "minimum": 1,
                             "maximum": 500
                         }
@@ -16093,13 +16094,14 @@
                             "type": "integer",
                             "format": "int64",
                             "nullable": true,
+                            "default": null,
                             "minimum": 0
                         }
                     },
                     {
                         "name": "filter",
                         "in": "query",
-                        "description": "Additional row filter as JSON-encoded filter groups (optional)",
+                        "description": "JSON encoded list of filter groups. Definitions within a group are AND-connected, groups are OR-connected, e.g. `[[{\"columnId\":1,\"operator\":\"contains\",\"value\":\"foo\"}]]` (optional)",
                         "schema": {
                             "type": "string",
                             "nullable": true,
@@ -16107,33 +16109,13 @@
                         }
                     },
                     {
-                        "name": "sort[]",
+                        "name": "sort",
                         "in": "query",
-                        "description": "Custom sort order (optional)",
+                        "description": "JSON encoded list of sort rules, e.g. `[{\"columnId\":1,\"mode\":\"ASC\"}]` (optional)",
                         "schema": {
-                            "type": "array",
+                            "type": "string",
                             "nullable": true,
-                            "default": null,
-                            "items": {
-                                "type": "object",
-                                "required": [
-                                    "columnId",
-                                    "mode"
-                                ],
-                                "properties": {
-                                    "columnId": {
-                                        "type": "integer",
-                                        "format": "int64"
-                                    },
-                                    "mode": {
-                                        "type": "string",
-                                        "enum": [
-                                            "ASC",
-                                            "DESC"
-                                        ]
-                                    }
-                                }
-                            }
+                            "default": null
                         }
                     },
                     {

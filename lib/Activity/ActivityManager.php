@@ -83,17 +83,15 @@ class ActivityManager {
 
 	/**
 	 * @param Row2|Table|View|Column $object
-	 * @param array<string, mixed>|null|string $additionalParams
+	 * @param array<string, mixed> $additionalParams
 	 * @param string|null $author
 	 *
 	 * @psalm-param self::TABLES_OBJECT_* $objectType
-	 * @psalm-param array<string, mixed>|null|string $additionalParams
+	 * @psalm-param array<string, mixed> $additionalParams
 	 * @psalm-param string|null $author
 	 */
-	public function triggerEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
-		if ($author === null) {
-			$author = $this->userId;
-		}
+	public function triggerEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array $additionalParams = [], ?string $author = null) {
+		$author ??= $this->userId;
 
 		try {
 			$event = $this->createEvent($objectType, $object, $subject, $additionalParams, $author);
@@ -154,7 +152,7 @@ class ActivityManager {
 	 * @psalm-param array<string, mixed> $additionalParams
 	 * @psalm-param string|null $author
 	 */
-	private function createEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array $additionalParams = [], array|string|null $author = null) {
+	private function createEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array $additionalParams = [], ?string $author = null) {
 		if ($object instanceof Table) {
 			$objectTitle = $object->getTitle();
 			$table = $object;
