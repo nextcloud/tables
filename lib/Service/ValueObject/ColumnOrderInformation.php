@@ -84,7 +84,7 @@ class ColumnOrderInformation implements ArrayAccess, JsonSerializable {
 		];
 	}
 
-	protected function ensureType(string $offset, mixed $value): int|bool {
+	protected function ensureType(string $offset, bool|int $value): int|bool {
 		return match ($offset) {
 			self::KEY_ID,
 			self::KEY_ORDER => (int)$value,

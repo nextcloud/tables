@@ -3132,23 +3132,33 @@ class FeatureContext implements Context {
 	public function theCurrentUserFetchesRowsFromWithThoseParameters(string $nodeType, string $nodeAlias, TableNode $parameters): void {
 		$query = '';
 		foreach ($parameters->getRows() as $row) {
-			if ($row[0] !== 'filter') {
-				$parameterName = $row[0];
-				$parameterValue = $row[1];
-			} else {
-				[$columnAlias,$operator,$value] = explode(',',$row[1]);
+			$parameterName = $row[0];
+			if ($parameterName === 'filter') {
+				// `<columnAlias>,<operator>,<value>` is turned into a single
+				// filter group holding a single filter definition
+				[$columnAlias, $operator, $value] = explode(',', $row[1]);
 				$columnId = $this->collectionManager->getByAlias('column', $columnAlias)['id'];
-				$filterArray = [ // all filters
-					[ // filter groups
-						[ // single filter definitions
+				$parameterValue = json_encode([ // all filter groups
+					[ // single filter group
+						[ // single filter definition
 							'columnId' => $columnId,
 							'operator' => $operator,
-							'value' => $value
+							'value' => $value,
 						],
 					],
-				];
-				$parameterName = $row[0];
-				$parameterValue = json_encode($filterArray);
+				]);
+			} elseif ($parameterName === 'sort') {
+				// `<columnAlias>,<mode>` is turned into a single sort rule
+				[$columnAlias, $mode] = explode(',', $row[1]);
+				$columnId = $this->collectionManager->getByAlias('column', $columnAlias)['id'];
+				$parameterValue = json_encode([
+					[
+						'columnId' => $columnId,
+						'mode' => $mode,
+					],
+				]);
+			} else {
+				$parameterValue = $row[1];
 			}
 			$query .= $parameterName . '=' . urlencode($parameterValue) . '&';
 		}
@@ -3192,6 +3202,26 @@ class FeatureContext implements Context {
 		foreach ($unexpectedRowAliases as $unexpectedRowAlias) {
 			$row = $this->collectionManager->getByAlias('row', $unexpectedRowAlias);
 			Assert::assertContains($row['id'], $returnedRowIds);
+		}
+	}
+
+	/**
+	 * @Then the rows are returned in the order :rowAliasList
+	 */
+	public function theRowsAreReturnedInTheOrder(string $rowAliasList): void {
+		$expectedRowAliases = array_map('trim', explode(',', $rowAliasList));
+		$responseData = $this->getDataFromResponse($this->response)['ocs']['data'];
+		// do not count the error message, if present
+		unset($responseData['message']);
+		$responseData = array_values($responseData);
+		Assert::assertCount(count($expectedRowAliases), $responseData);
+		foreach ($expectedRowAliases as $index => $expectedRowAlias) {
+			$expectedRow = $this->collectionManager->getByAlias('row', $expectedRowAlias);
+			Assert::assertSame(
+				$expectedRow['id'],
+				$responseData[$index]['id'],
+				sprintf('Row at position %d does not match the expected row "%s"', $index, $expectedRowAlias),
+			);
 		}
 	}
 }

@@ -165,8 +165,7 @@ class Row2Mapper {
 	}
 
 	/**
-	 * @param Column[] $tableColumns
-	 * @param Column[] $columns
+	 * @param int[] $showColumnIds
 	 * @param int $tableId
 	 * @param int|null $limit
 	 * @param int|null $offset
@@ -176,36 +175,21 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $tableColumns, array $columns, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
-		$this->setColumns($columns, $tableColumns);
-		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
+	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
+		try {
+			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
-		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $limit, $offset);
+			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
 
-		return $this->getRows($wantedRowIdsArray, $columnIdsArray, $sort ?? []);
-	}
+			// Get rows without SQL sorting
+			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
 
-	/**
-	 * @param Column[] $tableColumns
-	 * @param Column[] $columns
-	 * @param int $tableId
-	 * @param RowQuery $queryData
-	 * @return Row2[]
-	 * @throws InternalError
-	 */
-	public function findAllByQuery(array $tableColumns, array $columns, int $tableId, RowQuery $queryData): array {
-		$this->setColumns($columns, $tableColumns);
-		$columnIdsArray = array_map(static fn (Column $column) => $column->getId(), $columns);
-
-		$wantedRowIdsArray = $this->getWantedRowIds(
-			$queryData->getUserId(),
-			$tableId,
-			$queryData->getFilter(),
-			$queryData->getLimit(),
-			$queryData->getOffset()
-		);
-
-		return $this->getRows($wantedRowIdsArray, $columnIdsArray, $queryData->getSort() ?? []);
+			// Sort rows in PHP to preserve the order from getWantedRowIds
+			return $this->sortRowsByIds($rows, $wantedRowIdsArray);
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
 	}
 
 	/**
@@ -289,7 +273,6 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function addFilterToQuery(IQueryBuilder $qb, array $filters, string $userId): void {
 	private function addFilterToQuery(IQueryBuilder $qb, array $filters, string $userId): void {
 		// TODO move this into service
 		$this->replacePlaceholderValues($filters, $userId);

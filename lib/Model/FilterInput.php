@@ -10,6 +10,6 @@ class FilterInput {
 	public array $filter;
 	public function __construct(IRequest $request) {
 		$value = $request->getParam('filter', '[]');
-		$this->filter = json_decode($value,true) ?? [];
+		$this->filter = json_decode($value, true) ?? [];
 	}
 }
