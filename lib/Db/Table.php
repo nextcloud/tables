@@ -140,9 +140,7 @@ class Table extends EntitySuper implements JsonSerializable {
 	 */
 	public function getColumnOrderArray(): array {
 		$columnSettings = $this->getColumnOrderSettingsArray();
-		usort($columnSettings, static function (ColumnOrderInformation $a, ColumnOrderInformation $b) {
-			return $a->getOrder() - $b->getOrder();
-		});
+		usort($columnSettings, static fn (ColumnOrderInformation $a, ColumnOrderInformation $b) => $a->getOrder() - $b->getOrder());
 		/** @var list<ColumnOrderInformation> $columnSettings */
 		return array_map(static fn (ColumnOrderInformation $vci): int => $vci->getId(), $columnSettings);
 	}
@@ -157,7 +155,7 @@ class Table extends EntitySuper implements JsonSerializable {
 		}
 
 		if (is_array($columns[array_key_first($columns)] ?? null)) {
-			return array_values(array_map(static fn (array $a): ColumnOrderInformation => ColumnOrderInformation::fromArray($a), $columns));
+			return array_values(array_map(ColumnOrderInformation::fromArray(...), $columns));
 		}
 
 		$result = [];

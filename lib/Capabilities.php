@@ -19,19 +19,12 @@ use Psr\Log\LoggerInterface;
  * @package OCA\Tables
  */
 class Capabilities implements ICapability {
-	private IAppManager $appManager;
-
-	private LoggerInterface $logger;
-
-	private IConfig $config;
-
-	private CircleHelper $circleHelper;
-
-	public function __construct(IAppManager $appManager, LoggerInterface $logger, IConfig $config, CircleHelper $circleHelper) {
-		$this->appManager = $appManager;
-		$this->logger = $logger;
-		$this->config = $config;
-		$this->circleHelper = $circleHelper;
+	public function __construct(
+		private readonly IAppManager $appManager,
+		private readonly LoggerInterface $logger,
+		private readonly IConfig $config,
+		private readonly CircleHelper $circleHelper,
+	) {
 	}
 
 	/**

@@ -98,9 +98,7 @@ class View extends EntitySuper implements JsonSerializable {
 	public function getColumnsArray(): array {
 
 		$columnSettings = $this->getColumnsSettingsArray();
-		usort($columnSettings, static function (ViewColumnInformation $a, ViewColumnInformation $b) {
-			return $a->getOrder() - $b->getOrder();
-		});
+		usort($columnSettings, static fn (ViewColumnInformation $a, ViewColumnInformation $b) => $a->getOrder() - $b->getOrder());
 		return array_column($columnSettings, ViewColumnInformation::KEY_ID);
 	}
 
@@ -114,7 +112,7 @@ class View extends EntitySuper implements JsonSerializable {
 		}
 
 		if (is_array(reset($columns))) {
-			return array_values(array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $columns));
+			return array_values(array_map(ViewColumnInformation::fromArray(...), $columns));
 		}
 
 		$result = [];

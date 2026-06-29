@@ -39,7 +39,7 @@ class ContextNodeRelationMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType)));
 		$result = $qb->executeQuery();
 		$nodeRelIds = [];
-		while ($row = $result->fetch()) {
+		while ($row = $result->fetchAssociative()) {
 			$nodeRelIds[] = (int)$row['id'];
 		}
 		return $nodeRelIds;

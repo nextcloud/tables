@@ -18,13 +18,10 @@ use Psr\Log\LoggerInterface;
  * @template-implements IEventListener<Event|BeforeUserDeletedEvent>
  */
 class UserDeletedListener implements IEventListener {
-	private TableService $tableService;
-
-	private LoggerInterface $logger;
-
-	public function __construct(TableService $tableService, LoggerInterface $logger) {
-		$this->tableService = $tableService;
-		$this->logger = $logger;
+	public function __construct(
+		private readonly TableService $tableService,
+		private readonly LoggerInterface $logger,
+	) {
 	}
 
 	public function handle(Event $event): void {
@@ -42,7 +39,7 @@ class UserDeletedListener implements IEventListener {
 				$this->tableService->delete($table->getId(), $event->getUser()->getUID());
 			}
 			$this->logger->debug('tables for the deleted user removed');
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 		}
 	}
 }

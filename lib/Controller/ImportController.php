@@ -33,35 +33,23 @@ class ImportController extends Controller {
 		'application/vnd.oasis.opendocument.spreadsheet',
 	];
 
-	private ImportService $service;
-	private string $userId;
-
-	protected LoggerInterface $logger;
-
-	private IL10N $l10n;
-
 	use Errors;
 
 	public function __construct(
 		IRequest $request,
-		LoggerInterface $logger,
-		ImportService $service,
-		string $userId,
-		IL10N $l10n) {
+		protected LoggerInterface $logger,
+		private ImportService $service,
+		private string $userId,
+		private IL10N $l10n,
+	) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->logger = $logger;
-		$this->service = $service;
-		$this->userId = $userId;
-		$this->l10n = $l10n;
 	}
 
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function previewImportTable(int $tableId, String $path): DataResponse {
-		return $this->handleError(function () use ($tableId, $path) {
-			return $this->service->previewImport($tableId, null, $path);
-		});
+		return $this->handleError(fn () => $this->service->previewImport($tableId, null, $path));
 	}
 
 	/**
@@ -70,10 +58,9 @@ class ImportController extends Controller {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function importInTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
-		return $this->handleError(function () use ($tableId, $path, $createMissingColumns, $columnsConfig) {
+		return $this->handleError(
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			return $this->service->import($tableId, null, $path, $createMissingColumns, $columnsConfig);
-		});
+			fn () => $this->service->import($tableId, null, $path, $createMissingColumns, $columnsConfig));
 	}
 
 	#[NoAdminRequired]
@@ -95,9 +82,7 @@ class ImportController extends Controller {
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function previewImportView(int $viewId, String $path): DataResponse {
-		return $this->handleError(function () use ($viewId, $path) {
-			return $this->service->previewImport(null, $viewId, $path);
-		});
+		return $this->handleError(fn () => $this->service->previewImport(null, $viewId, $path));
 	}
 
 	/**
@@ -106,10 +91,9 @@ class ImportController extends Controller {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importInView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
-		return $this->handleError(function () use ($viewId, $path, $createMissingColumns, $columnsConfig) {
+		return $this->handleError(
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			return $this->service->import(null, $viewId, $path, $createMissingColumns, $columnsConfig);
-		});
+			fn () => $this->service->import(null, $viewId, $path, $createMissingColumns, $columnsConfig));
 	}
 
 	#[NoAdminRequired]
@@ -133,9 +117,7 @@ class ImportController extends Controller {
 	public function previewUploadImportTable(int $tableId): DataResponse {
 		try {
 			$file = $this->getUploadedFile('uploadfile');
-			return $this->handleError(function () use ($tableId, $file) {
-				return $this->service->previewImport($tableId, null, $file['tmp_name']);
-			});
+			return $this->handleError(fn () => $this->service->previewImport($tableId, null, $file['tmp_name']));
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
@@ -151,10 +133,9 @@ class ImportController extends Controller {
 		try {
 			$columnsConfigArray = json_decode($columnsConfig, true);
 			$file = $this->getUploadedFile('uploadfile');
-			return $this->handleError(function () use ($tableId, $file, $createMissingColumns, $columnsConfigArray) {
+			return $this->handleError(
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-				return $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
-			});
+				fn () => $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray));
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
@@ -167,9 +148,7 @@ class ImportController extends Controller {
 	public function previewUploadImportView(int $viewId): DataResponse {
 		try {
 			$file = $this->getUploadedFile('uploadfile');
-			return $this->handleError(function () use ($viewId, $file) {
-				return $this->service->previewImport(null, $viewId, $file['tmp_name']);
-			});
+			return $this->handleError(fn () => $this->service->previewImport(null, $viewId, $file['tmp_name']));
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
@@ -204,10 +183,9 @@ class ImportController extends Controller {
 		try {
 			$columnsConfigArray = json_decode($columnsConfig, true);
 			$file = $this->getUploadedFile('uploadfile');
-			return $this->handleError(function () use ($viewId, $file, $createMissingColumns, $columnsConfigArray) {
+			return $this->handleError(
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-				return $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
-			});
+				fn () => $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray));
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);

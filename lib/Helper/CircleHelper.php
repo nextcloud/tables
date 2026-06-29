@@ -28,9 +28,9 @@ class CircleHelper {
 	 * @psalm-suppress UndefinedClass
 	 */
 	public function __construct(
-		private LoggerInterface $logger,
+		private readonly LoggerInterface $logger,
 		IAppManager $appManager,
-		private IL10N $l10n,
+		private readonly IL10N $l10n,
 	) {
 		$this->circlesEnabled = $appManager->isEnabledForUser('circles');
 		$this->circlesManager = null;
@@ -103,9 +103,7 @@ class CircleHelper {
 			return null;
 		}
 
-		$circleIds = array_map(function (Circle $circle) {
-			return $circle->getSingleId();
-		}, $this->getUserCircles($userId));
+		$circleIds = array_map(fn (Circle $circle) => $circle->getSingleId(), $this->getUserCircles($userId));
 		return $circleIds;
 	}
 

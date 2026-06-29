@@ -29,8 +29,8 @@ class ColumnsHelper {
 	private array $columnBusinesses = [];
 
 	public function __construct(
-		private UserHelper $userHelper,
-		private CircleHelper $circleHelper,
+		private readonly UserHelper $userHelper,
+		private readonly CircleHelper $circleHelper,
 	) {
 	}
 
@@ -71,15 +71,15 @@ class ColumnsHelper {
 			case 'stars-3': return '3';
 			case 'stars-4': return '4';
 			case 'stars-5': return '5';
-			case 'datetime-date-today': return date('Y-m-d') ? date('Y-m-d') : '';
-			case 'datetime-date-start-of-year': return date('Y-01-01') ? date('Y-01-01') : '';
-			case 'datetime-date-start-of-month': return date('Y-m-01') ? date('Y-m-01') : '';
+			case 'datetime-date-today': return date('Y-m-d') ?: '';
+			case 'datetime-date-start-of-year': return date('Y-01-01') ?: '';
+			case 'datetime-date-start-of-month': return date('Y-m-01') ?: '';
 			case 'datetime-date-start-of-week':
 				$day = date('w');
 				$result = date('Y-m-d', strtotime('-' . $day . ' days'));
 				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
-			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
+			case 'datetime-now': return date('Y-m-d H:i') ?: '';
 			case 'datetime-exact-date': return $additionalValue ?? '';
 			case 'datetime-days-ahead':
 				$days = max(0, (int)$additionalValue);

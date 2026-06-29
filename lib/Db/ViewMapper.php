@@ -25,7 +25,7 @@ class ViewMapper extends QBMapper {
 
 	public function __construct(
 		IDBConnection $db,
-		private UserHelper $userHelper,
+		private readonly UserHelper $userHelper,
 	) {
 		parent::__construct($db, $this->table, View::class);
 		$this->cache = new CappedMemoryCache();

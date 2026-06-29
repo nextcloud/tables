@@ -14,9 +14,10 @@ class SelectionBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value (array|string|null)
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		$intValue = (int)$value;
 		if (!is_numeric($value) || $intValue != $value) {
 			return '';
@@ -31,7 +32,10 @@ class SelectionBusiness extends SuperBusiness {
 		return '';
 	}
 
-	public function parseDisplayValue($value, Column $column): string {
+	/**
+	 * @return false|string
+	 */
+	public function parseDisplayValue($value, Column $column): string|false {
 		foreach ($column->getSelectionOptionsArray() as $option) {
 			if ($option['label'] === $value) {
 				return json_encode($option['id']);

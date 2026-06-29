@@ -41,43 +41,20 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesView from ResponseDefinitions
  */
 class ViewService extends SuperService {
-	private ViewMapper $mapper;
-
-	private ShareService $shareService;
-
-	private RowService $rowService;
-
-	protected UserHelper $userHelper;
-
-	protected FavoritesService $favoritesService;
-
-	protected IL10N $l;
-	private ContextService $contextService;
-
-	protected IEventDispatcher $eventDispatcher;
-
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
 		?string $userId,
-		ViewMapper $mapper,
-		ShareService $shareService,
-		RowService $rowService,
-		UserHelper $userHelper,
-		FavoritesService $favoritesService,
-		IEventDispatcher $eventDispatcher,
-		ContextService $contextService,
-		IL10N $l,
+		private readonly ViewMapper $mapper,
+		private readonly ShareService $shareService,
+		private readonly RowService $rowService,
+		protected UserHelper $userHelper,
+		protected FavoritesService $favoritesService,
+		protected IEventDispatcher $eventDispatcher,
+		private readonly ContextService $contextService,
+		protected IL10N $l,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
-		$this->l = $l;
-		$this->mapper = $mapper;
-		$this->shareService = $shareService;
-		$this->rowService = $rowService;
-		$this->userHelper = $userHelper;
-		$this->favoritesService = $favoritesService;
-		$this->eventDispatcher = $eventDispatcher;
-		$this->contextService = $contextService;
 	}
 
 	/**
@@ -135,10 +112,10 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 		} catch (InternalError|\OCP\DB\Exception|MultipleObjectsReturnedException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -255,7 +232,7 @@ class ViewService extends SuperService {
 					$insertableValue = json_encode($value);
 				}
 
-				$setterMethod = 'set' . ucfirst($parameter->value);
+				$setterMethod = 'set' . ucfirst((string)$parameter->value);
 				$view->$setterMethod($insertableValue ?? $value);
 			}
 
@@ -308,10 +285,10 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 		} catch (InternalError|MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -333,7 +310,7 @@ class ViewService extends SuperService {
 			return $deletedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -388,7 +365,7 @@ class ViewService extends SuperService {
 		// add the rows count
 		try {
 			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
-		} catch (InternalError|PermissionError $e) {
+		} catch (InternalError|PermissionError) {
 		}
 
 		// Remove detailed view filtering and sorting information if necessary
@@ -454,7 +431,7 @@ class ViewService extends SuperService {
 						manage: $permissions->manage,
 						manageTable: $canManageTable,
 					));
-				} catch (NotFoundError $e) {
+				} catch (NotFoundError) {
 				} catch (\Exception $e) {
 					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
 					$view->setOnSharePermissions(new Permissions());
@@ -465,7 +442,7 @@ class ViewService extends SuperService {
 				try {
 					$allShares = $this->shareService->findAll('view', $view->getId());
 					$view->setHasShares(count($allShares) !== 0);
-				} catch (InternalError $e) {
+				} catch (InternalError) {
 				}
 			}
 		} else {
@@ -506,18 +483,14 @@ class ViewService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 		foreach ($views as $view) {
-			$filteredSortingRules = array_filter($view->getSortArray(), static function (array $sort) use ($columnId) {
-				return $sort['columnId'] !== $columnId;
-			});
+			$filteredSortingRules = array_filter($view->getSortArray(), static fn (array $sort) => $sort['columnId'] !== $columnId);
 			$filteredSortingRules = array_values($filteredSortingRules);
 
 			$applicableFilterArray = $this->removeColumnFromFilters($view->getFilterArray(), $columnId);
 
 			$applicableViewColumnInformationRecords = array_filter(
 				$view->getColumnsSettingsArray(),
-				static function (ViewColumnInformation $viewColumnInformation) use ($columnId): bool {
-					return $viewColumnInformation->getId() !== $columnId;
-				}
+				static fn (ViewColumnInformation $viewColumnInformation): bool => $viewColumnInformation->getId() !== $columnId
 			);
 
 			$viewUpdateInput = new ViewUpdateInput(
@@ -564,7 +537,7 @@ class ViewService extends SuperService {
 				$this->enhanceView($view, $userId);
 			}
 			return $views;
-		} catch (InternalError|\OCP\DB\Exception $e) {
+		} catch (InternalError|\OCP\DB\Exception) {
 			return [];
 		}
 	}

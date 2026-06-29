@@ -21,7 +21,7 @@ use OCP\Util;
 class TablesReferenceListener implements IEventListener {
 	private bool $isLoaded = false;
 	public function __construct(
-		private IEventDispatcher $eventDispatcher,
+		private readonly IEventDispatcher $eventDispatcher,
 	) {
 	}
 

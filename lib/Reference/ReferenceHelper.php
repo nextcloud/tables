@@ -27,35 +27,20 @@ use Throwable;
 
 class ReferenceHelper {
 	protected const RICH_OBJECT_TYPE = Application::APP_ID . '_link';
-
-	protected ?string $userId;
-	protected IURLGenerator $urlGenerator;
 	protected LinkReferenceProvider $linkReferenceProvider;
-	protected ViewService $viewService;
-	protected TableService $tableService;
-	protected ColumnService $columnService;
-	protected RowService $rowService;
-	protected IConfig $config;
-	protected LoggerInterface $logger;
 
-	public function __construct(IURLGenerator $urlGenerator,
-		ViewService $viewService,
-		TableService $tableService,
-		ColumnService $columnService,
-		RowService $rowService,
+	public function __construct(
+		protected IURLGenerator $urlGenerator,
+		protected ViewService $viewService,
+		protected TableService $tableService,
+		protected ColumnService $columnService,
+		protected RowService $rowService,
 		LinkReferenceProvider $linkReferenceProvider,
-		?string $userId,
-		IConfig $config,
-		LoggerInterface $logger) {
-		$this->userId = $userId;
-		$this->urlGenerator = $urlGenerator;
+		protected ?string $userId,
+		protected IConfig $config,
+		protected LoggerInterface $logger,
+	) {
 		$this->linkReferenceProvider = $linkReferenceProvider;
-		$this->viewService = $viewService;
-		$this->tableService = $tableService;
-		$this->rowService = $rowService;
-		$this->columnService = $columnService;
-		$this->config = $config;
-		$this->logger = $logger;
 	}
 
 	public function matchReference(string $referenceText, ?string $type = null): bool {
@@ -106,9 +91,9 @@ class ReferenceHelper {
 				} else {
 					$e = new Exception('Neither table nor view is given.');
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
-					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+					throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 				}
-			} catch (Exception|Throwable $e) {
+			} catch (Exception|Throwable) {
 				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
 			}
@@ -125,7 +110,7 @@ class ReferenceHelper {
 				$referenceInfo['title'] = $element->getTitle();
 			}
 
-			$reference->setDescription($element->getOwnerDisplayName() ? $element->getOwnerDisplayName() : $element->getOwnership());
+			$reference->setDescription($element->getOwnerDisplayName() ?: $element->getOwnership());
 
 			$referenceInfo['ownership'] = $element->getOwnership();
 			$referenceInfo['ownerDisplayName'] = $element->getOwnerDisplayName();
@@ -146,7 +131,7 @@ class ReferenceHelper {
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$referenceInfo['rows'] = $this->rowService->findAllByView($elementId, $this->userId, 10, 0);
 				}
-			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException $e) {
+			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException) {
 				// TODO add logging
 			}
 
@@ -221,7 +206,7 @@ class ReferenceHelper {
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$randString = '';
 		for ($i = 0; $i < $length; $i++) {
-			$randString = $characters[rand(0, strlen($characters))];
+			$randString = $characters[random_int(0, strlen($characters))];
 		}
 		return $randString;
 	}

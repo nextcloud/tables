@@ -1,0 +1,11 @@
+{
+	"require-dev": {
+		"rector/rector": "^2.0",
+		"nextcloud/rector": "^0.5.2"
+	},
+	"autoload": {
+		"classmap": [
+			"vendor/nextcloud/ocp/OCP/"
+		]
+	}
+}

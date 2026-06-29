@@ -59,7 +59,7 @@ class ShareControlMiddleware extends Middleware {
 		}
 
 		$allowedTokensJSON = $this->session->get(PublicShareController::DAV_AUTHENTICATED_FRONTEND) ?? '[]';
-		$allowedTokens = json_decode($allowedTokensJSON, true);
+		$allowedTokens = json_decode((string)$allowedTokensJSON, true);
 		if (!is_array($allowedTokens)) {
 			$allowedTokens = [];
 		}

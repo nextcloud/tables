@@ -47,7 +47,16 @@ class ActivityManager {
 	) {
 	}
 
-	public function triggerEvent($objectType, $object, $subject, $additionalParams = [], $author = null) {
+	/**
+	 * @param Row2|Table $object
+	 * @param \OCA\Tables\Model\ImportStats[]|null|string $additionalParams
+	 * @param (array|null)[]|null|string $author
+	 *
+	 * @psalm-param 'tables_row'|'tables_table' $objectType
+	 * @psalm-param array{importStats?: \OCA\Tables\Model\ImportStats}|null|string $additionalParams
+	 * @psalm-param array{before: array|null, after: array|null}|null|string $author
+	 */
+	public function triggerEvent(string $objectType, Table|Row2 $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
 		if ($author === null) {
 			$author = $this->userId;
 		}
@@ -58,19 +67,23 @@ class ActivityManager {
 			if ($event !== null) {
 				$this->sendToUsers($event, $object);
 			}
-		} catch (\Exception $e) {
+		} catch (\Exception) {
 			// Ignore exception for undefined activities on update events
 		}
 	}
 
-	public function triggerUpdateEvents($objectType, ChangeSet $changeSet, $subject) {
+	/**
+	 * @psalm-param 'tables_table' $objectType
+	 * @psalm-param 'table_update' $subject
+	 */
+	public function triggerUpdateEvents(string $objectType, ChangeSet $changeSet, string $subject) {
 		$previousEntity = $changeSet->getBefore();
 		$entity = $changeSet->getAfter();
 		$events = [];
 
 		if ($previousEntity !== null) {
 			foreach ($entity->getUpdatedFields() as $field => $value) {
-				$getter = 'get' . ucfirst($field);
+				$getter = 'get' . ucfirst((string)$field);
 				$subjectComplete = $subject . '_' . $field;
 				$changes = [
 					'before' => $previousEntity->$getter(),
@@ -82,7 +95,7 @@ class ActivityManager {
 						if ($event !== null) {
 							$events[] = $event;
 						}
-					} catch (\Exception $e) {
+					} catch (\Exception) {
 						// Ignore exception for undefined activities on update events
 					}
 				}
@@ -90,7 +103,7 @@ class ActivityManager {
 		} else {
 			try {
 				$events = [$this->createEvent($objectType, $entity, $subject)];
-			} catch (\Exception $e) {
+			} catch (\Exception) {
 				// Ignore exception for undefined activities on update events
 			}
 		}
@@ -100,7 +113,14 @@ class ActivityManager {
 		}
 	}
 
-	private function createEvent($objectType, $object, $subject, $additionalParams = [], $author = null) {
+	/**
+	 * @psalm-param array{before?: mixed, after?: mixed} $additionalParams
+	 * @psalm-param 'tables_row'|'tables_table' $objectType
+	 * @psalm-param array{before: array|null, after: array|null}|null|string $author
+	 *
+	 * @param (array|null)[]|null|string $author
+	 */
+	private function createEvent(string $objectType, Row2|Table $object, string $subject, array $additionalParams = [], array|string|null $author = null) {
 		if ($object instanceof Table) {
 			$objectTitle = $object->getTitle();
 			$table = $object;
@@ -118,7 +138,7 @@ class ActivityManager {
 		 */
 		$eventType = 'tables';
 		$subjectParams = [
-			'author' => $author === null ? $this->userId : $author,
+			'author' => $author ?? $this->userId,
 			'table' => $table
 		];
 		switch ($subject) {
@@ -181,7 +201,7 @@ class ActivityManager {
 		return $event;
 	}
 
-	private function sendToUsers(IEvent $event, $object) {
+	private function sendToUsers(IEvent $event, Row2|Table $object) {
 		if ($object instanceof Table) {
 			$tableId = $object->getId();
 			$owner = $object->getOwnership();
@@ -204,7 +224,7 @@ class ActivityManager {
 		}
 	}
 
-	public function getActivitySubject($language, $subjectIdentifier, $subjectParams = [], $ownActivity = false) {
+	public function getActivitySubject(string $language, $subjectIdentifier, array $subjectParams = [], bool $ownActivity = false) {
 		$subject = '';
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 
@@ -262,7 +282,7 @@ class ActivityManager {
 		return $subject;
 	}
 
-	public function getActivityMessage($language, $subjectIdentifier) {
+	public function getActivityMessage(string $language, $subjectIdentifier) {
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 
 		switch ($subjectIdentifier) {

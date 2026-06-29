@@ -19,10 +19,10 @@ class TablesProvider implements IProvider {
 
 	public function __construct(
 		private $userId,
-		private IURLGenerator $urlGenerator,
-		private ActivityManager $activityManager,
-		private IUserManager $userManager,
-		private LoggerInterface $logger,
+		private readonly IURLGenerator $urlGenerator,
+		private readonly ActivityManager $activityManager,
+		private readonly IUserManager $userManager,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
