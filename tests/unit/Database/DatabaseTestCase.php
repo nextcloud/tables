@@ -292,6 +292,7 @@ abstract class DatabaseTestCase extends TestCase {
 
 		if (!empty($cellsData)) {
 			$this->addCellsToRow($rowId, $cellsData, $columnMapping);
+			$this->updateCachedCells($rowId, $cellsData, $columnMapping);
 		}
 
 		return $result;
@@ -346,6 +347,31 @@ abstract class DatabaseTestCase extends TestCase {
 			->setValue('value', $qb->createNamedParameter($value))
 			->setValue('last_edit_at', $qb->createNamedParameter(date('Y-m-d H:i:s')))
 			->setValue('last_edit_by', $qb->createNamedParameter('user1'));
+
+		$qb->executeStatement();
+	}
+
+	/**
+	 * Updates the cached_cells column for a row
+	 */
+	protected function updateCachedCells(int $rowId, array $cellsData, array $columnMapping = []): void {
+		$cachedCells = [];
+		foreach ($cellsData as $columnIdentifier => $value) {
+			// Convert test_ident to actual column ID if mapping is provided
+			if (is_string($columnIdentifier) && isset($columnMapping[$columnIdentifier])) {
+				$columnId = $columnMapping[$columnIdentifier];
+			} else {
+				$columnId = $columnIdentifier;
+			}
+
+			// Format the value as expected by CachedRowLoader (matches cell mapper toArray format)
+			$cachedCells[$columnId] = ['value' => $value];
+		}
+
+		$qb = $this->connection->getQueryBuilder();
+		$qb->update('tables_row_sleeves')
+			->set('cached_cells', $qb->createNamedParameter(json_encode($cachedCells)))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($rowId)));
 
 		$qb->executeStatement();
 	}

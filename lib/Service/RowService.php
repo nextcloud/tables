@@ -901,6 +901,7 @@ class RowService extends SuperService {
 			$qb->insert('tables_row_sleeves')
 				->values([
 					'table_id' => $qb->createNamedParameter($table->getId(), IQueryBuilder::PARAM_INT),
+					'cached_cells' => $qb->createNamedParameter(json_encode([])),
 					'created_by' => $qb->createNamedParameter($table->getOwnership()),
 					'created_at' => $qb->createNamedParameter($row['createdAt']),
 					'last_edit_by' => $qb->createNamedParameter($table->getOwnership()),
