@@ -8,10 +8,11 @@
 namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Model\SelectionOptions;
 
 class SelectionMultiBusiness extends SuperBusiness {
 
-	private array $options = [];
+	private SelectionOptions $options;
 
 	/**
 	 * @param mixed $value (array|string|null)
@@ -23,7 +24,7 @@ class SelectionMultiBusiness extends SuperBusiness {
 			return json_encode([]);
 		}
 
-		$this->options = $column->getSelectionOptionsArray();
+		$this->options = $column->getSelectionOptionsCollection();
 
 		$wasString = false;
 		if (is_string($value)) {
@@ -48,20 +49,18 @@ class SelectionMultiBusiness extends SuperBusiness {
 	 * @param int|string|null $value int assume as option ID, string assumes a label
 	 * @return int|null return always the option ID or null
 	 */
-	private function getOptionIdForValue($value): ?int {
+	private function getOptionIdForValue(mixed $value): ?int {
 		if ($value === null) {
 			return null;
 		}
 
 		foreach ($this->options as $option) {
 			if (is_int($value)) {
-				if ($option['id'] === $value) {
-					return $option['id'];
+				if ($option->key() === $value) {
+					return $option->key();
 				}
-			} else {
-				if ($option['label'] === $value) {
-					return $option['id'];
-				}
+			} elseif ($option->label() === $value) {
+				return $option->key();
 			}
 		}
 		return null;
@@ -77,7 +76,7 @@ class SelectionMultiBusiness extends SuperBusiness {
 			return true;
 		}
 
-		$this->options = $column->getSelectionOptionsArray();
+		$this->options = $column->getSelectionOptionsCollection();
 
 		$wasString = false;
 		if (is_string($value)) {

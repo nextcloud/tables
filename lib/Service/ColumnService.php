@@ -21,10 +21,12 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\SelectionOptions;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Validation\ColumnDtoValidator;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
@@ -74,6 +76,7 @@ class ColumnService extends SuperService {
 	}
 
 	/**
+	 * @return Column[]
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
@@ -141,7 +144,7 @@ class ColumnService extends SuperService {
 	/**
 	 * @param int $viewId
 	 * @param string|null $userId
-	 * @return array
+	 * @return Column[]
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws InternalError
@@ -391,11 +394,10 @@ class ColumnService extends SuperService {
 			$item->setNumberMin($columnDto->getNumberMin());
 			$item->setNumberMax($columnDto->getNumberMax());
 			$item->setNumberDecimals($columnDto->getNumberDecimals());
-			if ($columnDto->getSelectionOptions() !== null) {
-				$item->setSelectionOptions($columnDto->getSelectionOptions());
-			}
-			if ($columnDto->getSelectionDefault() !== null) {
-				$item->setSelectionDefault($columnDto->getSelectionDefault());
+			if ($columnDto->getSelectionOptions() !== null || $columnDto->getSelectionDefault() !== null) {
+				$item->setSelectionOptionsCollection(SelectionOptions::createFromInputJsonString(
+					$columnDto->getSelectionOptions(), $columnDto->getSelectionDefault())
+				);
 			}
 			$item->setDatetimeDefault($columnDto->getDatetimeDefault());
 
@@ -672,6 +674,15 @@ class ColumnService extends SuperService {
 	 */
 	public function importColumn(Table $table, array $column): int {
 		$item = new Column();
+		if (isset($column['uuid'])) {
+			$uuid = (string)$column['uuid'];
+			if ($uuid === '') {
+				$uuid = null;
+			} elseif (!Uuid::isValid($uuid)) {
+				throw new \InvalidArgumentException('Invalid UUID provided');
+			}
+		}
+		$item->setUuid($uuid ?? null);
 		$item->setTableId($table->getId());
 		$item->setTitle($column['title']);
 		$item->setCreatedBy($table->getOwnership());
@@ -692,8 +703,7 @@ class ColumnService extends SuperService {
 		$item->setTextAllowedPattern($column['textAllowedPattern']);
 		$item->setTextMaxLength($column['textMaxLength']);
 		$item->setTextUnique($column['textUnique']);
-		$item->setSelectionOptions(json_encode($column['selectionOptions']));
-		$item->setSelectionDefault($column['selectionDefault']);
+		$item->setSelectionOptionsCollection(SelectionOptions::createFromInputArray($column['selectionOptions'], $column['selectionDefault']));
 		$item->setDatetimeDefault($column['datetimeDefault']);
 		$item->setUsergroupDefault(json_encode($column['usergroupDefault']));
 		$item->setUsergroupMultipleItems($column['usergroupMultipleItems']);
