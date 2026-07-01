@@ -12,7 +12,6 @@ namespace OCA\Tables\Tests\Unit\Validation;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Validation\ColumnDtoValidator;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Test\TestCase;
 
 class ColumnDtoValidatorTest extends TestCase {
@@ -57,7 +56,6 @@ class ColumnDtoValidatorTest extends TestCase {
 	/**
 	 * @dataProvider reservedNameProvider
 	 */
-	#[DataProvider('reservedNameProvider')]
 	public function testReservedTechnicalNamesAreRejected(string $name): void {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessageMatches('/reserved/i');
@@ -78,7 +76,6 @@ class ColumnDtoValidatorTest extends TestCase {
 	/**
 	 * @dataProvider invalidFormatProvider
 	 */
-	#[DataProvider('invalidFormatProvider')]
 	public function testInvalidFormatIsRejected(string $name): void {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessageMatches('/start with a letter|lowercase|underscores/i');
@@ -99,7 +96,6 @@ class ColumnDtoValidatorTest extends TestCase {
 	/**
 	 * @dataProvider validFormatProvider
 	 */
-	#[DataProvider('validFormatProvider')]
 	public function testValidFormatIsAccepted(string $name): void {
 		$this->expectNotToPerformAssertions();
 		$this->validator->validate($this->dto($name));
