@@ -967,21 +967,43 @@ class Row2Mapper {
 	}
 
 	/**
+	 * @param int[] $tableIds
+	 * @return array<int, int>
+	 */
+	public function countRowsForTables(array $tableIds): array {
+		return $this->rowSleeveMapper->countRowsByTableIds($tableIds);
+	}
+
+	/**
 	 * @param View $view
 	 * @param string $userId
 	 * @return int
 	 */
 	public function countRowsForView(View $view, string $userId): int {
 		$filter = $view->getFilterArray();
-		try {
-			$this->columnMapper->preloadColumns($view->getColumnsArray(), $filter, $view->getSortArray());
 
-			$rowIds = $this->getWantedRowIds($userId, $view->getTableId(), $filter);
-		} catch (InternalError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			$rowIds = [];
+		if (empty($filter)) {
+			return $this->countRowsForTable($view->getTableId());
 		}
-		return count($rowIds);
+
+		try {
+			$this->columnMapper->preloadColumns($view->getColumnsArray(), $filter);
+
+			$qb = $this->db->getQueryBuilder();
+			$qb->select($qb->func()->count('*', 'counter'))
+				->from('tables_row_sleeves', 'sleeves')
+				->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
+
+			$this->addFilterToQuery($qb, $filter, $userId);
+
+			$result = $this->db->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes());
+			$count = (int)$result->fetchOne();
+			$result->closeCursor();
+			return $count;
+		} catch (InternalError|Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			return 0;
+		}
 	}
 
 	private function getFormattedDefaultValue(Column $column) {
