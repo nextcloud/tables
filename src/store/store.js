@@ -648,5 +648,19 @@ export const useTablesStore = defineStore('store', {
 			}
 		},
 
+		setElementRowsCount({ isView, elementId, count }) {
+			const element = isView ? this.getView(elementId) : this.getTable(elementId)
+			if (element) {
+				element.rowsCount = count
+			}
+		},
+
+		addToTableRowsCount({ tableId, delta }) {
+			const table = this.getTable(tableId)
+			if (table && typeof table.rowsCount === 'number') {
+				table.rowsCount += delta
+			}
+		},
+
 	},
 })
