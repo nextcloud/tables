@@ -53,6 +53,7 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 			[FilterIds.IsEqual]() { return cellBoolean === filterBoolean },
 			[FilterIds.IsNotEqual]() { return cellBoolean !== filterBoolean },
 			[FilterIds.IsEmpty]() { return cell.value === null || cell.value === undefined || cell.value === '' },
+			[FilterIds.IsNotEmpty]() { return cell.value !== null && cell.value !== undefined && cell.value !== '' },
 		}[filter.operator.id]
 		return filterMethod ? filterMethod() : super.isFilterFound(filterMethod, cell)
 	}
