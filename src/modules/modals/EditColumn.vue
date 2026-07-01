@@ -225,8 +225,7 @@ export default {
 			delete data.lastEditBy
 
 			data.technicalName = this.normalizeTechnicalName(data.technicalName)
-			data.customSettings = { width: data.customSettings.width }
-			console.debug('this column data will be send', data)
+			data.customSettings = { ...data.customSettings, width: data.customSettings.width }
 			const res = await this.updateColumn({
 				id: this.editColumn.id,
 				isView: this.isView,

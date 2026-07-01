@@ -150,6 +150,18 @@ class Row2 implements JsonSerializable {
 	}
 
 	/**
+	 * @param int[] $columns
+	 * @return array
+	 */
+	public function filterDataByAliasByColumns(array $columns): array {
+		$this->dataByAlias = array_filter(
+			$this->dataByAlias,
+			static fn (array $cell): bool => in_array($cell['columnId'], $columns, true),
+		);
+		return $this->dataByAlias;
+	}
+
+	/**
 	 * @psalm-return TablesRow
 	 */
 	public function jsonSerialize(): array {

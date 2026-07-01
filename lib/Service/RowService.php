@@ -276,9 +276,7 @@ class RowService extends SuperService {
 				author: $this->userId,
 			);
 
-			$insertedRow = $this->filterRowResult($view, $insertedRow);
-			$this->attachAliasPayload($insertedRow, $columns);
-			return $insertedRow;
+			return $this->filterRowResult($view, $insertedRow);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -712,9 +710,7 @@ class RowService extends SuperService {
 			);
 		}
 
-		$updatedRow = $this->filterRowResult($view ?? null, $updatedRow);
-		$this->attachAliasPayload($updatedRow, $columns);
-		return $updatedRow;
+		return $this->filterRowResult($view ?? null, $updatedRow);
 	}
 
 	/**
@@ -783,8 +779,9 @@ class RowService extends SuperService {
 		}
 
 		try {
+			$columns = $this->loadColumnsForData($item->getData() ?? []);
 			$deletedRow = $this->row2Mapper->delete($item);
-			$this->attachAliasPayload($item);
+			$this->attachAliasPayload($item, $columns);
 
 			$event = new RowDeletedEvent($item, $item->getData());
 
@@ -796,9 +793,7 @@ class RowService extends SuperService {
 				author: $this->userId,
 			);
 
-			$deletedRow = $this->filterRowResult($view ?? null, $deletedRow);
-			$this->attachAliasPayload($deletedRow);
-			return $deletedRow;
+			return $this->filterRowResult($view ?? null, $deletedRow);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -896,7 +891,9 @@ class RowService extends SuperService {
 			return $row;
 		}
 
-		$row->filterDataByColumns($view->getColumnIds());
+		$columnIds = $view->getColumnIds();
+		$row->filterDataByColumns($columnIds);
+		$row->filterDataByAliasByColumns($columnIds);
 
 		return $row;
 	}
