@@ -55,17 +55,22 @@
 			<IconInformation :size="16" class="info-icon" />
 			<span>{{ t('tables', 'Only text and number columns can be used as label') }}</span>
 		</div>
+
+		<NcNoteCard v-if="targetInaccessible"
+			type="warning"
+			:text="t('tables', 'The linked table or view is no longer accessible to you, so this relation is disabled. Ask its owner to share it with you, or pick a different target.')" />
 	</div>
 </template>
 
 <script>
-import { NcSelect } from '@nextcloud/vue'
+import { NcSelect, NcNoteCard } from '@nextcloud/vue'
 import { translate as t } from '@nextcloud/l10n'
 import { mapState } from 'pinia'
 import { useTablesStore } from '../../../../../../store/store.js'
 import { useDataStore } from '../../../../../../store/data.js'
 import NumberColumn from '../../../mixins/columnsTypes/number.js'
 import TextLineColumn from '../../../mixins/columnsTypes/textLine.js'
+import permissionsMixin from '../../../mixins/permissionsMixin.js'
 import IconInformation from 'vue-material-design-icons/InformationOutline.vue'
 
 export default {
@@ -73,7 +78,9 @@ export default {
 	components: {
 		IconInformation,
 		NcSelect,
+		NcNoteCard,
 	},
+	mixins: [permissionsMixin],
 	props: {
 		column: {
 			type: Object,
@@ -88,6 +95,7 @@ export default {
 				relationType: this.column.customSettings.relationType ?? 'table',
 			},
 			loadingColumns: false,
+			targetInaccessible: false,
 			relationTypeOptions: [
 				{ id: 'table', label: t('tables', 'Table') },
 				{ id: 'view', label: t('tables', 'View') },
@@ -96,20 +104,29 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(useTablesStore, ['tables', 'views']),
+		...mapState(useTablesStore, ['tables', 'views', 'activeTable', 'activeView']),
+		hostTableId() {
+			return this.activeView ? this.activeView.tableId : (this.activeTable?.id ?? null)
+		},
 		availableTargets() {
 			if (this.customSettings.relationType === 'table') {
-				return this.tables.map(table => ({
-					id: table.id,
-					label: `${table.emoji} ${table.title}`,
-				}))
+				return this.tables
+					// exclude the host table (no self-reference) and anything the
+					// user cannot read
+					.filter(table => table.id !== this.hostTableId && this.canReadData(table))
+					.map(table => ({
+						id: table.id,
+						label: `${table.emoji} ${table.title}`,
+					}))
 			}
 
 			if (this.customSettings.relationType === 'view') {
-				return this.views.map(view => ({
-					id: view.id,
-					label: `${view.emoji} ${view.title}`,
-				}))
+				return this.views
+					.filter(view => view.tableId !== this.hostTableId && this.canReadData(view))
+					.map(view => ({
+						id: view.id,
+						label: `${view.emoji} ${view.title}`,
+					}))
 			}
 
 			return []
@@ -129,17 +146,23 @@ export default {
 			}
 
 			this.loadingColumns = true
+			this.targetInaccessible = false
 			try {
 				const dataStore = useDataStore()
 				const columns = await dataStore.getColumnsFromBE({
 					tableId: this.customSettings.relationType === 'table' ? this.customSettings.targetId : null,
 					viewId: this.customSettings.relationType === 'view' ? this.customSettings.targetId : null,
+					showError: false,
 				})
 				this.availableLabelColumns = columns
 					.filter(column =>
 						column instanceof NumberColumn || column instanceof TextLineColumn,
 					)
 					.map(column => ({ id: column.id, label: column.title }))
+			} catch (e) {
+				// The target is no longer readable (e.g. it was unshared)
+				this.availableLabelColumns = []
+				this.targetInaccessible = true
 			} finally {
 				this.loadingColumns = false
 			}

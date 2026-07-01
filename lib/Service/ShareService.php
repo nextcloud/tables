@@ -794,27 +794,55 @@ class ShareService extends SuperService {
 	public function findSharedWithUserIds(int $elementId, string $elementType): array {
 		try {
 			$shares = $this->mapper->findAllSharesForNode($elementType, $elementId, '');
-			$sharedWithUserIds = [];
-
-			foreach ($shares as $share) {
-				if ($share->getReceiverType() === ShareReceiverType::USER) {
-					$sharedWithUserIds[$share->getReceiver()] = 1;
-				}
-				if ($share->getReceiverType() === ShareReceiverType::CIRCLE && $this->circleHelper->isCirclesEnabled()) {
-					$userIds = $this->circleHelper->getUserIdsInCircle($share->getReceiver());
-					$sharedWithUserIds += array_fill_keys($userIds, 1);
-				}
-				if ($share->getReceiverType() === ShareReceiverType::GROUP) {
-					$userIds = $this->groupHelper->getUserIdsInGroup($share->getReceiver());
-					$sharedWithUserIds += array_fill_keys($userIds, 1);
-				}
-			}
-
-			return array_keys($sharedWithUserIds);
+			return $this->resolveShareReceiversToUserIds($shares);
 		} catch (Exception $e) {
 			$this->logger->error('Could not find shared with users: ' . $e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Could not find shared with users');
 		}
+	}
+
+	/**
+	 * Returns the IDs of all users that hold the manage permission on the given node
+	 *
+	 * @param int $elementId
+	 * @param string $elementType
+	 * @return string[]
+	 * @throws InternalError
+	 */
+	public function findManagerUserIds(int $elementId, string $elementType): array {
+		try {
+			$shares = $this->mapper->findAllSharesForNode($elementType, $elementId, '');
+			return $this->resolveShareReceiversToUserIds($shares, true);
+		} catch (Exception $e) {
+			$this->logger->error('Could not find managing users: ' . $e->getMessage(), ['exception' => $e]);
+			throw new InternalError('Could not find managing users');
+		}
+	}
+
+	/**
+	 * Resolves a list of shares into the set of user IDs they grant access to
+	 *
+	 * @param Share[] $shares
+	 * @param bool $requireManage when true, only shares carrying the manage permission are considered
+	 * @return string[]
+	 */
+	private function resolveShareReceiversToUserIds(array $shares, bool $requireManage = false): array {
+		$userIds = [];
+
+		foreach ($shares as $share) {
+			if ($requireManage && !$share->getPermissionManage()) {
+				continue;
+			}
+			if ($share->getReceiverType() === ShareReceiverType::USER) {
+				$userIds[$share->getReceiver()] = 1;
+			} elseif ($share->getReceiverType() === ShareReceiverType::CIRCLE && $this->circleHelper->isCirclesEnabled()) {
+				$userIds += array_fill_keys($this->circleHelper->getUserIdsInCircle($share->getReceiver()), 1);
+			} elseif ($share->getReceiverType() === ShareReceiverType::GROUP) {
+				$userIds += array_fill_keys($this->groupHelper->getUserIdsInGroup($share->getReceiver()), 1);
+			}
+		}
+
+		return array_keys($userIds);
 	}
 
 	/**
