@@ -1,6 +1,6 @@
 <!--
-  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
-  - SPDX-License-Identifier: AGPL-3.0-or-later
+	- SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
 	<NcAppNavigationItem v-if="table" data-cy="navigationTableItem" :name="table.title"
@@ -29,12 +29,12 @@
 
 		<template #actions>
 			<!-- EDIT -->
-			<NcActionButton v-if="canManageElement(table)" :close-after-click="true"
+			<NcActionButton :close-after-click="true"
 				@click="emit('tables:table:edit', table.id)">
 				<template #icon>
 					<IconRename :size="20" decorative />
 				</template>
-				{{ t('tables', 'Edit table') }}
+				{{ t('tables', 'Table settings') }}
 			</NcActionButton>
 
 			<!-- CREATE VIEW -->
@@ -67,6 +67,7 @@
 					<TrayArrowDown :size="20" />
 				</template>
 			</NcActionButton>
+
 			<!-- INTEGRATION -->
 			<NcActionButton :close-after-click="true" @click="actionShowIntegration">
 				{{ t('tables', 'Integration') }}

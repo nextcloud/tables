@@ -26,6 +26,7 @@ use OCA\Tables\Listener\WhenTableTransferredAuditLogListener;
 use OCA\Tables\Listener\WhenViewDeletedAuditLogListener;
 use OCA\Tables\Middleware\PermissionMiddleware;
 use OCA\Tables\Middleware\ShareControlMiddleware;
+use OCA\Tables\Notification\Notifier;
 use OCA\Tables\Reference\ContentReferenceProvider;
 use OCA\Tables\Reference\ReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
@@ -89,6 +90,8 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(AddMissingIndicesEvent::class, AddMissingIndicesListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
+
+		$context->registerNotifierService(Notifier::class);
 
 		$context->registerReferenceProvider(ReferenceProvider::class);
 		$context->registerReferenceProvider(ContentReferenceProvider::class);

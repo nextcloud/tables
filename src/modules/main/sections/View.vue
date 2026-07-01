@@ -32,7 +32,7 @@
 							<template #icon>
 								<PlaylistEdit :size="20" decorative />
 							</template>
-							{{ t('tables', 'Edit view') }}
+							{{ t('tables', 'View settings') }}
 						</NcActionButton>
 						<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
 							<template #icon>

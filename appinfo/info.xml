@@ -75,6 +75,7 @@ Have a good time and manage whatever you want.
 	<activity>
 		<settings>
 			<setting>OCA\Tables\Activity\SettingChanges</setting>
+			<setting>OCA\Tables\Activity\SettingSharing</setting>
 		</settings>
 		<filters>
 			<filter>OCA\Tables\Activity\Filter</filter>

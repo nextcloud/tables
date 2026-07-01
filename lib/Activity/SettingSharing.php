@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -11,7 +11,7 @@ namespace OCA\Tables\Activity;
 use OCP\Activity\ActivitySettings;
 use OCP\IL10N;
 
-class SettingChanges extends ActivitySettings {
+class SettingSharing extends ActivitySettings {
 
 	public function __construct(
 		protected IL10N $l,
@@ -31,7 +31,7 @@ class SettingChanges extends ActivitySettings {
 	 * @since 20.0.0
 	 */
 	public function getIdentifier(): string {
-		return 'tables';
+		return ActivityManager::EVENT_TYPE_SHARING;
 	}
 
 	/**
@@ -39,7 +39,7 @@ class SettingChanges extends ActivitySettings {
 	 * @since 20.0.0
 	 */
 	public function getName(): string {
-		return $this->l->t('A <strong>table or view</strong> was changed');
+		return $this->l->t('A <strong>table or view</strong> was shared with you');
 	}
 
 	/**
