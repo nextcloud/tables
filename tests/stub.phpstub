@@ -21,6 +21,12 @@ namespace OCA\Circles\Model {
 	}
 }
 
+namespace OCA\Circles\Events {
+	class CircleDestroyedEvent extends \OCP\EventDispatcher\Event {
+		public function getCircle(): \OCA\Circles\Model\Circle {}
+	}
+}
+
 namespace OC\Collaboration\Reference {
     class LinkReferenceProvider implements IReferenceProvider {
         abstract public function matchReference(string $referenceText): bool {}
