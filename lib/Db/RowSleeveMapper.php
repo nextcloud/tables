@@ -17,6 +17,8 @@ use Psr\Log\LoggerInterface;
 
 /** @template-extends QBMapper<RowSleeve> */
 class RowSleeveMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_row_sleeves';
 	protected LoggerInterface $logger;
 
@@ -121,6 +123,38 @@ class RowSleeveMapper extends QBMapper {
 			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Will return 0.');
 			return 0;
 		}
+	}
+
+	/**
+	 * @param int[] $tableIds
+	 * @return array<int, int>
+	 */
+	public function countRowsByTableIds(array $tableIds): array {
+		if (empty($tableIds)) {
+			return [];
+		}
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('table_id')
+			->selectAlias($qb->func()->count('*'), 'counter')
+			->from($this->table)
+			->where($qb->expr()->in('table_id', $qb->createParameter('tableIds')))
+			->groupBy('table_id');
+
+		$counts = [];
+		foreach (array_chunk($tableIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('tableIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			try {
+				$result = $qb->executeQuery();
+				while ($row = $result->fetch()) {
+					$counts[(int)$row['table_id']] = (int)$row['counter'];
+				}
+				$result->closeCursor();
+			} catch (Exception $e) {
+				$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Will skip chunk.');
+			}
+		}
+		return $counts;
 	}
 
 	/**

@@ -967,6 +967,14 @@ class Row2Mapper {
 	}
 
 	/**
+	 * @param int[] $tableIds
+	 * @return array<int, int>
+	 */
+	public function countRowsForTables(array $tableIds): array {
+		return $this->rowSleeveMapper->countRowsByTableIds($tableIds);
+	}
+
+	/**
 	 * @param View $view
 	 * @param string $userId
 	 * @return int
