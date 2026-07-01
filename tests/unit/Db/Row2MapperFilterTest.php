@@ -311,4 +311,12 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 
 		$this->assertSame(5, $this->mapper->countRowsForView($view, 'test_user'), 'View without filters should count all table rows');
 	}
+
+	public function testCountRowsForTables(): void {
+		$this->assertSame([], $this->mapper->countRowsForTables([]), 'Empty input should return an empty map');
+
+		$counts = $this->mapper->countRowsForTables([self::$testTableId, 999999]);
+		$this->assertSame(5, $counts[self::$testTableId] ?? 0, 'Batch count should match the table row count');
+		$this->assertArrayNotHasKey(999999, $counts, 'Tables without rows should be absent from the map');
+	}
 }

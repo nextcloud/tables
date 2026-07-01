@@ -127,16 +127,17 @@ class TableService extends SuperService {
 				) {
 					continue;
 				}
-				$allTables[$node['node_id']] = $this->find($node['node_id'], $skipTableEnhancement, $userId);
+				$allTables[$node['node_id']] = $this->find($node['node_id'], true, $userId);
 			}
 		}
 
 		// enhance table objects with additional data
 		if (!$skipTableEnhancement) {
+			$rowCountsByTableId = $this->rowService->getRowsCountForTables(array_keys($allTables));
 			foreach ($allTables as $table) {
 				/** @var string $userId */
 				try {
-					$this->enhanceTable($table, $userId);
+					$this->enhanceTable($table, $userId, $rowCountsByTableId);
 				} catch (InternalError|PermissionError $e) {
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
 				}
@@ -168,7 +169,7 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function enhanceTable(Table $table, string $userId): void {
+	private function enhanceTable(Table $table, string $userId, ?array $rowCountsByTableId = null): void {
 		// add owner display name for UI
 		$this->addOwnerDisplayName($table);
 
@@ -183,10 +184,14 @@ class TableService extends SuperService {
 		}
 
 		// add the rows count
-		try {
-			$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
-		} catch (PermissionError $e) {
-			$table->setRowsCount(0);
+		if ($rowCountsByTableId !== null) {
+			$table->setRowsCount($rowCountsByTableId[$table->getId()] ?? 0);
+		} else {
+			try {
+				$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
+			} catch (PermissionError $e) {
+				$table->setRowsCount(0);
+			}
 		}
 
 		// add the column count
