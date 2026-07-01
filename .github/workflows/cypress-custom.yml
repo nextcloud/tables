@@ -47,7 +47,7 @@ jobs:
     steps:
 
       - name: Checkout server
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           submodules: true
@@ -55,7 +55,7 @@ jobs:
           ref: ${{ matrix.server-versions }}
 
       - name: Checkout viewer
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           repository: nextcloud/viewer
@@ -68,14 +68,14 @@ jobs:
           echo "text_app_ref=$text_app_ref" >> $GITHUB_ENV
 
       - name: Checkout text app
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: nextcloud/text
           path: apps/text
           ref: ${{ env.text_app_ref }}
 
       - name: Checkout circles app
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           repository: nextcloud/circles
@@ -83,7 +83,7 @@ jobs:
           ref: ${{ matrix.server-versions }}
 
       - name: Checkout app
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           path: apps/${{ env.APP_NAME }}
