@@ -72,12 +72,13 @@ class RowService extends SuperService {
 
 	/**
 	 * @param Row2[] $rows
-	 * @return TablesPublicRow[]
+	 * @psalm-return TablesPublicRow[]
 	 */
 	public function formatRowsForPublicShare(array $rows): array {
 		return array_map(static function (Row2 $row): array {
 			$rowData = $row->jsonSerialize();
 			unset($rowData['tableId'], $rowData['createdBy'], $rowData['lastEditBy']);
+			/** @var TablesPublicRow $rowData */
 			return $rowData;
 		}, $rows);
 	}
@@ -100,7 +101,9 @@ class RowService extends SuperService {
 				$table = $this->tableMapper->find($tableId);
 				$sort = $table->getSortArray() ?: null;
 
-				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
+				$rows = $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
+				$this->attachAliasPayloads($rows, $tableColumns);
+				return $rows;
 			} else {
 				throw new PermissionError('no read access to table id = ' . $tableId);
 			}
@@ -135,6 +138,7 @@ class RowService extends SuperService {
 					$view->getSortArray(),
 					$this->resolveFilterUserId($userId, $view),
 				);
+
 			} else {
 				throw new PermissionError('no read access to view id = ' . $viewId);
 			}
@@ -181,6 +185,7 @@ class RowService extends SuperService {
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		$this->attachAliasPayload($row, $columns);
 		return $row;
 	}
 
@@ -261,6 +266,7 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->userId);
+			$this->attachAliasPayload($insertedRow, $columns);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 			$this->activityManager->triggerEvent(
@@ -687,6 +693,7 @@ class RowService extends SuperService {
 		}
 
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
+		$this->attachAliasPayload($updatedRow, $columns);
 
 		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
@@ -772,7 +779,9 @@ class RowService extends SuperService {
 		}
 
 		try {
+			$columns = $this->loadColumnsForData($item->getData() ?? []);
 			$deletedRow = $this->row2Mapper->delete($item);
+			$this->attachAliasPayload($item, $columns);
 
 			$event = new RowDeletedEvent($item, $item->getData());
 
@@ -882,9 +891,77 @@ class RowService extends SuperService {
 			return $row;
 		}
 
-		$row->filterDataByColumns($view->getColumnIds());
+		$columnIds = $view->getColumnIds();
+		$row->filterDataByColumns($columnIds);
+		$row->filterDataByAliasByColumns($columnIds);
 
 		return $row;
+	}
+
+	/**
+	 * @param Row2[] $rows
+	 * @param Column[]|null $columns
+	 */
+	private function attachAliasPayloads(array $rows, ?array $columns = null): void {
+		foreach ($rows as $row) {
+			$this->attachAliasPayload($row, $columns);
+		}
+	}
+
+	/**
+	 * @param Column[]|null $columns
+	 */
+	private function attachAliasPayload(Row2 $row, ?array $columns = null): void {
+		$data = $row->getData() ?? [];
+		if ($data === []) {
+			$row->setDataByAlias([]);
+			return;
+		}
+
+		$columns ??= $this->loadColumnsForData($data);
+		$aliasByColumnId = $this->buildAliasByColumnId($columns);
+
+		$dataByAlias = [];
+		foreach ($data as $cell) {
+			$columnId = (int)$cell['columnId'];
+			$alias = $aliasByColumnId[$columnId] ?? ('column_' . $columnId);
+			$dataByAlias[$alias] = [
+				'columnId' => $columnId,
+				'value' => $cell['value'],
+			];
+		}
+
+		$row->setDataByAlias($dataByAlias);
+	}
+
+	/**
+	 * Loads Column entities for the column IDs found in a row's data cells,
+	 * skipping meta column IDs (<= 0).
+	 *
+	 * @param array<array{columnId: int|string, value: mixed}> $data
+	 * @return Column[]
+	 */
+	private function loadColumnsForData(array $data): array {
+		$columnIds = array_values(array_unique(array_map(static fn (array $cell): int => (int)$cell['columnId'], $data)));
+		$columnIds = array_values(array_filter($columnIds, static fn (int $id): bool => $id > 0));
+		return $columnIds === [] ? [] : $this->columnMapper->findAll($columnIds);
+	}
+
+	/**
+	 * Builds a map of column ID => technical name for alias resolution.
+	 *
+	 * @param Column[] $columns
+	 * @return array<int, string>
+	 */
+	private function buildAliasByColumnId(array $columns): array {
+		$aliasByColumnId = [];
+		foreach ($columns as $column) {
+			$technicalName = $column->getTechnicalName();
+			if ($technicalName !== null && $technicalName !== '') {
+				$aliasByColumnId[$column->getId()] = $technicalName;
+			}
+		}
+		return $aliasByColumnId;
 	}
 
 	/**

@@ -933,6 +933,7 @@ export type components = {
             /** Format: int64 */
             readonly id: number;
             readonly title: string;
+            readonly technicalName: string;
             /** Format: int64 */
             readonly tableId: number;
             readonly createdBy: string;
@@ -1038,6 +1039,7 @@ export type components = {
             /** Format: int64 */
             readonly id: number;
             readonly title: string;
+            readonly technicalName: string;
             readonly createdAt: string;
             readonly lastEditAt: string;
             readonly type: string;
@@ -1093,6 +1095,13 @@ export type components = {
                 readonly columnId: number;
                 readonly value: Record<string, never>;
             } | null;
+            readonly dataByAlias: {
+                readonly [key: string]: {
+                    /** Format: int64 */
+                    readonly columnId: number;
+                    readonly value: Record<string, never>;
+                };
+            };
         };
         readonly Row: {
             /** Format: int64 */
@@ -1108,6 +1117,13 @@ export type components = {
                 readonly columnId: number;
                 readonly value: Record<string, never>;
             } | null;
+            readonly dataByAlias: {
+                readonly [key: string]: {
+                    /** Format: int64 */
+                    readonly columnId: number;
+                    readonly value: Record<string, never>;
+                };
+            };
         };
         readonly Share: {
             /** Format: int64 */
@@ -1178,6 +1194,13 @@ export type components = {
             readonly ownership: string;
             readonly ownerDisplayName: string | null;
             readonly createdBy: string;
+            readonly dataByAlias: {
+                readonly [key: string]: {
+                    /** Format: int64 */
+                    readonly columnId: number;
+                    readonly value: Record<string, never>;
+                };
+            };
             readonly createdAt: string;
             readonly lastEditBy: string;
             readonly lastEditAt: string;
@@ -2720,6 +2743,8 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * @description Column main type
                      * @enum {string}
@@ -2980,6 +3005,8 @@ export interface operations {
                     readonly viewId?: number | null;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * @description Column main type
                      * @enum {string}
@@ -3236,6 +3263,8 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Title */
                     readonly title?: string | null;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -5300,6 +5329,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * Format: double
                      * @description Default value for new rows
@@ -5476,6 +5507,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Default */
                     readonly textDefault?: string | null;
                     /** @description Allowed regex pattern */
@@ -5642,6 +5675,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
                     readonly selectionOptions: string;
                     /** @description Json int|list<int> for default selected option(s), eg 5 or ["1", "8"] */
@@ -5798,6 +5833,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * @description For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
                      * @enum {string|null}
@@ -5955,6 +5992,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}] */
                     readonly usergroupDefault?: string | null;
                     /**
