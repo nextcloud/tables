@@ -192,6 +192,16 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	public function deleteById(int $id): bool {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $qb->executeStatement() > 0;
+	}
+
+	/**
 	 * @param int $nodeId
 	 * @param string $nodeType
 	 * @throws Exception
@@ -234,6 +244,28 @@ class ShareMapper extends QBMapper {
 		}
 		$qb->where($orX);
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Return all shares as raw associative arrays, ordered by id.
+	 *
+	 * @return list<array<string, mixed>>
+	 * @throws Exception
+	 */
+	public function findAllRaw(): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select(
+			'id', 'sender', 'receiver', 'receiver_type', 'node_id', 'node_type',
+			'token', 'password',
+			'permission_read', 'permission_create', 'permission_update',
+			'permission_delete', 'permission_manage',
+			'created_at', 'last_edit_at'
+		)->from($this->table)
+			->orderBy('id', 'ASC');
+		$result = $qb->executeQuery();
+		$rows = $result->fetchAll();
+		$result->closeCursor();
+		return $rows;
 	}
 
 	/**

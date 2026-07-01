@@ -15,6 +15,28 @@ namespace OCA\Analytics\Datasource {
     }
 }
 
+namespace OCP\Share\Events {
+	class ShareReviewAccessCheckEvent extends \OCP\EventDispatcher\Event {
+		public function __construct(string $appId, string $shareId) {}
+		public function grantAccess(): void {}
+		public function denyAccess(string $reason): void {}
+		public function isHandled(): bool {}
+		public function isGranted(): bool {}
+	}
+}
+
+namespace OCA\ShareReview\Sources {
+    class SourceEvent extends \OCP\EventDispatcher\Event {
+        abstract public function registerSource(string $source): void {}
+    }
+
+    interface ISource {
+        public function getName(): string;
+        public function getShares(): array;
+        public function deleteShare(string $shareId): bool;
+    }
+}
+
 namespace OCA\Circles\Model {
 	class Circle {
 		abstract public function getSingleId(): string {}

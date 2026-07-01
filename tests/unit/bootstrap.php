@@ -23,6 +23,13 @@ require_once __DIR__ . '/Database/DatabaseTestCase.php';
 
 require_once __DIR__ . '/Db/Row2MapperTestDependencies.php';
 
+if (!interface_exists('OCA\ShareReview\Sources\ISource')) {
+	require_once __DIR__ . '/ShareReview/Stubs.php';
+}
+if (!class_exists(\OCP\Share\Events\ShareReviewAccessCheckEvent::class)) {
+	require_once __DIR__ . '/ShareReview/ShareReviewEventStub.php';
+}
+
 if (!class_exists(TestCase::class)) {
 	require_once('PHPUnit/Autoload.php');
 }
