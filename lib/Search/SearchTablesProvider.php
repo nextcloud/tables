@@ -23,22 +23,13 @@ use OCP\Search\SearchResult;
 use OCP\Search\SearchResultEntry;
 
 class SearchTablesProvider implements IProvider {
-	private IAppManager $appManager;
-	private IL10N $l10n;
-	private ViewService $viewService;
-	private TableService $tableService;
-	private IURLGenerator $urlGenerator;
-
-	public function __construct(IAppManager $appManager,
-		IL10N $l10n,
-		ViewService $viewService,
-		TableService $tableService,
-		IURLGenerator $urlGenerator) {
-		$this->appManager = $appManager;
-		$this->l10n = $l10n;
-		$this->viewService = $viewService;
-		$this->tableService = $tableService;
-		$this->urlGenerator = $urlGenerator;
+	public function __construct(
+		private readonly IAppManager $appManager,
+		private readonly IL10N $l10n,
+		private readonly ViewService $viewService,
+		private readonly TableService $tableService,
+		private readonly IURLGenerator $urlGenerator,
+	) {
 	}
 
 	/**
@@ -59,7 +50,7 @@ class SearchTablesProvider implements IProvider {
 	 * @inheritDoc
 	 */
 	public function getOrder(string $route, array $routeParameters): int {
-		if (strpos($route, Application::APP_ID . '.') === 0) {
+		if (str_starts_with($route, Application::APP_ID . '.')) {
 			// Active app, prefer Tables results
 			return -1;
 		}
@@ -89,29 +80,25 @@ class SearchTablesProvider implements IProvider {
 
 		// look for tables
 		$tables = $this->tableService->search($term, $limit, $offset);
-		$formattedTablesResults = array_map(function (Table $table) use ($appIconUrl): SearchResultEntry {
-			return new SearchResultEntry(
-				$appIconUrl,
-				$table->getEmoji() . ' ' . $table->getTitle(),
-				($table->getOwnerDisplayName() ? $table->getOwnerDisplayName() : $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()) . ', ' . $this->l10n->t('table'),
-				$this->getInternalLink($table->getId(), 'table'),
-				'',
-				false
-			);
-		}, $tables);
+		$formattedTablesResults = array_map(fn (Table $table): SearchResultEntry => new SearchResultEntry(
+			$appIconUrl,
+			$table->getEmoji() . ' ' . $table->getTitle(),
+			($table->getOwnerDisplayName() ?: $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()) . ', ' . $this->l10n->t('table'),
+			$this->getInternalLink($table->getId(), 'table'),
+			'',
+			false
+		), $tables);
 
 		// look for views
 		$views = $this->viewService->search($term, $limit, $offset);
-		$formattedViewResults = array_map(function (View $view) use ($viewIconUrl): SearchResultEntry {
-			return new SearchResultEntry(
-				$viewIconUrl,
-				$view->getEmoji() . ' ' . $view->getTitle(),
-				($view->getOwnerDisplayName() ? $view->getOwnerDisplayName(): $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()) . ', ' . $this->l10n->t('table view'),
-				$this->getInternalLink($view->getId(), 'view'),
-				'',
-				false
-			);
-		}, $views);
+		$formattedViewResults = array_map(fn (View $view): SearchResultEntry => new SearchResultEntry(
+			$viewIconUrl,
+			$view->getEmoji() . ' ' . $view->getTitle(),
+			($view->getOwnerDisplayName() ?: $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()) . ', ' . $this->l10n->t('table view'),
+			$this->getInternalLink($view->getId(), 'view'),
+			'',
+			false
+		), $views);
 
 		return SearchResult::paginated(
 			$this->getName(),

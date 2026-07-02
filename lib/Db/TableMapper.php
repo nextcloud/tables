@@ -23,7 +23,7 @@ class TableMapper extends QBMapper {
 	protected CappedMemoryCache $cache;
 	public function __construct(
 		IDBConnection $db,
-		private UserHelper $userHelper,
+		private readonly UserHelper $userHelper,
 	) {
 		parent::__construct($db, $this->table, Table::class);
 		$this->cache = new CappedMemoryCache();

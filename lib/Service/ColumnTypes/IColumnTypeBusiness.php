@@ -21,9 +21,9 @@ interface IColumnTypeBusiness {
 	 *
 	 * @param mixed $value
 	 * @param Column $column
-	 * @return string value stringify
+	 * @return string|false value stringify
 	 */
-	public function parseValue($value, Column $column): string;
+	public function parseValue($value, Column $column): string|false;
 
 	/**
 	 * Tests if the given value can be parsed to a value of the column type
@@ -57,7 +57,7 @@ interface IColumnTypeBusiness {
 	 *
 	 * @param mixed $value
 	 * @param Column $column
-	 * @return string
+	 * @return string|false
 	 */
-	public function parseDisplayValue($value, Column $column): string;
+	public function parseDisplayValue($value, Column $column): string|false;
 }

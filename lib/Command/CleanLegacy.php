@@ -30,12 +30,6 @@ class CleanLegacy extends Command {
 	public const PRINT_LEVEL_WARNING = 3;
 	public const PRINT_LEVEL_ERROR = 4;
 
-	protected ColumnService $columnService;
-	protected RowService $rowService;
-	protected TableService $tableService;
-	protected LoggerInterface $logger;
-	protected LegacyRowMapper $rowMapper;
-
 	private bool $dry = false;
 	private int $truncateLength = 20;
 
@@ -44,13 +38,14 @@ class CleanLegacy extends Command {
 
 	private OutputInterface $output;
 
-	public function __construct(LoggerInterface $logger, ColumnService $columnService, RowService $rowService, TableService $tableService, LegacyRowMapper $rowMapper) {
+	public function __construct(
+		protected LoggerInterface $logger,
+		protected ColumnService $columnService,
+		protected RowService $rowService,
+		protected TableService $tableService,
+		protected LegacyRowMapper $rowMapper,
+	) {
 		parent::__construct();
-		$this->logger = $logger;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->tableService = $tableService;
-		$this->rowMapper = $rowMapper;
 	}
 
 	protected function configure(): void {
@@ -95,7 +90,7 @@ class CleanLegacy extends Command {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->print('Error while fetching row', self::PRINT_LEVEL_ERROR);
 			$this->logger->error('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->print('');
 			$this->print('No more rows found.', self::PRINT_LEVEL_INFO);
 			$this->print('');
@@ -130,9 +125,9 @@ class CleanLegacy extends Command {
 			if (is_array($date->value)) {
 				$date->value = json_encode($date->value);
 			}
-			$suffix = strlen($date->value) > $this->truncateLength ? '...': '';
+			$suffix = strlen((string)$date->value) > $this->truncateLength ? '...': '';
 			$this->print('');
-			$this->print('columnId: ' . $date->columnId . ' -> ' . substr($date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
+			$this->print('columnId: ' . $date->columnId . ' -> ' . substr((string)$date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
 
 			try {
 				$this->columnService->find($date->columnId, '');
@@ -142,7 +137,7 @@ class CleanLegacy extends Command {
 			} catch (InternalError $e) {
 				$this->print('😱️ internal error while looking for column', self::PRINT_LEVEL_ERROR);
 				$this->logger->error('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
-			} catch (NotFoundError $e) {
+			} catch (NotFoundError) {
 				if ($this->output->isVerbose()) {
 					$this->print('corresponding column not found.', self::PRINT_LEVEL_ERROR);
 				} else {

@@ -14,9 +14,10 @@ class NumberBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value (int|float|string|null)
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		if ($value === null) {
 			return '';
 		}

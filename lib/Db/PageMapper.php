@@ -31,7 +31,7 @@ class PageMapper extends QBMapper {
 
 		$result = $qb->executeQuery();
 		$pageIds = [];
-		while ($row = $result->fetch()
+		while ($row = $result->fetchAssociative()
 		) {
 			$pageIds[] = (int)$row['id'];
 		}

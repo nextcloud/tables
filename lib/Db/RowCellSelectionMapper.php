@@ -30,12 +30,17 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 	}
 
 	public function formatRowData(Column $column, array $row) {
-		return json_decode($row['value']);
+		return json_decode((string)$row['value']);
 	}
 
-	private function valueToJsonDbValue(Column $column, $value): string {
+	/**
+	 * @param array|float|null|string $value
+	 *
+	 * @return array|false|float|string
+	 */
+	private function valueToJsonDbValue(Column $column, array|float|string|null $value): array|string|float|false {
 		if ($column->getSubtype() === 'check') {
-			return json_encode(ltrim($value, '"'));
+			return json_encode(ltrim((string)$value, '"'));
 		}
 
 		if ($column->getSubtype() === '' || $column->getSubtype() === null) {

@@ -60,7 +60,7 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 		$this->setColumnId($columnId);
 	}
 
-	public function setValueWrapper($value) {
+	public function setValueWrapper(array|float|null $value) {
 		$this->setValue($value);
 	}
 }

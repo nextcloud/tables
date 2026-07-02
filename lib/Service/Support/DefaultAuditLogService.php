@@ -13,7 +13,7 @@ use OCP\Log\Audit\CriticalActionPerformedEvent;
 
 final class DefaultAuditLogService implements AuditLogServiceInterface {
 	public function __construct(
-		private IEventDispatcher $eventDispatcher,
+		private readonly IEventDispatcher $eventDispatcher,
 	) {
 	}
 
