@@ -70,6 +70,7 @@ class ShareService extends SuperService {
 		private readonly IUserManager $userManager,
 		private readonly IHasher $hasher,
 		private readonly IShareManager $shareManager,
+		private readonly FederationService $federationService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -325,6 +326,10 @@ class ShareService extends SuperService {
 			);
 		}
 
+		if ($dto->getReceiverType() === ShareReceiverType::REMOTE) {
+			$dto->setShareToken($this->generateShareToken());
+		}
+
 		return $this->createNodeShare(
 			$dto->getNodeId(),
 			$dto->getNodeType(),
@@ -434,6 +439,15 @@ class ShareService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 
+		if ($receiverType === ShareReceiverType::REMOTE) {
+			try {
+				$this->federationService->sendShare($newShare);
+			} catch (Throwable $e) {
+				$this->logger->error($e->getMessage());
+				throw new InternalError($e->getMessage());
+			}
+		}
+
 		$newShare = $this->addReceiverDisplayName($newShare);
 		$this->triggerShareActivity($newShare, ActivityManager::SUBJECT_SHARE_CREATE);
 
@@ -488,6 +502,10 @@ class ShareService extends SuperService {
 	private function enforceGroupMembersOnlyPolicy(string $sender, string $receiverType, string $receiver): void {
 		if (!$this->shareManager->shareWithGroupMembersOnly()) {
 			return;
+		}
+
+		if ($receiverType === ShareReceiverType::REMOTE) {
+			throw new PermissionError('Federated sharing is not allowed when sharing is restricted to members of your groups.');
 		}
 
 		$senderGroupIds = $this->userHelper->getGroupIdsForUser($sender) ?? [];
@@ -624,6 +642,11 @@ class ShareService extends SuperService {
 		}
 
 		$share = $this->applyPermissions($item, $permissions);
+
+		if ($share->getReceiverType() === ShareReceiverType::REMOTE) {
+			$this->federationService->notifyPermissionUpdate($share);
+		}
+
 		$share = $this->addReceiverDisplayName($share);
 		$this->triggerShareActivity($share, ActivityManager::SUBJECT_SHARE_UPDATE);
 
@@ -693,6 +716,12 @@ class ShareService extends SuperService {
 
 		try {
 			$this->mapper->delete($item);
+
+			// notify federated shares about share deletion
+			if ($item->getReceiverType() === ShareReceiverType::REMOTE) {
+				$this->federationService->notifyShareDelete($item);
+			}
+
 			if ($item->getNodeType() === 'context') {
 				$this->contextNavigationMapper->deleteByShareId($item->getId());
 			}
@@ -753,6 +782,8 @@ class ShareService extends SuperService {
 				);
 				$share->setReceiverDisplayName($share->getReceiver());
 			}
+		} elseif ($share->getReceiverType() === ShareReceiverType::REMOTE) {
+			$share->setReceiverDisplayName($share->getReceiver());
 		} else {
 			$this->logger->info('can not use receiver type to get display name');
 			$share->setReceiverDisplayName($share->getReceiver());
@@ -991,5 +1022,4 @@ class ShareService extends SuperService {
 			$this->logger->error('Failed to import share: ' . $e->getMessage(), ['exception' => $e, 'share' => $share]);
 		}
 	}
-
 }
