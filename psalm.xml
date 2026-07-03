@@ -45,6 +45,10 @@
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
 				<referencedClass name="Doctrine\DBAL\Types\Types" />
 				<referencedClass name="OC\Core\Command\Base" />
+				<referencedClass name="OC\Http\Client\Response" />
+				<referencedClass name="OC\OCM\OCMSignatoryManager" />
+				<referencedClass name="GuzzleHttp\Exception\ClientException" />
+				<referencedClass name="GuzzleHttp\Exception\ServerException" />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>
@@ -57,6 +61,7 @@
 				<referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
 				<referencedClass name="Doctrine\DBAL\Schema\Sequence" />
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
+				<referencedClass name="OC\OCM\OCMSignatoryManager" />
 			</errorLevel>
 		</UndefinedDocblockClass>
 	</issueHandlers>

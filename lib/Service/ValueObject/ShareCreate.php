@@ -73,4 +73,8 @@ class ShareCreate {
 	public function getShareToken(): ?ShareToken {
 		return $this->shareToken;
 	}
+
+	public function setShareToken(ShareToken $token): void {
+		$this->shareToken = $token;
+	}
 }
