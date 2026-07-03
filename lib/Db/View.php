@@ -64,6 +64,10 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setOwnerDisplayName(string $ownerDisplayName)
  * @method getOwnership(): ?string
  * @method setOwnership(string $ownership)
+ * @method getExternalId(): ?int
+ * @method setExternalId(?int $externalId)
+ * @method getShareToken(): ?string
+ * @method setShareToken(?string $shareToken)
  */
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $uuid = null;
@@ -78,6 +82,9 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+
+	protected ?int $externalId = null;
+	protected ?string $shareToken = null;
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -229,6 +236,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'hasShares' => (bool)$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
+			'isFederated' => $this->isFederated(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 
@@ -243,5 +251,9 @@ class View extends EntitySuper implements JsonSerializable {
 		$columns = $this->getColumnsSettingsArray();
 
 		return array_map(static fn (ViewColumnInformation $column): int => $column->getId(), $columns);
+	}
+
+	public function isFederated(): bool {
+		return $this->externalId !== null && $this->shareToken !== null;
 	}
 }

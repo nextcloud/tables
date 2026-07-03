@@ -8,18 +8,22 @@
 namespace OCA\Tables\AppInfo;
 
 use Exception;
+use OC\OCM\OCMSignatoryManager;
 use OCA\Analytics\Datasource\DatasourceEvent;
 use OCA\Circles\Events\CircleDestroyedEvent;
 use OCA\Tables\Capabilities;
+use OCA\Tables\Config\ConfigLexicon;
 use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Event\ViewDeletedEvent;
+use OCA\Tables\Federation\FederationProvider;
 use OCA\Tables\Listener\AddMissingIndicesListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\BeforeTemplateRenderedListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\ReceiverCleanupListener;
+use OCA\Tables\Listener\ResourceTypeRegisterListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Listener\WhenRowDeletedAuditLogListener;
@@ -43,7 +47,12 @@ use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\DB\Events\AddMissingIndicesEvent;
+use OCP\Federation\ICloudFederationProvider;
+use OCP\Federation\ICloudFederationProviderManager;
 use OCP\Group\Events\GroupDeletedEvent;
+use OCP\OCM\Events\LocalOCMDiscoveryEvent;
+use OCP\Security\Signature\ISignatoryManager;
+use OCP\Server;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use Psr\Container\ContainerInterface;
@@ -81,6 +90,7 @@ class Application extends App implements IBootstrap {
 		}
 
 		$context->registerService(AuditLogServiceInterface::class, fn (ContainerInterface $c) => $c->get(DefaultAuditLogService::class));
+		$context->registerService(ISignatoryManager::class, fn (ContainerInterface $c) => $c->get(OCMSignatoryManager::class));
 
 		$context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
@@ -95,6 +105,7 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(UserDeletedEvent::class, ReceiverCleanupListener::class);
 		$context->registerEventListener(GroupDeletedEvent::class, ReceiverCleanupListener::class);
 		$context->registerEventListener(CircleDestroyedEvent::class, ReceiverCleanupListener::class);
+		$context->registerEventListener(LocalOCMDiscoveryEvent::class, ResourceTypeRegisterListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
@@ -109,8 +120,19 @@ class Application extends App implements IBootstrap {
 		$context->registerMiddleware(ShareControlMiddleware::class);
 
 		$context->registerUserMigrator(TablesMigrator::class);
+
+		$context->registerConfigLexicon(ConfigLexicon::class);
 	}
 
 	public function boot(IBootContext $context): void {
+		$context->injectFn([$this, 'registerCloudFederationProviderManager']);
+	}
+
+	public function registerCloudFederationProviderManager(ICloudFederationProviderManager $manager): void {
+		$manager->addCloudFederationProvider(
+			FederationProvider::PROVIDER_ID,
+			'Tables Federation',
+			static fn (): ICloudFederationProvider => Server::get(FederationProvider::class),
+		);
 	}
 }

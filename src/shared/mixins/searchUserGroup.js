@@ -49,6 +49,7 @@ export default {
 				...(this.selectUsers ? [this.SHARE_TYPES.SHARE_TYPE_USER] : []),
 				...(this.selectGroups ? [this.SHARE_TYPES.SHARE_TYPE_GROUP] : []),
 				...(this.selectCircles && this.isCirclesEnabled ? [this.SHARE_TYPES.SHARE_TYPE_CIRCLE] : []),
+				...(this.selectRemote ? [this.SHARE_TYPES.SHARE_TYPE_REMOTE] : []),
 			]
 		},
 		getShareTypeString() {
@@ -57,6 +58,7 @@ export default {
 				[this.SHARE_TYPES.SHARE_TYPE_USER]: 'User',
 				[this.SHARE_TYPES.SHARE_TYPE_GROUP]: 'Group',
 				[this.SHARE_TYPES.SHARE_TYPE_CIRCLE]: 'Team',
+				[this.SHARE_TYPES.SHARE_TYPE_REMOTE]: 'Federated',
 			}
 
 			const selectedLabels = shareTypes.map(type => typeLabels[type])

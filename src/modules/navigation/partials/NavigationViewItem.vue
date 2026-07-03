@@ -18,7 +18,8 @@
 			</template>
 		</template>
 		<template #counter>
-			<NcCounterBubble v-if="canReadData(view)">
+			<IconCloudOutline v-if="view.isFederated" :size="20" decorative style="margin-right: 8px;" />
+			<NcCounterBubble v-else-if="canReadData(view)">
 				{{ view.rowsCount }}
 			</NcCounterBubble>
 			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
@@ -135,11 +136,13 @@ import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import ActivityIcon from 'vue-material-design-icons/LightningBoltOutline.vue'
 import activityMixin from '../../../shared/mixins/activityMixin.js'
+import IconCloudOutline from 'vue-material-design-icons/CloudOutline.vue'
 
 export default {
 	name: 'NavigationViewItem',
 
 	components: {
+		IconCloudOutline,
 		ActivityIcon,
 		PlaylistEdit,
 		// eslint-disable-next-line vue/no-reserved-component-names

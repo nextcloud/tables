@@ -9,10 +9,12 @@ declare(strict_types=1);
 namespace OCA\Tables\Middleware;
 
 use InvalidArgumentException;
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\AssertShareAccessIsAccessible;
+use OCA\Tables\Service\ConfigService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Controller;
@@ -20,8 +22,10 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Middleware;
 use OCP\AppFramework\PublicShareController;
+use OCP\Federation\ICloudIdManager;
 use OCP\IRequest;
 use OCP\ISession;
+use OCP\OCM\IOCMDiscoveryService;
 use ReflectionMethod;
 
 class ShareControlMiddleware extends Middleware {
@@ -31,6 +35,9 @@ class ShareControlMiddleware extends Middleware {
 		private readonly IRequest $request,
 		private readonly ShareService $shareService,
 		private readonly ISession $session,
+		private readonly IOCMDiscoveryService $ocmDiscoveryService,
+		private readonly ICloudIdManager $cloudIdManager,
+		private readonly ConfigService $configService,
 	) {
 	}
 
@@ -72,10 +79,16 @@ class ShareControlMiddleware extends Middleware {
 	/**
 	 * @throws NotFoundError
 	 * @throws InvalidArgumentException
+	 * @throws PermissionError
 	 */
 	public function assertShareTokenIsValidAndExisting(string $tokenInput): void {
 		$shareToken = new ShareToken($tokenInput);
 		$this->share = $this->shareService->findByToken($shareToken);
+
+		if ($this->share->getReceiverType() === ShareReceiverType::REMOTE) {
+			$this->assertFederationShare();
+		}
+
 		$this->shareService->assertPublicShareAccessible($this->share);
 	}
 
@@ -90,5 +103,22 @@ class ShareControlMiddleware extends Middleware {
 			return new DataResponse(['message' => $exception->getMessage()], Http::STATUS_FORBIDDEN);
 		}
 		throw $exception;
+	}
+
+	private function assertFederationShare(): void {
+		if (!$this->configService->isFederationEnabled()) {
+			throw new PermissionError('Federation is disabled');
+		}
+
+		$signedRequest = $this->ocmDiscoveryService->getIncomingSignedRequest();
+		if ($signedRequest === null) {
+			throw new PermissionError('Federation requests must be signed');
+		}
+
+		$cloudId = $this->cloudIdManager->resolveCloudId($this->share->getReceiver());
+		$expectedOrigin = parse_url($cloudId->getRemote(), PHP_URL_HOST);
+		if ($signedRequest->getOrigin() !== $expectedOrigin) {
+			throw new PermissionError('Unauthorized federation request origin');
+		}
 	}
 }

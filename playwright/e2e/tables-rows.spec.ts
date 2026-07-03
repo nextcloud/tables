@@ -77,7 +77,7 @@ test.describe('Rows for a table', () => {
 		await createdRow.getByText('My first task', { exact: true }).click()
 		const titleInput = page.getByRole('textbox', { name: 'Cell input' }).first()
 		await expect(titleInput).toBeVisible({ timeout: 10000 })
-		const updateReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'PUT')
+		const updateReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/api/2/tables/') && r.url().includes('/rows') && r.request().method() === 'PUT')
 		await titleInput.clear()
 		await titleInput.fill('Changed column value')
 		await titleInput.press('Enter')
@@ -95,7 +95,7 @@ test.describe('Rows for a table', () => {
 		await openRowActionMenu(page, rowToDelete)
 		await page.locator('[data-cy="editRowBtn"]').click()
 
-		const deleteReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'DELETE')
+		const deleteReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/api/2/tables/') && r.url().includes('/rows') && r.request().method() === 'DELETE')
 		await page.locator('[data-cy="editRowDeleteButton"]').click()
 		await page.locator('[data-cy="editRowDeleteConfirmButton"]').click()
 		await deleteReqPromise
@@ -154,7 +154,7 @@ test.describe('Rows for a table', () => {
 		const rowToDelete = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'Row to delete' }).first()
 		await expect(rowToDelete).toBeVisible({ timeout: 10000 })
 
-		const deleteReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'DELETE')
+		const deleteReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/api/2/tables/') && r.url().includes('/rows') && r.request().method() === 'DELETE')
 		await openRowActionMenu(page, rowToDelete)
 		await page.locator('[data-cy="deleteRowBtn"]').click()
 		await page.locator('[data-cy="confirmDialog"]').getByRole('button', { name: 'Confirm' }).click()

@@ -789,7 +789,7 @@ class RowService extends SuperService {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
-			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
+			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId(), $userId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -808,7 +808,7 @@ class RowService extends SuperService {
 				objectType: ActivityManager::TABLES_OBJECT_ROW,
 				object: $deletedRow,
 				subject: ActivityManager::SUBJECT_ROW_DELETE,
-				author: $this->userId,
+				author: $userId,
 			);
 			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_ROW,

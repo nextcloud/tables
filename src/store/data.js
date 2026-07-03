@@ -279,11 +279,11 @@ export const useDataStore = defineStore('data', {
 		async updateRow({ id, isView, elementId, data }) {
 			let res = null
 			const viewId = isView ? elementId : null
+			const nodeCollection = isView ? 'views' : 'tables'
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, data })
+				res = await axios.put(generateOcsUrl('apps/tables/api/2/' + nodeCollection + '/' + elementId + '/rows/' + id), { data })
 			} catch (e) {
-				console.debug(e?.response)
 				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
 					showError(t('tables', 'Outdated data. View is reloaded'))
 					await this.loadRowsFromBE({ viewId })
@@ -295,7 +295,7 @@ export const useDataStore = defineStore('data', {
 
 			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.rows[stateId]) {
-				const row = res.data
+				const row = res.data.ocs.data
 				const updatedRows = this.rows[stateId].map(r => r.id === row.id ? row : r)
 				set(this.rows, stateId, updatedRows)
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
@@ -366,12 +366,9 @@ export const useDataStore = defineStore('data', {
 
 		async removeRow({ rowId, isView, elementId }) {
 			const viewId = isView ? elementId : null
+			const nodeCollection = isView ? 'views' : 'tables'
 			try {
-				if (viewId) {
-					await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
-				} else {
-					await axios.delete(generateUrl('/apps/tables/row/' + rowId))
-				}
+				await axios.delete(generateOcsUrl('apps/tables/api/2/' + nodeCollection + '/' + elementId + '/rows/' + rowId))
 			} catch (e) {
 				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
 					showError(t('tables', 'Outdated data. View is reloaded'))

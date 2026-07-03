@@ -63,14 +63,17 @@ export default {
 				return false
 			}
 
+			const isRemote = share.shareType === this.SHARE_TYPES.SHARE_TYPE_REMOTE
+			const receiver = isRemote ? share.shareWith : share.user
+
 			const data = {
 				nodeType: this.isView ? 'view' : 'table',
 				nodeId: this.activeElement.id,
-				receiver: share.user,
+				receiver,
 				receiverType: this.getReceiverType(share.shareType),
 				permissionRead: true,
-				permissionCreate: true,
-				permissionUpdate: true,
+				permissionCreate: !isRemote,
+				permissionUpdate: !isRemote,
 				permissionDelete: false,
 				permissionManage: false,
 			}
@@ -155,6 +158,7 @@ export default {
 				this.SHARE_TYPES.SHARE_TYPE_GROUP,
 				this.SHARE_TYPES.SHARE_TYPE_LINK,
 				...(this.isCirclesEnabled ? [this.SHARE_TYPES.SHARE_TYPE_CIRCLE] : []),
+				this.SHARE_TYPES.SHARE_TYPE_REMOTE,
 			].includes(shareType)
 		},
 
@@ -166,6 +170,8 @@ export default {
 				return 'group'
 			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
 				return 'circle'
+			case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
+				return 'remote'
 			default:
 				throw new Error('Invalid share type')
 			}

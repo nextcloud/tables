@@ -8,9 +8,11 @@
 namespace OCA\Tables\Service;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Config\ConfigLexicon;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\Config\IUserConfig;
+use OCP\IAppConfig;
 use OCP\IUserSession;
 
 class ConfigService {
@@ -28,6 +30,7 @@ class ConfigService {
 
 	public function __construct(
 		private readonly IUserConfig $userConfig,
+		private readonly IAppConfig $appConfig,
 	) {
 	}
 
@@ -142,5 +145,19 @@ class ConfigService {
 			return $this->userConfig->getValueBool($userId, Application::APP_ID, $scope . ':' . $scopeId . ':' . $key);
 		}
 		return false;
+	}
+
+	public function isFederationEnabled(): bool {
+		return $this->appConfig->getValueBool('tables', ConfigLexicon::FEDERATION_ENABLED, true);
+	}
+
+	public function isOutgoingFederationEnabled(): bool {
+		return $this->isFederationEnabled()
+			&& $this->appConfig->getValueBool('files_sharing', 'outgoing_server2server_share_enabled', true);
+	}
+
+	public function isIncomingFederationEnabled(): bool {
+		return $this->isFederationEnabled()
+			&& $this->appConfig->getValueBool('files_sharing', 'incoming_server2server_share_enabled', true);
 	}
 }

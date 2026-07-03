@@ -72,6 +72,7 @@ class ViewService extends SuperService {
 		IEventDispatcher $eventDispatcher,
 		ContextService $contextService,
 		IL10N $l,
+		private FederationService $federationService,
 		ActivityManager $activityManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -279,6 +280,10 @@ class ViewService extends SuperService {
 			$view->setLastEditBy($userId);
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
 			$view = $this->mapper->update($view);
+
+			// notify federated shares about view metadata update
+			$this->federationService->notifyNodeUpdate($view, 'view');
+
 			if (!$skipTableEnhancement) {
 				$this->enhanceView($view, $userId);
 			}
@@ -340,6 +345,10 @@ class ViewService extends SuperService {
 		if (!$this->permissionsService->canManageView($view, $userId)) {
 			throw new PermissionError('PermissionError: can not delete view with id ' . $id);
 		}
+
+		// notify federated shares about view deletion
+		$this->federationService->notifyNodeDelete($view, 'view');
+
 		$this->shareService->deleteAllForView($view);
 
 		// delete node relations if view is in any context
@@ -406,6 +415,11 @@ class ViewService extends SuperService {
 	 * $userId can be set or ''
 	 */
 	private function enhanceView(View $view, string $userId): void {
+		if ($view->isFederated()) {
+			$this->enhanceFederatedView($view, $userId);
+			return;
+		}
+
 		// add owner display name for UI
 		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
 
@@ -449,6 +463,21 @@ class ViewService extends SuperService {
 		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_VIEW, $view->getId())) {
 			$view->setFavorite(true);
 		}
+	}
+
+	private function enhanceFederatedView(View $view, string $userId): void {
+		$view->setOwnership($view->getCreatedBy());
+		$view->setOwnerDisplayName($view->getCreatedBy() ?? '');
+		$view->setIsShared(true);
+		$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
+		$view->setOnSharePermissions(new Permissions(
+			read: $permissions->read,
+			create: $permissions->create,
+			update: $permissions->update,
+			delete: $permissions->delete,
+			manage: false,
+			manageTable: false,
+		));
 	}
 
 	private function setIsSharedState(View $view, string $userId): void {
@@ -517,6 +546,7 @@ class ViewService extends SuperService {
 		}
 		$views = $this->findAll($table, $userId);
 		foreach ($views as $view) {
+			$this->federationService->notifyNodeDelete($view, 'view');
 			$this->deleteByObject($view, $userId);
 		}
 	}
