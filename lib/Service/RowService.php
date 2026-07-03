@@ -900,25 +900,24 @@ class RowService extends SuperService {
 
 	/**
 	 * @param Row2[] $rows
-	 * @param Column[]|null $columns
+	 * @param Column[] $columns
 	 */
-	private function attachAliasPayloads(array $rows, ?array $columns = null): void {
+	private function attachAliasPayloads(array $rows, array $columns): void {
 		foreach ($rows as $row) {
 			$this->attachAliasPayload($row, $columns);
 		}
 	}
 
 	/**
-	 * @param Column[]|null $columns
+	 * @param Column[] $columns
 	 */
-	private function attachAliasPayload(Row2 $row, ?array $columns = null): void {
+	private function attachAliasPayload(Row2 $row, array $columns): void {
 		$data = $row->getData() ?? [];
 		if ($data === []) {
 			$row->setDataByAlias([]);
 			return;
 		}
 
-		$columns ??= $this->loadColumnsForData($data);
 		$aliasByColumnId = $this->buildAliasByColumnId($columns);
 
 		$dataByAlias = [];
