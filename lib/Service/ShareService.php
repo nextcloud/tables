@@ -148,6 +148,29 @@ class ShareService extends SuperService {
 		}
 	}
 
+	public function isPublicShareAccessible(Share $share): bool {
+		$sender = $share->getSender();
+		if ($sender === null || $sender === '') {
+			return false;
+		}
+
+		$senderUser = $this->userManager->get($sender);
+		if ($senderUser === null || !$senderUser->isEnabled()) {
+			return false;
+		}
+
+		return !$this->shareManager->sharingDisabledForUser($sender);
+	}
+
+	/**
+	 * @throws PermissionError
+	 */
+	public function assertPublicShareAccessible(Share $share): void {
+		if (!$this->isPublicShareAccessible($share)) {
+			throw new PermissionError('Share cannot be accessed');
+		}
+	}
+
 	/**
 	 * @throws InternalError
 	 * @throws PermissionError
