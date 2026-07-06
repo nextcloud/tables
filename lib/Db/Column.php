@@ -245,7 +245,7 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public static function fromDto(ColumnDto $data): self {
 		$column = new self();
-		$column->assignUuid();
+		$column->setOrAssignUuid($data->getUuid());
 		$column->setTitle($data->getTitle());
 		$column->setTechnicalName($data->getTechnicalName());
 		$column->setType($data->getType());

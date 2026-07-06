@@ -22,6 +22,7 @@ use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -153,6 +154,9 @@ class ApiTablesController extends AOCSController {
 			$table = $this->service->create($title, 'custom', $emoji, $description);
 			$colMap = [];
 			foreach ($columns as $column) {
+				if (isset($column['uuid']) && !Uuid::isValid($column['uuid'])) {
+					throw new \InvalidArgumentException('Invalid UUID provided');
+				}
 				$col = $this->columnService->create(
 					$this->userId,
 					$table->getId(),
@@ -182,7 +186,8 @@ class ApiTablesController extends AOCSController {
 						usergroupSelectGroups: $column['usergroupSelectGroups'],
 						usergroupSelectTeams: $column['usergroupSelectTeams'],
 						showUserStatus: $column['showUserStatus'],
-						customSettings: empty($column['customSettings']) ? null : json_encode($column['customSettings'])
+						customSettings: empty($column['customSettings']) ? null : json_encode($column['customSettings']),
+						uuid: $column['uuid'] ?? null,
 					)
 				);
 				$colMap[$column['id']] = $col->getId();
