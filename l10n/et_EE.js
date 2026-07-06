@@ -643,7 +643,7 @@ OC.L10N.register(
     "Number of days ahead" : "Päevi tulevikus",
     "Enter number of days" : "Sisesta päevade arv",
     "Number of days ago" : "Päevi minevikus",
-    "ID" : "ID",
+    "ID" : "Tunnus",
     "Creator" : "Looja",
     "Last editor" : "Viimane muutja",
     "Last edited at" : "Viimase muutmise aeg",
