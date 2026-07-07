@@ -248,14 +248,18 @@ export default {
 
 	.tables-content-widget {
 		min-height: max(50vh, 200px);
-		height: 50vh;
+		height: 60vh;
+		max-height: calc(100dvh - 40px);
 		overflow: scroll;
+		overscroll-behavior: contain;
+		isolation: isolate;
 
 		& .header {
 			position: sticky;
 			top: 0;
 			inset-inline-start: 0;
-			z-index: 1;
+			z-index: 7;
+			background-color: var(--color-main-background);
 
 			:where(.options) {
 				position: sticky;
@@ -284,8 +288,11 @@ export default {
 		.nc-table {
 			min-width: var(--widget-content-width);
 
-			:where(.options.row) {
-				display: none;
+			:deep(.options.row) {
+				height: 0 !important;
+				overflow: hidden !important;
+				margin: 0 !important;
+				padding: 0 !important;
 			}
 
 			:where(thead) {
