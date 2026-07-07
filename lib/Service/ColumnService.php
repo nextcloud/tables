@@ -746,7 +746,7 @@ class ColumnService extends SuperService {
 	 * @throws BadRequestError
 	 * @throws InternalError
 	 */
-	private function handleColumnPersistDbException(\OCP\DB\Exception $e, string $context): void {
+	private function handleColumnPersistDbException(\OCP\DB\Exception $e, string $context): never {
 		if ($e->getReason() === \OCP\DB\Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
 			throw new BadRequestError('Technical name must be unique in the table.');
 		}

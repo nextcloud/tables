@@ -18,7 +18,7 @@ use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 use Override;
 
-class Version1000Date20260327000000 extends SimpleMigrationStep {
+class Version2200Date20260707000000 extends SimpleMigrationStep {
 	private IDBConnection $connection;
 
 	public function __construct(IDBConnection $connection) {
@@ -79,6 +79,6 @@ class Version1000Date20260327000000 extends SimpleMigrationStep {
 			$result->closeCursor();
 		}
 
-		$output->info('Version1000Date20260327000000: backfilled technical_name for ' . $updatedCount . ' columns.');
+		$output->info('Version2200Date20260707000000: backfilled technical_name for ' . $updatedCount . ' columns.');
 	}
 }
