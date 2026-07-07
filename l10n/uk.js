@@ -411,7 +411,7 @@ OC.L10N.register(
     "Copy" : "Копія",
     "Could not configure new view" : "Не вдалося налаштувати нове подання",
     "Duplicate view" : "Зробити копію подання",
-    "Filter items" : "Фільтрувати",
+    "Filter items" : "Швидкий фільтр ...",
     "Favorites" : "Із зірочкою",
     "Archived tables" : "Архівовані таблиці",
     "Applications" : "Застосунки",

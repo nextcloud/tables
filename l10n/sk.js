@@ -429,6 +429,7 @@ OC.L10N.register(
     "Set password" : "Nastaviť heslo",
     "Password" : "Heslo",
     "Share link" : "Zdieľať odkaz",
+    "Delete link" : "Odstrániť odkaz",
     "Public links" : "Verejné odkazy",
     "No view in context" : "V tomto kontexte nie je žiadny pohľad",
     "From {ownerName}" : "Od {ownerName}",
