@@ -112,6 +112,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param float|null $numberDefault Default value for new rows
@@ -144,7 +145,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
+	public function createNumberColumn(int $baseNodeId, string $title, ?string $technicalName, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		try {
@@ -154,6 +155,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::NUMBER->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
@@ -181,6 +183,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $textDefault Default
 	 * @param string|null $textAllowedPattern Allowed regex pattern
 	 * @param int|null $textMaxLength Max raw text length
@@ -212,7 +215,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?bool $textUnique = false, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
+	public function createTextColumn(int $baseNodeId, string $title, ?string $technicalName, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?bool $textUnique = false, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		try {
@@ -222,6 +225,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::TEXT->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
@@ -247,6 +251,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string $selectionOptions Json array{id: int, label: string} with
 	 *                                 options that can be selected, eg [{"id": 1, "label": "first"},{"id":
 	 *                                 2, "label": "second"}]
@@ -280,7 +285,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createSelectionColumn(int $baseNodeId, string $title, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
+	public function createSelectionColumn(int $baseNodeId, string $title, ?string $technicalName, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		try {
@@ -290,6 +295,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::SELECTION->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
@@ -313,6 +319,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param 'today'|'now'|null $datetimeDefault For a subtype 'date' you can
 	 *                                            set 'today'. For a main type or subtype 'time' you can set to 'now'.
 	 *
@@ -343,7 +350,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
+	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $technicalName, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		try {
@@ -353,6 +360,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::DATETIME->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
@@ -373,6 +381,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $usergroupDefault Json array{id: string, type: int},
 	 *                                      eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}]
 	 * @param boolean $usergroupMultipleItems Whether you can select multiple
@@ -408,7 +417,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
+	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $technicalName, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		try {
@@ -418,6 +427,7 @@ class ApiColumnsController extends ACommonColumnsOCSController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::PEOPLE->value,
 					mandatory: $mandatory,
 					description: $description,

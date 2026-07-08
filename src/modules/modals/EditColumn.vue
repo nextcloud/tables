@@ -6,16 +6,18 @@
 	<NcDialog size="large"
 		:name="t('tables', 'Edit column')"
 		@closing="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content create-column">
 			<div v-if="loading" class="icon-loading" />
-			<div class="row space-L">
+			<div class="row">
 				<div class="col-2">
 					<MainForm :description.sync="editColumn.description"
 						:mandatory.sync="editColumn.mandatory"
+						:technical-name.sync="editColumn.technicalName"
 						:title.sync="editColumn.title"
 						:custom-settings.sync="editColumn.customSettings"
 						:edit-column="true"
 						:title-missing-error="editErrorTitle"
+						:technical-name-invalid-error="technicalNameInvalidError"
 						:width-invalid-error="widthInvalidError" />
 				</div>
 				<div class="col-2 space-LR space-T">
@@ -74,6 +76,7 @@ import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../store/data.js'
 import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
+import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
 
 export default {
 	name: 'EditColumn',
@@ -129,6 +132,7 @@ export default {
 			editColumn: JSON.parse(JSON.stringify(this.column)),
 			deleteId: null,
 			editErrorTitle: false,
+			technicalNameInvalidError: false,
 			widthInvalidError: false,
 			canSave: true, // used to avoid saving an incorrect config
 		}
@@ -180,6 +184,12 @@ export default {
 			}
 			this.editColumn.title = title
 
+			if (!this.isTechnicalNameValid()) {
+				showError(t('tables', 'Cannot save column. Technical name must start with a lowercase letter and only contain lowercase letters, numbers, and underscores.'))
+				this.technicalNameInvalidError = true
+				return
+			}
+
 			if (this.editColumn.customSettings?.width
 				&& (this.editColumn.customSettings?.width < COLUMN_WIDTH_MIN || this.editColumn.customSettings?.width > COLUMN_WIDTH_MAX)) {
 				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
@@ -196,6 +206,7 @@ export default {
 			this.editColumn = null
 			this.deleteId = null
 			this.editErrorTitle = false
+			this.technicalNameInvalidError = false
 			this.widthInvalidError = false
 		},
 		async updateLocalColumn() {
@@ -212,6 +223,9 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
+
+			data.technicalName = this.normalizeTechnicalName(data.technicalName)
+			data.customSettings = { ...data.customSettings, width: data.customSettings.width }
 			const res = await this.updateColumn({
 				id: this.editColumn.id,
 				isView: this.isView,
@@ -222,6 +236,12 @@ export default {
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}
+		},
+		normalizeTechnicalName(technicalName) {
+			return normalizeTechnicalName(technicalName)
+		},
+		isTechnicalNameValid() {
+			return isTechnicalNameValid(this.editColumn.technicalName)
 		},
 	},
 }

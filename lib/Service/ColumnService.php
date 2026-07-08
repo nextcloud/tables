@@ -313,8 +313,18 @@ class ColumnService extends SuperService {
 		try {
 			$entity = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+		}
+		if ($entity->getTechnicalName() === null || $entity->getTechnicalName() === '') {
+			$entity->setTechnicalName($this->buildDefaultTechnicalName($entity->getId()));
+			try {
+				$entity = $this->mapper->update($entity);
+			} catch (\OCP\DB\Exception $e) {
+				$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
 		}
 		if (isset($view) && $view) {
 			// Add columns to view(s)
@@ -367,6 +377,9 @@ class ColumnService extends SuperService {
 			if ($title !== null) {
 				$item->setTitle($title);
 			}
+			if ($columnDto->getTechnicalName() !== null) {
+				$item->setTechnicalName($columnDto->getTechnicalName());
+			}
 			if ($columnDto->getType() !== null) {
 				$item->setType($columnDto->getType());
 			}
@@ -411,7 +424,11 @@ class ColumnService extends SuperService {
 			$item->setCustomSettings($columnDto->getCustomSettings());
 
 			$this->updateMetadata($item, $userId);
-			return $this->enhanceColumn($this->mapper->update($item));
+			try {
+				return $this->enhanceColumn($this->mapper->update($item));
+			} catch (\OCP\DB\Exception $e) {
+				$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+			}
 		} catch (BadRequestError $e) {
 			throw $e;
 		} catch (Exception $e) {
@@ -674,6 +691,7 @@ class ColumnService extends SuperService {
 		$item = new Column();
 		$item->setTableId($table->getId());
 		$item->setTitle($column['title']);
+		$item->setTechnicalName($column['technicalName'] ?? null);
 		$item->setCreatedBy($table->getOwnership());
 		$item->setCreatedAt($column['createdAt']);
 		$item->setLastEditBy($table->getOwnership());
@@ -705,10 +723,35 @@ class ColumnService extends SuperService {
 
 		try {
 			$newColumn = $this->mapper->insert($item);
+			if ($newColumn->getTechnicalName() === null || $newColumn->getTechnicalName() === '') {
+				$newColumn->setTechnicalName($this->buildDefaultTechnicalName($newColumn->getId()));
+				$newColumn = $this->mapper->update($newColumn);
+			}
+		} catch (BadRequestError $e) {
+			throw $e;
+		} catch (\OCP\DB\Exception $e) {
+			$this->handleColumnPersistDbException($e, 'importColumn insert error');
 		} catch (\Exception $e) {
 			$this->logger->error('importColumn insert error: ' . $e->getMessage());
 			throw new InternalError('importColumn insert error: ' . $e->getMessage());
 		}
 		return $newColumn->getId();
+	}
+
+	private function buildDefaultTechnicalName(int $columnId): string {
+		return 'column_' . $columnId;
+	}
+
+	/**
+	 * @throws BadRequestError
+	 * @throws InternalError
+	 */
+	private function handleColumnPersistDbException(\OCP\DB\Exception $e, string $context): never {
+		if ($e->getReason() === \OCP\DB\Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+			throw new BadRequestError('Technical name must be unique in the table.');
+		}
+
+		$this->logger->error($e->getMessage(), ['exception' => $e]);
+		throw new InternalError($context . ': ' . $e->getMessage());
 	}
 }

@@ -901,6 +901,7 @@ class Api1Controller extends ApiController {
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -941,6 +942,7 @@ class Api1Controller extends ApiController {
 		?int $tableId,
 		?int $viewId,
 		string $title,
+		?string $technicalName,
 		string $type,
 		?string $subtype,
 		bool $mandatory,
@@ -979,6 +981,7 @@ class Api1Controller extends ApiController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::from($type)->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
@@ -1034,6 +1037,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $columnId Column ID that will be updated
 	 * @param string|null $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1071,6 +1075,7 @@ class Api1Controller extends ApiController {
 	public function updateColumn(
 		int $columnId,
 		?string $title,
+		?string $technicalName,
 		?string $subtype,
 		?bool $mandatory,
 		?string $description,
@@ -1106,6 +1111,7 @@ class Api1Controller extends ApiController {
 				$this->userId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					subtype: $subtype,
 					mandatory: $mandatory,
 					description: $description,
@@ -1679,6 +1685,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1719,6 +1726,7 @@ class Api1Controller extends ApiController {
 	public function createTableColumn(
 		int $tableId,
 		string $title,
+		?string $technicalName,
 		string $type,
 		?string $subtype,
 		bool $mandatory,
@@ -1757,6 +1765,7 @@ class Api1Controller extends ApiController {
 				null,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::from($type)->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
