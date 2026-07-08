@@ -177,14 +177,7 @@ class ShareService extends SuperService {
 	 * @throws PermissionError
 	 */
 	public function createLinkShare(Table|View $node, ?string $password = null): Share {
-		// check admin sharing policy for this user (allowed/excluded sharing groups)
-		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
-			throw new PermissionError('Sharing is restricted by your administrator for your account.');
-		}
-		// check global admin setting for public link sharing
-		if (!$this->shareManager->shareApiAllowLinks()) {
-			throw new PermissionError('Public link sharing is disabled by your administrator.');
-		}
+		$this->assertPublicLinkSharingAllowed();
 
 		for ($i = 0; $i < 3; $i++) {
 			// there is the theoretical chance, that an existing share token would be re-used,
@@ -228,6 +221,18 @@ class ShareService extends SuperService {
 	protected function generateShareToken(): ShareToken {
 		$shareToken = $this->secureRandom->generate(ShareToken::MIN_LENGTH, ISecureRandom::CHAR_LOWER . ISecureRandom::CHAR_UPPER . ISecureRandom::CHAR_DIGITS);
 		return new ShareToken($shareToken);
+	}
+
+	/**
+	 * @throws PermissionError
+	 */
+	private function assertPublicLinkSharingAllowed(): void {
+		if ($this->shareManager->sharingDisabledForUser($this->userId)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
+		}
+		if (!$this->shareManager->shareApiAllowLinks()) {
+			throw new PermissionError('Public link sharing is disabled by your administrator.');
+		}
 	}
 
 	/**
@@ -358,6 +363,9 @@ class ShareService extends SuperService {
 		}
 		if ($receiverType === ShareReceiverType::GROUP && !$this->shareManager->allowGroupSharing()) {
 			throw new PermissionError('Group sharing is disabled by your administrator.');
+		}
+		if ($receiverType === ShareReceiverType::LINK) {
+			$this->assertPublicLinkSharingAllowed();
 		}
 		$this->enforceGroupMembersOnlyPolicy($this->userId, $receiverType, $receiver);
 
