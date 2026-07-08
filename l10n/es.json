@@ -529,6 +529,7 @@
     "_%n selected row_::_%n selected rows_" : ["%n fila seleccionada","%n filas seleccionadas","%n filas seleccionadas"],
     "Go to first page" : "Ir a la primera página",
     "Go to previous page" : "Ir a la página anterior",
+    "Page" : "Página",
     "Page number" : "Número de página",
     "Go to next page" : "Ir a la siguiente página",
     "Go to last page" : "Ir a la última página",
