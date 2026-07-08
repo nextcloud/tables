@@ -39,7 +39,6 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
-use OCP\IGroup;
 use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
@@ -234,8 +233,7 @@ class ShareService extends SuperService {
 		try {
 			$shares['user'] = $this->mapper->findAllSharesFor($elementType, [$userId], $userId);
 
-			$userGroups = $this->userHelper->getGroupsForUser($userId);
-			$userGroupIds = array_map(static fn (IGroup $group) => $group->getGid(), $userGroups);
+			$userGroupIds = $this->userHelper->getGroupIdsForUser($userId);
 			$shares['groups'] = $this->mapper->findAllSharesFor($elementType, $userGroupIds, $userId, ShareReceiverType::GROUP);
 
 			$userCircles = $this->circleHelper->getUserCircles($userId);
