@@ -74,6 +74,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Options" : "ตัวเลือก",
     "Undo" : "เลิกทำ",
+    "Advanced settings" : "การตั้งค่าขั้นสูง",
     "Prefix" : "คำนำหน้า",
     "Suffix" : "คำต่อท้าย",
     "Default" : "ค่าเริ่มต้น",

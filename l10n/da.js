@@ -310,6 +310,8 @@ OC.L10N.register(
     "Set today as default" : "Indstil i dag som standard",
     "Set now as default" : "Indstil nu som standard",
     "Enter a column title" : "Indtast en kolonnetitel",
+    "Advanced settings" : "Avancerede indstillinger",
+    "Technical name" : "Teknisk navn",
     "Default value" : "Standard værdi",
     "Decimals" : "Decimaler",
     "Minimum" : "Minimum",

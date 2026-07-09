@@ -265,6 +265,8 @@ OC.L10N.register(
     "Set today as default" : "Estableix avui com a per defecte",
     "Set now as default" : "Estableix ara com a per defecte",
     "Enter a column title" : "Introduïu un títol de columna",
+    "Advanced settings" : "Paràmetres avançats",
+    "Technical name" : "Nom tècnic",
     "Decimals" : "Decimals",
     "Minimum" : "Mínim",
     "Maximum" : "Màxim",

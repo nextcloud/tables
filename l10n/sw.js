@@ -150,6 +150,8 @@ OC.L10N.register(
     "Heading 3" : "Heading 3",
     "Code" : "Msimbo",
     "Task list" : "Task list",
+    "Advanced settings" : "Mipangilio ya kiwango cha juu",
+    "Technical name" : "Jina la kiufundi",
     "Default value" : "Thamani ya msingi",
     "Decimals" : "Desimali",
     "Prefix" : "Kiambishi awali",

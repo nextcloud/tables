@@ -156,6 +156,7 @@ OC.L10N.register(
     "Heading 2" : "כותרת 2",
     "Heading 3" : "כותרת 3",
     "Code" : "קוד",
+    "Advanced settings" : "הגדרות מתקדמות",
     "Prefix" : "תואר",
     "Suffix" : "סיומת",
     "Default" : "בררת מחדל",

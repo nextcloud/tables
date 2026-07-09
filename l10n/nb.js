@@ -456,6 +456,8 @@ OC.L10N.register(
     "Set now as default" : "Sett nå som standard",
     "Enter a column title" : "Angi en kolonnetittel",
     "Add column to other views" : "Legg til kolonne til andre visninger",
+    "Advanced settings" : "Avanserte innstillinger",
+    "Technical name" : "Teknisk navn",
     "The default value is lower than the minimum allowed value." : "Standardverdien er lavere enn den minste tillatte verdien.",
     "The default value is greater than the maximum allowed value." : "Standardverdien er større enn den maksimalt tillatte verdien.",
     "Default value" : "Standard verdi",

@@ -335,6 +335,8 @@ OC.L10N.register(
     "Set today as default" : "Nastavi današnji dan kot privzeto vrednost",
     "Set now as default" : "Nastavi trenutni čas kot privzeto vrednost",
     "Enter a column title" : "Naslov stolpca",
+    "Advanced settings" : "Napredne nastavitve",
+    "Technical name" : "Tehnično ime",
     "Default value" : "Privzeta vrednosti",
     "Decimals" : "Decimalna mesta",
     "Minimum" : "Najmanj",

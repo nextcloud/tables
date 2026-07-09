@@ -192,6 +192,7 @@ OC.L10N.register(
     "Heading 2" : "Đầu đề 2",
     "Heading 3" : "Đầu đề 3",
     "Code" : "Mã",
+    "Advanced settings" : "Cài đặt nâng cao",
     "Prefix" : "Tiền tố",
     "Suffix" : "Hậu tố",
     "Default" : "Mặc định",

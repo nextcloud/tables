@@ -98,6 +98,7 @@ OC.L10N.register(
     "Undo" : "Deshacer",
     "Bold" : "Negrita",
     "Italic" : "Itálico",
+    "Advanced settings" : "Configuraciones avanzadas",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",

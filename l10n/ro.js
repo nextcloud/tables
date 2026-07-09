@@ -100,6 +100,8 @@ OC.L10N.register(
     "Undo" : "Anulează ultima acțiune",
     "Redo" : "Repetă",
     "Code" : "Cod",
+    "Advanced settings" : "Setări avansate",
+    "Technical name" : "Nume tehnic",
     "Prefix" : "Prefix",
     "Suffix" : "Sufix",
     "Default" : "Implicit",

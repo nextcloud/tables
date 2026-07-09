@@ -278,6 +278,7 @@ OC.L10N.register(
     "Set today as default" : "Задайте днес по подразбиране",
     "Set now as default" : "Задайте сега по подразбиране",
     "Enter a column title" : "Въведете заглавие на колона",
+    "Advanced settings" : "Допълнителни настройки",
     "Default value" : "Стойност по подразбиране",
     "Decimals" : "Десетични знаци",
     "Minimum" : "Минимум",

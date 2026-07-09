@@ -325,6 +325,8 @@ OC.L10N.register(
     "Code" : "Код",
     "Set today as default" : "Использовать текущую дату по умолчанию",
     "Set now as default" : "Использовать текущее время по умолчанию",
+    "Advanced settings" : "Расширенные параметры",
+    "Technical name" : "Техническое название",
     "Default value" : "Значение по умолчанию",
     "Decimals" : "Десятичные дроби",
     "Minimum" : "Минимум",

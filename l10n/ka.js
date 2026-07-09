@@ -99,6 +99,7 @@ OC.L10N.register(
     "Sorting" : "Sorting",
     "Undo" : "Undo",
     "Code" : "Code",
+    "Advanced settings" : "Advanced settings",
     "Default" : "Default",
     "Copy link" : "Copy link",
     "Close editor" : "Close editor",

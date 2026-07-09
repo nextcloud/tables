@@ -61,6 +61,7 @@ OC.L10N.register(
     "Download" : "Descargar",
     "Search" : "Buscar",
     "Undo" : "Deshacer",
+    "Advanced settings" : "Configuraciones avanzados",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",

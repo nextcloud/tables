@@ -49,6 +49,7 @@ OC.L10N.register(
     "Download" : "Last ned",
     "Search" : "Søk",
     "URL" : "URL",
+    "Advanced settings" : "Avanserte innstillingar",
     "Default" : "Standard",
     "Copy link" : "Kopier lenkje",
     "ID" : "ID",

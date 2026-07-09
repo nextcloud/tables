@@ -89,6 +89,7 @@ OC.L10N.register(
     "Heading 1" : "Titolo 1",
     "Heading 2" : "Titolo 2",
     "Heading 3" : "Titolo 3",
+    "Advanced settings" : "Altanivela agordo",
     "Prefix" : "Prefikso",
     "Suffix" : "Sufikso",
     "Default" : "Defaŭlta",

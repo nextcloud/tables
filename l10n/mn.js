@@ -119,6 +119,8 @@ OC.L10N.register(
     "Heading 1" : "Гарчиг 1",
     "Heading 2" : "Гарчиг 2",
     "Heading 3" : "Гарчиг 3",
+    "Advanced settings" : "–ù–∞—Ä–∏–π–≤—á–∏–ª—Å–∞–Ω —Ç–æ—Ö–∏—Ä–≥–æ–æ",
+    "Technical name" : "Техникийн нэр",
     "Prefix" : "Угтвар",
     "Suffix" : "Дагавар",
     "Default" : "Өгөгдмөл",

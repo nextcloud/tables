@@ -94,6 +94,7 @@ OC.L10N.register(
     "Heading 2" : "Títol 2",
     "Heading 3" : "Títol 3",
     "Code" : "Còdi",
+    "Advanced settings" : "Paramètres avançats",
     "Default" : "Defaut",
     "Copy link" : "Copiar lo ligam",
     "Confirm" : "Confirmar",

@@ -217,6 +217,7 @@ OC.L10N.register(
     "Code" : "Code",
     "Set today as default" : "Stel vandaag als standaard in",
     "Set now as default" : "Stel nu als standaard in",
+    "Advanced settings" : "Geavanceerde instellingen",
     "Default value" : "Standaard waarde",
     "Decimals" : "Decimalen",
     "Minimum" : "Minimum",

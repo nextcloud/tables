@@ -76,6 +76,7 @@ OC.L10N.register(
     "Bold" : "I theksuar",
     "Italic" : "I pjerrët",
     "Code" : "Kod",
+    "Advanced settings" : "Rregullime të mëtejshme",
     "Prefix" : "Parashtesë",
     "Suffix" : "Prapashtesë",
     "Default" : "E paracaktuar",

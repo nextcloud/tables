@@ -67,6 +67,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Copiar al portapapeles",
     "Search" : "Buscar",
     "Undo" : "Deshacer",
+    "Advanced settings" : "Configuraciones avanzados",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",

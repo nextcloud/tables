@@ -412,6 +412,8 @@ OC.L10N.register(
     "Heading 2" : "标题 2",
     "Heading 3" : "标题 3",
     "Code" : "代码",
+    "Advanced settings" : "高级设置",
+    "Technical name" : "术语专称",
     "Default value" : "默认值",
     "Minimum" : "最少",
     "Maximum" : "最多",

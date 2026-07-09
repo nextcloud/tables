@@ -67,6 +67,7 @@ OC.L10N.register(
     "Search" : "Buscar",
     "URL" : "URL",
     "Undo" : "Deshacer",
+    "Advanced settings" : "Configuraciones avanzados",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",

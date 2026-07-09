@@ -113,6 +113,7 @@ OC.L10N.register(
     "Heading 1" : "Заглавие 1",
     "Heading 2" : "Заглавие 2",
     "Heading 3" : "Заглавие 3",
+    "Advanced settings" : "Напредни параметри",
     "Decimals" : "Децимали",
     "Prefix" : "Префикс",
     "Suffix" : "Суфикс",

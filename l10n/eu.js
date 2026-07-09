@@ -325,6 +325,8 @@ OC.L10N.register(
     "Set today as default" : "Ezarri gaur lehenetsi bezala",
     "Set now as default" : "Ezarri orain lehenetsi bezala",
     "Enter a column title" : "Sartu zutabe izenburu bat",
+    "Advanced settings" : "Ezarpen aurreratuak",
+    "Technical name" : "Izen teknikoa",
     "Default value" : "Balio lehenetsia",
     "Decimals" : "Dezimalak",
     "Minimum" : "Minimoa",

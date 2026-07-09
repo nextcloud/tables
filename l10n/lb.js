@@ -43,6 +43,7 @@ OC.L10N.register(
     "Download" : "Eroflueden",
     "Search" : "Search",
     "URL" : "URL",
+    "Advanced settings" : "Erweidert Astellungen",
     "Default" : "Standard",
     "Copy link" : "Link kopéieren",
     "Confirm" : "Konfirméieren",

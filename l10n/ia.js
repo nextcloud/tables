@@ -49,6 +49,7 @@ OC.L10N.register(
     "Search" : "Cercar",
     "URL" : "URL",
     "Undo" : "Disfacer",
+    "Advanced settings" : "Configurationes avantiate",
     "Prefix" : "Prefixo",
     "Suffix" : "Suffixo",
     "Copy link" : "Copiar ligamine",

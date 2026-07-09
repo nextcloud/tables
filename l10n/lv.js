@@ -102,6 +102,7 @@ OC.L10N.register(
     "Bold" : "Treknraksts",
     "Italic" : "Slīpraksts",
     "Code" : "Kods",
+    "Advanced settings" : "Paplašināti iestatījumi",
     "Prefix" : "Priedēklis",
     "Suffix" : "Piedēklis",
     "Default" : "Noklusējuma",

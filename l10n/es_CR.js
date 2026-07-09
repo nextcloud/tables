@@ -67,6 +67,7 @@ OC.L10N.register(
     "Error" : "Error",
     "Search" : "Buscar",
     "Undo" : "Deshacer",
+    "Advanced settings" : "Configuraciones avanzados",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",

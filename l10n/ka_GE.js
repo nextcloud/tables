@@ -66,6 +66,7 @@ OC.L10N.register(
     "Search" : "ძიება",
     "URL" : "URL",
     "Undo" : "დაბრუნება",
+    "Advanced settings" : "დამატებითი პარამეტრები",
     "Prefix" : "პრეფიქსი",
     "Suffix" : "სუფიქსი",
     "Default" : "საწყისი",

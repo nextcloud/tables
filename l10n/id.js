@@ -130,6 +130,7 @@ OC.L10N.register(
     "Heading 3" : "Judul 3",
     "Code" : "Kode",
     "Task list" : "Daftar tugas",
+    "Advanced settings" : "Pengaturan lanjutan",
     "Prefix" : "Prefix",
     "Suffix" : "Suffix",
     "Default" : "Bawaan",

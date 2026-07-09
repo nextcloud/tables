@@ -121,6 +121,7 @@ OC.L10N.register(
     "Heading 2" : "Fyrirsögn 2",
     "Heading 3" : "Fyrirsögn 3",
     "Code" : "Kóði",
+    "Advanced settings" : "Ítarlegri valkostir",
     "Prefix" : "Forskeyti",
     "Suffix" : "Viðskeyti",
     "Default" : "Sjálfgefið",

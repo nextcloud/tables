@@ -362,6 +362,7 @@ OC.L10N.register(
     "Set now as default" : "지금을 기본값으로 지정",
     "Enter a column title" : "행 제목 입력",
     "Add column to other views" : "다른 보기에 행 추가",
+    "Advanced settings" : "고급 설정",
     "The default value is lower than the minimum allowed value." : "기본값이 최소 허용치보다 낮습니다.",
     "The default value is greater than the maximum allowed value." : "기본값이 최대 허용치보다 높습니다.",
     "Default value" : "기본값",

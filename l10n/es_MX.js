@@ -123,6 +123,7 @@ OC.L10N.register(
     "Heading 1" : "Título 1",
     "Heading 2" : "Título 2",
     "Heading 3" : "Título 3",
+    "Advanced settings" : "Configuraciones avanzadas",
     "Decimals" : "Decimales",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
