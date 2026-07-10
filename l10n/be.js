@@ -261,6 +261,7 @@ OC.L10N.register(
     "Code" : "Код",
     "Task list" : "Спіс заданняў",
     "Enter a column title" : "Увядзіце загаловак слупка",
+    "Advanced settings" : "Пашыраныя налады",
     "Column width" : "Шырыня слупка",
     "Enter a column width between {min} and {max}" : "Увядзіце шырыню слупка ад {min} да {max}",
     "Default value" : "Прадвызначанае значэнне",

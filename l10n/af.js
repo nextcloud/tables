@@ -56,6 +56,7 @@ OC.L10N.register(
     "Heading 1" : "Kop 1",
     "Heading 2" : "Kop 2",
     "Heading 3" : "Kop 3",
+    "Advanced settings" : "Gevorderde instellings",
     "Prefix" : "Voorvoegsel",
     "Suffix" : "Agtervoegsel",
     "Default" : "Verstek",

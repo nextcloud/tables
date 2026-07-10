@@ -54,6 +54,7 @@ OC.L10N.register(
     "Search" : "Axtarış",
     "URL" : "URL",
     "Back" : "Geri",
+    "Advanced settings" : "İrəliləmiş quraşdırmalar",
     "Default" : "Susmaya görə",
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",

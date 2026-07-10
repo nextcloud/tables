@@ -479,6 +479,8 @@ OC.L10N.register(
     "Set now as default" : "تعيين الآن كافتراضي",
     "Enter a column title" : "أدخِل عنوان العمود",
     "Add column to other views" : "إضافة عمود إلى طرق العرض الأخرى",
+    "Advanced settings" : "إعدادات متقدمة",
+    "Technical name" : "الاسم الفني",
     "The default value is lower than the minimum allowed value." : "القيمة التلقائية أصغر من الحد الأدنى المسموح به.",
     "The default value is greater than the maximum allowed value." : "القيمة التلقائية أكبر من الحد الأقصى المسموح به.",
     "Default value" : "القيمة الافتراضية",
