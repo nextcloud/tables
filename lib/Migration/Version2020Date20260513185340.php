@@ -12,6 +12,7 @@ namespace OCA\Tables\Migration;
 use Closure;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
@@ -22,6 +23,7 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 	private const TARGET_TABLE = 'tables_columns';
 	private const COL_ID = 'id';
 	private const COL_UUID = 'uuid';
+	private const COL_SELECTION_OPTIONS = 'selection_options';
 	private const INDEX_NAME = 'tables_col_uuid_uniq';
 
 	public function __construct(
@@ -54,16 +56,52 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 		return $schema;
 	}
 
+	private function applyColumnOptionsUpdateIfNecessary(IQueryBuilder $query, int $columnId, ?string $rawSelectionOptions): void {
+		$columnSelectionOptions = trim($rawSelectionOptions ?? '');
+		if ($columnSelectionOptions === '') {
+			return;
+		}
+
+		$selectionOptions = \json_decode($columnSelectionOptions, true);
+		if (!is_array($selectionOptions) || empty($selectionOptions)) {
+			return;
+		}
+
+		foreach ($selectionOptions as &$selectionOption) {
+			if (!isset($selectionOption['uuid'])) {
+				$selectionOption['uuid'] = Uuid::v7()->toRfc4122();
+			}
+		}
+
+		$updatedSelectionOptions = json_encode($selectionOptions);
+		unset($selectionOption);
+		$query->setParameters(
+			[
+				'columnLocalId' => $columnId,
+				'columnSelectionOptions' => $updatedSelectionOptions,
+			],
+			[
+				Types::INTEGER,
+				Types::TEXT,
+			]
+		);
+		$query->executeStatement();
+	}
+
 	#[Override]
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
+		$qbColUuidUpdate = $this->db->getQueryBuilder();
+		$qbColUuidUpdate->update(self::TARGET_TABLE)
+			->set(self::COL_UUID, $qbColUuidUpdate->createParameter('columnUuid'))
+			->where($qbColUuidUpdate->expr()->eq(self::COL_ID, $qbColUuidUpdate->createParameter('columnLocalId')));
 
-		$qbUpdate = $this->db->getQueryBuilder();
-		$qbUpdate->update(self::TARGET_TABLE)
-			->set(self::COL_UUID, $qbUpdate->createParameter('columnUuid'))
-			->where($qbUpdate->expr()->eq(self::COL_ID, $qbUpdate->createParameter('columnLocalId')));
+		$qbColOptionsUuidUpdate = $this->db->getQueryBuilder();
+		$qbColOptionsUuidUpdate->update(self::TARGET_TABLE)
+			->set(self::COL_SELECTION_OPTIONS, $qbColOptionsUuidUpdate->createParameter('columnSelectionOptions'))
+			->where($qbColOptionsUuidUpdate->expr()->eq(self::COL_ID, $qbColOptionsUuidUpdate->createParameter('columnLocalId')));
 
 		$qbSelect = $this->db->getQueryBuilder();
-		$qbSelect->select(self::COL_ID)
+		$qbSelect->select(self::COL_ID, self::COL_SELECTION_OPTIONS)
 			->from(self::TARGET_TABLE);
 		$select = $qbSelect->executeQuery();
 
@@ -72,8 +110,9 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 
 		try {
 			$this->db->beginTransaction();
-			while (($columnId = $select->fetchOne()) !== false) {
-				$qbUpdate->setParameters(
+			while (($columnData = $select->fetchAssociative()) !== false) {
+				$columnId = $columnData[self::COL_ID];
+				$qbColUuidUpdate->setParameters(
 					[
 						'columnLocalId' => (int)$columnId,
 						'columnUuid' => Uuid::v7()->toRfc4122(),
@@ -83,7 +122,10 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 						Types::STRING,
 					]
 				);
-				$qbUpdate->executeStatement();
+				$qbColUuidUpdate->executeStatement();
+
+				$this->applyColumnOptionsUpdateIfNecessary($qbColOptionsUuidUpdate, (int)$columnId, $columnData[self::COL_SELECTION_OPTIONS]);
+
 				$updates++;
 				if ($updates % $writeBatches === 0) {
 					$this->db->commit();

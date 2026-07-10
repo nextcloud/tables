@@ -17,7 +17,7 @@ class SelectionOption implements \JsonSerializable {
 	) {
 	}
 
-	public static function createFromInputArray(array $data): self {
+	public static function createFromInputArray(array $data, bool $allowPassingUuid = false): self {
 		if (!isset($data['id']) || !is_numeric($data['id'])) {
 			throw new \InvalidArgumentException('Only integer keys are allowed for options');
 		}
@@ -26,7 +26,7 @@ class SelectionOption implements \JsonSerializable {
 			throw new \InvalidArgumentException('Option label is missing');
 		}
 
-		if (isset($data['uuid'])) {
+		if (isset($data['uuid']) && !$allowPassingUuid) {
 			throw new \InvalidArgumentException('It is forbidden to set the Uuid from external');
 		}
 

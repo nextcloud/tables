@@ -71,18 +71,18 @@ class SelectionOptions implements JsonSerializable, Iterator {
 		$this->default = $confirmedOptions;
 	}
 
-	public static function createFromInputArray(?array $data, null|bool|int|string $default): self {
+	public static function createFromInputArray(?array $data, null|bool|int|string $default, bool $allowPassingUuid = false): self {
 		if ($data !== null) {
 			$selectionOptions = [];
 			foreach ($data as $inputSelectionOption) {
-				$selectionOptions[] = SelectionOption::createFromInputArray($inputSelectionOption);
+				$selectionOptions[] = SelectionOption::createFromInputArray($inputSelectionOption, $allowPassingUuid);
 			}
 		}
 		// `check` subtype has null as options
 		return new self($selectionOptions ?? null, $default);
 	}
 
-	public static function createFromInputJsonString(?string $data, null|bool|int|string $default): self {
+	public static function createFromInputJsonString(?string $data, null|bool|int|string $default, bool $allowPassingUuid = false): self {
 		if ($data !== null && $data !== 'null') {
 			$inputArray = \json_decode($data === '' ? '[]' : $data, true);
 			if (!is_array($inputArray)) {
@@ -92,7 +92,7 @@ class SelectionOptions implements JsonSerializable, Iterator {
 			// `check` subtype has "null" as options
 			$inputArray = null;
 		}
-		return self::createFromInputArray($inputArray, $default);
+		return self::createFromInputArray($inputArray, $default, $allowPassingUuid);
 	}
 
 	public function default(): mixed {
