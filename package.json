@@ -74,7 +74,7 @@
     "cypress-downloadfile": "^1.2.4",
     "openapi-typescript": "^7.13.0",
     "typescript": "^5.3.3",
-    "cypress-vite": "^1.10.1",
+    "cypress-vite": "^1.10.2",
     "vite": "^7.3.5"
   },
   "optionalDependencies": {
