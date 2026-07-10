@@ -57,8 +57,8 @@ jobs:
         # Continue if no package.json
         continue-on-error: true
         with:
-          fallbackNode: '^20'
-          fallbackNpm: '^10'
+          fallbackNode: '^24'
+          fallbackNpm: '^11.3'
 
       - name: Set up node ${{ steps.node_versions.outputs.nodeVersion }}
         if: ${{ steps.node_versions.outputs.nodeVersion }}
@@ -86,7 +86,7 @@ jobs:
 
       - name: Check openapi*.json and typescript changes
         run: |
-          bash -c "[[ ! \"`git status --porcelain openapi.json src/types/openapi/openapi.ts `\" ]] || (echo 'Please run \"composer run openapi\" and commit the openapi*.json files and (if applicable) src/types/openapi/openapi*.ts, see the section \"Show changes on failure\" for details' && exit 1)"
+          bash -c "[[ ! \"`git status --porcelain `\" ]] || (echo 'Please run \"composer run openapi\" and commit the openapi*.json files and (if applicable) src/types/openapi/openapi*.ts, see the section \"Show changes on failure\" for details' && exit 1)"
 
       - name: Show changes on failure
         if: failure()
