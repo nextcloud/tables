@@ -127,8 +127,14 @@
 			</NcActionButton>
 		</template>
 		<ul>
-			<NavigationViewItem v-for="view in getViews" :key="'view' + view.id" :view="view"
-				:show-share-sender="false" />
+			<NavigationViewItem v-for="(view, index) in orderedViews" :key="'view' + view.id" :view="view"
+				:show-share-sender="false"
+				:draggable="canReorderViews"
+				:class="{ 'view-drop-target': dragOverIndex === index }"
+				@dragstart.native="onViewDragStart(index)"
+				@dragover.native.prevent="onViewDragOver(index)"
+				@drop.native.prevent="onViewDrop"
+				@dragend.native="onViewDragEnd" />
 		</ul>
 	</NcAppNavigationItem>
 </template>
@@ -195,6 +201,9 @@ export default {
 	data() {
 		return {
 			isParentOfActiveView: false,
+			orderedViews: [],
+			draggedIndex: null,
+			dragOverIndex: null,
 		}
 	},
 
@@ -207,13 +216,28 @@ export default {
 			return getCurrentUser().uid
 		},
 		getViews() {
-			return this.views.filter(v => v.tableId === this.table.id && v.title.toLowerCase().includes(this.filterString.toLowerCase()))
+			return this.views
+				.filter(v => v.tableId === this.table.id && v.title.toLowerCase().includes(this.filterString.toLowerCase()))
+				.sort((a, b) => {
+					const orderA = a.sidebarOrder ?? Number.MAX_SAFE_INTEGER
+					const orderB = b.sidebarOrder ?? Number.MAX_SAFE_INTEGER
+					return orderA - orderB || a.id - b.id
+				})
 		},
 		hasViews() {
 			return this.getViews.length > 0
 		},
+		canReorderViews() {
+			return this.canManageElement(this.table) && !this.filterString && this.orderedViews.length > 1
+		},
 	},
 	watch: {
+		getViews: {
+			handler(views) {
+				this.orderedViews = [...views]
+			},
+			immediate: true,
+		},
 		activeView() {
 			if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
 				this.isParentOfActiveView = true
@@ -226,8 +250,47 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(useTablesStore, ['favoriteTable', 'removeFavoriteTable', 'updateTable']),
+		...mapActions(useTablesStore, ['favoriteTable', 'removeFavoriteTable', 'updateTable', 'updateView']),
 		emit,
+		onViewDragStart(index) {
+			if (!this.canReorderViews) {
+				return
+			}
+			this.draggedIndex = index
+		},
+		onViewDragOver(index) {
+			if (this.draggedIndex === null || this.draggedIndex === index) {
+				return
+			}
+			const moved = this.orderedViews.splice(this.draggedIndex, 1)[0]
+			this.orderedViews.splice(index, 0, moved)
+			this.draggedIndex = index
+			this.dragOverIndex = index
+		},
+		onViewDrop() {
+			this.persistViewOrder()
+		},
+		onViewDragEnd() {
+			this.persistViewOrder()
+		},
+		async persistViewOrder() {
+			if (this.draggedIndex === null) {
+				this.dragOverIndex = null
+				return
+			}
+			this.draggedIndex = null
+			this.dragOverIndex = null
+
+			const updates = []
+			this.orderedViews.forEach((view, index) => {
+				if (view.sidebarOrder !== index) {
+					updates.push(this.updateView({ id: view.id, data: { data: { sidebarOrder: index } } }))
+				}
+			})
+			if (updates.length) {
+				await Promise.all(updates)
+			}
+		},
 		deleteTable() {
 			emit('tables:table:delete', this.table)
 		},
@@ -330,5 +393,9 @@ export default {
 	.app-navigation-entry__counter-wrapper .counter-bubble__counter {
 		display: inline;
 	}
+}
+
+.view-drop-target {
+	border-top: 2px solid var(--color-primary-element);
 }
 </style>

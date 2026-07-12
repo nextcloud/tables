@@ -261,6 +261,8 @@ class ViewService extends SuperService {
 			}
 
 			foreach ($data->updateDetail() as $parameter => $value) {
+				$insertableValue = null;
+
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
