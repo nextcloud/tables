@@ -17,4 +17,5 @@ enum ViewUpdatableParameters: string {
 	case FILTER = 'filter';
 	case COLUMN_SETTINGS = 'columns';
 	case TECHNICAL_NAME = 'technicalName';
+	case SIDEBAR_ORDER = 'sidebarOrder';
 }

@@ -44,6 +44,7 @@ namespace OCA\Tables;
  *  hasShares: bool,
  *  rowsCount: int,
  *  isFederated: bool,
+ *  sidebarOrder: int|null,
  * }
  *
  * @psalm-type TablesTable = array{
