@@ -195,4 +195,15 @@ class ShareMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)))
 			->executeStatement();
 	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function deleteByReceiver(string $receiver, string $receiverType): int {
+		$qb = $this->db->getQueryBuilder();
+		return $qb->delete($this->table)
+			->where($qb->expr()->eq('receiver', $qb->createNamedParameter($receiver, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)))
+			->executeStatement();
+	}
 }
