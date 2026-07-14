@@ -288,4 +288,90 @@ class TablesMigratorTest extends TestCase {
 			$newTable->getSort()
 		);
 	}
+
+	public function testImportRemapsViewCardSources(): void {
+		$user = $this->createMock(IUser::class);
+		$importSource = $this->createMock(IImportSource::class);
+		$output = new NullOutput();
+
+		$user->method('getUID')->willReturn('user1');
+		$importSource->method('getMigratorVersion')->willReturn(1);
+
+		$tableData = [
+			'id' => 1,
+			'title' => 'Test',
+		];
+		$columns = [
+			['id' => 10, 'tableId' => 1],
+			['id' => 11, 'tableId' => 1],
+		];
+		$views = [
+			[
+				'tableId' => 1,
+				'title' => 'Nested settings',
+				'columnSettings' => [['columnId' => 10, 'order' => 0]],
+				'viewSettings' => [
+					'cardBackgroundSource' => 10,
+					'cardTitleSource' => 11,
+				],
+			],
+			[
+				'tableId' => 1,
+				'title' => 'Legacy settings',
+				'columnSettings' => [['columnId' => 11, 'order' => 0]],
+				'cardBackgroundSource' => 11,
+				'cardTitleSource' => 10,
+			],
+		];
+
+		$importSource->method('getFileContents')->willReturnCallback(static function (string $file) use ($tableData, $columns, $views): string {
+			return match ($file) {
+				'tables.json' => json_encode([$tableData]),
+				'columns.json' => json_encode($columns),
+				'views.json' => json_encode($views),
+				default => json_encode([]),
+			};
+		});
+
+		$newTable = new Table();
+		$newTable->setId(100);
+		$this->tableService->method('importTable')->willReturn($newTable);
+		$this->columnService->method('importColumn')->willReturnOnConsecutiveCalls(20, 21);
+		$this->rowService->method('importRow')->willReturn(1);
+
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+
+		$importedViews = [];
+		$this->viewService->expects($this->exactly(2))
+			->method('importView')
+			->with(
+				$this->identicalTo(100),
+				$this->callback(static function (array $view) use (&$importedViews): bool {
+					$importedViews[] = $view;
+					return true;
+				}),
+				$this->identicalTo('user1'),
+			);
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertSame(
+			[
+				'cardBackgroundSource' => 20,
+				'cardTitleSource' => 21,
+			],
+			$importedViews[0]['viewSettings']
+		);
+		$this->assertSame(20, $importedViews[0]['columnSettings'][0]['columnId']);
+		$this->assertSame(21, $importedViews[1]['cardBackgroundSource']);
+		$this->assertSame(20, $importedViews[1]['cardTitleSource']);
+		$this->assertSame(21, $importedViews[1]['columnSettings'][0]['columnId']);
+	}
 }
