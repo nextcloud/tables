@@ -450,7 +450,7 @@ OC.L10N.register(
     "Can edit" : "Kann bearbeiten",
     "Custom permissions" : "Benutzerdefinierte Berechtigungen",
     "Quick share options, current: {option}" : "Schnellfreigabeoptionen, aktuell: {option}",
-    "Read" : "Gelesen",
+    "Read" : "Lesen",
     "Update" : "Aktualisieren",
     "Error creating link share" : "Fehler beim Erstellen der Linkfreigabe",
     "Error deleting link share" : "Fehler beim Löschen der Linkfreigabe",
