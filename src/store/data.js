@@ -63,7 +63,7 @@ export const useDataStore = defineStore('data', {
 		},
 
 		// COLUMNS
-		async getColumnsFromBE({ tableId, viewId }) {
+		async getColumnsFromBE({ tableId, viewId, showError = true }) {
 			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
 			this.loading[stateId] = true
 			let res = null
@@ -80,10 +80,17 @@ export const useDataStore = defineStore('data', {
 				}
 				if (!Array.isArray(res.data)) {
 					const e = new Error('Expected array, but is not')
+					if (!showError) {
+						throw e
+					}
 					displayError(e, 'Format for loaded columns not valid.')
 					return []
 				}
 			} catch (e) {
+				if (!showError) {
+					this.loading[stateId] = false
+					throw e
+				}
 				displayError(e, t('tables', 'Could not load columns.'))
 				return []
 			}
@@ -160,6 +167,17 @@ export const useDataStore = defineStore('data', {
 				this.columns[stateId].push(parseCol(res.data))
 				this.loading[stateId] = false
 			}
+
+			// A freshly added relation column has no entry in the already-loaded
+			// relations cache, so force a reload to populate its dropdown options
+			// without requiring a page refresh.
+			if (res.data?.type === 'relation') {
+				await this.loadRelationsFromBE({
+					tableId: isView ? undefined : elementId,
+					viewId: isView ? elementId : undefined,
+					force: true,
+				})
+			}
 			return true
 		},
 
@@ -180,6 +198,16 @@ export const useDataStore = defineStore('data', {
 				const col = res.data
 				const index = this.columns[stateId].findIndex(c => c.id === col.id)
 				set(this.columns[stateId], index, parseCol(col))
+			}
+
+			// The relation's target or label column may have changed, which makes
+			// the cached relation data stale, so we reload it.
+			if (res.data?.type === 'relation') {
+				await this.loadRelationsFromBE({
+					tableId: isView ? undefined : elementId,
+					viewId: isView ? elementId : undefined,
+					force: true,
+				})
 			}
 
 			return true
