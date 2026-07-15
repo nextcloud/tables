@@ -222,7 +222,7 @@ test.describe('Import Export Scheme', () => {
 		await importedViewRow.click()
 
 		await page.locator('[data-cy="customTableAction"] button').first().click()
-		const editViewBtn = page.getByText('Edit view', { exact: true })
+		const editViewBtn = page.getByText('View settings', { exact: true })
 		await editViewBtn.waitFor({ state: 'visible' })
 		await editViewBtn.click()
 

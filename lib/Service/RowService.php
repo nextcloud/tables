@@ -25,6 +25,7 @@ use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\RowUpdatedEvent;
 use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\RowDataInput;
+use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -56,6 +57,7 @@ class RowService extends SuperService {
 		private IEventDispatcher $eventDispatcher,
 		private ColumnsHelper $columnsHelper,
 		private ActivityManager $activityManager,
+		private NotificationHelper $notificationHelper,
 		private IDBConnection $connection,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -274,6 +276,12 @@ class RowService extends SuperService {
 				object: $insertedRow,
 				subject: ActivityManager::SUBJECT_ROW_CREATE,
 				author: $this->userId,
+			);
+			$this->notificationHelper->sendNotification(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $insertedRow,
+				subject: ActivityManager::SUBJECT_ROW_CREATE,
+				author: $this->userId
 			);
 
 			return $this->filterRowResult($view, $insertedRow);
@@ -708,6 +716,16 @@ class RowService extends SuperService {
 					'after' => $updatedRow->getData(),
 				]
 			);
+			$this->notificationHelper->sendNotification(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $updatedRow,
+				subject: ActivityManager::SUBJECT_ROW_UPDATE,
+				author: $this->userId,
+				additionalParams: [
+					'before' => $previousData,
+					'after' => $updatedRow->getData(),
+				]
+			);
 		}
 
 		return $this->filterRowResult($view ?? null, $updatedRow);
@@ -787,6 +805,12 @@ class RowService extends SuperService {
 
 			$this->eventDispatcher->dispatchTyped($event);
 			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $deletedRow,
+				subject: ActivityManager::SUBJECT_ROW_DELETE,
+				author: $this->userId,
+			);
+			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_ROW,
 				object: $deletedRow,
 				subject: ActivityManager::SUBJECT_ROW_DELETE,

@@ -6,7 +6,7 @@
 	<ActivityList v-if="$parent.isActive"
 		filter="tables"
 		:object-id="activeElement.id"
-		object-type="tables_table"
+		:object-type="isView ? 'view' : 'table'"
 		type="tables" />
 </template>
 
@@ -21,7 +21,7 @@ export default {
 		ActivityList,
 	},
 	computed: {
-		...mapState(useTablesStore, ['activeElement']),
+		...mapState(useTablesStore, ['activeElement', 'isView']),
 	},
 }
 </script>

@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 use InvalidArgumentException;
 use OCA\Circles\Model\Circle;
+use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
@@ -42,6 +43,7 @@ use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
+use OCP\Server;
 use OCP\Share\IManager as IShareManager;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -424,7 +426,10 @@ class ShareService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 
-		return $this->addReceiverDisplayName($newShare);
+		$newShare = $this->addReceiverDisplayName($newShare);
+		$this->triggerShareActivity($newShare, ActivityManager::SUBJECT_SHARE_CREATE);
+
+		return $newShare;
 	}
 
 	/**
@@ -607,7 +612,10 @@ class ShareService extends SuperService {
 		}
 
 		$share = $this->applyPermissions($item, $permissions);
-		return $this->addReceiverDisplayName($share);
+		$share = $this->addReceiverDisplayName($share);
+		$this->triggerShareActivity($share, ActivityManager::SUBJECT_SHARE_UPDATE);
+
+		return $share;
 	}
 
 	/**
@@ -662,10 +670,14 @@ class ShareService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		$item = $this->addReceiverDisplayName($item);
+
 		// security
 		if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
 			throw new PermissionError('PermissionError: can not delete share with id ' . $id);
 		}
+
+		$this->triggerShareActivity($item, ActivityManager::SUBJECT_SHARE_DELETE);
 
 		try {
 			$this->mapper->delete($item);
@@ -676,7 +688,33 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
-		return $this->addReceiverDisplayName($item);
+		return $item;
+	}
+
+	private function triggerShareActivity(Share $share, string $subject): void {
+		if (!in_array($share->getNodeType(), ['table', 'view'], true)) {
+			return;
+		}
+
+		try {
+			if ($share->getNodeType() === 'table') {
+				$object = $this->tableMapper->find($share->getNodeId());
+				$objectType = ActivityManager::TABLES_OBJECT_TABLE;
+			} else {
+				$object = $this->viewMapper->find($share->getNodeId());
+				$objectType = ActivityManager::TABLES_OBJECT_VIEW;
+			}
+
+			Server::get(ActivityManager::class)->triggerEvent(
+				$objectType,
+				$object,
+				$subject,
+				['share' => $share],
+				$this->userId,
+			);
+		} catch (Throwable $e) {
+			$this->logger->warning('Could not trigger share activity event: ' . $e->getMessage(), ['exception' => $e]);
+		}
 	}
 
 	/**
@@ -836,6 +874,39 @@ class ShareService extends SuperService {
 			$this->logger->error('Could not find shared with users: ' . $e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Could not find shared with users');
 		}
+	}
+
+	/**
+	 * Resolve a share receiver into concrete user ids.
+	 *
+	 * @return string[]
+	 */
+	public function findUserIdsForShareReceiver(string $receiverType, string $receiverId): array {
+		try {
+			if ($receiverType === ShareReceiverType::USER) {
+				return [$receiverId];
+			}
+
+			if ($receiverType === ShareReceiverType::GROUP) {
+				return $this->groupHelper->getUserIdsInGroup($receiverId);
+			}
+
+			if ($receiverType === ShareReceiverType::CIRCLE) {
+				if (!$this->circleHelper->isCirclesEnabled()) {
+					return [];
+				}
+
+				return $this->circleHelper->getUserIdsInCircle($receiverId);
+			}
+		} catch (Throwable $e) {
+			$this->logger->warning('Could not resolve users for share receiver: ' . $e->getMessage(), [
+				'receiverType' => $receiverType,
+				'receiverId' => $receiverId,
+				'exception' => $e,
+			]);
+		}
+
+		return [];
 	}
 
 	/**

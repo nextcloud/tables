@@ -60,7 +60,16 @@ class Filter implements IFilter {
 	 * @since 11.0.0
 	 */
 	public function filterTypes(array $types): array {
-		return $types;
+		return array_merge(
+			$types,
+			[
+				ActivityManager::EVENT_TYPE_SHARING,
+				ActivityManager::EVENT_TYPE_TABLE_ROW,
+				ActivityManager::EVENT_TYPE_VIEW_ROW,
+				ActivityManager::EVENT_TYPE_TABLE_COLUMN,
+				ActivityManager::EVENT_TYPE_VIEW_COLUMN
+			]
+		);
 	}
 
 	/**
