@@ -53,6 +53,7 @@ OC.L10N.register(
     "Activity" : "Aktivaĵoj",
     "Manage" : "Administri",
     "Owner" : "Posedanto",
+    "Notifications" : "Atentigoj",
     "Close" : "Malfermi",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Select from Files" : "Elekti el dosieroj",

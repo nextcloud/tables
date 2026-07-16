@@ -33,6 +33,7 @@ OC.L10N.register(
     "Please select a file." : "Wiel eng Datei aus.",
     "Failed" : "Ausgefall",
     "Sort" : "Zortéieren",
+    "Saving..." : "Speicheren...",
     "Export" : "Exportéieren",
     "Copy" : "Kopie",
     "Favorites" : "Favoriten",

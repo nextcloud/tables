@@ -64,6 +64,7 @@ OC.L10N.register(
     "Importing data from " : "Ievieto datus no",
     "Failed" : "Neizdevās",
     "Sort" : "Kārtot",
+    "Saving..." : "Saglabā...",
     "Export" : "Izgūt",
     "Add to favorites" : "Pievienot izlasei",
     "Remove from favorites" : "Noņemt no izlases",

@@ -75,6 +75,7 @@ OC.L10N.register(
     "Transfer" : "Færa",
     "Filter" : "Sía",
     "Sort" : "Flokka",
+    "Saving..." : "Vista...",
     "Export" : "Flytja út",
     "Add to favorites" : "Bæta í eftirlæti",
     "Remove from favorites" : "Fjarlægja úr eftirlætum",

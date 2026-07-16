@@ -50,6 +50,7 @@ OC.L10N.register(
     "Transfer" : "โอนย้าย",
     "Filter" : "ตัวกรอง",
     "Sort" : "จัดเรียง",
+    "Saving..." : "กำลังบันทึก...",
     "Export" : "ส่งออก",
     "Add to favorites" : "เพิ่มในรายการโปรด",
     "Remove from favorites" : "เอาออกจากรายการโปรด",

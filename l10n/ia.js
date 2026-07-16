@@ -38,6 +38,7 @@ OC.L10N.register(
     "Select from Files" : "Selectionar de Files",
     "Preview" : "Previsualisar",
     "Sort" : "Ordinar",
+    "Saving..." : "Salveguardante...",
     "Export" : "Exportar",
     "Favorites" : "Favoritos",
     "group" : "gruppo",

@@ -56,6 +56,7 @@ OC.L10N.register(
     "Edit" : "Edit",
     "Activity" : "აქტივობა",
     "Owner" : "Owner",
+    "Notifications" : "შეტყობინებები",
     "Close" : "Close",
     "Please select a file." : "Please select a file.",
     "Upload from device" : "Upload from device",

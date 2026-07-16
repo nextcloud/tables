@@ -141,7 +141,6 @@ OC.L10N.register(
     "Total" : "Total",
     "Data" : "Dades",
     "Manage table" : "Gestionar la taula",
-    "Edit table" : "Edita la taula",
     "Create column" : "Crea una columna",
     "Import" : "Importa",
     "No columns" : "Sense columnes",

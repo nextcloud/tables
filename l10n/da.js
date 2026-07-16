@@ -150,7 +150,6 @@ OC.L10N.register(
     "Total" : "Total",
     "Data" : "Data",
     "Manage table" : "Administrer tabel",
-    "Edit table" : "Redigér tabel",
     "Create column" : "Opret kolonne",
     "Import" : "Import",
     "No columns" : "Ingen kolonner",

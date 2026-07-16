@@ -32,6 +32,7 @@ OC.L10N.register(
     "Activity" : "សកម្មភាព",
     "Close" : "បិទ",
     "Sort" : "តម្រៀប",
+    "Saving..." : "កំពុង​រក្សាទុក",
     "Export" : "នាំចេញ",
     "Favorites" : "Favorites",
     "group" : "ក្រុម",

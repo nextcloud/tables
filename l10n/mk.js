@@ -70,6 +70,7 @@ OC.L10N.register(
     "Transfer" : "Пренос",
     "Filter" : "Филтер",
     "Sort" : "Сортирај",
+    "Saving..." : "Зачувува ...",
     "Export" : "Извези",
     "Remove from favorites" : "Избриши од фаворити",
     "Copy" : "Копирај",
