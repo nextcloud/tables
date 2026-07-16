@@ -32,15 +32,23 @@ class Row2Mapper {
 
 	private const DB_CHUNK_SIZE = 1_000;
 
-	public function __construct(
-		private ?string $userId,
-		private IDBConnection $db,
-		private LoggerInterface $logger,
-		protected UserHelper $userHelper,
-		private RowSleeveMapper $rowSleeveMapper,
-		private ColumnsHelper $columnsHelper,
-		protected ColumnMapper $columnMapper,
-	) {
+	private RowSleeveMapper $rowSleeveMapper;
+	private ?string $userId;
+	private IDBConnection $db;
+	private LoggerInterface $logger;
+	protected UserHelper $userHelper;
+	protected ColumnMapper $columnMapper;
+
+	private ColumnsHelper $columnsHelper;
+
+	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper $columnsHelper, ColumnMapper $columnMapper) {
+		$this->rowSleeveMapper = $rowSleeveMapper;
+		$this->userId = $userId;
+		$this->db = $db;
+		$this->logger = $logger;
+		$this->userHelper = $userHelper;
+		$this->columnsHelper = $columnsHelper;
+		$this->columnMapper = $columnMapper;
 	}
 
 	/**
@@ -59,7 +67,7 @@ class Row2Mapper {
 		} catch (Throwable $e) {
 			$this->db->rollBack();
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new Exception(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new Exception(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		return $row;
@@ -83,12 +91,12 @@ class Row2Mapper {
 		if (count($rows) === 0) {
 			$e = new Exception('Wanted row not found.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		$e = new Exception('Too many results for one wanted row.');
 		$this->logger->error($e->getMessage(), ['exception' => $e]);
-		throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 	}
 
 	/**
@@ -99,7 +107,7 @@ class Row2Mapper {
 			$rowSleeve = $this->rowSleeveMapper->findNext($offsetId);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException) {
 			return null;
 		}
@@ -150,10 +158,10 @@ class Row2Mapper {
 			$result = $this->db->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes());
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
-		return array_map(fn (array $item) => $item['id'], $result->fetchAllAssociative());
+		return array_map(fn (array $item) => $item['id'], $result->fetchAll());
 	}
 
 	/**
@@ -180,7 +188,7 @@ class Row2Mapper {
 			return $this->sortRowsByIds($rows, $wantedRowIdsArray);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -249,14 +257,14 @@ class Row2Mapper {
 			$result = $qb->executeQuery();
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
 		try {
 			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		return $this->parseEntities($result, $sleeves);
@@ -342,7 +350,7 @@ class Row2Mapper {
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
-				if (str_starts_with((string)$filter['value'], '@')) {
+				if (str_starts_with($filter['value'], '@')) {
 					$columnId = (int)($filter['columnId'] ?? 0);
 					$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
 					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId, $column);
@@ -397,7 +405,7 @@ class Row2Mapper {
 			} else {
 				$e = new Exception('Needed column (' . $columnId . ') not found.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			$filterExpressions[] = $sql;
 		}
@@ -413,7 +421,7 @@ class Row2Mapper {
 			$value = $this->getCellMapper($column)->filterValueToQueryParam($column, $value);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error('Cannot filter, because the column does not exist', ['exception' => $e]);
-			throw new InternalError(static::class . '::' . __FUNCTION__ . ': Cannot filter, because the column does not exist');
+			throw new InternalError(get_class($this) . '::' . __FUNCTION__ . ': Cannot filter, because the column does not exist');
 		}
 
 		// We try to match the requested value against the default before building the query
@@ -433,12 +441,12 @@ class Row2Mapper {
 
 		switch ($operator) {
 			case 'begins-with':
-				$includeDefault = str_starts_with((string)($defaultValue ?? ''), (string)$value);
-				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
+				$includeDefault = str_starts_with((string)($defaultValue ?? ''), $value);
+				$filterExpression = $qb->expr()->ilike('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'ends-with':
-				$includeDefault = str_ends_with((string)($defaultValue ?? ''), (string)$value);
-				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
+				$includeDefault = str_ends_with((string)($defaultValue ?? ''), $value);
+				$filterExpression = $qb->expr()->ilike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
 				break;
 			case 'contains':
 				$filterExpressions = [];
@@ -465,18 +473,18 @@ class Row2Mapper {
 					break;
 				}
 
-				$includeDefault = str_contains((string)($defaultValue ?? ''), (string)$value);
+				$includeDefault = str_contains((string)($defaultValue ?? ''), $value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->orX(
-						$qb->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
-						$qb->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
-						$qb->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
-						$qb->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
+						$qb->expr()->ilike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
+						$qb->expr()->ilike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
+						$qb->expr()->ilike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
+						$qb->expr()->ilike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
 					);
 					break;
 				}
-				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+				$filterExpression = $qb->expr()->ilike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'does-not-contain':
 				if (is_array($value) && $column->getType() === Column::TYPE_USERGROUP) {
@@ -510,18 +518,19 @@ class Row2Mapper {
 							$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
 						);
 				}
-				$includeDefault = !str_contains((string)($defaultValue ?? ''), (string)$value);
+				$includeDefault = !str_contains((string)($defaultValue ?? ''), $value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->andX(
-						$qb->expr()->notLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
-						$qb->expr()->notLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
-						$qb->expr()->notLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
-						$qb->expr()->notLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
-					);
+						$qb->expr()->andX(
+							$this->notILike($qb, 'value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
+							$this->notILike($qb, 'value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
+							$this->notILike($qb, 'value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
+							$this->notILike($qb, 'value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
+						));
 					break;
 				}
-				$filterExpression = $qb->expr()->notLike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+				$filterExpression = $this->notILike($qb, 'value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'is-equal':
 				$includeDefault = $defaultValue === $value;
@@ -590,15 +599,37 @@ class Row2Mapper {
 		$qb2->select('id');
 		$qb2->from('tables_row_sleeves');
 
-		match ($columnId) {
-			Column::TYPE_META_ID => $qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT)),
-			Column::TYPE_META_CREATED_BY => $qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR)),
-			Column::TYPE_META_CREATED_AT => $qb2->where($this->getSqlOperator($operator, $qb, 'created_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE)),
-			Column::TYPE_META_UPDATED_BY => $qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR)),
-			Column::TYPE_META_UPDATED_AT => $qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE)),
-			default => $qb2,
-		};
+		switch ($columnId) {
+			case Column::TYPE_META_ID:
+				$qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT));
+				break;
+			case Column::TYPE_META_CREATED_BY:
+				$qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR));
+				break;
+			case Column::TYPE_META_CREATED_AT:
+				$qb2->where($this->getSqlOperator($operator, $qb, 'created_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE));
+				break;
+			case Column::TYPE_META_UPDATED_BY:
+				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR));
+				break;
+			case Column::TYPE_META_UPDATED_AT:
+				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE));
+				break;
+		}
 		return $qb2;
+	}
+
+	/**
+	 * Helper method to use notILike if available, otherwise fall back to not(iLike(...))
+	 */
+	private function notILike(IQueryBuilder $qb, string $column, $parameter): string {
+		$expr = $qb->expr();
+		// Nextcloud v35 introduced shortcut method
+		if (method_exists($expr, 'notILike')) {
+			return $expr->notILike($column, $parameter);
+		}
+
+		return 'NOT (' . $expr->iLike($column, $parameter) . ')';
 	}
 
 	/**
@@ -611,20 +642,32 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getSqlOperator(string $operator, IQueryBuilder $qb, string $columnName, $value, $paramType): string {
-		return match ($operator) {
-			'begins-with' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType)),
-			'ends-with' => $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType)),
-			'contains' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
-			'does-not-contain' => $qb->expr()->notLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
-			'is-equal' => $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType)),
-			'is-not-equal' => $qb->expr()->neq($columnName, $qb->createNamedParameter($value, $paramType)),
-			'is-greater-than' => $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType)),
-			'is-greater-than-or-equal' => $qb->expr()->gte($columnName, $qb->createNamedParameter($value, $paramType)),
-			'is-lower-than' => $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType)),
-			'is-lower-than-or-equal' => $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType)),
-			'is-empty' => $qb->expr()->isNull($columnName),
-			default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
-		};
+		switch ($operator) {
+			case 'begins-with':
+				return $qb->expr()->ilike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
+			case 'ends-with':
+				return $qb->expr()->ilike($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
+			case 'contains':
+				return $qb->expr()->ilike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+			case 'does-not-contain':
+				return $this->notILike($qb, $columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+			case 'is-equal':
+				return $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-not-equal':
+				return $qb->expr()->neq($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-greater-than':
+				return $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-greater-than-or-equal':
+				return $qb->expr()->gte($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-lower-than':
+				return $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-lower-than-or-equal':
+				return $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-empty':
+				return $qb->expr()->isNull($columnName);
+			default:
+				throw new InternalError('Operator ' . $operator . ' is not supported.');
+		}
 	}
 
 	/**
@@ -650,7 +693,7 @@ class Row2Mapper {
 		$keyToRowId = [];
 		$cellMapperCache = [];
 
-		while ($rowData = $result->fetchAssociative()) {
+		while ($rowData = $result->fetch()) {
 			if (!isset($rowData['row_id'], $rows[$rowData['row_id']])) {
 				break;
 			}
@@ -740,7 +783,7 @@ class Row2Mapper {
 			$this->rowSleeveMapper->update($sleeve);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		$this->columnMapper->preloadColumns(array_column($changedCells, 'columnId'));
@@ -807,7 +850,7 @@ class Row2Mapper {
 			$column = $this->columnMapper->find($columnId);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error('Can not insert cell, because the given column-id is not known', ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// insert new cell
@@ -861,7 +904,7 @@ class Row2Mapper {
 		$cellMapper = $this->getCellMapper($column);
 		try {
 			if ($cellMapper->hasMultipleValues()) {
-				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value): void {
+				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value) {
 					// For a usergroup field with mutiple values, each is inserted as a new cell
 					// we need to delete all previous cells for this row and column, otherwise we get duplicates
 					$cellMapper->deleteAllForColumnAndRow($columnId, $rowId);
@@ -875,7 +918,7 @@ class Row2Mapper {
 			$this->insertCell($rowId, $columnId, $value);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -890,7 +933,7 @@ class Row2Mapper {
 			return Server::get($cellMapperClassName);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -909,7 +952,7 @@ class Row2Mapper {
 			$this->getCellMapper($column)->deleteAllForColumn($column->getId());
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -957,14 +1000,23 @@ class Row2Mapper {
 
 	private function getFormattedDefaultValue(Column $column) {
 		$defaultValue = null;
-		$defaultValue = match ($column->getType()) {
-			Column::TYPE_SELECTION => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getSelectionDefault()),
-			Column::TYPE_DATETIME => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getDatetimeDefault()),
-			Column::TYPE_NUMBER => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault()),
-			Column::TYPE_TEXT => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault()),
-			Column::TYPE_USERGROUP => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault()),
-			default => $defaultValue,
-		};
+		switch ($column->getType()) {
+			case Column::TYPE_SELECTION:
+				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getSelectionDefault());
+				break;
+			case Column::TYPE_DATETIME:
+				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getDatetimeDefault());
+				break;
+			case Column::TYPE_NUMBER:
+				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault());
+				break;
+			case Column::TYPE_TEXT:
+				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault());
+				break;
+			case Column::TYPE_USERGROUP:
+				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault());
+				break;
+		}
 		return $defaultValue;
 	}
 
