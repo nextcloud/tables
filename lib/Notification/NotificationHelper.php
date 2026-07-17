@@ -43,14 +43,19 @@ class NotificationHelper {
 	}
 
 	/**
-	 * @param Row2|Column $object
+	 * @param Table|Row2|Column $object
 	 * @param string $subject
 	 * @param array<string, mixed> $additionalParams
 	 * @param string|null $author
 	 */
-	public function sendNotification(string $objectType, Row2|Column $object, string $subject, $additionalParams = [], ?string $author = null): void {
+	public function sendNotification(string $objectType, Table|Row2|Column $object, string $subject, array $additionalParams = [], ?string $author = null): void {
 		try {
 			switch ($objectType) {
+				case ActivityManager::TABLES_OBJECT_TABLE:
+					if ($object instanceof Table) {
+						$this->sendTableNotification($object, $subject, $author);
+					}
+					break;
 				case ActivityManager::TABLES_OBJECT_ROW:
 					if ($object instanceof Row2) {
 						$this->sendRowNotification($object, $subject, $additionalParams, $author);
@@ -70,6 +75,26 @@ class NotificationHelper {
 				'error' => $e->getMessage(),
 			]);
 		}
+	}
+
+	private function sendTableNotification(Table $object, string $subject, ?string $author): void {
+		$subjectParams = [
+			'author' => $author,
+			'objectType' => ActivityManager::TABLES_OBJECT_TABLE,
+			'table' => [
+				'id' => $object->getId(),
+				'title' => $object->getTitle(),
+			]
+		];
+		$this->sendNotifiesByElement(
+			element: $object,
+			subject: $subject,
+			subjectParams: $subjectParams,
+			objectType: ActivityManager::TABLES_OBJECT_TABLE,
+			objectId: (string)$object->getId(),
+			authorId: null,
+			configKey: null,
+		);
 	}
 
 	/**
