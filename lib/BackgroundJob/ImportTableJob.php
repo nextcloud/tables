@@ -81,20 +81,11 @@ class ImportTableJob extends QueuedJob {
 			],
 			author: $userId
 		);
-		if ($viewId) {
-			$this->notificationHelper->sendNotification(
-				objectType: ActivityManager::TABLES_OBJECT_VIEW,
-				object: $this->viewMapper->find($viewId),
-				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
-				author: $userId
-			);
-		} else {
-			$this->notificationHelper->sendNotification(
-				objectType: ActivityManager::TABLES_OBJECT_TABLE,
-				object: $this->tableMapper->find($tableId),
-				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
-				author: $userId
-			);
-		}
+		$this->notificationHelper->sendNotification(
+			objectType: ActivityManager::TABLES_OBJECT_TABLE,
+			object: $this->tableMapper->find($tableId),
+			subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
+			author: $userId
+		);
 	}
 }
