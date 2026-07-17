@@ -167,6 +167,7 @@ OC.L10N.register(
     "Last edited" : "Utolsó módosítás",
     "Shares" : "Megosztások",
     "Actions" : "Műveletek",
+    "View settings" : "Beállítások megtekintése",
     "Share" : "Megosztás",
     "Integration" : "Integráció",
     "Delete view" : "Nézet törlése",

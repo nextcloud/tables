@@ -117,6 +117,7 @@ OC.L10N.register(
     "Columns" : "Colonne",
     "Shares" : "Condivisioni",
     "Actions" : "Azioni",
+    "View settings" : "impostazioni di visualizzazione",
     "Share" : "Condividi",
     "Integration" : "Integrazione",
     "Total" : "Totale",

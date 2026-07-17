@@ -59,6 +59,7 @@ OC.L10N.register(
     "Select from Files" : "Elekti el dosieroj",
     "Preview" : "Antaŭvidi",
     "Sort" : "Ordigi",
+    "Saving..." : "Konservado...",
     "Export" : "Eksporti",
     "Add to favorites" : "Aldoni al pliŝatataĵoj",
     "Remove from favorites" : "Malpliŝatigi",

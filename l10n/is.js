@@ -46,6 +46,7 @@ OC.L10N.register(
     "Views" : "Skoðun",
     "Shares" : "Sameignir",
     "Actions" : "Aðgerðir",
+    "View settings" : "Skoða stillingar",
     "Share" : "Deila",
     "Integration" : "Samþætting",
     "Total" : "Alls",

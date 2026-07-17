@@ -42,6 +42,7 @@ OC.L10N.register(
     "Please select a file." : "Kies asb. ’n lêer.",
     "Select from Files" : "Kies uit Lêers",
     "Filter" : "Filter",
+    "Saving..." : "Stoor tans…",
     "Export" : "Voer uit",
     "Favorites" : "Gunstelinge",
     "group" : "Groep",

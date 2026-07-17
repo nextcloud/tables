@@ -87,6 +87,7 @@ OC.L10N.register(
     "Views" : "תצוגות",
     "Shares" : "שיתופים",
     "Actions" : "פעולות",
+    "View settings" : "הצגת ההגדרות",
     "Share" : "שתף",
     "Integration" : "שילוב",
     "Total" : "סך הכול",

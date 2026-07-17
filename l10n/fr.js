@@ -216,6 +216,7 @@ OC.L10N.register(
     "Last edited" : "Dernière modification",
     "Shares" : "Partages",
     "Actions" : "Actions",
+    "View settings" : "Voir les paramètres",
     "Share" : "Partager",
     "Integration" : "Intégration",
     "Delete view" : "Supprimer la vue",

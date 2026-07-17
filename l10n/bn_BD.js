@@ -32,6 +32,7 @@ OC.L10N.register(
     "Activity" : "সক্রিয়তা",
     "Close" : "বন্ধ",
     "Please select a file." : "একটি ফাইল নির্বাচন করুন",
+    "Saving..." : "সংরক্ষণ করা হচ্ছে..",
     "Export" : "রপ্তানি",
     "Favorites" : "প্রিয়জন",
     "group" : "দল",
