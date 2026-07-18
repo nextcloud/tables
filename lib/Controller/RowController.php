@@ -8,6 +8,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\RowService;
 use OCP\AppFramework\Controller;
@@ -30,17 +31,19 @@ class RowController extends Controller {
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
-	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId, $this->userId);
+	public function index(int $tableId, string $customFilters = ''): DataResponse {
+		return $this->handleError(function () use ($tableId, $customFilters) {
+			$customFilters = json_decode($customFilters, true) ?? [];
+			return $this->service->findAllByTable($tableId, $this->userId, customFilters: $customFilters);
 		});
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
-	public function indexView(int $viewId): DataResponse {
-		return $this->handleError(function () use ($viewId) {
-			return $this->service->findAllByView($viewId, $this->userId);
+	public function indexView(int $viewId, string $customFilters = ''): DataResponse {
+		return $this->handleError(function () use ($viewId, $customFilters) {
+			$customFilters = json_decode($customFilters, true) ?? [];
+			return $this->service->findAllByView($viewId, $this->userId, customFilters: $customFilters);
 		});
 	}
 

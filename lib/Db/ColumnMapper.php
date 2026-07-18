@@ -190,7 +190,7 @@ class ColumnMapper extends QBMapper {
 	 * This method efficiently loads column data for a given set of columns, filters, and sorts
 	 * by fetching all required data in a single database operation.
 	 */
-	public function preloadColumns(array $columns, ?array $filters = null, ?array $sorts = null): void {
+	public function preloadColumns(array $columns, ?array $filters = null, ?array $sorts = null, array $customFilters = []): void {
 		$columnIds = $columns;
 		if (!is_null($sorts) && count($sorts) > 0) {
 			$columnIds = [...$columns, ...array_column($sorts, 'columnId')];
@@ -200,7 +200,11 @@ class ColumnMapper extends QBMapper {
 				array_push($columnIds, ...array_column($filterGroup, 'columnId'));
 			}
 		}
-
+		if (!is_null($customFilters) && count($customFilters) > 0) {
+			foreach ($customFilters as $filterGroup) {
+				array_push($columnIds, ...array_column($filterGroup, 'columnId'));
+			}
+		}
 		$this->findAll(array_unique($columnIds));
 	}
 
