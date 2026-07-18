@@ -230,6 +230,13 @@ class SharePageShareDataDecorator implements IShare {
 		return $this->share->getPassword();
 	}
 
+	/**
+	 * Forward-compatibility with Nextcloud v35
+	 */
+	public function isPasswordProtected(): bool {
+		return !empty($this->share->getPassword());
+	}
+
 	public function setToken($token): never {
 		throw new LogicException('Not implemented: read only object');
 	}

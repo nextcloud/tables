@@ -604,6 +604,10 @@ class ShareService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		if ($item->getNodeType() === 'context') {
+			throw new PermissionError('PermissionError: cannot update permissions on context shares');
+		}
+
 		$this->assertSharePermissionUpdateAllowedWhenSharingRestricted($item, $permissions);
 
 		// security
