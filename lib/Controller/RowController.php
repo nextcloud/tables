@@ -8,7 +8,6 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
-use OCA\Tables\Db\Column;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\RowService;
 use OCP\AppFramework\Controller;

@@ -132,15 +132,15 @@ class Row2Mapper {
 	 * @return int[]
 	 * @throws InternalError
 	 */
-	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null): array {
+	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null, array $customFilters = []): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('sleeves.id')
 			->from('tables_row_sleeves', 'sleeves')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
 
-		if ($filter) {
-			$this->addFilterToQuery($qb, $filter, $userId);
+		if ($filter || $customFilters) {
+			$this->addFilterToQuery($qb, $filter ?? [], $customFilters ?? [], $userId);
 		}
 
 		$this->addSortQueryForMultipleSleeveFinder($qb, 'sleeves', $sort);
@@ -172,14 +172,15 @@ class Row2Mapper {
 	 * @param array|null $filter
 	 * @param array|null $sort
 	 * @param string|null $userId
+	 * @param array $customFilters
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
+	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null, array $customFilters = []): array {
 		try {
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
-			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
+			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset, $customFilters);
 
 			// Get rows without SQL sorting
 			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
@@ -273,16 +274,22 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function addFilterToQuery(IQueryBuilder $qb, array $filters, string $userId): void {
-		// TODO move this into service
-		$this->replacePlaceholderValues($filters, $userId);
-
+	private function addFilterToQuery(IQueryBuilder $qb, array $filters, array $customFilters, string $userId): void {
+		$conditions = [];
 		if (count($filters) > 0) {
-			$qb->andWhere(
-				$qb->expr()->orX(
-					...$this->getFilterGroups($qb, $filters)
-				)
-			);
+			$this->replacePlaceholderValues($filters, $userId);
+			$conditions[] = $qb->expr()->orX(...$this->getFilterGroups($qb, $filters));
+		}
+
+		if (count($customFilters) > 0) {
+			$this->replacePlaceholderValues($customFilters, $userId);
+			$conditions[] = $qb->expr()->orX(...$this->getFilterGroups($qb, $customFilters));
+		}
+
+		if (count($conditions) == 1) {
+			$qb->andWhere($conditions[0]);
+		} elseif (count($conditions) > 1) {
+			$qb->andWhere($qb->expr()->andX(...$conditions));
 		}
 	}
 
@@ -350,7 +357,7 @@ class Row2Mapper {
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
-				if (str_starts_with($filter['value'], '@')) {
+				if (is_string($filter['value']) && str_starts_with($filter['value'], '@')) {
 					$columnId = (int)($filter['columnId'] ?? 0);
 					$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
 					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId, $column);
@@ -593,14 +600,14 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string $value): IQueryBuilder {
+	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string|array $value): IQueryBuilder {
 		$qb2 = $this->db->getQueryBuilder();
 		$qb2->select('id');
 		$qb2->from('tables_row_sleeves');
 
 		switch ($columnId) {
 			case Column::TYPE_META_ID:
-				$qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT));
+				$qb2->where($this->getSqlOperator($operator, $qb, 'id', (array)$value, IQueryBuilder::PARAM_INT_ARRAY));
 				break;
 			case Column::TYPE_META_CREATED_BY:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR));
@@ -638,6 +645,9 @@ class Row2Mapper {
 			case 'does-not-contain':
 				return $qb->expr()->notLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 			case 'is-equal':
+				if (is_array($value)) {
+					return $qb->expr()->in($columnName, $qb->createNamedParameter($value, $paramType));
+				}
 				return $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType));
 			case 'is-not-equal':
 				return $qb->expr()->neq($columnName, $qb->createNamedParameter($value, $paramType));
