@@ -74,12 +74,28 @@ export default {
 		},
 
 		isViewSettingSet() {
+			if (this.$route.query.customFilters?.length > 0) {
+				return true
+			}
+
 			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
 	},
 
 	methods: {
 		resetLocalAdjustments() {
+			if (this.$route.query.customFilters?.length > 0) {
+				this.$router.push({
+					path: this.$route.path,
+					query: {
+						...this.$route.query,
+						customFilters: undefined,
+					},
+				})
+
+				return
+			}
+
 			this.$emit('update:viewSetting', {})
 		},
 	},
