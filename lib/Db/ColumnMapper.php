@@ -200,7 +200,7 @@ class ColumnMapper extends QBMapper {
 				array_push($columnIds, ...array_column($filterGroup, 'columnId'));
 			}
 		}
-		if (!is_null($customFilters) && count($customFilters) > 0) {
+		if (count($customFilters) > 0) {
 			foreach ($customFilters as $filterGroup) {
 				array_push($columnIds, ...array_column($filterGroup, 'columnId'));
 			}

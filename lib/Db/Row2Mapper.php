@@ -140,7 +140,7 @@ class Row2Mapper {
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
 
 		if ($filter || $customFilters) {
-			$this->addFilterToQuery($qb, $filter ?? [], $customFilters ?? [], $userId);
+			$this->addFilterToQuery($qb, $filter ?? [], $customFilters, $userId);
 		}
 
 		$this->addSortQueryForMultipleSleeveFinder($qb, 'sleeves', $sort);

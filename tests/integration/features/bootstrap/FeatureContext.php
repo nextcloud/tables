@@ -3163,6 +3163,22 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user fetches rows for table :tableAlias with customFilters containing array values
+	 */
+	public function fetchRowsForTableWithCustomFilters(string $user, string $tableAlias): void {
+		$this->setCurrentUser($user);
+		$tableItem = $this->collectionManager->getByAlias('table', $tableAlias);
+
+		// Test with array value in filter (the bug case: value is an array instead of string)
+		$customFilters = json_encode([[['columnId' => -1, 'operator' => 'is-equal', 'value' => [1, 2, 3]]]]);
+
+		$this->sendRequest(
+			'GET',
+			sprintf('/apps/tables/row/table/%s?customFilters=%s', $tableItem['id'], urlencode($customFilters)),
+		);
+	}
+
+	/**
 	 * @Then view :viewName has exactly the following rows
 	 *
 	 * @param string $viewName
