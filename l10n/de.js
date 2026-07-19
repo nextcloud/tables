@@ -1,7 +1,7 @@
 OC.L10N.register(
     "tables",
     {
-    "You have imported file to table {table}" : "Sie haben die Datei in die Tabelle {table} importiert",
+    "You have imported file to table {table}" : "Du hast die Datei in die Tabelle {table} importiert",
     "{user} has imported file to table {table}" : "{user} hat die Datei in die Tabelle {table} importiert",
     "You have created a new table {table}" : "Du hast eine neue Tabelle {table} erstellt",
     "{user} has created a new table {table}" : "{user} hat eine neue Tabelle {table} erstellt",
@@ -244,7 +244,7 @@ OC.L10N.register(
     "Edit a row" : "Eine Zeile bearbeiten",
     "Go to a row you want to edit and use the *pencil* edit button. Maybe you want to add a *Done* status to this row?" : "Gehe zu einer Zeile, die du bearbeiten möchtest, und verwende die Schaltfläche *Bleistift* zum Bearbeiten. Vielleicht möchtest du dieser Zeile einen Status *Erledigt* hinzufügen?",
     "Add a new column" : "Neue Spalte hinzufügen",
-    "You can add, remove and adjust columns as you need. Open the three-dot-menu on the upper right of this table and choose *Create column*. Fill in the data you want, at least a title and column type." : "Sie können Spalten nach Bedarf hinzufügen, entfernen und anpassen. Öffnen Sie das Drei-Punkte-Menü oben rechts in dieser Tabelle und wählen Sie *Spalte erstellen*. Geben Sie die gewünschten Daten ein, mindestens einen Titel und einen Spaltentyp.",
+    "You can add, remove and adjust columns as you need. Open the three-dot-menu on the upper right of this table and choose *Create column*. Fill in the data you want, at least a title and column type." : "Du kannst Spalten nach Bedarf hinzufügen, entfernen und anpassen. Öffne das Drei-Punkte-Menü oben rechts in dieser Tabelle und wähle *Spalte erstellen*. Gib die gewünschten Daten ein, mindestens einen Titel und einen Spaltentyp.",
     "Create views for tables" : "Ansichten für Tabellen erstellen",
     "Filter data and save table presets as views to share and combine them into applications." : "Daten filtern und Tabellenvorgaben als Ansichten speichern, um sie freizugeben und in Anwendungen zu kombinieren.",
     "Create applications" : "Anwendungen erstellen",

@@ -415,6 +415,7 @@ OC.L10N.register(
     "Set password" : "Ορισμός συνθηματικού",
     "Password" : "Συνθηματικό",
     "Share link" : "Διαμοιρασμός συνδέσμου",
+    "Delete link" : "Διαγραφή συνδέσμου",
     "Public links" : "Δημόσιοι σύνδεσμοι",
     "No view in context" : "Καμία προβολή στο πλαίσιο",
     "From {ownerName}" : "Από {ownerName}",
