@@ -220,19 +220,12 @@ class Column extends EntitySuper implements JsonSerializable {
 		parent::setter($name, $args);
 	}
 
-	private function assignUuid(): void {
-		if ($this->uuid !== null) {
-			throw new \RuntimeException('This column already has a UUID, they are immutable');
-		}
-		$this->applyUuid(Uuid::v7()->toRfc4122());
-	}
-
 	private function setOrAssignUuid(?string $uuid): void {
 		if ($this->uuid !== null) {
 			throw new \RuntimeException('This column already has a UUID, they are immutable');
 		}
 		if ($uuid === null) {
-			$this->assignUuid();
+			$this->applyUuid(Uuid::v7()->toRfc4122());
 			return;
 		}
 		$this->applyUuid($uuid);
