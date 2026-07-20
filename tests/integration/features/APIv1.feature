@@ -393,7 +393,7 @@ Feature: APIv1
       | t2    | table | read                |
     When user "participant1" shares the Context "c1" to "user" "participant2"
     Then the reported status is "200"
-    When user "participant1" tries to set permission "manage" to 1 for context "c1" and user "participant2"
+    When user "participant1" tries to set permission "manage" to 1
     Then the reported status is "403"
 
   @api1 @contexts @contexts-sharing

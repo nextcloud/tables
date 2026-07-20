@@ -2875,9 +2875,9 @@ class FeatureContext implements Context {
 	}
 
 	/**
-	 * @When user :user tries to set permission :permission to :value for context :contextAlias and user :targetUser
+	 * @When user :user tries to set permission :permission to :value
 	 */
-	public function userTriesToSetPermissionToForContextAndUser(string $user, string $permission, string $value, string $contextAlias, string $targetUser): void {
+	public function userTriesToSetPermission(string $user, string $permission, string $value): void {
 		$this->setCurrentUser($user);
 
 		$this->sendRequest(
