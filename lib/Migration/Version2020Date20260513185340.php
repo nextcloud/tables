@@ -20,11 +20,13 @@ use OCP\Migration\SimpleMigrationStep;
 use Override;
 
 class Version2020Date20260513185340 extends SimpleMigrationStep {
-	private const TARGET_TABLE = 'tables_columns';
+	private const TARGET_TABLE_COLUMNS = 'tables_columns';
+	private const TARGET_TABLE_VIEWS = 'tables_views';
 	private const COL_ID = 'id';
 	private const COL_UUID = 'uuid';
 	private const COL_SELECTION_OPTIONS = 'selection_options';
-	private const INDEX_NAME = 'tables_col_uuid_uniq';
+	private const INDEX_NAME_COLUMNS = 'tables_col_uuid_uniq';
+	private const INDEX_NAME_VIEWS = 'tables_views_uuid_uniq';
 
 	public function __construct(
 		private readonly IDBConnection $db,
@@ -36,24 +38,28 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable(self::TARGET_TABLE)) {
-			return null;
-		}
+		$this->addUuidColumnToTable($schema, self::TARGET_TABLE_COLUMNS, self::INDEX_NAME_COLUMNS);
+		$this->addUuidColumnToTable($schema, self::TARGET_TABLE_VIEWS, self::INDEX_NAME_VIEWS);
 
-		$columnsTable = $schema->getTable(self::TARGET_TABLE);
-		if (!$columnsTable->hasColumn(self::COL_UUID)) {
-			$columnsTable->addColumn(self::COL_UUID, Types::STRING, [
+		return $schema;
+	}
+
+	private function addUuidColumnToTable(ISchemaWrapper $schema, string $tableName, string $indexName): void {
+		if (!$schema->hasTable($tableName)) {
+			return;
+		}
+		$targetTable = $schema->getTable($tableName);
+		if (!$targetTable->hasColumn(self::COL_UUID)) {
+			$targetTable->addColumn(self::COL_UUID, Types::STRING, [
 				'notnull' => false,
 				'default' => null,
 				'length' => 36,
 				'comment' => 'UUIDv7 identifier to support structural updates across instances',
 			]);
 		}
-		if (!$columnsTable->hasUniqueConstraint(self::INDEX_NAME)) {
-			$columnsTable->addUniqueIndex(['table_id', self::COL_UUID], self::INDEX_NAME);
+		if (!$targetTable->hasUniqueConstraint($indexName)) {
+			$targetTable->addUniqueIndex(['table_id', self::COL_UUID], $indexName);
 		}
-
-		return $schema;
 	}
 
 	private function applyColumnOptionsUpdateIfNecessary(IQueryBuilder $query, int $columnId, ?string $rawSelectionOptions): void {
@@ -90,19 +96,24 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 
 	#[Override]
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
+		$this->fillColumnUuids();
+		$this->fillViewUuids();
+	}
+
+	private function fillColumnUuids(): void {
 		$qbColUuidUpdate = $this->db->getQueryBuilder();
-		$qbColUuidUpdate->update(self::TARGET_TABLE)
+		$qbColUuidUpdate->update(self::TARGET_TABLE_COLUMNS)
 			->set(self::COL_UUID, $qbColUuidUpdate->createParameter('columnUuid'))
 			->where($qbColUuidUpdate->expr()->eq(self::COL_ID, $qbColUuidUpdate->createParameter('columnLocalId')));
 
 		$qbColOptionsUuidUpdate = $this->db->getQueryBuilder();
-		$qbColOptionsUuidUpdate->update(self::TARGET_TABLE)
+		$qbColOptionsUuidUpdate->update(self::TARGET_TABLE_COLUMNS)
 			->set(self::COL_SELECTION_OPTIONS, $qbColOptionsUuidUpdate->createParameter('columnSelectionOptions'))
 			->where($qbColOptionsUuidUpdate->expr()->eq(self::COL_ID, $qbColOptionsUuidUpdate->createParameter('columnLocalId')));
 
 		$qbSelect = $this->db->getQueryBuilder();
 		$qbSelect->select(self::COL_ID, self::COL_SELECTION_OPTIONS)
-			->from(self::TARGET_TABLE);
+			->from(self::TARGET_TABLE_COLUMNS);
 		$select = $qbSelect->executeQuery();
 
 		$writeBatches = 250;
@@ -125,6 +136,51 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 				$qbColUuidUpdate->executeStatement();
 
 				$this->applyColumnOptionsUpdateIfNecessary($qbColOptionsUuidUpdate, (int)$columnId, $columnData[self::COL_SELECTION_OPTIONS]);
+
+				$updates++;
+				if ($updates % $writeBatches === 0) {
+					$this->db->commit();
+					$this->db->beginTransaction();
+				}
+			}
+			$this->db->commit();
+		} catch (\Exception $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+
+		$select->closeCursor();
+	}
+
+	private function fillViewUuids(): void {
+		$qbColUuidUpdate = $this->db->getQueryBuilder();
+		$qbColUuidUpdate->update(self::TARGET_TABLE_VIEWS)
+			->set(self::COL_UUID, $qbColUuidUpdate->createParameter('columnUuid'))
+			->where($qbColUuidUpdate->expr()->eq(self::COL_ID, $qbColUuidUpdate->createParameter('columnLocalId')));
+
+		$qbSelect = $this->db->getQueryBuilder();
+		$qbSelect->select(self::COL_ID)
+			->from(self::TARGET_TABLE_VIEWS);
+		$select = $qbSelect->executeQuery();
+
+		$writeBatches = 250;
+		$updates = 0;
+
+		try {
+			$this->db->beginTransaction();
+			while (($columnData = $select->fetchAssociative()) !== false) {
+				$columnId = $columnData[self::COL_ID];
+				$qbColUuidUpdate->setParameters(
+					[
+						'columnLocalId' => (int)$columnId,
+						'columnUuid' => Uuid::v7()->toRfc4122(),
+					],
+					[
+						Types::INTEGER,
+						Types::STRING,
+					]
+				);
+				$qbColUuidUpdate->executeStatement();
 
 				$updates++;
 				if ($updates % $writeBatches === 0) {
