@@ -40,6 +40,9 @@ jobs:
           cache: 'npm'
           node-version-file: 'package.json'
 
+      - name: Set up dependencies
+        run: composer i --no-dev
+
       - name: Install dependencies
         run: npm ci
 
