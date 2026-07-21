@@ -54,6 +54,16 @@ jobs:
         env:
           SERVER_BRANCH: ${{ matrix.server-versions }}
 
+      - name: Show logs
+        if: failure()
+        run: |
+          for id in $(docker ps -aq); do
+            docker container inspect "$id" --format '=== Logs for container {{.Name}} ==='
+            docker logs "$id" >> nextcloud.log
+          done
+          echo '=== Nextcloud server logs ==='
+          docker exec nextcloud-e2e-test-server_tables cat data/nextcloud.log
+
       - name: Upload test results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
