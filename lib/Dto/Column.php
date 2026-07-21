@@ -35,6 +35,7 @@ class Column {
 		private ?bool $usergroupSelectTeams = null,
 		private ?bool $showUserStatus = null,
 		private ?string $customSettings = null,
+		private ?string $uuid = null,
 	) {
 	}
 
@@ -71,7 +72,12 @@ class Column {
 			usergroupSelectTeams: $data['usergroupSelectTeams'] ?? null,
 			showUserStatus: $data['showUserStatus'] ?? null,
 			customSettings: $customSettings,
+			uuid: $data['uuid'] ?? null,
 		);
+	}
+
+	public function getUuid(): ?string {
+		return $this->uuid;
 	}
 
 	public function getType(): ?string {

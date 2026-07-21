@@ -10,8 +10,10 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Model\SelectionOptions;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use ValueError;
 
 /**
@@ -19,6 +21,8 @@ use ValueError;
  *
  * @psalm-import-type TablesColumn from ResponseDefinitions
  *
+ * @method string|null getUuid()
+ * @method setUuid(?string $uuid)
  * @method getTitle(): string
  * @method setTitle(string $title)
  * @method getTechnicalName(): string
@@ -60,14 +64,12 @@ use ValueError;
  * @method setTextDefault(?string $textDefault)
  * @method getTextAllowedPattern(): string
  * @method setTextAllowedPattern(?string $textAllowedPattern)
- * @method getTextAllowedPattern(): ?string
  * @method getTextMaxLength(): int
  * @method setTextMaxLength(?int $textMaxLength)
  * @method getTextUnique(): bool
  * @method setTextUnique(?bool $textUnique)
- * @method getSelectionOptions(): string
- * @method getSelectionDefault(): string
- * @method setSelectionOptions(?string $selectionOptionsArray)
+ * @method string getSelectionOptions()
+ * @method setSelectionOptions(?string $selectionOptions)
  * @method setSelectionDefault(?string $selectionDefault)
  * @method getSelectionDefault(): ?string
  * @method getDatetimeDefault(): string
@@ -120,6 +122,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const RELATION_TARGET_ID = 'targetId';
 	public const RELATION_LABEL_COLUMN = 'labelColumn';
 
+	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?string $technicalName = null;
 	protected ?int $tableId = null;
@@ -172,6 +175,7 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('uuid', 'string');
 		$this->addType('tableId', 'integer');
 		$this->addType('mandatory', 'boolean');
 
@@ -193,6 +197,8 @@ class Column extends EntitySuper implements JsonSerializable {
 		$this->addType('showUserStatus', 'boolean');
 
 		$this->addType('customSettings', 'string');
+
+		$this->addType('selectionOptions', 'string');
 	}
 
 	public static function isValidMetaTypeId(int $metaTypeId): bool {
@@ -205,8 +211,34 @@ class Column extends EntitySuper implements JsonSerializable {
 		], true);
 	}
 
+	public function setter(string $name, array $args): void {
+		if ($name === 'uuid') {
+			$this->setOrAssignUuid((string)$args[0]);
+			return;
+		}
+
+		parent::setter($name, $args);
+	}
+
+	private function setOrAssignUuid(?string $uuid): void {
+		if ($this->uuid !== null) {
+			throw new \RuntimeException('This column already has a UUID, they are immutable');
+		}
+		if ($uuid === null) {
+			$this->applyUuid(Uuid::v7()->toRfc4122());
+			return;
+		}
+		$this->applyUuid($uuid);
+	}
+
+	private function applyUuid(string $uuid): void {
+		$this->uuid = $uuid;
+		$this->markFieldUpdated('uuid');
+	}
+
 	public static function fromDto(ColumnDto $data): self {
 		$column = new self();
+		$column->setOrAssignUuid($data->getUuid());
 		$column->setTitle($data->getTitle());
 		$column->setTechnicalName($data->getTechnicalName());
 		$column->setType($data->getType());
@@ -223,8 +255,7 @@ class Column extends EntitySuper implements JsonSerializable {
 		$column->setNumberDecimals($data->getNumberDecimals());
 		$column->setNumberPrefix($data->getNumberPrefix() ?? '');
 		$column->setNumberSuffix($data->getNumberSuffix() ?? '');
-		$column->setSelectionOptions($data->getSelectionOptions());
-		$column->setSelectionDefault($data->getSelectionDefault());
+		$column->setSelectionOptionsCollection(SelectionOptions::createFromInputJsonString($data->getSelectionOptions() ?? '[]', $data->getSelectionDefault(), true));
 		$column->setDatetimeDefault($data->getDatetimeDefault());
 		$column->setUsergroupDefault($data->getUsergroupDefault());
 		$column->setUsergroupMultipleItems($data->getUsergroupMultipleItems());
@@ -250,18 +281,17 @@ class Column extends EntitySuper implements JsonSerializable {
 		$this->setUsergroup($json);
 	}
 
-	public function getSelectionOptionsArray(): array {
-		$options = $this->getSelectionOptions();
-		if ($options !== '' && $options !== null && $options !== 'null') {
-			return \json_decode($options, true);
-		} else {
-			return [];
-		}
+	public function getSelectionOptionsCollection(): SelectionOptions {
+		return SelectionOptions::createFromInputJsonString($this->getSelectionOptions() ?? '[]', $this->getSelectionDefault(), true);
 	}
 
-	public function setSelectionOptionsArray(array $array):void {
-		$json = \json_encode($array);
-		$this->setSelectionOptions($json);
+	public function setSelectionOptionsCollection(SelectionOptions $selectionOptions): void {
+		$this->setSelectionOptions(json_encode($selectionOptions->jsonSerialize()));
+		$this->setSelectionDefault($selectionOptions->defaultSerialized());
+	}
+
+	public function getSelectionOptionsArray(): ?array {
+		return $this->getSelectionOptionsCollection()->jsonSerialize();
 	}
 
 	/**
@@ -270,6 +300,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
+			'uuid' => $this->uuid,
 			'tableId' => $this->tableId,
 			'title' => $this->title,
 			'technicalName' => $this->technicalName,

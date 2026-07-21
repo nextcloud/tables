@@ -983,6 +983,7 @@ export type components = {
         readonly Column: {
             /** Format: int64 */
             readonly id: number;
+            readonly uuid: string;
             readonly title: string;
             readonly technicalName: string;
             /** Format: int64 */

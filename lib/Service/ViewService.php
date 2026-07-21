@@ -33,6 +33,7 @@ use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -209,6 +210,7 @@ class ViewService extends SuperService {
 
 		$time = new DateTime();
 		$item = new View();
+		$item->setUuid(null);
 		$item->setTitle($title);
 		if ($emoji) {
 			$item->setEmoji($emoji);
@@ -634,6 +636,7 @@ class ViewService extends SuperService {
 	 */
 	public function importView(int $tableId, array $view, string $userId): void {
 		$item = new View();
+		$item->setUuid((isset($view['uuid']) && Uuid::isValid($view['uuid'])) ? $view['uuid'] : null);
 		$item->setTableId($tableId);
 		$item->setTitle($view['title']);
 		$item->setEmoji($view['emoji']);
