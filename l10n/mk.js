@@ -75,6 +75,7 @@ OC.L10N.register(
     "Remove from favorites" : "Избриши од фаворити",
     "Copy" : "Копирај",
     "Favorites" : "Омилени",
+    "Applications" : "Апликации",
     "Clear filter" : "Исчисти филтри",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
     "Copy internal link to clipboard" : "Копирај внатрешен линк во клипборд",
