@@ -14,7 +14,7 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 	}
 
 	sort(mode, nextSorts) {
-		const factor = mode === 'DESC' ? 1 : -1
+		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value
 			const valueA = Number.isNaN(parseInt(tmpA)) ? -1 : parseInt(tmpA)
