@@ -28,6 +28,22 @@
 				</template>
 				{{ t('tables', 'Transfer application') }}
 			</NcActionButton>
+			<!-- ARCHIVE -->
+			<NcActionButton v-if="!context.archived" :close-after-click="true" @click="toggleArchiveContext(true)">
+				<template #icon>
+					<ArchiveArrowDownOutline :size="20" />
+				</template>
+				{{ t('tables', 'Archive application') }}
+			</NcActionButton>
+
+			<!-- UNARCHIVE -->
+			<NcActionButton v-if="context.archived" :close-after-click="true" @click="toggleArchiveContext(false)">
+				<template #icon>
+					<ArchiveArrowUpOutline :size="20" />
+				</template>
+				{{ t('tables', 'Unarchive application') }}
+			</NcActionButton>
+
 			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn"
 				@click="deleteContext">
 				<template #icon>
@@ -35,6 +51,7 @@
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
+
 			<NcActionCheckbox :checked="showInNavigation" data-cy="navigationContextShowInNavSwitch" @change="changeDisplayMode">
 				{{ t('tables', 'Show in app list') }}
 			</NcActionCheckbox>
@@ -50,6 +67,8 @@ import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import FileSwapOutline from 'vue-material-design-icons/FileSwapOutline.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
+import ArchiveArrowDownOutline from 'vue-material-design-icons/ArchiveArrowDownOutline.vue'
+import ArchiveArrowUpOutline from 'vue-material-design-icons/ArchiveArrowUpOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.ts'
@@ -64,6 +83,8 @@ export default {
 		FileSwapOutline,
 		TableIcon,
 		DeleteOutline,
+		ArchiveArrowDownOutline,
+		ArchiveArrowUpOutline,
 		NcIconSvgWrapper,
 		NcAppNavigationItem,
 		NcActionButton,
@@ -99,7 +120,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['updateDisplayMode']),
+		...mapActions(useTablesStore, ['updateDisplayMode', 'archiveContext', 'unarchiveContext']),
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
@@ -117,6 +138,13 @@ export default {
 				}
 			}
 			return false
+		},
+		async toggleArchiveContext(archived) {
+			if (archived) {
+				await this.archiveContext({ id: this.context.id })
+			} else {
+				await this.unarchiveContext({ id: this.context.id })
+			}
 		},
 		async changeDisplayMode() {
 			const value = !this.showInNavigation

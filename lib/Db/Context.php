@@ -21,6 +21,7 @@ use JsonSerializable;
  * @method setOwnerId(string $value): void
  * @method getOwnerType(): int
  * @method setOwnerType(int $value): void
+ * @method setArchived(bool $value): void
  *
  * @method getSharing(): array
  * @method setSharing(array $value): void
@@ -35,6 +36,7 @@ class Context extends EntitySuper implements JsonSerializable {
 	protected ?string $description = null;
 	protected ?string $ownerId = null;
 	protected ?int $ownerType = null;
+	protected bool $archived = false;
 
 	// virtual properties
 	protected ?array $sharing = null;
@@ -46,6 +48,11 @@ class Context extends EntitySuper implements JsonSerializable {
 	public function __construct() {
 		$this->addType('id', 'integer');
 		$this->addType('owner_type', 'integer');
+		$this->addType('archived', 'boolean');
+	}
+
+	public function isArchived(): bool {
+		return $this->archived;
 	}
 
 	public function jsonSerialize(): array {
@@ -56,7 +63,8 @@ class Context extends EntitySuper implements JsonSerializable {
 			'iconName' => $this->getIcon(),
 			'description' => $this->getDescription(),
 			'owner' => $this->getOwnerId(),
-			'ownerType' => $this->getOwnerType()
+			'ownerType' => $this->getOwnerType(),
+			'archived' => $this->isArchived(),
 		];
 
 		// extended data
