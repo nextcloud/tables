@@ -118,6 +118,6 @@ export default {
 
 .move-button {
 	cursor: move !important;
-	padding-right: 10px;
+	padding-inline-end: 10px;
 }
 </style>

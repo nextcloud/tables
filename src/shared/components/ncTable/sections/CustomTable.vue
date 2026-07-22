@@ -356,7 +356,7 @@ export default {
 
 	thead tr > th.frozen-column {
 		z-index: 6;
-		border-right: 1px solid transparent; // aligns inset shadow with td (which has a 1px border)
+		border-inline-end: 1px solid transparent; // aligns inset shadow with td (which has a 1px border)
 		box-shadow: inset 0 -1px 0 var(--color-border), inset -1px 0 0 var(--color-border-dark);
 	}
 
