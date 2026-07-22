@@ -21,6 +21,8 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareCreate;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\DB\Exception;
 use OCP\IDBConnection;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -144,5 +146,60 @@ class ShareServiceTest extends TestCase {
 
 		$this->expectException(PermissionError::class);
 		$this->shareService->assertPublicShareAccessible($this->publicShare);
+	}
+
+	public function testDeleteForShareReviewCallsSideEffects(): void {
+		$share = new Share();
+		$share->setId(42);
+		$share->setNodeType('table');
+		$this->mapper->expects($this->once())
+			->method('find')
+			->with(42)
+			->willReturn($share);
+		$this->mapper->expects($this->once())
+			->method('delete')
+			->with($share);
+		$this->contextNavigationMapper->expects($this->never())->method('deleteByShareId');
+
+		$this->shareService->deleteForShareReview(42);
+	}
+
+	public function testDeleteForShareReviewCleansUpContextNavigation(): void {
+		$share = new Share();
+		$share->setId(7);
+		$share->setNodeType('context');
+		$this->mapper->expects($this->once())
+			->method('find')
+			->with(7)
+			->willReturn($share);
+		$this->mapper->expects($this->once())
+			->method('delete')
+			->with($share);
+		$this->contextNavigationMapper->expects($this->once())
+			->method('deleteByShareId')
+			->with(7);
+
+		$this->shareService->deleteForShareReview(7);
+	}
+
+	public function testDeleteForShareReviewPropagatesDoesNotExist(): void {
+		$this->mapper->expects($this->once())
+			->method('find')
+			->with(99)
+			->willThrowException(new DoesNotExistException(''));
+
+		$this->expectException(DoesNotExistException::class);
+		$this->shareService->deleteForShareReview(99);
+	}
+
+	public function testDeleteForShareReviewPropagatesDbException(): void {
+		$share = new Share();
+		$share->setId(5);
+		$share->setNodeType('table');
+		$this->mapper->method('find')->willReturn($share);
+		$this->mapper->method('delete')->willThrowException($this->createMock(Exception::class));
+
+		$this->expectException(Exception::class);
+		$this->shareService->deleteForShareReview(5);
 	}
 }
