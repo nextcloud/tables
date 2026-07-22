@@ -70,7 +70,7 @@ npm run stylelint:fix   # CSS/SCSS auto-fix
 make test               # All tests (unit + Behat + Cypress)
 composer test           # PHP unit tests
 composer test:unit:local  # PHP unit tests without Nextcloud bootstrap
-npm run tests:component # Cypress component tests
+npm run test:component  # Cypress component tests
 npm run test:e2e        # Playwright E2E tests
 npm run test:e2e:ui     # Playwright with interactive UI
 ```

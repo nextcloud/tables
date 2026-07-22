@@ -5,14 +5,14 @@
 module.exports = {
 	root: true,
 	extends: [
-		'@nextcloud',
-		'@nextcloud/eslint-config/typescript',
+		'@nextcloud/eslint-config/vue3',
 	],
 	rules: {
 		'jsdoc/require-jsdoc': 'off',
 		'jsdoc/tag-lines': 'off',
 		'vue/first-attribute-linebreak': 'off',
 		'vue/max-attributes-per-line': 'off',
+		'vue/custom-event-name-casing': ['warn', 'kebab-case'],
 	},
 	overrides: [
 		{
