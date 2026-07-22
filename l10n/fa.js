@@ -399,6 +399,7 @@ OC.L10N.register(
     "New title of the view" : "عنوان جدید نما",
     "Filter" : "فیلتر",
     "Sort" : "مرتب‌سازی",
+    "Saving..." : "در حال ذخیره...",
     "Delete application" : "حذف برنامه",
     "Do you really want to delete the table \"{table}\"?" : "آیا واقعاً می‌خواهید جدول \"{table}\" را حذف کنید؟",
     "Export" : "خروجی",

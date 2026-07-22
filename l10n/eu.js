@@ -232,6 +232,7 @@ OC.L10N.register(
     "Save View" : "Gorde ikuspegia",
     "Filter" : "Iragazi",
     "Sort" : "Ordenatu",
+    "Saving..." : "Gordetzen...",
     "Do you really want to delete the table \"{table}\"?" : "Benetan ezabatu nahi al duzu \"{table}\" taula?",
     "Export" : "Esportatu",
     "Add to favorites" : "Gehitu gogokoetara",
