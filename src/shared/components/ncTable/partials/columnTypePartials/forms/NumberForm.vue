@@ -76,7 +76,7 @@
 <script>
 
 import { translate as t } from '@nextcloud/l10n'
-import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 
 export default {
 	name: 'NumberForm',

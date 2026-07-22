@@ -246,7 +246,7 @@ export default {
 
 			this.$nextTick(() => {
 				if (this.isPlainUrl) {
-					const input = this.$el.querySelector('input[type="text"]')
+					const input = this.$el?.querySelector?.('input[type="text"]')
 					if (input) {
 						input.focus()
 						// Place cursor at the end for existing content
@@ -255,7 +255,7 @@ export default {
 						}
 					}
 				} else {
-					const selectInput = this.$el.querySelector('.vs__search')
+					const selectInput = this.$el?.querySelector?.('.vs__search')
 					if (selectInput) {
 						selectInput.focus()
 					}

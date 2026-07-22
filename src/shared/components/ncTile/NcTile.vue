@@ -12,16 +12,6 @@
 
 export default {
 
-	filters: {
-		truncate(string, num) {
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
-	},
-
 	props: {
 		active: {
 			type: Boolean,
@@ -41,6 +31,10 @@ export default {
 		    },
 	},
 
+	emits: [
+		'set-template',
+		'update:active',
+	],
 	computed: {
 		localeActive: {
 			get() {

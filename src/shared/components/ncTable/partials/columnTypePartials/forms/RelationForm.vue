@@ -16,7 +16,7 @@
 					:disabled="column.id && column.id > 0"
 					required
 					:clearable="false"
-					@input="onRelationTypeChange" />
+					@update:model-value="onRelationTypeChange" />
 			</div>
 		</div>
 
@@ -32,7 +32,7 @@
 					:disabled="column.id && column.id > 0"
 					required
 					:clearable="false"
-					@input="onTargetChange" />
+					@update:model-value="onTargetChange" />
 			</div>
 		</div>
 
@@ -48,7 +48,7 @@
 					:aria-label-combobox="t('tables', 'Select label for relation selection')"
 					required
 					:clearable="false"
-					@input="onLabelColumnChange" />
+					@update:model-value="onLabelColumnChange" />
 			</div>
 		</div>
 		<div class="info-text">
@@ -80,6 +80,9 @@ export default {
 			required: true,
 		},
 	},
+	emits: [
+		'update:customSettings',
+	],
 	data() {
 		return {
 			customSettings: {

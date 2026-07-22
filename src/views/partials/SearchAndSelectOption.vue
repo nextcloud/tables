@@ -17,9 +17,7 @@
 				<NcUserBubble v-if="owner"
 					:user="owner"
 					:display-name="ownerDisplayName ?? owner" />&nbsp;
-				<NcCounterBubble v-if="rowsCount !== null">
-					{{ n('tables', '{nb} row', '{nb} rows', rowsCount, { nb: rowsCount}) }}
-				</NcCounterBubble>
+				<NcCounterBubble v-if="rowsCount !== null" :count="rowsCount" />
 				<div v-if="subline" class="subline p span">
 					{{ subline }}
 				</div>
@@ -43,19 +41,6 @@ export default {
 		IconTable,
 		IconView,
 		IconRow,
-	},
-
-	filters: {
-		truncate(string, num) {
-			if (!string) {
-				return ''
-			}
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
 	},
 
 	props: {

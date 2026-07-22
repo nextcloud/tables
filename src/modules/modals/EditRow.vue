@@ -34,11 +34,11 @@
 				</NcButton>
 			</div>
 
-			<div v-if="activeTabId === 'edit'" class="row">
+			<div v-if="activeTabId === 'edit' && localRow" class="row">
 				<div v-for="column in nonMetaColumns" :key="column.id">
 					<ColumnFormComponent
-						:column="column"
-						:value.sync="localRow[column.id]" />
+						v-model:value="localRow[column.id]"
+						:column="column" />
 					<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(localRow[column.id], column)"
 						type="error">
 						{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
@@ -139,6 +139,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			localRow: null,
@@ -168,10 +171,10 @@ export default {
 				if (oldRow?.id === newRow.id && this.localRow !== null) {
 					return
 				}
-				if (this.$router.currentRoute.path.includes('/row/')) {
-					this.$router.replace(this.$router.currentRoute.path.split('/row/')[0])
+				if (this.$route.path.includes('/row/')) {
+					this.$router.replace(this.$route.path.split('/row/')[0])
 				}
-				this.$router.push(this.$router.currentRoute.path + '/row/' + newRow.id)
+				this.$router.push(this.$route.path + '/row/' + newRow.id)
 				this.setActiveRowId(null)
 				this.loadValues()
 			}
@@ -208,7 +211,7 @@ export default {
 		},
 		actionCancel() {
 			// Remove the row path from URL if it exists
-			if (this.$router && this.$router.currentRoute.path.includes('/row/')) {
+			if (this.$router && this.$route.path.includes('/row/')) {
 				this.$router.back()
 			}
 			this.reset()

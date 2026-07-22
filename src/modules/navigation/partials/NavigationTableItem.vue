@@ -3,9 +3,9 @@
 	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcAppNavigationItem v-if="table" data-cy="navigationTableItem" :name="table.title"
-		:class="{ active: activeTable && table.id === activeTable.id }" :allow-collapse="hasViews" :force-menu="true"
-		:open.sync="isParentOfActiveView" :to="'/table/' + parseInt(table.id)" @click="openTable">
+	<NcAppNavigationItem v-if="table" v-model:open="isParentOfActiveView" data-cy="navigationTableItem"
+		:name="table.title" :class="{ active: activeTable && table.id === activeTable.id }" :allow-collapse="hasViews"
+		:force-menu="true" :to="'/table/' + parseInt(table.id)" @click="openTable">
 		<template #icon>
 			<template v-if="table.emoji">
 				{{ table.emoji }}
@@ -17,9 +17,7 @@
 		</template>
 
 		<template #counter>
-			<NcCounterBubble v-if="canReadData(table)">
-				{{ table.rowsCount }}
-			</NcCounterBubble>
+			<NcCounterBubble v-if="canReadData(table)" :count="table.rowsCount" />
 			<NcActionButton v-if="table.hasShares" icon="icon-share"
 				:class="{ 'margin-right': !(activeTable && table.id === activeTable.id) }" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
@@ -180,16 +178,6 @@ export default {
 		PlaylistPlus,
 		DeleteOutline,
 		ActivityIcon,
-	},
-
-	filters: {
-		truncate(string, num) {
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
 	},
 
 	mixins: [permissionsMixin, activityMixin],

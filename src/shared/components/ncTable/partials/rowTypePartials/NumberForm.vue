@@ -39,6 +39,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'update:value',
+	],
 	computed: {
 		getStep() {
 			if (this.column?.numberDecimals === 0) {

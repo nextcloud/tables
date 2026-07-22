@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcAppSettingsDialog :open.sync="open"
+	<NcAppSettingsDialog v-model:open="open"
 		:show-navigation="true"
 		:title="t('tables', 'Table settings')"
 		data-cy="editTableModal">
@@ -30,14 +30,14 @@
 					{{ t('tables', 'Description') }}
 				</div>
 				<div class="col-4">
-					<TableDescription v-if="localTable" :description.sync="localTable.description" />
+					<TableDescription v-if="localTable" v-model:description="localTable.description" />
 				</div>
 			</div>
 		</NcAppSettingsSection>
 		<NcAppSettingsSection v-if="localTable && canManageElement(localTable)" id="column-order" :name="t('tables', 'Column order')">
 			<ColumnOrderList
 				:columns="tableColumns"
-				@update:columnSettings="localColumnSettings = $event" />
+				@update:column-settings="localColumnSettings = $event" />
 		</NcAppSettingsSection>
 		<NcAppSettingsSection v-if="localTable && canManageElement(localTable)" id="default-sort" :name="t('tables', 'Default sorting')">
 			<DefaultSortRules
@@ -125,6 +125,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			open: false,

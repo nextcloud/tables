@@ -12,7 +12,7 @@
 			class="tiptap-edit-mode"
 			@keydown.escape.prevent="cancelEdit">
 			<TiptapMenuBar
-				:value.sync="localValue"
+				v-model:value="localValue"
 				:text-length-limit="getTextLimit"
 				@input="updateText" />
 			<div v-if="localLoading" class="loading-indicator">
@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import { Editor, EditorContent } from '@tiptap/vue-2'
+import { markRaw } from 'vue'
+import { Editor, EditorContent } from '@tiptap/vue-3'
 import { StarterKit } from '@tiptap/starter-kit'
 import TiptapMenuBar from './TiptapMenuBar.vue'
 import cellEditMixin from '../mixins/cellEditMixin.js'
@@ -81,13 +82,13 @@ export default {
 	},
 
 	mounted() {
-		this.editor = new Editor({
+		this.editor = markRaw(new Editor({
 			extensions: [
 				StarterKit,
 			],
 			content: this.value,
 			editable: false,
-		})
+		}))
 	},
 
 	beforeUnmount() {

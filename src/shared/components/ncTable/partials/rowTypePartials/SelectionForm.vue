@@ -34,6 +34,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update:value',
+	],
 	computed: {
 		localValue: {
 			get() {

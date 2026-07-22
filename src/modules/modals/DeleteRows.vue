@@ -45,6 +45,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'cancel',
+	],
 	methods: {
 		...mapActions(useDataStore, ['removeRow', 'removePublicRow']),
 		deleteRows() {

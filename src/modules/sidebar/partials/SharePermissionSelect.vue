@@ -28,32 +28,36 @@
 		</NcActions>
 
 		<div v-if="showCustom" class="share-permission-select__custom">
-			<NcCheckboxRadioSwitch
-				:checked="share.permissionRead"
-				data-cy="sharePermissionRead"
-				@update:checked="updateCustom('permissionRead', $event)">
-				{{ t('tables', 'Read') }}
-			</NcCheckboxRadioSwitch>
-			<NcCheckboxRadioSwitch
-				:checked="share.permissionCreate"
-				data-cy="sharePermissionCreate"
-				@update:checked="updateCustom('permissionCreate', $event)">
-				{{ t('tables', 'Create') }}
-			</NcCheckboxRadioSwitch>
-			<NcCheckboxRadioSwitch
-				:checked="share.permissionUpdate"
-				:disabled="!share.permissionRead"
-				data-cy="sharePermissionUpdate"
-				@update:checked="updateCustom('permissionUpdate', $event)">
-				{{ t('tables', 'Update') }}
-			</NcCheckboxRadioSwitch>
-			<NcCheckboxRadioSwitch
-				:checked="share.permissionDelete"
-				:disabled="!share.permissionRead"
-				data-cy="sharePermissionDelete"
-				@update:checked="updateCustom('permissionDelete', $event)">
-				{{ t('tables', 'Delete') }}
-			</NcCheckboxRadioSwitch>
+			<div data-cy="sharePermissionRead">
+				<NcCheckboxRadioSwitch
+					:model-value="share.permissionRead"
+					@update:model-value="updateCustom('permissionRead', $event)">
+					{{ t('tables', 'Read') }}
+				</NcCheckboxRadioSwitch>
+			</div>
+			<div data-cy="sharePermissionCreate">
+				<NcCheckboxRadioSwitch
+					:model-value="share.permissionCreate"
+					@update:model-value="updateCustom('permissionCreate', $event)">
+					{{ t('tables', 'Create') }}
+				</NcCheckboxRadioSwitch>
+			</div>
+			<div data-cy="sharePermissionUpdate">
+				<NcCheckboxRadioSwitch
+					:model-value="share.permissionUpdate"
+					:disabled="!share.permissionRead"
+					@update:model-value="updateCustom('permissionUpdate', $event)">
+					{{ t('tables', 'Update') }}
+				</NcCheckboxRadioSwitch>
+			</div>
+			<div data-cy="sharePermissionDelete">
+				<NcCheckboxRadioSwitch
+					:model-value="share.permissionDelete"
+					:disabled="!share.permissionRead"
+					@update:model-value="updateCustom('permissionDelete', $event)">
+					{{ t('tables', 'Delete') }}
+				</NcCheckboxRadioSwitch>
+			</div>
 		</div>
 	</div>
 </template>

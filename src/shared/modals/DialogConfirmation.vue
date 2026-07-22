@@ -62,6 +62,7 @@ export default {
 			default: 'success', // primary, secondary, tertiary, tertiary-no-background, tertiary-on-primary, error, warning, success
 		},
 	},
+	emits: ['cancel', 'confirm'],
 }
 </script>
 <style scoped>

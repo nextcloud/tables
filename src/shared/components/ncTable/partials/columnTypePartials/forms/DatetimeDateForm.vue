@@ -9,8 +9,8 @@
 			<div class="fix-col-4 title">
 				{{ t('tables', 'Set today as default') }}
 			</div>
-			<div class="fix-col-4 margin-bottom">
-				<NcCheckboxRadioSwitch type="switch" :checked.sync="todayAsDefault" data-cy="datetimeDateFormTodaySwitch" />
+			<div class="fix-col-4 margin-bottom" data-cy="datetimeDateFormTodaySwitch">
+				<NcCheckboxRadioSwitch v-model="todayAsDefault" type="switch" />
 			</div>
 		</div>
 	</div>

@@ -6,7 +6,7 @@
 	<NcAppNavigation v-if="!isStandaloneContext">
 		<template #list>
 			<div class="filter-box">
-				<NcTextField :value.sync="filterString" :label="t('tables', 'Filter items')"
+				<NcTextField v-model="filterString" :label="t('tables', 'Filter items')"
 					trailing-button-icon="close" :show-trailing-button="filterString !== ''"
 					@trailing-button-click="filterString = ''">
 					<Magnify :size="16" />
@@ -19,11 +19,11 @@
 				<NcAppNavigationCaption v-if="getFavoriteNodes.length > 0" :name="t('tables', 'Favorites')" />
 
 				<!-- FAVORITES -->
-				<template v-for="node in getFavoriteNodes">
-					<NavigationTableItem v-if="!node.tableId" :key="node.id" :filter-string="filterString"
+				<template v-for="node in getFavoriteNodes" :key="node.tableId ? 'view' + node.id : node.id">
+					<NavigationTableItem v-if="!node.tableId" :filter-string="filterString"
 						:table="node" />
 
-					<NavigationViewItem v-else :key="'view' + node.id" :view="node" />
+					<NavigationViewItem v-else :view="node" />
 				</template>
 
 				<NcAppNavigationCaption :name="t('tables', 'Tables')">
@@ -35,12 +35,12 @@
 
 				<!-- ALL NON-FAVORITES -->
 
-				<template v-for="node in getAllNodes">
-					<NavigationTableItem v-if="!node.tableId && !node.archived && !node.favorite" :key="node.id"
+				<template v-for="node in getAllNodes" :key="node.tableId ? 'view' + node.id : node.id">
+					<NavigationTableItem v-if="!node.tableId && !node.archived && !node.favorite"
 						:filter-string="filterString" :table="node" />
 
 					<NavigationViewItem v-else-if="node.tableId && !node.favorite && !viewAlreadyListed(node)"
-						:key="'view' + node.id" :view="node" />
+						:view="node" />
 				</template>
 
 				<!-- ARCHIVED -->
@@ -51,9 +51,7 @@
 					</template>
 
 					<template #counter>
-						<NcCounterBubble>
-							{{ getArchivedTables.length }}
-						</NcCounterBubble>
+						<NcCounterBubble :count="getArchivedTables.length" />
 					</template>
 
 					<NavigationTableItem v-for="table in getArchivedTables" :key="table.id"
@@ -68,8 +66,8 @@
 					</template>
 				</NcAppNavigationCaption>
 
-				<template v-for="node in getAllContexts">
-					<NavigationContextItem :key="node.id" :context="node" />
+				<template v-for="node in getAllContexts" :key="node.id">
+					<NavigationContextItem :context="node" />
 				</template>
 			</ul>
 

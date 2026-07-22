@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcPopover popup-role="dialog" :shown.sync="showIconPicker">
+	<NcPopover v-model:shown="showIconPicker" popup-role="dialog">
 		<template #trigger="slotProps">
 			<slot v-bind="slotProps" />
 		</template>

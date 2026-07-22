@@ -4,15 +4,11 @@
 -->
 <template>
 	<div class="activity-list">
-		<div v-if="isLoading" class="icon icon-loading" />
 		<ActivityEntry v-for="activity in activities"
 			:key="activity.activity_id"
 			:activity="activity" />
-		<InfiniteLoading :identifier="objectId" @infinite="infiniteHandler" @change="changeObject">
-			<div slot="spinner" class="icon-loading" />
-			<div slot="no-more" />
-			<div slot="no-results" />
-		</InfiniteLoading>
+		<div v-if="isLoading" class="icon-loading" />
+		<div ref="sentinel" class="activity-list__sentinel" />
 	</div>
 </template>
 
@@ -20,7 +16,6 @@
 import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
 import ActivityEntry from './ActivityEntry.vue'
-import InfiniteLoading from 'vue-infinite-loading'
 
 const ACTIVITY_FETCH_LIMIT = 50
 
@@ -28,7 +23,6 @@ export default {
 	name: 'ActivityList',
 	components: {
 		ActivityEntry,
-		InfiniteLoading,
 	},
 	props: {
 		filter: {
@@ -54,9 +48,59 @@ export default {
 			isLoading: false,
 			since: 0,
 			endReached: false,
+			observer: null,
 		}
 	},
+	watch: {
+		objectId() {
+			this.resetAndReload()
+		},
+	},
+	mounted() {
+		this.setupObserver()
+	},
+	beforeUnmount() {
+		this.teardownObserver()
+	},
 	methods: {
+		setupObserver() {
+			this.observer = new IntersectionObserver((entries) => {
+				if (entries[0]?.isIntersecting) {
+					this.loadMore()
+				}
+			}, { threshold: 0.1 })
+			if (this.$refs.sentinel) {
+				this.observer.observe(this.$refs.sentinel)
+			}
+		},
+		teardownObserver() {
+			if (this.observer) {
+				this.observer.disconnect()
+				this.observer = null
+			}
+		},
+		async loadMore() {
+			if (this.isLoading || this.endReached) {
+				return
+			}
+			this.isLoading = true
+			try {
+				await this.loadActivity()
+			} finally {
+				this.isLoading = false
+			}
+			await this.$nextTick()
+			if (this.observer && this.$refs.sentinel && !this.endReached) {
+				this.observer.unobserve(this.$refs.sentinel)
+				this.observer.observe(this.$refs.sentinel)
+			}
+		},
+		resetAndReload() {
+			this.since = 0
+			this.activities = []
+			this.endReached = false
+			this.loadMore()
+		},
 		async loadActivity() {
 			const params = new URLSearchParams()
 			params.append('format', 'json')
@@ -98,19 +142,6 @@ export default {
 			}
 			this.since = (activities[activities.length - 1].activity_id)
 			return activities
-		},
-		async infiniteHandler($state) {
-			await this.loadActivity()
-			if (!this.endReached) {
-				$state.loaded()
-			} else {
-				$state.complete()
-			}
-		},
-		changeObject() {
-			this.since = 0
-			this.activities = []
-			this.endReached = false
 		},
 	},
 }

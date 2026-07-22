@@ -49,6 +49,10 @@ export default {
 		},
 	},
 
+	emits: [
+		'remove',
+		'update:resources',
+	],
 	data() {
 		return {
 			loading: false,

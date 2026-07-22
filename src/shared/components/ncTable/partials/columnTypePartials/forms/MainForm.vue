@@ -29,7 +29,7 @@
 			{{ t('tables', 'Mandatory') }}
 		</div>
 		<div class="fix-col-4">
-			<NcCheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
+			<NcCheckboxRadioSwitch v-model="localMandatory" type="switch" />
 		</div>
 
 		<!-- add to views -->
@@ -113,7 +113,6 @@
 					:placeholder="t('tables', 'Enter a column width between {min} and {max}', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX })">
 			</div>
 		</template>
-
 	</div>
 </template>
 
@@ -180,16 +179,20 @@ export default {
 			},
 		},
 	},
+	emits: [
+		'update:customSettings',
+		'update:description',
+		'update:mandatory',
+		'update:selectedViews',
+		'update:technicalName',
+		'update:title',
+	],
 	data() {
 		return {
 			COLUMN_WIDTH_MIN,
 			COLUMN_WIDTH_MAX,
 			showAdvanced: false,
 		}
-	},
-	watch: {
-		technicalNameInvalidError: 'expandAdvancedOnError',
-		widthInvalidError: 'expandAdvancedOnError',
 	},
 	computed: {
 		...mapState(useTablesStore, ['views', 'activeElement', 'isView']),
@@ -232,6 +235,10 @@ export default {
 			}
 			return this.views.filter(view => view.tableId === this.activeElement?.id).filter(view => !this.localSelectedViews.includes(view))
 		},
+	},
+	watch: {
+		technicalNameInvalidError: 'expandAdvancedOnError',
+		widthInvalidError: 'expandAdvancedOnError',
 	},
 
 	mounted() {

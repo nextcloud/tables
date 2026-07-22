@@ -9,7 +9,7 @@
 			:loading="localLoading"
 			:disabled="!canEditCell()"
 			type="switch"
-			@update:modelValue="onToggle" />
+			@update:model-value="onToggle" />
 	</div>
 </template>
 

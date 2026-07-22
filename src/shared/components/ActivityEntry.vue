@@ -11,35 +11,33 @@
 				{{ relativeDate(activity.datetime) }}
 			</div>
 		</div>
+		<!-- eslint-disable-next-line vue/no-v-html -- sanitizedMessage is sanitized with DOMPurify -->
 		<p v-if="activity.message" class="activity--message" v-html="sanitizedMessage" />
 	</div>
 </template>
 
 <script>
+import { h } from 'vue'
 import { NcUserBubble, NcRichText } from '@nextcloud/vue'
 import moment from '@nextcloud/moment'
 import DOMPurify from 'dompurify'
 import relativeDate from '../mixins/relativeDate.js'
 import formatReadableDate from '../mixins/readableDate.js'
 
-const InternalLink = {
-	name: 'InternalLink',
-	functional: true,
-	props: {
-		href: {
-			type: String,
-			default: '',
-		},
-		name: {
-			type: String,
-			default: '',
-		},
+const InternalLink = (props) => {
+	if (!props.href) {
+		return h('strong', { style: { fontWeight: 600 } }, props.name)
+	}
+	return h('a', { href: props.href || '#', style: { fontWeight: 600 } }, props.name)
+}
+InternalLink.props = {
+	href: {
+		type: String,
+		default: '',
 	},
-	render(createElement, context) {
-		if (!context.props.href) {
-			return createElement('strong', { style: { 'font-weight': 600 } }, context.props.name)
-		}
-		return createElement('a', { attrs: { href: context.props.href || '#' }, style: { 'font-weight': 600 } }, context.props.name)
+	name: {
+		type: String,
+		default: '',
 	},
 }
 export default {

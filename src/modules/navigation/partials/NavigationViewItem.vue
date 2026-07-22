@@ -18,9 +18,7 @@
 			</template>
 		</template>
 		<template #counter>
-			<NcCounterBubble v-if="canReadData(view)">
-				{{ view.rowsCount }}
-			</NcCounterBubble>
+			<NcCounterBubble v-if="canReadData(view)" :count="view.rowsCount" />
 			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
 			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view) && showShareSender" class="margin-left">
 				<NcAvatar :user="view.ownership" :show-user-status="false" />
@@ -134,7 +132,6 @@ import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import ActivityIcon from 'vue-material-design-icons/LightningBoltOutline.vue'
-import activityMixin from '../../../shared/mixins/activityMixin.js'
 
 export default {
 	name: 'NavigationViewItem',
@@ -156,17 +153,7 @@ export default {
 		DeleteOutline,
 	},
 
-	filters: {
-		truncate(string, num) {
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
-	},
-
-	mixins: [permissionsMixin, activityMixin],
+	mixins: [permissionsMixin],
 
 	props: {
 		view: {

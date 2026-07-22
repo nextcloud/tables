@@ -9,7 +9,7 @@
 				{{ t('tables', 'Options') }}
 			</div>
 			<div v-for="opt in mutableColumn.selectionOptions" :key="opt.id" class="col-4 inline" data-cy="selectionOption">
-				<NcCheckboxRadioSwitch :value="'' + opt.id" type="radio" :checked.sync="mutableColumn.selectionDefault" />
+				<NcCheckboxRadioSwitch v-model="mutableColumn.selectionDefault" :value="'' + opt.id" type="radio" />
 				<input :value="opt.label" data-cy="selectionOptionLabel" @input="updateLabel(opt.id, $event)">
 				<NcButton type="tertiary" :aria-label="t('tables', 'Delete option')" @click="deleteOption(opt.id)">
 					<template #icon>

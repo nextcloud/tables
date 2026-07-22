@@ -36,6 +36,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update:value',
+	],
 	data() {
 		return {
 		}

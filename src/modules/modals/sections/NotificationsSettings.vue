@@ -16,11 +16,11 @@
 			<NcCheckboxRadioSwitch
 				v-for="setting in notificationSettings"
 				:key="setting.key"
-				:checked="config[setting.key]"
+				:model-value="config[setting.key]"
 				:disabled="savingConfig[setting.key]"
 				:description="setting.description"
 				type="switch"
-				@update:checked="updateConfig(setting.key, $event)">
+				@update:model-value="updateConfig(setting.key, $event)">
 				<div class="notifications-settings__label">
 					<span>{{ setting.label }}</span>
 					<span v-if="savingConfig[setting.key]" class="notifications-settings__saving">
@@ -112,9 +112,9 @@ export default {
 		t,
 		getDefaultConfig() {
 			return {
+				'notify-assigned': false,
 				'notify-column': false,
 				'notify-row': false,
-				'notify-mention': false,
 			}
 		},
 		getConfigCollectionEndpoint() {

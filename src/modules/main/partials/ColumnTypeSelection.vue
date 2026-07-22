@@ -74,6 +74,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update:columnId',
+	],
 	data() {
 		return {
 			type: 'text',

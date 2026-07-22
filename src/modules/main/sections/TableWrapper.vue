@@ -4,9 +4,9 @@
 -->
 <template>
 	<div>
-		<ElementTitle :active-element="table" :view-setting.sync="localViewSetting" />
+		<ElementTitle v-model:view-setting="localViewSetting" :active-element="table" />
 		<TableDescription :description="table.description" :read-only="true" />
-		<DataTable :show-options="false" :table="table" :columns="columns" :rows="rows" :view-setting.sync="localViewSetting"
+		<DataTable v-model:view-setting="localViewSetting" :show-options="false" :table="table" :columns="columns" :rows="rows"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
 			@download-csv="$emit('download-csv')"
@@ -52,6 +52,15 @@ export default {
 		},
 	},
 
+	emits: [
+		'create-column',
+		'download-csv',
+		'download-filtered-csv',
+		'import',
+		'show-integration',
+		'toggle-share',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			localViewSetting: this.viewSetting,

@@ -40,12 +40,14 @@
 				<div class="col-4">
 					{{ t('tables', 'Resources') }}
 				</div>
-				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
+				<NcContextResource v-model:resources="resources" v-model:receivers="receivers" />
 			</div>
 			<div class="row space-T">
-				<NcActionCheckbox :checked="showInNavigationDefault" data-cy="createContextShowInNavSwitch" @change="changeDisplayMode">
-					{{ t('tables', 'Show in app list') }}
-				</NcActionCheckbox>
+				<div data-cy="createContextShowInNavSwitch">
+					<NcActionCheckbox :model-value="showInNavigationDefault" @change="changeDisplayMode">
+						{{ t('tables', 'Show in app list') }}
+					</NcActionCheckbox>
+				</div>
 				<p class="nav-display-subtext">
 					{{ t('tables', 'This can be overridden by a per-account preference') }}
 				</p>
@@ -91,6 +93,9 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			title: '',

@@ -5,7 +5,7 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description">
 		<TiptapMenuBar
-			:value.sync="localValue"
+			v-model:value="localValue"
 			:text-length-limit="getTextLimit"
 			:readonly="column.viewColumnInformation?.readonly"
 			@input="updateText" />
@@ -32,6 +32,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update:value',
+	],
 	computed: {
 		localValue: {
 			get() {

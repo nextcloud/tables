@@ -21,7 +21,7 @@
 			<div class="details">
 				<NcUserBubble :user="richObject.ownership"
 					:display-name="richObject.ownerDisplayName" />&nbsp;
-				<NcCounterBubble>{{ n('tables', '{nb} row', '{nb} rows', richObject.rowsCount, { nb: richObject.rowsCount}) }}</NcCounterBubble>
+				<NcCounterBubble :count="richObject.rowsCount" />
 			</div>
 			<!-- <div>
 				{{ richObject.rows }}

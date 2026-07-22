@@ -83,6 +83,8 @@ export default {
 			context: null,
 			contextResources: [],
 			errorMessage: null,
+			loadedSignature: null,
+			isReloading: false,
 		}
 	},
 
@@ -124,12 +126,20 @@ export default {
 	},
 
 	watch: {
-		async activeContext() {
-			if (this.errorMessage) {
-				// Already showing an error, don't redirect
-				return
-			}
-			await this.reload()
+
+		activeContext: {
+			handler() {
+				if (this.errorMessage) {
+					// Already showing an error, don't redirect
+					return
+				}
+				const signature = this.contextSignature()
+				if (signature === this.loadedSignature) {
+					return
+				}
+				this.loadedSignature = signature
+				this.reload()
+			},
 		},
 		'context.iconName': {
 			async handler(value) {
@@ -147,12 +157,21 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess']),
+		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE']),
+		contextSignature() {
+			const ctx = this.activeContext
+			return ctx ? `${ctx.id}:${Object.keys(ctx.nodes || {}).sort().join(',')}` : null
+		},
 		async reload() {
 			if (!this.activeContextId) {
 				return
 			}
+
+			if (this.isReloading) {
+				return
+			}
+			this.isReloading = true
 			this.loading = true
 			this.contextResources = []
 
@@ -165,6 +184,8 @@ export default {
 					this.errorMessage = t('tables', 'This application could not be found')
 					return
 				}
+
+				this.loadedSignature = this.contextSignature()
 
 				this.icon = await this.getContextIcon(this.activeContext.iconName)
 
@@ -184,6 +205,8 @@ export default {
 							try {
 								const nodeType = parseInt(node.node_type)
 								if (nodeType === NODE_TYPE_TABLE) {
+
+									await this.loadContextTable({ id: node.node_id })
 									const table = this.tables.find(table => table.id === node.node_id)
 									if (table) {
 										await this.loadColumnsFromBE({
@@ -200,6 +223,7 @@ export default {
 									}
 
 								} else if (nodeType === NODE_TYPE_VIEW) {
+									await this.loadContextView({ id: node.node_id })
 									const view = this.views.find(view => view.id === node.node_id)
 									if (view) {
 										await this.loadColumnsFromBE({
@@ -234,6 +258,7 @@ export default {
 				}
 			} finally {
 				this.loading = false
+				this.isReloading = false
 			}
 		},
 		createColumn(isView, element) {
