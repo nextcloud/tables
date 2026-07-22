@@ -24,6 +24,23 @@ async function setCheckboxState(control: Locator, checked: boolean) {
 	}
 }
 
+async function setNcCheckboxRadioSwitchState(control: Locator, checked: boolean) {
+	const switchControl = control.first()
+	const input = switchControl.locator('input').first()
+
+	await input.waitFor({ state: 'attached', timeout: 5000 })
+	if ((await input.isChecked()) === checked) {
+		return
+	}
+
+	await switchControl.locator('.checkbox-content').first().click()
+	if (checked) {
+		await expect(input).toBeChecked()
+	} else {
+		await expect(input).not.toBeChecked()
+	}
+}
+
 async function waitForTransientModalsToClose(page: Page) {
 	await page
 		.locator('[data-cy="createRowModal"], [data-cy="editRowModal"]')
@@ -56,10 +73,14 @@ async function navigateViaNavLink(page: Page, link: Locator) {
 	await link.scrollIntoViewIfNeeded()
 
 	const href = await link.getAttribute('href')
-	if (href) {
+	// vue-router 4 hash history renders relative hrefs like `#/table/4`.
+	// page.goto() resolves those against the baseURL (Nextcloud root), which
+	// navigates away from the app. Click the link for in-app SPA navigation
+	// instead; only use goto() for absolute hrefs.
+	if (href && !href.startsWith('#')) {
 		await page.goto(href, { waitUntil: 'domcontentloaded', timeout: 60000 })
 	} else {
-		await link.click()
+		await link.click({ force: true })
 	}
 }
 
@@ -511,12 +532,7 @@ export async function createUsergroupColumn(
 		.click()
 
 	if (hasMultipleValues) {
-		// NcCheckboxRadioSwitch type="switch" renders with role="switch", not "checkbox",
-		// and the label is in a separate div, so use data-cy to find it
-		const multiSwitchInput = page.locator('[data-cy="usergroupMultipleSwitch"] input')
-		if (await multiSwitchInput.count() > 0 && !(await multiSwitchInput.isChecked())) {
-			await multiSwitchInput.check({ force: true })
-		}
+		await setNcCheckboxRadioSwitchState(page.locator('[data-cy="usergroupMultipleSwitch"]'), true)
 	}
 
 	await setCheckboxState(
@@ -547,7 +563,8 @@ export async function createUsergroupColumn(
 			await defaultSelectInput.dispatchEvent('input')
 		}
 		await defaultSelectInput.pressSequentially(value)
-		const dropdownItem = page.locator(`.vs__dropdown-menu [id="${value}"]`)
+
+		const dropdownItem = page.locator('.vs__dropdown-menu li').filter({ hasText: value }).first()
 		await dropdownItem.waitFor({ state: 'visible', timeout: 10000 })
 		await dropdownItem.click()
 		await page.waitForTimeout(500)
@@ -686,10 +703,7 @@ export async function createSelectionMultiColumn(
 		.locator('.vs__dropdown-menu .multiSelectOptionLabel')
 		.filter({ hasText: 'Selection' })
 		.click()
-	await page
-		.locator('[data-cy="createColumnMultipleSelectionSwitch"]')
-		.filter({ hasText: 'Multiple selection' })
-		.click()
+	await setNcCheckboxRadioSwitchState(page.locator('[data-cy="createColumnMultipleSelectionSwitch"]'), true)
 
 	// remove default option
 	await page.locator('[data-cy="selectionOption"] button').first().click()
@@ -779,7 +793,7 @@ export async function createDatetimeColumn(
 		.click()
 
 	if (setNow) {
-		await page.locator('[data-cy="datetimeFormNowSwitch"]').click()
+		await setNcCheckboxRadioSwitchState(page.locator('[data-cy="datetimeFormNowSwitch"]'), true)
 	}
 
 	await page
@@ -810,13 +824,10 @@ export async function createDatetimeDateColumn(
 		.locator('.vs__dropdown-menu .multiSelectOptionLabel')
 		.filter({ hasText: 'Date and time' })
 		.click()
-	await page
-		.locator('[data-cy="createColumnDateSwitch"]')
-		.filter({ hasText: 'Date' })
-		.click()
+	await setNcCheckboxRadioSwitchState(page.locator('[data-cy="createColumnDateSwitch"]'), true)
 
 	if (setNow) {
-		await page.locator('[data-cy="datetimeDateFormTodaySwitch"]').click()
+		await setNcCheckboxRadioSwitchState(page.locator('[data-cy="datetimeDateFormTodaySwitch"]'), true)
 	}
 
 	await page
@@ -847,13 +858,10 @@ export async function createDatetimeTimeColumn(
 		.locator('.vs__dropdown-menu .multiSelectOptionLabel')
 		.filter({ hasText: 'Date and time' })
 		.click()
-	await page
-		.locator('[data-cy="createColumnTimeSwitch"]')
-		.filter({ hasText: 'Time' })
-		.click()
+	await setNcCheckboxRadioSwitchState(page.locator('[data-cy="createColumnTimeSwitch"]'), true)
 
 	if (setNow) {
-		await page.locator('[data-cy="datetimeTimeFormNowSwitch"]').click()
+		await setNcCheckboxRadioSwitchState(page.locator('[data-cy="datetimeTimeFormNowSwitch"]'), true)
 	}
 
 	await page
@@ -1024,13 +1032,10 @@ export async function createSelectionCheckColumn(
 		.locator('.vs__dropdown-menu .multiSelectOptionLabel')
 		.filter({ hasText: 'Selection' })
 		.click()
-	await page
-		.locator('[data-cy="createColumnYesNoSwitch"]')
-		.filter({ hasText: 'Yes/No' })
-		.click()
+	await setNcCheckboxRadioSwitchState(page.locator('[data-cy="createColumnYesNoSwitch"]'), true)
 
 	if (defaultValue) {
-		await page.locator('[data-cy="selectionCheckFormDefaultSwitch"]').click()
+		await setNcCheckboxRadioSwitchState(page.locator('[data-cy="selectionCheckFormDefaultSwitch"]'), true)
 	}
 	await page
 		.locator('.modal-container button')

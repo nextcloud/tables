@@ -36,8 +36,10 @@ async function createPublicLinkShare(page: Page, options: { password?: string, p
 	await page.locator('[data-cy="sharingEntryLinkCreateButton"]').click()
 
 	if (options.password) {
-		await page.locator('[data-cy="sharingEntryLinkPasswordCheck"]').click()
-		await page.locator('[data-cy="sharingEntryLinkPasswordInput"] input').fill(options.password)
+		await page.locator('[data-cy="sharingEntryLinkPasswordCheck"] .action-checkbox').click()
+		const passwordInput = page.locator('[data-cy="sharingEntryLinkPasswordInput"] input')
+		await expect(passwordInput).toBeVisible()
+		await passwordInput.fill(options.password)
 	}
 
 	await page.locator('[data-cy="sharingEntryLinkCreateFormCreateButton"]').click()
@@ -84,7 +86,9 @@ async function setSharePermissions(page: Page, permissions: { read?: boolean, cr
 			if (isChecked !== value) {
 				const reloadReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/share/') && r.request().method() === 'GET')
 				await waitForPermissionsUpdate(async () => {
-					await checkbox.click({ force: true })
+					await page
+						.locator(`[data-cy="sharePermission${key.charAt(0).toUpperCase() + key.slice(1)}"] .checkbox-content`)
+						.click()
 				})
 				await reloadReqPromise
 			}

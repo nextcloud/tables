@@ -92,8 +92,14 @@ test.describe('Manage a table', () => {
 		await expect(page.locator('[data-cy="transferTableModal"]')).toBeVisible()
 
 		await page.locator('[data-cy="transferTableModal"] input[type="search"]').clear()
+		const autocompleteResponsePromise = page.waitForResponse(r => r.url().includes('/core/autocomplete/get') && r.request().method() === 'GET')
 		await page.locator('[data-cy="transferTableModal"] input[type="search"]').fill(targetUserTransfer.userId)
-		await page.locator(`.vs__dropdown-menu [id="${targetUserTransfer.userId}"]`).click()
+		const autocompleteResponse = await autocompleteResponsePromise
+		expect(autocompleteResponse.ok()).toBeTruthy()
+
+		const targetUserOption = page.locator('.vs__dropdown-menu .vs__dropdown-option').filter({ hasText: targetUserTransfer.userId }).first()
+		await expect(targetUserOption).toBeVisible()
+		await targetUserOption.click()
 
 		await expect(page.locator('[data-cy="transferTableButton"]')).toBeEnabled()
 		await page.locator('[data-cy="transferTableButton"]').click()

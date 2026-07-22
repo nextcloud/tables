@@ -41,11 +41,11 @@ describe('Test context navigation shared context', () => {
 		cy.get('[data-cy="context-title"]').should('be.visible')
 		cy.openContextEditModal(contextTitle)
 		cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
-		cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
+		cy.contains('.vs__dropdown-menu li', nonLocalUser.userId).click()
 		cy.get('[data-cy="contextResourceShare"] span').contains(nonLocalUser.userId).should('exist')
 		cy.get('[data-cy="editContextSubmitBtn"]').click()
 
-		cy.get('[data-cy="navigationContextItem"]').contains(contextTitle).click({ force: true })
+		cy.get(`[data-cy="navigationContextItem"]:contains("${contextTitle}")`).find('button').click({ force: true })
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('be.checked')
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').click({ force: true })
 		cy.get('[data-cy="navigationContextShowInNavSwitch"] input').should('not.be.checked')

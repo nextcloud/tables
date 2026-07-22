@@ -48,7 +48,7 @@ test.describe('Test column ' + columnTitle, () => {
 
 		await page.locator('button').filter({ hasText: 'Create row' }).click()
 		await page.locator('[data-cy="usergroupRowSelect"] input').pressSequentially(nonLocalUser.userId)
-		await page.locator(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).first().click()
+		await page.locator('.vs__dropdown-menu li').filter({ hasText: nonLocalUser.userId }).first().click()
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 
 		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
@@ -76,7 +76,7 @@ test.describe('Test column ' + columnTitle, () => {
 		await expect(usergroupSelect.locator('.vs__selected').filter({ hasText: user.userId }).first()).toBeVisible()
 
 		await usergroupSelect.locator('input').pressSequentially(nonLocalUser.userId)
-		await page.locator(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
+		await page.locator('.vs__dropdown-menu li').filter({ hasText: nonLocalUser.userId }).first().click()
 		await expect(usergroupSelect.locator('.vs__selected').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
 
 		const localUserSelection = usergroupSelect.locator('.vs__selected').filter({ hasText: user.userId }).first()

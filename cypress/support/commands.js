@@ -231,7 +231,7 @@ Cypress.Commands.add('createUsergroupColumn', (title, selectUsers, selectGroups,
 
 	defaultValue.forEach((value) => {
 		cy.get('[data-cy="usergroupDefaultSelect"] input').type(value)
-		cy.get(`.vs__dropdown-menu [id="${value}"]`).click()
+		cy.contains('.vs__dropdown-menu li', value).click()
 	})
 
 	cy.get('[data-cy="createColumnSaveBtn"]').click()
