@@ -675,22 +675,29 @@ class FeatureContext implements Context {
 
 	/**
 	 * @Given user :user create view :title with emoji :emoji for :tableName as :viewName
+	 * @Given user :user create view :title with emoji :emoji and technical name :technicalName for :tableName as :viewName
 	 *
 	 * @param string $user
 	 * @param string $title
 	 * @param string $tableName
 	 * @param string $viewName
 	 * @param string|null $emoji
+	 * @param string|null $technicalName
 	 */
-	public function createView(string $user, string $title, string $tableName, string $viewName, ?string $emoji = null): void {
+	public function createView(string $user, string $title, string $tableName, string $viewName, ?string $emoji = null, ?string $technicalName = null): void {
 		$this->setCurrentUser($user);
+		$data = [
+			'title' => $title,
+			'emoji' => $emoji
+		];
+		if ($technicalName !== null) {
+			$data['technicalName'] = $technicalName;
+		}
+
 		$this->sendRequest(
 			'POST',
 			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/views',
-			[
-				'title' => $title,
-				'emoji' => $emoji
-			]
+			$data
 		);
 
 		$newItem = $this->getDataFromResponse($this->response);
@@ -704,6 +711,9 @@ class FeatureContext implements Context {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newItem['title'], $title);
 		Assert::assertEquals($newItem['emoji'], $emoji);
+		if ($technicalName !== null) {
+			Assert::assertEquals($newItem['technicalName'], $technicalName);
+		}
 
 		$this->sendRequest(
 			'GET',
@@ -715,6 +725,9 @@ class FeatureContext implements Context {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($itemToVerify['title'], $title);
 		Assert::assertEquals($itemToVerify['emoji'], $emoji);
+		if ($technicalName !== null) {
+			Assert::assertEquals($itemToVerify['technicalName'], $technicalName);
+		}
 	}
 
 	/**
@@ -886,18 +899,23 @@ class FeatureContext implements Context {
 
 	/**
 	 * @When user :user update view :viewName with title :title and emoji :emoji
+	 * @When user :user update view :viewName with title :title, emoji :emoji and technical name :technicalName
 	 *
 	 * @param string $user
 	 * @param string $viewName
 	 * @param string $title
 	 * @param string|null $emoji
+	 * @param string|null $technicalName
 	 */
-	public function updateView(string $user, string $viewName, string $title, ?string $emoji): void {
+	public function updateView(string $user, string $viewName, string $title, ?string $emoji, ?string $technicalName = null): void {
 		$this->setCurrentUser($user);
 
 		$data = ['title' => $title];
 		if ($emoji !== null) {
 			$data['emoji'] = $emoji;
+		}
+		if ($technicalName !== null) {
+			$data['technicalName'] = $technicalName;
 		}
 
 		$this->sendUpdateViewRequest($viewName, $data);
@@ -906,6 +924,9 @@ class FeatureContext implements Context {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($updatedItem['title'], $title);
 		Assert::assertEquals($updatedItem['emoji'], $emoji);
+		if ($technicalName !== null) {
+			Assert::assertEquals($updatedItem['technicalName'], $technicalName);
+		}
 
 		$this->sendRequest(
 			'GET',
@@ -916,6 +937,9 @@ class FeatureContext implements Context {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($itemToVerify['title'], $title);
 		Assert::assertEquals($itemToVerify['emoji'], $emoji);
+		if ($technicalName !== null) {
+			Assert::assertEquals($itemToVerify['technicalName'], $technicalName);
+		}
 	}
 
 	/**
@@ -1085,6 +1109,43 @@ class FeatureContext implements Context {
 				'receiver' => $receiver
 			])
 		);
+	}
+
+	/**
+	 * @When user :user attempts to create view :title with emoji :emoji and technical name :technicalName for :tableName as :viewName
+	 */
+	public function userAttemptsToCreateViewWithTechnicalName(string $user, string $title, string $tableName, string $viewName, ?string $emoji = null, ?string $technicalName = null): void {
+		$this->setCurrentUser($user);
+		$data = [
+			'title' => $title,
+			'emoji' => $emoji
+		];
+		if ($technicalName !== null) {
+			$data['technicalName'] = $technicalName;
+		}
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/views',
+			$data
+		);
+	}
+
+	/**
+	 * @When user :user attempts to update view :viewName with title :title, emoji :emoji and technical name :technicalName
+	 */
+	public function userAttemptsToUpdateViewWithTechnicalName(string $user, string $viewName, string $title, ?string $emoji = null, ?string $technicalName = null): void {
+		$this->setCurrentUser($user);
+
+		$data = ['title' => $title];
+		if ($emoji !== null) {
+			$data['emoji'] = $emoji;
+		}
+		if ($technicalName !== null) {
+			$data['technicalName'] = $technicalName;
+		}
+
+		$this->sendUpdateViewRequest($viewName, $data);
 	}
 
 	/**
