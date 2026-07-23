@@ -374,8 +374,8 @@ export default {
 				const columnFilters = this.getFilterForColumn(this.column)
 				if (columnFilters && columnFilters
 					.filter(fil => fil.operator.id === this.selectedOperator.id)
-					.map(fil => fil.value)
-					.includes(this.searchValue)) {
+					.map(fil => fil.value.toLowerCase())
+					.includes(this.searchValue.toLowerCase())) {
 					this.reset()
 					return
 				}
