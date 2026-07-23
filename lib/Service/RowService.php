@@ -90,11 +90,12 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @param ?int $limit
 	 * @param ?int $offset
+	 * @param array $customFilters
 	 * @return Row2[]
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null): array {
+	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null, array $customFilters = []): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
 				$tableColumns = $this->columnMapper->findAllByTable($tableId);
@@ -103,7 +104,7 @@ class RowService extends SuperService {
 				$table = $this->tableMapper->find($tableId);
 				$sort = $table->getSortArray() ?: null;
 
-				$rows = $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
+				$rows = $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId, $customFilters);
 				$this->attachAliasPayloads($rows, $tableColumns);
 				return $rows;
 			} else {
@@ -120,13 +121,14 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param array $customFilters
 	 * @return Row2[]
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 * @throws PermissionError
 	 */
-	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null): array {
+	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null, array $customFilters = []): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
@@ -139,6 +141,7 @@ class RowService extends SuperService {
 					$view->getFilterArray(),
 					$view->getSortArray(),
 					$this->resolveFilterUserId($userId, $view),
+					$customFilters,
 				);
 
 			} else {
