@@ -3,11 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcAppSettingsDialog :open.sync="open"
+	<NcAppSettingsDialog v-model:open="open"
 		:show-navigation="true"
-		:title="t('tables', 'Edit table')"
+		:title="t('tables', 'Table settings')"
 		data-cy="editTableModal">
-		<NcAppSettingsSection id="title" :name="t('tables', 'Title')">
+		<NcAppSettingsSection v-if="localTable && canManageElement(localTable)" id="title" :name="t('tables', 'Title')">
 			<div class="row">
 				<div class="col-3 content-emoji">
 					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
@@ -30,22 +30,22 @@
 					{{ t('tables', 'Description') }}
 				</div>
 				<div class="col-4">
-					<TableDescription v-if="localTable" :description.sync="localTable.description" />
+					<TableDescription v-if="localTable" v-model:description="localTable.description" />
 				</div>
 			</div>
 		</NcAppSettingsSection>
-		<NcAppSettingsSection id="column-order" :name="t('tables', 'Column order')">
+		<NcAppSettingsSection v-if="localTable && canManageElement(localTable)" id="column-order" :name="t('tables', 'Column order')">
 			<ColumnOrderList
 				:columns="tableColumns"
-				@update:columnSettings="localColumnSettings = $event" />
+				@update:column-settings="localColumnSettings = $event" />
 		</NcAppSettingsSection>
-		<NcAppSettingsSection id="default-sort" :name="t('tables', 'Default sorting')">
+		<NcAppSettingsSection v-if="localTable && canManageElement(localTable)" id="default-sort" :name="t('tables', 'Default sorting')">
 			<DefaultSortRules
 				:columns="tableColumns"
 				:sort-rules="localSortRules"
 				@update="localSortRules = $event" />
 		</NcAppSettingsSection>
-		<NcAppSettingsSection v-if="localTable" id="manage" :name="t('tables', 'Manage')">
+		<NcAppSettingsSection v-if="localTable && canManageElement(localTable)" id="manage" :name="t('tables', 'Manage')">
 			<div class="row">
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Owner') }}
@@ -81,6 +81,9 @@
 				</div>
 			</div>
 		</NcAppSettingsSection>
+		<NcAppSettingsSection v-if="tableId" id="notifications" :name="t('tables', 'Notifications')">
+			<NotificationsSettings :is-view="false" :element-id="tableId" />
+		</NcAppSettingsSection>
 	</NcAppSettingsDialog>
 </template>
 
@@ -94,6 +97,7 @@ import { emit } from '@nextcloud/event-bus'
 import TableDescription from '../main/sections/TableDescription.vue'
 import ColumnOrderList from '../main/partials/editTablePartials/ColumnOrderList.vue'
 import DefaultSortRules from '../main/partials/editTablePartials/DefaultSortRules.vue'
+import NotificationsSettings from './sections/NotificationsSettings.vue'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 
@@ -105,6 +109,7 @@ export default {
 		NcEmojiPicker,
 		NcButton,
 		NcUserBubble,
+		NotificationsSettings,
 		TableDescription,
 		ColumnOrderList,
 		DefaultSortRules,
@@ -120,6 +125,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			open: false,
@@ -164,6 +172,7 @@ export default {
 		},
 	},
 	methods: {
+		t,
 		...mapActions(useTablesStore, ['removeTable', 'updateTable']),
 		...mapActions(useDataStore, ['getColumnsFromBE']),
 		actionCancel() {

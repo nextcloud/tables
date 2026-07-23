@@ -41,6 +41,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'cancel',
+	],
 	computed: {
 		deleteDescription() {
 			return t('tables', 'Are you sure you want to delete column "{column}"?', { column: this.columnToDelete.title })

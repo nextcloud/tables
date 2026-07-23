@@ -44,7 +44,7 @@ export default {
 		this.updateSandIcon()
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		clearTimeout(this.sandIconTimer)
 	},
 

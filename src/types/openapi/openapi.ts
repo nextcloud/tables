@@ -842,6 +842,57 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/ocs/v2.php/apps/tables/api/2/config/table/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Gets the config for a specific table */
+        readonly get: operations["config-get-table-config"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/config/view/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Gets the config for a specific view */
+        readonly get: operations["config-get-view-config"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/config/{key}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** Sets a config value for a specific key */
+        readonly post: operations["config-set-value"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/columns": {
         readonly parameters: {
             readonly query?: never;
@@ -932,7 +983,9 @@ export type components = {
         readonly Column: {
             /** Format: int64 */
             readonly id: number;
+            readonly uuid: string;
             readonly title: string;
+            readonly technicalName: string;
             /** Format: int64 */
             readonly tableId: number;
             readonly createdBy: string;
@@ -1027,6 +1080,11 @@ export type components = {
             readonly shareToken: string;
             readonly url: string;
         };
+        readonly NotifyConfig: {
+            readonly "notify-assigned": boolean;
+            readonly "notify-column": boolean;
+            readonly "notify-row": boolean;
+        };
         readonly OCSMeta: {
             readonly status: string;
             readonly statuscode: number;
@@ -1038,6 +1096,7 @@ export type components = {
             /** Format: int64 */
             readonly id: number;
             readonly title: string;
+            readonly technicalName: string;
             readonly createdAt: string;
             readonly lastEditAt: string;
             readonly type: string;
@@ -1093,6 +1152,13 @@ export type components = {
                 readonly columnId: number;
                 readonly value: Record<string, never>;
             } | null;
+            readonly dataByAlias: {
+                readonly [key: string]: {
+                    /** Format: int64 */
+                    readonly columnId: number;
+                    readonly value: Record<string, never>;
+                };
+            };
         };
         readonly Row: {
             /** Format: int64 */
@@ -1108,6 +1174,13 @@ export type components = {
                 readonly columnId: number;
                 readonly value: Record<string, never>;
             } | null;
+            readonly dataByAlias: {
+                readonly [key: string]: {
+                    /** Format: int64 */
+                    readonly columnId: number;
+                    readonly value: Record<string, never>;
+                };
+            };
         };
         readonly Share: {
             /** Format: int64 */
@@ -1178,6 +1251,13 @@ export type components = {
             readonly ownership: string;
             readonly ownerDisplayName: string | null;
             readonly createdBy: string;
+            readonly dataByAlias: {
+                readonly [key: string]: {
+                    /** Format: int64 */
+                    readonly columnId: number;
+                    readonly value: Record<string, never>;
+                };
+            };
             readonly createdAt: string;
             readonly lastEditBy: string;
             readonly lastEditAt: string;
@@ -2720,6 +2800,8 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * @description Column main type
                      * @enum {string}
@@ -2980,6 +3062,8 @@ export interface operations {
                     readonly viewId?: number | null;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * @description Column main type
                      * @enum {string}
@@ -3236,6 +3320,8 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Title */
                     readonly title?: string | null;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -5300,6 +5386,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * Format: double
                      * @description Default value for new rows
@@ -5476,6 +5564,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Default */
                     readonly textDefault?: string | null;
                     /** @description Allowed regex pattern */
@@ -5642,6 +5732,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
                     readonly selectionOptions: string;
                     /** @description Json int|list<int> for default selected option(s), eg 5 or ["1", "8"] */
@@ -5798,6 +5890,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /**
                      * @description For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
                      * @enum {string|null}
@@ -5955,6 +6049,8 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
+                    /** @description Technical name of the column */
+                    readonly technicalName?: string | null;
                     /** @description Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}] */
                     readonly usergroupDefault?: string | null;
                     /**
@@ -7113,6 +7209,180 @@ export interface operations {
             };
             /** @description Internal error */
             readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "config-get-table-config": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Table id */
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Table config returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["NotifyConfig"];
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "config-get-view-config": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description View id */
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description View config returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["NotifyConfig"];
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "config-set-value": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Config key */
+                readonly key: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Config value */
+                    readonly value: Record<string, never>;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Config updated */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: boolean;
+                        };
+                    };
+                };
+            };
+            /** @description bad request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
                 headers: {
                     readonly [name: string]: unknown;
                 };

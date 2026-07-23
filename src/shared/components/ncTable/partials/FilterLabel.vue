@@ -40,6 +40,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'delete-filter',
+	],
 	computed: {
 		getValue() {
 			if (FilterIds.ContainsItem === this.operator.id) {

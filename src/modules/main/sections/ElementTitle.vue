@@ -65,6 +65,9 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'update:viewSetting',
+	],
 	computed: {
 		isFiltered() {
 			return this.activeElement.filter && this.activeElement.filter[0]?.length > 0

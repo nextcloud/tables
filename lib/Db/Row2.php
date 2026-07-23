@@ -23,6 +23,8 @@ class Row2 implements JsonSerializable {
 	private ?string $lastEditBy = null;
 	private ?string $lastEditAt = null;
 	private ?array $data = [];
+	/** @var array<string, array{columnId: int, value: mixed}> */
+	private array $dataByAlias = [];
 	private array $changedColumnIds = []; // collect column ids that have changed after $loaded = true
 
 	private bool $loaded = false; // set to true if model is loaded, after that changed column ids will be collected
@@ -71,6 +73,20 @@ class Row2 implements JsonSerializable {
 
 	public function getData(): ?array {
 		return $this->data;
+	}
+
+	/**
+	 * @return array<string, array{columnId: int, value: mixed}>
+	 */
+	public function getDataByAlias(): array {
+		return $this->dataByAlias;
+	}
+
+	/**
+	 * @param array<string, array{columnId: int, value: mixed}> $dataByAlias
+	 */
+	public function setDataByAlias(array $dataByAlias): void {
+		$this->dataByAlias = $dataByAlias;
 	}
 
 	/**
@@ -134,6 +150,18 @@ class Row2 implements JsonSerializable {
 	}
 
 	/**
+	 * @param int[] $columns
+	 * @return array
+	 */
+	public function filterDataByAliasByColumns(array $columns): array {
+		$this->dataByAlias = array_filter(
+			$this->dataByAlias,
+			static fn (array $cell): bool => in_array($cell['columnId'], $columns, true),
+		);
+		return $this->dataByAlias;
+	}
+
+	/**
 	 * @psalm-return TablesRow
 	 */
 	public function jsonSerialize(): array {
@@ -145,6 +173,7 @@ class Row2 implements JsonSerializable {
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditAt' => $this->lastEditAt,
 			'data' => $this->data,
+			'dataByAlias' => $this->dataByAlias,
 		];
 	}
 
@@ -154,6 +183,7 @@ class Row2 implements JsonSerializable {
 			rowId: $this->id,
 			previousValues: $previousValues,
 			values: $this->data,
+			dataByAlias: $this->dataByAlias,
 		);
 	}
 

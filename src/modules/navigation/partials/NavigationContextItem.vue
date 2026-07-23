@@ -35,7 +35,7 @@
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
-			<NcActionCheckbox :checked="showInNavigation" data-cy="navigationContextShowInNavSwitch" @change="changeDisplayMode">
+			<NcActionCheckbox :model-value="showInNavigation" data-cy="navigationContextShowInNavSwitch" @change="changeDisplayMode">
 				{{ t('tables', 'Show in app list') }}
 			</NcActionCheckbox>
 		</template>

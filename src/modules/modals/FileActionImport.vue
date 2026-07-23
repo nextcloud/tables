@@ -13,15 +13,16 @@
 				:title="t('tables', 'Import as new table')"
 				:description="t('tables', 'This will create a new table from the data in this file.')">
 				<div style="display: flex; flex-flow: row wrap; align-items: center;">
-					<NcCheckboxRadioSwitch
-						data-cy="importAsNewTableSwitch"
-						:aria-label="t('tables', 'Import as new table')"
-						:checked.sync="importAsNew"
-						type="switch"
-						class="switch"
-						style="flex-grow: 0;">
-						{{ t('tables', 'Import as new table') }}
-					</NcCheckboxRadioSwitch>
+					<div data-cy="importAsNewTableSwitch">
+						<NcCheckboxRadioSwitch
+							v-model="importAsNew"
+							:aria-label="t('tables', 'Import as new table')"
+							type="switch"
+							class="switch"
+							style="flex-grow: 0;">
+							{{ t('tables', 'Import as new table') }}
+						</NcCheckboxRadioSwitch>
+					</div>
 
 					<div style="display: flex; flex-flow: row nowrap; flex-grow: 1;">
 						<NcEmojiPicker :close-on-select="true" @select="selectIcon">
@@ -64,10 +65,10 @@
 			</RowFormWrapper>
 
 			<NcCheckboxRadioSwitch
+				v-model="createMissingColumns"
 				:aria-label="t('tables', 'Create missing columns')"
 				type="switch"
 				:disabled="importAsNew"
-				:checked.sync="createMissingColumns"
 				style="flex-grow: 0;">
 				{{ t('tables', 'Create missing columns') }}
 			</NcCheckboxRadioSwitch>
@@ -90,8 +91,8 @@
 	</NcDialog>
 
 	<NcDialog v-else-if="importResults && !importResults.async"
+		v-model:open="showResultsDialog"
 		:name="t('tables', 'Import successful')"
-		:open.sync="showResultsDialog"
 		size="small">
 		<template #actions>
 			<NcButton :aria-label="t('tables', 'Close')" @click="closeResultsDialog()">
@@ -142,6 +143,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			importAsNew: true,

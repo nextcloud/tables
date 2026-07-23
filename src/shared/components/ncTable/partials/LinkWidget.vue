@@ -10,7 +10,7 @@
 
 		<div class="labels">
 			<div :class="{underline: underlineTitle}">
-				<a :href="url" target="_blank" :title="title">{{ title | truncate(truncateLength) }}</a>
+				<a :href="url" target="_blank" :title="title">{{ truncate(title, truncateLength) }}</a>
 			</div>
 			<p v-if="subline" class="multiSelectOptionLabel span">
 				{{ subline }}
@@ -26,20 +26,6 @@ export default {
 
 	components: {
 		LinkIcon,
-	},
-
-	filters: {
-		truncate(string, num) {
-			if (!string) {
-				return ''
-			}
-
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
 	},
 
 	props: {
@@ -79,6 +65,20 @@ export default {
 		      type: Boolean,
 		      default: false,
 		    },
+	},
+
+	methods: {
+		truncate(string, num) {
+			if (!string) {
+				return ''
+			}
+
+			if (string.length >= num) {
+				return string.substring(0, num) + '...'
+			} else {
+				return string
+			}
+		},
 	},
 
 }

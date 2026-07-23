@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="menu" :class="{showOnHover: getSortMode === null}">
-		<NcActions :open.sync="localOpenState" :force-menu="true">
+		<NcActions v-model:open="localOpenState" :force-menu="true">
 			<template v-if="getSortMode !== null" #icon>
 				<SortDesc v-if="getSortMode === 'DESC'" :size="20" />
 				<SortAsc v-else-if="getSortMode === 'ASC'" :size="20" />
@@ -22,9 +22,9 @@
 					:key="index"
 					:name="'filter-operators-column-' + column.id"
 					:value="op.id"
-					:checked="selectedOperator.id === op.id"
+					:model-value="selectedOperator.id"
 					:disabled="isDisabled(op.id)"
-					@change="changeFilterOperator(op)">
+					@update:model-value="changeFilterOperator(op)">
 					{{ op.label }}
 				</NcActionRadio>
 			</template>
@@ -57,9 +57,9 @@
 				<NcActionInput
 					v-else
 					ref="filterInput"
+					v-model="searchValue"
 					:label-visible="false"
 					:label="t('tables', 'Keyword and submit')"
-					:value.sync="searchValue"
 					:show-trailing-button="true"
 					@submit="submitFilterInput">
 					<template #icon>
@@ -74,7 +74,7 @@
 					v-for="(magicField, index) in getMagicFields"
 					:key="'magic-field-' + index"
 					:value="magicField.id"
-					:checked="index === 0"
+					:model-value="index === 0"
 					:icon="magicField.icon"
 					@click="submitMagicField(magicField)">
 					{{ magicField.label }}
@@ -216,6 +216,13 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'delete-column',
+		'edit-column',
+		'pin-column',
+		'update:open-state',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			searchValue: '',

@@ -5,7 +5,7 @@
 import { defineConfig } from 'cypress'
 import vitePreprocessor from 'cypress-vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
-import vue from '@vitejs/plugin-vue2'
+import vue from '@vitejs/plugin-vue'
 
 const baseUrl = process.env.CYPRESS_baseUrl ?? 'http://127.0.0.1:8089/index.php/'
 

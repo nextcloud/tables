@@ -4,15 +4,15 @@
 -->
 <template>
 	<div>
-		<ElementTitle :active-element="view" :is-table="false" :view-setting.sync="localViewSetting" />
+		<ElementTitle v-model:view-setting="localViewSetting" :active-element="view" :is-table="false" />
 		<TableDescription :description="view.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="view" />
 			<TableView v-else
+				v-model:view-setting="localViewSetting"
 				:rows="rows"
 				:columns="columns"
 				:element="view"
-				:view-setting.sync="localViewSetting"
 				:is-view="true"
 				:can-read-rows="canReadData(view)"
 				:can-create-rows="canCreateRowInElement(view)"
@@ -32,7 +32,7 @@
 							<template #icon>
 								<PlaylistEdit :size="20" decorative />
 							</template>
-							{{ t('tables', 'Edit view') }}
+							{{ t('tables', 'View settings') }}
 						</NcActionButton>
 						<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
 							<template #icon>
@@ -140,6 +140,15 @@ export default {
 
 	},
 
+	emits: [
+		'create-column',
+		'download-csv',
+		'download-filtered-csv',
+		'import',
+		'show-integration',
+		'toggle-share',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			localLoading: false,

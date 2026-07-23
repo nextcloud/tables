@@ -2789,6 +2789,108 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @Given user :sharer shares the Context :contextAlias to :shareeType :sharee with permissions :permissions
+	 */
+	public function userSharesTheContextToWithPermissions(string $sharer, string $contextAlias, string $shareeType, string $sharee, string $permissions): void {
+		$this->setCurrentUser($sharer);
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		$permissionMap = [
+			'read' => 'permissionRead',
+			'create' => 'permissionCreate',
+			'update' => 'permissionUpdate',
+			'delete' => 'permissionDelete',
+			'manage' => 'permissionManage',
+		];
+
+		$permissionList = explode(',', $permissions);
+		$permissionData = [
+			'permissionRead' => false,
+			'permissionCreate' => false,
+			'permissionUpdate' => false,
+			'permissionDelete' => false,
+			'permissionManage' => false,
+		];
+
+		foreach ($permissionList as $perm) {
+			$perm = trim($perm);
+			if (isset($permissionMap[$perm])) {
+				$permissionData[$permissionMap[$perm]] = true;
+			}
+		}
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/shares',
+			array_merge($permissionData, [
+				'nodeId' => $context['id'],
+				'nodeType' => 'context',
+				'receiver' => $sharee,
+				'receiverType' => $shareeType,
+				'displayMode' => 2,
+			])
+		);
+
+		if ($this->response->getStatusCode() === 200) {
+			$share = $this->getDataFromResponse($this->response);
+			$this->shareId = $share['id'];
+
+			Assert::assertEquals($share['nodeType'], 'context');
+			Assert::assertEquals($share['nodeId'], $context['id']);
+			Assert::assertEquals($share['receiverType'], $shareeType);
+			Assert::assertEquals($share['receiver'], $sharee);
+		}
+	}
+
+	/**
+	 * @Then user :user has the following context permissions for :contextAlias
+	 */
+	public function userHasTheFollowingContextPermissionsFor(string $user, string $contextAlias, TableNode $table): void {
+		$this->setCurrentUser($user);
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		$this->sendOcsRequest(
+			'GET',
+			sprintf('/apps/tables/api/2/contexts/%d', $context['id'])
+		);
+
+		$contextData = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		foreach ($table->getRows() as $row) {
+			$permissionName = $row[0];
+			$expectedValue = (int)$row[1];
+
+			$permissionField = match ($permissionName) {
+				'read' => 'permissionRead',
+				'create' => 'permissionCreate',
+				'update' => 'permissionUpdate',
+				'delete' => 'permissionDelete',
+				'manage' => 'permissionManage',
+				default => throw new \InvalidArgumentException("Unknown permission: $permissionName"),
+			};
+
+			Assert::assertEquals($expectedValue, (int)($contextData['onSharePermissions'][$permissionField] ?? 0), "Permission $permissionName mismatch");
+		}
+	}
+
+	/**
+	 * @When user :user tries to set permission :permission to :value
+	 */
+	public function userTriesToSetPermission(string $user, string $permission, string $value): void {
+		$this->setCurrentUser($user);
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/shares/' . $this->shareId,
+			[
+				'permissionType' => $permission,
+				'permissionValue' => (bool)$value
+			]
+		);
+	}
+
+	/**
 	 * @Then user :initiator shares view :viewAlias with :recipient
 	 */
 	public function shareViewWithUser(string $initiator, string $viewAlias, string $recipient): void {
@@ -3118,6 +3220,29 @@ class FeatureContext implements Context {
 				$actualFormattedRows[$i],
 				'Row ' . $i . ' does not match expected values'
 			);
+		}
+	}
+
+	/**
+	 * @Then the last created row has the following dataByAlias
+	 *
+	 * @param TableNode $table
+	 */
+	public function theLastCreatedRowHasTheFollowingDataByAlias(TableNode $table): void {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/' . $this->rowId,
+		);
+
+		$row = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		$dataByAlias = $row['dataByAlias'];
+
+		foreach ($table->getRows() as [$alias, $expectedValue]) {
+			Assert::assertArrayHasKey($alias, $dataByAlias, "Alias '$alias' not found in dataByAlias");
+			Assert::assertEquals($expectedValue, (string)$dataByAlias[$alias]['value'], "Value mismatch for alias '$alias'");
+			$columnId = $this->collectionManager->getByAlias('column', $alias)['id'];
+			Assert::assertEquals($columnId, $dataByAlias[$alias]['columnId'], "columnId mismatch for alias '$alias'");
 		}
 	}
 }

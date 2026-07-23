@@ -28,7 +28,7 @@ async function setupDatetimeFilteringTable(page: Page) {
 	const addRow = async (title: string, date: Date) => {
 		await page.locator('[data-cy="createRowBtn"]').click()
 		await fillInValueTextLine(page, 'title', title)
-		const input = page.locator('.modal__content input.native-datetime-picker--input')
+		const input = page.locator('.modal__content input[type="date"]')
 		await input.clear()
 		await input.fill(formatDate(date))
 		await page.locator('[data-cy="createRowSaveButton"]').click()

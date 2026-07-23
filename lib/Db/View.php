@@ -15,6 +15,7 @@ use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -23,6 +24,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  *
  * @method getId(): int
  * @method setId(int $id)
+ * @method string getUuid()
+ * @method setUuid(?string $uuid)
  * @method getTitle(): string
  * @method setTitle(string $title)
  * @method getTableId(): int
@@ -63,6 +66,7 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setOwnership(string $ownership)
  */
 class View extends EntitySuper implements JsonSerializable {
+	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
@@ -88,7 +92,32 @@ class View extends EntitySuper implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('uuid', 'string');
 		$this->addType('tableId', 'integer');
+	}
+
+	public function setter(string $name, array $args): void {
+		if ($name === 'uuid') {
+			$this->setOrAssignUuid($args[0]);
+			return;
+		}
+		parent::setter($name, $args);
+	}
+
+	private function setOrAssignUuid(?string $uuid): void {
+		if ($this->uuid !== null) {
+			throw new \RuntimeException('This view already has a UUID, they are immutable');
+		}
+		if ($uuid === null) {
+			$this->applyUuid(Uuid::v7()->toRfc4122());
+			return;
+		}
+		$this->applyUuid($uuid);
+	}
+
+	private function applyUuid(string $uuid): void {
+		$this->uuid = $uuid;
+		$this->markFieldUpdated('uuid');
 	}
 
 	/**
@@ -181,6 +210,7 @@ class View extends EntitySuper implements JsonSerializable {
 	public function jsonSerialize(): array {
 		$serialisedJson = [
 			'id' => $this->id,
+			'uuid' => $this->uuid,
 			'tableId' => ($this->tableId || $this->tableId === 0) ? $this->tableId : -1,
 			'title' => $this->title ?: '',
 			'description' => $this->description,

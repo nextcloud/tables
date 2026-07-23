@@ -17,7 +17,7 @@
     "nextcloud/coding-standard": "^v1.5.0",
     "nextcloud/ocp": "dev-stable33",
     "staabm/annotate-pull-request-from-checkstyle": "^1.8.7",
-    "phpunit/phpunit": "9.6.34",
+    "phpunit/phpunit": "9.6.35",
     "psalm/phar": "^5.26.1"
   },
   "config": {
@@ -39,7 +39,7 @@
     "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
     "cs:check": "php-cs-fixer fix --dry-run --diff",
     "cs:fix": "php-cs-fixer fix",
-    "psalm": "./vendor/bin/psalm.phar --show-info=false --no-cache",
+    "psalm": "@php ./vendor/bin/psalm.phar --show-info=false --no-cache",
     "psalm:update-baseline": "./vendor/bin/psalm.phar --update-baseline",
     "psalm:fix": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType",
     "psalm:fix:dry": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run",
@@ -65,6 +65,7 @@
   "require": {
     "phpoffice/phpspreadsheet": "^5.1",
     "ext-json": "*",
-    "bamarni/composer-bin-plugin": "^1.9.1"
+    "bamarni/composer-bin-plugin": "^1.9.1",
+    "symfony/uid": "^6.4"
   }
 }

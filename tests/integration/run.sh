@@ -78,7 +78,7 @@ echo ''
 echo '#'
 echo '# Running tests'
 echo '#'
-vendor/bin/behat --colors -f junit -f pretty $SCENARIO
+vendor/bin/behat --strict --colors -f junit -f pretty $SCENARIO
 RESULT=$?
 
 echo ''

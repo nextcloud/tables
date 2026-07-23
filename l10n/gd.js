@@ -25,6 +25,7 @@ OC.L10N.register(
     "Delete" : "Sguab às",
     "Edit" : "Deasaich",
     "Activity" : "Gnìomhachd",
+    "Notifications" : "Brathan",
     "Close" : "Dùin",
     "Please select a file." : "Tagh faidhle.",
     "Preview" : "Ro-sheall",

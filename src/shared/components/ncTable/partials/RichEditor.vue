@@ -7,8 +7,8 @@
 		class="rich-editor-edit-mode"
 		@keydown.escape.prevent="cancelEdit">
 		<NcEditor
+			v-model:text="localValue"
 			:can-edit="true"
-			:text.sync="localValue"
 			:show-border="false"
 			:show-readonly-bar="false"
 			:show-menu-bar="false" />
@@ -40,6 +40,10 @@ export default {
 		},
 	},
 
+	emits: [
+		'cancel',
+		'save',
+	],
 	data() {
 		return {
 			localValue: this.value || '',
@@ -61,7 +65,7 @@ export default {
 		})
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		document.removeEventListener('click', this.handleClickOutside)
 	},
 

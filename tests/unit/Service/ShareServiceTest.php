@@ -22,6 +22,7 @@ use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCP\IDBConnection;
+use OCP\IUser;
 use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
@@ -45,6 +46,7 @@ class ShareServiceTest extends TestCase {
 	private $hasher;
 	private $shareManager;
 	protected $shareService;
+	private Share $publicShare;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -80,6 +82,9 @@ class ShareServiceTest extends TestCase {
 			$this->hasher,
 			$this->shareManager
 		);
+
+		$this->publicShare = new Share();
+		$this->publicShare->setSender('userA');
 	}
 
 	public function testCreateContextShareSetsAllPermissionsFalse(): void {
@@ -113,5 +118,31 @@ class ShareServiceTest extends TestCase {
 
 		$this->expectException(PermissionError::class);
 		$this->shareService->updatePermission(1, ['manage' => true]);
+	}
+
+	public function testIsPublicShareAccessibleReturnsTrueWhenSenderCanShare(): void {
+		$senderUser = $this->createMock(IUser::class);
+		$senderUser->method('isEnabled')->willReturn(true);
+		$this->userManager->method('get')->with('userA')->willReturn($senderUser);
+		$this->shareManager->method('sharingDisabledForUser')->with('userA')->willReturn(false);
+
+		$this->assertTrue($this->shareService->isPublicShareAccessible($this->publicShare));
+	}
+
+	public function testIsPublicShareAccessibleReturnsFalseWhenSenderUserDisabled(): void {
+		$senderUser = $this->createMock(IUser::class);
+		$senderUser->method('isEnabled')->willReturn(false);
+		$this->userManager->method('get')->with('userA')->willReturn($senderUser);
+
+		$this->assertFalse($this->shareService->isPublicShareAccessible($this->publicShare));
+	}
+
+	public function testAssertPublicShareAccessibleThrowsWhenSenderCannotShare(): void {
+		$senderUser = $this->createMock(IUser::class);
+		$senderUser->method('isEnabled')->willReturn(false);
+		$this->userManager->method('get')->with('userA')->willReturn($senderUser);
+
+		$this->expectException(PermissionError::class);
+		$this->shareService->assertPublicShareAccessible($this->publicShare);
 	}
 }

@@ -9,7 +9,7 @@
 			data-cy="shareFormSelect" :hide-selected="true" :internal-search="false"
 			:loading="loading" :options="options" :placeholder="selectPlaceholder" :preselect-first="true"
 			:preserve-search="true" :searchable="true" :user-select="true" :get-option-key="(option) => option.key"
-			:aria-label-combobox="selectPlaceholder" label="displayName" @search="asyncFind" @input="addShare">
+			:aria-label-combobox="selectPlaceholder" label="displayName" @search="asyncFind" @update:model-value="addShare">
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
@@ -58,6 +58,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'add',
+	],
 	computed: {
 		...mapState(useTablesStore, ['tables', 'showSidebar', 'isLoadingSomething']),
 

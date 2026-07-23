@@ -10,21 +10,21 @@
 		<div class="selection-wrapper">
 			<div class="selection">
 				<div class="space-T space-B">
-					<Search :value.sync="value" />
+					<Search v-model:value="value" />
 				</div>
 
 				<div class="space-T space-B">
 					<h3>{{ t('tables', 'Render mode') }}</h3>
 					<div class="radio">
 						<NcCheckboxRadioSwitch
-							:checked.sync="renderMode"
+							v-model="renderMode"
 							value="link"
 							name="render-mode"
 							type="radio">
 							<IconLink :size="20" />{{ t('tables', 'Link') }}
 						</NcCheckboxRadioSwitch>
 						<NcCheckboxRadioSwitch
-							:checked.sync="renderMode"
+							v-model="renderMode"
 							value="content"
 							name="render-mode"
 							type="radio">
@@ -159,24 +159,27 @@ export default {
 
 				this.previewLoading = false
 			} else {
-				this.$delete(this.richObject, 'rows')
-				this.$delete(this.richObject, 'columns')
+				delete this.richObject.rows
+				delete this.richObject.columns
 			}
 		},
 		selectReference() {
-			this.$emit('submit', this.getLink)
+			// The reference-picker framework listens for a DOM 'submit' event on the
+			// rendered element (element.addEventListener('submit', e => onSubmit(e.detail))).
+			// Vue 3 has no $on bridge like Vue 2, so dispatch a native CustomEvent.
+			this.$el?.dispatchEvent(new CustomEvent('submit', { detail: this.getLink, bubbles: true }))
 		},
 		updateRichObject() {
 			if (!this.value) return
 
-			this.$set(this.richObject, 'emoji', this.value.emoji)
-			this.$set(this.richObject, 'link', this.getLink)
-			this.$set(this.richObject, 'ownerDisplayName', this.value.ownerDisplayName)
-			this.$set(this.richObject, 'ownership', this.value.owner)
-			this.$set(this.richObject, 'rowsCount', this.value.rowsCount)
-			this.$set(this.richObject, 'title', this.value.label)
-			this.$set(this.richObject, 'type', this.value.type)
-			this.$set(this.richObject, 'id', this.value.value)
+			this.richObject.emoji = this.value.emoji
+			this.richObject.link = this.getLink
+			this.richObject.ownerDisplayName = this.value.ownerDisplayName
+			this.richObject.ownership = this.value.owner
+			this.richObject.rowsCount = this.value.rowsCount
+			this.richObject.title = this.value.label
+			this.richObject.type = this.value.type
+			this.richObject.id = this.value.value
 		},
 		async loadColumnsForContentPreview() {
 			if (this.value === null) {
@@ -185,7 +188,7 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/api/1/' + this.value.type + 's/' + this.value.value + '/columns'))
-				this.$set(this.richObject, 'columns', res.data)
+				this.richObject.columns = res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch columns for content preview.'))
 			}
@@ -197,7 +200,7 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/row/' + this.value.type + '/' + this.value.value))
-				this.$set(this.richObject, 'rows', res.data)
+				this.richObject.rows = res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch rows for content preview.'))
 			}

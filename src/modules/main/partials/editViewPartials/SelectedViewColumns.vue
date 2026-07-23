@@ -20,9 +20,9 @@
 				</NcButton>
 				<NcCheckboxRadioSwitch
 					v-if="!disableHide"
-					:checked="selectedColumns.includes(column.id)"
+					:model-value="selectedColumns.includes(column.id)"
 					class="display-checkbox"
-					@update:checked="onToggle(column.id)" />
+					@update:model-value="onToggle(column.id)" />
 				<span :class="{ 'title-readonly': column.viewColumnInformation?.readonly }">
 					{{ column.title }}
 					<span v-if="isMandatory(column)" class="mandatory-indicator">*</span>
@@ -38,7 +38,7 @@
 					<NcActionCheckbox
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnReadonlyCheckbox"
-						:checked="column.viewColumnInformation?.readonly"
+						:model-value="column.viewColumnInformation?.readonly"
 						:disabled="isMandatory(column)"
 						@change="onReadonlyChanged(column.id, $event.target.checked)">
 						{{ t('tables', 'Read only') }}
@@ -47,7 +47,7 @@
 					<NcActionCheckbox
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnMandatoryCheckbox"
-						:checked="isMandatory(column)"
+						:model-value="isMandatory(column)"
 						:disabled="column.viewColumnInformation?.readonly"
 						@change="onMandatoryChanged(column.id, $event.target.checked)">
 						{{ t('tables', 'Mandatory') }}
@@ -181,20 +181,20 @@ export default {
 			if (!column) return
 
 			if (!column.viewColumnInformation) {
-				this.$set(column, 'viewColumnInformation', {})
+				column.viewColumnInformation = {}
 			}
 
-			this.$set(column.viewColumnInformation, 'readonly', readonly)
+			column.viewColumnInformation.readonly = readonly
 		},
 		onMandatoryChanged(columnId, mandatory) {
 			const column = this.mutableColumns.find(col => col.id === columnId)
 			if (!column) return
 
 			if (!column.viewColumnInformation) {
-				this.$set(column, 'viewColumnInformation', {})
+				column.viewColumnInformation = {}
 			}
 
-			this.$set(column.viewColumnInformation, 'mandatory', mandatory)
+			column.viewColumnInformation.mandatory = mandatory
 		},
 		async dragEnd(goalIndex) {
 			if (this.draggedItem === null) return

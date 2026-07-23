@@ -438,9 +438,9 @@ class PermissionsService {
 
 		if ($share->getReceiverType() === 'group') {
 			try {
-				$userGroups = $this->userHelper->getGroupsForUser($userId);
-				foreach ($userGroups as $userGroup) {
-					if ($userGroup->getGID() === $share->getReceiver()) {
+				$userGroups = $this->userHelper->getGroupIdsForUser($userId);
+				foreach ($userGroups as $userGroupId) {
+					if ($userGroupId === $share->getReceiver()) {
 						return true;
 					}
 				}

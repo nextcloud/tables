@@ -22,8 +22,8 @@ test.describe('Test column ' + columnTitle, () => {
 		await page.locator('button').filter({ hasText: 'Create row' }).click()
 		await page.locator('.modal__content input').first().clear()
 		await page.locator('.modal__content input').first().fill('2023-12-24T05:15')
-		await page.locator('[data-cy="createRowAddMoreSwitch"]').click()
-		await page.locator('[data-cy="createRowAddMoreSwitch"]').click()
+		await page.locator('[data-cy="createRowAddMoreSwitch"] .checkbox-content').click()
+		await page.locator('[data-cy="createRowAddMoreSwitch"] .checkbox-content').click()
 		await page.locator('button').filter({ hasText: 'Save' }).click()
 
 		await expect(page.locator('.custom-table table tr td div').filter({ hasText: '24' }).first()).toBeVisible()
@@ -72,8 +72,8 @@ test.describe('Test column ' + columnTitle, () => {
 
 		await page.locator('button').filter({ hasText: 'Create row' }).click()
 		await expect(page.locator('.modal__content input').first()).toHaveValue(/2023-12-24T07:21/)
-		await page.locator('[data-cy="createRowAddMoreSwitch"]').click()
-		await page.locator('[data-cy="createRowAddMoreSwitch"]').click()
+		await page.locator('[data-cy="createRowAddMoreSwitch"] .checkbox-content').click()
+		await page.locator('[data-cy="createRowAddMoreSwitch"] .checkbox-content').click()
 		await page.locator('button').filter({ hasText: 'Save' }).click()
 
 		await expect(page.locator('.custom-table table tr td div').filter({ hasText: '7:' }).first()).toBeVisible()

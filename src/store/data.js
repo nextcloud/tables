@@ -9,7 +9,6 @@ import displayError from '../shared/utils/displayError.js'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
 import { showError } from '@nextcloud/dialogs'
-import { set } from 'vue'
 import { emit } from '@nextcloud/event-bus'
 
 function genStateKey(isView, elementId) {
@@ -38,7 +37,7 @@ export const useDataStore = defineStore('data', {
 		},
 		getRelations: (state) => (columnId) => {
 			if (state.relations[columnId] === undefined) {
-				set(state.relations, columnId, {})
+				state.relations[columnId] = {}
 			}
 			return state.relations[columnId]
 		},
@@ -114,7 +113,7 @@ export const useDataStore = defineStore('data', {
 				// no view: keep the backend-ordered result (ColumnService::findAllByTable already applies columnOrder)
 			}
 			const stateId = genStateKey(!!(view?.id), view?.id ?? tableId)
-			set(this.columns, stateId, allColumns)
+			this.columns[stateId] = allColumns
 			return true
 		},
 
@@ -139,7 +138,7 @@ export const useDataStore = defineStore('data', {
 					return orderA - orderB
 				})
 				.map(col => parseCol(col))
-			set(this.columns, stateId, columns)
+			this.columns[stateId] = columns
 			this.loading[stateId] = false
 			return columns
 		},
@@ -179,7 +178,7 @@ export const useDataStore = defineStore('data', {
 			if (stateId && this.columns[stateId]) {
 				const col = res.data
 				const index = this.columns[stateId].findIndex(c => c.id === col.id)
-				set(this.columns[stateId], index, parseCol(col))
+				this.columns[stateId][index] = parseCol(col)
 			}
 
 			return true
@@ -196,7 +195,7 @@ export const useDataStore = defineStore('data', {
 			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.columns[stateId]) {
 				const filteredColumns = this.columns[stateId].filter(c => c.id !== id)
-				set(this.columns, stateId, filteredColumns)
+				this.columns[stateId] = filteredColumns
 			}
 
 			return true
@@ -211,7 +210,7 @@ export const useDataStore = defineStore('data', {
 				return
 			}
 
-			set(this.relationsLoading, stateId, true)
+			this.relationsLoading[stateId] = true
 
 			let res = null
 
@@ -223,14 +222,14 @@ export const useDataStore = defineStore('data', {
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load relation data.'))
-				set(this.relationsLoading, stateId, false)
+				this.relationsLoading[stateId] = false
 				return {}
 			}
 
 			Object.entries(res.data).forEach(([columnId, relations]) => {
-				set(this.relations, columnId, relations)
+				this.relations[columnId] = relations
 			})
-			set(this.relationsLoading, stateId, false)
+			this.relationsLoading[stateId] = false
 		},
 
 		// ROWS
@@ -250,7 +249,7 @@ export const useDataStore = defineStore('data', {
 				return false
 			}
 
-			set(this.rows, stateId, res.data)
+			this.rows[stateId] = res.data
 			this.loading[stateId] = false
 			return true
 		},
@@ -266,14 +265,14 @@ export const useDataStore = defineStore('data', {
 				return false
 			}
 
-			set(this.rows, stateId, res.data.ocs.data)
+			this.rows[stateId] = res.data.ocs.data
 			this.loading[stateId] = false
 			return true
 		},
 
 		removeRows({ isView, elementId }) {
 			const stateId = genStateKey(isView, elementId)
-			set(this.rows, stateId, [])
+			this.rows[stateId] = []
 		},
 
 		async updateRow({ id, isView, elementId, data }) {
@@ -297,7 +296,7 @@ export const useDataStore = defineStore('data', {
 			if (stateId && this.rows[stateId]) {
 				const row = res.data
 				const updatedRows = this.rows[stateId].map(r => r.id === row.id ? row : r)
-				set(this.rows, stateId, updatedRows)
+				this.rows[stateId] = updatedRows
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 			}
 
@@ -316,7 +315,7 @@ export const useDataStore = defineStore('data', {
 			if (this.rows[stateId]) {
 				const row = res?.data?.ocs?.data
 				const index = this.rows[stateId].findIndex(r => r.id === rowId)
-				set(this.rows[stateId], index, row)
+				this.rows[stateId][index] = row
 			}
 			return true
 		},
@@ -337,7 +336,7 @@ export const useDataStore = defineStore('data', {
 			if (stateId && this.rows[stateId]) {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
-				set(this.rows[stateId], newIndex, row)
+				this.rows[stateId][newIndex] = row
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 			}
 
@@ -358,7 +357,7 @@ export const useDataStore = defineStore('data', {
 			if (this.rows[stateId]) {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
-				set(this.rows[stateId], newIndex, row)
+				this.rows[stateId][newIndex] = row
 			}
 
 			return true
@@ -385,7 +384,7 @@ export const useDataStore = defineStore('data', {
 			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.rows[stateId]) {
 				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
-				set(this.rows, stateId, filteredRows)
+				this.rows[stateId] = filteredRows
 			}
 			return true
 		},
@@ -400,7 +399,7 @@ export const useDataStore = defineStore('data', {
 			const stateId = 'public-' + token
 			if (this.rows[stateId]) {
 				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
-				set(this.rows, stateId, filteredRows)
+				this.rows[stateId] = filteredRows
 			}
 			return true
 		},
@@ -430,7 +429,7 @@ export const useDataStore = defineStore('data', {
 		seedRows({ isView, elementId, rows }) {
 			const stateId = genStateKey(isView, elementId)
 			if (stateId) {
-				set(this.rows, stateId, rows)
+				this.rows[stateId] = rows
 			}
 		},
 	},

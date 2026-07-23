@@ -12,9 +12,9 @@
 				:placeholder="t('tables', 'Column')" label="title" />
 			<div class="mode-switch">
 				<NcCheckboxRadioSwitch
+					v-model="sortMode"
 					:button-variant="true"
 					:disabled="true"
-					:checked.sync="sortMode"
 					value="ASC"
 					type="radio"
 					button-variant-grouped="horizontal"
@@ -25,9 +25,9 @@
 					</div>
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
+					v-model="sortMode"
 					:button-variant="true"
 					:disabled="true"
-					:checked.sync="sortMode"
 					value="DESC"
 					type="radio"
 					button-variant-grouped="horizontal"
@@ -78,6 +78,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'reactive-sorting-rule',
+	],
 	data() {
 		return {
 			selectedColumn: null,

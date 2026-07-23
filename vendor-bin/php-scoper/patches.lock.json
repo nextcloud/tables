@@ -1,0 +1,49 @@
+{
+    "_hash": "c8fb3c34bc401cfb91713f5403b9bbebd1070c43c09e5f03d373094e285b95d3",
+    "patches": {
+        "thecodingmachine/safe": [
+            {
+                "package": "thecodingmachine/safe",
+                "description": "PHP 8.4 compatibility, patch 1",
+                "url": "patches/thecodingmachine_safe_464.patch",
+                "sha256": "1ce69fe482f3279c0c58592aafadcb2682d41691609f6806a95a6adf99fe98a4",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "thecodingmachine/safe",
+                "description": "PHP 8.4 compatibility, patch 2",
+                "url": "patches/thecodingmachine_safe_466.patch",
+                "sha256": "1e66db39edaa0be1aa5077300b76fe77b354b2a178ad30bce47accca83ea2cfc",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "thecodingmachine/safe",
+                "description": "PHP 8.4 compatibility, patch 3",
+                "url": "patches/blizzz_safe_6eeee2a20ffb2be3456ae8615b227c78e1ca8a20.patch",
+                "sha256": "95bc42db06a6661ceaddcb9b91f6c1f865b9d9469e8d216d8dd84768c67a6b8f",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "humbug/php-scoper": [
+            {
+                "package": "humbug/php-scoper",
+                "description": "PHP 8.5 compatibility, patch1",
+                "url": "patches/blizzz_php-scoper_1.patch",
+                "sha256": "83f86f1b049c4e8fd900314a6782cbb46e31bbd2ab1e8bb8abcd96ea39cb99bf",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}

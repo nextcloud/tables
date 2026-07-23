@@ -5,7 +5,7 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
 		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
-			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
+			<NcCheckboxRadioSwitch :model-value="selected" @update:model-value="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
 		<td v-for="(col, index) in visibleColumns" :key="col.id"
 			:style="{
@@ -151,6 +151,12 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'copy-row',
+		'delete-row',
+		'edit-row',
+		'update-row-selection',
+	],
 	computed: {
 		getSelection: {
 			get: () => { return this.selected },

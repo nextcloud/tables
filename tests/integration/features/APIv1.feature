@@ -393,7 +393,7 @@ Feature: APIv1
       | t2    | table | read                |
     When user "participant1" shares the Context "c1" to "user" "participant2"
     Then the reported status is "200"
-    When user "participant1" tries to set permission "manage" to 1 for context "c1" and user "participant2"
+    When user "participant1" tries to set permission "manage" to 1
     Then the reported status is "403"
 
   @api1 @contexts @contexts-sharing
@@ -649,3 +649,23 @@ Feature: APIv1
     Then relation column "product" exists on table "secret-orders" pointing to table "secret-products" using label column "name"
     When user "participant2" fetches relations for table "secret-orders"
     Then the reported status is "404"
+
+  @api1 @columns @rows
+  Scenario: Column technicalName is returned and dataByAlias maps alias to row values
+    Given table "Alias test" with emoji "🔖" exists for user "participant1" as "base1"
+    Then column "name" exists with following properties
+      | type          | text        |
+      | subtype       | line        |
+      | mandatory     | 0           |
+      | technicalName | name        |
+    Then column "score" exists with following properties
+      | type          | number      |
+      | mandatory     | 0           |
+      | technicalName | score       |
+    Then row exists with following values
+      | name  | check1 |
+      | score | 42    |
+    Then the last created row has the following dataByAlias
+      | name  | check1 |
+      | score | 42    |
+    Then user "participant1" deletes table with keyword "Alias test"

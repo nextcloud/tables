@@ -24,7 +24,7 @@ SPDX-FileCopyrightText = "2024 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = [".scoper-production-dependencies", "vendor-bin/php-scoper/composer.json", "vendor-bin/php-scoper/composer.lock"]
+path = [".scoper-production-dependencies", "vendor-bin/php-scoper/composer.json", "vendor-bin/php-scoper/composer.lock", "vendor-bin/php-scoper/patches.lock.json"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

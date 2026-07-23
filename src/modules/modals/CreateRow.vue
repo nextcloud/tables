@@ -11,8 +11,8 @@
 		<div class="modal__content" @keydown="onKeydown">
 			<div v-for="column in nonMetaColumns" :key="column.id" :data-cy="column.title">
 				<ColumnFormComponent
-					:column="column"
-					:value.sync="row[column.id]" />
+					v-model:value="row[column.id]"
+					:column="column" />
 				<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(row[column.id], column)"
 					type="error">
 					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
@@ -24,8 +24,8 @@
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
-					<div class="padding-right">
-						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch" data-cy="createRowAddMoreSwitch">
+					<div class="padding-right" data-cy="createRowAddMoreSwitch">
+						<NcCheckboxRadioSwitch v-model="addNewAfterSave" type="switch">
 							{{ addMoreLabel }}
 						</NcCheckboxRadioSwitch>
 					</div>
@@ -85,6 +85,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			row: {},
@@ -124,7 +127,7 @@ export default {
 					this.row = prefilled
 				}
 				this.$nextTick(() => {
-					this.$el.querySelector('input')?.focus()
+					this.$el?.querySelector?.('input')?.focus()
 				})
 			}
 		},

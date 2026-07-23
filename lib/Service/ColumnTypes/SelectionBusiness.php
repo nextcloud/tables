@@ -22,9 +22,9 @@ class SelectionBusiness extends SuperBusiness {
 			return '';
 		}
 
-		foreach ($column->getSelectionOptionsArray() as $option) {
-			if ($option['id'] === $intValue) {
-				return json_encode((string)$option['id']);
+		foreach ($column->getSelectionOptionsCollection() as $option) {
+			if ($option->key() === $intValue) {
+				return json_encode((string)$option->key());
 			}
 		}
 
@@ -32,9 +32,9 @@ class SelectionBusiness extends SuperBusiness {
 	}
 
 	public function parseDisplayValue($value, Column $column): string {
-		foreach ($column->getSelectionOptionsArray() as $option) {
-			if ($option['label'] === $value) {
-				return json_encode($option['id']);
+		foreach ($column->getSelectionOptionsCollection() as $option) {
+			if ($option->label() === $value) {
+				return json_encode($option->key());
 			}
 		}
 
@@ -46,7 +46,7 @@ class SelectionBusiness extends SuperBusiness {
 	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, Column $column): bool {
+	public function canBeParsed(mixed $value, Column $column): bool {
 		if ($value === null) {
 			return true;
 		}
@@ -56,8 +56,8 @@ class SelectionBusiness extends SuperBusiness {
 			return false;
 		}
 
-		foreach ($column->getSelectionOptionsArray() as $option) {
-			if ($option['id'] === $intValue) {
+		foreach ($column->getSelectionOptionsCollection() as $option) {
+			if ($option->key() === $intValue) {
 				return true;
 			}
 		}
@@ -70,8 +70,8 @@ class SelectionBusiness extends SuperBusiness {
 			return true;
 		}
 
-		foreach ($column->getSelectionOptionsArray() as $option) {
-			if ($option['label'] === $value) {
+		foreach ($column->getSelectionOptionsCollection() as $option) {
+			if ($option->label() === $value) {
 				return true;
 			}
 		}

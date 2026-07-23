@@ -114,7 +114,7 @@ function mountContentWidget(richObject) {
 	cy.reply('**/apps/tables/row/table/*', richObject.rows)
 
 	cy.mount(ContentReferenceWidget, {
-		propsData: {
+		props: {
 			richObject,
 		},
 	})

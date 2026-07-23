@@ -6,16 +6,18 @@
 	<div style="width: 100%">
 		<div>
 			<div class="col-4 selections space-T space-L">
-				<NcCheckboxRadioSwitch
+				<div
 					v-for="key in Object.keys(selectOptions)"
 					:key="key"
-					:checked.sync="checkedValue"
-					:value="key"
-					name="usergroupTypeSelection"
-					:data-cy="`${selectOptions[key].toLowerCase()}Switch`"
-					:disabled="isOnlyChecked(key)">
-					{{ t('tables', selectOptions[key]) }}
-				</NcCheckboxRadioSwitch>
+					:data-cy="`${selectOptions[key].toLowerCase()}Switch`">
+					<NcCheckboxRadioSwitch
+						v-model="checkedValue"
+						:value="key"
+						name="usergroupTypeSelection"
+						:disabled="isOnlyChecked(key)">
+						{{ t('tables', selectOptions[key]) }}
+					</NcCheckboxRadioSwitch>
+				</div>
 			</div>
 
 			<div class="row space-T">
@@ -27,7 +29,7 @@
 						:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
 						label="displayName" :aria-label-combobox="getPlaceholder()"
 						:user-select="true" :close-on-select="false"
-						:multiple="mutableColumn.usergroupMultipleItems" data-cy="usergroupDefaultSelect" @search="asyncFind" @input="addItem">
+						:multiple="mutableColumn.usergroupMultipleItems" data-cy="usergroupDefaultSelect" @search="asyncFind" @update:model-value="addItem">
 						<template #noResult>
 							{{ noResultText }}
 						</template>
@@ -37,8 +39,8 @@
 					<div class="fix-col-4 title">
 						{{ t('tables', 'Select multiple items') }}
 					</div>
-					<div class="fix-col-4 space-L-small">
-						<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.usergroupMultipleItems" data-cy="usergroupMultipleSwitch" />
+					<div class="fix-col-4 space-L-small" data-cy="usergroupMultipleSwitch">
+						<NcCheckboxRadioSwitch v-model="mutableColumn.usergroupMultipleItems" type="switch" />
 					</div>
 				</div>
 			</div>
@@ -47,7 +49,7 @@
 					{{ t('tables', 'Show user status') }}
 				</div>
 				<div class="fix-col-4 space-L-small">
-					<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.showUserStatus" />
+					<NcCheckboxRadioSwitch v-model="mutableColumn.showUserStatus" type="switch" />
 				</div>
 			</div>
 		</div>

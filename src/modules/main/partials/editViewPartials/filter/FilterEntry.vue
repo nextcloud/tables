@@ -44,7 +44,7 @@
 				data-cy="filterEntryDate" />
 			<NcTextField
 				v-if="additionalInputType === AdditionalInputTypes.NUMBER"
-				v-model.number="additionalInputValue"
+				v-model="numberInputValue"
 				class="additional-input"
 				:label="selectedMagicField?.additionalInputLabel"
 				type="number"
@@ -96,6 +96,10 @@ export default {
 		},
 	},
 
+	emits: [
+		'delete-filter',
+		'update:filter-entry',
+	],
 	data() {
 		return {
 			term: '',
@@ -136,6 +140,7 @@ export default {
 				} else {
 					this.mutableFilterEntry.value = ''
 				}
+				this.term = ''
 			},
 		},
 		selectedColumn: {
@@ -240,6 +245,18 @@ export default {
 		additionalInputType() {
 			return this.selectedMagicField?.additionalInput || null
 		},
+		// NcTextField (NcInputField) in @nextcloud/vue 9 calls modelValue.toString()
+		// during render and crashes on null, so keep the model a string here and
+		// convert to a number (or null) for additionalInputValue.
+		numberInputValue: {
+			get() {
+				return this.additionalInputValue == null ? '' : String(this.additionalInputValue)
+			},
+			set(value) {
+				const parsed = parseInt(value)
+				this.additionalInputValue = isNaN(parsed) ? null : parsed
+			},
+		},
 	},
 
 	watch: {
@@ -288,7 +305,7 @@ export default {
 			if (!this.additionalInputType) return
 
 			this.$nextTick(() => {
-				const input = this.$el.querySelector('.additional-input input')
+				const input = this.$el?.querySelector?.('.additional-input input')
 				if (input) {
 					input.focus()
 				}

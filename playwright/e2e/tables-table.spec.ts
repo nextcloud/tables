@@ -5,7 +5,7 @@
 
 import { test, expect } from '../support/fixtures'
 import { createRandomUser } from '../support/api'
-import { clickOnNavigationTableMenu, clickOnTableThreeDotMenu, createTable, createTextLineColumn, deleteTable, loadTable } from '../support/commands'
+import { clickOnNavigationTableMenu, clickOnTableThreeDotMenu, createTable, createTextLineColumn, deleteTable, fillInValueTextLine, loadTable, openCreateRowModal } from '../support/commands'
 import { login } from '../support/login'
 
 test.describe('Manage a table', () => {
@@ -37,7 +37,7 @@ test.describe('Manage a table', () => {
 		await createTable(page, 'to do list update desc')
 		await loadTable(page, 'to do list update desc')
 		await expect(page.locator('.icon-loading').first()).toBeHidden()
-		await clickOnNavigationTableMenu(page, 'to do list update desc', 'Edit table')
+		await clickOnNavigationTableMenu(page, 'to do list update desc', 'Table settings')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 		await page.locator('#description-editor .tiptap.ProseMirror').fill('Updated ToDo List description')
@@ -84,7 +84,7 @@ test.describe('Manage a table', () => {
 		await page.locator('[data-cy="createTableSubmitBtn"]').click()
 
 		await loadTable(page, 'test table')
-		await clickOnTableThreeDotMenu(page, 'Edit table')
+		await clickOnTableThreeDotMenu(page, 'Table settings')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 		await page.locator('[data-cy="editTableModal"] button').filter({ hasText: 'Change owner' }).click()
@@ -92,8 +92,14 @@ test.describe('Manage a table', () => {
 		await expect(page.locator('[data-cy="transferTableModal"]')).toBeVisible()
 
 		await page.locator('[data-cy="transferTableModal"] input[type="search"]').clear()
+		const autocompleteResponsePromise = page.waitForResponse(r => r.url().includes('/core/autocomplete/get') && r.request().method() === 'GET')
 		await page.locator('[data-cy="transferTableModal"] input[type="search"]').fill(targetUserTransfer.userId)
-		await page.locator(`.vs__dropdown-menu [id="${targetUserTransfer.userId}"]`).click()
+		const autocompleteResponse = await autocompleteResponsePromise
+		expect(autocompleteResponse.ok()).toBeTruthy()
+
+		const targetUserOption = page.locator('.vs__dropdown-menu .vs__dropdown-option').filter({ hasText: targetUserTransfer.userId }).first()
+		await expect(targetUserOption).toBeVisible()
+		await targetUserOption.click()
 
 		await expect(page.locator('[data-cy="transferTableButton"]')).toBeEnabled()
 		await page.locator('[data-cy="transferTableButton"]').click()
@@ -108,13 +114,13 @@ test.describe('Manage a table', () => {
 		await expect(page.locator('.app-navigation__list').filter({ hasText: 'test table' })).toBeVisible()
 	})
 
-	test('Set column order in Edit Table modal', async ({ userPage: { page } }) => {
+	test('Set column order in Table settings modal', async ({ userPage: { page } }) => {
 		await page.goto('/index.php/apps/tables')
 		await createTable(page, 'Column order test table')
 		await createTextLineColumn(page, 'colFirst', '', '', true)
 		await createTextLineColumn(page, 'colSecond', '', '', false)
 
-		await clickOnTableThreeDotMenu(page, 'Edit table')
+		await clickOnTableThreeDotMenu(page, 'Table settings')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 
@@ -145,12 +151,22 @@ test.describe('Manage a table', () => {
 		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
 	})
 
-	test('Set default sort in Edit Table modal', async ({ userPage: { page } }) => {
+	test('Set default sort in Table settings modal', async ({ userPage: { page } }) => {
 		await page.goto('/index.php/apps/tables')
 		await createTable(page, 'Default sort test table')
 		await createTextLineColumn(page, 'name', '', '', true)
 
-		await clickOnTableThreeDotMenu(page, 'Edit table')
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'name', 'alpha')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'name', 'bravo')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toContainText('alpha')
+
+		await clickOnTableThreeDotMenu(page, 'Table settings')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
 
@@ -179,5 +195,9 @@ test.describe('Manage a table', () => {
 		expect(body.ocs.data.sort[0].mode).toBe('DESC')
 
 		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
+
+		await page.reload()
+		await expect(page.locator('h1').filter({ hasText: 'Default sort test table' })).toBeVisible()
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toContainText('bravo')
 	})
 })

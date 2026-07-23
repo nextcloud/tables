@@ -17,22 +17,22 @@
 				<div class="fix-col-2" style="justify-content: end;">
 					<NcActions :force-menu="true" data-cy="resourceSharePermsActions">
 						<NcActionCaption :name="t('tables', 'Permissions')" />
-						<NcActionCheckbox :checked.sync="resource.permissionRead" :disabled="true"
+						<NcActionCheckbox v-model="resource.permissionRead" :disabled="true"
 							@check="updatePermission(resource, 'permissionRead', true)"
 							@uncheck="updatePermission(resource, 'permissionRead', false)">
 							{{ t('tables', 'Read resource') }}
 						</NcActionCheckbox>
-						<NcActionCheckbox :checked.sync="resource.permissionCreate"
+						<NcActionCheckbox v-model="resource.permissionCreate"
 							@check="updatePermission(resource, 'permissionCreate', true)"
 							@uncheck="updatePermission(resource, 'permissionCreate', false)">
 							{{ t('tables', 'Create resource') }}
 						</NcActionCheckbox>
-						<NcActionCheckbox :checked.sync="resource.permissionUpdate"
+						<NcActionCheckbox v-model="resource.permissionUpdate"
 							@check="updatePermission(resource, 'permissionUpdate', true)"
 							@uncheck="updatePermission(resource, 'permissionUpdate', false)">
 							{{ t('tables', 'Update resource') }}
 						</NcActionCheckbox>
-						<NcActionCheckbox :checked.sync="resource.permissionDelete"
+						<NcActionCheckbox v-model="resource.permissionDelete"
 							@check="updatePermission(resource, 'permissionDelete', true)"
 							@uncheck="updatePermission(resource, 'permissionDelete', false)">
 							{{ t('tables', 'Delete resource') }}
@@ -64,6 +64,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'update',
+	],
 	data() {
 		return {
 			loading: false,

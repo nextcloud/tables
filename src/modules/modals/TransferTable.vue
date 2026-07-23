@@ -11,7 +11,7 @@
 		<div class="modal__content">
 			<div class="row">
 				<h3>{{ t('tables', 'Transfer this table to another user') }}</h3>
-				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="selectedUserId" />
+				<NcUserPicker v-model:selected-user-id="selectedUserId" :select-users="true" :select-groups="false" />
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
@@ -52,6 +52,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			loading: false,

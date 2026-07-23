@@ -11,6 +11,7 @@
 			<SortEntry
 				:sort-entry="sortingRule"
 				:columns="eligibleColumns(sortingRule.columnId)"
+				@update:sort-entry="updateSortingRule(i, $event)"
 				@delete-sorting-rule="deleteSortingRule(i)" />
 		</div>
 		<NcButton
@@ -49,14 +50,17 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update',
+	],
 	data() {
 		return {
 			mutableSort: [...(this.sortRules ?? [])],
 		}
 	},
 	watch: {
-		mutableSort() {
-			this.$emit('update', this.mutableSort)
+		sortRules() {
+			this.mutableSort = [...(this.sortRules ?? [])]
 		},
 	},
 	methods: {
@@ -82,9 +86,18 @@ export default {
 		},
 		deleteSortingRule(index) {
 			this.mutableSort.splice(index, 1)
+			this.emitUpdate()
 		},
 		addSortingRule() {
 			this.mutableSort.push({ columnId: null, mode: 'ASC' })
+			this.emitUpdate()
+		},
+		updateSortingRule(index, sortingRule) {
+			this.mutableSort.splice(index, 1, sortingRule)
+			this.emitUpdate()
+		},
+		emitUpdate() {
+			this.$emit('update', [...this.mutableSort])
 		},
 	},
 }

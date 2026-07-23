@@ -31,6 +31,7 @@ OC.L10N.register(
     "Activity" : "Aktivnost",
     "Owner" : "Vlasnik",
     "Close" : "Zatvori",
+    "Saving..." : "Spremanje...",
     "Export" : "Izvezi",
     "Favorites" : "Favoriti",
     "group" : "grupa",

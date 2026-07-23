@@ -29,13 +29,13 @@
 
 							<div class="no-padding-on-mobile">
 								<div class="flex w-100">
-									<NcCheckboxRadioSwitch v-if="createMissingColumns" :checked.sync="columnsConfig[colIndex].action" value="new" name="columnActionSelection" type="radio" @update:checked="$forceUpdate()">
+									<NcCheckboxRadioSwitch v-if="createMissingColumns" v-model="columnsConfig[colIndex].action" value="new" name="columnActionSelection" type="radio" @update:model-value="$forceUpdate()">
 										{{ t('tables', 'Create new column') }}
 									</NcCheckboxRadioSwitch>
 								</div>
 								<div class="col-4 action-selections mobile-block">
 									<div class="w-100">
-										<NcCheckboxRadioSwitch :checked.sync="columnsConfig[colIndex].action" value="exist" name="columnActionSelection" type="radio" @update:checked="$forceUpdate()">
+										<NcCheckboxRadioSwitch v-model="columnsConfig[colIndex].action" value="exist" name="columnActionSelection" type="radio" @update:model-value="$forceUpdate()">
 											{{ t('tables', 'Import to existing column') }}
 										</NcCheckboxRadioSwitch>
 									</div>
@@ -48,7 +48,7 @@
 									</div>
 								</div>
 								<div v-if="!createMissingColumns" class="flex w-100">
-									<NcCheckboxRadioSwitch :checked.sync="columnsConfig[colIndex].action" value="ignore" name="columnActionSelection" type="radio" @update:checked="$forceUpdate()">
+									<NcCheckboxRadioSwitch v-model="columnsConfig[colIndex].action" value="ignore" name="columnActionSelection" type="radio" @update:model-value="$forceUpdate()">
 										{{ t('tables', 'Ignore column') }}
 									</NcCheckboxRadioSwitch>
 								</div>
@@ -101,6 +101,9 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'update:columns',
+	],
 	data() {
 		return {
 			editingColumnIndex: null,

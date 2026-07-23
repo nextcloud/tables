@@ -11,7 +11,7 @@
 			:hide-selected="true" :placeholder="t('tables', 'Select a table or view')" :searchable="true"
 			:get-option-key="(option) => option.key" label="title"
 			:aria-label-combobox="t('tables', 'Select a table or view')" :preselect-first="true"
-			:preserve-search="true" @search="asyncFind" @input="addResource">
+			:preserve-search="true" @search="asyncFind" @update:model-value="addResource">
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
@@ -57,6 +57,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'add',
+	],
 	data() {
 		return {
 			query: '',

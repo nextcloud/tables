@@ -102,7 +102,8 @@
 </template>
 
 <script>
-import { Editor, EditorContent } from '@tiptap/vue-2'
+import { markRaw } from 'vue'
+import { Editor, EditorContent } from '@tiptap/vue-3'
 import { CharacterCount } from '@tiptap/extension-character-count'
 import { StarterKit } from '@tiptap/starter-kit'
 import { TaskList } from '@tiptap/extension-task-list'
@@ -151,6 +152,9 @@ export default {
 		    },
 	},
 
+	emits: [
+		'input',
+	],
 	data() {
 		return {
 			editor: null,
@@ -168,7 +172,7 @@ export default {
 	},
 
 	mounted() {
-		this.editor = new Editor({
+		this.editor = markRaw(new Editor({
 			extensions: [
 				StarterKit,
 				TaskList,
@@ -188,7 +192,7 @@ export default {
 					spellcheck: 'false',
 				},
 			},
-		})
+		}))
 	},
 
 	beforeUnmount() {

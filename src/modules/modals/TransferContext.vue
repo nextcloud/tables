@@ -11,7 +11,7 @@
 		<div class="modal__content">
 			<div class="row">
 				<h3>{{ t('tables', 'Transfer the application "{context}" to another user', { context: context.name }) }}</h3>
-				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="newOwnerId" />
+				<NcUserPicker v-model:selected-user-id="newOwnerId" :select-users="true" :select-groups="false" />
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
@@ -53,6 +53,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			loading: false,

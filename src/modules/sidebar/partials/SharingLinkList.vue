@@ -40,6 +40,11 @@ export default {
 		},
 	},
 
+	emits: [
+		'create-link-share',
+		'delete-share',
+		'update-share-permissions',
+	],
 	computed: {
 		linkShares() {
 			return this.shares.filter(share => share.receiverType === 'link')

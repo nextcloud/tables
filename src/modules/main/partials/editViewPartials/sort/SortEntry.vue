@@ -11,8 +11,8 @@
 				:placeholder="t('tables', 'Column')" label="title" />
 			<div class="mode-switch">
 				<NcCheckboxRadioSwitch
+					v-model="sortMode"
 					:button-variant="true"
-					:checked.sync="sortMode"
 					value="ASC"
 					type="radio"
 					button-variant-grouped="horizontal"
@@ -23,8 +23,8 @@
 					</div>
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
+					v-model="sortMode"
 					:button-variant="true"
-					:checked.sync="sortMode"
 					value="DESC"
 					type="radio"
 					button-variant-grouped="horizontal"
@@ -75,32 +75,32 @@ export default {
 			default: null,
 		},
 	},
-	data() {
-		return {
-			selectedColumn: null,
-			sortMode: 'ASC',
-			mutableSortEntry: this.sortEntry,
-		}
-	},
-	watch: {
-		sortEntry() {
-			this.reset()
+	emits: [
+		'delete-sorting-rule',
+		'update:sort-entry',
+	],
+	computed: {
+		selectedColumn: {
+			get() {
+				return (this.columns ?? []).find(col => col.id === this.sortEntry.columnId)
+			},
+			set(column) {
+				this.$emit('update:sort-entry', {
+					...this.sortEntry,
+					columnId: column?.id ?? null,
+				})
+			},
 		},
-		selectedColumn() {
-			this.mutableSortEntry.columnId = this.selectedColumn?.id
-		},
-		sortMode() {
-			this.mutableSortEntry.mode = this.sortMode
-		},
-	},
-	mounted() {
-		this.reset()
-	},
-
-	methods: {
-		reset() {
-			this.selectedColumn = this.columns.find(col => col.id === this.sortEntry.columnId)
-			this.sortMode = this.sortEntry.mode
+		sortMode: {
+			get() {
+				return this.sortEntry.mode
+			},
+			set(mode) {
+				this.$emit('update:sort-entry', {
+					...this.sortEntry,
+					mode,
+				})
+			},
 		},
 	},
 }

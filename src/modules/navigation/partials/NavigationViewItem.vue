@@ -1,6 +1,6 @@
 <!--
-  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
-  - SPDX-License-Identifier: AGPL-3.0-or-later
+	- SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
 	<NcAppNavigationItem v-if="view"
@@ -18,9 +18,7 @@
 			</template>
 		</template>
 		<template #counter>
-			<NcCounterBubble v-if="canReadData(view)">
-				{{ view.rowsCount }}
-			</NcCounterBubble>
+			<NcCounterBubble v-if="canReadData(view)" :count="view.rowsCount" />
 			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
 			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view) && showShareSender" class="margin-left">
 				<NcAvatar :user="view.ownership" :show-user-status="false" />
@@ -28,13 +26,13 @@
 		</template>
 		<template #actions>
 			<!-- EDIT -->
-			<NcActionButton v-if="canManageElement(view)"
+			<NcActionButton
 				:close-after-click="true"
 				@click="editView">
 				<template #icon>
 					<PlaylistEdit :size="20" />
 				</template>
-				{{ t('tables', 'Edit view') }}
+				{{ t('tables', 'View settings') }}
 			</NcActionButton>
 
 			<!-- DUPLICATE -->
@@ -72,6 +70,15 @@
 				{{ t('tables', 'Integration') }}
 				<template #icon>
 					<ListBoxOutline :size="20" />
+				</template>
+			</NcActionButton>
+
+			<!-- Activity -->
+			<NcActionButton v-if="canReadData(view) && isActivityEnabled" :close-after-click="true"
+				@click="actionShowActivity">
+				{{ t('tables', 'Activity') }}
+				<template #icon>
+					<ActivityIcon :size="20" />
 				</template>
 			</NcActionButton>
 
@@ -124,11 +131,13 @@ import PlaylistPlay from 'vue-material-design-icons/PlaylistPlay.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import Import from 'vue-material-design-icons/Import.vue'
+import ActivityIcon from 'vue-material-design-icons/LightningBoltOutline.vue'
 
 export default {
 	name: 'NavigationViewItem',
 
 	components: {
+		ActivityIcon,
 		PlaylistEdit,
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
@@ -144,16 +153,6 @@ export default {
 		DeleteOutline,
 	},
 
-	filters: {
-		truncate(string, num) {
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
-	},
-
 	mixins: [permissionsMixin],
 
 	props: {
@@ -163,9 +162,9 @@ export default {
 		},
 		// this is good if you show the share sender via the table and show this as children
 		showShareSender: {
-		      type: Boolean,
-		      default: true,
-		    },
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	data() {
@@ -192,6 +191,10 @@ export default {
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
+			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
+		},
+		async actionShowActivity() {
+			emit('tables:sidebar:activity', { open: true, tab: 'activity' })
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
 		},
 		async editView() {

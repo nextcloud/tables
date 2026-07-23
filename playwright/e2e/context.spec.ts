@@ -250,7 +250,7 @@ test.describe('Manage a context', () => {
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 
 		await createTextLineColumn(page, 'title', '', '', true)
-		await page.locator('button').filter({ hasText: 'Create row' }).click()
+		await page.locator('button').filter({ hasText: 'Create row' }).first().click()
 		await fillInValueTextLine(page, 'title', 'first row')
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 
@@ -304,7 +304,7 @@ test.describe('Manage a context', () => {
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible()
 		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible()
 
-		await page.locator('button').filter({ hasText: 'Create row' }).click()
+		await page.locator('button').filter({ hasText: 'Create row' }).first().click()
 		await fillInValueTextLine(page, 'title', 'first row')
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 

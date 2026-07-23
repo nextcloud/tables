@@ -25,6 +25,7 @@ use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\RowUpdatedEvent;
 use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\RowDataInput;
+use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -56,6 +57,7 @@ class RowService extends SuperService {
 		private IEventDispatcher $eventDispatcher,
 		private ColumnsHelper $columnsHelper,
 		private ActivityManager $activityManager,
+		private NotificationHelper $notificationHelper,
 		private IDBConnection $connection,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -72,12 +74,13 @@ class RowService extends SuperService {
 
 	/**
 	 * @param Row2[] $rows
-	 * @return TablesPublicRow[]
+	 * @psalm-return TablesPublicRow[]
 	 */
 	public function formatRowsForPublicShare(array $rows): array {
 		return array_map(static function (Row2 $row): array {
 			$rowData = $row->jsonSerialize();
 			unset($rowData['tableId'], $rowData['createdBy'], $rowData['lastEditBy']);
+			/** @var TablesPublicRow $rowData */
 			return $rowData;
 		}, $rows);
 	}
@@ -100,7 +103,9 @@ class RowService extends SuperService {
 				$table = $this->tableMapper->find($tableId);
 				$sort = $table->getSortArray() ?: null;
 
-				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
+				$rows = $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId);
+				$this->attachAliasPayloads($rows, $tableColumns);
+				return $rows;
 			} else {
 				throw new PermissionError('no read access to table id = ' . $tableId);
 			}
@@ -135,6 +140,7 @@ class RowService extends SuperService {
 					$view->getSortArray(),
 					$this->resolveFilterUserId($userId, $view),
 				);
+
 			} else {
 				throw new PermissionError('no read access to view id = ' . $viewId);
 			}
@@ -181,6 +187,7 @@ class RowService extends SuperService {
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		$this->attachAliasPayload($row, $columns);
 		return $row;
 	}
 
@@ -261,6 +268,7 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->userId);
+			$this->attachAliasPayload($insertedRow, $columns);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 			$this->activityManager->triggerEvent(
@@ -268,6 +276,12 @@ class RowService extends SuperService {
 				object: $insertedRow,
 				subject: ActivityManager::SUBJECT_ROW_CREATE,
 				author: $this->userId,
+			);
+			$this->notificationHelper->sendNotification(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $insertedRow,
+				subject: ActivityManager::SUBJECT_ROW_CREATE,
+				author: $this->userId
 			);
 
 			return $this->filterRowResult($view, $insertedRow);
@@ -687,11 +701,22 @@ class RowService extends SuperService {
 		}
 
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
+		$this->attachAliasPayload($updatedRow, $columns);
 
 		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
 		if ($updatedRow->getData() !== $previousData) {
 			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $updatedRow,
+				subject: ActivityManager::SUBJECT_ROW_UPDATE,
+				author: $this->userId,
+				additionalParams: [
+					'before' => $previousData,
+					'after' => $updatedRow->getData(),
+				]
+			);
+			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_ROW,
 				object: $updatedRow,
 				subject: ActivityManager::SUBJECT_ROW_UPDATE,
@@ -772,12 +797,20 @@ class RowService extends SuperService {
 		}
 
 		try {
+			$columns = $this->loadColumnsForData($item->getData() ?? []);
 			$deletedRow = $this->row2Mapper->delete($item);
+			$this->attachAliasPayload($item, $columns);
 
 			$event = new RowDeletedEvent($item, $item->getData());
 
 			$this->eventDispatcher->dispatchTyped($event);
 			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $deletedRow,
+				subject: ActivityManager::SUBJECT_ROW_DELETE,
+				author: $this->userId,
+			);
+			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_ROW,
 				object: $deletedRow,
 				subject: ActivityManager::SUBJECT_ROW_DELETE,
@@ -882,9 +915,76 @@ class RowService extends SuperService {
 			return $row;
 		}
 
-		$row->filterDataByColumns($view->getColumnIds());
+		$columnIds = $view->getColumnIds();
+		$row->filterDataByColumns($columnIds);
+		$row->filterDataByAliasByColumns($columnIds);
 
 		return $row;
+	}
+
+	/**
+	 * @param Row2[] $rows
+	 * @param Column[] $columns
+	 */
+	private function attachAliasPayloads(array $rows, array $columns): void {
+		foreach ($rows as $row) {
+			$this->attachAliasPayload($row, $columns);
+		}
+	}
+
+	/**
+	 * @param Column[] $columns
+	 */
+	private function attachAliasPayload(Row2 $row, array $columns): void {
+		$data = $row->getData() ?? [];
+		if ($data === []) {
+			$row->setDataByAlias([]);
+			return;
+		}
+
+		$aliasByColumnId = $this->buildAliasByColumnId($columns);
+
+		$dataByAlias = [];
+		foreach ($data as $cell) {
+			$columnId = (int)$cell['columnId'];
+			$alias = $aliasByColumnId[$columnId] ?? ('column_' . $columnId);
+			$dataByAlias[$alias] = [
+				'columnId' => $columnId,
+				'value' => $cell['value'],
+			];
+		}
+
+		$row->setDataByAlias($dataByAlias);
+	}
+
+	/**
+	 * Loads Column entities for the column IDs found in a row's data cells,
+	 * skipping meta column IDs (<= 0).
+	 *
+	 * @param array<array{columnId: int|string, value: mixed}> $data
+	 * @return Column[]
+	 */
+	private function loadColumnsForData(array $data): array {
+		$columnIds = array_values(array_unique(array_map(static fn (array $cell): int => (int)$cell['columnId'], $data)));
+		$columnIds = array_values(array_filter($columnIds, static fn (int $id): bool => $id > 0));
+		return $columnIds === [] ? [] : $this->columnMapper->findAll($columnIds);
+	}
+
+	/**
+	 * Builds a map of column ID => technical name for alias resolution.
+	 *
+	 * @param Column[] $columns
+	 * @return array<int, string>
+	 */
+	private function buildAliasByColumnId(array $columns): array {
+		$aliasByColumnId = [];
+		foreach ($columns as $column) {
+			$technicalName = $column->getTechnicalName();
+			if ($technicalName !== null && $technicalName !== '') {
+				$aliasByColumnId[$column->getId()] = $technicalName;
+			}
+		}
+		return $aliasByColumnId;
 	}
 
 	/**

@@ -35,7 +35,7 @@
 					{{ t('tables', 'Description') }}
 				</div>
 				<div class="col-4">
-					<TableDescription :description.sync="description" :read-only="false" />
+					<TableDescription v-model:description="description" :read-only="false" />
 				</div>
 			</div>
 			<div class="row space-T">
@@ -111,6 +111,9 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			title: '',

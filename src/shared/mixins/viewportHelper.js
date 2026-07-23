@@ -21,7 +21,7 @@ export default {
 	created() {
 		window.addEventListener('resize', this.updateMobileSizes)
 	},
-	destroyed() {
+	unmounted() {
 		window.removeEventListener('resize', this.updateMobileSizes)
 	},
 	methods: {

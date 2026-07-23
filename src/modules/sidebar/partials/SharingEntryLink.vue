@@ -20,15 +20,15 @@
 
 			<!-- Inline Creation Form -->
 			<div v-else class="sharing-entry-link__create-form">
-				<div class="sharing-entry-link__form-row">
-					<NcActionCheckbox :checked.sync="usePassword" data-cy="sharingEntryLinkPasswordCheck" @update:chk="onTogglePassword">
+				<div class="sharing-entry-link__form-row" data-cy="sharingEntryLinkPasswordCheck">
+					<NcActionCheckbox v-model="usePassword">
 						{{ t('tables', 'Set password') }}
 					</NcActionCheckbox>
 				</div>
 
-				<div v-if="usePassword" class="sharing-entry-link__form-row">
-					<NcActionInput :value.sync="password" type="password" :label="t('tables', 'Password')"
-						:show-trailing-button="true" class="sharing-entry-link__password-input" data-cy="sharingEntryLinkPasswordInput">
+				<div v-if="usePassword" class="sharing-entry-link__form-row" data-cy="sharingEntryLinkPasswordInput">
+					<NcActionInput v-model="password" type="password" :label="t('tables', 'Password')"
+						:show-trailing-button="true" class="sharing-entry-link__password-input">
 						<template #trailing>
 							<NcActionButton @click="copyPassword">
 								<template #icon>
@@ -79,7 +79,7 @@
 					</NcActionButton>
 
 					<!-- Actions Menu -->
-					<NcActions :open.sync="openMenu" menu-align="right">
+					<NcActions v-model:open="openMenu" menu-align="right">
 						<template #icon>
 							<DotsHorizontal :size="20" />
 						</template>
@@ -149,6 +149,11 @@ export default {
 		},
 	},
 
+	emits: [
+		'create-link-share',
+		'delete-share',
+		'update-share',
+	],
 	data() {
 		return {
 			loading: false,
@@ -173,20 +178,19 @@ export default {
 
 	watch: {
 		showCreateForm(val) {
-			if (val) {
-				this.onTogglePassword(this.usePassword)
+			if (val && !this.usePassword) {
+				this.password = ''
+			}
+		},
+		usePassword(checked) {
+			if (!checked) {
+				this.password = ''
 			}
 		},
 	},
 
 	methods: {
 		t,
-		onTogglePassword(checked) {
-			this.usePassword = checked
-			if (!checked) {
-				this.password = ''
-			}
-		},
 		cancelCreate() {
 			this.showCreateForm = false
 			this.password = ''

@@ -7,8 +7,8 @@
 		<div class="fix-col-4 title">
 			{{ t('tables', 'Set now as default') }}
 		</div>
-		<div class="fix-col-4 space-L-small">
-			<NcCheckboxRadioSwitch type="switch" :checked.sync="nowAsDefault" data-cy="datetimeTimeFormNowSwitch" />
+		<div class="fix-col-4 space-L-small" data-cy="datetimeTimeFormNowSwitch">
+			<NcCheckboxRadioSwitch v-model="nowAsDefault" type="switch" />
 		</div>
 	</div>
 </template>

@@ -13,7 +13,7 @@
 				<table v-if="activeElement">
 					<tr>
 						<td>{{ t('tables', 'Created at') }}</td>
-						<td>{{ activeElement.createdAt | niceDateTime }}</td>
+						<td>{{ niceDateTime(activeElement.createdAt) }}</td>
 					</tr>
 					<tr>
 						<td>{{ t('tables', 'Ownership') }}</td>
@@ -84,9 +84,6 @@ import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	name: 'Sidebar',
-	setup() {
-		return { IconPersonAdd, IconPersonAddOutline }
-	},
 	components: {
 		NcUserBubble,
 		SidebarActivity,
@@ -101,13 +98,10 @@ export default {
 		NcIconSvgWrapper,
 	},
 
-	filters: {
-		niceDateTime(value) {
-			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
-		},
-	},
-
 	mixins: [permissionsMixin, activityMixin],
+	setup() {
+		return { IconPersonAdd, IconPersonAddOutline }
+	},
 
 	data() {
 		return {
@@ -139,12 +133,15 @@ export default {
 		subscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
 		subscribe('tables:sidebar:activity', data => this.handleToggleSidebar(data))
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		unsubscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
 		unsubscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
 		unsubscribe('tables:sidebar:activity', data => this.handleToggleSidebar(data))
 	},
 	methods: {
+		niceDateTime(value) {
+			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
+		},
 		handleToggleSidebar(data) {
 			this.showSidebar = data.open ? data.open : false
 			this.activeSidebarTab = data.tab ? data.tab : ''

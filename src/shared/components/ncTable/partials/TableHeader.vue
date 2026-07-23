@@ -6,7 +6,7 @@
 	<tr>
 		<th v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<div class="cell-wrapper">
-				<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
+				<NcCheckboxRadioSwitch :model-value="allRowsAreSelected" @update:model-value="value => $emit('select-all-rows', value)" />
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
 		</th>
@@ -28,10 +28,10 @@
 							{{ col.title }}
 						</div>
 						<TableHeaderColumnOptions
+							v-model:open-state="openedColumnHeaderMenus[col.id]"
+							v-model:view-setting="localViewSetting"
 							:column="col"
-							:open-state.sync="openedColumnHeaderMenus[col.id]"
 							:config="config"
-							:view-setting.sync="localViewSetting"
 							:pinned-column-id="pinnedColumnId"
 							@edit-column="col => $emit('edit-column', col)"
 							@delete-column="col => $emit('delete-column', col)"
@@ -101,6 +101,13 @@ export default {
 		},
 	},
 
+	emits: [
+		'delete-column',
+		'edit-column',
+		'pin-column',
+		'select-all-rows',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			openedColumnHeaderMenus: {},

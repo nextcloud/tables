@@ -9,6 +9,7 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
+use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
@@ -21,10 +22,13 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\SelectionOptions;
+use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Validation\ColumnDtoValidator;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
@@ -48,6 +52,10 @@ class ColumnService extends SuperService {
 
 	private ColumnDtoValidator $columnDtoValidator;
 
+	private ActivityManager $activityManager;
+
+	private NotificationHelper $notificationHelper;
+
 	/** @var array<int, int[]> Per-request cache of sorted column-id order, keyed by tableId. */
 	private array $columnOrderCache = [];
 
@@ -59,6 +67,8 @@ class ColumnService extends SuperService {
 		TableMapper $tableMapper,
 		ViewService $viewService,
 		RowService $rowService,
+		ActivityManager $activityManager,
+		NotificationHelper $notificationHelper,
 		IL10N $l,
 		UserHelper $userHelper,
 		ColumnDtoValidator $columnDtoValidator,
@@ -68,12 +78,15 @@ class ColumnService extends SuperService {
 		$this->tableMapper = $tableMapper;
 		$this->viewService = $viewService;
 		$this->rowService = $rowService;
+		$this->activityManager = $activityManager;
+		$this->notificationHelper = $notificationHelper;
 		$this->l = $l;
 		$this->userHelper = $userHelper;
 		$this->columnDtoValidator = $columnDtoValidator;
 	}
 
 	/**
+	 * @return Column[]
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
@@ -141,7 +154,7 @@ class ColumnService extends SuperService {
 	/**
 	 * @param int $viewId
 	 * @param string|null $userId
-	 * @return array
+	 * @return Column[]
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws InternalError
@@ -313,8 +326,18 @@ class ColumnService extends SuperService {
 		try {
 			$entity = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+		}
+		if ($entity->getTechnicalName() === null || $entity->getTechnicalName() === '') {
+			$entity->setTechnicalName($this->buildDefaultTechnicalName($entity->getId()));
+			try {
+				$entity = $this->mapper->update($entity);
+			} catch (\OCP\DB\Exception $e) {
+				$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
 		}
 		if (isset($view) && $view) {
 			// Add columns to view(s)
@@ -335,6 +358,20 @@ class ColumnService extends SuperService {
 
 			$this->viewService->addColumnToView($view, $entity, $userId);
 		}
+
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $entity,
+			subject: ActivityManager::SUBJECT_COLUMN_CREATE,
+			author: $userId ?? $this->userId,
+		);
+		$this->notificationHelper->sendNotification(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $entity,
+			subject: ActivityManager::SUBJECT_COLUMN_CREATE,
+			author: $userId ?? $this->userId,
+		);
+
 		return $this->enhanceColumn($entity);
 	}
 
@@ -367,6 +404,9 @@ class ColumnService extends SuperService {
 			if ($title !== null) {
 				$item->setTitle($title);
 			}
+			if ($columnDto->getTechnicalName() !== null) {
+				$item->setTechnicalName($columnDto->getTechnicalName());
+			}
 			if ($columnDto->getType() !== null) {
 				$item->setType($columnDto->getType());
 			}
@@ -391,11 +431,10 @@ class ColumnService extends SuperService {
 			$item->setNumberMin($columnDto->getNumberMin());
 			$item->setNumberMax($columnDto->getNumberMax());
 			$item->setNumberDecimals($columnDto->getNumberDecimals());
-			if ($columnDto->getSelectionOptions() !== null) {
-				$item->setSelectionOptions($columnDto->getSelectionOptions());
-			}
-			if ($columnDto->getSelectionDefault() !== null) {
-				$item->setSelectionDefault($columnDto->getSelectionDefault());
+			if ($columnDto->getSelectionOptions() !== null || $columnDto->getSelectionDefault() !== null) {
+				$item->setSelectionOptionsCollection(SelectionOptions::createFromInputJsonString(
+					$columnDto->getSelectionOptions(), $columnDto->getSelectionDefault())
+				);
 			}
 			$item->setDatetimeDefault($columnDto->getDatetimeDefault());
 
@@ -411,7 +450,26 @@ class ColumnService extends SuperService {
 			$item->setCustomSettings($columnDto->getCustomSettings());
 
 			$this->updateMetadata($item, $userId);
-			return $this->enhanceColumn($this->mapper->update($item));
+			try {
+				$updatedColumn = $this->mapper->update($item);
+
+				$this->activityManager->triggerEvent(
+					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+					object: $updatedColumn,
+					subject: ActivityManager::SUBJECT_COLUMN_UPDATE,
+					author: $userId ?? $this->userId,
+				);
+				$this->notificationHelper->sendNotification(
+					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+					object: $updatedColumn,
+					subject: ActivityManager::SUBJECT_COLUMN_UPDATE,
+					author: $userId ?? $this->userId,
+				);
+
+				return $this->enhanceColumn($updatedColumn);
+			} catch (\OCP\DB\Exception $e) {
+				$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+			}
 		} catch (BadRequestError $e) {
 			throw $e;
 		} catch (Exception $e) {
@@ -533,7 +591,6 @@ class ColumnService extends SuperService {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
-			$this->viewService->deleteColumnDataFromViews($id, $table);
 		}
 
 		try {
@@ -542,6 +599,24 @@ class ColumnService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $item,
+			subject: ActivityManager::SUBJECT_COLUMN_DELETE,
+			author: $userId ?? $this->userId,
+		);
+		$this->notificationHelper->sendNotification(
+			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
+			object: $item,
+			subject: ActivityManager::SUBJECT_COLUMN_DELETE,
+			author: $userId ?? $this->userId,
+		);
+
+		if (!$skipRowCleanup) {
+			$this->viewService->deleteColumnDataFromViews($id, $table);
+		}
+
 		return $this->enhanceColumn($item);
 	}
 
@@ -672,8 +747,18 @@ class ColumnService extends SuperService {
 	 */
 	public function importColumn(Table $table, array $column): int {
 		$item = new Column();
+		if (isset($column['uuid'])) {
+			$uuid = (string)$column['uuid'];
+			if ($uuid === '') {
+				$uuid = null;
+			} elseif (!Uuid::isValid($uuid)) {
+				throw new \InvalidArgumentException('Invalid UUID provided');
+			}
+		}
+		$item->setUuid($uuid ?? null);
 		$item->setTableId($table->getId());
 		$item->setTitle($column['title']);
+		$item->setTechnicalName($column['technicalName'] ?? null);
 		$item->setCreatedBy($table->getOwnership());
 		$item->setCreatedAt($column['createdAt']);
 		$item->setLastEditBy($table->getOwnership());
@@ -692,8 +777,7 @@ class ColumnService extends SuperService {
 		$item->setTextAllowedPattern($column['textAllowedPattern']);
 		$item->setTextMaxLength($column['textMaxLength']);
 		$item->setTextUnique($column['textUnique']);
-		$item->setSelectionOptions(json_encode($column['selectionOptions']));
-		$item->setSelectionDefault($column['selectionDefault']);
+		$item->setSelectionOptionsCollection(SelectionOptions::createFromInputArray($column['selectionOptions'], $column['selectionDefault']));
 		$item->setDatetimeDefault($column['datetimeDefault']);
 		$item->setUsergroupDefault(json_encode($column['usergroupDefault']));
 		$item->setUsergroupMultipleItems($column['usergroupMultipleItems']);
@@ -705,10 +789,35 @@ class ColumnService extends SuperService {
 
 		try {
 			$newColumn = $this->mapper->insert($item);
+			if ($newColumn->getTechnicalName() === null || $newColumn->getTechnicalName() === '') {
+				$newColumn->setTechnicalName($this->buildDefaultTechnicalName($newColumn->getId()));
+				$newColumn = $this->mapper->update($newColumn);
+			}
+		} catch (BadRequestError $e) {
+			throw $e;
+		} catch (\OCP\DB\Exception $e) {
+			$this->handleColumnPersistDbException($e, 'importColumn insert error');
 		} catch (\Exception $e) {
 			$this->logger->error('importColumn insert error: ' . $e->getMessage());
 			throw new InternalError('importColumn insert error: ' . $e->getMessage());
 		}
 		return $newColumn->getId();
+	}
+
+	private function buildDefaultTechnicalName(int $columnId): string {
+		return 'column_' . $columnId;
+	}
+
+	/**
+	 * @throws BadRequestError
+	 * @throws InternalError
+	 */
+	private function handleColumnPersistDbException(\OCP\DB\Exception $e, string $context): never {
+		if ($e->getReason() === \OCP\DB\Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+			throw new BadRequestError('Technical name must be unique in the table.');
+		}
+
+		$this->logger->error($e->getMessage(), ['exception' => $e]);
+		throw new InternalError($context . ': ' . $e->getMessage());
 	}
 }

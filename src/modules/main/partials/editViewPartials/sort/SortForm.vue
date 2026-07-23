@@ -33,6 +33,7 @@
 					:sort-entry="sortingRule"
 					:columns="eligibleColumns(sortingRule.columnId)"
 					:class="{'locallyAdded': isLocallyAdded(sortingRule)}"
+					@update:sort-entry="updateSortingRule(i, $event)"
 					@delete-sorting-rule="deleteSortingRule(i)" />
 			</div>
 			<NcButton
@@ -82,9 +83,12 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update:sort',
+	],
 	data() {
 		return {
-			mutableSort: this.sort,
+			mutableSort: [...(this.sort ?? [])],
 		}
 	},
 	computed: {
@@ -100,13 +104,14 @@ export default {
 		},
 	},
 	watch: {
-		mutableSort() {
-			this.$emit('update:sort', this.mutableSort)
+		sort() {
+			this.mutableSort = [...(this.sort ?? [])]
 		},
 	},
 	methods: {
 		reactiveSortingRule(entry) {
 			this.mutableSort.unshift(entry)
+			this.emitUpdate()
 		},
 		isLocallyAdded(entry) {
 			if (this.hadHiddenSortingRules || !this.viewSort || !this.generatedSort) return false
@@ -138,13 +143,22 @@ export default {
 		},
 		deleteSortingRule(index) {
 			this.mutableSort.splice(index, 1)
+			this.emitUpdate()
 		},
 		addSortingRule() {
 			this.mutableSort.push({ columnId: null, mode: 'ASC' })
+			this.emitUpdate()
+		},
+		updateSortingRule(index, sortingRule) {
+			this.mutableSort.splice(index, 1, sortingRule)
+			this.emitUpdate()
 		},
 		overrideRules() {
 			this.mutableSort.splice(0, this.mutableSort.length)
 			this.addSortingRule()
+		},
+		emitUpdate() {
+			this.$emit('update:sort', [...this.mutableSort])
 		},
 	},
 }

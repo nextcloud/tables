@@ -501,7 +501,7 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function getShare(int $shareId): DataResponse {
 		try {
-			return new DataResponse($this->shareService->find($shareId)->jsonSerialize());
+			return new DataResponse($this->shareService->formatForOutput($this->shareService->find($shareId))->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -608,7 +608,7 @@ class Api1Controller extends ApiController {
 	): DataResponse {
 		try {
 			return new DataResponse(
-				$this->shareService->create(new ShareCreate(
+				$this->shareService->formatForOutput($this->shareService->create(new ShareCreate(
 					$nodeId,
 					$nodeType,
 					$receiver,
@@ -619,7 +619,7 @@ class Api1Controller extends ApiController {
 					$permissionDelete,
 					$permissionManage,
 					$displayMode
-				))->jsonSerialize()
+				)))->jsonSerialize()
 			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
@@ -652,7 +652,7 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function deleteShare(int $shareId): DataResponse {
 		try {
-			return new DataResponse($this->shareService->delete($shareId)->jsonSerialize());
+			return new DataResponse($this->shareService->formatForOutput($this->shareService->delete($shareId))->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -686,7 +686,7 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
 		try {
-			return new DataResponse($this->shareService->updatePermission($shareId, [$permissionType => $permissionValue])->jsonSerialize());
+			return new DataResponse($this->shareService->formatForOutput($this->shareService->updatePermission($shareId, [$permissionType => $permissionValue]))->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -901,6 +901,7 @@ class Api1Controller extends ApiController {
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -941,6 +942,7 @@ class Api1Controller extends ApiController {
 		?int $tableId,
 		?int $viewId,
 		string $title,
+		?string $technicalName,
 		string $type,
 		?string $subtype,
 		bool $mandatory,
@@ -979,6 +981,7 @@ class Api1Controller extends ApiController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::from($type)->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
@@ -1034,6 +1037,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $columnId Column ID that will be updated
 	 * @param string|null $title Title
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1071,6 +1075,7 @@ class Api1Controller extends ApiController {
 	public function updateColumn(
 		int $columnId,
 		?string $title,
+		?string $technicalName,
 		?string $subtype,
 		?bool $mandatory,
 		?string $description,
@@ -1106,6 +1111,7 @@ class Api1Controller extends ApiController {
 				$this->userId,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					subtype: $subtype,
 					mandatory: $mandatory,
 					description: $description,
@@ -1645,7 +1651,7 @@ class Api1Controller extends ApiController {
 	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
 		try {
 			return new DataResponse(
-				$this->shareService->create(new ShareCreate(
+				$this->shareService->formatForOutput($this->shareService->create(new ShareCreate(
 					$tableId,
 					'table',
 					$receiver,
@@ -1656,7 +1662,7 @@ class Api1Controller extends ApiController {
 					$permissionDelete,
 					$permissionManage,
 					Application::NAV_ENTRY_MODE_ALL
-				))->jsonSerialize()
+				)))->jsonSerialize()
 			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
@@ -1679,6 +1685,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1719,6 +1726,7 @@ class Api1Controller extends ApiController {
 	public function createTableColumn(
 		int $tableId,
 		string $title,
+		?string $technicalName,
 		string $type,
 		?string $subtype,
 		bool $mandatory,
@@ -1757,6 +1765,7 @@ class Api1Controller extends ApiController {
 				null,
 				new ColumnDto(
 					title: $title,
+					technicalName: $technicalName,
 					type: ColumnType::from($type)->value,
 					subtype: $subtype,
 					mandatory: $mandatory,

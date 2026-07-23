@@ -1,11 +1,11 @@
 <!--
-  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
-  - SPDX-License-Identifier: AGPL-3.0-or-later
+	- SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcAppNavigationItem v-if="table" data-cy="navigationTableItem" :name="table.title"
-		:class="{ active: activeTable && table.id === activeTable.id }" :allow-collapse="hasViews" :force-menu="true"
-		:open.sync="isParentOfActiveView" :to="'/table/' + parseInt(table.id)" @click="openTable">
+	<NcAppNavigationItem v-if="table" v-model:open="isParentOfActiveView" data-cy="navigationTableItem"
+		:name="table.title" :class="{ active: activeTable && table.id === activeTable.id }" :allow-collapse="hasViews"
+		:force-menu="true" :to="'/table/' + parseInt(table.id)" @click="openTable">
 		<template #icon>
 			<template v-if="table.emoji">
 				{{ table.emoji }}
@@ -17,9 +17,7 @@
 		</template>
 
 		<template #counter>
-			<NcCounterBubble v-if="canReadData(table)">
-				{{ table.rowsCount }}
-			</NcCounterBubble>
+			<NcCounterBubble v-if="canReadData(table)" :count="table.rowsCount" />
 			<NcActionButton v-if="table.hasShares" icon="icon-share"
 				:class="{ 'margin-right': !(activeTable && table.id === activeTable.id) }" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
@@ -29,12 +27,12 @@
 
 		<template #actions>
 			<!-- EDIT -->
-			<NcActionButton v-if="canManageElement(table)" :close-after-click="true"
+			<NcActionButton :close-after-click="true"
 				@click="emit('tables:table:edit', table.id)">
 				<template #icon>
 					<IconRename :size="20" decorative />
 				</template>
-				{{ t('tables', 'Edit table') }}
+				{{ t('tables', 'Table settings') }}
 			</NcActionButton>
 
 			<!-- CREATE VIEW -->
@@ -67,6 +65,7 @@
 					<TrayArrowDown :size="20" />
 				</template>
 			</NcActionButton>
+
 			<!-- INTEGRATION -->
 			<NcActionButton :close-after-click="true" @click="actionShowIntegration">
 				{{ t('tables', 'Integration') }}
@@ -179,16 +178,6 @@ export default {
 		PlaylistPlus,
 		DeleteOutline,
 		ActivityIcon,
-	},
-
-	filters: {
-		truncate(string, num) {
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
 	},
 
 	mixins: [permissionsMixin, activityMixin],

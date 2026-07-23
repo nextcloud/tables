@@ -13,7 +13,7 @@
 			:close-on-select="false"
 			:multiple="column.usergroupMultipleItems"
 			data-cy="usergroupRowSelect"
-			@search="asyncFind" @input="addItem">
+			@search="asyncFind" @update:model-value="addItem">
 			<template #noResult>
 				{{ noResultText }}
 			</template>
@@ -43,6 +43,9 @@ export default {
 			default: () => ([]),
 		},
 	},
+	emits: [
+		'update:value',
+	],
 	data() {
 		return {
 			selectUsers: this.column.usergroupSelectUsers,

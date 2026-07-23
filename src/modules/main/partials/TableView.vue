@@ -4,12 +4,12 @@
 -->
 <template>
 	<NcTable v-if="columns.length > 0"
+		v-model:view-setting="localViewSetting"
 		:rows="rows"
 		:columns="columns"
 		:element-id="element.id"
 		:is-view="isView"
 		:download-title="element.title"
-		:view-setting.sync="localViewSetting"
 		:can-read-rows="canReadRows"
 		:can-create-rows="canCreateRows"
 		:can-edit-rows="canEditRows"
@@ -108,6 +108,10 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'download-filtered-csv',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			localViewSetting: this.viewSetting,

@@ -31,6 +31,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'update:description',
+	],
 	data() {
 		return {
 			mode: 'view',
@@ -47,7 +50,7 @@ export default {
 			this.setupEditor()
 		}
 	},
-	async beforeDestroy() {
+	async beforeUnmount() {
 		await this.destroyEditor()
 	},
 	methods: {

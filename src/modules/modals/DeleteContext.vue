@@ -37,6 +37,9 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'cancel',
+	],
 	computed: {
 		...mapState(useTablesStore, ['activeContextId']),
 		getTranslatedDescription() {

@@ -39,7 +39,7 @@ class SettingChanges extends ActivitySettings {
 	 * @since 20.0.0
 	 */
 	public function getName(): string {
-		return $this->l->t('A <strong>table or row</strong> was changed');
+		return $this->l->t('A <strong>table or view</strong> was changed');
 	}
 
 	/**

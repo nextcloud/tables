@@ -9,8 +9,8 @@
 			<div class="fix-col-4">
 				{{ t('tables', 'Default') }}
 			</div>
-			<div class="fix-col-4 space-L-small">
-				<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.selectionDefault" data-cy="selectionCheckFormDefaultSwitch" />
+			<div class="fix-col-4 space-L-small" data-cy="selectionCheckFormDefaultSwitch">
+				<NcCheckboxRadioSwitch v-model="mutableColumn.selectionDefault" type="switch" />
 			</div>
 		</div>
 	</div>

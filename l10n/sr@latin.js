@@ -34,6 +34,7 @@ OC.L10N.register(
     "Close" : "Zatvori",
     "Please select a file." : "Izaberite fajl. ",
     "Failed" : "Nije uspelo",
+    "Saving..." : "Upisujem...",
     "Copy" : "Kopiraj",
     "Favorites" : "Omiljene",
     "group" : "grupa",

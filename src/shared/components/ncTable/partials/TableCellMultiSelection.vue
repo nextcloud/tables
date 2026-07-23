@@ -63,6 +63,10 @@ export default {
 		},
 	},
 
+	emits: [
+		'input',
+		'update:value',
+	],
 	data() {
 		return {
 			localEditValues: [],

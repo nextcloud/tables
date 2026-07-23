@@ -131,6 +131,12 @@ export default {
 		},
 	},
 
+	emits: [
+		'create-row',
+		'delete-selected-rows',
+		'download-filtered-csv',
+		'set-search-string',
+	],
 	data() {
 		return {
 			optionsDivWidth: null,
@@ -161,7 +167,7 @@ export default {
 		window.addEventListener('resize', this.updateOptionsDivWidth)
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener('resize', this.updateOptionsDivWidth)
 	},
 

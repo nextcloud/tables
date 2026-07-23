@@ -36,6 +36,9 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'cancel',
+	],
 	computed: {
 		...mapState(useTablesStore, ['activeView', 'isView']),
 		getTranslatedDescription() {

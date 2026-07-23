@@ -76,6 +76,7 @@ class ShareControlMiddleware extends Middleware {
 	public function assertShareTokenIsValidAndExisting(string $tokenInput): void {
 		$shareToken = new ShareToken($tokenInput);
 		$this->share = $this->shareService->findByToken($shareToken);
+		$this->shareService->assertPublicShareAccessible($this->share);
 	}
 
 	public function afterException($controller, $methodName, \Exception $exception): DataResponse {
