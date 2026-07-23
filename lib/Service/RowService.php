@@ -872,6 +872,25 @@ class RowService extends SuperService {
 	}
 
 	/**
+	 * @param int[] $tableIds
+	 * @return array<int, int>
+	 */
+	public function getRowsCountForTables(array $tableIds): array {
+		$readableTableIds = array_values(array_filter(
+			$tableIds,
+			fn (int $tableId): bool => $this->permissionsService->canReadRowsByElementId($tableId, 'table'),
+		));
+
+		$counts = $this->row2Mapper->countRowsForTables($readableTableIds);
+
+		$result = [];
+		foreach ($tableIds as $tableId) {
+			$result[$tableId] = $counts[$tableId] ?? 0;
+		}
+		return $result;
+	}
+
+	/**
 	 * @param View $view
 	 * @param string $userId
 	 * @return int
