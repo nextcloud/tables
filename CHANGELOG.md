@@ -5,6 +5,59 @@
 
 # Changelog
 
+## 2.2.1
+
+### Added
+* [Feat: add relation column type (tables#2248)](https://github.com/nextcloud/tables/pull/2248)
+* [#1840: API structure improvement: expose columns through a technical name/slug/alias (tables#2428)](https://github.com/nextcloud/tables/pull/2428)
+* [feat(Analytics): enhance datasource (tables#2554)](https://github.com/nextcloud/tables/pull/2554)
+* [Feat: add UUIDs to columns (tables#2598)](https://github.com/nextcloud/tables/pull/2598)
+* [Feat: add notifications (tables#2681)](https://github.com/nextcloud/tables/pull/2681)
+
+### Fixed
+* [Revert: timezone conversion intended for meta fields, accidentally broke datetime columns (tables#2583)](https://github.com/nextcloud/tables/pull/2583)
+* [Fix does not contains function (tables#2670)](https://github.com/nextcloud/tables/pull/2670)
+* [Fix Add 'does-not-contain' condition to Row2Mapper (tables#2671)](https://github.com/nextcloud/tables/pull/2671)
+* [Fix: Avoid saving whitespace titles (tables#2684)](https://github.com/nextcloud/tables/pull/2684)
+* [Fix: flaky Playwright tests (tables#2689)](https://github.com/nextcloud/tables/pull/2689)
+* [Fix respect view column order in public sharing (tables#2701)](https://github.com/nextcloud/tables/pull/2701)
+* [Fix: Chunk IN clause to <1000 items for oracle compatibility (tables#2713)](https://github.com/nextcloud/tables/pull/2713)
+* [Apply remove share for users/teams/groups (tables#2728)](https://github.com/nextcloud/tables/pull/2728)
+* [Fix: update wording for relation column label selection prompts (tables#2729)](https://github.com/nextcloud/tables/pull/2729)
+* [Fix: align share response with documented response definition (tables#2838)](https://github.com/nextcloud/tables/pull/2838)
+
+### Other
+* [Perf: Do not recreate `Cell` entity just for formatting value (tables#2238)](https://github.com/nextcloud/tables/pull/2238)
+* [Perf: cache shared view permission lookups (tables#2586)](https://github.com/nextcloud/tables/pull/2586)
+* [Build: bump PHP requirement for deps to at least 8.2 (tables#2594)](https://github.com/nextcloud/tables/pull/2594)
+* [Update agent info (tables#2704)](https://github.com/nextcloud/tables/pull/2704)
+* [Enh: update max-version to NC 35 (tables#2710)](https://github.com/nextcloud/tables/pull/2710)
+* [Add AI policy check (tables#2712)](https://github.com/nextcloud/tables/pull/2712)
+* [Docs(AI): Adjust git commit strategy as per org policy (tables#2717)](https://github.com/nextcloud/tables/pull/2717)
+* [Chore: add useBaseBranchConfig option to renovate configuration (tables#2761)](https://github.com/nextcloud/tables/pull/2761)
+* [Docs: Update author to generic variant (tables#2766)](https://github.com/nextcloud/tables/pull/2766)
+* [Ci/noid/sync workflows (tables#2787)](https://github.com/nextcloud/tables/pull/2787)
+* [Ci: update workflows from templates (tables#2805)](https://github.com/nextcloud/tables/pull/2805)
+* [Perf: Don't fetch full group information (tables#2809)](https://github.com/nextcloud/tables/pull/2809)
+* [main: Update nextcloud/ocp dependency (tables#2812)](https://github.com/nextcloud/tables/pull/2812)
+* [Refactor(Share): move utility function from Controller to Service (tables#2814)](https://github.com/nextcloud/tables/pull/2814)
+
+### Dependencies
+* [Chore(deps): update shivammathur/setup-php action to v2.37.2 (main) (tables#2732)](https://github.com/nextcloud/tables/pull/2732)
+* [Chore(deps): update alexwilson/enable-github-automerge-action action to v3 (main) (tables#2737)](https://github.com/nextcloud/tables/pull/2737)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.62.2 (main) (tables#2769)](https://github.com/nextcloud/tables/pull/2769)
+* [Chore(deps): update actions/checkout action to v7 (main) (tables#2782)](https://github.com/nextcloud/tables/pull/2782)
+* [Chore(deps): update dependency @playwright/test to ^1.61.1 (main) (tables#2788)](https://github.com/nextcloud/tables/pull/2788)
+* [Chore(deps): update dependency cypress-vite to ^1.10.2 (main) (tables#2789)](https://github.com/nextcloud/tables/pull/2789)
+* [Chore(deps): update dependency vite to ^7.3.6 (main) (tables#2790)](https://github.com/nextcloud/tables/pull/2790)
+* [Chore(deps): update dependency cypress to ^15.18.0 (main) (tables#2792)](https://github.com/nextcloud/tables/pull/2792)
+* [main: Fix npm audit (tables#2798)](https://github.com/nextcloud/tables/pull/2798)
+* [Chore(deps): update nextcloud/pr-feedback-action digest to c8c97a6 (main) (tables#2801)](https://github.com/nextcloud/tables/pull/2801)
+* [Chore(deps): update cypress-io/github-action action to v7.4.1 (main) (tables#2802)](https://github.com/nextcloud/tables/pull/2802)
+* [Fix(deps): update dependency @material-symbols/svg-400 to ^0.45.7 (main) (tables#2822)](https://github.com/nextcloud/tables/pull/2822)
+* [Fix(deps): update tiptap to ^3.27.4 (main) (tables#2823)](https://github.com/nextcloud/tables/pull/2823)
+* [Fix(deps): update dependency dompurify to ^3.4.12 (main) (tables#2826)](https://github.com/nextcloud/tables/pull/2826)
+
 ## 2.2.0
 
 ### Added
