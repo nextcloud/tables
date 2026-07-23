@@ -5,7 +5,7 @@
 
 import { test, expect } from '../support/fixtures'
 import { createRandomUser } from '../support/api'
-import { clickOnNavigationTableMenu, clickOnTableThreeDotMenu, createTable, createTextLineColumn, deleteTable, loadTable } from '../support/commands'
+import { clickOnNavigationTableMenu, clickOnTableThreeDotMenu, createTable, createTextLineColumn, deleteTable, fillInValueTextLine, loadTable, openCreateRowModal } from '../support/commands'
 import { login } from '../support/login'
 
 test.describe('Manage a table', () => {
@@ -156,6 +156,16 @@ test.describe('Manage a table', () => {
 		await createTable(page, 'Default sort test table')
 		await createTextLineColumn(page, 'name', '', '', true)
 
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'name', 'alpha')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'name', 'bravo')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toContainText('alpha')
+
 		await clickOnTableThreeDotMenu(page, 'Table settings')
 
 		await expect(page.locator('[data-cy="editTableModal"]')).toBeVisible()
@@ -185,5 +195,9 @@ test.describe('Manage a table', () => {
 		expect(body.ocs.data.sort[0].mode).toBe('DESC')
 
 		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
+
+		await page.reload()
+		await expect(page.locator('h1').filter({ hasText: 'Default sort test table' })).toBeVisible()
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toContainText('bravo')
 	})
 })

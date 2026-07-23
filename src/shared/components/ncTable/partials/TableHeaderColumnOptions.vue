@@ -74,7 +74,7 @@
 					v-for="(magicField, index) in getMagicFields"
 					:key="'magic-field-' + index"
 					:value="magicField.id"
-					:checked="index === 0"
+					:model-value="index === 0"
 					:icon="magicField.icon"
 					@click="submitMagicField(magicField)">
 					{{ magicField.label }}

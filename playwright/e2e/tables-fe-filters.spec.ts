@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from '../support/fixtures'
-import { createTable, createTextLineColumn, createView, ensureNavigationOpen, loadTable, loadView, sortTableColumn } from '../support/commands'
+import { createTable, createTextLineColumn, createView, ensureNavigationOpen, fillInValueTextLine, loadTable, loadView, openCreateRowModal, sortTableColumn } from '../support/commands'
 
 test.describe('FE sorting and filtering', () => {
 
@@ -60,6 +60,31 @@ test.describe('FE sorting and filtering', () => {
 		await expect(page.locator('.info').filter({ hasText: 'Reset local adjustments' })).toBeVisible()
 		await loadView(page, 'view for second table')
 		await expect(page.locator('.info').filter({ hasText: 'Reset local adjustments' })).toBeHidden()
+	})
+
+	test('Save FE sort as view sort', async ({ userPage: { page } }) => {
+		await page.goto('/index.php/apps/tables')
+		await createTable(page, 'FE sort view table')
+		await createTextLineColumn(page, 'name', '', '', true)
+
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'name', 'bravo')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, 'name', 'alpha')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toContainText('bravo')
+
+		await sortTableColumn(page, 'name')
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toContainText('alpha')
+
+		await createView(page, 'FE sort saved view')
+		await page.reload()
+
+		await expect(page.locator('h1').filter({ hasText: 'FE sort saved view' })).toBeVisible()
+		await expect(page.locator('[data-cy="customTableRow"]').first()).toContainText('alpha')
 	})
 
 	test('Navigation filtering', async ({ userPage: { page } }) => {
