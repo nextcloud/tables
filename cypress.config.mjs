@@ -7,7 +7,7 @@ import vitePreprocessor from 'cypress-vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import vue from '@vitejs/plugin-vue2'
 
-const baseUrl = process.env.CYPRESS_baseUrl ?? 'http://127.0.0.1:8089/index.php/'
+const baseUrl = process.env.CYPRESS_baseUrl ?? 'https://nextcloud.local/index.php/'
 
 export default defineConfig({
 	allowCypressEnv: false,

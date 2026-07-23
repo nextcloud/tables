@@ -5,25 +5,22 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ shareHeading }}</h3>
-		<NcSelect id="ajax" style="width: 100%;" :clear-on-select="true"
-			data-cy="shareFormSelect" :hide-selected="true" :internal-search="false"
-			:loading="loading" :options="options" :placeholder="selectPlaceholder" :preselect-first="true"
-			:preserve-search="true" :searchable="true" :user-select="true" :get-option-key="(option) => option.key"
-			:aria-label-combobox="selectPlaceholder" label="displayName" @search="asyncFind" @input="addShare">
-			<template #no-options>
-				{{ t('tables', 'No recommendations. Start typing.') }}
-			</template>
-			<template #noResult>
-				{{ noResultText }}
-			</template>
-		</NcSelect>
+		<NcSelectUsers
+			v-model="selectedShare"
+			style="width: 100%;"
+			data-cy="shareFormSelect"
+			:loading="loading"
+			:options="options"
+			:placeholder="selectPlaceholder"
+			:aria-label-combobox="selectPlaceholder"
+			@search="asyncFind" />
 	</div>
 </template>
 
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { NcSelect } from '@nextcloud/vue'
+import { NcSelectUsers } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
@@ -34,7 +31,7 @@ import { useTablesStore } from '../../../store/store.js'
 export default {
 	name: 'ShareForm',
 	components: {
-		NcSelect,
+		NcSelectUsers,
 	},
 
 	mixins: [formatting, ShareTypes, searchUserGroup],
@@ -56,6 +53,16 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		selectRemote: {
+			type: Boolean,
+			default: true,
+		},
+	},
+
+	data() {
+		return {
+			selectedShare: null,
+		}
 	},
 
 	computed: {
@@ -71,6 +78,24 @@ export default {
 			return this.isCirclesEnabled
 				? t('tables', 'User, group or team …')
 				: t('tables', 'User or group …')
+		},
+
+		sourceToShareType() {
+			return {
+				users: this.SHARE_TYPES.SHARE_TYPE_USER,
+				groups: this.SHARE_TYPES.SHARE_TYPE_GROUP,
+				circles: this.SHARE_TYPES.SHARE_TYPE_CIRCLE,
+				remotes: this.SHARE_TYPES.SHARE_TYPE_REMOTE,
+			}
+		},
+	},
+
+	watch: {
+		selectedShare(share) {
+			if (share) {
+				this.addShare(share)
+				this.selectedShare = null
+			}
 		},
 	},
 
@@ -120,6 +145,7 @@ export default {
 				[this.SHARE_TYPES.SHARE_TYPE_USER]: 'user',
 				[this.SHARE_TYPES.SHARE_TYPE_GROUP]: 'group',
 				...(this.isCirclesEnabled ? { [this.SHARE_TYPES.SHARE_TYPE_CIRCLE]: 'circle' } : {}),
+				[this.SHARE_TYPES.SHARE_TYPE_REMOTE]: 'remote',
 			}
 
 			// Filter out current user and sort
@@ -144,29 +170,14 @@ export default {
 		},
 
 		formatResult(result) {
-			const isUser = result.source.startsWith('users')
-			const isGroup = result.source.startsWith('groups')
-			const isCircle = !isUser && !isGroup && this.isCirclesEnabled
-
 			return {
-				shareWith: result.id,
-				shareType: isUser
-					? this.SHARE_TYPES.SHARE_TYPE_USER
-					: isGroup
-						? this.SHARE_TYPES.SHARE_TYPE_GROUP
-						: isCircle
-							? this.SHARE_TYPES.SHARE_TYPE_CIRCLE
-							: this.SHARE_TYPES.SHARE_TYPE_USER,
+				id: result.id,
 				user: result.id,
-				isNoUser: !isUser,
 				displayName: result.label,
-				icon: isUser
-					? 'icon-user'
-					: isGroup
-						? 'icon-group'
-						: isCircle
-							? 'icon-circles'
-							: 'icon-user',
+				subname: result.shareWithDisplayNameUnique || result.subline || result.id,
+				shareWith: result.id,
+				shareType: this.sourceToShareType[result.source] ?? this.SHARE_TYPES.SHARE_TYPE_USER,
+				isNoUser: !result.source.startsWith('users'),
 				key: result.source + '-' + result.id,
 			}
 		},
@@ -178,26 +189,15 @@ export default {
 		 * @return {object}
 		 */
 		formatRecommendations(result) {
-			const isUser = result.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
-			const isGroup = result.value.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP
-			const isCircle = !isUser && !isGroup && this.isCirclesEnabled
-
 			return {
+				id: result.uuid || result.value.shareWith,
+				user: result.uuid || result.value.shareWith,
+				displayName: result.name || result.label,
+				subname: result.value.shareWith,
 				shareWith: result.value.shareWith,
 				shareType: result.value.shareType,
-				user: result.uuid || result.value.shareWith,
-				isNoUser: !isUser,
-				displayName: result.name || result.label,
-				icon: isUser
-					? 'icon-user'
-					: isGroup
-						? 'icon-group'
-						: isCircle
-							? 'icon-circle'
-							: 'icon-user',
-				key: result.uuid || result.value.shareWith + '-'
-					+ result.value.shareType + '-'
-					+ (result.name || result.label),
+				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
+				key: result.uuid || result.value.shareWith + '-' + result.value.shareType,
 			}
 		},
 

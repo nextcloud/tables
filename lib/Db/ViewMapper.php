@@ -42,7 +42,7 @@ class ViewMapper extends QBMapper {
 			$qb = $this->db->getQueryBuilder();
 			$qb->select('v.*', 't.ownership')
 				->from($this->table, 'v')
-				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+				->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
 				->where($qb->expr()->eq('v.id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 			$entity = $this->findEntity($qb);
 			$this->cache[$cacheKey] = $entity;
@@ -75,7 +75,7 @@ class ViewMapper extends QBMapper {
 			$qb = $this->db->getQueryBuilder();
 			$qb->select('v.*', 't.ownership')
 				->from($this->table, 'v')
-				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+				->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
 				->where($qb->expr()->in('v.id', $qb->createNamedParameter($missingChunk, IQueryBuilder::PARAM_INT_ARRAY)));
 
 			foreach ($this->findEntities($qb) as $entity) {
@@ -85,6 +85,32 @@ class ViewMapper extends QBMapper {
 			}
 		}
 		return $result;
+	}
+
+	public function findByExternalIdAndToken(int $externalId, string $shareToken): ?View {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('external_id', $qb->createNamedParameter($externalId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('share_token', $qb->createNamedParameter($shareToken, IQueryBuilder::PARAM_STR)));
+		try {
+			return $this->findEntity($qb);
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
+
+	public function isFederated(int $id): bool {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->isNotNull('external_id'))
+			->andWhere($qb->expr()->isNotNull('share_token'));
+		$result = $qb->executeQuery();
+		$exists = $result->fetchOne() !== false;
+		$result->closeCursor();
+		return $exists;
 	}
 
 	public function delete(Entity $entity): View {

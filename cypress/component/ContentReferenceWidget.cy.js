@@ -81,10 +81,12 @@ describe('ContentReferenceWidget', () => {
 		// Load a fixture which is used to reply to the edit row request
 		cy.fixture('widgets/editRow.json')
 			.then((rowData) => {
-				cy.reply('**/index.php/apps/tables/row/*', rowData)
+				cy.reply('**/ocs/v2.php/apps/tables/api/2/**/rows/*', rowData)
 
 				const updatedRows = richObject.rows.map(row => row.id === rowData.id ? rowData : row)
-				cy.reply('**/apps/tables/row/table/*', updatedRows)
+				cy.intercept('GET', '**/apps/tables/row/table/*', (req) => {
+					req.reply({ delay: 1000, body: updatedRows })
+				})
 			})
 
 		// Open the row action menu on the first row, then click Edit

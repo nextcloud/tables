@@ -156,8 +156,6 @@ return [
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
 
-		['name' => 'RowOCS#createRow',	'url' => '/api/2/{nodeCollection}/{nodeId}/rows', 'verb' => 'POST', 'requirements' => ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)']],
-
 		['name' => 'Config#getTableConfig', 'url' => '/api/2/config/table/{id}', 'verb' => 'GET'],
 		['name' => 'Config#getViewConfig', 'url' => '/api/2/config/view/{id}', 'verb' => 'GET'],
 		['name' => 'Config#setValue', 'url' => '/api/2/config/{key}', 'verb' => 'POST'],

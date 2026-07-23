@@ -15,4 +15,5 @@ class ShareReceiverType {
 	public const GROUP = 'group';
 	public const CIRCLE = 'circle';
 	public const LINK = 'link';
+	public const REMOTE = 'remote';
 }
