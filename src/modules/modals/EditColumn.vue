@@ -71,6 +71,7 @@ import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTyp
 import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
 import RelationForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationForm.vue'
+import RelationLookupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationLookupForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
@@ -103,6 +104,7 @@ export default {
 		NcUserBubble,
 		UsergroupForm,
 		RelationForm,
+		RelationLookupForm,
 	},
 	props: {
 		column: {

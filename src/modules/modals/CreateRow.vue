@@ -9,15 +9,15 @@
 		data-cy="createRowModal"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
-			<div v-for="column in nonMetaColumns" :key="column.id" :data-cy="column.title">
+			<div v-for="column in nonMetaColumns" :key="column.getValueColumnId()" :data-cy="column.title">
 				<ColumnFormComponent
-					v-model:value="row[column.id]"
+					v-model:value="row[column.getValueColumnId()]"
 					:column="column" />
-				<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(row[column.id], column)"
+				<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(row[column.getValueColumnId()], column)"
 					type="error">
 					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
 				</NcNoteCard>
-				<NcNoteCard v-if="row[column.id] && column.type === 'text-link' && !isValidUrlProtocol(row[column.id])"
+				<NcNoteCard v-if="row[column.getValueColumnId()] && column.type === 'text-link' && !isValidUrlProtocol(row[column.getValueColumnId()])"
 					type="error">
 					{{ t('tables', 'Invalid protocol. Allowed: {allowed}', {allowed: allowedProtocols.join(', ')}) }}
 				</NcNoteCard>
@@ -104,7 +104,7 @@ export default {
 			return this.checkMandatoryFields(this.row)
 		},
 		hasInvalidUrlProtocol() {
-			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.row[col.id]))
+			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.row[col.getValueColumnId()]))
 		},
 		dialogTitle() {
 			return this.isFormMode ? t('tables', 'Fill form') : t('tables', 'Create row')

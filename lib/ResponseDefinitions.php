@@ -237,6 +237,8 @@ namespace OCA\Tables;
  *     notify-column: bool,
  *     notify-row: bool,
  * }
+ *
+ * @psalm-type TablesRelationData = list<array{column: ?TablesColumn, values: list<array{id: int, value: mixed}>}>
  */
 class ResponseDefinitions {
 }

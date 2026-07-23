@@ -834,7 +834,8 @@ class Api1Controller extends ApiController {
 	 * Get all relation data for a table
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRelationData, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @psalm-return DataResponse<Http::STATUS_OK, list<array{column: ?TablesColumn, values: list<array{id: int, value: mixed}>}>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Relation data returned
 	 * 403: No permissions
@@ -844,6 +845,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableRelations(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->relationService->getRelationsForTable($tableId));
@@ -866,7 +868,8 @@ class Api1Controller extends ApiController {
 	 * Get all relation data for a view
 	 *
 	 * @param int $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRelationData, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @psalm-return DataResponse<Http::STATUS_OK, list<array{column: ?TablesColumn, values: list<array{id: int, value: mixed}>}>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Relation data returned
 	 * 403: No permissions
@@ -876,6 +879,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewRelations(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->relationService->getRelationsForView($viewId));
@@ -900,7 +904,7 @@ class Api1Controller extends ApiController {
 	 * @param int|null $tableId Table ID
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation'|'relation_lookup' $type Column main type
 	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
@@ -1684,7 +1688,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation'|'relation_lookup' $type Column main type
 	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory

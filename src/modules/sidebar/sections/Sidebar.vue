@@ -84,6 +84,9 @@ import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	name: 'Sidebar',
+	setup() {
+		return { IconPersonAdd, IconPersonAddOutline }
+	},
 	components: {
 		NcUserBubble,
 		SidebarActivity,
@@ -99,9 +102,6 @@ export default {
 	},
 
 	mixins: [permissionsMixin, activityMixin],
-	setup() {
-		return { IconPersonAdd, IconPersonAddOutline }
-	},
 
 	data() {
 		return {
