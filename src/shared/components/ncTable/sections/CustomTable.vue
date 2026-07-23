@@ -6,10 +6,10 @@
 	<div class="container">
 		<table class="tables-list__table">
 			<thead class="tables-list__thead">
-				<TableHeader :columns="columns"
+				<TableHeader v-model:view-setting="localViewSetting"
+					:columns="columns"
 					:selected-rows="selectedRows"
 					:rows="rows"
-					:view-setting.sync="localViewSetting"
 					:config="config"
 					:pinned-column-id="pinnedColumnId"
 					:column-widths="columnWidths"
@@ -33,11 +33,11 @@
 				@after-leave="disableRowAnimation">
 				<TableRow v-for="row in currentPageRows"
 					:key="row.id"
+					v-model:view-setting="localViewSetting"
 					data-cy="customTableRow"
 					:row="row"
 					:columns="columns"
 					:selected="isRowSelected(row?.id)"
-					:view-setting.sync="localViewSetting"
 					:config="config"
 					:element-id="elementId"
 					:is-view="isView"
@@ -94,6 +94,18 @@ export default {
 		},
 	},
 
+	emits: [
+		'copy-row',
+		'create-column',
+		'create-row',
+		'delete-column',
+		'delete-row',
+		'download-csv',
+		'edit-column',
+		'edit-row',
+		'update-selected-rows',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			selectedRows: [],
@@ -134,7 +146,7 @@ export default {
 		subscribe('tables:row:animate', this.enableRowAnimation)
 		subscribe('tables:pagination-changed', this.handlePaginationChanged)
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		unsubscribe('tables:row:animate', this.enableRowAnimation)
 		unsubscribe('tables:pagination-changed', this.handlePaginationChanged)
@@ -146,7 +158,7 @@ export default {
 			this.pinnedColumnId = this.pinnedColumnId === columnId ? null : columnId
 		},
 		measureColumnWidths() {
-			const headerRow = this.$el.querySelector('thead tr')
+			const headerRow = this.$el?.querySelector?.('thead tr')
 			if (!headerRow) return
 			const widths = {}
 			headerRow.querySelectorAll('th[data-col-id]').forEach(th => {
@@ -344,7 +356,7 @@ export default {
 
 	thead tr > th.frozen-column {
 		z-index: 6;
-		border-right: 1px solid transparent; // aligns inset shadow with td (which has a 1px border)
+		border-inline-end: 1px solid transparent; // aligns inset shadow with td (which has a 1px border)
 		box-shadow: inset 0 -1px 0 var(--color-border), inset -1px 0 0 var(--color-border-dark);
 	}
 

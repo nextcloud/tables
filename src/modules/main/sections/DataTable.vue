@@ -74,12 +74,12 @@
 		<div class="row">
 			<EmptyTable v-if="columns.length === 0" :table="table" @create-column="showCreateColumn = true" />
 			<TableView v-else
+				v-model:view-setting="localViewSetting"
+				v-model:selected-rows="localSelectedRows"
 				:rows="rows"
 				:columns="columns"
 				:element="table"
-				:view-setting.sync="localViewSetting"
 				:is-view="false"
-				:selected-rows.sync="localSelectedRows"
 				:can-read-rows="canReadData(table)"
 				:can-create-rows="canCreateRowInElement(table)"
 				:can-edit-rows="canUpdateData(table)"
@@ -226,6 +226,17 @@ export default {
 		},
 	},
 
+	emits: [
+		'create-column',
+		'create-view',
+		'download-csv',
+		'download-filtered-csv',
+		'import',
+		'show-integration',
+		'toggle-share',
+		'update:selectedRows',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			localSelectedRows: this.selectedRows,

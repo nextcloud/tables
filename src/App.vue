@@ -73,8 +73,10 @@ export default {
 			store.setLoading({ key: 'viewsShared', value: false })
 			store.setLoading({ key: 'contexts', value: false })
 		}
-		this.routing(this.$router.currentRoute)
-		this.observeAppContent()
+		this.routing(this.$route)
+	},
+	mounted() {
+		this.$nextTick(() => this.observeAppContent())
 	},
 	methods: {
 		...mapActions(useTablesStore, ['loadTablesFromBE', 'getAllContexts', 'loadViewsSharedWithMeFromBE', 'loadTemplatesFromBE', 'setActiveRowId', 'setActiveTableId', 'setActiveViewId', 'setActiveContextId']),

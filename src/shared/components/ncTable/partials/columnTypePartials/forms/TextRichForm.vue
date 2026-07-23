@@ -10,7 +10,7 @@
 				{{ t('tables', 'Default') }}
 			</div>
 			<div class="fix-col-4 space-B">
-				<NcEditor :text.sync="mutableColumn.textDefault" height="small" />
+				<NcEditor v-model:text="mutableColumn.textDefault" height="small" />
 			</div>
 		</div>
 	</div>

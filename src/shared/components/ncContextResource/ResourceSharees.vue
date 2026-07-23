@@ -14,7 +14,7 @@
 			:aria-label-combobox="getPlaceholder()" :user-select="true"
 			:close-on-select="false"
 			:multiple="true"
-			@search="asyncFind" @input="addShare">
+			@search="asyncFind" @update:model-value="addShare">
 			<template #noResult>
 				{{ noResultText }}
 			</template>
@@ -51,6 +51,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'update',
+	],
 	data() {
 		return {
 			preExistingSharees: [...this.receivers],

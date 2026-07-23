@@ -7,7 +7,7 @@
 		<NcSelect v-model="value" style="width: 100%;" :loading="loading" :options="options"
 			:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
 			label="displayName" :aria-label-combobox="getPlaceholder()" :user-select="true" @search="asyncFind"
-			@input="addTransfer">
+			@update:model-value="addTransfer">
 			<template #noResult>
 				{{ noResultText }}
 			</template>
@@ -44,6 +44,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'update:selectedUserId',
+	],
 	data() {
 		return {
 			value: '',

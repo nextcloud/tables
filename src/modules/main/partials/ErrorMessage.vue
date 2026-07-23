@@ -42,7 +42,7 @@ export default {
 		font-size: clamp(1.2rem, 4vw, 2rem);
 		font-weight: 600;
 		max-width: 90%;
-		word-wrap: break-word;
+		overflow-wrap: break-word;
 	}
 }
 </style>

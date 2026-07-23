@@ -9,7 +9,7 @@
 			{{ t('tables', 'This is your API endpoint for this view') }}
 		</p>
 		<NcInputField id="urlTextField"
-			:value="apiEndpointUrl"
+			:model-value="apiEndpointUrl"
 			:show-trailing-button="true"
 			:trailing-button-label="t('files', 'Copy to clipboard')"
 			readonly="readonly"
@@ -51,7 +51,7 @@ import { generateUrl } from '@nextcloud/router'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import copyToClipboard from '../../../shared/mixins/copyToClipboard.js'
 
-import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
+import NcInputField from '@nextcloud/vue/components/NcInputField'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 
 export default {

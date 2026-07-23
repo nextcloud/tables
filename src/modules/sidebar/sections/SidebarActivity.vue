@@ -3,7 +3,7 @@
 	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<ActivityList v-if="$parent.isActive"
+	<ActivityList v-if="activeElement"
 		filter="tables"
 		:object-id="activeElement.id"
 		:object-type="isView ? 'view' : 'table'"

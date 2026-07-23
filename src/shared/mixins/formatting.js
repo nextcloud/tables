@@ -5,7 +5,7 @@
 import Moment from '@nextcloud/moment'
 
 export default {
-	filters: {
+	methods: {
 		niceDateTime(value, format) {
 			if (!format) {
 				format = 'lll'

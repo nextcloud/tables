@@ -150,11 +150,11 @@ export default {
 		rows: {
 			deep: true,
 			handler(newRows) {
-				// Sync changes back to richObject for reactivity
 				if (this.richObject && newRows) {
-					this.$set(this.richObject, 'rows', newRows)
-					// Update row count
-					this.$set(this.richObject, 'rowsCount', newRows.length)
+					/* eslint-disable vue/no-mutating-props */
+					this.richObject.rows = newRows
+					this.richObject.rowsCount = newRows.length
+					/* eslint-enable vue/no-mutating-props */
 				}
 				// Force update of filteredRows when rows change
 				this.search(this.searchExp ? this.searchExp.source : '')
@@ -166,7 +166,8 @@ export default {
 		useResizeObserver(this.$el, (entries) => {
 			const entry = entries[0]
 			const { width } = entry.contentRect
-			this.$el.style.setProperty('--widget-content-width', `${width}px`)
+			// In Vue 3 $el can be a fragment/comment node (no style), so guard it.
+			this.$el?.style?.setProperty?.('--widget-content-width', `${width}px`)
 		})
 
 		this.tablesStore = useTablesStore()

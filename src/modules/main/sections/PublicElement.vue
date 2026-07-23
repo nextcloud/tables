@@ -4,7 +4,7 @@
 -->
 <template>
 	<div>
-		<ElementTitle :active-element="element" :is-table="false" :view-setting.sync="localViewSetting" :is-form-mode="isFormMode" />
+		<ElementTitle v-model:view-setting="localViewSetting" :active-element="element" :is-table="false" :is-form-mode="isFormMode" />
 		<TableDescription :description="element.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="element" />
@@ -108,6 +108,10 @@ export default {
 		},
 	},
 
+	emits: [
+		'download-csv',
+		'download-filtered-csv',
+	],
 	data() {
 		return {
 			showCreateRow: false,

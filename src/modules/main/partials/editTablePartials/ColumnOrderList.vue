@@ -72,6 +72,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update:columnSettings',
+	],
 	data() {
 		return {
 			mutableColumns: this.columns ? [...this.columns] : [],

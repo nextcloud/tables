@@ -5,12 +5,12 @@
 <template>
 	<div :class="{ empty: localValue === '' }">
 		<NcTextField
-			:value.sync="localValue"
+			v-model="localValue"
 			:label="t('tables', 'Search')"
 			trailing-button-icon="close"
 			:show-trailing-button="localValue !== ''"
 			@trailing-button-click="clearValue"
-			@update:value="debounceSubmit">
+			@update:model-value="debounceSubmit">
 			<Magnify :size="16" />
 		</NcTextField>
 	</div>
@@ -40,6 +40,9 @@ export default {
 		    },
 	},
 
+	emits: [
+		'set-search-string',
+	],
 	data() {
 		return {
 			localValue: '',

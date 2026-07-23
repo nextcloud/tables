@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { markRaw } from 'vue'
 import { NcEmptyContent } from '@nextcloud/vue'
 import Alert from 'vue-material-design-icons/AlertOutline.vue'
 import { translate as t } from '@nextcloud/l10n'
@@ -58,6 +59,9 @@ export default {
 		    },
 	},
 
+	emits: [
+		'update:text',
+	],
 	data() {
 		return {
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
@@ -101,7 +105,7 @@ export default {
 		this.setupLazyInitialization()
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		this?.observer?.disconnect?.()
 		this?.editor?.destroy?.()
 	},
@@ -131,14 +135,14 @@ export default {
 		async setupEditor() {
 			this?.editor?.destroy()
 			if (this.textAppAvailable) {
-				this.editor = await window.OCA.Text.createEditor({
+				this.editor = markRaw(await window.OCA.Text.createEditor({
 					el: this.$refs.editor,
 					content: this.localText,
 					readOnly: !this.canEdit,
 					onUpdate: ({ markdown }) => {
 						this.localText = markdown
 					},
-				})
+				}))
 			} else {
 				console.debug('try to load editor, but not initialized')
 			}

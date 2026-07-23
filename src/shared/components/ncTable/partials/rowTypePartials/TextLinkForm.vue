@@ -11,7 +11,7 @@
 				</NcNoteCard>
 			</div>
 			<div class="link-input">
-				<NcTextField v-if="isPlainUrl" :value.sync="plainLink" :placeholder="t('tables', 'URL')" />
+				<NcTextField v-if="isPlainUrl" v-model="plainLink" :placeholder="t('tables', 'URL')" />
 				<NcSelect v-else v-model="localValue"
 					:options="results"
 					:clearable="true"
@@ -48,7 +48,7 @@
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import ClipboardCheckMultipleOutline from 'vue-material-design-icons/ClipboardCheckMultipleOutline.vue'
 import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
-import { NcReferenceList } from '@nextcloud/vue/dist/Components/NcRichText.js'
+import { NcReferenceList } from '@nextcloud/vue/components/NcRichText'
 import RowFormWrapper from './RowFormWrapper.vue'
 import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
@@ -89,6 +89,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'update:value',
+	],
 	data() {
 		return {
 			providers: null,

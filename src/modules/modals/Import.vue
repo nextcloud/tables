@@ -48,7 +48,7 @@
 
 				<div class="row">
 					<div class="fix-col-2">
-						<NcCheckboxRadioSwitch :checked.sync="createMissingColumns" type="switch" :disabled="!canCreateMissingColumns">
+						<NcCheckboxRadioSwitch v-model="createMissingColumns" type="switch" :disabled="!canCreateMissingColumns">
 							{{ t('tables', 'Create missing columns') }}
 						</NcCheckboxRadioSwitch>
 					</div>
@@ -165,6 +165,9 @@ export default {
 			default: true,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			path: '',

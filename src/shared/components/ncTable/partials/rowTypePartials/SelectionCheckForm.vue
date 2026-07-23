@@ -4,11 +4,12 @@
 -->
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description">
-		<NcCheckboxRadioSwitch
-			type="switch"
-			:checked.sync="localValue"
-			:disabled="column.viewColumnInformation?.readonly"
-			data-cy="selectionCheckFormSwitch" />
+		<span data-cy="selectionCheckFormSwitch">
+			<NcCheckboxRadioSwitch
+				v-model="localValue"
+				type="switch"
+				:disabled="column.viewColumnInformation?.readonly" />
+		</span>
 	</RowFormWrapper>
 </template>
 
@@ -33,6 +34,9 @@ export default {
 			default: '',
 		},
 	},
+	emits: [
+		'update:value',
+	],
 	data() {
 		return {
 		}

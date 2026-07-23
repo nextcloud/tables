@@ -3,8 +3,8 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<component :is="getFormComponent" :column="column"
-		:value.sync="value_data" />
+	<component :is="getFormComponent" v-model:value="value_data"
+		:column="column" />
 </template>
 
 <script>
@@ -53,6 +53,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'update:value',
+	],
 	data() {
 		return {
 			value_data: this.value,

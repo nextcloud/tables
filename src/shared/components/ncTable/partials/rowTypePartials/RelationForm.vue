@@ -44,6 +44,9 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'update:value',
+	],
 	computed: {
 		...mapState(useTablesStore, ['activeTable', 'activeView']),
 		loading() {

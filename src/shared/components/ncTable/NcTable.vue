@@ -43,17 +43,17 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 <template>
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
-			<Options :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
+			<Options v-model:view-setting="localViewSetting" :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId"
+				:is-view="isView"
 				:selected-rows="localSelectedRows"
-				:show-options="parsedColumns.length !== 0"
-				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row')"
+				:show-options="parsedColumns.length !== 0" :config="config" @create-row="$emit('create-row')"
 				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)"
 				@set-search-string="str => setSearchString(str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" :columns="parsedColumns"
-				:rows="getSearchedAndFilteredAndSortedRows" :is-view="isView" :element-id="elementId" :view-setting.sync="localViewSetting"
+			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" v-model:view-setting="localViewSetting"
+				:columns="parsedColumns" :rows="getSearchedAndFilteredAndSortedRows" :is-view="isView" :element-id="elementId"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@copy-row="rowId => $emit('copy-row', rowId)"
@@ -210,6 +210,19 @@ export default {
 			default: false,
 		},
 	},
+	emits: [
+		'copy-row',
+		'create-column',
+		'create-row',
+		'delete-column',
+		'delete-row',
+		'delete-selected-rows',
+		'download-filtered-csv',
+		'edit-column',
+		'edit-row',
+		'update:selectedRows',
+		'update:viewSetting',
+	],
 	data() {
 		return {
 			localSelectedRows: [],
@@ -407,7 +420,7 @@ export default {
 			})
 		}
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
 	},
 	methods: {

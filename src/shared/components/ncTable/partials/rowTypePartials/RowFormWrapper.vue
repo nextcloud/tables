@@ -10,9 +10,9 @@
 					{{ title }}<span v-if="mandatory" :title="t('tables', 'This field is mandatory')">*</span>
 					<NcLoadingIcon v-if="loading" />
 				</div>
-				<p v-if="description" class="fix-col-4 span">
+				<div v-if="description" class="fix-col-4 span">
 					<pre>{{ description }}</pre>
-				</p>
+				</div>
 			</div>
 		</div>
 		<div v-if="hasHeadSlot" class="fix-col-1 end">
@@ -67,7 +67,7 @@ export default {
 
 	computed: {
 		hasHeadSlot() {
-			return !!this.$slots.head?.[0]
+			return !!this.$slots.head
 		},
 	},
 	methods: {
@@ -95,7 +95,7 @@ pre {
 	white-space: -moz-pre-wrap;
 	white-space: -pre-wrap;
 	white-space: -o-pre-wrap;
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 </style>

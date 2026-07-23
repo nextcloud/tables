@@ -166,7 +166,7 @@ export default {
 	#app-content-vue table td, #app-content-vue table th {
 		white-space: normal !important;
 		word-break: normal !important;
-		word-wrap: break-word !important;
+		overflow-wrap: break-word !important;
 		width: auto !important;
 	}
 

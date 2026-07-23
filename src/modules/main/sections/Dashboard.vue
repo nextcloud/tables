@@ -42,7 +42,7 @@
 								{{ view.columnSettings ? Object.keys(view.columnSettings).length : 0 }}
 							</td>
 							<td class="link-to-view" @click="openView(view)">
-								{{ view.lastEditAt | niceDateTime }}
+								{{ niceDateTime(view.lastEditAt) }}
 							</td>
 							<td v-if="view.hasShares">
 								<NcLoadingIcon v-if="loadingViewShares" />
@@ -144,12 +144,6 @@ export default {
 		DeleteOutline,
 	},
 
-	filters: {
-		niceDateTime(value) {
-			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
-		},
-	},
-
 	mixins: [permissionsMixin],
 
 	props: {
@@ -159,6 +153,9 @@ export default {
 		},
 	},
 
+	emits: [
+		'create-view',
+	],
 	data() {
 		return {
 			loadingTableShares: true,
@@ -188,6 +185,9 @@ export default {
 	methods: {
 		...mapActions(useTablesStore, ['updateTable']),
 		emit,
+		niceDateTime(value) {
+			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
+		},
 		openView(view) {
 			this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
 		},

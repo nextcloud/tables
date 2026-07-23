@@ -10,7 +10,7 @@
 		<div v-for="(filter, index) in mutableFilterGroup"
 			:key="index">
 			<FilterEntry
-				:filter-entry.sync="mutableFilterGroup[index]"
+				v-model:filter-entry="mutableFilterGroup[index]"
 				:columns="columns"
 				:class="{'locallyAdded': isLocallyAdded(filter)}"
 				@delete-filter="deleteFilter(index)" />
@@ -59,6 +59,10 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'delete-filter-group',
+		'update:filter-group',
+	],
 	computed: {
 		mutableFilterGroup: {
 			get() {

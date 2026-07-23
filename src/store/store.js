@@ -10,7 +10,6 @@ import { showError } from '@nextcloud/dialogs'
 import displayError from '../shared/utils/displayError.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 import { getCurrentUser } from '@nextcloud/auth'
-import { set } from 'vue'
 
 export const useTablesStore = defineStore('store', {
 	state: () => ({
@@ -259,7 +258,7 @@ export const useTablesStore = defineStore('store', {
 				const views = this.views
 				res.data.forEach(view => {
 					const index = views.findIndex(v => v.id === view.id)
-					set(this.views, index, view)
+					this.views[index] = view
 				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not reload view.'))
@@ -281,7 +280,7 @@ export const useTablesStore = defineStore('store', {
 			const table = res.data
 			const tables = this.tables
 			const index = tables.findIndex(t => t.id === table.id)
-			set(this.tables, index, table)
+			this.tables[index] = table
 			return true
 		},
 
@@ -436,7 +435,7 @@ export const useTablesStore = defineStore('store', {
 
 			const context = res.data.ocs.data
 			const index = this.contexts.findIndex(c => c.id === context.id)
-			set(this.contexts, index, context)
+			this.contexts[index] = context
 
 			return true
 		},

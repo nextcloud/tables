@@ -24,7 +24,7 @@ test.describe('Test column ' + columnTitle, () => {
 
 		// insert row
 		await page.locator('button').filter({ hasText: 'Create row' }).click()
-		await page.locator('[data-cy="selectionCheckFormSwitch"]').first().click()
+		await page.locator('[data-cy="selectionCheckFormSwitch"] .checkbox-content').first().click()
 		await page.locator('button').filter({ hasText: 'Save' }).click()
 		await expect(page.locator('.custom-table table tr td div .checkbox-radio-switch--checked')).toBeVisible()
 
@@ -44,7 +44,7 @@ test.describe('Test column ' + columnTitle, () => {
 
 		// insert row (uncheck it)
 		await page.locator('button').filter({ hasText: 'Create row' }).click()
-		await page.locator('[data-cy="selectionCheckFormSwitch"]').first().click()
+		await page.locator('[data-cy="selectionCheckFormSwitch"] .checkbox-content').first().click()
 		await page.locator('button').filter({ hasText: 'Save' }).click()
 		// it should NOT be visible
 		// The original test said 'checkbox-radio-switch--checkedn' typo. Now fixing.

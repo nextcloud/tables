@@ -2,61 +2,51 @@
  * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-import { registerCustomPickerElement, registerWidget, NcCustomPickerRenderResult } from '@nextcloud/vue/dist/Functions/registerReference.js'
+import { registerCustomPickerElement, registerWidget, NcCustomPickerRenderResult } from '@nextcloud/vue/functions/registerReference'
 import './styles/smart-picker.scss'
 
 registerWidget('tables_link', async (el, { richObjectType, richObject, accessible }) => {
-	const { default: Vue } = await import('vue')
+	const { createApp } = await import('vue')
 	const { default: TableReferenceWidget } = await import('./views/LinkReferenceWidget.vue')
-	Vue.mixin({ methods: { t, n } })
-	const Widget = Vue.extend(TableReferenceWidget)
-	new Widget({
-		propsData: {
-			richObjectType,
-			richObject,
-			accessible,
-		},
-	}).$mount(el)
+	const app = createApp(TableReferenceWidget, {
+		richObjectType,
+		richObject,
+		accessible,
+	})
+	app.mixin({ methods: { t, n } })
+	app.mount(el)
 })
 
 registerWidget('tables_content', async (el, { richObjectType, richObject, accessible, interactive = true }) => {
-	const { default: Vue } = await import('vue')
+	const { createApp } = await import('vue')
 	const { default: TableReferenceWidget } = interactive
-		? await import(/* webpackChunkName: "reference-table-lazy" */'./views/ContentReferenceWidget.vue')
-		: await import(/* webpackChunkName: "reference-table-lazy" */'./views/LinkReferenceWidget.vue')
+		? await import('./views/ContentReferenceWidget.vue')
+		: await import('./views/LinkReferenceWidget.vue')
 
-	const { createPinia, setActivePinia } = await import('pinia')
+	const { createPinia } = await import('pinia')
 	const pinia = createPinia()
-	setActivePinia(pinia)
 
-	Vue.mixin({ methods: { t, n } })
-	Vue.use(pinia)
-	const Widget = Vue.extend(TableReferenceWidget)
-	new Widget({
-		propsData: {
-			richObjectType,
-			richObject,
-			accessible,
-		},
-		pinia,
-	}).$mount(el)
+	const app = createApp(TableReferenceWidget, {
+		richObjectType,
+		richObject,
+		accessible,
+	})
+	app.use(pinia)
+	app.mixin({ methods: { t, n } })
+	app.mount(el)
 }, () => {}, { hasInteractiveView: true })
 
 registerCustomPickerElement('tables-ref-tables', async (el, { providerId, accessible }) => {
-	const { default: Vue } = await import('vue')
+	const { createApp } = await import('vue')
 	const { default: TablesSmartPicker } = await import('./views/SmartPicker.vue')
 
 	const { createPinia } = await import('pinia')
 	const pinia = createPinia()
 
-	Vue.use(pinia)
-
-	const Element = Vue.extend(TablesSmartPicker)
-	const vueElement = new Element({
-		propsData: {
-		},
-	}).$mount(el)
-	return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
+	const app = createApp(TablesSmartPicker)
+	app.use(pinia)
+	const vueElement = app.mount(el)
+	return new NcCustomPickerRenderResult(vueElement.$el, app)
 }, (el, renderResult) => {
-	renderResult.object.$destroy()
+	renderResult.object.unmount()
 })

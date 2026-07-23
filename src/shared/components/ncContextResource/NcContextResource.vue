@@ -49,6 +49,10 @@ export default {
 		},
 	},
 
+	emits: [
+		'update:receivers',
+		'update:resources',
+	],
 	data() {
 		return {
 			loading: false,

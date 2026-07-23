@@ -4,7 +4,7 @@
  */
 
 /**
- * @param {string|null|undefined} technicalName
+ * @param {string|null|undefined} technicalName the raw technical name to normalize
  * @return {string|null}
  */
 export function normalizeTechnicalName(technicalName) {
@@ -15,7 +15,7 @@ export function normalizeTechnicalName(technicalName) {
 /**
  * returns true if the technical name is valid including null value.
  *
- * @param {string|null|undefined} technicalName
+ * @param {string|null|undefined} technicalName the technical name to validate
  * @return {boolean}
  */
 export function isTechnicalNameValid(technicalName) {

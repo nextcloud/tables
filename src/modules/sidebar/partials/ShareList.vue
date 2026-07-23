@@ -33,32 +33,32 @@
 						<template v-if="!personHasTableManagePermission(share.receiver)">
 							<template v-if="canShare">
 								<NcActionCaption :name="t('tables', 'Permissions')" />
-								<NcActionCheckbox :checked.sync="share.permissionRead"
+								<NcActionCheckbox v-model="share.permissionRead"
 									:disabled="share.permissionManage || share.permissionUpdate || share.permissionDelete"
 									@check="updatePermission(share, 'read', true)"
 									@uncheck="updatePermission(share, 'read', false)">
 									{{ t('tables', 'Read data') }}
 								</NcActionCheckbox>
-								<NcActionCheckbox :checked.sync="share.permissionCreate"
+								<NcActionCheckbox v-model="share.permissionCreate"
 									:disabled="share.permissionManage"
 									@check="updatePermission(share, 'create', true)"
 									@uncheck="updatePermission(share, 'create', false)">
 									{{ t('tables', 'Create data') }}
 								</NcActionCheckbox>
-								<NcActionCheckbox :checked.sync="share.permissionUpdate"
+								<NcActionCheckbox v-model="share.permissionUpdate"
 									:disabled="share.permissionManage"
 									@check="updatePermission(share, 'update', true)"
 									@uncheck="updatePermission(share, 'update', false)">
 									{{ t('tables', 'Update data') }}
 								</NcActionCheckbox>
-								<NcActionCheckbox :checked.sync="share.permissionDelete"
+								<NcActionCheckbox v-model="share.permissionDelete"
 									:disabled="share.permissionManage"
 									@check="updatePermission(share, 'delete', true)"
 									@uncheck="updatePermission(share, 'delete', false)">
 									{{ t('tables', 'Delete data') }}
 								</NcActionCheckbox>
 								<NcActionCheckbox v-if="share.nodeType === 'view'"
-									:checked.sync="share.permissionManage"
+									v-model="share.permissionManage"
 									@check="updatePermission(share, 'manage', true)"
 									@uncheck="updatePermission(share, 'manage', false)">
 									{{ t('tables', 'Manage view') }}
@@ -174,6 +174,10 @@ export default {
 		},
 	},
 
+	emits: [
+		'remove',
+		'update',
+	],
 	data() {
 		return {
 			loading: false,

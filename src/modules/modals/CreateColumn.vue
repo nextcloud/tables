@@ -10,12 +10,12 @@
 		<div class="modal__content create-column">
 			<div class="row">
 				<div class="fix-col-2">
-					<MainForm :description.sync="column.description"
-						:mandatory.sync="column.mandatory"
-						:technical-name.sync="column.technicalName"
-						:title.sync="column.title"
-						:custom-settings.sync="column.customSettings"
-						:selected-views.sync="column.selectedViews"
+					<MainForm v-model:description="column.description"
+						v-model:mandatory="column.mandatory"
+						v-model:technical-name="column.technicalName"
+						v-model:title="column.title"
+						v-model:custom-settings="column.customSettings"
+						v-model:selected-views="column.selectedViews"
 						:title-missing-error="titleMissingError"
 						:technical-name-invalid-error="technicalNameInvalidError"
 						:width-invalid-error="widthInvalidError" />
@@ -26,7 +26,7 @@
 							{{ t('tables', 'Type') }}
 						</div>
 						<div class="col-4">
-							<ColumnTypeSelection :column-id.sync="combinedType" />
+							<ColumnTypeSelection v-model:column-id="combinedType" />
 						</div>
 					</div>
 
@@ -34,13 +34,13 @@
 
 					<div v-if="column.type === 'text' && column.subtype !== 'link'" class="row no-padding-on-mobile space-L">
 						<div class="col-4 typeSelections space-B space-T space-L">
-							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="line" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch v-model="column.subtype" value="line" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Text line') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch v-if="!textAppAvailable" :checked.sync="column.subtype" value="long" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch v-if="!textAppAvailable" v-model="column.subtype" value="long" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Simple text') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="column.subtype" value="rich" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch v-if="textAppAvailable" v-model="column.subtype" value="rich" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
 						</div>
@@ -48,41 +48,51 @@
 
 					<div v-if="column.type === 'selection'" class="row no-padding-on-mobile space-L">
 						<div class="col-4 typeSelections space-B space-T space-L">
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection" name="selectionTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch v-model="combinedType" value="selection" name="selectionTypeSelection" type="radio">
 								{{ t('tables', 'Single selection') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-multi" name="selectionTypeSelection" type="radio" data-cy="createColumnMultipleSelectionSwitch">
-								{{ t('tables', 'Multiple selection') }}
-							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-check" name="selectionTypeSelection" type="radio" data-cy="createColumnYesNoSwitch">
-								{{ t('tables', 'Yes/No') }}
-							</NcCheckboxRadioSwitch>
+							<div data-cy="createColumnMultipleSelectionSwitch">
+								<NcCheckboxRadioSwitch v-model="combinedType" value="selection-multi" name="selectionTypeSelection" type="radio">
+									{{ t('tables', 'Multiple selection') }}
+								</NcCheckboxRadioSwitch>
+							</div>
+							<div data-cy="createColumnYesNoSwitch">
+								<NcCheckboxRadioSwitch v-model="combinedType" value="selection-check" name="selectionTypeSelection" type="radio">
+									{{ t('tables', 'Yes/No') }}
+								</NcCheckboxRadioSwitch>
+							</div>
 						</div>
 					</div>
 
 					<div v-if="column.type === 'datetime'" class="row no-padding-on-mobile space-L">
 						<div class="col-4 typeSelections space-B space-T space-L">
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-date" name="datetimeTypeSelection" type="radio" data-cy="createColumnDateSwitch">
-								{{ t('tables', 'Date') }}
-							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-time" name="datetimeTypeSelection" type="radio" data-cy="createColumnTimeSwitch">
-								{{ t('tables', 'Time') }}
-							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime" name="datetimeTypeSelection" type="radio" data-cy="createColumnDateAndTimeSwitch">
-								{{ t('tables', 'Date and time') }}
-							</NcCheckboxRadioSwitch>
+							<div data-cy="createColumnDateSwitch">
+								<NcCheckboxRadioSwitch v-model="combinedType" value="datetime-date" name="datetimeTypeSelection" type="radio">
+									{{ t('tables', 'Date') }}
+								</NcCheckboxRadioSwitch>
+							</div>
+							<div data-cy="createColumnTimeSwitch">
+								<NcCheckboxRadioSwitch v-model="combinedType" value="datetime-time" name="datetimeTypeSelection" type="radio">
+									{{ t('tables', 'Time') }}
+								</NcCheckboxRadioSwitch>
+							</div>
+							<div data-cy="createColumnDateAndTimeSwitch">
+								<NcCheckboxRadioSwitch v-model="combinedType" value="datetime" name="datetimeTypeSelection" type="radio">
+									{{ t('tables', 'Date and time') }}
+								</NcCheckboxRadioSwitch>
+							</div>
 						</div>
 					</div>
 					<div class="row no-padding-on-mobile space-L" :data-cy="getColumnForm">
 						<component :is="getColumnForm" :column="column"
-							@update:customSettings="onUpdateCustomSettings" />
+							@update:custom-settings="onUpdateCustomSettings" />
 					</div>
 				</div>
 			</div>
 			<div class="row space-T">
 				<div class="fix-col-4 end">
 					<div class="padding-right">
-						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch">
+						<NcCheckboxRadioSwitch v-model="addNewAfterSave" type="switch">
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
 					</div>
@@ -168,6 +178,10 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+		'save',
+	],
 	data() {
 		return {
 			column: {
@@ -280,7 +294,7 @@ export default {
 		showModal() {
 			if (this.showModal) {
 				this.$nextTick(() => {
-					this.$el.querySelector('input')?.focus()
+					this.$el?.querySelector?.('input')?.focus()
 				})
 			}
 		},

@@ -26,6 +26,9 @@ export default {
 		    },
 	},
 
+	emits: [
+		'click',
+	],
 	methods: {
 		submit() {
 			this.$emit('click')

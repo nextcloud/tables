@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" data-cy="viewSettingsDialog" :title="createView ? t('tables', 'Create view') : t('tables', 'View settings')">
+	<NcAppSettingsDialog v-model:open="open" :show-navigation="true" data-cy="viewSettingsDialog" :title="createView ? t('tables', 'Create view') : t('tables', 'Edit view')">
 		<NcAppSettingsSection v-if="columns === null" id="loading" name="">
 			<div class="icon-loading" />
 		</NcAppSettingsSection>
@@ -32,7 +32,7 @@
 					{{ t('tables', 'Description') }}
 				</div>
 				<div class="col-4">
-					<TableDescription :description.sync="description" />
+					<TableDescription v-model:description="description" />
 				</div>
 			</div>
 		</NcAppSettingsSection>
@@ -48,7 +48,7 @@
 		<!--filtering-->
 		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="filter" :name="t('tables', 'Filter')">
 			<FilterForm
-				:filters.sync="mutableFilters"
+				v-model:filters="mutableFilters"
 				:view-filters="viewSetting ? view.filter : null"
 				:generated-filters="viewSetting ? generatedView.filter : null"
 				:columns="allColumns" />
@@ -56,7 +56,7 @@
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="sort" :name="t('tables', 'Sort')">
 			<SortForm
-				:sort="mutableView.sort"
+				v-model:sort="mutableView.sort"
 				:view-sort="viewSetting ? view.sort : null"
 				:generated-sort="viewSetting ? generatedView.sort : null"
 				:columns="allColumns" />
@@ -131,6 +131,9 @@ export default {
 			default: null,
 		},
 	},
+	emits: [
+		'close',
+	],
 	data() {
 		return {
 			open: false,
@@ -218,7 +221,7 @@ export default {
 				this.reset()
 				await this.loadTableColumnsFromBE()
 				this.open = true
-				this.$nextTick(() => this.$el.querySelector('input')?.focus())
+				this.$nextTick(() => this.$el?.querySelector?.('input')?.focus())
 			}
 		},
 		open(value) {
@@ -345,12 +348,12 @@ export default {
 			}
 		},
 		reset() {
-			// Deep copy of generated view config data
-			this.mutableView = JSON.parse(JSON.stringify(this.generateViewConfigData))
-			this.generatedView = JSON.parse(JSON.stringify(this.generateViewConfigData))
-			this.title = this.mutableView.title ?? ''
-			this.description = this.mutableView.description ?? ''
-			this.icon = this.mutableView.emoji ?? this.loadEmoji()
+			const config = this.generateViewConfigData ?? {}
+			this.mutableView = JSON.parse(JSON.stringify(config))
+			this.generatedView = JSON.parse(JSON.stringify(config))
+			this.title = this.mutableView?.title ?? ''
+			this.description = this.mutableView?.description ?? ''
+			this.icon = this.mutableView?.emoji ?? this.loadEmoji()
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []

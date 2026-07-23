@@ -27,7 +27,7 @@ test.describe('Test column number progress', () => {
 
 		await page.locator('button').filter({ hasText: 'Save' }).click()
 
-		await expect(page.getByRole('progressbar').first()).toBeVisible()
+		await expect(page.locator('.custom-table').getByRole('progressbar').first()).toBeVisible()
 		await expect(page.getByRole('cell', { name: '80' }).first()).toBeVisible()
 	})
 })

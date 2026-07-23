@@ -5,7 +5,7 @@
 <template>
 	<div class="cell-progress" :style="{ opacity: !canEditCell() ? 0.6 : 1 }" @click="startEditingProgress">
 		<div v-if="!isEditing" class="progress-display">
-			<NcProgressBar :value="getValue" />
+			<NcProgressBar class="progress-display__bar" :value="getValue" :size="8" />
 		</div>
 		<div v-else class="inline-editing-container">
 			<input ref="input" v-model="editValue" type="number" min="0" max="100" :disabled="localLoading"
@@ -17,6 +17,7 @@
 
 <script>
 import { NcProgressBar } from '@nextcloud/vue'
+
 import cellEditMixin from '../mixins/cellEditMixin.js'
 
 export default {
@@ -94,25 +95,22 @@ export default {
 	padding-inline-end: 10px;
 	min-width: 12vw;
 	cursor: pointer;
+}
 
-	div {
-		min-height: 20px;
-        display: flex;
-        align-items: center;
-	}
+.progress-display,
+.inline-editing-container {
+	min-height: 20px;
+	display: flex;
+	align-items: center;
 }
 
 .progress-display {
 	width: 100%;
-	min-height: 20px;
 	cursor: pointer;
 }
 
-.empty-progress-placeholder {
-	color: var(--color-text-maxcontrast);
-	font-style: italic;
-	font-size: 0.9em;
-	padding: 4px 0;
+.progress-display__bar {
+	width: 100%;
 }
 
 .cell-input {
