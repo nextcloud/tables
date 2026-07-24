@@ -685,7 +685,6 @@ OC.L10N.register(
     "Go to last page" : "前往最後一頁",
     "Confirmation" : "確認",
     "Confirm" : "確認",
-    "_{nb} row_::_{nb} rows_" : ["{nb} 列"],
     "Could not fetch columns for content preview." : "無法擷取欄位供內容預覽。",
     "Could not fetch rows for content preview." : "無法擷取列供內容預覽。",
     "Render mode" : "繪製模式",

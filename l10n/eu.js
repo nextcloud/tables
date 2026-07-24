@@ -355,7 +355,6 @@ OC.L10N.register(
     "Go to previous page" : "Itzuli aurreko orrira",
     "Confirmation" : "Berrespena",
     "Confirm" : "Berretsi",
-    "_{nb} row_::_{nb} rows_" : ["errenkada {nb}","{nb} errenkada"],
     "Render mode" : "Errenderizatze modua",
     "Content" : "Edukia",
     "Select" : "Hautatu",

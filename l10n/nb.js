@@ -503,7 +503,6 @@ OC.L10N.register(
     "Go to last page" : "Gå til siste side",
     "Confirmation" : "Bekreftelse",
     "Confirm" : "Bekreft",
-    "_{nb} row_::_{nb} rows_" : ["{nb} rad","{nb} rader"],
     "Could not fetch columns for content preview." : "Kan ikke hente kolonner for forhåndsvisning av innhold.",
     "Could not fetch rows for content preview." : "Kan ikke hente rader for forhåndsvisning av innhold.",
     "Render mode" : "Gjengivelsesmodus",

@@ -606,7 +606,6 @@
     "Go to last page" : "До останньої сторінки",
     "Confirmation" : "Підтвердження",
     "Confirm" : "Підтвердити",
-    "_{nb} row_::_{nb} rows_" : ["{nb} рядок","{nb} рядки","{nb} рядків","{nb} рядків"],
     "Could not fetch columns for content preview." : "Не вдалося отримати стовпці для попереднього показу вмісту.",
     "Could not fetch rows for content preview." : "Не вдалося отримати рядки для попереднього показу вмісту.",
     "Render mode" : "Режим показу",

@@ -277,7 +277,6 @@ OC.L10N.register(
     "Page number" : "Нумар старонкі",
     "Confirmation" : "Пацвярджэнне",
     "Confirm" : "Пацвердзіць",
-    "_{nb} row_::_{nb} rows_" : ["{nb} радок","{nb} радкі","{nb} радкоў","{nb} радкоў"],
     "Content" : "Змест",
     "Select" : "Выбраць",
     "Insert" : "Уставіць",

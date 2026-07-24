@@ -497,7 +497,6 @@ OC.L10N.register(
     "Go to last page" : "Mene viimeiselle sivulle",
     "Confirmation" : "Vahvistus",
     "Confirm" : "Hyväksy",
-    "_{nb} row_::_{nb} rows_" : ["{nb} rivi","{nb} riviä"],
     "Could not fetch columns for content preview." : "Sisällön esikatselun sarakkeita ei voitu noutaa.",
     "Could not fetch rows for content preview." : "Sisällön esikatselua varten ei voitu noutaa rivejä.",
     "Render mode" : "Renderöintitila",

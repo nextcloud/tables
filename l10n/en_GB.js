@@ -712,7 +712,6 @@ OC.L10N.register(
     "Go to last page" : "Go to last page",
     "Confirmation" : "Confirmation",
     "Confirm" : "Confirm",
-    "_{nb} row_::_{nb} rows_" : ["{nb} row","{nb} rows"],
     "Could not fetch columns for content preview." : "Could not fetch columns for content preview.",
     "Could not fetch rows for content preview." : "Could not fetch rows for content preview.",
     "Render mode" : "Render mode",

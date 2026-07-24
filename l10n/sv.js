@@ -712,7 +712,6 @@ OC.L10N.register(
     "Go to last page" : "Gå till sista sidan",
     "Confirmation" : "Bekräftelse",
     "Confirm" : "Bekräfta",
-    "_{nb} row_::_{nb} rows_" : ["{nb} rad","{nb} rader"],
     "Could not fetch columns for content preview." : "Det gick inte att hämta kolumner för förhandsgranskning av innehåll.",
     "Could not fetch rows for content preview." : "Det gick inte att hämta rader för förhandsgranskning av innehåll.",
     "Render mode" : "Renderingsläge",

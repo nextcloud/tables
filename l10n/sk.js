@@ -554,7 +554,6 @@ OC.L10N.register(
     "Go to last page" : "Ísť na poslednú stránku",
     "Confirmation" : "Potvrdenie",
     "Confirm" : "Potvrdiť",
-    "_{nb} row_::_{nb} rows_" : ["{nb} riadok","{nb} riadky","{nb} riadkov","{nb} riadkov"],
     "Could not fetch columns for content preview." : "Nepodarilo sa načítať stĺpce pre náhľad obsahu.",
     "Could not fetch rows for content preview." : "Nepodarilo sa načítať riadky pre náhľad obsahu.",
     "Render mode" : "Mód renderovania",

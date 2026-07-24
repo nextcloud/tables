@@ -551,7 +551,6 @@
     "Go to last page" : "ئاخىرقى بەتكە بېرىڭ",
     "Confirmation" : "جەزملەشتۈرۈش",
     "Confirm" : "جەزملەشتۈرۈڭ",
-    "_{nb} row_::_{nb} rows_" : ["{nb} قۇر","{nb} قۇرلار"],
     "Could not fetch columns for content preview." : "مەزمۇننى ئالدىن كۆرۈش ئۈچۈن ستون ئالالمىدى.",
     "Could not fetch rows for content preview." : "مەزمۇننى ئالدىن كۆرۈش ئۈچۈن قۇر ئالالمىدى.",
     "Render mode" : "Render mode",

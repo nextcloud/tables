@@ -710,7 +710,6 @@
     "Go to last page" : "Téigh go dtí an leathanach deiridh",
     "Confirmation" : "Daingniú",
     "Confirm" : "Deimhnigh",
-    "_{nb} row_::_{nb} rows_" : ["{nb} ró","{nb} rónna","{nb} rónna","{nb} rónna","{nb} rónna"],
     "Could not fetch columns for content preview." : "Níorbh fhéidir na colúin a fháil le haghaidh réamhamharc inneachair.",
     "Could not fetch rows for content preview." : "Níorbh fhéidir sraitheanna a fháil le haghaidh réamhamharc inneachair.",
     "Render mode" : "Modh rindreála",

@@ -255,7 +255,6 @@ OC.L10N.register(
     "Go to previous page" : "Dir a la páxina anterior",
     "Confirmation" : "Confirmación",
     "Confirm" : "Confirmar",
-    "_{nb} row_::_{nb} rows_" : ["{nb} filera","{nb} fileres"],
     "Content" : "Conteníu",
     "Select" : "Seleicionar",
     "Insert" : "Inxertar",

@@ -607,7 +607,6 @@
     "Go to last page" : "Aller à la dernière page",
     "Confirmation" : "Confirmation",
     "Confirm" : "Confirmer",
-    "_{nb} row_::_{nb} rows_" : ["{nb} ligne","{nb} lignes","{nb} lignes"],
     "Could not fetch columns for content preview." : "Impossible de récupérer les colonnes du tableau pour la prévisualisation",
     "Could not fetch rows for content preview." : "Impossible de récupérer les lignes du tableau pour la prévisualisation",
     "Render mode" : "Mode de rendu",

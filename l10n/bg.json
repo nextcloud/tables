@@ -302,7 +302,6 @@
     "_%n selected row_::_%n selected rows_" : ["%n избрани редове","%n избрани редове"],
     "Confirmation" : "Потвърждение",
     "Confirm" : "Потвърдете",
-    "_{nb} row_::_{nb} rows_" : ["{nb} редове","{nb} редове"],
     "Content" : "Съдържание",
     "Select" : "Избери",
     "Insert" : "Вмъкване",

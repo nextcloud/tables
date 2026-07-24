@@ -523,7 +523,6 @@
     "Go to last page" : "إنتقِل إلى الصفحة الأخيرة",
     "Confirmation" : "تأكيد",
     "Confirm" : "تأكيد",
-    "_{nb} row_::_{nb} rows_" : ["{nb} صفوف","{nb} صف","{nb} صفوف","{nb} صفوف","{nb} صفوف","{nb} صفوف"],
     "Could not fetch columns for content preview." : "تعذّر جلب الأعمدة لمعاينة المحتوى",
     "Could not fetch rows for content preview." : "تعذّر جلب الصفوف لمعاينة المحتوى",
     "Render mode" : "وضعية العرض Render mode",

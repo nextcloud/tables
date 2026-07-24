@@ -644,7 +644,6 @@ OC.L10N.register(
     "Go to last page" : "Mine viimasele lehele",
     "Confirmation" : "Kinnitus",
     "Confirm" : "Kinnita",
-    "_{nb} row_::_{nb} rows_" : ["{nb} rida","{nb} rida"],
     "Could not fetch columns for content preview." : "Sisu eelvaate jaoks veergude laadimine ei õnnestunud.",
     "Could not fetch rows for content preview." : "Sisu eelvaate jaoks ridade laadimine ei õnnestunud.",
     "Render mode" : "Renderduse viis",

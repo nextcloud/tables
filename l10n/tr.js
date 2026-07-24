@@ -592,7 +592,6 @@ OC.L10N.register(
     "Go to last page" : "Son sayfaya git",
     "Confirmation" : "Onaylama",
     "Confirm" : "Onayla",
-    "_{nb} row_::_{nb} rows_" : ["{nb} satır","{nb} satır"],
     "Could not fetch columns for content preview." : "İçerik ön izlemesi için sütunlar alınamadı.",
     "Could not fetch rows for content preview." : "İçerik ön izlemesi için satırlar alınamadı.",
     "Render mode" : "Görüntüleme kipi",

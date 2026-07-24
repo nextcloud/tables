@@ -569,7 +569,6 @@ OC.L10N.register(
     "Go to last page" : "Přejít na poslední stránku",
     "Confirmation" : "Potvrzení",
     "Confirm" : "Potvrdit",
-    "_{nb} row_::_{nb} rows_" : ["{nb} řádek","{nb} řádky","{nb} řádků","{nb} řádky"],
     "Could not fetch columns for content preview." : "Nepodařilo se získat sloupce pro náhled obsahu.",
     "Could not fetch rows for content preview." : "Nepodařilo se získat řádky pro náhled obsahu.",
     "Render mode" : "Režim vykreslování",

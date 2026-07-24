@@ -710,7 +710,6 @@
     "Go to last page" : "Ir para a última página",
     "Confirmation" : "Confirmação",
     "Confirm" : "Confirmar",
-    "_{nb} row_::_{nb} rows_" : ["{nb} linha","{nb} linhas","{nb} linhas"],
     "Could not fetch columns for content preview." : "Não foi possível buscar colunas para visualização do conteúdo.",
     "Could not fetch rows for content preview." : "Não foi possível buscar linhas para visualização do conteúdo.",
     "Render mode" : "Modo de renderização",

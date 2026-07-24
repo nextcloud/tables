@@ -561,7 +561,6 @@ OC.L10N.register(
     "Go to last page" : "Ir á última páxina",
     "Confirmation" : "Confirmación",
     "Confirm" : "Confirmar",
-    "_{nb} row_::_{nb} rows_" : ["{nb} fila","{nb} filas"],
     "Could not fetch columns for content preview." : "Non foi posíbel recuperar as columnas para a vista previa do contido.",
     "Could not fetch rows for content preview." : "Non foi posíbel recuperar as filas para a vista previa do contido.",
     "Render mode" : "Modo de representar",

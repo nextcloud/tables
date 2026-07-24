@@ -712,7 +712,6 @@ OC.L10N.register(
     "Go to last page" : "Μετάβαση στην τελευταία σελίδα",
     "Confirmation" : "Επιβεβαίωση",
     "Confirm" : "Επιβεβαίωση",
-    "_{nb} row_::_{nb} rows_" : ["{nb} γραμμή","{nb} γραμμές"],
     "Could not fetch columns for content preview." : "Δεν ήταν δυνατή η ανάκτηση των στηλών για προεπισκόπηση περιεχομένου.",
     "Could not fetch rows for content preview." : "Δεν ήταν δυνατή η ανάκτηση των γραμμών για προεπισκόπηση περιεχομένου.",
     "Render mode" : "Τρόπος απεικόνισης",

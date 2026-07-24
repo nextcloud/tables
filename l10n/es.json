@@ -539,7 +539,6 @@
     "Go to last page" : "Ir a la última página",
     "Confirmation" : "Confirmación",
     "Confirm" : "Confirmar",
-    "_{nb} row_::_{nb} rows_" : ["{nb} fila","{nb} filas","{nb} filas"],
     "Could not fetch columns for content preview." : "No se han podido recuperar las columnas para la vista previa del contenido.",
     "Could not fetch rows for content preview." : "No se han podido recuperar las filas para la vista previa del contenido.",
     "Render mode" : "Modo de presentación",

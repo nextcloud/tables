@@ -418,7 +418,6 @@
     "Go to last page" : "Ugrás az utolsó oldalra",
     "Confirmation" : "Megerősítés",
     "Confirm" : "Megerősítés",
-    "_{nb} row_::_{nb} rows_" : ["{nb} sor","{nb} sor"],
     "Could not fetch columns for content preview." : "Nem sikerült lekérni az oszlopokat az előnézethez.",
     "Could not fetch rows for content preview." : "Nem sikerült lekérni a sorokat az előnézethez.",
     "Content" : "Tartalom",

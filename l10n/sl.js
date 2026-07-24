@@ -360,7 +360,6 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n izbrana vrstica","%n izbrani vrstici","%n izbrane vrstice","%n izbranih vrstic"],
     "Confirmation" : "Potrjevanje",
     "Confirm" : "Potrdi",
-    "_{nb} row_::_{nb} rows_" : ["{nb} vrstica","{nb} vrstici","{nb} vrstice","{nb} vrstic"],
     "Content" : "Vsebina",
     "Select" : "Izbor",
     "Insert" : "Vstavi",

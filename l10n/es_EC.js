@@ -324,7 +324,6 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n fila seleccionada","%n filas seleccionadas","%n filas seleccionadas"],
     "Confirmation" : "Confirmación",
     "Confirm" : "Confirmar",
-    "_{nb} row_::_{nb} rows_" : ["{nb} fila","{nb} filas","{nb} filas"],
     "Content" : "Contenido",
     "Insert" : "Insertar",
     "Could not create share." : "No se pudo crear el recurso compartido.",

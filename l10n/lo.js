@@ -552,7 +552,6 @@ OC.L10N.register(
     "Go to last page" : "ໄປໜ້າສຸດທ້າຍ",
     "Confirmation" : "ການຢືນຢັນ",
     "Confirm" : "ຢືນຢັນ",
-    "_{nb} row_::_{nb} rows_" : ["{nb} ແຖວ"],
     "Could not fetch columns for content preview." : "ບໍ່ສາມາດດຶງຄໍລຳສຳລັບການເບິ່ງຕົວຢ່າງເນື້ອຫາໄດ້.",
     "Could not fetch rows for content preview." : "ບໍ່ສາມາດດຶງແຖວສຳລັບການເບິ່ງຕົວຢ່າງເນື້ອຫາໄດ້.",
     "Render mode" : "ໂໝດການສະແດງຜົນ",

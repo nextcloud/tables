@@ -603,7 +603,6 @@ OC.L10N.register(
     "Go to last page" : "رفتن به صفحه آخر",
     "Confirmation" : "تأیید",
     "Confirm" : "تأیید",
-    "_{nb} row_::_{nb} rows_" : ["{nb} row","{nb} rows"],
     "Could not fetch columns for content preview." : "امکان دریافت ستون‌ها برای پیش‌نمایش محتوا وجود ندارد.",
     "Could not fetch rows for content preview." : "امکان دریافت ردیف‌ها برای پیش‌نمایش محتوا وجود ندارد.",
     "Render mode" : "حالت رندر",

@@ -712,7 +712,6 @@ OC.L10N.register(
     "Go to last page" : "Zur letzten Seite springen",
     "Confirmation" : "Bestätigung",
     "Confirm" : "Bestätigen",
-    "_{nb} row_::_{nb} rows_" : ["{nb} Zeile","{nb} Zeilen"],
     "Could not fetch columns for content preview." : "Spalten für die Inhaltsvorschau konnten nicht abgerufen werden.",
     "Could not fetch rows for content preview." : "Zeilen für die Inhaltsvorschau konnten nicht abgerufen werden.",
     "Render mode" : "Render-Modus",

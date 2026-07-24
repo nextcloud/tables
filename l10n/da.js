@@ -347,7 +347,6 @@ OC.L10N.register(
     "Go to previous page" : "Gå til forrige side",
     "Confirmation" : "Bekræftelse",
     "Confirm" : "Bekræft",
-    "_{nb} row_::_{nb} rows_" : ["{nb} række","{nb} rækker"],
     "Content" : "Indhold",
     "Select" : "Vælg",
     "Insert" : "Indsæt",

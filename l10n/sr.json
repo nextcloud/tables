@@ -552,7 +552,6 @@
     "Go to last page" : "Иди на последњу страницу",
     "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
-    "_{nb} row_::_{nb} rows_" : ["{nb} ред","{nb} реда","{nb} редова"],
     "Could not fetch columns for content preview." : "Нису могле да се добаве колоне за преглед садржаја.",
     "Could not fetch rows for content preview." : "Нису могли да се добаве редови за преглед садржаја.",
     "Render mode" : "Режим исцртавања",

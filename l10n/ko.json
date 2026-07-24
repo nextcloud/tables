@@ -395,7 +395,6 @@
     "Go to previous page" : "이전 페이지로 이동",
     "Confirmation" : "확인",
     "Confirm" : "확인",
-    "_{nb} row_::_{nb} rows_" : ["{nb}개의 행"],
     "Could not fetch columns for content preview." : "행을 콘텐츠 미리보기에 불러올 수 없음",
     "Could not fetch rows for content preview." : "행을 콘텐츠 미리보기에 불러올 수 없음",
     "Render mode" : "렌더 모드",
