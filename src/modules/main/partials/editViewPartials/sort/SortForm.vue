@@ -127,7 +127,7 @@ export default {
 		 * - Not all columns that are sortable on the front-end are sortable on the back-end.
 		 * - Example: "selection" fields — the front-end can sort them by value (since it has it),
 		 *   but the back-end only stores an ID and cannot easily JOIN the value for sorting.
-		 * @param col {AbstractColumn} The column to check.
+		 * @param {AbstractColumn} col The column to check.
 		 */
 		canBeSorted(col) {
 			return ![

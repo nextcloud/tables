@@ -139,7 +139,6 @@ export default {
 	components: {
 		ActivityIcon,
 		PlaylistEdit,
-		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
 		Star,
 		StarOutline,

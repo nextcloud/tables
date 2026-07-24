@@ -74,8 +74,8 @@ export class AbstractColumn {
 	/**
 	 * parse an input value
 	 *
-	 * @param {*} value Value to parse
-	 * @return {*}
+	 * @param {unknown} value Value to parse
+	 * @return {unknown}
 	 */
 	parseValue(value) {
 		return value

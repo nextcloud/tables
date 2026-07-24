@@ -205,7 +205,7 @@ export default {
 			this.widthInvalidError = false
 		},
 		async updateLocalColumn() {
-			const data = Object.assign({}, this.editColumn)
+			const data = { ...this.editColumn }
 			if ((this.column.type === ColumnTypes.SelectionMulti || this.column.type === ColumnTypes.SelectionCheck) && data.selectionDefault !== null) data.selectionDefault = JSON.stringify(data.selectionDefault)
 			data.numberDefault = data.numberDefault === '' ? null : data.numberDefault
 			data.numberDecimals = data.numberDecimals === '' ? null : data.numberDecimals

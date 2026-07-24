@@ -206,7 +206,7 @@ export default {
 					}
 				})
 
-				this.localRow = Object.assign({}, tmp)
+				this.localRow = { ...tmp }
 			}
 		},
 		actionCancel() {
