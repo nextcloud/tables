@@ -97,7 +97,6 @@ async function stop() {
 	process.stderr.write('Stopping Nextcloud server…\n')
 	await closeReadyServer()
 	await stopNextcloud()
-	// eslint-disable-next-line n/no-process-exit
 	process.exit(0)
 }
 

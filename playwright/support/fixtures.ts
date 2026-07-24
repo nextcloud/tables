@@ -19,7 +19,6 @@ export const test = base.extend<{
 		user: TestUser
 	}
 }>({
-	// eslint-disable-next-line no-empty-pattern
 	userPage: [async ({ browser, baseURL }, use, testInfo) => {
 		const context = await browser.newContext({ baseURL })
 		const page = await context.newPage()

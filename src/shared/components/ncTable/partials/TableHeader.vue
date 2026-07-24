@@ -146,7 +146,7 @@ export default {
 		getFrozenColumnStyle,
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
-			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
+			this.openedColumnHeaderMenus = { ...this.openedColumnHeaderMenus }
 		},
 		getFilterForColumn(column) {
 			return getFiltersForColumn(column, this.localViewSetting)

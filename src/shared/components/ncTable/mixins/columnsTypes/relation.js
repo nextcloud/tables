@@ -18,7 +18,7 @@ export default class RelationColumn extends AbstractColumn {
 
 	/**
 	 * Format the value for display
-	 * @param {any} value The value to format
+	 * @param {unknown} value The value to format
 	 * @return {string} The formatted value
 	 */
 	formatValue(value) {
@@ -31,8 +31,8 @@ export default class RelationColumn extends AbstractColumn {
 
 	/**
 	 * Parse the value from input
-	 * @param {any} value The value to parse
-	 * @return {any} The parsed value
+	 * @param {unknown} value The value to parse
+	 * @return {unknown} The parsed value
 	 */
 	parseValue(value) {
 		if (value === null || value === undefined || value === '') {
@@ -74,8 +74,8 @@ export default class RelationColumn extends AbstractColumn {
 
 	/**
 	 * Check if filter matches the cell value
-	 * @param {any} cell The cell to check
-	 * @param {any} filter The filter to apply
+	 * @param {object} cell The cell to check
+	 * @param {object} filter The filter to apply
 	 * @return {boolean} Whether the filter matches
 	 */
 	isFilterFound(cell, filter) {
