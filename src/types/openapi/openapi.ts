@@ -1295,6 +1295,8 @@ export type components = {
             readonly hasShares: boolean;
             /** Format: int64 */
             readonly rowsCount: number;
+            /** Format: int64 */
+            readonly sidebarOrder: number | null;
         };
     };
     responses: never;

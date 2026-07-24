@@ -29,10 +29,14 @@ class ViewUpdateInput {
 		protected readonly ?ColumnSettings $columnSettings = null,
 		protected readonly ?FilterSet $filterSet = null,
 		protected readonly ?SortRuleSet $sortRuleSet = null,
+		protected readonly ?int $sidebarOrder = null,
 	) {
 	}
 
 	public function updateDetail(): Generator {
+		if ($this->sidebarOrder !== null) {
+			yield ViewUpdatableParameters::SIDEBAR_ORDER => $this->sidebarOrder;
+		}
 		if ($this->title) {
 			yield ViewUpdatableParameters::TITLE => $this->title;
 		}
@@ -61,7 +65,8 @@ class ViewUpdateInput {
 	 *     columns?: list<int>,
 	 *     columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
-	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
+	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>,
+	 *     sidebarOrder?: int
 	 * } $data
 	 */
 	public static function fromInputArray(array $data): self {
@@ -87,6 +92,7 @@ class ViewUpdateInput {
 			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings']) : null,
 			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter']) : null,
 			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort']) : null,
+			sidebarOrder: (array_key_exists('sidebarOrder', $data) && $data['sidebarOrder'] !== null) ? (int)$data['sidebarOrder'] : null,
 		);
 	}
 
