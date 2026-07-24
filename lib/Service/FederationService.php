@@ -223,12 +223,9 @@ class FederationService {
 		);
 	}
 
-	/**
-	 * @throws FederationDisabledError
-	 */
 	public function isNodeFederated(int $id, string $nodeType): bool {
 		if (!$this->configService->isFederationEnabled()) {
-			throw new FederationDisabledError('Federation is disabled');
+			return false;
 		}
 
 		return match($nodeType) {

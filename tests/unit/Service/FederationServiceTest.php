@@ -64,10 +64,9 @@ class FederationServiceTest extends TestCase {
 		);
 	}
 
-	public function testIsNodeFederatedThrowsWhenFederationDisabled(): void {
+	public function testIsNodeFederatedReturnsFalseWhenFederationDisabled(): void {
 		$this->configService->method('isFederationEnabled')->willReturn(false);
-		$this->expectException(FederationDisabledError::class);
-		$this->federationService->isNodeFederated(1, 'table');
+		$this->assertFalse($this->federationService->isNodeFederated(1, 'table'));
 	}
 
 	public function testIsNodeFederatedReturnsTrueForFederatedTable(): void {
