@@ -22,6 +22,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Validation\ColumnDtoValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
@@ -43,6 +44,8 @@ class ColumnService extends SuperService {
 
 	private UserHelper $userHelper;
 
+	private ColumnDtoValidator $columnDtoValidator;
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
@@ -53,6 +56,7 @@ class ColumnService extends SuperService {
 		RowService $rowService,
 		IL10N $l,
 		UserHelper $userHelper,
+		ColumnDtoValidator $columnDtoValidator,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -61,6 +65,7 @@ class ColumnService extends SuperService {
 		$this->rowService = $rowService;
 		$this->l = $l;
 		$this->userHelper = $userHelper;
+		$this->columnDtoValidator = $columnDtoValidator;
 	}
 
 	/**
@@ -181,6 +186,7 @@ class ColumnService extends SuperService {
 		if (ColumnType::tryFrom($columnDto->getType()) === null) {
 			throw new BadRequestError('Column type ' . $columnDto->getType() . ' does not exist.');
 		}
+		$this->columnDtoValidator->validate($columnDto);
 		// security
 		if ($viewId) {
 			try {
@@ -298,6 +304,7 @@ class ColumnService extends SuperService {
 			if (!$this->permissionsService->canUpdateColumnsByTableId($item->getTableId())) {
 				throw new PermissionError('update column id = ' . $columnId . ' is not allowed.');
 			}
+			$this->columnDtoValidator->validate($columnDto);
 
 			if ($columnDto->getTitle() !== null) {
 				$item->setTitle($columnDto->getTitle());
