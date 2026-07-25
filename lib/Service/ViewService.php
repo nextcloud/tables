@@ -21,6 +21,7 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -195,11 +196,13 @@ class ViewService extends SuperService {
 	 * @param string|null $emoji
 	 * @param Table $table
 	 * @param string|null $userId
+	 * @param string|null $technicalName
 	 * @return View
 	 * @throws InternalError
 	 * @throws PermissionError
+	 * @throws BadRequestError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null): View {
+	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null, ?string $technicalName = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -221,6 +224,10 @@ class ViewService extends SuperService {
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+		if ($technicalName !== null) {
+			$this->assertTechnicalNameValid($technicalName);
+			$item->setTechnicalName($technicalName);
+		}
 		// ownership is not stored with the record, but it might be necessary upon
 		// further interaction with the view in the running process, as the instance
 		// is cached now. The ownership is always inherited from the table.
@@ -228,8 +235,15 @@ class ViewService extends SuperService {
 		try {
 			$newItem = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+			$this->handleViewPersistDbException($e, 'create view insert error');
+		}
+		if ($newItem->getTechnicalName() === null || $newItem->getTechnicalName() === '') {
+			$newItem->setTechnicalName($this->buildDefaultTechnicalName($newItem->getId()));
+			try {
+				$newItem = $this->mapper->update($newItem);
+			} catch (\OCP\DB\Exception $e) {
+				$this->handleViewPersistDbException($e, 'create view update error');
+			}
 		}
 
 		$this->activityManager->triggerEvent(
@@ -267,6 +281,10 @@ class ViewService extends SuperService {
 					$this->assertInputColumnsAreValid($view, $userId, $value);
 				}
 
+				if ($parameter === ViewUpdatableParameters::TECHNICAL_NAME) {
+					$this->assertTechnicalNameValid($value);
+				}
+
 				if ($value instanceof JsonSerializable) {
 					$insertableValue = json_encode($value);
 				}
@@ -289,8 +307,10 @@ class ViewService extends SuperService {
 				subject: ActivityManager::SUBJECT_VIEW_UPDATE,
 			);
 			return $view;
-		} catch (InvalidArgumentException $e) {
+		} catch (BadRequestError|InvalidArgumentException $e) {
 			throw $e;
+		} catch (\OCP\DB\Exception $e) {
+			$this->handleViewPersistDbException($e, 'update view error');
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
@@ -640,6 +660,11 @@ class ViewService extends SuperService {
 		$item->setTableId($tableId);
 		$item->setTitle($view['title']);
 		$item->setEmoji($view['emoji']);
+		$technicalName = $view['technicalName'] ?? null;
+		if ($technicalName !== null) {
+			$this->assertTechnicalNameValid($technicalName);
+			$item->setTechnicalName($technicalName);
+		}
 		$item->setCreatedBy($userId);
 		$item->setCreatedAt($view['createdAt']);
 		$item->setLastEditBy($userId);
@@ -650,9 +675,44 @@ class ViewService extends SuperService {
 		$item->setFilter(json_encode($view['filter']));
 		try {
 			$this->mapper->insert($item);
+			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
+				$item->setTechnicalName($this->buildDefaultTechnicalName($item->getId()));
+				$this->mapper->update($item);
+			}
+		} catch (\OCP\DB\Exception $e) {
+			$this->handleViewPersistDbException($e, 'importView insert error');
 		} catch (\Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
+	}
+
+	private function buildDefaultTechnicalName(int $viewId): string {
+		return 'view_' . $viewId;
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function assertTechnicalNameValid(string $technicalName): void {
+		if (strlen($technicalName) > 200) {
+			throw new BadRequestError('Technical name must not exceed 200 characters.');
+		}
+		if (!preg_match('/^[a-z][a-z0-9_]*$/', $technicalName)) {
+			throw new BadRequestError('Technical name must start with a lowercase letter and contain only lowercase letters, numbers, and underscores.');
+		}
+	}
+
+	/**
+	 * @throws BadRequestError
+	 * @throws InternalError
+	 */
+	private function handleViewPersistDbException(\OCP\DB\Exception $e, string $context): never {
+		if ($e->getReason() === \OCP\DB\Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+			throw new BadRequestError('Technical name must be unique in the table.');
+		}
+
+		$this->logger->error($e->getMessage(), ['exception' => $e]);
+		throw new InternalError($context . ': ' . $e->getMessage());
 	}
 }

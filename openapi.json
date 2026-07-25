@@ -970,6 +970,7 @@
                 "required": [
                     "id",
                     "title",
+                    "technicalName",
                     "emoji",
                     "tableId",
                     "ownership",
@@ -997,6 +998,10 @@
                     },
                     "title": {
                         "type": "string"
+                    },
+                    "technicalName": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "emoji": {
                         "type": "string",
@@ -2010,6 +2015,12 @@
                                         "type": "string",
                                         "nullable": true,
                                         "description": "Emoji for the view"
+                                    },
+                                    "technicalName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Technical name for the view"
                                     }
                                 }
                             }
@@ -2035,6 +2046,24 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/View"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
                                 }
                             }
                         }

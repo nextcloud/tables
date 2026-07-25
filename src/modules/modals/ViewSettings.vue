@@ -62,6 +62,39 @@
 				:columns="allColumns" />
 		</NcAppSettingsSection>
 
+		<!--advanced settings-->
+		<NcAppSettingsSection v-if="columns != null" id="advanced" :name="t('tables', 'Advanced settings')">
+			<div v-if="!showAdvanced" class="row">
+				<div class="col-4">
+					<NcButton type="tertiary" :aria-label="t('tables', 'Show advanced settings')" @click="showAdvanced = true">
+						<template #icon>
+							<ChevronDown :size="20" />
+						</template>
+						{{ t('tables', 'Show advanced settings') }}
+					</NcButton>
+				</div>
+			</div>
+			<div v-if="showAdvanced" class="row">
+				<div class="col-4 space-T" :class="{error: technicalNameInvalidError}">
+					{{ t('tables', 'Technical name') }}
+				</div>
+				<div class="col-4" :class="{error: technicalNameInvalidError}">
+					<input
+						v-model="technicalName"
+						data-cy="viewTechnicalNameInput"
+						type="text"
+						:placeholder="t('tables', 'Optional, e.g. customer_view')">
+				</div>
+			</div>
+			<div v-if="showAdvanced && showTechnicalNameWarning" class="row">
+				<div class="col-4 space-T">
+					<NcNoteCard type="warning">
+						<p>{{ t('tables', 'Changing the technical name affects integrations and API. Make sure to update your services accordingly.') }}</p>
+					</NcNoteCard>
+				</div>
+			</div>
+		</NcAppSettingsSection>
+
 		<div v-if="canManageTable(view)" class="row sticky">
 			<div class="fix-col-4 space-T end">
 				<div style="padding-right: var(--default-grid-baseline);">
@@ -83,7 +116,8 @@
 </template>
 
 <script>
-import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcNoteCard } from '@nextcloud/vue'
+import ChevronDown from 'vue-material-design-icons/ChevronDown.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
@@ -96,6 +130,7 @@ import permissionsMixin from '../../shared/components/ncTable/mixins/permissions
 import { mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
+import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
 
 export default {
 	name: 'ViewSettings',
@@ -104,6 +139,8 @@ export default {
 		NcAppSettingsSection,
 		NcEmojiPicker,
 		NcButton,
+		NcNoteCard,
+		ChevronDown,
 		NotificationsSettings,
 		FilterForm,
 		SelectedViewColumns,
@@ -137,9 +174,13 @@ export default {
 	data() {
 		return {
 			open: false,
+			showAdvanced: false,
 			title: '',
 			description: '',
 			icon: '',
+			technicalName: '',
+			originalTechnicalName: '',
+			technicalNameInvalidError: false,
 			errorTitle: false,
 			selectedColumns: [],
 			allColumns: [],
@@ -160,6 +201,9 @@ export default {
 			set(filters) {
 				this.mutableView.filter = filters
 			},
+		},
+		showTechnicalNameWarning() {
+			return !this.createView && this.technicalName !== this.originalTechnicalName
 		},
 		saveText() {
 			if (this.createView) {
@@ -270,32 +314,48 @@ export default {
 				titleErrorText += ' ' + t('tables', 'Title is missing.')
 				showError(titleErrorText)
 				this.errorTitle = true
-			} else {
-				this.localLoading = true
+			}
+
+			if (!this.isTechnicalNameValid()) {
+				showError(t('tables', 'Cannot save view. Technical name must start with a lowercase letter and only contain lowercase letters, numbers, and underscores.'))
+				this.technicalNameInvalidError = true
+				return
+			}
+
+			this.localLoading = true
+			if (this.createView) {
+				this.mutableView.id = await this.sendNewViewToBE()
+			}
+			const success = await this.updateViewToBE(this.mutableView.id)
+			this.localLoading = false
+			if (success) {
 				if (this.createView) {
-					this.mutableView.id = await this.sendNewViewToBE()
+					await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
 				}
-				const success = await this.updateViewToBE(this.mutableView.id)
-				this.localLoading = false
-				if (success) {
-					if (this.createView) await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
-					this.actionCancel()
-				}
+				this.actionCancel()
 			}
 		},
 		async createNewView() {
 			if (this.title === '') {
 				showError(t('tables', 'Cannot create view.') + ' ' + t('tables', 'Title is missing.'))
 				this.errorTitle = true
-			} else {
-				this.localLoading = true
-				this.mutableView.id = await this.sendNewViewToBE()
-				const success = await this.updateViewToBE(this.mutableView.id)
-				this.localLoading = false
-				if (success) {
-					await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
-					this.actionCancel()
-				}
+			}
+
+			if (this.technicalName === this.originalTechnicalName) {
+				this.technicalName = ''
+			} else if (!this.isTechnicalNameValid()) {
+				showError(t('tables', 'Cannot save view. Technical name must start with a lowercase letter and only contain lowercase letters, numbers, and underscores.'))
+				this.technicalNameInvalidError = true
+				return
+			}
+
+			this.localLoading = true
+			this.mutableView.id = await this.sendNewViewToBE()
+			const success = await this.updateViewToBE(this.mutableView.id)
+			this.localLoading = false
+			if (success) {
+				await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
+				this.actionCancel()
 			}
 		},
 		async sendNewViewToBE() {
@@ -304,13 +364,9 @@ export default {
 				title: this.title,
 				description: this.description,
 				emoji: this.icon,
+				technicalName: normalizeTechnicalName(this.technicalName),
 			}
-			const res = await this.insertNewView({ data })
-			if (res) {
-				return res
-			} else {
-				showError(t('tables', 'Could not create new view'))
-			}
+			return await this.insertNewView({ data })
 		},
 		async updateViewToBE(id) {
 			const newColumnSettings = this.allColumns
@@ -326,6 +382,7 @@ export default {
 					title: this.title,
 					description: this.description,
 					emoji: this.icon,
+					technicalName: normalizeTechnicalName(this.technicalName),
 					columnSettings: JSON.stringify(newColumnSettings),
 				},
 			}
@@ -340,12 +397,7 @@ export default {
 				data.data.filter = JSON.stringify(filteredFilteringRules)
 			}
 
-			const res = await this.updateView({ id, data })
-			if (res) {
-				return res
-			} else {
-				showError(t('tables', 'Could not update view'))
-			}
+			return await this.updateView({ id, data })
 		},
 		reset() {
 			const config = this.generateViewConfigData ?? {}
@@ -354,6 +406,9 @@ export default {
 			this.title = this.mutableView?.title ?? ''
 			this.description = this.mutableView?.description ?? ''
 			this.icon = this.mutableView?.emoji ?? this.loadEmoji()
+			this.technicalName = this.mutableView?.technicalName ?? ''
+			this.originalTechnicalName = this.mutableView?.technicalName ?? ''
+			this.technicalNameInvalidError = false
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
@@ -363,6 +418,9 @@ export default {
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
 			return emojis[~~(Math.random() * emojis.length)]
+		},
+		isTechnicalNameValid() {
+			return isTechnicalNameValid(this.technicalName)
 		},
 	},
 }
@@ -389,5 +447,13 @@ export default {
 .sticky {
 	position: sticky;
 	bottom: 0;
+}
+
+.error {
+	color: var(--color-error);
+}
+
+.error input {
+	border-color: var(--color-error);
 }
 </style>

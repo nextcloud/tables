@@ -348,10 +348,12 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID that will hold the view
 	 * @param string $title Title for the view
 	 * @param string|null $emoji Emoji for the view
+	 * @param string|null $technicalName Technical name for the view
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View created
+	 * 400: Bad request
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -360,13 +362,17 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
-	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
+	public function createView(int $tableId, string $title, ?string $emoji, ?string $technicalName = null): DataResponse {
 		try {
-			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId))->jsonSerialize());
+			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId), null, $technicalName)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (BadRequestError $e) {
+			$this->logger->warning('A bad request error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -442,6 +448,10 @@ class Api1Controller extends ApiController {
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InvalidArgumentException $e) {
 			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
+		} catch (BadRequestError $e) {
+			$this->logger->warning('A bad request error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {

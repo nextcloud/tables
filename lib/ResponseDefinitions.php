@@ -16,6 +16,7 @@ namespace OCA\Tables;
  * @psalm-type TablesView = array{
  * 	id: int,
  * 	title: string,
+ * 	technicalName: string|null,
  * 	emoji: string|null,
  *  tableId: int,
  * 	ownership: string,
