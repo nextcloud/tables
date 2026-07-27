@@ -43,7 +43,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 <template>
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
-			<Options v-model:view-setting="localViewSetting" :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId"
+			<Options v-model:view-setting="localViewSetting" :rows="getSearchedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId"
 				:is-view="isView"
 				:selected-rows="localSelectedRows"
 				:show-options="parsedColumns.length !== 0" :config="config" @create-row="$emit('create-row')"
@@ -53,7 +53,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" v-model:view-setting="localViewSetting"
-				:columns="parsedColumns" :rows="getSearchedAndFilteredAndSortedRows" :is-view="isView" :element-id="elementId"
+				:columns="parsedColumns" :rows="getSearchedRows" :is-view="isView" :element-id="elementId"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@copy-row="rowId => $emit('copy-row', rowId)"
@@ -66,7 +66,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				<template #actions>
 					<slot name="actions"
 						:is-filtered="isFilteredComputed"
-						:on-export-filtered="() => $emit('download-filtered-csv', getSearchedAndFilteredAndSortedRows)" />
+						:on-export-filtered="() => $emit('download-filtered-csv', getSearchedRows)" />
 				</template>
 			</CustomTable>
 			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
@@ -117,9 +117,6 @@ import {
 	TYPE_META_UPDATED_AT,
 	TYPE_META_UPDATED_BY,
 } from '../../constants.ts'
-import { MetaColumns } from './mixins/metaColumns.js'
-import { MagicFields } from './mixins/magicFields.js'
-import { FilterIds, getFiltersForColumn } from './mixins/filter.js'
 
 export default {
 	name: 'NcTable',
@@ -267,12 +264,9 @@ export default {
 			return (this.localViewSetting?.filter?.length > 0) || !!this.localViewSetting?.searchString
 		},
 
-		sorting() {
-			return this.viewSetting?.sorting
-		},
-		getSearchedAndFilteredRows() {
-			// if we don't have to search and/or filter
-			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
+		getSearchedRows() {
+			// if we don't have to search
+			if (!this.viewSetting?.searchString) {
 				// cleanup markers
 				if (this.rows && this.columns) {
 					this.rows.forEach(row => {
@@ -283,7 +277,6 @@ export default {
 									return
 								}
 								delete cell.searchStringFound
-								delete cell.filterFound
 							})
 						}
 					})
@@ -302,14 +295,11 @@ export default {
 				if (!row || !row.data) {
 					continue
 				}
-				let filterStatusRow = null
 				let searchStatusRow = false
 
 				// each column in a row => cell
 				this.columns.forEach(column => {
-					let filterStatus = null
 					let searchStatus = true
-					const filters = getFiltersForColumn(column, this.viewSetting)
 					let cell
 					if (column.id < 0) {
 						cell = { columnId: column.id }
@@ -343,55 +333,20 @@ export default {
 					}
 					// cleanup possible old markers
 					delete cell.searchStringFound
-					delete cell.filterFound
 
-					// apply filters (if any)
-					filters.forEach(fil => {
-						this.addMagicFieldsValues(fil)
-						if (filterStatus === null || filterStatus === true) {
-							filterStatus = column.isFilterFound(cell, fil)
-						}
-					})
 					// if we should search
 					if (searchString) {
 						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
 					}
 
-					// if filterStatus is null, this result should be ignored
-					if (filterStatus !== null && (filterStatusRow || filterStatusRow === null)) {
-						filterStatusRow = filterStatus
-					}
-
-					// filterStatusRow = filterStatus
 					searchStatusRow = searchStatusRow || searchStatus
 				})
 
-				if ((filterStatusRow || filterStatusRow === null) && searchStatusRow) {
+				if (searchStatusRow) {
 					data.push({ ...row })
 				}
 			}
 			return data
-		},
-		getSearchedAndFilteredAndSortedRows() {
-			const allColumns = this.columns.concat(MetaColumns)
-			const sort = (sortCols) => {
-				const sortColumn = allColumns.find(item => item.id === sortCols?.[0].columnId)
-				const nextSorts = []
-				for (let i = 1; i < sortCols.length; i++) {
-					const sortColumn = allColumns.find(item => item.id === sortCols[i].columnId)
-					nextSorts.push(sortColumn?.sort?.(sortCols[i].mode))
-				}
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(sortCols[0].mode, nextSorts))
-			}
-
-			// if we have to sort
-			if (this.viewSetting?.presetSorting) {
-				return sort(this.viewSetting.presetSorting)
-			}
-			if (this.viewSetting?.sorting) {
-				return sort(this.viewSetting.sorting)
-			}
-			return this.getSearchedAndFilteredRows
 		},
 	},
 	watch: {
@@ -433,18 +388,6 @@ export default {
 		setSearchString(str) {
 			this.localViewSetting.searchString = str !== '' ? str : null
 			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
-		},
-		addMagicFieldsValues(filter) {
-			if (FilterIds.ContainsItem === filter.operator.id) {
-				return
-			}
-
-			Object.values(MagicFields).forEach(field => {
-				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
-				if (filter.value !== newFilterValue) {
-					filter.magicValuesEnriched = newFilterValue
-				}
-			})
 		},
 	},
 }

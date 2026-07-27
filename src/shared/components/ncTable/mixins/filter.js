@@ -74,27 +74,27 @@ export const Filters = {
 	BeginsWith: new Filter({
 		id: FilterIds.BeginsWith,
 		label: t('tables', 'Begins with'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLink],
+		goodFor: [ColumnTypes.TextLine],
 		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith],
 	}),
 	EndsWith: new Filter({
 		id: FilterIds.EndsWith,
 		label: t('tables', 'Ends with'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLink],
+		goodFor: [ColumnTypes.TextLine],
 		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.EndsWith],
 	}),
 	IsEqual: new Filter({
 		id: FilterIds.IsEqual,
 		label: t('tables', 'Is equal'),
 		shortLabel: '=',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Relation],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.IsNotEqual, FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsNotEqual: new Filter({
 		id: FilterIds.IsNotEqual,
 		label: t('tables', 'Is not equal'),
 		shortLabel: '!=',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Relation],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsGreaterThan: new Filter({

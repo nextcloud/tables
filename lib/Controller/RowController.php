@@ -31,26 +31,30 @@ class RowController extends Controller {
 	/**
 	 * @param int $tableId ID of the table
 	 * @param string $customFilters JSON-encoded array of filter groups to apply
+	 * @param string $sort JSON-encoded array of sort rules to apply, an empty array disables default sorting
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
-	public function index(int $tableId, string $customFilters = ''): DataResponse {
-		return $this->handleError(function () use ($tableId, $customFilters) {
+	public function index(int $tableId, string $customFilters = '', string $sort = ''): DataResponse {
+		return $this->handleError(function () use ($tableId, $customFilters, $sort) {
 			$customFilters = json_decode($customFilters, true) ?? [];
-			return $this->service->findAllByTable($tableId, $this->userId, customFilters: $customFilters);
+			$sort = $sort === '' ? null : (json_decode($sort, true) ?? []);
+			return $this->service->findAllByTable($tableId, $this->userId, customFilters: $customFilters, sort: $sort);
 		});
 	}
 
 	/**
 	 * @param int $viewId ID of the view
 	 * @param string $customFilters JSON-encoded array of filter groups to apply
+	 * @param string $sort JSON-encoded array of sort rules to apply, an empty array disables default sorting
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
-	public function indexView(int $viewId, string $customFilters = ''): DataResponse {
-		return $this->handleError(function () use ($viewId, $customFilters) {
+	public function indexView(int $viewId, string $customFilters = '', string $sort = ''): DataResponse {
+		return $this->handleError(function () use ($viewId, $customFilters, $sort) {
 			$customFilters = json_decode($customFilters, true) ?? [];
-			return $this->service->findAllByView($viewId, $this->userId, customFilters: $customFilters);
+			$sort = $sort === '' ? null : (json_decode($sort, true) ?? []);
+			return $this->service->findAllByView($viewId, $this->userId, customFilters: $customFilters, sort: $sort);
 		});
 	}
 

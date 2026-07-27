@@ -5,7 +5,6 @@
 import { AbstractTextColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
-import { TYPE_META_CREATED_BY, TYPE_META_UPDATED_BY } from '../../../../constants.ts'
 
 export default class TextLineColumn extends AbstractTextColumn {
 
@@ -14,23 +13,6 @@ export default class TextLineColumn extends AbstractTextColumn {
 		this.type = ColumnTypes.TextLine
 		this.textMaxLength = data.textMaxLength
 		this.textUnique = data.textUnique
-	}
-
-	sort(mode, nextSorts) {
-		const factor = mode === 'DESC' ? -1 : 1
-		return (rowA, rowB) => {
-			let valueA = rowA.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
-			let valueB = rowB.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
-			if (this.id === TYPE_META_CREATED_BY) {
-				valueA = rowA.createdBy?.toLowerCase() || ''
-				valueB = rowB.createdBy?.toLowerCase() || ''
-			}
-			if (this.id === TYPE_META_UPDATED_BY) {
-				valueA = rowA.lastEditBy?.toLowerCase() || ''
-				valueB = rowB.lastEditBy?.toLowerCase() || ''
-			}
-			return valueA.localeCompare(valueB, undefined) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
-		}
 	}
 
 	getValueString(valueObject) {

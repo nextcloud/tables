@@ -26,23 +26,6 @@ export class AbstractColumn {
 		this.customSettings = data.customSettings
 	}
 
-	canSort() {
-		return typeof this.sort === 'function'
-	}
-
-	getNextSortsResult(nextSorts, rowA, rowB) {
-		if (!nextSorts) {
-			return 0
-		}
-		for (const sort of nextSorts) {
-			const result = sort(rowA, rowB)
-			if (result !== 0) {
-				return result
-			}
-		}
-		return 0
-	}
-
 	getPossibleOperators() {
 		return Object.values(Filters).filter(fil => fil.goodFor.includes(this.type))
 	}

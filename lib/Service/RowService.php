@@ -91,18 +91,21 @@ class RowService extends SuperService {
 	 * @param ?int $limit
 	 * @param ?int $offset
 	 * @param array $customFilters
+	 * @param array|null $sort JSON-decoded sort rules, null to use the table default, an empty array for no sorting
 	 * @return Row2[]
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null, array $customFilters = []): array {
+	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null, array $customFilters = [], ?array $sort = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
 				$tableColumns = $this->columnMapper->findAllByTable($tableId);
 				$showColumnIds = array_map(fn (Column $column) => $column->getId(), $tableColumns);
 
-				$table = $this->tableMapper->find($tableId);
-				$sort = $table->getSortArray() ?: null;
+				if ($sort === null) {
+					$table = $this->tableMapper->find($tableId);
+					$sort = $table->getSortArray() ?: null;
+				}
 
 				$rows = $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, $sort, $userId, $customFilters);
 				$this->attachAliasPayloads($rows, $tableColumns);
@@ -122,16 +125,21 @@ class RowService extends SuperService {
 	 * @param int|null $limit
 	 * @param int|null $offset
 	 * @param array $customFilters
+	 * @param array|null $sort JSON-decoded sort rules, null to use the view default, an empty array for no sorting
 	 * @return Row2[]
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 * @throws PermissionError
 	 */
-	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null, array $customFilters = []): array {
+	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null, array $customFilters = [], ?array $sort = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
+
+				if ($sort === null) {
+					$sort = $view->getSortArray();
+				}
 
 				$rows = $this->row2Mapper->findAll(
 					$view->getColumnIds(),
@@ -139,7 +147,7 @@ class RowService extends SuperService {
 					$limit,
 					$offset,
 					$view->getFilterArray(),
-					$view->getSortArray(),
+					$sort,
 					$this->resolveFilterUserId($userId, $view),
 					$customFilters,
 				);

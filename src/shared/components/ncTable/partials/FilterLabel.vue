@@ -30,6 +30,10 @@ export default {
 		      type: [String, Array],
 		      default: '',
 		    },
+		displayValue: {
+		      type: String,
+		      default: null,
+		    },
 		type: {
 		      type: String,
 		      default: 'highlighted', // highlighted, outlined
@@ -45,11 +49,18 @@ export default {
 	],
 	computed: {
 		getValue() {
+			if (this.displayValue) {
+				return this.displayValue
+			}
+
 			if (FilterIds.ContainsItem === this.operator.id) {
 				return this.value
 			}
 
 			let value = this.value
+			if (typeof value !== 'string') {
+				return value
+			}
 			Object.values(MagicFields).forEach(field => {
 				value = value.replace('@' + field.id, field.label)
 			})
