@@ -11,7 +11,7 @@
 				:view="element"
 				:columns="columns"
 				:rows="rows"
-				:view-setting="viewSetting"
+				:view-setting.sync="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV"
@@ -22,7 +22,7 @@
 				:table="element"
 				:columns="columns"
 				:rows="rows"
-				:view-setting="viewSetting"
+				:view-setting.sync="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV"
@@ -45,6 +45,9 @@ import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
 import { showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
+import { buildBackendFilterQuery } from '../../../shared/components/ncTable/mixins/filterSupport.js'
+import { getExplicitSortRules, normalizeBackendSortRulesForColumns } from '../../../shared/components/ncTable/mixins/sortSupport.js'
 
 export default {
 	name: 'MainWrapper',
@@ -81,13 +84,14 @@ export default {
 			localLoading: false,
 			lastActiveElement: null,
 			viewSetting: {},
+			isRefreshing: false,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['activeRowId']),
-		customFiltered() {
-			return this.$route.query.customFilters
+		backendQueryKey() {
+			return JSON.stringify(this.buildRefreshQuery())
 		},
 	},
 
@@ -98,8 +102,12 @@ export default {
 		activeRowId() {
 			this.reload()
 		},
-		customFiltered() {
-			this.reload(true)
+		backendQueryKey() {
+			if (!this.element || this.localLoading || this.isRefreshing || !this.lastActiveElement) {
+				return
+			}
+
+			this.refreshRows()
 		},
 	},
 
@@ -155,25 +163,70 @@ export default {
 		deleteRows(rowIds) {
 			this.rowsToDelete = rowIds
 		},
-		async reload(force = false) {
+		buildRefreshQuery() {
+			const columns = this.columns || []
+			const effectiveSort = normalizeBackendSortRulesForColumns(getExplicitSortRules(this.viewSetting), columns)
+			const customFilters = buildBackendFilterQuery(this.$route.query.customFilters, this.viewSetting, columns)
+
+			return {
+				customFilters,
+				sort: effectiveSort.length > 0 ? JSON.stringify(effectiveSort) : null,
+			}
+		},
+		async refreshRows() {
+			this.isRefreshing = true
+			try {
+				await this.syncRows({ showRefreshError: true })
+			} finally {
+				this.isRefreshing = false
+			}
+		},
+		async syncRows({ showRefreshError = false } = {}) {
+			if (!this.canReadData(this.element)) {
+				await this.removeRows({
+					isView: this.isView,
+					elementId: this.element.id,
+				})
+				return
+			}
+
+			const refreshQuery = this.buildRefreshQuery()
+			const rowsLoaded = await this.loadRowsFromBE({
+				viewId: this.isView ? this.element.id : null,
+				tableId: this.isView ? null : this.element.id,
+				customFilters: refreshQuery.customFilters,
+				sort: refreshQuery.sort,
+			})
+
+			if (showRefreshError && rowsLoaded === false) {
+				showError(t('tables', 'Error refreshing, please try to reload the whole page'))
+			}
+		},
+		async reload(force = false, manualRefresh = false) {
 			if (!this.element) {
 				return
 			}
 
-			// Used to reload View from backend, in case there are Filter updates
-			const isLastElementSameAndView = this.element.id === this.lastActiveElement?.id && this.isView === this.lastActiveElement?.isView
+			const sameElement = this.lastActiveElement
+				&& this.element.id === this.lastActiveElement.id
+				&& this.isView === this.lastActiveElement.isView
 
-			if (!this.lastActiveElement || this.element.id !== this.lastActiveElement.id || isLastElementSameAndView || this.isView !== this.lastActiveElement.isView || force) {
+			if (sameElement && !force) {
+				return
+			}
+
+			if (manualRefresh) {
+				this.isRefreshing = true
+			} else {
 				this.localLoading = true
-
-				// Since we show one page at a time, no need keep other tables in the store
 				this.clearState()
-
 				this.viewSetting = {}
 				if (this.element?.sort?.length) {
 					this.viewSetting.presetSorting = [...this.element.sort]
 				}
+			}
 
+			try {
 				await this.loadColumnsFromBE({
 					view: this.isView ? this.element : null,
 					tableId: !this.isView ? this.element.id : null,
@@ -185,18 +238,8 @@ export default {
 					force: true,
 				})
 
-				if (this.canReadData(this.element)) {
-					await this.loadRowsFromBE({
-						viewId: this.isView ? this.element.id : null,
-						tableId: !this.isView ? this.element.id : null,
-						customFilters: this.$route.query.customFilters,
-					})
-				} else {
-					await this.removeRows({
-						isView: this.isView,
-						elementId: this.element.id,
-					})
-				}
+				await this.syncRows({ showRefreshError: manualRefresh })
+
 				this.lastActiveElement = {
 					id: this.element.id,
 					isView: this.isView,
@@ -204,7 +247,9 @@ export default {
 				if (this.activeRowId) {
 					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns, isView: this.isView, elementId: this.element.id, element: this.element })
 				}
+			} finally {
 				this.localLoading = false
+				this.isRefreshing = false
 			}
 		},
 	},

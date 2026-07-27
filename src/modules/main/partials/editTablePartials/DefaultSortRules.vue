@@ -31,7 +31,7 @@
 import SortEntry from '../editViewPartials/sort/SortEntry.vue'
 import { NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
-import { ColumnTypes } from '../../../../shared/components/ncTable/mixins/columnHandler.js'
+import { isBackendSortableColumn } from '../../../../shared/components/ncTable/mixins/sortSupport.js'
 
 export default {
 	name: 'DefaultSortRules',
@@ -64,25 +64,8 @@ export default {
 		},
 	},
 	methods: {
-		/**
-		 * The method rejects column types for which there is no sort support on the backend.
-		 *
-		 * Important:
-		 * - Not all columns that are sortable on the front-end are sortable on the back-end.
-		 * - Example: "selection" fields — the front-end can sort them by value (since it has it),
-		 *   but the back-end only stores an ID and cannot easily JOIN the value for sorting.
-		 * @param {AbstractColumn} col The column to check.
-		 */
-		canBeSorted(col) {
-			return ![
-				ColumnTypes.Selection,
-				ColumnTypes.SelectionMulti,
-				ColumnTypes.TextLink,
-				ColumnTypes.Usergroup,
-			].includes(col.type)
-		},
 		eligibleColumns(selectedId) {
-			return this.columns?.filter(col => col.canSort() && this.canBeSorted(col) && (!this.mutableSort.map(e => e.columnId).includes(col.id) || col.id === selectedId))
+			return this.columns?.filter(col => isBackendSortableColumn(col) && (!this.mutableSort.map(e => e.columnId).includes(col.id) || col.id === selectedId))
 		},
 		deleteSortingRule(index) {
 			this.mutableSort.splice(index, 1)

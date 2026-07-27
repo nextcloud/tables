@@ -178,7 +178,7 @@ class Row2Mapper {
 	 */
 	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null, array $customFilters = []): array {
 		try {
-			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
+			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort, $customFilters);
 
 			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset, $customFilters);
 

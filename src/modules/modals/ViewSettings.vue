@@ -227,8 +227,8 @@ export default {
 					mergedViewSettings.columnSettings = this.view.columnSettings
 				}
 			}
-			if (this.viewSetting.sorting) {
-				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
+			if (Array.isArray(this.viewSetting.sorting) && this.viewSetting.sorting.length > 0) {
+				mergedViewSettings.sort = [...this.viewSetting.sorting]
 			} else {
 				mergedViewSettings.sort = this.view.sort
 			}

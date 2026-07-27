@@ -18,26 +18,6 @@ export default class DatetimeDateColumn extends AbstractDatetimeColumn {
 		return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('ll')
 	}
 
-	sort(mode, nextSorts) {
-		const factor = mode === 'DESC' ? -1 : 1
-		return (rowA, rowB) => {
-			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
-			const valueA = new Moment(tmpA)
-			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value || ''
-			const valueB = new Moment(tmpB)
-			if (!tmpA && tmpB) {
-				return -1 * factor
-			}
-			if (tmpA && !tmpB) {
-				return 1 * factor
-			}
-			if (!tmpA && !tmpB) {
-				return super.getNextSortsResult(nextSorts, rowA, rowB)
-			}
-			return (valueA.diff(valueB)) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
-		}
-	}
-
 	isSearchStringFound(cell, searchString) {
 		const date = new Moment(cell.value, 'YYYY-MM-DD').format('ll')
 		return super.isSearchStringFound(date, cell, searchString)

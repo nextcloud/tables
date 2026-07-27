@@ -43,6 +43,7 @@
 							:key="filter.columnId + filter.operator.id+ filter.value"
 							:operator="castToFilter(filter.operator.id)"
 							:value="filter.value"
+							:display-value="filter.displayValue"
 							@delete-filter="id => deleteFilter(id)" />
 					</div>
 				</div>

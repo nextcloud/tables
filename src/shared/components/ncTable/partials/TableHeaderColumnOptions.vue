@@ -42,8 +42,24 @@
 						v-model="searchOptions"
 						type="multiselect"
 						:multiple="true"
-						:options="column.selectionOptions"
+						:options="selectionFilterOptions"
 						:placeholder="t('tables', 'Select options')" />
+					<NcActionButton
+						:close-after-click="true"
+						@click="submitFilterInput()">
+						<template #icon>
+							<Magnify :size="20" />
+						</template>
+						{{ t('tables', 'Submit') }}
+					</NcActionButton>
+				</template>
+				<template v-else-if="shouldUseOptionInput">
+					<NcActionInput
+						v-model="searchOption"
+						type="multiselect"
+						:multiple="false"
+						:options="filterOptions"
+						:placeholder="optionInputPlaceholder" />
 					<NcActionButton
 						:close-after-click="true"
 						@click="submitFilterInput()">
@@ -88,8 +104,8 @@
 					</template>
 					{{ pinnedColumnId === column.id ? t('tables', 'Unpin column') : t('tables', 'Pin column') }}
 				</NcActionButton>
-				<NcActionCaption v-if="!hasPresetSorting && canSort" :name="t('tables', 'Sorting')" />
-				<NcActionButtonGroup v-if="!hasPresetSorting && canSort">
+				<NcActionCaption v-if="canSort" :name="t('tables', 'Sorting')" />
+				<NcActionButtonGroup v-if="canSort">
 					<NcActionButton :class="{ selected: getSortMode === 'ASC' }" :aria-label="t('tables', 'Sort asc')" @click="sort('ASC')">
 						<template #icon>
 							<SortAsc :size="20" />
@@ -172,7 +188,10 @@ import {
 } from '@nextcloud/vue'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { FilterIds } from '../mixins/filter.js'
+import { isBackendSortableColumn } from '../mixins/sortSupport.js'
 import { translate as t } from '@nextcloud/l10n'
+import { useDataStore } from '../../../../store/data.js'
+import { useTablesStore } from '../../../../store/store.js'
 
 export default {
 	components: {
@@ -226,9 +245,9 @@ export default {
 	data() {
 		return {
 			searchValue: '',
+			searchOption: null,
 			searchOptions: [],
 			operator: null,
-			sortMode: null,
 			term: '',
 			selectOperator: false,
 			selectValue: false,
@@ -272,14 +291,53 @@ export default {
 		getMagicFields() {
 			return this.column.getPossibleMagicFields()
 		},
-		canSort() {
-			return this.column.canSort()
+		isSelectionColumn() {
+			return ['selection', 'selection-multi'].includes(this.column?.type)
 		},
-		hasPresetSorting() {
-			return this.localViewSetting?.presetSorting?.find(item => item.columnId === this.column?.id)
+		isRelationColumn() {
+			return this.column?.type === 'relation'
+		},
+		shouldUseOptionInput() {
+			return (this.isSelectionColumn || this.isRelationColumn) && !this.selectedOperator?.noSearchValue
+		},
+		selectionFilterOptions() {
+			return (this.column?.selectionOptions ?? [])
+				.filter(option => !option.deleted)
+				.map(option => ({
+					id: '@selection-id-' + option.id,
+					label: option.label,
+				}))
+		},
+		relationFilterOptions() {
+			const dataStore = useDataStore()
+			const columnRelations = dataStore.getRelations(this.column?.id)?.data
+			return Object.values(columnRelations ?? {})
+				.map(option => ({
+					id: '@relation-id-' + option.id,
+					label: option.label,
+				}))
+		},
+		filterOptions() {
+			if (this.isRelationColumn) {
+				return this.relationFilterOptions
+			}
+			return this.selectionFilterOptions
+		},
+		optionInputPlaceholder() {
+			if (this.isRelationColumn) {
+				return t('tables', 'Select relation value')
+			}
+			return t('tables', 'Select option')
+		},
+		canSort() {
+			return isBackendSortableColumn(this.column)
 		},
 		getSortMode() {
-			const sortObject = this.localViewSetting?.presetSorting?.find(item => item.columnId === this.column?.id) ?? this.localViewSetting?.sorting?.find(item => item.columnId === this.column?.id)
+			if (Array.isArray(this.localViewSetting?.sorting)) {
+				return this.localViewSetting.sorting.find(item => item.columnId === this.column?.id)?.mode ?? null
+			}
+
+			const sortObject = this.localViewSetting?.presetSorting?.find(item => item.columnId === this.column?.id)
 			if (sortObject) {
 				return sortObject.mode
 			}
@@ -341,9 +399,27 @@ export default {
 	},
 	created() {
 		this.reset()
+		this.loadRelationOptions()
 	},
 	methods: {
 		t,
+		loadRelationOptions() {
+			if (!this.isRelationColumn) {
+				return
+			}
+
+			const tablesStore = useTablesStore()
+			const dataStore = useDataStore()
+			const activeElement = tablesStore.activeView || tablesStore.activeTable
+			if (!activeElement) {
+				return
+			}
+
+			dataStore.loadRelationsFromBE({
+				tableId: tablesStore.activeTable?.id,
+				viewId: tablesStore.activeView?.id,
+			})
+		},
 		isDisabled(op) {
 			return this.getDisabledOperators.map(o => o.id).includes(op)
 		},
@@ -369,13 +445,19 @@ export default {
 			}
 		},
 		submitFilterInput() {
+			const filterValue = this.getFilterValue()
+			if (this.shouldUseOptionInput && !filterValue) {
+				this.reset()
+				return
+			}
+
 			// Prevents adding duplicate "Contains" or "DoesNotContain" filters with the same value on the same column
 			if ([FilterIds.Contains, FilterIds.DoesNotContain].includes(this.selectedOperator.id)) {
 				const columnFilters = this.getFilterForColumn(this.column)
 				if (columnFilters && columnFilters
 					.filter(fil => fil.operator.id === this.selectedOperator.id)
 					.map(fil => fil.value)
-					.includes(this.searchValue)) {
+					.includes(filterValue)) {
 					this.reset()
 					return
 				}
@@ -392,7 +474,11 @@ export default {
 			const filterObject = {
 				columnId: this.column.id,
 				operator: this.selectedOperator,
-				value: FilterIds.ContainsItem === this.selectedOperator.id ? this.searchOptions : this.searchValue,
+				value: this.getFilterValue(),
+			}
+			const displayValue = this.getFilterDisplayValue()
+			if (displayValue !== null) {
+				filterObject.displayValue = displayValue
 			}
 			if (!this.localViewSetting.filter) {
 				this.localViewSetting.filter = []
@@ -400,29 +486,50 @@ export default {
 			this.localViewSetting.filter.push(filterObject)
 			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 		},
+		getFilterValue() {
+			if (FilterIds.ContainsItem === this.selectedOperator.id) {
+				return this.searchOptions
+			}
+			if (this.shouldUseOptionInput) {
+				return this.searchOption?.id ?? ''
+			}
+			return this.searchValue
+		},
+		// show the lable of the selection instead of magic value like @selection-id-1
+		getFilterDisplayValue() {
+			if (FilterIds.ContainsItem === this.selectedOperator.id) {
+				return null
+			}
+			if (this.shouldUseOptionInput) {
+				return this.searchOption?.label ?? ''
+			}
+			return null
+		},
 		reset() {
 			this.operator = null
 			this.searchValue = ''
+			this.searchOption = null
 			this.searchOptions = []
 			this.sortMode = this.getSortMode
 			this.selectOperator = false
 			this.selectValue = false
 		},
 		sort(mode) {
-			if (mode === this.getSortMode) {
-				this.sortMode = null
-				this.localViewSetting.sorting = null
-			} else {
-				if (mode !== 'ASC' && mode !== 'DESC') {
-					return
-				}
-				this.sortMode = mode
-				this.localViewSetting.sorting = [{
+			if (mode !== 'ASC' && mode !== 'DESC') {
+				return
+			}
+
+			const sorting = mode === this.getSortMode
+				? []
+				: [{
 					columnId: this.column.id,
 					mode,
 				}]
+
+			this.localViewSetting = {
+				...this.localViewSetting,
+				sorting,
 			}
-			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 			this.close()
 		},
 		hideColumn() {

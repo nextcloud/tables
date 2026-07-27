@@ -233,16 +233,24 @@ export const useDataStore = defineStore('data', {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ tableId, viewId, customFilters = null }) {
+		async loadRowsFromBE({ tableId, viewId, customFilters = null, sort = null }) {
 			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
 			this.loading[stateId] = true
 			let res = null
 
 			try {
+				const params = {}
+				if (customFilters) {
+					params.customFilters = customFilters
+				}
+				if (sort) {
+					params.sort = sort
+				}
+
 				if (viewId) {
-					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId), { params: { customFilters } })
+					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId), { params })
 				} else {
-					res = await axios.get(generateUrl('/apps/tables/row/table/' + tableId), { params: { customFilters } })
+					res = await axios.get(generateUrl('/apps/tables/row/table/' + tableId), { params })
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load rows.'))
