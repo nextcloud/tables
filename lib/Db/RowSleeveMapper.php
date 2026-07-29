@@ -106,24 +106,30 @@ class RowSleeveMapper extends QBMapper {
 	}
 
 	/**
-	 * @param int $tableId
-	 * @return int
+	 * @param int[] $tableIds
+	 * @return array<int, int>
 	 */
-	public function countRows(int $tableId): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*', 'counter'));
-		$qb->from($this->table, 't1');
-		$qb->where(
-			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
-		);
-
-		try {
-			$result = $this->findOneQuery($qb);
-			return (int)$result['counter'];
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Will return 0.');
-			return 0;
+	public function countRowsForTables(array $tableIds): array {
+		if (empty($tableIds)) {
+			return [];
 		}
+
+		$counts = array_fill_keys($tableIds, 0);
+		foreach (array_chunk($tableIds, 1000 - 1) as $tableIdsChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('table_id', $qb->func()->count('*', 'counter'))
+				->from($this->table)
+				->where($qb->expr()->in('table_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
+				->groupBy('table_id');
+
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$counts[(int)$row['table_id']] = (int)$row['counter'];
+			}
+			$result->closeCursor();
+		}
+
+		return $counts;
 	}
 
 	/**
