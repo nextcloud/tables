@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Service;
 
+use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
@@ -246,5 +247,39 @@ class ShareServiceTest extends TestCase {
 
 		$this->expectException(Exception::class);
 		$this->shareService->deleteForShareReview(5);
+	}
+
+	public function testDeleteAllForContextCleansNavigationForAllSenders(): void {
+		$context = new Context();
+		$context->setId(123);
+
+		$share1 = new Share();
+		$share1->setId(1);
+		$share1->setSender('userA');
+
+		$share2 = new Share();
+		$share2->setId(2);
+		$share2->setSender('userB');
+
+		$deletedShareIds = [];
+		$this->mapper->expects($this->once())
+			->method('findAllSharesForNode')
+			->with('context', 123)
+			->willReturn([$share1, $share2]);
+
+		$this->contextNavigationMapper->expects($this->exactly(2))
+			->method('deleteByShareId')
+			->willReturnCallback(function (int $shareId) use (&$deletedShareIds): int {
+				$deletedShareIds[] = $shareId;
+				return 1;
+			});
+
+		$this->mapper->expects($this->once())
+			->method('deleteByNode')
+			->with(123, 'context');
+
+		$this->shareService->deleteAllForContext($context);
+
+		$this->assertEqualsCanonicalizing([1, 2], $deletedShareIds);
 	}
 }
