@@ -257,6 +257,72 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @param int[] $tableIds
+	 * @param string|null $userId
+	 * @return array<int, int>
+	 * @throws InternalError
+	 */
+	public function countSharesForTables(array $tableIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
+			$shares = $this->mapper->findAllSharesForNodes('table', $tableIds, $userId, $excluded);
+
+			$counts = array_fill_keys($tableIds, 0);
+			foreach ($shares as $share) {
+				$nodeId = $share->getNodeId();
+				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
+			}
+
+			return $counts;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int[] $viewIds
+	 * @param string|null $userId
+	 * @return array<int, int>
+	 * @throws InternalError
+	 */
+	public function countSharesForViews(array $viewIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
+			$shares = $this->mapper->findAllSharesForNodes('view', $viewIds, $userId, $excluded);
+
+			$counts = array_fill_keys($viewIds, 0);
+			foreach ($shares as $share) {
+				$nodeId = $share->getNodeId();
+				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
+			}
+
+			return $counts;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int[] $tableIds
+	 * @return int[]
+	 * @throws InternalError
+	 */
+	public function getTableIdsWithLinkShares(array $tableIds): array {
+		try {
+			return $this->mapper->findLinkSharesForTables($tableIds);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
 	 * @throws InternalError
 	 */
 	private function findElementsSharedWithMe(string $elementType = 'table', ?string $userId = null): array {
