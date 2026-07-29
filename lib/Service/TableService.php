@@ -127,24 +127,17 @@ class TableService extends SuperService {
 				) {
 					continue;
 				}
-				$allTables[$node['node_id']] = $this->find($node['node_id'], $skipTableEnhancement, $userId);
+				$allTables[$node['node_id']] = $this->find($node['node_id'], true, $userId);
 			}
 		}
 
 		// enhance table objects with additional data
 		if (!$skipTableEnhancement) {
-			foreach ($allTables as $table) {
-				/** @var string $userId */
-				try {
-					$this->enhanceTable($table, $userId);
-				} catch (InternalError|PermissionError $e) {
-					$this->logger->error($e->getMessage(), ['exception' => $e]);
-				}
-				// if the table is shared with me, there are no other shares
-				// will avoid showing the shared icon in the FE nav
-				if ($table->getIsShared()) {
-					$table->setHasShares(false);
-				}
+			/** @var string $userId */
+			try {
+				$this->enhanceTables($allTables, $userId);
+			} catch (InternalError|PermissionError $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}
 		}
 
@@ -160,51 +153,99 @@ class TableService extends SuperService {
 	}
 
 	/**
-	 * add some basic values related to this table in context
+	 * Adds some basic values related to a list of tables in context (rows count,
+	 * columns count, shares count, etc.)
 	 *
 	 * $userId can be set or ''
-	 * @param Table $table
+	 *
+	 * @param Table[] $tables
 	 * @param string $userId
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function enhanceTable(Table $table, string $userId): void {
-		// add owner display name for UI
-		$this->addOwnerDisplayName($table);
+	private function enhanceTables(array $tables, string $userId): void {
+		if (empty($tables)) {
+			return;
+		}
 
-		// set hasShares if this table is shared by you (you share it with somebody else)
-		// (senseless if we have no user in context)
-		if ($userId !== '') {
-			try {
-				$shares = $this->shareService->findAll('table', $table->getId());
-				$table->setHasShares(count($shares) !== 0);
-			} catch (InternalError $e) {
+		$tablesById = [];
+		foreach ($tables as $table) {
+			$tablesById[$table->getId()] = $table;
+		}
+		$tableIds = array_keys($tablesById);
+
+		// add owner display names for UI
+		$ownerIds = array_values(array_filter(
+			array_unique(array_map(static fn (Table $table) => $table->getOwnership(), $tables))
+		));
+		$ownerDisplayNames = $this->userHelper->getUsersDisplayNames($ownerIds);
+		foreach ($tables as $table) {
+			$ownerId = $table->getOwnership() ?? '';
+			$table->setOwnerDisplayName($ownerDisplayNames[$ownerId] ?? $ownerId);
+		}
+
+		// add the rows and columns counts
+		$rowsCounts = $this->rowService->getRowsCountForTables($tableIds, $userId);
+		$columnsCounts = $this->columnService->getColumnsCountForTables($tableIds, $userId);
+		foreach ($tables as $table) {
+			$table->setRowsCount($rowsCounts[$table->getId()] ?? 0);
+			$table->setColumnsCount($columnsCounts[$table->getId()] ?? 0);
+		}
+
+		// set hasShares / public isShared in one batch
+		if ($userId === '') {
+			$linkShareTableIds = $this->shareService->getTableIdsWithLinkShares($tableIds);
+			$linkShareTableIds = array_flip($linkShareTableIds);
+			foreach ($tables as $table) {
+				$table->setIsShared(isset($linkShareTableIds[$table->getId()]));
+				$table->setOnSharePermissions(new Permissions(read: true));
+			}
+		} else {
+			$ownedTableIds = array_filter($tableIds, static fn (int $id) => $tablesById[$id]->getOwnership() === $userId);
+			$sharesCount = $this->shareService->countSharesForTables($ownedTableIds, $userId);
+			foreach ($tables as $table) {
+				$table->setHasShares(($sharesCount[$table->getId()] ?? 0) > 0);
 			}
 		}
 
-		// add the rows count
-		try {
-			$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
-		} catch (PermissionError $e) {
-			$table->setRowsCount(0);
+		// set isShared and onSharePermissions (kept as is, per table)
+		if ($userId !== '') {
+			foreach ($tables as $table) {
+				try {
+					$this->setIsSharedState($table, $userId);
+				} catch (InternalError|PermissionError $e) {
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+					$table->setIsShared(false);
+					$table->setOnSharePermissions(new Permissions());
+				}
+			}
 		}
 
-		// add the column count
-		try {
-			$table->setColumnsCount($this->columnService->getColumnsCount($table->getId()));
-		} catch (PermissionError $e) {
-			$table->setColumnsCount(0);
+		// if the table is shared with me, there are no other shares
+		// will avoid showing the shared icon in the FE nav
+		foreach ($tables as $table) {
+			if ($table->getIsShared()) {
+				$table->setHasShares(false);
+			}
 		}
 
-		$this->setIsSharedState($table, $userId);
-
-		if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
-			// add the corresponding views if it is an own table, or you have table manage rights
-			$table->setViews($this->viewService->findAll($table));
+		// add the corresponding views if it is an own table, or you have table manage rights
+		foreach ($tables as $table) {
+			if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
+				try {
+					$table->setViews($this->viewService->findAll($table));
+				} catch (InternalError|PermissionError $e) {
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+					$table->setViews([]);
+				}
+			}
 		}
 
-		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {
-			$table->setFavorite(true);
+		// add favorites
+		foreach ($tables as $table) {
+			if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {
+				$table->setFavorite(true);
+			}
 		}
 	}
 
@@ -251,7 +292,7 @@ class TableService extends SuperService {
 			}
 
 			if (!$skipTableEnhancement) {
-				$this->enhanceTable($table, $userId);
+				$this->enhanceTables([$table], $userId);
 			}
 
 			return $table;
@@ -304,11 +345,11 @@ class TableService extends SuperService {
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
-			$table = $this->addOwnerDisplayName($newTable);
+			$table = $newTable;
 		}
 
 		try {
-			$this->enhanceTable($table, $userId);
+			$this->enhanceTables([$table], $userId);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -526,7 +567,7 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		try {
-			$this->enhanceTable($table, $userId);
+			$this->enhanceTables([$table], $userId);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -552,9 +593,7 @@ class TableService extends SuperService {
 			/** @var string $userId */
 			$userId = $this->permissionsService->preCheckUserId($userId);
 			$tables = $this->mapper->search($term, $userId, $limit, $offset);
-			foreach ($tables as &$table) {
-				$this->enhanceTable($table, $userId);
-			}
+			$this->enhanceTables($tables, $userId);
 			return $tables;
 		} catch (InternalError|PermissionError|OcpDbException $e) {
 			return [];
@@ -569,20 +608,11 @@ class TableService extends SuperService {
 	public function getScheme(int $id, ?string $userId = null): TableScheme {
 		$table = $this->find($id, skipTableEnhancement: true);
 		$columns = $this->columnService->findAllByTable($id, null, $table);
-		$this->enhanceTable($table, $userId);
+		$this->enhanceTables([$table], $userId);
 		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'), $table->getColumnOrderSettingsArray(), $table->getSortArray());
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
-
-	/**
-	 * @param Table $table
-	 * @return Table
-	 */
-	private function addOwnerDisplayName(Table $table): Table {
-		$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
-		return $table;
-	}
 
 	/**
 	 * @param array $table

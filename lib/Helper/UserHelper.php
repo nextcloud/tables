@@ -37,6 +37,23 @@ class UserHelper {
 	}
 
 	/**
+	 * @param string[] $userIds
+	 * @return array<string, null|string>
+	 */
+	public function getUsersDisplayNames(array $userIds): array {
+		$displayNames = [];
+		foreach (array_unique($userIds) as $userId) {
+			if ($userId === '' || $userId === null) {
+				$displayNames[$userId] = $userId;
+				continue;
+			}
+			$displayName = $this->userManager->getDisplayName($userId);
+			$displayNames[$userId] = $displayName ?: $userId;
+		}
+		return $displayNames;
+	}
+
+	/**
 	 * @throws InternalError
 	 */
 	private function getUser(string $userId): IUser {

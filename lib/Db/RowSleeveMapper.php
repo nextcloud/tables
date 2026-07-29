@@ -125,6 +125,41 @@ class RowSleeveMapper extends QBMapper {
 
 	/**
 	 * @param int[] $tableIds
+	 * @return array<int, int>
+	 */
+	public function countRowsForTables(array $tableIds): array {
+		if (empty($tableIds)) {
+			return [];
+		}
+
+		$counts = [];
+		foreach (array_chunk($tableIds, 1000 - 1) as $tableIdsChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('table_id', $qb->func()->count('*', 'counter'))
+				->from($this->table, 't1')
+				->where($qb->expr()->in('table_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
+				->groupBy('table_id');
+
+			try {
+				$result = $qb->executeQuery();
+				while ($row = $result->fetch()) {
+					$counts[(int)$row['table_id']] = (int)$row['counter'];
+				}
+				$result->closeCursor();
+			} catch (Exception $e) {
+				$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Will return 0 for all given tables.');
+			}
+		}
+
+		foreach ($tableIds as $tableId) {
+			$counts[$tableId] ??= 0;
+		}
+
+		return $counts;
+	}
+
+	/**
+	 * @param int[] $tableIds
 	 *
 	 * @return RowSleeve[]
 	 */
