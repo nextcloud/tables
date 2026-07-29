@@ -79,12 +79,10 @@ class ShareService extends SuperService {
 	 * @throws InternalError
 	 * @return Share[]
 	 */
-	public function findAll(string $nodeType, int $nodeId, ?string $userId = null, bool $enhanceShares = true): array {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
+	public function findAll(string $nodeType, int $nodeId, bool $enhanceShares = true): array {
 		try {
 			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
-			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId, $excluded);
+			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $excluded);
 
 			return $enhanceShares ? $this->addReceiverDisplayNames($shares) : $shares;
 		} catch (Exception $e) {
@@ -254,6 +252,72 @@ class ShareService extends SuperService {
 	 */
 	public function findTablesSharedWithMe(?string $userId = null): array {
 		return $this->findElementsSharedWithMe('table', $userId);
+	}
+
+	/**
+	 * @param int[] $tableIds
+	 * @param string|null $userId
+	 * @return array<int, int>
+	 * @throws InternalError
+	 */
+	public function countSharesForTables(array $tableIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
+			$shares = $this->mapper->findAllSharesForNodes('table', $tableIds, $userId, $excluded);
+
+			$counts = array_fill_keys($tableIds, 0);
+			foreach ($shares as $share) {
+				$nodeId = $share->getNodeId();
+				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
+			}
+
+			return $counts;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int[] $viewIds
+	 * @param string|null $userId
+	 * @return array<int, int>
+	 * @throws InternalError
+	 */
+	public function countSharesForViews(array $viewIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
+			$shares = $this->mapper->findAllSharesForNodes('view', $viewIds, $userId, $excluded);
+
+			$counts = array_fill_keys($viewIds, 0);
+			foreach ($shares as $share) {
+				$nodeId = $share->getNodeId();
+				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
+			}
+
+			return $counts;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int[] $tableIds
+	 * @return int[]
+	 * @throws InternalError
+	 */
+	public function getTableIdsWithLinkShares(array $tableIds): array {
+		try {
+			return $this->mapper->findLinkSharesForTables($tableIds);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
 	}
 
 	/**
@@ -838,7 +902,7 @@ class ShareService extends SuperService {
 	public function deleteAllForContext(Context $context): void {
 		try {
 			$this->atomic(function () use ($context): void {
-				$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
+				$shares = $this->mapper->findAllSharesForNode('context', $context->getId());
 				foreach ($shares as $share) {
 					$this->contextNavigationMapper->deleteByShareId($share->getId());
 				}
@@ -854,7 +918,7 @@ class ShareService extends SuperService {
 	 * @return Share[]
 	 */
 	public function changeSenderForNode(string $nodeType, int $nodeId, string $newOwnerUserId, ?string $userId = null): array {
-		$sharesForTable = $this->findAll($nodeType, $nodeId, $userId, false);
+		$sharesForTable = $this->findAll($nodeType, $nodeId, false);
 		$newShares = [];
 
 		foreach ($sharesForTable as $share) {
@@ -916,7 +980,7 @@ class ShareService extends SuperService {
 	 */
 	public function findSharedWithUserIds(int $elementId, string $elementType): array {
 		try {
-			$shares = $this->mapper->findAllSharesForNode($elementType, $elementId, '');
+			$shares = $this->mapper->findAllSharesForNode($elementType, $elementId);
 			$sharedWithUserIds = [];
 
 			foreach ($shares as $share) {
