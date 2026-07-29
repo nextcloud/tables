@@ -111,7 +111,7 @@ class ViewService extends SuperService {
 	/**
 	 * @param Table[] $tables
 	 * @param string|null $userId
-	 * @param array<int, int> $tableRowsCounts
+	 * @param array<int, int|null> $tableRowsCounts
 	 * @return array<int, View[]>
 	 * @throws InternalError
 	 */
@@ -459,7 +459,7 @@ class ViewService extends SuperService {
 	 * $userId can be set or ''
 	 *
 	 * @param View[] $views
-	 * @param array<int, int> $tableRowsCounts
+	 * @param array<int, int|null> $tableRowsCounts
 	 */
 	private function enhanceViews(array $views, string $userId, array $tableRowsCounts = []): void {
 		if (empty($views)) {
@@ -478,8 +478,26 @@ class ViewService extends SuperService {
 
 		$rowsCountCache = [];
 
+		$sharesCounts = [];
+		if ($userId !== '') {
+			$ownedViewIds = [];
+			foreach ($views as $view) {
+				if ($userId === $view->getOwnership()) {
+					$ownedViewIds[] = $view->getId();
+				}
+			}
+
+			if (!empty($ownedViewIds)) {
+				try {
+					$sharesCounts = $this->shareService->countSharesForViews($ownedViewIds, $userId);
+				} catch (InternalError $e) {
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+				}
+			}
+		}
+
 		foreach ($views as $view) {
-			$this->setIsSharedState($view, $userId);
+			$this->setIsSharedState($view, $userId, $sharesCounts[$view->getId()] ?? null);
 
 			if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
 				continue;
@@ -535,7 +553,7 @@ class ViewService extends SuperService {
 		}
 	}
 
-	private function setIsSharedState(View $view, string $userId): void {
+	private function setIsSharedState(View $view, string $userId, ?int $sharesCount = null): void {
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
@@ -575,10 +593,14 @@ class ViewService extends SuperService {
 			} else {
 				// set hasShares if this table is shared by you (you share it with somebody else)
 				// (senseless if we have no user in context)
-				try {
-					$allShares = $this->shareService->findAll('view', $view->getId());
-					$view->setHasShares(count($allShares) !== 0);
-				} catch (InternalError $e) {
+				if ($sharesCount !== null) {
+					$view->setHasShares($sharesCount > 0);
+				} else {
+					try {
+						$allShares = $this->shareService->findAll('view', $view->getId(), $userId);
+						$view->setHasShares(count($allShares) !== 0);
+					} catch (InternalError $e) {
+					}
 				}
 			}
 		} else {

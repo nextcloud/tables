@@ -99,6 +99,8 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
+	 * @deprecated Use {@link findAllByTableIds} instead
+	 *
 	 * @return View[]
 	 * @throws Exception
 	 */

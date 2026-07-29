@@ -284,6 +284,36 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @param int[] $viewIds
+	 * @param string|null $userId
+	 * @return array<int, int>
+	 * @throws InternalError
+	 */
+	public function countSharesForViews(array $viewIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
+			$shares = $this->mapper->findAllSharesForNodes('view', $viewIds, $userId, $excluded);
+
+			$counts = [];
+			foreach ($shares as $share) {
+				$nodeId = $share->getNodeId();
+				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
+			}
+
+			foreach ($viewIds as $viewId) {
+				$counts[$viewId] ??= 0;
+			}
+
+			return $counts;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
 	 * @param int[] $tableIds
 	 * @return int[]
 	 * @throws InternalError
