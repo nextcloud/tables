@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -97,7 +98,7 @@ class ShareMapper extends QBMapper {
 			return [];
 		}
 
-		$chunks = [];
+		$chunks = [[]];
 		// deduct extra parameters (sender, node type, receiver type)
 		foreach (array_chunk($receivers, 1000 - 3) as $receiversChunk) {
 			$qb = $this->db->getQueryBuilder();
@@ -134,6 +135,77 @@ class ShareMapper extends QBMapper {
 		}
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @param string $nodeType
+	 * @param int[] $nodeIds
+	 * @param string $sender
+	 * @param array<string> $excluded receiver types to exclude from results
+	 * @return Share[]
+	 * @throws Exception
+	 */
+	public function findAllSharesForNodes(string $nodeType, array $nodeIds, string $sender = '', array $excluded = []): array {
+		if (empty($nodeIds)) {
+			return [];
+		}
+
+		$extraParams = 2;
+		if ($sender !== '') {
+			$extraParams++;
+		}
+		if (!empty($excluded)) {
+			$extraParams++;
+		}
+
+		$chunks = [[]];
+		foreach (array_chunk($nodeIds, 1000 - $extraParams) as $nodeIdsChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+				->andWhere($qb->expr()->in('node_id', $qb->createNamedParameter($nodeIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+
+			if ($sender !== '') {
+				$qb->andWhere($qb->expr()->eq('sender', $qb->createNamedParameter($sender, IQueryBuilder::PARAM_STR)));
+			}
+
+			if (!empty($excluded)) {
+				$qb->andWhere($qb->expr()->notIn('receiver_type', $qb->createNamedParameter($excluded, IQueryBuilder::PARAM_STR_ARRAY)));
+			}
+
+			$chunks[] = $this->findEntities($qb);
+		}
+
+		return array_merge(...$chunks);
+	}
+
+	/**
+	 * @param int[] $tableIds
+	 * @return int[]
+	 */
+	public function findLinkSharesForTables(array $tableIds): array {
+		if (empty($tableIds)) {
+			return [];
+		}
+
+		$linkTableIds = [];
+		foreach (array_chunk($tableIds, 1000 - 2) as $tableIdsChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->selectDistinct('node_id')
+				->from($this->table)
+				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
+				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter(ShareReceiverType::LINK, IQueryBuilder::PARAM_STR)))
+				->andWhere($qb->expr()->in('node_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$linkTableIds[] = (int)$row['node_id'];
+			}
+			$result->closeCursor();
+		}
+
+		return $linkTableIds;
 	}
 
 	/**

@@ -249,6 +249,50 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @param int[] $tableIds
+	 * @param string|null $userId
+	 * @return array<int, int>
+	 * @throws InternalError
+	 */
+	public function countSharesForTables(array $tableIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
+			$shares = $this->mapper->findAllSharesForNodes('table', $tableIds, $userId, $excluded);
+
+			$counts = [];
+			foreach ($shares as $share) {
+				$nodeId = $share->getNodeId();
+				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
+			}
+
+			foreach ($tableIds as $tableId) {
+				$counts[$tableId] ??= 0;
+			}
+
+			return $counts;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int[] $tableIds
+	 * @return int[]
+	 * @throws InternalError
+	 */
+	public function getTableIdsWithLinkShares(array $tableIds): array {
+		try {
+			return $this->mapper->findLinkSharesForTables($tableIds);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
 	 * @throws InternalError
 	 */
 	private function findElementsSharedWithMe(string $elementType = 'table', ?string $userId = null): array {
