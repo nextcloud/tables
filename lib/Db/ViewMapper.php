@@ -115,6 +115,25 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int[] $tableIds
+	 * @return View[]
+	 * @throws Exception
+	 */
+	public function findAllByTableIds(array $tableIds): array {
+		if (empty($tableIds)) {
+			return [];
+		}
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->where($qb->expr()->in('v.table_id', $qb->createNamedParameter($tableIds, IQueryBuilder::PARAM_INT_ARRAY)));
+
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @return View[]
 	 * @throws Exception
 	 */

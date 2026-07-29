@@ -230,14 +230,22 @@ class TableService extends SuperService {
 		}
 
 		// add the corresponding views if it is an own table, or you have table manage rights
+		$tablesToLoadViews = [];
 		foreach ($tables as $table) {
 			if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
-				try {
-					$table->setViews($this->viewService->findAll($table));
-				} catch (InternalError|PermissionError $e) {
-					$this->logger->error($e->getMessage(), ['exception' => $e]);
-					$table->setViews([]);
-				}
+				$tablesToLoadViews[] = $table;
+			}
+		}
+
+		try {
+			$viewsByTable = $this->viewService->findForTables($tablesToLoadViews, $userId, $rowsCounts);
+			foreach ($tablesToLoadViews as $table) {
+				$table->setViews($viewsByTable[$table->getId()] ?? []);
+			}
+		} catch (InternalError|PermissionError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			foreach ($tablesToLoadViews as $table) {
+				$table->setViews([]);
 			}
 		}
 
