@@ -759,6 +759,25 @@ class ShareService extends SuperService {
 		return $shares;
 	}
 
+	/**
+	 * Delete a share on behalf of a trusted share-review operation.
+	 *
+	 * PERMISSION_MANAGE is intentionally not checked. The caller must verify
+	 * operator access via ShareReviewAccessCheckEvent before invoking this
+	 * method. All other side effects are preserved so the deletion is auditable.
+	 *
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if $id does not exist
+	 * @throws Exception on database failure
+	 */
+	public function deleteForShareReview(int $id): void {
+		$share = $this->mapper->find($id);
+		$this->triggerShareActivity($share, ActivityManager::SUBJECT_SHARE_DELETE);
+		$this->mapper->delete($share);
+		if ($share->getNodeType() === 'context') {
+			$this->contextNavigationMapper->deleteByShareId($share->getId());
+		}
+	}
+
 	public function deleteAllForTable(Table $table):void {
 		try {
 			$this->mapper->deleteByNode($table->getId(), 'table');

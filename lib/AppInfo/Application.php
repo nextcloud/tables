@@ -34,6 +34,7 @@ use OCA\Tables\Reference\ReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\Support\DefaultAuditLogService;
+use OCA\Tables\ShareReview\ShareReviewListener;
 use OCA\Tables\UserMigration\TablesMigrator;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -44,6 +45,7 @@ use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\DB\Events\AddMissingIndicesEvent;
 use OCP\Group\Events\GroupDeletedEvent;
+use OCP\Share\ShareReview\RegisterShareReviewSourceEvent;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use Psr\Container\ContainerInterface;
@@ -84,6 +86,7 @@ class Application extends App implements IBootstrap {
 
 		$context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
+		$context->registerEventListener(RegisterShareReviewSourceEvent::class, ShareReviewListener::class);
 		$context->registerEventListener(RenderReferenceEvent::class, TablesReferenceListener::class);
 		$context->registerEventListener(BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
 		$context->registerEventListener(LoadAdditionalScriptsEvent::class, LoadAdditionalListener::class);
