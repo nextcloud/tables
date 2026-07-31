@@ -715,4 +715,22 @@ class ViewService extends SuperService {
 		$this->logger->error($e->getMessage(), ['exception' => $e]);
 		throw new InternalError($context . ': ' . $e->getMessage());
 	}
+
+    /**
+     * @param int $tableId
+     * @param array $views
+     * @return void
+     * @throws InternalError
+     * @throws PermissionError
+     * @throws InvalidArgumentException
+ */
+	public function importViews(int $tableId, array $views): void {
+		foreach ($views as $view) {
+			if (isset($view['uuid']) && $existView = $this->mapper->findByUuid($view['uuid'])) {
+				$this->update($existView->getId(), ViewUpdateInput::fromInputArray($view), $this->userId);
+				continue;
+			}
+			$this->importView($tableId, $view, $this->userId);
+		}
+	}
 }
