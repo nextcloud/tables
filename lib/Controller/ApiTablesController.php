@@ -287,6 +287,72 @@ class ApiTablesController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] import table scheme into existing table
+	 *
+	 * @param int $id Table ID
+	 * @param string $title title of new table
+	 * @param string $emoji emoji
+	 * @param string $description description
+	 * @param list<TablesColumn> $columns columns
+	 * @param list<TablesView> $views views
+	 * @param list<array{columnId: int, order: int, readonly: bool}> $columnOrder Default column order settings
+	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sort Default sort rules
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Tables returned
+	 * 400: Invalid request data
+	 * 403: No permissions
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	public function importScheme(int $id, string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
+		try {
+			ColumnSettings::createFromInputArray($columnOrder);
+			SortRuleSet::createFromInputArray($sort);
+		} catch (\InvalidArgumentException $e) {
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+		try {
+			$this->db->beginTransaction();
+			$table = $this->service->update($id, $title, $emoji, $description, null, $this->userId, ColumnSettings::createFromInputArray($columnOrder), SortRuleSet::createFromInputArray($sort));
+			$this->columnService->importColumns($table, $columns);
+			$this->viewService->importViews($id, $views);
+
+			$this->db->commit();
+			return new DataResponse($table->jsonSerialize());
+		} catch (PermissionError $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			return $this->handlePermissionError($e);
+		} catch (\InvalidArgumentException $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		} catch (BadRequestError $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			return $this->handleBadRequestError($e);
+		} catch (InternalError|Exception $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $e) {
+				return $this->handleError($e);
+			}
+			return $this->handleError($e);
+		}
+	}
+
+	/**
 	 * [api v2] Create a new table and return it
 	 *
 	 * @param string $title Title of the table
