@@ -249,7 +249,7 @@ export default {
 
 	.tables-content-widget {
 		min-height: max(50vh, 200px);
-		height: 60vh;
+		height: auto;
 		max-height: calc(100dvh - 40px);
 		overflow: scroll;
 		overscroll-behavior: contain;
