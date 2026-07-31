@@ -820,4 +820,21 @@ class ColumnService extends SuperService {
 		$this->logger->error($e->getMessage(), ['exception' => $e]);
 		throw new InternalError($context . ': ' . $e->getMessage());
 	}
+
+	/**
+	 * @param Table $table
+	 * @param array $columns
+	 * @return void
+	 * @throws BadRequestError
+	 * @throws InternalError
+	 */
+	public function importColumns(Table $table, array $columns): void {
+		foreach ($columns as $column) {
+			if (isset($column['uuid']) && $existColumn = $this->mapper->findByUuid($column['uuid'])) {
+				$this->update($existColumn->getId(), $table->getOwnership(), ColumnDto::createFromArray($column));
+				continue;
+			}
+			$this->importColumn($table, $column);
+		}
+	}
 }

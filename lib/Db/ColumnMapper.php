@@ -225,4 +225,12 @@ class ColumnMapper extends QBMapper {
 
 		return $this->findEntities($qb);
 	}
+
+	public function findByUuid(string $uuid): ?Column {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('uuid', $qb->createNamedParameter($uuid)));
+		return $this->findEntity($qb);
+	}
 }

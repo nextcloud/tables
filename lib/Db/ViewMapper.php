@@ -207,4 +207,13 @@ class ViewMapper extends QBMapper {
 		}
 		return $map;
 	}
+
+	public function findByUuid(string $uuid): ?View {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->where($qb->expr()->eq('v.uuid', $qb->createNamedParameter($uuid)));
+		return $this->findEntity($qb);
+	}
 }
