@@ -104,8 +104,8 @@ export const useDataStore = defineStore('data', {
 				allColumns = allColumns.concat(MetaColumns.filter(col => columnSettingsMap[col.id]))
 				if (view.columnSettings) {
 					allColumns = allColumns.sort((a, b) => {
-						const orderA = columnSettingsMap[a.id]?.order ?? Number.MAX_SAFE_INTEGER
-						const orderB = columnSettingsMap[b.id]?.order ?? Number.MAX_SAFE_INTEGER
+						const orderA = a.viewColumnInformation?.order ?? columnSettingsMap[a.id]?.order ?? Number.MAX_SAFE_INTEGER
+						const orderB = b.viewColumnInformation?.order ?? columnSettingsMap[b.id]?.order ?? Number.MAX_SAFE_INTEGER
 						return orderA - orderB
 					})
 				}
