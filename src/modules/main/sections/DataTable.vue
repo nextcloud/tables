@@ -35,6 +35,14 @@
 							</template>
 							{{ t('tables', 'Create column') }}
 						</NcActionButton>
+						<NcActionButton v-if="canManageTable(table)"
+							:close-after-click="true"
+							@click="$emit('import-scheme', table)">
+							<template #icon>
+								<Import :size="20" decorative title="Import scheme" />
+							</template>
+							{{ t('tables', 'Import scheme') }}
+						</NcActionButton>
 
 						<NcActionCaption :name="t('tables', 'Integration')" />
 						<NcActionButton v-if="canCreateRowInElement(table)"
@@ -114,6 +122,14 @@
 								<TableColumnPlusAfter :size="20" decorative title="" />
 							</template>
 							{{ t('tables', 'Create column') }}
+						</NcActionButton>
+						<NcActionButton v-if="canManageTable(table)"
+							:close-after-click="true"
+							@click="$emit('import-scheme', table)">
+							<template #icon>
+								<Import :size="20" decorative title="Import scheme" />
+							</template>
+							{{ t('tables', 'Import scheme') }}
 						</NcActionButton>
 
 						<NcActionCaption :name="t('tables', 'Integration')" />
@@ -232,6 +248,7 @@ export default {
 		'download-csv',
 		'download-filtered-csv',
 		'import',
+		'import-scheme',
 		'show-integration',
 		'toggle-share',
 		'update:selectedRows',

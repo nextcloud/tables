@@ -24,6 +24,7 @@
 					<div v-if="!resource.isView" class="resource">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
+							@import-scheme="openImportSchemeModal(resource)"
 							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 					</div>
@@ -302,6 +303,9 @@ export default {
 		},
 		openImportModal(element, isView) {
 			emit('tables:modal:import', { element, isView })
+		},
+		openImportSchemeModal(table) {
+			emit('tables:modal:table-scheme-import', { table })
 		},
 	},
 }
