@@ -25,6 +25,7 @@
 				:view-setting="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
+				@import-scheme="openImportSchemeModal"
 				@download-csv="downloadCSV"
 				@download-filtered-csv="downloadFilteredCSV"
 				@toggle-share="toggleShare"
@@ -145,6 +146,9 @@ export default {
 		},
 		openImportModal() {
 			emit('tables:modal:import', { element: this.element, isView: this.isView })
+		},
+		openImportSchemeModal() {
+			emit('tables:modal:table-scheme-import', { table: this.element })
 		},
 		deleteRows(rowIds) {
 			this.rowsToDelete = rowIds

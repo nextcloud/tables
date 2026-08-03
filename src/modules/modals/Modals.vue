@@ -1,6 +1,6 @@
 <!--
-  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
-  - SPDX-License-Identifier: AGPL-3.0-or-later
+	- SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
 	<div>
@@ -46,6 +46,10 @@
 			:show-modal="showImportScheme"
 			:title="importSchemeTitle"
 			@close="showImportScheme = false" />
+		<ImportTableScheme
+			:show-modal="importSchemaToTable !== null"
+			:table="importSchemaToTable"
+			@close="importSchemaToTable = null" />
 		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
 		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
@@ -58,6 +62,7 @@
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import CreateRow from './CreateRow.vue'
 import ImportScheme from './ImportScheme.vue'
+import ImportTableScheme from './ImportTableScheme.vue'
 import DeleteColumn from './DeleteColumn.vue'
 import EditColumn from './EditColumn.vue'
 import CreateColumn from './CreateColumn.vue'
@@ -82,6 +87,7 @@ export default {
 		CreateTable,
 		Import,
 		ImportScheme,
+		ImportTableScheme,
 		DeleteRows,
 		ViewSettings,
 		EditRow,
@@ -109,6 +115,7 @@ export default {
 			showModalCreateTable: false,
 			showModalCreateContext: false,
 			importToElement: null,
+			importSchemaToTable: null,
 			showImportScheme: false,
 			importSchemeTitle: '',
 			createViewTableId: null, // if null, no modal open
@@ -157,6 +164,7 @@ export default {
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
 		subscribe('tables:modal:scheme', title => { this.importSchemeTitle = title; this.showImportScheme = true })
+		subscribe('tables:modal:table-scheme-import', payload => { this.importSchemaToTable = payload.table })
 
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
@@ -186,6 +194,7 @@ export default {
 		})
 		unsubscribe('tables:table:create', () => { this.showModalCreateTable = true })
 		unsubscribe('tables:modal:import', element => { this.importToElement = element })
+		unsubscribe('tables:modal:table-scheme-import', payload => { this.importSchemaToTable = payload.table })
 		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
 		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
