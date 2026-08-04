@@ -314,7 +314,7 @@ OC.L10N.register(
     "Options" : "Варианты",
     "Back" : "Назад",
     "Search for value" : "Поиск ценности",
-    "Select options" : "Выберете варианты",
+    "Select options" : "Выберите варианты",
     "Sorting" : "Сортировка",
     "Hide column" : "Скрыть столбец",
     "Undo" : "Отменить",
