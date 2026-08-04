@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\PermissionError;
@@ -21,6 +22,7 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareCreate;
+use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\IDBConnection;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -145,4 +147,46 @@ class ShareServiceTest extends TestCase {
 		$this->expectException(PermissionError::class);
 		$this->shareService->assertPublicShareAccessible($this->publicShare);
 	}
+
+	public function testCreateLinkShareThrowsWhenPublicLinksDisabled(): void {
+		$this->shareManager->method('sharingDisabledForUser')->willReturn(false);
+		$this->shareManager->method('shareApiAllowLinks')->willReturn(false);
+
+		$this->mapper->expects($this->never())->method('insert');
+
+		$this->expectException(PermissionError::class);
+		$this->expectExceptionMessage('Public link sharing is disabled by your administrator.');
+
+		$table = new Table();
+		$table->setId(1);
+		$this->shareService->createLinkShare($table);
+	}
+
+	public function testCreateThrowsWhenPublicLinksDisabledForGenericLinkShare(): void {
+		$this->shareManager->method('sharingDisabledForUser')->willReturn(false);
+		$this->shareManager->method('shareApiAllowLinks')->willReturn(false);
+
+		$this->mapper->expects($this->never())->method('insert');
+
+		$this->expectException(PermissionError::class);
+		$this->expectExceptionMessage('Public link sharing is disabled by your administrator.');
+
+		$this->shareService->create(
+			new ShareCreate(
+				1,
+				'table',
+				'',
+				'link',
+				true,
+				false,
+				false,
+				true,
+				false,
+				0,
+				null,
+				new ShareToken('tokenBypass2026x'),
+			)
+		);
+	}
+
 }

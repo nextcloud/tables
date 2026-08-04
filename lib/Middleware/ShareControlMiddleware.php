@@ -22,6 +22,7 @@ use OCP\AppFramework\Middleware;
 use OCP\AppFramework\PublicShareController;
 use OCP\IRequest;
 use OCP\ISession;
+use OCP\Share\IManager as ShareManager;
 use ReflectionMethod;
 
 class ShareControlMiddleware extends Middleware {
@@ -31,6 +32,7 @@ class ShareControlMiddleware extends Middleware {
 		private readonly IRequest $request,
 		private readonly ShareService $shareService,
 		private readonly ISession $session,
+		private readonly ShareManager $shareManager,
 	) {
 	}
 
@@ -72,11 +74,29 @@ class ShareControlMiddleware extends Middleware {
 	/**
 	 * @throws NotFoundError
 	 * @throws InvalidArgumentException
+	 * @throws PermissionError
 	 */
 	public function assertShareTokenIsValidAndExisting(string $tokenInput): void {
 		$shareToken = new ShareToken($tokenInput);
 		$this->share = $this->shareService->findByToken($shareToken);
 		$this->shareService->assertPublicShareAccessible($this->share);
+		$this->assertPublicLinkSharingAllowedForShareSender();
+	}
+
+	/**
+	 * if public link token is already issued, prevent them from working after admin disables
+	 *
+	 * @throws PermissionError
+	 */
+	private function assertPublicLinkSharingAllowedForShareSender(): void {
+		if (!$this->shareManager->shareApiAllowLinks()) {
+			throw new PermissionError('Public link sharing is disabled by your administrator.');
+		}
+
+		$sender = $this->share->getSender();
+		if ($sender !== null && $this->shareManager->sharingDisabledForUser($sender)) {
+			throw new PermissionError('Sharing is restricted by your administrator for your account.');
+		}
 	}
 
 	public function afterException($controller, $methodName, \Exception $exception): DataResponse {
