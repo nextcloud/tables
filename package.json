@@ -80,7 +80,7 @@
     "cypress": "^15.18.1",
     "cypress-downloadfile": "^1.2.4",
     "cypress-vite": "^1.10.2",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.0",
     "openapi-typescript": "^7.13.0",
     "typescript": "^5.3.3",
     "vite": "^7.3.6"
