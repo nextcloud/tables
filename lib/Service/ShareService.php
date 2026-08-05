@@ -272,6 +272,7 @@ class ShareService extends SuperService {
 	 * @param string $receiverType
 	 *
 	 * @throws InternalError
+	 * @throws PermissionError
 	 *
 	 * @return Share
 	 */
@@ -285,6 +286,14 @@ class ShareService extends SuperService {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		$allowedReceiverTypes = [
+			ShareReceiverType::USER,
+			ShareReceiverType::GROUP,
+			ShareReceiverType::CIRCLE,
+		];
+		if (!in_array($receiverType, $allowedReceiverTypes, true)) {
+			throw new PermissionError('Invalid share receiver type.');
 		}
 		if ($receiverType === ShareReceiverType::GROUP && !$this->shareManager->allowGroupSharing()) {
 			throw new PermissionError('Group sharing is disabled by your administrator.');
