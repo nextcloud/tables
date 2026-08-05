@@ -106,4 +106,26 @@ class ShareServiceTest extends TestCase {
 		$this->expectException(PermissionError::class);
 		$this->shareService->updatePermission(1, 'manage', true);
 	}
+
+	public function testCreateThrowsForUnsupportedReceiverType(): void {
+		$this->mapper->expects($this->never())->method('insert');
+
+		$this->expectException(PermissionError::class);
+		$this->expectExceptionMessage('Invalid share receiver type.');
+
+		$this->shareService->create(
+			new ShareCreate(
+				1,
+				'table',
+				'',
+				'link',
+				true,
+				false,
+				false,
+				false,
+				false,
+				0,
+			)
+		);
+	}
 }
