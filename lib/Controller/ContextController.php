@@ -282,6 +282,32 @@ class ContextController extends AOCSController {
 		return new DataResponse($this->contextService->updateContentOrder($pageId, $content));
 	}
 
+	/**
+	 * [api v2] Export the scheme of a context
+	 *
+	 * @param int $contextId ID of the context
+	 *
+	 * @return
+	 *
+	 * @CanManageContext
+	 *
+	 * 200: returning the scheme of the context
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
+	public function exportScheme(int $contextId): DataResponse {
+		try {
+			$contextScheme = $this->contextService->getScheme($contextId);
+			return new DataResponse($contextScheme->jsonSerialize());
+		} catch (Exception|InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
+
 	protected function isValidIcon(string $iconName): bool {
 		if ($iconName === '' || !preg_match('/^[a-zA-Z0-9-]+$/', $iconName)) {
 			return false;
