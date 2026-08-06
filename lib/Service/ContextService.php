@@ -23,6 +23,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\ContextScheme;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -645,5 +646,44 @@ class ContextService {
 		}
 
 		return $newContext;
+	}
+
+	public function getScheme(int $contextId): ContextScheme {
+		$context = $this->contextMapper->findById($contextId);
+		$tableService = \OCP\Server::get(TableService::class);
+		$viewService = \OCP\Server::get(ViewService::class);
+		$nodes = $context->getNodes();
+		$tables = [];
+
+		foreach ($nodes as &$node) {
+			if ($node['node_type'] === Application::NODE_TYPE_TABLE && !isset($tables[$node['node_id']])) {
+				try {
+					$tableScheme = $tableService->getScheme($node['node_id'])->jsonSerialize();
+					$tables[$node['node_id']] = $tableScheme;
+				} catch (InternalError|PermissionError|NotFoundError $e) {
+					$this->logger->error('Failed to enhance context scheme for table node: ' . $e->getMessage(), ['exception' => $e]);
+				}
+			}
+			if ($node['node_type'] === Application::NODE_TYPE_VIEW) {
+				try {
+					$view = $viewService->find($node['node_id']);
+					if (isset($tables[$view->getTableId()])) {
+						continue;
+					}
+					$tables[$view->getTableId()] = $tableService->getScheme($view->getTableId())->jsonSerialize();
+				} catch (InternalError|PermissionError|NotFoundError $e) {
+					$this->logger->error('Failed to enhance context scheme for view node: ' . $e->getMessage(), ['exception' => $e]);
+				}
+			}
+		}
+
+		return new ContextScheme(
+			$context->getName(),
+			$context->getIcon(),
+			$context->getDescription(),
+			$nodes,
+			$context->getPages(),
+			array_values($tables),
+		);
 	}
 }

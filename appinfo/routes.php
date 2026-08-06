@@ -154,6 +154,7 @@ return [
 		['name' => 'Context#create', 'url' => '/api/2/contexts', 'verb' => 'POST'],
 		['name' => 'Context#update', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'PUT'],
 		['name' => 'Context#destroy', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'DELETE'],
+		['name' => 'Context#exportScheme', 'url' => '/api/2/contexts/{contextId}/scheme/export', 'verb' => 'GET'],
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
 
