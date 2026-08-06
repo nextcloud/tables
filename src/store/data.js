@@ -91,24 +91,27 @@ export const useDataStore = defineStore('data', {
 			this.loading[stateId] = false
 			return columns
 		},
-
+		
 		async loadColumnsFromBE({ view, tableId }) {
 			let allColumns = await this.getColumnsFromBE({ tableId, viewId: view?.id })
 			if (view) {
-				// Transform array to object for faster access
+				// Meta columns aren't real DB columns, so they never come back
+				// from the fetch above -- append any this view has settings for.
 				const columnSettingsMap = view.columnSettings?.reduce((acc, item) => {
 					acc[item.columnId] = item
 					return acc
 				}, {}) ?? {}
-
 				allColumns = allColumns.concat(MetaColumns.filter(col => columnSettingsMap[col.id]))
-				if (view.columnSettings) {
-					allColumns = allColumns.sort((a, b) => {
-						const orderA = columnSettingsMap[a.id]?.order ?? Number.MAX_SAFE_INTEGER
-						const orderB = columnSettingsMap[b.id]?.order ?? Number.MAX_SAFE_INTEGER
-						return orderA - orderB
-					})
-				}
+		
+				// Real columns carry their own order via viewColumnInformation;
+				// meta columns fall back to columnSettingsMap since they were
+				// just concatenated above and never went through server-side
+				// enhancement.
+				allColumns = allColumns.sort((a, b) => {
+					const orderA = a.viewColumnInformation?.order ?? columnSettingsMap[a.id]?.order ?? Number.MAX_SAFE_INTEGER
+					const orderB = b.viewColumnInformation?.order ?? columnSettingsMap[b.id]?.order ?? Number.MAX_SAFE_INTEGER
+					return orderA - orderB
+				})
 			} else {
 				// no view: keep the backend-ordered result (ColumnService::findAllByTable already applies columnOrder)
 			}
@@ -116,7 +119,7 @@ export const useDataStore = defineStore('data', {
 			this.columns[stateId] = allColumns
 			return true
 		},
-
+		
 		async loadPublicColumnsFromBE({ token }) {
 			const stateId = 'public-' + token
 			this.loading[stateId] = true
