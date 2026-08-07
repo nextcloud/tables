@@ -68,7 +68,7 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 
 	isFilterFound(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		const valueString = this.getValueString(cell)
+		const valueString = this.getValueString(cell)?.toLowerCase()
 
 		const filterMethod = {
 			[FilterIds.ContainsItem]() {
@@ -78,10 +78,10 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 				const filterOptionIds = filter.value.map(option => option.id)
 				return cell.value.filter(v => filterOptionIds.includes(v)).length > 0
 			},
-			[FilterIds.Contains]() { return valueString?.includes(filterValue) },
-			[FilterIds.DoesNotContain]() { return !valueString?.includes(filterValue) },
-			[FilterIds.IsEqual]() { return valueString === filterValue },
-			[FilterIds.IsNotEqual]() { return valueString !== filterValue },
+			[FilterIds.Contains]() { return valueString?.includes(filterValue.toLowerCase()) },
+			[FilterIds.DoesNotContain]() { return !valueString?.includes(filterValue.toLowerCase()) },
+			[FilterIds.IsEqual]() { return valueString === filterValue.toLowerCase() },
+			[FilterIds.IsNotEqual]() { return valueString !== filterValue.toLowerCase() },
 			[FilterIds.IsEmpty]() { return !valueString },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
