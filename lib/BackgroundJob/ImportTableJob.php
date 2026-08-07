@@ -10,6 +10,7 @@ namespace OCA\Tables\BackgroundJob;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ImportService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\QueuedJob;
@@ -25,6 +26,7 @@ class ImportTableJob extends QueuedJob {
 		private ActivityManager $activityManager,
 		private TableMapper $tableMapper,
 		private ViewMapper $viewMapper,
+		private NotificationHelper $notificationHelper,
 	) {
 		parent::__construct($time);
 	}
@@ -79,5 +81,20 @@ class ImportTableJob extends QueuedJob {
 			],
 			author: $userId
 		);
+		if ($viewId) {
+			$this->notificationHelper->sendNotification(
+				objectType: ActivityManager::TABLES_OBJECT_VIEW,
+				object: $this->viewMapper->find($viewId),
+				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
+				author: $userId
+			);
+		} else {
+			$this->notificationHelper->sendNotification(
+				objectType: ActivityManager::TABLES_OBJECT_TABLE,
+				object: $this->tableMapper->find($tableId),
+				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
+				author: $userId
+			);
+		}
 	}
 }

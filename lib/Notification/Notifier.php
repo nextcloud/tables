@@ -293,6 +293,37 @@ class Notifier implements INotifier {
 					: $l->t('{user} has deleted the column {column} from table {table}');
 				break;
 
+			case ActivityManager::SUBJECT_IMPORT_FINISHED:
+				$link = $hasViewContext ? $richParams['view']['link'] : $richParams['table']['link'];
+				$recipient = $notification->getUser();
+				$isActivityOwner = $params['author'] === $recipient;
+				if ($hasViewContext) {
+					$parsedSubject = $isActivityOwner
+						? $l->t('You have imported file to view {view}', [
+							$richParams['view']['name'] ?? '',
+						])
+						: $l->t('{user} has imported file to view {view}', [
+							$richParams['user']['name'] ?? '',
+							$richParams['view']['name'] ?? '',
+						]);
+					$subject = $isActivityOwner
+						? $l->t('You have imported file to view {view}')
+						: $l->t('{user} has imported file to view {view}');
+					break;
+				}
+				$parsedSubject = $isActivityOwner
+					? $l->t('You have imported file to table {table}', [
+						$richParams['table']['name'] ?? '',
+					])
+					: $l->t('{user} has imported file to table {table}', [
+						$richParams['user']['name'] ?? '',
+						$richParams['table']['name'] ?? '',
+					]);
+				$subject = $isActivityOwner
+					? $l->t('You have imported file to table {table}')
+					: $l->t('{user} has imported file to table {table}');
+				break;
+
 			default:
 				throw new UnknownNotificationException();
 		}
