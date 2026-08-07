@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -260,5 +261,19 @@ class ShareMapper extends QBMapper {
 			->where($qb->expr()->eq('receiver', $qb->createNamedParameter($receiver, IQueryBuilder::PARAM_STR)))
 			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)))
 			->executeStatement();
+	}
+
+	/**
+	 * @return Share[]
+	 * @throws Exception
+	 */
+	public function findRemoteSharesForNode(int $nodeId, string $nodeType): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter(ShareReceiverType::REMOTE, IQueryBuilder::PARAM_STR)));
+		return $this->findEntities($qb);
 	}
 }

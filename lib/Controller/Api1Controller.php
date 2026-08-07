@@ -24,6 +24,8 @@ use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\ConfigService;
+use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\ImportService;
 use OCA\Tables\Service\RelationService;
 use OCA\Tables\Service\RowService;
@@ -88,6 +90,8 @@ class Api1Controller extends ApiController {
 		LoggerInterface $logger,
 		IL10N $l10N,
 		?string $userId,
+		private FederationService $federationService,
+		private ConfigService $configService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->tableService = $service;
@@ -781,6 +785,11 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableColumns(int $tableId, ?int $viewId): DataResponse {
 		try {
+			if ($this->configService->isFederationEnabled() && $this->federationService->isNodeFederated($tableId, 'table')) {
+				$table = $this->tableService->find($tableId, true);
+				return new DataResponse($this->federationService->getColumns($table));
+			}
+
 			if ($viewId) {
 				$view = $this->viewService->find($viewId, false, $this->userId);
 				if ($tableId !== $view->getTableId()) {
@@ -824,6 +833,11 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewColumns(int $viewId): DataResponse {
 		try {
+			if ($this->configService->isFederationEnabled() && $this->federationService->isNodeFederated($viewId, 'view')) {
+				$view = $this->viewService->find($viewId, true);
+				return new DataResponse($this->federationService->getColumns($view));
+			}
+
 			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByView($viewId)));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
