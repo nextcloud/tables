@@ -28,19 +28,29 @@ class RowController extends Controller {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
+	/**
+	 * @param int $tableId ID of the table
+	 * @param string $customFilters JSON-encoded array of filter groups to apply
+	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
-	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId, $this->userId);
+	public function index(int $tableId, string $customFilters = ''): DataResponse {
+		return $this->handleError(function () use ($tableId, $customFilters) {
+			$customFilters = json_decode($customFilters, true) ?? [];
+			return $this->service->findAllByTable($tableId, $this->userId, customFilters: $customFilters);
 		});
 	}
 
+	/**
+	 * @param int $viewId ID of the view
+	 * @param string $customFilters JSON-encoded array of filter groups to apply
+	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
-	public function indexView(int $viewId): DataResponse {
-		return $this->handleError(function () use ($viewId) {
-			return $this->service->findAllByView($viewId, $this->userId);
+	public function indexView(int $viewId, string $customFilters = ''): DataResponse {
+		return $this->handleError(function () use ($viewId, $customFilters) {
+			$customFilters = json_decode($customFilters, true) ?? [];
+			return $this->service->findAllByView($viewId, $this->userId, customFilters: $customFilters);
 		});
 	}
 

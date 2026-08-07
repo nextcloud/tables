@@ -44,6 +44,12 @@
 						</template>
 						{{ t('tables', 'Export filtered rows') }}
 					</NcActionButton>
+					<NcActionButton close-after-click @click="shareRows">
+						<template #icon>
+							<ShareVariantOutline :size="20" />
+						</template>
+						{{ t('tables', 'Share rows') }}
+					</NcActionButton>
 					<NcActionButton v-if="config.canDeleteRows" close-after-click @click="deleteSelectedRows">
 						<template #icon>
 							<Delete :size="20" />
@@ -70,10 +76,13 @@ import Plus from 'vue-material-design-icons/Plus.vue'
 import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
 import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
+import ShareVariantOutline from 'vue-material-design-icons/ShareVariantOutline.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
+import copyToClipboard from '../../../mixins/copyToClipboard.js'
 import SearchForm from '../partials/SearchForm.vue'
 import PaginationBlock from './PaginationBlock.vue'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
+import { TYPE_META_ID } from '../../../constants.ts'
 
 export default {
 	name: 'Options',
@@ -87,10 +96,11 @@ export default {
 		Check,
 		Delete,
 		TrayArrowDown,
+		ShareVariantOutline,
 		PaginationBlock,
 	},
 
-	mixins: [viewportHelper],
+	mixins: [viewportHelper, copyToClipboard],
 
 	props: {
 		selectedRows: {
@@ -192,6 +202,23 @@ export default {
 		},
 		deselectAllRows() {
 			emit('tables:selected-rows:deselect', { elementId: this.elementId, isView: this.isView })
+		},
+		async shareRows() {
+			await this.$router.push({
+				path: this.$route.path,
+				query: {
+					...this.$route.query,
+					customFilters: JSON.stringify([[
+						{
+							columnId: TYPE_META_ID,
+							operator: 'is-equal',
+							value: this.selectedRows,
+						},
+					]]),
+				},
+			})
+
+			this.copyToClipboard(document.location.href, false)
 		},
 	},
 }
