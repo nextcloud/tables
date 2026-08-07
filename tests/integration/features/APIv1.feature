@@ -700,6 +700,65 @@ Feature: APIv1
     When user "participant2" fetches relations for table "secret-orders"
     Then the reported status is "404"
 
+  @api1 @relation @relation-lookup
+  Scenario: Create a relation lookup column and fetch relations for a table
+    Given table "Products" with emoji "📦" exists for user "participant1" as "products"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then column "category" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then row exists with following values
+      | name     | Apple  |
+      | category | Fruit  |
+    Then row exists with following values
+      | name     | Banana |
+      | category | Berry  |
+    Given table "Orders" with emoji "🛒" exists for user "participant1" as "orders"
+    Then relation column "product" exists on table "orders" pointing to table "products" using label column "name"
+    Then relation lookup column "product category" exists on table "orders" for relation column "product" using target column "category"
+    When user "participant1" fetches relations for table "orders"
+    Then the reported status is "200"
+    Then the relations response contains 2 entries for column "product"
+    Then the relations response for column "product" has an entry with label "Apple"
+    Then the relations response for column "product" has an entry with label "Banana"
+    Then the relations response contains 2 entries for column "product category"
+    Then the relations response for column "product category" has an entry with value "Fruit"
+    Then the relations response for column "product category" has an entry with value "Berry"
+
+  @api1 @relation @relation-lookup
+  Scenario: Create a relation lookup column for a relation pointing to a view
+    Given table "Fruits" with emoji "🍎" exists for user "participant1" as "fruits"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then column "color" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then row exists with following values
+      | name  | Apple  |
+      | color | Red    |
+    Then row exists with following values
+      | name  | Banana |
+      | color | Yellow |
+    When user "participant1" create view "Fruit View" with emoji "👁" for "fruits" as "fruit-view"
+    Given table "Baskets" with emoji "🧺" exists for user "participant1" as "baskets"
+    Then relation column "fruit" exists on table "baskets" pointing to view "fruit-view" using label column "name"
+    Then relation lookup column "fruit color" exists on table "baskets" for relation column "fruit" using target column "color"
+    When user "participant1" fetches relations for table "baskets"
+    Then the reported status is "200"
+    Then the relations response contains 2 entries for column "fruit"
+    Then the relations response for column "fruit" has an entry with label "Apple"
+    Then the relations response for column "fruit" has an entry with label "Banana"
+    Then the relations response contains 2 entries for column "fruit color"
+    Then the relations response for column "fruit color" has an entry with value "Red"
+    Then the relations response for column "fruit color" has an entry with value "Yellow"
+
   @api1 @columns @rows
   Scenario: Column technicalName is returned and dataByAlias maps alias to row values
     Given table "Alias test" with emoji "🔖" exists for user "participant1" as "base1"
