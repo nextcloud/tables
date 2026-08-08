@@ -3,9 +3,10 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2" :readonly="column.readonly">
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :readonly="column.readonly">
 		<NcSelect
 			v-model="localValue"
+			class="relation-select"
 			:options="relationOptions"
 			:clearable="!column.mandatory"
 			:reduce="(option) => option.id"
@@ -90,7 +91,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.relation-form {
+:deep(.relation-select) {
 	width: 100%;
+}
+
+:deep(.vs__selected) {
+	min-width: 0;
+	max-width: 100%;
+}
+
+:deep(.vs__selected .name-parts) {
+	display: flex !important;
+	align-items: center;
+	max-width: 100% !important;
+	min-width: 0;
 }
 </style>
