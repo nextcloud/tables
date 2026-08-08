@@ -205,7 +205,7 @@ class ImportService extends SuperService {
 		$this->getColumns($firstRow, $secondRow);
 
 		foreach ($this->rawColumnTitles as $colIndex => $title) {
-			if ($this->columns[$colIndex] !== '') {
+			if (isset($this->columns[$colIndex]) && $this->columns[$colIndex] !== '') {
 				/** @var Column $column */
 				$column = $this->columns[$colIndex];
 				$columns[] = $column;
@@ -623,20 +623,14 @@ class ImportService extends SuperService {
 					continue;
 				}
 
-				$columnKey = $i;
-				if ($this->columnsConfig && $this->idColumnIndex !== null && $i > $this->idColumnIndex) {
-					// if we have an ID column, we need to adjust the index
-					$columnKey = $i - 1;
-				}
-
 				// only add the dataset if column is known
-				if (!isset($this->columns[$columnKey]) || $this->columns[$columnKey] === '') {
+				if (!isset($this->columns[$i]) || $this->columns[$i] === '') {
 					$this->logger->debug('Column unknown while fetching rows data for importing.');
 					continue;
 				}
 
 				/** @var Column $column */
-				$column = $this->columns[$columnKey];
+				$column = $this->columns[$i];
 
 				// if cell is empty
 				if (!$cell || $cell->getValue() === null) {
@@ -750,57 +744,76 @@ class ImportService extends SuperService {
 		$secondRowCellIterator = $secondRow->getCellIterator();
 		$titles = [];
 		$dataTypes = [];
+		$rawColumnTitles = [];
+		$rawColumnDataTypes = [];
+		$columnFileIndices = [];
 		$index = 0;
 		$countMatchingColumnsFromConfig = 0;
 		$countCreatedColumnsFromConfig = 0;
 		$lastCellWasEmpty = false;
 		$hasGapInTitles = false;
+		$this->columns = [];
+
 		foreach ($cellIterator as $cell) {
 			if ($cell && $cell->getValue() !== null && $cell->getValue() !== '') {
 				$title = $cell->getValue();
+				$titleRaw = $title;
+				$dataType = $this->parseColumnDataType($secondRowCellIterator->current());
+				$shouldImport = true;
 
 				if (!$this->columnsConfig && mb_strtolower($title) === Column::META_ID_TITLE) {
 					$this->idColumnIndex = $index;
-					$titles[] = $title;
-					$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
-					$secondRowCellIterator->next();
-					$index++;
-					continue;
-				}
-				if (isset($this->columnsConfig[$index]) && $this->columnsConfig[$index]['action'] === 'exist' && $this->columnsConfig[$index]['existColumn']) {
-					$title = $this->columnsConfig[$index]['existColumn']['label'];
-					$countMatchingColumnsFromConfig++;
-
-					// no need to create the ID (Meta) column as it used for update
-					if ($this->columnsConfig[$index]['existColumn']['id'] === Column::TYPE_META_ID) {
+					$this->countMatchingColumns++;
+					$shouldImport = false;
+				} elseif (isset($this->columnsConfig[$index])) {
+					if ($this->columnsConfig[$index]['action'] === 'ignore') {
+						$shouldImport = false;
+					} elseif (
+						$this->columnsConfig[$index]['action'] === 'exist'
+						&& isset($this->columnsConfig[$index]['existColumn'])
+						&& $this->columnsConfig[$index]['existColumn']['id'] === Column::TYPE_META_ID
+					) {
 						$this->idColumnIndex = $index;
-						$secondRowCellIterator->next();
-						$index++;
-						continue;
+						$countMatchingColumnsFromConfig++;
+						$shouldImport = false;
+					} elseif (
+						$this->columnsConfig[$index]['action'] === 'exist'
+						&& $this->columnsConfig[$index]['existColumn']
+					) {
+						$title = $this->columnsConfig[$index]['existColumn']['label'];
+						$countMatchingColumnsFromConfig++;
+					} elseif (
+						$this->columnsConfig[$index]['action'] === 'new'
+						&& $this->createUnknownColumns
+					) {
+						$column = $this->columnService->create(
+							$this->userId,
+							$this->tableId,
+							$this->viewId,
+							ColumnDto::createFromArray($this->columnsConfig[$index]),
+							$this->columnsConfig[$index]['selectedViewIds'] ?? []
+						);
+						$title = $column->getTitle();
+						$countCreatedColumnsFromConfig++;
 					}
 				}
-				if (isset($this->columnsConfig[$index]) && $this->columnsConfig[$index]['action'] === 'new' && $this->createUnknownColumns) {
-					$column = $this->columnService->create(
-						$this->userId,
-						$this->tableId,
-						$this->viewId,
-						ColumnDto::createFromArray($this->columnsConfig[$index]),
-						$this->columnsConfig[$index]['selectedViewIds'] ?? []
-					);
-					$title = $column->getTitle();
-					$countCreatedColumnsFromConfig++;
-				}
-				$titles[] = $title;
 
-				// Convert data type to our data type
-				$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
+				$rawColumnTitles[] = $titleRaw;
+				$rawColumnDataTypes[] = $dataType;
+
+				if ($shouldImport) {
+					$titles[] = $title;
+					$dataTypes[] = $dataType;
+					$columnFileIndices[] = $index;
+				}
+
 				if ($lastCellWasEmpty) {
 					$hasGapInTitles = true;
 				}
 				$lastCellWasEmpty = false;
 			} else {
 				$this->logger->debug('No cell given or cellValue is empty while loading columns for importing');
-				if ($cell->getDataType() === 'null') {
+				if ($cell && $cell->getDataType() === 'null') {
 					// LibreOffice generated XLSX doc may have more empty columns in the first row.
 					// Continue without increasing error count, but leave a marker to detect gaps in titles.
 					$lastCellWasEmpty = true;
@@ -817,11 +830,16 @@ class ImportService extends SuperService {
 			$this->countErrors++;
 		}
 
-		$this->rawColumnTitles = $titles;
-		$this->rawColumnDataTypes = $dataTypes;
+		$this->rawColumnTitles = $rawColumnTitles;
+		$this->rawColumnDataTypes = $rawColumnDataTypes;
 
 		try {
-			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $dataTypes, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
+			$result = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $dataTypes, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
+			foreach ($result as $resultIndex => $column) {
+				if ($column instanceof Column) {
+					$this->columns[$columnFileIndices[$resultIndex]] = $column;
+				}
+			}
 			if (!empty($this->columnsConfig)) {
 				$this->countMatchingColumns = $countMatchingColumnsFromConfig;
 				$this->countCreatedColumns = $countCreatedColumnsFromConfig;
