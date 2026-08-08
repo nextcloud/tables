@@ -388,7 +388,7 @@ class ImportService extends SuperService {
 		}
 
 		return [
-			'found_columns_count' => count($this->columns),
+			'found_columns_count' => count(array_filter($this->columns, fn ($column): bool => $column instanceof Column)),
 			'matching_columns_count' => $this->countMatchingColumns,
 			'created_columns_count' => $this->countCreatedColumns,
 			'inserted_rows_count' => $this->countInsertedRows,
@@ -527,7 +527,7 @@ class ImportService extends SuperService {
 		}
 
 		return new ImportStats(
-			count($this->columns),
+			count(array_filter($this->columns, fn ($column): bool => $column instanceof Column)),
 			$this->countMatchingColumns,
 			$this->countCreatedColumns,
 			$this->countInsertedRows,
@@ -763,8 +763,6 @@ class ImportService extends SuperService {
 
 				if (!$this->columnsConfig && mb_strtolower($title) === Column::META_ID_TITLE) {
 					$this->idColumnIndex = $index;
-					$this->countMatchingColumns++;
-					$shouldImport = false;
 				} elseif (isset($this->columnsConfig[$index])) {
 					if ($this->columnsConfig[$index]['action'] === 'ignore') {
 						$shouldImport = false;
@@ -836,9 +834,10 @@ class ImportService extends SuperService {
 		try {
 			$result = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $dataTypes, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
 			foreach ($result as $resultIndex => $column) {
-				if ($column instanceof Column) {
-					$this->columns[$columnFileIndices[$resultIndex]] = $column;
-				}
+				$this->columns[$columnFileIndices[$resultIndex]] = $column;
+			}
+			if ($this->idColumnIndex !== null && (!isset($this->columns[$this->idColumnIndex]) || !$this->columns[$this->idColumnIndex] instanceof Column)) {
+				$this->countMatchingColumns++;
 			}
 			if (!empty($this->columnsConfig)) {
 				$this->countMatchingColumns = $countMatchingColumnsFromConfig;
