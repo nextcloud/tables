@@ -91,7 +91,7 @@ export default {
 		relationOptions() {
 			const activeElement = this.activeView || this.activeTable
 			if (activeElement) {
-				return Object.values(this.allRelations || {})
+				return Object.values(this.allRelations || {}).map(option => ({ ...option, id: parseInt(option.id) }))
 			}
 			return []
 		},
@@ -124,6 +124,17 @@ export default {
 			this.startEditing()
 			// Stop the event from propagating to avoid immediate click outside
 			event.stopPropagation()
+		},
+
+		startEditing() {
+			if (!this.canEditCell()) {
+				return false
+			}
+			this.isEditing = true
+			this.editValue = this.value ? parseInt(this.value) : null
+			this.$nextTick(() => {
+				this.$refs.editingContainer?.focus()
+			})
 		},
 
 		async saveChanges() {
