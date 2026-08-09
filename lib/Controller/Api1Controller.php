@@ -327,7 +327,7 @@ class Api1Controller extends ApiController {
 	public function indexViews(int $tableId): DataResponse {
 		try {
 			$table = $this->tableService->find($tableId);
-			return new DataResponse($this->viewService->formatViews($this->viewService->findAll($table, tableRowsCount: $table->getRowsCount())));
+			return new DataResponse($this->viewService->formatViews($table->getViews() ?? []));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

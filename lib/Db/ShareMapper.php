@@ -130,6 +130,10 @@ class ShareMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
 			->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)));
 
+		if ($sender !== '') {
+			$qb->andWhere($qb->expr()->eq('sender', $qb->createNamedParameter($sender, IQueryBuilder::PARAM_STR)));
+		}
+
 		if (!empty($excluded)) {
 			$qb->andWhere($qb->expr()->notIn('receiver_type', $qb->createNamedParameter($excluded, IQueryBuilder::PARAM_STR_ARRAY)));
 		}

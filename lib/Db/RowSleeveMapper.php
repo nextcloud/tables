@@ -111,27 +111,19 @@ class RowSleeveMapper extends QBMapper {
 			return [];
 		}
 
-		$counts = [];
+		$counts = array_fill_keys($tableIds, 0);
 		foreach (array_chunk($tableIds, 1000 - 1) as $tableIdsChunk) {
 			$qb = $this->db->getQueryBuilder();
 			$qb->select('table_id', $qb->func()->count('*', 'counter'))
-				->from($this->table, 't1')
+				->from($this->table)
 				->where($qb->expr()->in('table_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
 				->groupBy('table_id');
 
-			try {
-				$result = $qb->executeQuery();
-				while ($row = $result->fetch()) {
-					$counts[(int)$row['table_id']] = (int)$row['counter'];
-				}
-				$result->closeCursor();
-			} catch (Exception $e) {
-				$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Will return 0 for all given tables.');
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$counts[(int)$row['table_id']] = (int)$row['counter'];
 			}
-		}
-
-		foreach ($tableIds as $tableId) {
-			$counts[$tableId] ??= 0;
+			$result->closeCursor();
 		}
 
 		return $counts;

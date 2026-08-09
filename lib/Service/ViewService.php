@@ -597,8 +597,8 @@ class ViewService extends SuperService {
 					$view->setHasShares($sharesCount > 0);
 				} else {
 					try {
-						$allShares = $this->shareService->findAll('view', $view->getId(), $userId);
-						$view->setHasShares(count($allShares) !== 0);
+						$counts = $this->shareService->countSharesForViews([$view->getId()], $userId);
+						$view->setHasShares(($counts[$view->getId()] ?? 0) > 0);
 					} catch (InternalError $e) {
 					}
 				}

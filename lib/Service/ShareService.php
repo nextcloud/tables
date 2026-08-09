@@ -266,14 +266,10 @@ class ShareService extends SuperService {
 			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
 			$shares = $this->mapper->findAllSharesForNodes('table', $tableIds, $userId, $excluded);
 
-			$counts = [];
+			$counts = array_fill_keys($tableIds, 0);
 			foreach ($shares as $share) {
 				$nodeId = $share->getNodeId();
 				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
-			}
-
-			foreach ($tableIds as $tableId) {
-				$counts[$tableId] ??= 0;
 			}
 
 			return $counts;
@@ -296,14 +292,10 @@ class ShareService extends SuperService {
 			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
 			$shares = $this->mapper->findAllSharesForNodes('view', $viewIds, $userId, $excluded);
 
-			$counts = [];
+			$counts = array_fill_keys($viewIds, 0);
 			foreach ($shares as $share) {
 				$nodeId = $share->getNodeId();
 				$counts[$nodeId] = ($counts[$nodeId] ?? 0) + 1;
-			}
-
-			foreach ($viewIds as $viewId) {
-				$counts[$viewId] ??= 0;
 			}
 
 			return $counts;
