@@ -80,25 +80,23 @@ class ContextService {
 	public function addToNavigation(string $userId): void {
 		$contexts = $this->findForNavigation($userId);
 		foreach ($contexts as $context) {
-			$this->navigationManager->add(function () use ($context) {
-				$iconRelPath = 'material/' . $context->getIcon() . '.svg';
-				if (file_exists(__DIR__ . '/../../img/' . $iconRelPath)) {
-					$iconUrl = $this->urlGenerator->imagePath(Application::APP_ID, $iconRelPath);
-				} else {
-					$iconUrl = $this->urlGenerator->imagePath('core', 'places/default-app-icon.svg');
-				}
+			$iconRelPath = 'material/' . $context->getIcon() . '.svg';
+			if (file_exists(__DIR__ . '/../../img/' . $iconRelPath)) {
+				$iconUrl = $this->urlGenerator->imagePath(Application::APP_ID, $iconRelPath);
+			} else {
+				$iconUrl = $this->urlGenerator->imagePath('core', 'places/default-app-icon.svg');
+			}
 
-				$contextUrl = $this->urlGenerator->linkToRoute('tables.page.context', ['contextId' => $context->getId()]);
+			$contextUrl = $this->urlGenerator->linkToRoute('tables.page.context', ['contextId' => $context->getId()]);
 
-				return [
-					'id' => Application::APP_ID . '_application_' . $context->getId(),
-					'name' => $context->getName(),
-					'href' => $contextUrl,
-					'icon' => $iconUrl,
-					'order' => 500,
-					'type' => 'link',
-				];
-			});
+			$this->navigationManager->add([
+				'id' => Application::APP_ID . '_application_' . $context->getId(),
+				'name' => $context->getName(),
+				'href' => $contextUrl,
+				'icon' => $iconUrl,
+				'order' => 500,
+				'type' => 'link',
+			]);
 		}
 	}
 
