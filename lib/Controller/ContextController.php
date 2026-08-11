@@ -16,14 +16,20 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
+use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -34,6 +40,10 @@ use Psr\Log\LoggerInterface;
 
 class ContextController extends AOCSController {
 	private ContextService $contextService;
+	private TableService $tableService;
+	private IDBConnection $db;
+	private ColumnService $columnService;
+	private ViewService $viewService;
 
 	public function __construct(
 		IRequest $request,
@@ -41,10 +51,18 @@ class ContextController extends AOCSController {
 		IL10N $n,
 		string $userId,
 		ContextService $contextService,
+		TableService $tableService,
+		IDBConnection $db,
+		ColumnService $columnService,
+		ViewService $viewService,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->contextService = $contextService;
+		$this->tableService = $tableService;
 		$this->userId = $userId;
+		$this->columnService = $columnService;
+		$this->viewService = $viewService;
+		$this->db = $db;
 	}
 
 	/**
@@ -287,7 +305,7 @@ class ContextController extends AOCSController {
 	 *
 	 * @param int $contextId ID of the context
 	 *
-	 * @return
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
 	 * @CanManageContext
 	 *
@@ -305,6 +323,75 @@ class ContextController extends AOCSController {
 			return $this->handleError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Import the scheme of a context
+	 *
+	 * @param int $contextId ID of the context
+	 *
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
+	 *
+	 * @CanManageContext
+	 *
+	 * 200: context updated successfully
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
+	public function importScheme(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?array $tables): DataResponse {
+		try {
+			$this->db->beginTransaction();
+
+			foreach ($tables as $table) {
+				if (isset($table['overrideTableId'])) {
+					$updatedTable = $this->tableService->update(
+						$table['overrideTableId'],
+						$table['title'],
+						$table['emoji'],
+						$table['description'],
+						null,
+						$this->userId,
+						ColumnSettings::createFromInputArray($table['columnOrder']),
+						SortRuleSet::createFromInputArray($table['sort']),
+					);
+					$this->columnService->importColumns($updatedTable, $table['columns']);
+					$this->viewService->importViews($updatedTable->getId(), $table['views']);
+				}
+				foreach ($nodes as &$node) {
+					if ($node['type'] === Application::NODE_TYPE_TABLE && $node['node_id'] === $table['id']) {
+						$node['node_id'] = $updatedTable->getId();
+					}
+
+                    // @TODO: mapping id of view nodes
+				}
+			}
+
+			$context = $this->contextService->update(
+				$contextId,
+				$this->userId,
+				$name,
+				$iconName,
+				$description,
+				$nodes,
+			);
+
+			$this->db->commit();
+			return new DataResponse($context->jsonSerialize());
+		} catch (\InvalidArgumentException $e) {
+			$this->db->rollBack();
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		} catch (Exception|MultipleObjectsReturnedException $e) {
+			$this->db->rollBack();
+			return $this->handleError($e);
+		} catch (PermissionError $e) {
+			$this->db->rollBack();
+			return $this->handlePermissionError($e);
+		} catch (DoesNotExistException $e) {
+			$this->db->rollBack();
+			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
 	}
 
