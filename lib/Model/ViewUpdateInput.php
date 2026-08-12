@@ -40,7 +40,7 @@ class ViewUpdateInput {
 		if ($this->technicalName !== null) {
 			yield ViewUpdatableParameters::TECHNICAL_NAME => $this->technicalName;
 		}
-		if ($this->description) {
+		if ($this->description !== null) {
 			yield ViewUpdatableParameters::DESCRIPTION => $this->description;
 		}
 		if ($this->emoji) {
