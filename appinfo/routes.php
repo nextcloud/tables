@@ -136,6 +136,7 @@ return [
 		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
 		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],
 		['name' => 'ApiTables#transfer', 'url' => '/api/2/tables/{id}/transfer', 'verb' => 'PUT'],
+		['name' => 'ApiTables#previewSchemeChanges', 'url' => '/api/2/tables/{id}/scheme/preview-changes', 'verb' => 'POST'],
 		['name' => 'ApiTables#importScheme', 'url' => '/api/2/tables/{id}/scheme/import', 'verb' => 'POST'],
 
 		['name' => 'ApiColumns#index', 'url' => '/api/2/columns/{nodeType}/{nodeId}', 'verb' => 'GET'],

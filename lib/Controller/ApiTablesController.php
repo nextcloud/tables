@@ -20,6 +20,7 @@ use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\StructureService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
@@ -43,6 +44,7 @@ class ApiTablesController extends AOCSController {
 	private ViewService $viewService;
 	private IAppManager $appManager;
 	private IDBConnection $db;
+	private StructureService $structureService;
 
 	public function __construct(
 		IRequest $request,
@@ -53,6 +55,7 @@ class ApiTablesController extends AOCSController {
 		IL10N $n,
 		IAppManager $appManager,
 		IDBConnection $db,
+		StructureService $structureService,
 		string $userId) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->service = $service;
@@ -60,6 +63,7 @@ class ApiTablesController extends AOCSController {
 		$this->appManager = $appManager;
 		$this->viewService = $viewService;
 		$this->db = $db;
+		$this->structureService = $structureService;
 	}
 
 	/**
@@ -287,16 +291,42 @@ class ApiTablesController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Preview changes to a table scheme
+	 *
+	 * @param int $id
+	 * @param array $updateScheme
+	 * @return DataResponse<Http::STATUS_OK, array{addedColumns: list<TablesColumn>, removedColumns: list<TablesColumn>, modifiedColumns: list<TablesColumn>}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Changes preview returned
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	public function previewSchemeChanges(int $id, array $updateScheme): DataResponse {
+		try {
+			$this->structureService->resolveChangesForTable($id, $updateScheme);
+			return new DataResponse([
+				'addedColumns' => $this->structureService->addedColumns(),
+				'removedColumns' => $this->structureService->removedColumns(),
+				'modifiedColumns' => $this->structureService->modifiedColumn(),
+			]);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError|Exception $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
 	 * [api v2] import table scheme into existing table
 	 *
 	 * @param int $id Table ID
-	 * @param string $title title of new table
-	 * @param string $emoji emoji
-	 * @param string $description description
-	 * @param list<TablesColumn> $columns columns
-	 * @param list<TablesView> $views views
-	 * @param list<array{columnId: int, order: int, readonly: bool}> $columnOrder Default column order settings
-	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sort Default sort rules
+	 * @param list<TablesColumn> $addColumns columns to add
+	 * @param list<TablesColumn> $removeColumns columns to remove
+	 * @param list<TablesColumn> $modifyColumns columns to modify
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
@@ -305,21 +335,20 @@ class ApiTablesController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
-	public function importScheme(int $id, string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
-		try {
-			ColumnSettings::createFromInputArray($columnOrder);
-			SortRuleSet::createFromInputArray($sort);
-		} catch (\InvalidArgumentException $e) {
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
-		}
+	public function importScheme(int $id, array $addColumns, array $removeColumns, array $modifyColumns): DataResponse {
 		try {
 			$this->db->beginTransaction();
-			$table = $this->service->update($id, $title, $emoji, $description, null, $this->userId, ColumnSettings::createFromInputArray($columnOrder), SortRuleSet::createFromInputArray($sort));
-			$this->columnService->importColumns($table, $columns);
-			$this->viewService->importViews($id, $views);
+			$this->service->updateTableStructure(
+				$id,
+				$addColumns,
+				$removeColumns,
+				$modifyColumns,
+				$this->userId
+			);
 
 			$this->db->commit();
-			return new DataResponse($table->jsonSerialize());
+			$columns = $this->columnService->findAllByTable($id);
+			return new DataResponse($this->columnService->formatColumns($columns));
 		} catch (PermissionError $e) {
 			try {
 				$this->db->rollBack();

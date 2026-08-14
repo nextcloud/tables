@@ -4,69 +4,26 @@
 -->
 <template>
 	<div class="import-table-scheme-preview">
-		<div class="preview-section preview-section--option">
-			<div class="preview-option">
-				<NcCheckboxRadioSwitch v-model="importTitle" class="preview-option__label" type="switch">
-					{{ t('tables', 'Title') }}
-				</NcCheckboxRadioSwitch>
-				<div v-if="importTitle" class="preview-option__value">
-					{{ previewData?.title || '' }}
-				</div>
-			</div>
-		</div>
-
-		<div class="preview-section preview-section--option">
-			<div class="preview-option">
-				<NcCheckboxRadioSwitch v-model="importEmoji" class="preview-option__label" type="switch">
-					{{ t('tables', 'Emoji') }}
-				</NcCheckboxRadioSwitch>
-				<div v-if="importEmoji" class="preview-option__value">
-					{{ previewData?.emoji || '' }}
-				</div>
-			</div>
-		</div>
-
-		<div class="preview-section preview-section--option">
-			<div class="preview-option">
-				<NcCheckboxRadioSwitch v-model="importDescription" class="preview-option__label" type="switch">
-					{{ t('tables', 'Description') }}
-				</NcCheckboxRadioSwitch>
-				<div v-if="importDescription" class="preview-option__value">
-					{{ previewData?.description || '' }}
-				</div>
-			</div>
-		</div>
-
 		<div class="preview-section">
 			<div class="preview-section__heading">
 				<h4 class="preview-section__subtitle">
-					{{ t('tables', 'Columns') }}
+					{{ t('tables', 'New Columns') }}
 				</h4>
-				<NcCheckboxRadioSwitch v-model="importColumns" class="preview-option__label" type="switch">
-					{{ t('tables', 'Import columns') }}
-				</NcCheckboxRadioSwitch>
 			</div>
-			<div v-if="importColumns" class="preview-option__value">
-				{{ columnsConfig.length }} {{ t('tables', 'columns') }}
+			<div v-if="addColumnsConfig.length" class="preview-option__value">
+				{{ addColumnsConfig.length }} {{ t('tables', 'columns') }}
 			</div>
-			<div v-if="importColumns && columnsConfig.length" class="preview-list">
-				<div v-for="(columnEntry, index) in columnsConfig" :key="columnEntry.key" class="preview-card">
+			<div v-if="addColumnsConfig.length" class="preview-list">
+				<div v-for="(columnEntry, index) in addColumnsConfig" :key="columnEntry.key" class="preview-card">
 					<div class="preview-card__header">
-						<div class="preview-card__actions">
-							<NcCheckboxRadioSwitch v-model="columnsConfig[index].included" class="preview-card__choice" type="switch">
-								{{ columnEntry.title }}
-							</NcCheckboxRadioSwitch>
-						</div>
-					</div>
-					<div v-if="columnEntry.hasConflict && columnEntry.included" class="preview-card__actions">
-						<NcCheckboxRadioSwitch v-model="columnsConfig[index].action" class="preview-card__choice" value="override" :name="'column-action-' + index" type="radio">
-							{{ t('tables', 'Override existing') }}
-						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch v-model="columnsConfig[index].action" class="preview-card__choice" value="create" :name="'column-action-' + index" type="radio">
-							{{ t('tables', 'Create new') }}
+						<NcCheckboxRadioSwitch v-model="addColumnsConfig[index].included" class="preview-card__choice" type="switch">
+							{{ columnEntry.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<ul v-if="columnEntry.included" class="preview-card__meta">
+						<li>
+							{{ t('tables', 'UUID') }}: {{ columnEntry.column.uuid }}
+						</li>
 						<li>
 							{{ t('tables', 'Type') }}: {{ columnEntry.column.type }}
 						</li>
@@ -79,53 +36,82 @@
 					</ul>
 				</div>
 			</div>
-			<div v-else-if="importColumns" class="preview-empty">
-				{{ t('tables', 'No columns to import') }}
+			<div v-else class="preview-empty">
+				{{ t('tables', 'No columns to add') }}
 			</div>
 		</div>
 
 		<div class="preview-section">
 			<div class="preview-section__heading">
 				<h4 class="preview-section__subtitle">
-					{{ t('tables', 'Views') }}
+					{{ t('tables', 'Change Columns') }}
 				</h4>
-				<NcCheckboxRadioSwitch v-model="importViews" class="preview-option__label" type="switch">
-					{{ t('tables', 'Import views') }}
-				</NcCheckboxRadioSwitch>
 			</div>
-			<div v-if="importViews" class="preview-option__value">
-				{{ viewsConfig.length }} {{ t('tables', 'views') }}
+			<div v-if="modifyColumnsConfig.length" class="preview-option__value">
+				{{ modifyColumnsConfig.length }} {{ t('tables', 'columns') }}
 			</div>
-			<div v-if="importViews && viewsConfig.length" class="preview-list">
-				<div v-for="(viewEntry, index) in viewsConfig" :key="viewEntry.key" class="preview-card">
+			<div v-if="modifyColumnsConfig.length" class="preview-list">
+				<div v-for="(columnEntry, index) in modifyColumnsConfig" :key="columnEntry.key" class="preview-card">
 					<div class="preview-card__header">
-						<NcCheckboxRadioSwitch v-model="viewsConfig[index].included" class="preview-card__choice" type="switch">
-							{{ viewEntry.title }}
+						<NcCheckboxRadioSwitch v-model="modifyColumnsConfig[index].included" class="preview-card__choice" type="switch">
+							{{ columnEntry.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<div v-if="viewEntry.hasConflict && viewEntry.included" class="preview-card__actions">
-						<NcCheckboxRadioSwitch v-model="viewsConfig[index].action" class="preview-card__choice" value="override" :name="'view-action-' + index" type="radio">
-							{{ t('tables', 'Override existing') }}
-						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch v-model="viewsConfig[index].action" class="preview-card__choice" value="create" :name="'view-action-' + index" type="radio">
-							{{ t('tables', 'Create new') }}
-						</NcCheckboxRadioSwitch>
-					</div>
-					<ul v-if="viewEntry.included" class="preview-card__meta">
+					<ul v-if="columnEntry.included" class="preview-card__meta">
 						<li>
-							{{ t('tables', 'Emoji') }}: {{ viewEntry.view.emoji || '' }}
+							{{ t('tables', 'UUID') }}: {{ columnEntry.column.to.uuid || '' }}
 						</li>
 						<li>
-							{{ t('tables', 'Description') }}: {{ viewEntry.view.description || '' }}
+							{{ t('tables', 'From') }}: {{ columnEntry.column.from.title || '' }}
 						</li>
 						<li>
-							{{ t('tables', 'Technical name') }}: {{ viewEntry.view.technicalName || '' }}
+							{{ t('tables', 'To') }}: {{ columnEntry.column.to.title || '' }}
+						</li>
+						<li>
+							{{ t('tables', 'Technical name') }}: {{ columnEntry.column.to.technicalName || '' }}
 						</li>
 					</ul>
 				</div>
 			</div>
-			<div v-else-if="importViews" class="preview-empty">
-				{{ t('tables', 'No views to import') }}
+			<div v-else class="preview-empty">
+				{{ t('tables', 'No columns to change') }}
+			</div>
+		</div>
+
+		<div class="preview-section">
+			<div class="preview-section__heading">
+				<h4 class="preview-section__subtitle">
+					{{ t('tables', 'Remove Columns') }}
+				</h4>
+			</div>
+			<div v-if="removeColumnsConfig.length" class="preview-option__value">
+				{{ removeColumnsConfig.length }} {{ t('tables', 'columns') }}
+			</div>
+			<div v-if="removeColumnsConfig.length" class="preview-list">
+				<div v-for="(columnEntry, index) in removeColumnsConfig" :key="columnEntry.key" class="preview-card">
+					<div class="preview-card__header">
+						<NcCheckboxRadioSwitch v-model="removeColumnsConfig[index].included" class="preview-card__choice" type="switch">
+							{{ columnEntry.title }}
+						</NcCheckboxRadioSwitch>
+					</div>
+					<ul v-if="columnEntry.included" class="preview-card__meta">
+						<li>
+							{{ t('tables', 'UUID') }}: {{ columnEntry.column.uuid }}
+						</li>
+						<li>
+							{{ t('tables', 'Type') }}: {{ columnEntry.column.type }}
+						</li>
+						<li>
+							{{ t('tables', 'Description') }}: {{ columnEntry.shortDescription }}
+						</li>
+						<li>
+							{{ t('tables', 'Technical name') }}: {{ columnEntry.column.technicalName }}
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div v-else class="preview-empty">
+				{{ t('tables', 'No columns to remove') }}
 			</div>
 		</div>
 	</div>
@@ -134,9 +120,6 @@
 <script>
 import { translate as t } from '@nextcloud/l10n'
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import { mapState, mapActions } from 'pinia'
-import { useTablesStore } from '../../store/store.js'
-import { useDataStore } from '../../store/data.js'
 
 export default {
 	name: 'ImportTableSchemePreview',
@@ -168,14 +151,9 @@ export default {
 
 	data() {
 		return {
-			importTitle: true,
-			importEmoji: true,
-			importDescription: true,
-			importColumns: true,
-			importViews: true,
-			columnsConfig: [],
-			viewsConfig: [],
-			existingColumns: [],
+			addColumnsConfig: [],
+			removeColumnsConfig: [],
+			modifyColumnsConfig: [],
 		}
 	},
 
@@ -187,28 +165,19 @@ export default {
 			deep: true,
 			immediate: true,
 		},
-		importTitle() {
-			this.emitPayload()
-		},
-		importEmoji() {
-			this.emitPayload()
-		},
-		importDescription() {
-			this.emitPayload()
-		},
-		importColumns() {
-			this.emitPayload()
-		},
-		importViews() {
-			this.emitPayload()
-		},
-		columnsConfig: {
+		addColumnsConfig: {
 			handler() {
 				this.emitPayload()
 			},
 			deep: true,
 		},
-		viewsConfig: {
+		removeColumnsConfig: {
+			handler() {
+				this.emitPayload()
+			},
+			deep: true,
+		},
+		modifyColumnsConfig: {
 			handler() {
 				this.emitPayload()
 			},
@@ -217,91 +186,64 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['reloadViewsOfTable']),
-		...mapActions(useDataStore, ['getColumnsFromBE']),
 		t,
 
-		async initializeSelection() {
-			this.columnsConfig = []
-			this.viewsConfig = []
-			this.existingColumns = []
+		initializeSelection() {
+			const addedColumns = this.previewData?.addedColumns ?? {}
+			const removedColumns = this.previewData?.removedColumns ?? {}
+			const modifiedColumns = this.previewData?.modifiedColumns ?? {}
 
-			if (this.table?.id) {
-				this.existingColumns = await this.getColumnsFromBE({ tableId: this.table.id }) || []
-			}
-
-			const existingViews = this.table.views || []
-			const previewColumns = Array.isArray(this.previewData?.columns) ? this.previewData.columns : []
-			const previewViews = Array.isArray(this.previewData?.views) ? this.previewData.views : []
-
-			this.columnsConfig = previewColumns.map((column, index) => {
-				const hasConflict = this.hasUuidConflict(column.uuid, this.existingColumns)
-				return {
-					key: `${column.uuid || 'column'}-${index}`,
-					title: column.title || t('tables', 'Untitled column'),
-					shortDescription: column.description?.length > 50 ? column.description.substring(0, 50) + '...' : column.description,
-					column,
-					included: true,
-					hasConflict,
-					action: hasConflict ? 'override' : 'create',
-				}
-			})
-
-			this.viewsConfig = previewViews.map((view, index) => {
-				const hasConflict = this.hasUuidConflict(view.uuid, existingViews)
-				return {
-					key: `${view.uuid || 'view'}-${index}`,
-					title: view.title || t('tables', 'Untitled view'),
-					shortDescription: view.description?.length > 50 ? view.description.substring(0, 50) + '...' : view.description,
-					view,
-					included: true,
-					hasConflict,
-					action: hasConflict ? 'override' : 'create',
-				}
-			})
+			this.addColumnsConfig = this.mapColumnsConfig(addedColumns)
+			this.removeColumnsConfig = this.mapColumnsConfig(removedColumns)
+			this.modifyColumnsConfig = this.mapModifiedColumnsConfig(modifiedColumns)
 
 			this.emitPayload()
 		},
 
-		hasUuidConflict(uuid, items) {
-			return Boolean(uuid && Array.isArray(items) && items.some(item => item.uuid === uuid))
+		mapColumnsConfig(columnsMap) {
+			return Object.entries(columnsMap).map(([uuid, column], index) => ({
+				key: `${uuid || 'column'}-${index}`,
+				title: column?.title || t('tables', 'Untitled column'),
+				shortDescription: this.getShortDescription(column?.description),
+				column,
+				included: true,
+			}))
+		},
+
+		mapModifiedColumnsConfig(columnsMap) {
+			return Object.entries(columnsMap).map(([uuid, column], index) => ({
+				key: `${uuid || 'column'}-${index}`,
+				title: column?.to?.title || column?.from?.title || t('tables', 'Untitled column'),
+				column,
+				included: true,
+			}))
+		},
+
+		getShortDescription(description) {
+			if (!description) {
+				return ''
+			}
+
+			return description.length > 50 ? description.substring(0, 50) + '...' : description
 		},
 
 		emitPayload() {
 			const payload = {
-				...this.previewData,
-				title: this.importTitle ? (this.previewData?.title ?? '') : (this.table?.title ?? this.previewData?.title ?? ''),
-				emoji: this.importEmoji ? (this.previewData?.emoji ?? null) : (this.table?.emoji ?? this.previewData?.emoji ?? null),
-				description: this.importDescription ? (this.previewData?.description ?? '') : (this.table?.description ?? this.previewData?.description ?? ''),
+				addColumns: this.addColumnsConfig
+					.filter(item => item.included)
+					.map(item => ({ ...item.column })),
+				removeColumns: this.removeColumnsConfig
+					.filter(item => item.included)
+					.map(item => ({ ...item.column })),
+				modifyColumns: this.modifyColumnsConfig
+					.filter(item => item.included)
+					.map(item => ({
+						from: { ...item.column.from },
+						to: { ...item.column.to },
+					})),
 			}
-
-			payload.columns = this.importColumns
-				? this.columnsConfig.filter(item => item.included).map(item => this.buildImportedColumn(item))
-				: []
-			payload.views = this.importViews
-				? this.viewsConfig.filter(item => item.included).map(item => this.buildImportedView(item))
-				: []
 
 			this.$emit('update', payload)
-		},
-
-		buildImportedColumn(item) {
-			const column = { ...item.column }
-			column.selectionOptions = JSON.stringify(column.selectionOptions)
-			column.usergroupDefault = JSON.stringify(column.usergroupDefault)
-			column.customSettings = JSON.stringify(column.customSettings)
-			if (item.action === 'create' && item.hasConflict) {
-				column.uuid = ''
-			}
-			return column
-		},
-
-		buildImportedView(item) {
-			const view = { ...item.view }
-			if (item.action === 'create' && item.hasConflict) {
-				view.uuid = ''
-			}
-			return view
 		},
 	},
 }

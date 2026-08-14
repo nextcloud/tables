@@ -22,6 +22,13 @@
 				</template>
 				{{ t('tables', 'Edit application') }}
 			</NcActionButton>
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextExportSchemeBtn"
+				@click="exportContextScheme">
+				<template #icon>
+					<TrayArrowDown :size="20" />
+				</template>
+				{{ t('tables', 'Export application scheme') }}
+			</NcActionButton>
 			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="transferContext">
 				<template #icon>
 					<FileSwapOutline :size="20" />
@@ -50,11 +57,14 @@ import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import FileSwapOutline from 'vue-material-design-icons/FileSwapOutline.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.ts'
 import rebuildNavigation from '../../../service/rebuild-navigation.js'
 import { useTablesStore } from '../../../store/store.js'
+import axios from '@nextcloud/axios'
+import { generateOcsUrl } from '@nextcloud/router'
 
 export default {
 	name: 'NavigationContextItem',
@@ -68,6 +78,7 @@ export default {
 		NcAppNavigationItem,
 		NcActionButton,
 		NcActionCheckbox,
+		TrayArrowDown,
 	},
 
 	mixins: [permissionsMixin, svgHelper],
@@ -103,6 +114,21 @@ export default {
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
+		},
+		async exportContextScheme() {
+			try {
+				const response = await axios.get(generateOcsUrl('apps/tables/api/2/contexts/' + this.context.id + '/scheme/export'))
+				const blob = new Blob([JSON.stringify(response.data?.ocs?.data || '')], { type: 'application/json' })
+				const url = window.URL.createObjectURL(blob)
+				const link = document.createElement('a')
+				link.href = url
+				link.setAttribute('download', `${this.context.name}.json`)
+				document.body.appendChild(link)
+				link.click()
+				document.body.removeChild(link)
+			} catch (error) {
+				console.error('Error exporting context scheme:', error)
+			}
 		},
 		async transferContext() {
 			emit('tables:context:transfer', this.context)
