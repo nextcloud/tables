@@ -208,6 +208,11 @@ class ViewMapper extends QBMapper {
 		return $map;
 	}
 
+	/**
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
 	public function findByUuid(string $uuid): ?View {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('v.*', 't.ownership')

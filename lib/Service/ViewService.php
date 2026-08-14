@@ -650,11 +650,11 @@ class ViewService extends SuperService {
 	 * @param array $view
 	 * @param string $userId
 	 *
-	 * @return void
+	 * @return View
 	 *
 	 * @throws InternalError
 	 */
-	public function importView(int $tableId, array $view, string $userId): void {
+	public function importView(int $tableId, array $view, string $userId): View {
 		$item = new View();
 		$item->setUuid((isset($view['uuid']) && Uuid::isValid($view['uuid'])) ? $view['uuid'] : null);
 		$item->setTableId($tableId);
@@ -674,11 +674,12 @@ class ViewService extends SuperService {
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
 		try {
-			$this->mapper->insert($item);
+			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
 				$item->setTechnicalName($this->buildDefaultTechnicalName($item->getId()));
-				$this->mapper->update($item);
+				$importedView = $this->mapper->update($item);
 			}
+			return $importedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->handleViewPersistDbException($e, 'importView insert error');
 		} catch (\Exception $e) {
@@ -709,28 +710,82 @@ class ViewService extends SuperService {
 	 */
 	private function handleViewPersistDbException(\OCP\DB\Exception $e, string $context): never {
 		if ($e->getReason() === \OCP\DB\Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
-			throw new BadRequestError('Technical name must be unique in the table.');
+			throw new BadRequestError('Technical name must be unique in the table. ' . $e->getMessage());
 		}
 
 		$this->logger->error($e->getMessage(), ['exception' => $e]);
 		throw new InternalError($context . ': ' . $e->getMessage());
 	}
 
-    /**
-     * @param int $tableId
-     * @param array $views
-     * @return void
-     * @throws InternalError
-     * @throws PermissionError
-     * @throws InvalidArgumentException
- */
-	public function importViews(int $tableId, array $views): void {
-		foreach ($views as $view) {
-			if (isset($view['uuid']) && $existView = $this->mapper->findByUuid($view['uuid'])) {
-				$this->update($existView->getId(), ViewUpdateInput::fromInputArray($view), $this->userId);
-				continue;
+	public function remapColumnIdsInViewSettings(View $view, array $columnIdMapping): View {
+		$updatedColumnSettings = array_map(function (ViewColumnInformation $columnInfo) use ($columnIdMapping) {
+			$oldColumnId = $columnInfo->getId();
+			if (isset($columnIdMapping[$oldColumnId])) {
+				return new ViewColumnInformation($columnIdMapping[$oldColumnId], $columnInfo->getOrder());
 			}
-			$this->importView($tableId, $view, $this->userId);
+			return $columnInfo;
+		}, $view->getColumnsSettingsArray());
+
+		$updatedView = new ViewUpdateInput(columnSettings: new ColumnSettings($updatedColumnSettings));
+		return $this->update($view->getId(), $updatedView, $this->userId, true);
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param array $views
+	 * @param array $columnIdsMapping
+	 *
+	 * @return array
+	 *
+	 * @throws InternalError
+	 * @throws PermissionError
+	 * @throws InvalidArgumentException
+ */
+	public function importViews(int $tableId, array $views, array $columnIdsMapping = []): array {
+		$importedViews = [];
+		foreach ($views as $view) {
+			// Remap column IDs in the view settings if a mapping is provided
+			if (!empty($columnIdsMapping)) {
+				if (isset($view['columnSettings'])) {
+					$view['columnSettings'] = array_map(static function (array $column) use ($columnIdsMapping): array {
+						$colId = $column['columnId'];
+						$column['columnId'] = $colId > 0 ? ($columnIdsMapping[$colId] ?? $colId) : $colId;
+						return $column;
+					}, $view['columnSettings']);
+				}
+				if (isset($view['sort'])) {
+					$view['sort'] = array_map(static function (array $sort) use ($columnIdsMapping): array {
+						if ($sort['columnId'] > 0) {
+							$sort['columnId'] = $columnIdsMapping[$sort['columnId']] ?? $sort['columnId'];
+						}
+						return $sort;
+					}, $view['sort']);
+				}
+				if (isset($view['filter'])) {
+					$view['filter'] = array_map(static function (array $filters) use ($columnIdsMapping): array {
+						return array_map(static function (array $filter) use ($columnIdsMapping): array {
+							if ($filter['columnId'] > 0) {
+								$filter['columnId'] = $columnIdsMapping[$filter['columnId']] ?? $filter['columnId'];
+							}
+							return $filter;
+						}, $filters);
+					}, $view['filter']);
+				}
+			}
+
+			if (isset($view['uuid'])) {
+				try {
+					$existView = $this->mapper->findByUuid($view['uuid']);
+					$importedView = $this->update($existView->getId(), ViewUpdateInput::fromInputArray($view), $this->userId);
+					$importedViews[$view['id']] = $importedView->getId();
+					continue;
+				} catch (DoesNotExistException $e) {
+					// View does not exist, proceed with import
+				}
+			}
+			$importedView = $this->importView($tableId, $view, $this->userId);
+			$importedViews[$view['id']] = $importedView->getId();
 		}
+		return $importedViews;
 	}
 }

@@ -15,6 +15,7 @@ use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -569,7 +570,7 @@ class TableService extends SuperService {
 	public function getScheme(int $id, ?string $userId = null): TableScheme {
 		$table = $this->find($id, skipTableEnhancement: true);
 		$columns = $this->columnService->findAllByTable($id, null, $table);
-		$this->enhanceTable($table, $userId);
+		$this->enhanceTable($table, $userId ?? $this->userId);
 		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'), $table->getColumnOrderSettingsArray(), $table->getSortArray());
 	}
 
@@ -610,5 +611,47 @@ class TableService extends SuperService {
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
 		return $newTable;
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param array $addColumns
+	 * @param array $removeColumns
+	 * @param array $updateColumns
+	 * @param string|null $userId
+	 *
+	 * @return void
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws \OCA\Tables\Errors\BadRequestError
+	 */
+	public function updateTableStructure(int $tableId, array $addColumns, array $removeColumns, array $updateColumns, ?string $userId = null): void
+	{
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		// Check if the user has permission to manage the table
+		$table = $this->find($tableId, true);
+		if (!$this->permissionsService->canManageTable($table, $userId)) {
+			throw new PermissionError('PermissionError: can not manage table with id ' . $tableId);
+		}
+
+		// Add new columns
+		foreach ($addColumns as $columnData) {
+			$this->columnService->create($userId, $tableId, null, ColumnDto::createFromArray($columnData));
+		}
+
+		// Remove columns
+		foreach ($removeColumns as $columnData) {
+			$this->columnService->delete($columnData['id']);
+		}
+
+		// Update existing columns
+		foreach ($updateColumns as $columnData) {
+			$fromColumn = $columnData['from'];
+			$toColumn = $columnData['to'];
+			$this->columnService->update($fromColumn['id'], $userId, ColumnDto::createFromArray($toColumn));
+		}
 	}
 }
