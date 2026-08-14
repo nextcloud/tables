@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { getCanonicalLocale } from '@nextcloud/l10n'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 
 export default {
@@ -42,7 +43,16 @@ export default {
 			if (this.value === null) {
 				return null
 			}
-			return this.value.toFixed(this.column?.numberDecimals)
+			// Intl.NumberFormat only accepts 0..20 fraction digits
+			const raw = Number(this.column?.numberDecimals ?? 0)
+			const fractionDigits = Number.isFinite(raw)
+				? Math.min(20, Math.max(0, Math.trunc(raw)))
+				: 0
+			return new Intl.NumberFormat(getCanonicalLocale(), {
+				maximumFractionDigits: fractionDigits,
+				minimumFractionDigits: fractionDigits,
+				useGrouping: false,
+			}).format(this.value)
 		},
 
 		getStep() {
