@@ -11,7 +11,6 @@ namespace OCA\Tables\Migration;
 
 use Closure;
 use Doctrine\DBAL\Schema\SchemaException;
-use Doctrine\DBAL\Schema\Table;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
 use OCP\Migration\IOutput;
@@ -39,7 +38,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 		return $schema;
 	}
 
-	protected function shouldAddTable(string $tableName, ISchemaWrapper $schema): ?Table {
+	protected function shouldAddTable(string $tableName, ISchemaWrapper $schema) {
 		return !$schema->hasTable($tableName) ? $schema->createTable($tableName) : null;
 	}
 
