@@ -18,6 +18,7 @@ export const ColumnTypes = {
 	Datetime: 'datetime',
 	Usergroup: 'usergroup',
 	Relation: 'relation',
+	RelationLookup: 'relation_lookup',
 }
 
 export function getColumnWidthStyle(column) {

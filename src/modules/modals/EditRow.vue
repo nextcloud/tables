@@ -35,15 +35,15 @@
 			</div>
 
 			<div v-if="activeTabId === 'edit' && localRow" class="row">
-				<div v-for="column in nonMetaColumns" :key="column.id">
+				<div v-for="column in nonMetaColumns" :key="column.getValueColumnId()">
 					<ColumnFormComponent
-						v-model:value="localRow[column.id]"
+						v-model:value="localRow[column.getValueColumnId()]"
 						:column="column" />
-					<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(localRow[column.id], column)"
+					<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(localRow[column.getValueColumnId()], column)"
 						type="error">
 						{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
 					</NcNoteCard>
-					<NcNoteCard v-if="localRow[column.id] && column.type === 'text-link' && !isValidUrlProtocol(localRow[column.id])"
+					<NcNoteCard v-if="localRow[column.getValueColumnId()] && column.type === 'text-link' && !isValidUrlProtocol(localRow[column.getValueColumnId()])"
 						type="error">
 						{{ t('tables', 'Invalid protocol. Allowed: {allowed}', {allowed: allowedProtocols.join(', ')}) }}
 					</NcNoteCard>
@@ -162,7 +162,7 @@ export default {
 			return this.checkMandatoryFields(this.localRow)
 		},
 		hasInvalidUrlProtocol() {
-			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.localRow[col.id]))
+			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.localRow[col.getValueColumnId()]))
 		},
 	},
 	watch: {
@@ -196,12 +196,12 @@ export default {
 
 				// Ensure all columns have entries, even if missing from row data
 				this.columns.forEach(column => {
-					if (!(column.id in tmp)) {
+					if (!(column.getValueColumnId() in tmp)) {
 						// For usergroup columns, initialize as empty array
 						if (column.type === 'usergroup') {
-							tmp[column.id] = []
+							tmp[column.getValueColumnId()] = []
 						} else {
-							tmp[column.id] = null
+							tmp[column.getValueColumnId()] = null
 						}
 					}
 				})
