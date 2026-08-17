@@ -91,13 +91,26 @@ class NotificationHelper {
 				'title' => $object->getTitle(),
 			]
 		];
+
+		if ($subject === ActivityManager::SUBJECT_IMPORT_FINISHED) {
+			$notification = $this->generateNotification(
+				subject: $subject,
+				subjectParams: $subjectParams,
+				objectType: ActivityManager::TABLES_OBJECT_TABLE,
+				objectId: (string)$object->getId(),
+				receiver: $author,
+			);
+			$this->notificationManager->notify($notification);
+			return;
+		}
+
 		$this->sendNotifiesByElement(
 			element: $object,
 			subject: $subject,
 			subjectParams: $subjectParams,
 			objectType: ActivityManager::TABLES_OBJECT_TABLE,
 			objectId: (string)$object->getId(),
-			authorId: null,
+			authorId: $author,
 			configKey: null,
 		);
 	}
@@ -111,13 +124,32 @@ class NotificationHelper {
 				'title' => $object->getTitle(),
 			],
 		];
+
+		if ($subject === ActivityManager::SUBJECT_IMPORT_FINISHED) {
+			$subjectParams['isViewContext'] = true;
+			$subjectParams['view'] = [
+				'id' => $object->getId(),
+				'title' => $object->getTitle(),
+			];
+
+			$notification = $this->generateNotification(
+				subject: $subject,
+				subjectParams: $subjectParams,
+				objectType: ActivityManager::TABLES_OBJECT_VIEW,
+				objectId: (string)$object->getId(),
+				receiver: $author,
+			);
+			$this->notificationManager->notify($notification);
+			return;
+		}
+
 		$this->sendNotifiesByElement(
 			element: $object,
 			subject: $subject,
 			subjectParams: $subjectParams,
 			objectType: ActivityManager::TABLES_OBJECT_VIEW,
 			objectId: (string)$object->getId(),
-			authorId: null,
+			authorId: $author,
 			configKey: null,
 		);
 	}
