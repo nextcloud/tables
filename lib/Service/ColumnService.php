@@ -692,16 +692,19 @@ class ColumnService extends SuperService {
 	}
 
 	/**
-	 * @param int $tableId
-	 * @return int
-	 * @throws PermissionError
+	 * @param int[] $tableIds
+	 * @param string|null $userId
+	 * @return array<int, int>
 	 */
-	public function getColumnsCount(int $tableId): int {
-		if ($this->permissionsService->canReadColumnsByTableId($tableId)) {
-			return $this->mapper->countColumns($tableId);
-		} else {
-			throw new PermissionError('no read access for counting to table id = ' . $tableId);
+	public function getColumnsCountForTables(array $tableIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+		$counts = $this->mapper->countColumnsForTables($tableIds);
+		foreach ($tableIds as $tableId) {
+			if (!$this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
+				$counts[$tableId] = 0;
+			}
 		}
+		return $counts;
 	}
 
 	/**
