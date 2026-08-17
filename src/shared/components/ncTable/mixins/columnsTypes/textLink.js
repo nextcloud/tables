@@ -52,7 +52,7 @@ export default class TextLinkColumn extends AbstractTextColumn {
 	}
 
 	isFilterFound(cell, filter) {
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
 		const value = this.getValueFromCellValue(cell.value)
 
 		const filterMethod = {

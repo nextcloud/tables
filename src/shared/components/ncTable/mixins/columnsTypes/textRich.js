@@ -18,11 +18,12 @@ export default class TextRichColumn extends AbstractTextColumn {
 	}
 
 	isFilterFound(cell, filter) {
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
+		const cellValue = cell.value?.toLowerCase()
 
 		const filterMethod = {
-			[FilterIds.Contains]() { return cell.value && cell.value.includes(filterValue) },
-			[FilterIds.DoesNotContain]() { return cell.value && !cell.value.includes(filterValue) },
+			[FilterIds.Contains]() { return cellValue && cellValue.includes(filterValue) },
+			[FilterIds.DoesNotContain]() { return cellValue && !cellValue.includes(filterValue) },
 			[FilterIds.IsEmpty]() { return !cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
