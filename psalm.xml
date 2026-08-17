@@ -45,6 +45,7 @@
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
 				<referencedClass name="Doctrine\DBAL\Types\Types" />
 				<referencedClass name="OC\Core\Command\Base" />
+				<referencedClass name="OCP\DB\Schema\ITable" />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>

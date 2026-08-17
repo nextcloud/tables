@@ -37,14 +37,17 @@ class Version000400Date20230406000000 extends SimpleMigrationStep {
 
 			$column = $table->getColumn('selection_options');
 			$column->setLength(65535);
+			/** @psalm-suppress InvalidArgument Chane to ColumnType enum when app support nc >= 35 */
 			$column->setType(Type::getType('text'));
 
 			$column = $table->getColumn('selection_default');
 			$column->setLength(65535);
+			/** @psalm-suppress InvalidArgument Chane to ColumnType enum when app support nc >= 35 */
 			$column->setType(Type::getType('text'));
 
 			$column = $table->getColumn('text_default');
 			$column->setLength(65535);
+			/** @psalm-suppress InvalidArgument Chane to ColumnType enum when app support nc >= 35 */
 			$column->setType(Type::getType('text'));
 		}
 
