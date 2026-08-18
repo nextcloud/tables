@@ -305,11 +305,33 @@ class ApiTablesController extends AOCSController {
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function previewSchemeChanges(int $id, array $updateScheme): DataResponse {
 		try {
+			$table = $this->service->find($id);
 			$this->structureService->resolveChangesForTable($id, $updateScheme);
 			return new DataResponse([
-				'addedColumns' => $this->structureService->addedColumns(),
-				'removedColumns' => $this->structureService->removedColumns(),
-				'modifiedColumns' => $this->structureService->modifiedColumn(),
+				'title' => [
+					'from' => $table->getTitle(),
+					'to' => $updateScheme['title'] ?? $table->getTitle(),
+				],
+				'emoji' => [
+					'from' => $table->getEmoji(),
+					'to' => $updateScheme['emoji'] ?? $table->getEmoji(),
+				],
+				'description' => [
+					'from' => $table->getDescription(),
+					'to' => $updateScheme['description'] ?? $table->getDescription(),
+				],
+				'columns' => [
+					'addColumns' => $this->structureService->addedColumns(),
+					'removeColumns' => $this->structureService->removedColumns(),
+					'modifyColumns' => $this->structureService->modifiedColumns(),
+				],
+				'views' => [
+					'addViews' => $this->structureService->addedViews(),
+					'removeViews' => $this->structureService->removedViews(),
+					'modifyViews' => $this->structureService->modifiedViews(),
+				],
+				'columnOrderChanges' => $this->structureService->columnOrderChanges(),
+				'sortChanges' => $this->structureService->sortChanges(),
 			]);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);

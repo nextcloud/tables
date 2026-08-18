@@ -29,6 +29,6 @@ class StructureServiceTest extends TestCase {
 		$this->service->resolveChanges($this->originalSchema, $this->originalSchema);
 		$this->assertSame([], $this->service->addedColumns());
 		$this->assertSame([], $this->service->removedColumns());
-		$this->assertSame([], $this->service->modifiedColumn());
+		$this->assertSame([], $this->service->modifiedColumns());
 	}
 }
