@@ -305,39 +305,13 @@ class ApiTablesController extends AOCSController {
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function previewSchemeChanges(int $id, array $updateScheme): DataResponse {
 		try {
-			$table = $this->service->find($id);
-			$this->structureService->resolveChangesForTable($id, $updateScheme);
-			return new DataResponse([
-				'title' => [
-					'from' => $table->getTitle(),
-					'to' => $updateScheme['title'] ?? $table->getTitle(),
-				],
-				'emoji' => [
-					'from' => $table->getEmoji(),
-					'to' => $updateScheme['emoji'] ?? $table->getEmoji(),
-				],
-				'description' => [
-					'from' => $table->getDescription(),
-					'to' => $updateScheme['description'] ?? $table->getDescription(),
-				],
-				'columns' => [
-					'addColumns' => $this->structureService->addedColumns(),
-					'removeColumns' => $this->structureService->removedColumns(),
-					'modifyColumns' => $this->structureService->modifiedColumns(),
-				],
-				'views' => [
-					'addViews' => $this->structureService->addedViews(),
-					'removeViews' => $this->structureService->removedViews(),
-					'modifyViews' => $this->structureService->modifiedViews(),
-				],
-				'columnOrderChanges' => $this->structureService->columnOrderChanges(),
-				'sortChanges' => $this->structureService->sortChanges(),
-			]);
+			$changes = $this->service->compareTableSchemeChanges($id, $updateScheme);
+			return new DataResponse($changes);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
-		} catch (InternalError|Exception $e) {
+		} catch (InternalError|Exception|\Throwable $e) {
 			return $this->handleError($e);
 		}
 	}
@@ -357,20 +331,14 @@ class ApiTablesController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
-	public function importScheme(int $id, array $addColumns, array $removeColumns, array $modifyColumns): DataResponse {
+	public function importScheme(int $id, string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
 		try {
 			$this->db->beginTransaction();
-			$this->service->updateTableStructure(
-				$id,
-				$addColumns,
-				$removeColumns,
-				$modifyColumns,
-				$this->userId
-			);
+			$this->service->update($id, $title, $emoji, $description, null, $this->userId);
+			$table = $this->service->updateTableStructure($id, $columns, $views, $columnOrder, $sort, $this->userId);
 
 			$this->db->commit();
-			$columns = $this->columnService->findAllByTable($id);
-			return new DataResponse($this->columnService->formatColumns($columns));
+			return new DataResponse($table->jsonSerialize());
 		} catch (PermissionError $e) {
 			try {
 				$this->db->rollBack();

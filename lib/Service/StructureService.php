@@ -182,6 +182,27 @@ class StructureService {
 
 		$existingViewMap = $this->getViewMap($currentSchema['views']);
 		$updatedViewMap = $this->getViewMap($updateSchema['views']);
+		$columnsMap = $this->getColumnsMapById($updateSchema['columns']);
+
+		foreach ($updateSchema['views'] as $i => $view) {
+			foreach ($view['columnSettings'] as $j => $col) {
+				if (isset($columnsMap[$col['columnId']])) {
+					$updateSchema['views'][$i]['columnSettings'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+				}
+			}
+			foreach ($view['sort'] as $j => $col) {
+				if (isset($columnsMap[$col['columnId']])) {
+					$updateSchema['views'][$i]['sort'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+				}
+			}
+			foreach ($view['filter'] as $j => $filterGroup) {
+				foreach ($filterGroup as $k => $col) {
+					if (isset($columnsMap[$col['columnId']])) {
+						$updateSchema['views'][$i]['filter'][$j][$k]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+					}
+				}
+			}
+		}
 
 		$this->determineAddedViews($existingViewMap, $updatedViewMap, $updateSchema);
 		$this->determineRemovedViews($existingViewMap, $updatedViewMap, $currentSchema);

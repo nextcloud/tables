@@ -156,6 +156,7 @@ return [
 		['name' => 'Context#update', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'PUT'],
 		['name' => 'Context#destroy', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'DELETE'],
 		['name' => 'Context#exportScheme', 'url' => '/api/2/contexts/{contextId}/scheme/export', 'verb' => 'GET'],
+		['name' => 'Context#previewSchemeChanges', 'url' => '/api/2/contexts/{contextId}/scheme/preview-changes', 'verb' => 'POST'],
 		['name' => 'Context#importScheme', 'url' => '/api/2/contexts/{contextId}/scheme/import', 'verb' => 'POST'],
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],

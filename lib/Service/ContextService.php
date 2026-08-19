@@ -34,6 +34,8 @@ use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 class ContextService {
@@ -646,6 +648,16 @@ class ContextService {
 		return $newContext;
 	}
 
+	/**
+	 * @param int $contextId
+	 *
+	 * @return ContextScheme
+	 *
+	 * @throws ContainerExceptionInterface
+	 * @throws Exception
+	 * @throws NotFoundError
+	 * @throws NotFoundExceptionInterface
+	 */
 	public function getScheme(int $contextId): ContextScheme {
 		$context = $this->contextMapper->findById($contextId);
 		$tableService = \OCP\Server::get(TableService::class);
@@ -656,8 +668,11 @@ class ContextService {
 		foreach ($nodes as &$node) {
 			if ($node['node_type'] === Application::NODE_TYPE_TABLE && !isset($tables[$node['node_id']])) {
 				try {
+					$table = $tableService->find($node['node_id']);
 					$tableScheme = $tableService->getScheme($node['node_id'])->jsonSerialize();
 					$tables[$node['node_id']] = $tableScheme;
+					$node['node_uuid'] = $table->getUuid();
+					$node['node_title'] = $table->getTitle();
 				} catch (InternalError|PermissionError|NotFoundError $e) {
 					$this->logger->error('Failed to enhance context scheme for table node: ' . $e->getMessage(), ['exception' => $e]);
 				}
@@ -665,6 +680,8 @@ class ContextService {
 			if ($node['node_type'] === Application::NODE_TYPE_VIEW) {
 				try {
 					$view = $viewService->find($node['node_id']);
+					$node['node_uuid'] = $view->getUuid();
+					$node['node_title'] = $view->getTitle();
 					if (isset($tables[$view->getTableId()])) {
 						continue;
 					}
@@ -679,9 +696,73 @@ class ContextService {
 			$context->getName(),
 			$context->getIcon(),
 			$context->getDescription(),
-			$nodes,
+			array_values($nodes),
 			$context->getPages(),
 			array_values($tables),
 		);
+	}
+
+	/**
+	 * @param int $contextId
+	 * @param array $updateScheme
+	 *
+	 * @return array|array[]
+	 *
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 */
+	public function compareSchemeChanges(int $contextId, array $updateScheme): array {
+		$context = $this->contextMapper->findById($contextId);
+		$currentScheme = $this->getScheme($contextId);
+		$tableService = \OCP\Server::get(TableService::class);
+
+		$changes = [
+			'name' => [
+				'from' => $context->getName(),
+				'to' => $updateScheme['name'] ?? $context->getName()
+			],
+			'icon' => [
+				'from' => $context->getIcon(),
+				'to' => $updateScheme['icon'] ?? $context->getIcon()
+			],
+			'description' => [
+				'from' => $context->getDescription(),
+				'to' => $updateScheme['description'] ?? $context->getDescription()
+			],
+			'nodes' => [
+				'from' => $currentScheme->getNodes(),
+				'to' => $updateScheme['nodes'] ?? $currentScheme->getNodes()
+			],
+		];
+
+		$tables = $tableService->findAll();
+		$tablesMap = [];
+		foreach ($tables as $table) {
+			$tablesMap[$table->getUuid()] = $table;
+		}
+
+		// Detect new tables
+		foreach ($updateScheme['tables'] as $table) {
+			if (!isset($tablesMap[$table['uuid']])) {
+				$changes['addTables'][] = $table;
+			}
+		}
+
+		// Detect modify tables
+		foreach ($updateScheme['tables'] as $tableUpdateScheme) {
+			if (isset($tablesMap[$tableUpdateScheme['uuid']])) {
+				$tableLocalId = $tablesMap[$tableUpdateScheme['uuid']]->getId();
+				$tableLocalScheme = $tableService->getScheme($tableLocalId)->jsonSerialize();
+				if (json_encode($tableLocalScheme) !== json_encode($tableUpdateScheme)) {
+					$changes['modifyTables'][] = $tableService->compareTableSchemeChanges($tableLocalId, $tableUpdateScheme);
+				}
+			}
+		}
+
+		return $changes;
 	}
 }

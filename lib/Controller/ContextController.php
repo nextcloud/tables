@@ -319,10 +319,41 @@ class ContextController extends AOCSController {
 		try {
 			$contextScheme = $this->contextService->getScheme($contextId);
 			return new DataResponse($contextScheme->jsonSerialize());
-		} catch (Exception|InternalError $e) {
-			return $this->handleError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
+		} catch (Exception|\Throwable $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Preview the changes that would be applied to a context scheme
+	 *
+	 * @param int $contextId ID of the context
+	 *
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
+	 *
+	 * @CanManageContext
+	 *
+	 * 200: returning the changes that would be applied to the context scheme
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
+	public function previewSchemeChanges(int $contextId, array $updateScheme): DataResponse {
+		try {
+			$changes = $this->contextService->compareSchemeChanges($contextId, $updateScheme);
+			return new DataResponse($changes);
+		}
+		catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+		catch (PermissionError $e) {
+			$this->db->rollBack();
+			return $this->handlePermissionError($e);
+		} catch (Exception|InternalError|\Throwable $e) {
+			return $this->handleError($e);
 		}
 	}
 

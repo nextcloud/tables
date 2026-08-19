@@ -11,6 +11,7 @@ namespace OCA\Tables\Model;
 
 use InvalidArgumentException;
 use JsonSerializable;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Service\ValueObject\SortRule;
 
 class SortRuleSet implements JsonSerializable {
@@ -32,12 +33,22 @@ class SortRuleSet implements JsonSerializable {
 	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $data
 	 * @throws InvalidArgumentException
 	 */
-	public static function createFromInputArray(array $data): self {
+	public static function createFromInputArray(array $data, array $columnsMap = []): self {
 		$sortRules = [];
 		foreach ($data as $inputSortRule) {
 			if (!is_array($inputSortRule)) {
 				throw new InvalidArgumentException('Each sort rule entry must be an array');
 			}
+
+			// Resolve columnId from uuid if provided
+			if (isset($inputSortRule['columnUuid']) && isset($columnsMap[$inputSortRule['columnUuid']]) && $columnsMap[$inputSortRule['columnUuid']] instanceof Column) {
+				$inputSortRule['columnId'] = $columnsMap[$inputSortRule['columnUuid']]->getId();
+			}
+
+			if (!isset($inputSortRule['columnId']) && !empty($columnsMap)) {
+				continue; // Skip sort rules that reference a column that doesn't exist in the current table
+			}
+
 			if (!isset($inputSortRule['columnId'], $inputSortRule['mode'])) {
 				throw new InvalidArgumentException('Required sort parameters are missing');
 			}

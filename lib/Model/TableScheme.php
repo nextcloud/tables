@@ -13,6 +13,7 @@ use OCA\Tables\Db\View;
 
 class TableScheme implements JsonSerializable {
 
+	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?string $emoji = null;
 
@@ -26,7 +27,8 @@ class TableScheme implements JsonSerializable {
 	protected array $columnOrder = [];
 	protected array $sort = [];
 
-	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion, array $columnOrder = [], array $sort = []) {
+	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion, array $columnOrder = [], array $sort = [], string $uuid = null) {
+		$this->uuid = $uuid;
 		$this->tablesVersion = $tablesVersion;
 		$this->title = $title;
 		$this->emoji = $emoji;
@@ -43,6 +45,7 @@ class TableScheme implements JsonSerializable {
 
 	public function jsonSerialize(): array {
 		return [
+			'uuid' => $this->uuid ?: '',
 			'title' => $this->title ?: '',
 			'emoji' => $this->emoji,
 			'columns' => $this->columns,
