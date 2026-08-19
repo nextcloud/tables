@@ -11,6 +11,7 @@ namespace OCA\Tables\Model;
 
 use Generator;
 use JsonSerializable;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Service\ValueObject\ColumnOrderInformation;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
@@ -37,11 +38,19 @@ class ColumnSettings implements JsonSerializable {
 	/**
 	 * Creates column settings with only columnId and order (for table use).
 	 */
-	public static function createFromInputArray(array $inputColumnSettings): self {
+	public static function createFromInputArray(array $inputColumnSettings, array $columnsMap = []): self {
 		$columnSettings = [];
 		foreach ($inputColumnSettings as $inputColumnSetting) {
 			if (!is_array($inputColumnSetting)) {
 				throw new \InvalidArgumentException('Each column settings entry must be an array');
+			}
+
+			// Resolve columnId from uuid if provided
+			if (isset($inputColumnSetting['columnUuid']) && isset($columnsMap[$inputColumnSetting['columnUuid']]) && $columnsMap[$inputColumnSetting['columnUuid']] instanceof Column) {
+				$inputColumnSetting['columnId'] = $columnsMap[$inputColumnSetting['columnUuid']]->getId();
+			}
+			if (!isset($inputColumnSetting['columnId'])) {
+				continue;
 			}
 			$columnSettings[] = ColumnOrderInformation::fromArray($inputColumnSetting);
 		}
