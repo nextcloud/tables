@@ -73,7 +73,7 @@ export default {
 		// To make nested dynamic keys reactive, you need to use a computed property or watch for changes.
 		const rows = computed(() => getRows.value(props.isView, props.element.id))
 		const columns = computed(() => getColumns.value(props.isView, props.element.id))
-		return { rows, columns }
+		return { rows, columns, dataStore: store }
 	},
 
 	data() {
@@ -195,7 +195,10 @@ export default {
 					isView: this.isView,
 				}
 				if (this.activeRowId) {
-					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns, isView: this.isView, elementId: this.element.id, element: this.element })
+					const row = this.dataStore.getRows(this.isView, this.element.id).find(r => r.id === this.activeRowId)
+					if (row) {
+						emit('tables:row:edit', { row, columns: this.dataStore.getColumns(this.isView, this.element.id), isView: this.isView, elementId: this.element.id, element: this.element })
+					}
 				}
 				this.localLoading = false
 			}
