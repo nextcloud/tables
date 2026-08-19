@@ -95,6 +95,29 @@ class SelectionOptions implements JsonSerializable, Iterator {
 		return self::createFromInputArray($inputArray, $default, $allowPassingUuid);
 	}
 
+	/**
+	 * Keep stored option UUIDs by option id and generate any that are missing.
+	 */
+	public function ensureServerManagedUuids(?self $existing = null): void {
+		if ($this->selectionOptions === null) {
+			return;
+		}
+
+		$existingByKey = [];
+		if ($existing !== null) {
+			foreach ($existing as $existingOption) {
+				$existingUuid = $existingOption->uuid();
+				if ($existingUuid !== null) {
+					$existingByKey[$existingOption->key()] = $existingUuid;
+				}
+			}
+		}
+
+		foreach ($this->selectionOptions as $selectionOption) {
+			$selectionOption->ensureUuid($existingByKey[$selectionOption->key()] ?? null);
+		}
+	}
+
 	public function default(): mixed {
 		return $this->default;
 	}

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Model;
 
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
+
 class SelectionOption implements \JsonSerializable {
 	private string $uuid;
 
@@ -30,12 +32,8 @@ class SelectionOption implements \JsonSerializable {
 			throw new \InvalidArgumentException('Option label is missing');
 		}
 
-		if (isset($data['uuid']) && !$allowPassingUuid) {
-			throw new \InvalidArgumentException('It is forbidden to set the Uuid from external');
-		}
-
 		$instance = new self((int)$data['id'], $data['label']);
-		if (isset($data['uuid'])) {
+		if ($allowPassingUuid && isset($data['uuid']) && is_string($data['uuid']) && $data['uuid'] !== '') {
 			$instance->setUuid($data['uuid']);
 		}
 		return $instance;
@@ -49,7 +47,29 @@ class SelectionOption implements \JsonSerializable {
 		return $this->label;
 	}
 
+	public function uuid(): ?string {
+		/** @psalm-suppress RedundantPropertyInitializationCheck */
+		return $this->uuid ?? null;
+	}
+
+	/**
+	 * UUID is assigned once, if there is no UUID a new one is generated, existing ones are never replaced
+	 */
+	public function ensureUuid(?string $existingUuid = null): void {
+		if ($this->uuid() !== null) {
+			return;
+		}
+		if ($existingUuid !== null && $existingUuid !== '') {
+			$this->setUuid($existingUuid);
+			return;
+		}
+		$this->setUuid(Uuid::v7()->toRfc4122());
+	}
+
 	protected function setUuid(string $uuid): void {
+		if ($this->uuid() !== null) {
+			return;
+		}
 		$this->uuid = $uuid;
 	}
 
