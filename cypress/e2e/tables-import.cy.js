@@ -136,6 +136,38 @@ describe('Import csv', () => {
 		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
 	})
 
+	it('Import small csv from device with an extra ignored column', () => {
+		const csv = [
+			['What', 'How to do', 'Ease of use', 'Done', 'Extra column to ignore'],
+			['A1', 'A2', '0', 'true', 'ignore1'],
+			['B1', 'B2', '2', 'true', 'ignore2'],
+			['C1', 'C2', '5', 'false', 'ignore3'],
+		]
+		cy.writeFile('cypress/fixtures/test-import-with-extra.csv', csv.map(row => row.join(',')).join('\n'))
+
+		cy.loadTable('Welcome to Nextcloud Tables!')
+		cy.clickOnTableThreeDotMenu('Import')
+		cy.get('.modal__content button').contains('Upload from device').click()
+		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-with-extra.csv', { force: true })
+
+		cy.get('.modal__content input[type="checkbox"]').first().uncheck({ force: true })
+
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload-preview/**' }).as('importPreviewUploadExtra')
+		cy.get('.modal__content button').contains('Preview').click()
+		cy.wait('@importPreviewUploadExtra')
+		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 5)
+
+		cy.intercept({ method: 'POST', url: '**/apps/tables/v2/importupload/table/*' }).as('importUploadReqExtra')
+		cy.get('.modal__content button').contains('Import').click()
+		cy.wait('@importUploadReqExtra')
+		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '4')
+		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
+		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
+		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+	})
+
 })
 
 describe('Import csv from Files file action', () => {
