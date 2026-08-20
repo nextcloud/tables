@@ -16,8 +16,6 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
-use OCA\Tables\Model\ColumnSettings;
-use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -255,7 +253,7 @@ class ContextController extends AOCSController {
 	 * @psalm-param int<0, 0> $newOwnerType
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(Application::PERMISSION_OWNER, null, 'context', 'contextId')]
+	#[RequirePermission(permission: Application::PERMISSION_OWNER, typeParam: 'context', idParam: 'contextId')]
 	public function transfer(int $contextId, string $newOwnerId, int $newOwnerType = 0): DataResponse {
 		try {
 			return new DataResponse($this->contextService->transfer($contextId, $newOwnerId, $newOwnerType)->jsonSerialize());
@@ -314,10 +312,10 @@ class ContextController extends AOCSController {
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	public function exportScheme(int $contextId): DataResponse {
 		try {
-			$contextScheme = $this->contextService->getScheme($contextId);
+			$contextScheme = $this->contextService->getScheme($contextId, $this->userId);
 			return new DataResponse($contextScheme->jsonSerialize());
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
@@ -340,16 +338,14 @@ class ContextController extends AOCSController {
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	public function previewSchemeChanges(int $contextId, array $updateScheme): DataResponse {
 		try {
-			$changes = $this->contextService->compareSchemeChanges($contextId, $updateScheme);
+			$changes = $this->contextService->compareSchemeChanges($contextId, $updateScheme, $this->userId);
 			return new DataResponse($changes);
-		}
-		catch (NotFoundError $e) {
+		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
-		}
-		catch (PermissionError $e) {
+		} catch (PermissionError $e) {
 			$this->db->rollBack();
 			return $this->handlePermissionError($e);
 		} catch (Exception|InternalError|\Throwable $e) {
@@ -371,7 +367,7 @@ class ContextController extends AOCSController {
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables): DataResponse {
 		try {
 			$this->db->beginTransaction();

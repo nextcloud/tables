@@ -154,15 +154,6 @@ export default {
 		}
 	},
 
-	watch: {
-		showModal(newVal) {
-			if (newVal) {
-				this.reset()
-				this.$nextTick(() => this.clearSelectedUploadFile())
-			}
-		},
-	},
-
 	computed: {
 		...mapState(useTablesStore, ['getContext', 'tables', 'views', 'activeContextId']),
 		importFileName() {
@@ -195,6 +186,15 @@ export default {
 		},
 		showLoading() {
 			return this.loading && !this.waitForReload
+		},
+	},
+
+	watch: {
+		showModal(newVal) {
+			if (newVal) {
+				this.reset()
+				this.$nextTick(() => this.clearSelectedUploadFile())
+			}
 		},
 	},
 

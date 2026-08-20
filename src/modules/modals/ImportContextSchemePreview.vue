@@ -93,7 +93,7 @@
 				<div v-for="(tableEntry, index) in addTablesConfig" :key="tableEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="addTablesConfig[index].included" class="preview-card__choice" type="switch">
-							{{ tableEntry.uuid }}
+							{{ tableEntry.table.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<ul v-if="tableEntry.included" class="preview-card__meta">
@@ -110,7 +110,7 @@
 							<strong>{{ t('tables', 'Columns') }}:</strong>
 							<ul>
 								<li v-for="(column, colIndex) in tableEntry.table.columns" :key="colIndex">
-									{{ column.title }} ({{ column.technicalName }} - {{ column.uuid }})
+									{{ column.title }} ({{ column.technicalName }})
 								</li>
 							</ul>
 						</li>
@@ -118,7 +118,7 @@
 							<strong>{{ t('tables', 'Views') }}:</strong>
 							<ul>
 								<li v-for="(view, viewIndex) in tableEntry.table.views" :key="viewIndex">
-									{{ view.emoji }} {{ view.title }} ({{ view.technicalName }} - {{ view.uuid }})
+									{{ view.emoji }} {{ view.title }} ({{ view.technicalName }})
 								</li>
 							</ul>
 						</li>
@@ -140,7 +140,7 @@
 				<div v-for="(tableEntry, index) in modifyTablesConfig" :key="tableEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="modifyTablesConfig[index].included" class="preview-card__choice" type="switch">
-							{{ tableEntry.uuid }}
+							{{ tableEntry.table.title.to }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<div v-if="tableEntry.included" class="preview-card__meta">
@@ -153,7 +153,7 @@
 			</div>
 		</div>
 
-		<!-- Column Order Section -->
+		<!-- Resources Section -->
 		<div class="preview-section preview-section--option">
 			<div class="preview-option">
 				<NcCheckboxRadioSwitch v-model="importNodes" class="preview-option__label" type="switch">
@@ -165,7 +165,7 @@
 							{{ t('tables', 'From') }}:
 						</li>
 						<li v-for="(node, index) in previewData.nodes.from" :key="index">
-							{{ node.node_title }} ({{ node.node_uuid }})
+							{{ node.node_title }}
 						</li>
 					</ul>
 					<ul class="preview-card__meta--after">
@@ -173,7 +173,7 @@
 							{{ t('tables', 'To') }}:
 						</li>
 						<li v-for="(column, index) in previewData.nodes.to" :key="index">
-							{{ column.node_title }} ({{ column.node_uuid }})
+							{{ column.node_title }}
 						</li>
 					</ul>
 				</div>
@@ -184,9 +184,9 @@
 
 <script>
 import { translate as t } from '@nextcloud/l10n'
-import { NcCheckboxRadioSwitch, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import ImportTableSchemePreview from './ImportTableSchemePreview.vue'
-import svgHelper from "../../shared/components/ncIconPicker/mixins/svgHelper.js";
+import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js';
 
 export default {
 	name: 'ImportContextSchemePreview',
@@ -194,7 +194,6 @@ export default {
 	components: {
 		ImportTableSchemePreview,
 		NcCheckboxRadioSwitch,
-		NcIconSvgWrapper,
 	},
 
 	mixins: [svgHelper],
@@ -288,19 +287,6 @@ export default {
 		},
 	},
 
-	computed: {
-		iconFrom: {
-			async get() {
-				return await this.getContextIcon(this.previewData.icon.from)
-			}
-		},
-		iconTo: {
-			async get() {
-				return await this.getContextIcon(this.previewData.icon.to)
-			}
-		}
-	},
-
 	methods: {
 		t,
 
@@ -335,8 +321,8 @@ export default {
 		emitPayload() {
 			const payload = {
 				name: this.importName ? this.previewData.name.to : this.previewData.name.from,
-				iconName: this.importIcon ? this.previewData.icon.to: this.previewData.icon.from,
-				description: this.importDescription ? this.previewData.description.to: this.previewData.description.from,
+				iconName: this.importIcon ? this.previewData.icon.to : this.previewData.icon.from,
+				description: this.importDescription ? this.previewData.description.to : this.previewData.description.from,
 				tables: {
 					addTables: this.addTablesConfig
 							.filter(item => item.included)

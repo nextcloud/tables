@@ -27,7 +27,7 @@ class TableScheme implements JsonSerializable {
 	protected array $columnOrder = [];
 	protected array $sort = [];
 
-	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion, array $columnOrder = [], array $sort = [], string $uuid = null) {
+	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion, array $columnOrder = [], array $sort = [], ?string $uuid = null) {
 		$this->uuid = $uuid;
 		$this->tablesVersion = $tablesVersion;
 		$this->title = $title;
