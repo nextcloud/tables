@@ -24,7 +24,6 @@ use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
-use OCA\Tables\Service\ConfigService;
 use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\ImportService;
 use OCA\Tables\Service\RelationService;
@@ -91,7 +90,6 @@ class Api1Controller extends ApiController {
 		IL10N $l10N,
 		?string $userId,
 		private FederationService $federationService,
-		private ConfigService $configService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->tableService = $service;
@@ -785,7 +783,7 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableColumns(int $tableId, ?int $viewId): DataResponse {
 		try {
-			if ($this->configService->isFederationEnabled() && $this->federationService->isNodeFederated($tableId, 'table')) {
+			if ($this->federationService->isNodeFederated($tableId, 'table')) {
 				$table = $this->tableService->find($tableId, true);
 				return new DataResponse($this->federationService->getColumns($table));
 			}
@@ -833,7 +831,7 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewColumns(int $viewId): DataResponse {
 		try {
-			if ($this->configService->isFederationEnabled() && $this->federationService->isNodeFederated($viewId, 'view')) {
+			if ($this->federationService->isNodeFederated($viewId, 'view')) {
 				$view = $this->viewService->find($viewId, true);
 				return new DataResponse($this->federationService->getColumns($view));
 			}
