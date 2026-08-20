@@ -13,6 +13,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use OC\Http\Client\Response;
 use OCA\Tables\Db\Share;
+use OCA\Tables\Errors\FederationRequestError;
 use OCP\AppFramework\Http;
 use OCP\Federation\ICloudFederationFactory;
 use OCP\Federation\ICloudFederationProviderManager;
@@ -70,7 +71,7 @@ class FederationProxy {
 
 	/**
 	 * @param 'get'|'post'|'put'|'delete' $verb
-	 * @throws \Exception
+	 * @throws FederationRequestError
 	 */
 	protected function request(
 		string $verb,
@@ -93,7 +94,7 @@ class FederationProxy {
 			$body->rewind();
 
 			if (!is_array(json_decode($content, true))) {
-				throw new \Exception('Error parsing JSON response', $status);
+				throw new FederationRequestError('Error parsing JSON response', $status);
 			}
 
 			$this->logger->debug('Client error from remote', ['exception' => $e]);
@@ -101,9 +102,8 @@ class FederationProxy {
 			/** @psalm-suppress InvalidReturnStatement */
 			return new Response($e->getResponse(), false);
 		} catch (ServerException|\Throwable $e) {
-			$serverException = new \Exception($e->getMessage(), $e->getCode(), $e);
-			$this->logger->error('Could not reach remote', ['exception' => $serverException]);
-			throw $serverException;
+			$this->logger->error('Could not reach remote', ['exception' => $e]);
+			throw new FederationRequestError('Could not reach remote: ' . $e->getMessage(), $e->getCode(), $e);
 		}
 	}
 
@@ -123,6 +123,9 @@ class FederationProxy {
 		return $this->request('delete', $shareToken, $url);
 	}
 
+	/**
+	 * @throws FederationRequestError
+	 */
 	public function getOCSData(IResponse $response, array $allowedStatusCodes = [Http::STATUS_OK]): array {
 		if (!in_array($response->getStatusCode(), $allowedStatusCodes, true)) {
 			$this->logger->debug('Unexpected status code ' . $response->getStatusCode());
@@ -132,11 +135,11 @@ class FederationProxy {
 			$content = $response->getBody();
 			$responseData = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
 			if (!is_array($responseData)) {
-				throw new \RuntimeException('JSON response is not an array');
+				throw new FederationRequestError('JSON response is not an array');
 			}
 		} catch (\Throwable $e) {
 			$this->logger->error('Error parsing JSON response', ['exception' => $e]);
-			throw new \Exception('Error parsing JSON response', $e->getCode(), $e);
+			throw new FederationRequestError('Error parsing JSON response', $e->getCode(), $e);
 		}
 
 		return $responseData['ocs']['data'] ?? [];

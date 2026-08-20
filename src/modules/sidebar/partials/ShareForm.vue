@@ -59,15 +59,16 @@ export default {
 		},
 	},
 
-	data() {
-		return {
-			selectedShare: null,
-		}
-	},
-
 	emits: [
 		'add',
 	],
+
+  data() {
+    return {
+      selectedShare: null,
+    }
+  },
+
 	computed: {
 		...mapState(useTablesStore, ['tables', 'showSidebar', 'isLoadingSomething']),
 

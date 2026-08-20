@@ -25,8 +25,8 @@ use OCP\AppFramework\PublicShareController;
 use OCP\Federation\ICloudIdManager;
 use OCP\IRequest;
 use OCP\ISession;
-use OCP\Share\IManager as ShareManager;
 use OCP\OCM\IOCMDiscoveryService;
+use OCP\Share\IManager as ShareManager;
 use ReflectionMethod;
 
 class ShareControlMiddleware extends Middleware {
