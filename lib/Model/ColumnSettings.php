@@ -60,11 +60,19 @@ class ColumnSettings implements JsonSerializable {
 	/**
 	 * Creates column settings with view-specific fields (columnId, order, readonly, mandatory).
 	 */
-	public static function createViewSettingsFromInputArray(array $inputColumnSettings): self {
+	public static function createViewSettingsFromInputArray(array $inputColumnSettings, array $columnsMap = []): self {
 		$columnSettings = [];
 		foreach ($inputColumnSettings as $inputColumnSetting) {
 			if (!is_array($inputColumnSetting)) {
 				throw new \InvalidArgumentException('Each column settings entry must be an array');
+			}
+
+			// Resolve columnId from uuid if provided
+			if (isset($inputColumnSetting['columnUuid']) && isset($columnsMap[$inputColumnSetting['columnUuid']]) && $columnsMap[$inputColumnSetting['columnUuid']] instanceof Column) {
+				$inputColumnSetting['columnId'] = $columnsMap[$inputColumnSetting['columnUuid']]->getId();
+			}
+			if (!isset($inputColumnSetting['columnId'])) {
+				continue;
 			}
 			$columnSettings[] = ViewColumnInformation::fromArray($inputColumnSetting);
 		}

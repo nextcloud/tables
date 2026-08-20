@@ -24,6 +24,7 @@ use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\TableScheme;
@@ -743,6 +744,9 @@ class TableService extends SuperService {
 
 		// Add views
 		foreach ($views['addViews'] as $view) {
+			$view['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($view['columnSettings'], $columnsMap)->jsonSerialize();
+			$view['sort'] = SortRuleSet::createFromInputArray($view['sort'], $columnsMap)->jsonSerialize();
+			$view['filter'] = FilterSet::createFromInputArray($view['filter'], $columnsMap)->jsonSerialize();
 			$this->viewService->importView($tableId, $view, $userId);
 		}
 

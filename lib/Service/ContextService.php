@@ -19,6 +19,8 @@ use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -54,6 +56,8 @@ class ContextService {
 		private bool $isCLI,
 		protected INavigationManager $navigationManager,
 		protected IURLGenerator $urlGenerator,
+		private TableMapper $tableMapper,
+		private ViewMapper $viewMapper,
 	) {
 	}
 
@@ -758,11 +762,62 @@ class ContextService {
 				$tableLocalId = $tablesMap[$tableUpdateScheme['uuid']]->getId();
 				$tableLocalScheme = $tableService->getScheme($tableLocalId)->jsonSerialize();
 				if (json_encode($tableLocalScheme) !== json_encode($tableUpdateScheme)) {
-					$changes['modifyTables'][] = $tableService->compareTableSchemeChanges($tableLocalId, $tableUpdateScheme);
+					$changes['modifyTables'][$tableUpdateScheme['uuid']] = $tableService->compareTableSchemeChanges($tableLocalId, $tableUpdateScheme);
 				}
 			}
 		}
 
 		return $changes;
+	}
+
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId): Context {
+		// Validate the structure of the columns and views arrays
+		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
+			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
+			throw new BadRequestError('Invalid tables structure provided.');
+		}
+
+		$tableService = \OCP\Server::get(TableService::class);
+		$viewService = \OCP\Server::get(ViewService::class);
+		$columnService = \OCP\Server::get(ColumnService::class);
+
+		foreach ($tables['addTables'] as $tableScheme) {
+			$table = $tableService->importTable($tableScheme, $userId);
+			foreach ($tableScheme['views'] as $viewData) {
+				$viewService->importView($table->getId(), $viewData, $userId);
+			}
+			foreach ($tableScheme['columns'] as $columnData) {
+				$columnService->importColumn($table->getId(), $columnData);
+			}
+		}
+
+		foreach ($tables['modifyTables'] as $tableScheme) {
+			$table = $this->tableMapper->findByUuid($tableScheme['uuid']);
+			$tableService->updateTableStructure($table->getId(), $tableScheme['columns'], $tableScheme['views'], $tableScheme['columnOrder'], $tableScheme['sort'], $userId);
+		}
+
+		// Resolve node ids for the new tables and views
+		$resolvedNodes = [];
+		foreach ($nodes as &$node) {
+			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
+				$table = $this->tableMapper->findByUuid($node['node_uuid']);
+				$resolvedNodes[] = [
+					'id' => $table->getId(),
+					'type' => $node['node_type'],
+					'permissions' => $node['permissions'],
+				];
+			} elseif ($node['node_type'] === Application::NODE_TYPE_VIEW) {
+				$view = $this->viewMapper->findByUuid($node['node_uuid']);
+				$resolvedNodes[] = [
+					'id' => $view->getId(),
+					'type' => $node['node_type'],
+					'permissions' => $node['permissions'],
+				];
+			}
+		}
+
+		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
+
+		return $context;
 	}
 }
