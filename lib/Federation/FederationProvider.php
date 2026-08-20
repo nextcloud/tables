@@ -68,6 +68,10 @@ class FederationProvider implements ICloudFederationProvider {
 		}
 
 		$nodeType = $metaData['nodeType'];
+		if (!in_array($nodeType, ['table', 'view'], true)) {
+			throw new ProviderCouldNotAddShareException('Unsupported node type: ' . $nodeType);
+		}
+
 		$nodeId = $this->insertFederatedNode($share, $metaData, $nodeType);
 		$localShare = $this->buildShareForFederationNode($share, $nodeId, $nodeType, $localUser);
 
