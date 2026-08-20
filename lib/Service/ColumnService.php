@@ -436,7 +436,7 @@ class ColumnService extends SuperService {
 					$columnDto->getSelectionOptions(),
 					$columnDto->getSelectionDefault(),
 				);
-				$selectionOptions->ensureServerManagedUuids($item->getSelectionOptionsCollection());
+				$selectionOptions->assignServerManagedUuids($item->getSelectionOptionsCollection());
 				$item->setSelectionOptionsCollection($selectionOptions);
 			}
 			$item->setDatetimeDefault($columnDto->getDatetimeDefault());

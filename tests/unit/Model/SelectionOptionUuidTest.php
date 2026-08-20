@@ -47,26 +47,40 @@ class SelectionOptionUuidTest extends TestCase {
 			'[{"id":0,"label":"➡️ Not started ","uuid":"00000000-0000-0000-0000-000000000000"}]',
 			null,
 		);
-		$incoming->ensureServerManagedUuids($existing);
+		$incoming->assignServerManagedUuids($existing);
 
 		$serialized = $incoming->jsonSerialize();
 		$this->assertSame($storedUuid, $serialized[0]['uuid']);
 		$this->assertSame('➡️ Not started ', $serialized[0]['label']);
 	}
 
-	public function testMissingAndNewOptionsGetGeneratedUuids(): void {
+	public function testLegacyOptionWithoutUuidGetsFirstTimeAssignment(): void {
 		$existing = SelectionOptions::createFromInputArray([
 			['id' => 0, 'label' => 'Old'],
 		], null);
 
 		$incoming = SelectionOptions::createFromInputArray([
 			['id' => 0, 'label' => 'Old renamed'],
-			['id' => 1, 'label' => 'New option'],
 		], null);
-		$incoming->ensureServerManagedUuids($existing);
+		$incoming->assignServerManagedUuids($existing);
 
 		$serialized = $incoming->jsonSerialize();
 		$this->assertNotEmpty($serialized[0]['uuid']);
+	}
+
+	public function testNewOptionGetsUuidOnCreate(): void {
+		$existing = SelectionOptions::createFromInputArray([
+			['id' => 0, 'label' => 'Old', 'uuid' => '019f90c5-8576-7f0b-9b14-9bf49b2826cf'],
+		], null, true);
+
+		$incoming = SelectionOptions::createFromInputArray([
+			['id' => 0, 'label' => 'Old'],
+			['id' => 1, 'label' => 'New option'],
+		], null);
+		$incoming->assignServerManagedUuids($existing);
+
+		$serialized = $incoming->jsonSerialize();
+		$this->assertSame('019f90c5-8576-7f0b-9b14-9bf49b2826cf', $serialized[0]['uuid']);
 		$this->assertNotEmpty($serialized[1]['uuid']);
 		$this->assertNotSame($serialized[0]['uuid'], $serialized[1]['uuid']);
 	}

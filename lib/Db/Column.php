@@ -256,7 +256,7 @@ class Column extends EntitySuper implements JsonSerializable {
 		$column->setNumberPrefix($data->getNumberPrefix() ?? '');
 		$column->setNumberSuffix($data->getNumberSuffix() ?? '');
 		$selectionOptions = SelectionOptions::createFromInputJsonString($data->getSelectionOptions() ?? '[]', $data->getSelectionDefault(), true);
-		$selectionOptions->ensureServerManagedUuids();
+		$selectionOptions->assignServerManagedUuids();
 		$column->setSelectionOptionsCollection($selectionOptions);
 		$column->setDatetimeDefault($data->getDatetimeDefault());
 		$column->setUsergroupDefault($data->getUsergroupDefault());

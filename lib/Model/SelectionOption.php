@@ -53,14 +53,20 @@ class SelectionOption implements \JsonSerializable {
 	}
 
 	/**
-	 * UUID is assigned once, if there is no UUID a new one is generated, existing ones are never replaced
+	 * If UUID is present, prefer the stored UUID
 	 */
-	public function ensureUuid(?string $existingUuid = null): void {
-		if ($this->uuid() !== null) {
+	public function applyStoredUuid(string $uuid): void {
+		if ($this->uuid() !== null || $uuid === '') {
 			return;
 		}
-		if ($existingUuid !== null && $existingUuid !== '') {
-			$this->setUuid($existingUuid);
+		$this->setUuid($uuid);
+	}
+
+	/**
+	 * Generate a UUID when creating an option for the first time, existing ones are not replaced
+	 */
+	public function generateUuid(): void {
+		if ($this->uuid() !== null) {
 			return;
 		}
 		$this->setUuid(Uuid::v7()->toRfc4122());
