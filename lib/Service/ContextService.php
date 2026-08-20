@@ -662,7 +662,7 @@ class ContextService {
 	 * @throws NotFoundError
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function getScheme(int $contextId): ContextScheme {
+	public function getScheme(int $contextId, string $userId): ContextScheme {
 		$context = $this->contextMapper->findById($contextId);
 		$tableService = \OCP\Server::get(TableService::class);
 		$viewService = \OCP\Server::get(ViewService::class);
@@ -673,7 +673,7 @@ class ContextService {
 			if ($node['node_type'] === Application::NODE_TYPE_TABLE && !isset($tables[$node['node_id']])) {
 				try {
 					$table = $tableService->find($node['node_id']);
-					$tableScheme = $tableService->getScheme($node['node_id'])->jsonSerialize();
+					$tableScheme = $tableService->getScheme($node['node_id'], $userId)->jsonSerialize();
 					$tables[$node['node_id']] = $tableScheme;
 					$node['node_uuid'] = $table->getUuid();
 					$node['node_title'] = $table->getTitle();
@@ -689,7 +689,7 @@ class ContextService {
 					if (isset($tables[$view->getTableId()])) {
 						continue;
 					}
-					$tables[$view->getTableId()] = $tableService->getScheme($view->getTableId())->jsonSerialize();
+					$tables[$view->getTableId()] = $tableService->getScheme($view->getTableId(), $userId)->jsonSerialize();
 				} catch (InternalError|PermissionError|NotFoundError $e) {
 					$this->logger->error('Failed to enhance context scheme for view node: ' . $e->getMessage(), ['exception' => $e]);
 				}
@@ -719,9 +719,9 @@ class ContextService {
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function compareSchemeChanges(int $contextId, array $updateScheme): array {
+	public function compareSchemeChanges(int $contextId, array $updateScheme, string $userId): array {
 		$context = $this->contextMapper->findById($contextId);
-		$currentScheme = $this->getScheme($contextId);
+		$currentScheme = $this->getScheme($contextId, $userId);
 		$tableService = \OCP\Server::get(TableService::class);
 
 		$changes = [
@@ -760,7 +760,7 @@ class ContextService {
 		foreach ($updateScheme['tables'] as $tableUpdateScheme) {
 			if (isset($tablesMap[$tableUpdateScheme['uuid']])) {
 				$tableLocalId = $tablesMap[$tableUpdateScheme['uuid']]->getId();
-				$tableLocalScheme = $tableService->getScheme($tableLocalId)->jsonSerialize();
+				$tableLocalScheme = $tableService->getScheme($tableLocalId, $userId)->jsonSerialize();
 				if (json_encode($tableLocalScheme) !== json_encode($tableUpdateScheme)) {
 					$changes['modifyTables'][$tableUpdateScheme['uuid']] = $tableService->compareTableSchemeChanges($tableLocalId, $tableUpdateScheme);
 				}

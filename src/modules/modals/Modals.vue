@@ -80,7 +80,7 @@ import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
 import TransferContext from './TransferContext.vue'
 import DeleteContext from './DeleteContext.vue'
-import ImportContextScheme from "./ImportContextScheme.vue";
+import ImportContextScheme from './ImportContextScheme.vue';
 
 export default {
 	components: {

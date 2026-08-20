@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
@@ -209,8 +210,7 @@ class StructureService {
 		$this->determineModifiedViews($existingViewMap, $updatedViewMap, $currentSchema, $updateSchema);
 	}
 
-	protected function getViewMap(array $currentSchemaViews): array
-	{
+	protected function getViewMap(array $currentSchemaViews): array {
 		$map = [];
 		foreach ($currentSchemaViews as $i => $view) {
 			if ($view instanceof \OCA\Tables\Db\View) {
@@ -224,24 +224,21 @@ class StructureService {
 		return $map;
 	}
 
-	protected function determineAddedViews(array $existingViewMap, array $updatedViewMap, array $updateSchema): void
-	{
+	protected function determineAddedViews(array $existingViewMap, array $updatedViewMap, array $updateSchema): void {
 		$viewUuids = array_keys(array_diff_key($updatedViewMap, $existingViewMap));
 		foreach ($viewUuids as $uuid) {
 			$this->addedViews[$uuid] = $updateSchema['views'][$updatedViewMap[$uuid]['arrayIndex']];
 		}
 	}
 
-	protected function determineRemovedViews(array $existingViewMap, array $updatedViewMap, array $currentSchema): void
-	{
+	protected function determineRemovedViews(array $existingViewMap, array $updatedViewMap, array $currentSchema): void {
 		$viewUuids = array_keys(array_diff_key($existingViewMap, $updatedViewMap));
 		foreach ($viewUuids as $uuid) {
 			$this->removedViews[$uuid] = $currentSchema['views'][$existingViewMap[$uuid]['arrayIndex']];
 		}
 	}
 
-	protected function determineModifiedViews(array $existingViewMap, array $updatedViewMap, array $currentSchema, array $updateSchema): void
-	{
+	protected function determineModifiedViews(array $existingViewMap, array $updatedViewMap, array $currentSchema, array $updateSchema): void {
 		$updatedViewUuids = array_keys(array_intersect_key($existingViewMap, $updatedViewMap));
 
 		$updatedViewUuids = array_filter(
@@ -261,8 +258,7 @@ class StructureService {
 		}
 	}
 
-	protected function isViewModified($viewA, $viewB): bool
-	{
+	protected function isViewModified($viewA, $viewB): bool {
 		if ($viewA instanceof \OCA\Tables\Db\View) {
 			$viewA = $viewA->jsonSerialize();
 		}

@@ -59,12 +59,21 @@ class Version2200Date20260819000000 extends SimpleMigrationStep {
 			->from('tables_tables');
 		$select = $qbSelect->executeQuery();
 
+		$writeBatches = 250;
+		$updates = 0;
+
 		try {
 			$this->connection->beginTransaction();
 			while (($row = $select->fetchAssociative()) !== false) {
 				$qb->setParameter('tableLocalId', $row['id']);
 				$qb->setParameter('uuid', Uuid::v7()->toRfc4122());
 				$qb->executeStatement();
+
+				$updates++;
+				if ($updates % $writeBatches === 0) {
+					$this->connection->commit();
+					$this->connection->beginTransaction();
+				}
 			}
 			$this->connection->commit();
 		} catch (\Exception $e) {

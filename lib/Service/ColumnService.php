@@ -820,31 +820,4 @@ class ColumnService extends SuperService {
 		$this->logger->error($e->getMessage(), ['exception' => $e]);
 		throw new InternalError($context . ': ' . $e->getMessage());
 	}
-
-	/**
-	 * @param Table $table
-	 * @param array $columns
-	 *
-	 * @return array Array of imported columns with the original column IDs as keys and the newly imported column IDs as values
-	 *
-	 * @throws BadRequestError
-	 * @throws InternalError
-	 */
-	public function importColumns(Table $table, array $columns): array {
-		$importedColumns = [];
-		foreach ($columns as $column) {
-			if (isset($column['uuid'])) {
-				try {
-					$existColumn = $this->mapper->findByUuid($column['uuid']);
-					$updatedColumn = $this->update($existColumn->getId(), $table->getOwnership(), ColumnDto::createFromArray($column));
-					$importedColumns[$column['id']] = $updatedColumn->getId();
-					continue;
-				} catch (DoesNotExistException $e) {
-					// Column does not exist, proceed to create a new one
-				}
-			}
-			$importedColumns[$column['id']] = $this->importColumn($table, $column);
-		}
-		return $importedColumns;
-	}
 }

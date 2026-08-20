@@ -12,7 +12,6 @@ namespace OCA\Tables\Model;
 use Generator;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ViewUpdatableParameters;
-use OCA\Tables\Db\Column;
 use OCA\Tables\Service\ValueObject\Emoji;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;

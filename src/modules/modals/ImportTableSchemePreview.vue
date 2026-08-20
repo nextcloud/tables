@@ -93,7 +93,7 @@
 				<div v-for="(columnEntry, index) in addColumnsConfig" :key="columnEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="addColumnsConfig[index].included" class="preview-card__choice" type="switch">
-							{{ columnEntry.uuid }}
+							{{ columnEntry.column.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<ul v-if="columnEntry.included" class="preview-card__meta">
@@ -127,7 +127,7 @@
 				<div v-for="(columnEntry, index) in modifyColumnsConfig" :key="columnEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="modifyColumnsConfig[index].included" class="preview-card__choice" type="switch">
-							{{ columnEntry.uuid }}
+							{{ columnEntry.column.to.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<div v-if="columnEntry.included" class="preview-card__meta preview-card__meta--compare">
@@ -183,7 +183,7 @@
 				<div v-for="(columnEntry, index) in removeColumnsConfig" :key="columnEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="removeColumnsConfig[index].included" class="preview-card__choice" type="switch">
-							{{ columnEntry.uuid }}
+							{{ columnEntry.column.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<ul v-if="columnEntry.included" class="preview-card__meta">
@@ -221,7 +221,7 @@
 				<div v-for="(viewEntry, index) in addViewsConfig" :key="viewEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="addViewsConfig[index].included" class="preview-card__choice" type="switch">
-							{{ viewEntry.uuid }}
+							{{ viewEntry.view.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<ul v-if="viewEntry.included" class="preview-card__meta">
@@ -252,7 +252,7 @@
 				<div v-for="(viewEntry, index) in modifyViewsConfig" :key="viewEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="modifyViewsConfig[index].included" class="preview-card__choice" type="switch">
-							{{ viewEntry.uuid }}
+							{{ viewEntry.view.to.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<div v-if="viewEntry.included" class="preview-card__meta preview-card__meta--compare">
@@ -302,7 +302,7 @@
 				<div v-for="(viewEntry, index) in removeViewsConfig" :key="viewEntry.key" class="preview-card">
 					<div class="preview-card__header">
 						<NcCheckboxRadioSwitch v-model="removeViewsConfig[index].included" class="preview-card__choice" type="switch">
-							{{ viewEntry.uuid }}
+							{{ viewEntry.view.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<ul v-if="viewEntry.included" class="preview-card__meta">
@@ -592,8 +592,8 @@ export default {
 		emitPayload() {
 			const payload = {
 				title: this.importTitle ? this.previewData.title.to : this.previewData.title.from,
-				emoji: this.importEmoji ? this.previewData.emoji.to: this.previewData.emoji.from,
-				description: this.importDescription ? this.previewData.description.to: this.previewData.description.from,
+				emoji: this.importEmoji ? this.previewData.emoji.to : this.previewData.emoji.from,
+				description: this.importDescription ? this.previewData.description.to : this.previewData.description.from,
 				columns: {
 					addColumns: this.addColumnsConfig
 							.filter(item => item.included)

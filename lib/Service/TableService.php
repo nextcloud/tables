@@ -577,7 +577,7 @@ class TableService extends SuperService {
 	public function getScheme(int $id, ?string $userId = null): TableScheme {
 		$table = $this->find($id, skipTableEnhancement: true);
 		$columns = $this->columnService->findAllByTable($id, null, $table);
-		$this->enhanceTable($table, $userId ?? $this->userId);
+		$this->enhanceTable($table, $userId ?? '');
 		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'), $table->getColumnOrderSettingsArray(), $table->getSortArray(), $table->getUuid());
 	}
 
@@ -681,8 +681,7 @@ class TableService extends SuperService {
 	 * @throws PermissionError
 	 * @throws BadRequestError
 	 */
-	public function updateTableStructure(int $tableId, array $columns, array $views, array $columnOrder = [], array $sort = [], ?string $userId = null): Table
-	{
+	public function updateTableStructure(int $tableId, array $columns, array $views, array $columnOrder = [], array $sort = [], ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		// Check if the user has permission to manage the table
