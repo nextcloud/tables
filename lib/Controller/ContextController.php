@@ -372,43 +372,10 @@ class ContextController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(Application::PERMISSION_MANAGE, null, 'context', 'contextId')]
-	public function importScheme(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?array $tables): DataResponse {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables): DataResponse {
 		try {
 			$this->db->beginTransaction();
-
-			foreach ($tables as $table) {
-				if (isset($table['overrideTableId'])) {
-					$updatedTable = $this->tableService->update(
-						$table['overrideTableId'],
-						$table['title'],
-						$table['emoji'],
-						$table['description'],
-						null,
-						$this->userId,
-						ColumnSettings::createFromInputArray($table['columnOrder']),
-						SortRuleSet::createFromInputArray($table['sort']),
-					);
-					$this->columnService->importColumns($updatedTable, $table['columns']);
-					$this->viewService->importViews($updatedTable->getId(), $table['views']);
-				}
-				foreach ($nodes as &$node) {
-					if ($node['type'] === Application::NODE_TYPE_TABLE && $node['node_id'] === $table['id']) {
-						$node['node_id'] = $updatedTable->getId();
-					}
-
-                    // @TODO: mapping id of view nodes
-				}
-			}
-
-			$context = $this->contextService->update(
-				$contextId,
-				$this->userId,
-				$name,
-				$iconName,
-				$description,
-				$nodes,
-			);
-
+			$context = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId);
 			$this->db->commit();
 			return new DataResponse($context->jsonSerialize());
 		} catch (\InvalidArgumentException $e) {

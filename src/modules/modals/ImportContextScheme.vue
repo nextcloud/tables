@@ -11,7 +11,7 @@
 			<!-- Starting -->
 			<div v-if="showStarting">
 				<div class="row space-T">
-					{{ t('tables', 'Import table scheme from a file') }}
+					{{ t('tables', 'Import application scheme from a file') }}
 				</div>
 				<RowFormWrapper>
 					<div v-if="importFileName.length" class="import-filename">
@@ -41,7 +41,7 @@
 
 			<!-- show preview -->
 			<div v-if="showPreview">
-				<ImportTableSchemePreview :preview-data="preview" @update="onUpdateScheme" />
+				<ImportContextSchemePreview :preview-data="preview" :table="table" @update="onUpdateScheme" />
 			</div>
 
 			<!-- show results -->
@@ -99,11 +99,11 @@ import permissionsMixin from '../../shared/components/ncTable/mixins/permissions
 import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
 import axios from '@nextcloud/axios'
-import {generateOcsUrl, generateUrl} from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { useTablesStore } from '../../store/store.js'
 import { mapState, mapActions } from 'pinia'
 import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
-import ImportTableSchemePreview from './ImportTableSchemePreview.vue'
+import ImportContextSchemePreview from './ImportContextSchemePreview.vue'
 import { translate as t } from '@nextcloud/l10n'
 import { useDataStore } from '../../store/data.js'
 
@@ -117,7 +117,7 @@ export default {
 		IconFile,
 		NcDialog,
 		NcButton,
-		ImportTableSchemePreview,
+		ImportContextSchemePreview,
 		RowFormWrapper,
 		NcEmptyContent,
 	},
@@ -129,8 +129,8 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		table: {
-			type: Object,
+		contextId: {
+			type: Number,
 			default: null,
 		},
 	},
@@ -142,7 +142,7 @@ export default {
 			loading: false,
 			importFailed: false,
 			result: null,
-			importInitialized: false,
+			importFinished: false,
 			preview: null,
 			schemeData: null,
 			waitForReload: false,
@@ -164,7 +164,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(useTablesStore, ['activeElement']),
+		...mapState(useTablesStore, ['getContext', 'tables', 'views', 'activeContextId']),
 		importFileName() {
 			const fileName = this.selectedUploadFile ? this.selectedUploadFile.name : ''
 
@@ -176,22 +176,22 @@ export default {
 			return fileName
 		},
 		title() {
-			let title = t('tables', 'Import table scheme')
+			let title = t('tables', 'Import application scheme')
 
-			if (!this.loading && this.preview !== null && !this.importInitialized && !this.waitForReload && !this.importFailed) {
-				title = t('tables', 'Preview table scheme changes')
+			if (!this.loading && this.preview !== null && !this.importFinished && !this.waitForReload && !this.importFailed) {
+				title = t('tables', 'Preview application scheme changes')
 			}
 
 			return title
 		},
 		showStarting() {
-			return !this.loading && !this.importInitialized && this.preview === null && !this.waitForReload
+			return !this.loading && !this.importFinished && this.preview === null && !this.waitForReload
 		},
 		showPreview() {
-			return !this.loading && this.preview !== null && !this.importInitialized && !this.importFailed && !this.waitForReload
+			return !this.loading && this.preview !== null && !this.importFinished && !this.importFailed && !this.waitForReload
 		},
 		showResults() {
-			return !this.loading && (this.importInitialized || this.importFailed) && !this.waitForReload
+			return !this.loading && (this.importFinished || this.importFailed) && !this.waitForReload
 		},
 		showLoading() {
 			return this.loading && !this.waitForReload
@@ -199,30 +199,13 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['loadTablesFromBE', 'loadViewsSharedWithMeFromBE']),
+		...mapActions(useTablesStore, ['loadContext', 'loadTablesFromBE', 'loadViewsSharedWithMeFromBE']),
 		...mapActions(useDataStore, ['loadRowsFromBE', 'loadColumnsFromBE']),
 		async actionCloseAndReload() {
-			if (!this?.activeElement) {
-				this.actionCancel()
-				return
-			}
-
-			// reload data if active element was affected
-			if (this.activeElement.tableId === this.table.id || this.activeElement.id === this.table.id) {
-				this.waitForReload = true
-				await this.loadTablesFromBE()
-				await this.loadViewsSharedWithMeFromBE()
-				await this.loadColumnsFromBE({
-					tableId: this.table.id,
-				})
-				if (this.canReadData(this.table)) {
-					await this.loadRowsFromBE({
-						tableId: this.table.id,
-					})
-				}
-				this.waitForReload = false
-			}
-
+			this.waitForReload = true
+			await this.loadContext({ id: this.contextId })
+			await this.loadTablesFromBE()
+			this.waitForReload = false
 			this.actionCancel()
 		},
 		actionPreview() {
@@ -244,7 +227,7 @@ export default {
 			this.errorMessage = t('tables', 'Could not import due to unknown errors.')
 
 			try {
-				const url = generateOcsUrl('/apps/tables/api/2/tables/' + this.table.id + '/scheme/preview-changes')
+				const url = generateOcsUrl('/apps/tables/api/2/contexts/' + this.contextId + '/scheme/preview-changes')
 				const res = await axios.post(url, {
 					updateScheme: this.schemeData
 				})
@@ -269,11 +252,11 @@ export default {
 			this.loading = true
 			this.importFailed = false
 			try {
-				const url = generateOcsUrl('/apps/tables/api/2/tables/' + this.table.id + '/scheme/import')
+				const url = generateOcsUrl('/apps/tables/api/2/contexts/' + this.contextId + '/scheme/import')
 				const res = await axios.post(url, this.schemeData)
 
 				if (res.status === 200) {
-					this.importInitialized = true
+					this.importFinished = true
 					this.result = res.data
 				} else {
 					console.debug('error while importing', res)
@@ -297,7 +280,7 @@ export default {
 		},
 		reset() {
 			this.result = null
-			this.importInitialized = false
+			this.importFinished = false
 			this.importFailed = false
 			this.preview = null
 			this.loading = false

@@ -665,6 +665,7 @@ class ViewService extends SuperService {
 			$this->assertTechnicalNameValid($technicalName);
 			$item->setTechnicalName($technicalName);
 		}
+		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
 		$item->setCreatedAt($view['createdAt']);
 		$item->setLastEditBy($userId);

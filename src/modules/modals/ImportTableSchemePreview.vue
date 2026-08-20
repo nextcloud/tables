@@ -35,7 +35,7 @@
 				<NcCheckboxRadioSwitch v-model="importEmoji" class="preview-option__label" type="switch">
 					{{ t('tables', 'Emoji') }}
 				</NcCheckboxRadioSwitch>
-				<div v-if="importTitle" class="preview-card__meta preview-card__meta--compare">
+				<div v-if="importEmoji" class="preview-card__meta preview-card__meta--compare">
 					<ul class="preview-card__meta--before">
 						<li class="preview-card__meta-title">
 							{{ t('tables', 'From') }}:
@@ -61,7 +61,7 @@
 				<NcCheckboxRadioSwitch v-model="importDescription" class="preview-option__label" type="switch">
 					{{ t('tables', 'Description') }}
 				</NcCheckboxRadioSwitch>
-				<div v-if="importTitle" class="preview-card__meta preview-card__meta--compare">
+				<div v-if="importDescription" class="preview-card__meta preview-card__meta--compare">
 					<ul class="preview-card__meta--before">
 						<li class="preview-card__meta-title">
 							{{ t('tables', 'From') }}:
@@ -427,10 +427,6 @@ export default {
 					},
 				}
 			},
-		},
-		table: {
-			type: Object,
-			default: null,
 		},
 	},
 

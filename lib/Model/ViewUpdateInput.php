@@ -87,47 +87,14 @@ class ViewUpdateInput {
 			$data['columnSettings'] = $value;
 		}
 
-		// Resolve column IDs from UUIDs in columnSettings, sort, and filter arrays
-		if (!empty($columnsMap)) {
-			if ($data['columnSettings']) {
-				foreach ($data['columnSettings'] as $i => $item) {
-					if (isset($columnsMap[$item['uuid']]) && $columnsMap[$item['uuid']] instanceof Column) {
-						$data['columnSettings'][$i]['columnId'] = $columnsMap[$item['uuid']]->getId();
-					} else {
-						unset($data['columnSettings'][$i]); // Remove the item if the column doesn't exist
-					}
-				}
-			}
-			if ($data['sort']) {
-				foreach ($data['sort'] as $i => $item) {
-					if (isset($columnsMap[$item['uuid']]) && $columnsMap[$item['uuid']] instanceof Column) {
-						$data['sort'][$i]['columnId'] = $columnsMap[$item['uuid']]->getId();
-					} else {
-						unset($data['sort'][$i]); // Remove the item if the column doesn't exist
-					}
-				}
-			}
-			if ($data['filter']) {
-				foreach ($data['filter'] as $i => $filerGroup) {
-					foreach ($filerGroup as $j => $item) {
-						if (isset($columnsMap[$item['uuid']]) && $columnsMap[$item['uuid']] instanceof Column) {
-							$data['filter'][$i][$j]['columnId'] = $columnsMap[$item['uuid']]->getId();
-						} else {
-							unset($data['filter'][$i][$j]); // Remove the item if the column doesn't exist
-						}
-					}
-				}
-			}
-		}
-
 		return new self(
 			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
 			technicalName: $data['technicalName'] ?? null,
 			description: $data['description'] ?? null,
 			emoji: ($data['emoji'] ?? null) ? new Emoji($data['emoji']) : null,
-			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings']) : null,
-			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter']) : null,
-			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort']) : null,
+			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings'], $columnsMap) : null,
+			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter'], $columnsMap) : null,
+			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
 		);
 	}
 

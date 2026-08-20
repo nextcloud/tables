@@ -1,6 +1,6 @@
 <!--
-  - SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
-  - SPDX-License-Identifier: AGPL-3.0-or-later
+	- SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
 	<NcAppNavigationItem v-if="context" data-cy="navigationContextItem" :name="context.name"
@@ -23,11 +23,18 @@
 				{{ t('tables', 'Edit application') }}
 			</NcActionButton>
 			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextExportSchemeBtn"
+				@click="importContextScheme">
+				<template #icon>
+					<Import :size="20" />
+				</template>
+				{{ t('tables', 'Import scheme') }}
+			</NcActionButton>
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextExportSchemeBtn"
 				@click="exportContextScheme">
 				<template #icon>
 					<TrayArrowDown :size="20" />
 				</template>
-				{{ t('tables', 'Export application scheme') }}
+				{{ t('tables', 'Export scheme') }}
 			</NcActionButton>
 			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="transferContext">
 				<template #icon>
@@ -65,11 +72,13 @@ import rebuildNavigation from '../../../service/rebuild-navigation.js'
 import { useTablesStore } from '../../../store/store.js'
 import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
+import Import from 'vue-material-design-icons/Import.vue'
 
 export default {
 	name: 'NavigationContextItem',
 
 	components: {
+		Import,
 		PlaylistEdit,
 		FileSwapOutline,
 		TableIcon,
@@ -114,6 +123,9 @@ export default {
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
+		},
+		async importContextScheme() {
+			emit('tables:context:import-scheme', this.context.id)
 		},
 		async exportContextScheme() {
 			try {

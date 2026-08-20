@@ -52,6 +52,7 @@
 			@close="importSchemaToTable = null" />
 		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
+		<ImportContextScheme :context-id="importContext" :show-modal="importContext !== null" @close="importContext = null" />
 		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
 		<DeleteContext :show-modal="contextToDelete !== null" :context="contextToDelete" @cancel="contextToDelete = null" />
 	</div>
@@ -79,6 +80,7 @@ import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
 import TransferContext from './TransferContext.vue'
 import DeleteContext from './DeleteContext.vue'
+import ImportContextScheme from "./ImportContextScheme.vue";
 
 export default {
 	components: {
@@ -101,6 +103,7 @@ export default {
 		EditContext,
 		TransferContext,
 		DeleteContext,
+		ImportContextScheme,
 	},
 
 	data() {
@@ -123,6 +126,7 @@ export default {
 			viewToDelete: null,
 			editTable: null,
 			editContext: null,
+			importContext: null,
 			tableToTransfer: null,
 			contextToTransfer: null,
 			contextToDelete: null,
@@ -169,6 +173,7 @@ export default {
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
 		subscribe('tables:context:edit', contextId => { this.editContext = contextId })
+		subscribe('tables:context:import-scheme', contextId => { this.importContext = contextId })
 		subscribe('tables:context:transfer', context => { this.contextToTransfer = context })
 		subscribe('tables:context:delete', context => { this.contextToDelete = context })
 
@@ -200,6 +205,7 @@ export default {
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
 		unsubscribe('tables:context:create', () => { this.showModalCreateContext = true })
 		unsubscribe('tables:context:edit', contextId => { this.editContext = contextId })
+		unsubscribe('tables:context:import-scheme', contextId => { this.importContext = contextId })
 		unsubscribe('tables:context:transfer', context => { this.contextToTransfer = context })
 		unsubscribe('tables:context:delete', context => { this.contextToDelete = context })
 	},
