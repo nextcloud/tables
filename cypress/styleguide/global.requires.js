@@ -7,6 +7,9 @@ import 'core-js/stable'
 
 import axios from '@nextcloud/axios'
 
+// Match Nextcloud's root install path so router helpers do not infer Cypress' /__cypress iframe path.
+window._oc_webroot = ''
+
 const USER_GROUPS = [
 	{ id: 'admin', displayname: 'The administrators' },
 	{ id: 'accounting', displayname: 'Accounting team' },
