@@ -296,8 +296,8 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Preview changes to a table scheme
 	 *
-	 * @param int $id
-	 * @param array $updateScheme
+	 * @param int $id identifier of the table
+	 * @psalm-param TablesTable $updateScheme the new schema of the table
 	 * @return DataResponse<Http::STATUS_OK, array{addedColumns: list<TablesColumn>, removedColumns: list<TablesColumn>, modifiedColumns: list<TablesColumn>}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Changes preview returned
@@ -323,10 +323,14 @@ class ApiTablesController extends AOCSController {
 	 * [api v2] import table scheme into existing table
 	 *
 	 * @param int $id Table ID
-	 * @param list<TablesColumn> $addColumns columns to add
-	 * @param list<TablesColumn> $removeColumns columns to remove
-	 * @param list<TablesColumn> $modifyColumns columns to modify
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @param string $title Title of the table
+	 * @param string $emoji Emoji of the table
+	 * @param string $description description of the table
+	 * @param array{addColumns: list<TablesColumn>, modifyColumns: list<TablesColumn>, removeColumns: list<TablesColumn>} $columns definitions of columns to add, remove or modify
+	 * @param list<TablesView> $views Definition of the views
+	 * @param list<array{columnId: int, columnUuid: string}> $columnOrder Ordered meta data of the columns
+	 * @param list<array{columnId: int, columnUuid: string, mode: string}> $sort Meta data of the sort rules
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 * 400: Invalid request data

@@ -34,6 +34,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesContext from ResponseDefinitions
+ * @psalm-import-type TablesTable from ResponseDefinitions
  */
 
 class ContextController extends AOCSController {
@@ -328,6 +329,7 @@ class ContextController extends AOCSController {
 	 * [api v2] Preview the changes that would be applied to a context scheme
 	 *
 	 * @param int $contextId ID of the context
+	 * @psalm-param TablesContext $updateScheme New scheme of the context
 	 *
 	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
@@ -357,12 +359,16 @@ class ContextController extends AOCSController {
 	 * [api v2] Import the scheme of a context
 	 *
 	 * @param int $contextId ID of the context
+	 * @param string $name Title of the context
+	 * @param string $iconName Identifier of the context icon
+	 * @param string $description Description of the context
+	 * @param list<array{node_type: int, node_uuid: string, permissions: int}> $nodes Ordered meta data of the related nodes
+	 * @psalm-param array{addTables: list<TablesTable>, modifyTables: list<TablesTable>} $tables Tables to be added or modified
 	 *
-	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
-	 *
-	 * @CanManageContext
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: context updated successfully
+	 * 400: Bad request
 	 * 403: No permissions
 	 * 404: Not found
 	 */

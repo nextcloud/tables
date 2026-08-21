@@ -798,7 +798,7 @@ class ContextService {
 
 		// Resolve node ids for the new tables and views
 		$resolvedNodes = [];
-		foreach ($nodes as &$node) {
+		foreach ($nodes as $node) {
 			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
 				$table = $this->tableMapper->findByUuid($node['node_uuid']);
 				$resolvedNodes[] = [
