@@ -43,10 +43,10 @@ export default {
 			if (this.value === null) {
 				return null
 			}
-			// Intl.NumberFormat only accepts 0..20 fraction digits
+			// Intl.NumberFormat only accepts 0..100 fraction digits
 			const raw = Number(this.column?.numberDecimals ?? 0)
 			const fractionDigits = Number.isFinite(raw)
-				? Math.min(20, Math.max(0, Math.trunc(raw)))
+				? Math.min(100, Math.max(0, Math.trunc(raw)))
 				: 0
 			return new Intl.NumberFormat(getCanonicalLocale(), {
 				maximumFractionDigits: fractionDigits,

@@ -19,7 +19,7 @@
 					{{ t('tables', 'Decimals') }}
 				</div>
 				<div class="fix-col-4">
-					<input v-model="mutableColumn.numberDecimals" type="number">
+					<input v-model="mutableColumn.numberDecimals" type="number" min="0" max="100" step="1">
 				</div>
 			</div>
 			<div v-if="defaultValueErrorHint !== ''" class="col-4">
