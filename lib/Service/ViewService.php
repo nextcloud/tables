@@ -202,7 +202,14 @@ class ViewService extends SuperService {
 	 * @throws PermissionError
 	 * @throws BadRequestError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null, ?string $technicalName = null): View {
+	public function create(
+		string $title,
+		?string $emoji,
+		Table $table,
+		?string $userId = null,
+		?string $technicalName = null,
+		?string $uuid = null,
+	): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -213,7 +220,7 @@ class ViewService extends SuperService {
 
 		$time = new DateTime();
 		$item = new View();
-		$item->setUuid(null);
+		$item->setUuid($uuid);
 		$item->setTitle($title);
 		if ($emoji) {
 			$item->setEmoji($emoji);
