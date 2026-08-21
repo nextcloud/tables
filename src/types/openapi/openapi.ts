@@ -1330,6 +1330,7 @@ export type components = {
         readonly View: {
             /** Format: int64 */
             readonly id: number;
+            readonly uuid: string;
             readonly title: string;
             readonly technicalName: string | null;
             readonly emoji: string | null;
@@ -7448,6 +7449,22 @@ export interface operations {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: {
                                 readonly [key: string]: Record<string, never>;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Bad request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
                             };
                         };
                     };
