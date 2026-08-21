@@ -275,7 +275,7 @@ class StructureService {
 				'columns' => $viewA['columns'],
 				'columnSettings' => $viewA['columnSettings'],
 				'sort' => $viewA['sort'],
-				'filters' => $viewA['filters'],
+				'filter' => $viewA['filter'],
 			]
 		);
 		$jsonViewB = json_encode(
@@ -287,7 +287,7 @@ class StructureService {
 				'columns' => $viewB['columns'],
 				'columnSettings' => $viewB['columnSettings'],
 				'sort' => $viewB['sort'],
-				'filters' => $viewB['filters'],
+				'filter' => $viewB['filter'],
 			]
 		);
 
