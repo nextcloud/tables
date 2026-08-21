@@ -9,6 +9,7 @@
 		<DataTable v-model:view-setting="localViewSetting" :show-options="false" :table="table" :columns="columns" :rows="rows"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
+			@import-scheme="$emit('import-scheme')"
 			@download-csv="$emit('download-csv')"
 			@download-filtered-csv="rows => $emit('download-filtered-csv', rows)"
 			@toggle-share="$emit('toggle-share')"
@@ -57,6 +58,7 @@ export default {
 		'download-csv',
 		'download-filtered-csv',
 		'import',
+		'import-scheme',
 		'show-integration',
 		'toggle-share',
 		'update:viewSetting',

@@ -12,6 +12,7 @@ use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ColumnOrderInformation;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -21,6 +22,8 @@ use OCA\Tables\Service\ValueObject\ColumnOrderInformation;
  *
  * @method getTitle(): string
  * @method getId(): int
+ * @method getUuid(): string
+ * @method setUuid(?string $uuid)
  * @method setTitle(string $title)
  * @method getEmoji(): string
  * @method setEmoji(string $emoji)
@@ -62,6 +65,7 @@ use OCA\Tables\Service\ValueObject\ColumnOrderInformation;
  * @method setLastEditAt(string $lastEditAt)
  */
 class Table extends EntitySuper implements JsonSerializable {
+	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?string $emoji = null;
 	protected ?string $ownership = null;
@@ -90,7 +94,32 @@ class Table extends EntitySuper implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('uuid', 'string');
 		$this->addType('archived', 'boolean');
+	}
+
+	public function setter(string $name, array $args): void {
+		if ($name === 'uuid') {
+			$this->setOrAssignUuid($args[0]);
+			return;
+		}
+		parent::setter($name, $args);
+	}
+
+	private function setOrAssignUuid(?string $uuid): void {
+		if ($this->uuid !== null) {
+			throw new \RuntimeException('This table already has a UUID, they are immutable');
+		}
+		if ($uuid === null) {
+			$this->applyUuid(Uuid::v7()->toRfc4122());
+			return;
+		}
+		$this->applyUuid($uuid);
+	}
+
+	private function applyUuid(string $uuid): void {
+		$this->uuid = $uuid;
+		$this->markFieldUpdated('uuid');
 	}
 
 	/**
@@ -99,6 +128,7 @@ class Table extends EntitySuper implements JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
+			'uuid' => $this->uuid,
 			'title' => $this->title ?: '',
 			'emoji' => $this->emoji,
 			'ownership' => $this->ownership ?: '',

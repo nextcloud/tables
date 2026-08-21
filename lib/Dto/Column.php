@@ -45,6 +45,16 @@ class Column {
 			$customSettings = json_encode($customSettings);
 		}
 
+		$selectionOptions = $data['selectionOptions'] ?? null;
+		if (is_array($selectionOptions)) {
+			$selectionOptions = json_encode($selectionOptions);
+		}
+
+		$userGroupDefault = $data['usergroupDefault'] ?? null;
+		if (is_array($userGroupDefault)) {
+			$userGroupDefault = json_encode($userGroupDefault);
+		}
+
 		return new self(
 			title: $data['title'] ?? null,
 			technicalName: $data['technicalName'] ?? null,
@@ -62,10 +72,10 @@ class Column {
 			numberDecimals: $data['numberDecimals'] ?? null,
 			numberPrefix: $data['numberPrefix'] ?? null,
 			numberSuffix: $data['numberSuffix'] ?? null,
-			selectionOptions: $data['selectionOptions'] ?? null,
+			selectionOptions: $selectionOptions,
 			selectionDefault: $data['selectionDefault'] ?? null,
 			datetimeDefault: $data['datetimeDefault'] ?? null,
-			usergroupDefault: $data['usergroupDefault'] ?? null,
+			usergroupDefault: $userGroupDefault,
 			usergroupMultipleItems: $data['usergroupMultipleItems'] ?? null,
 			usergroupSelectUsers: $data['usergroupSelectUsers'] ?? null,
 			usergroupSelectGroups: $data['usergroupSelectGroups'] ?? null,

@@ -11,6 +11,7 @@ namespace OCA\Tables\Model;
 
 use InvalidArgumentException;
 use JsonSerializable;
+use OCA\Tables\Db\Column;
 
 class FilterSet implements JsonSerializable {
 
@@ -27,9 +28,20 @@ class FilterSet implements JsonSerializable {
 		}
 	}
 
-	public static function createFromInputArray(array $data): self {
+	public static function createFromInputArray(array $data, array $columnsMap = []): self {
 		$filterGroups = [];
 		foreach ($data as $inputFilterGroup) {
+			foreach ($inputFilterGroup as $j => $item) {
+				if (isset($columnsMap[$item['columnUuid']]) && $columnsMap[$item['columnUuid']] instanceof Column) {
+					$inputFilterGroup[$j]['columnId'] = $columnsMap[$item['columnUuid']]->getId();
+				}
+				if (!isset($inputFilterGroup[$j]['columnId']) && !empty($columnsMap)) {
+					unset($inputFilterGroup[$j]); // Remove the item if the column doesn't exist
+				}
+			}
+			if (empty($inputFilterGroup)) {
+				continue; // Skip empty filter groups
+			}
 			$filterGroups[] = FilterGroup::createFromInputArray($inputFilterGroup);
 		}
 		return new self($filterGroups);

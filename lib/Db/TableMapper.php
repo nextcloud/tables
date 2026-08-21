@@ -53,6 +53,21 @@ class TableMapper extends QBMapper {
 	}
 
 	/**
+	 * @param string $uuid
+	 * @return Table
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
+	public function findByUuid(string $uuid): Table {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('uuid', $qb->createNamedParameter($uuid, IQueryBuilder::PARAM_STR)));
+		return $this->findEntity($qb);
+	}
+
+	/**
 	 * @param int[] $ids
 	 * @return array<int, Table> indexed by table id
 	 */

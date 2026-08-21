@@ -15,6 +15,8 @@ use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -22,11 +24,14 @@ use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\TableScheme;
+use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -36,6 +41,8 @@ use OCP\Defaults;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\IL10N;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -274,12 +281,13 @@ class TableService extends SuperService {
 	 * @throws \InvalidArgumentException
 	 * @noinspection DuplicatedCode
 	 */
-	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null): Table {
+	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null, ?string $uuid = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // we can assume that the $userId is set
 		$title = (string)new Title($title);
 
 		$time = new DateTime();
 		$item = new Table();
+		$item->setUuid($uuid);
 		$item->setTitle($title);
 		$item->setDescription($description);
 		if ($emoji) {
@@ -569,8 +577,8 @@ class TableService extends SuperService {
 	public function getScheme(int $id, ?string $userId = null): TableScheme {
 		$table = $this->find($id, skipTableEnhancement: true);
 		$columns = $this->columnService->findAllByTable($id, null, $table);
-		$this->enhanceTable($table, $userId);
-		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'), $table->getColumnOrderSettingsArray(), $table->getSortArray());
+		$this->enhanceTable($table, $userId ?? '');
+		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'), $table->getColumnOrderSettingsArray(), $table->getSortArray(), $table->getUuid());
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
@@ -594,6 +602,7 @@ class TableService extends SuperService {
 	 */
 	public function importTable(array $table, string $userId): Table {
 		$item = new Table();
+		$item->setUuid((isset($table['uuid']) && Uuid::isValid($table['uuid'])) ? $table['uuid'] : null);
 		$item->setTitle($table['title']);
 		$item->setEmoji($table['emoji']);
 		$item->setOwnership($userId);
@@ -610,5 +619,149 @@ class TableService extends SuperService {
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
 		return $newTable;
+	}
+
+	/**
+	 * @param int $id
+	 * @param array $updateScheme
+	 *
+	 * @return array
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 */
+	public function compareTableSchemeChanges(int $id, array $updateScheme): array {
+		$table = $this->find($id);
+		$structureService = \OCP\Server::get(StructureService::class);
+		$structureService->resolveChangesForTable($id, $updateScheme);
+
+		return [
+			'title' => [
+				'from' => $table->getTitle(),
+				'to' => $updateScheme['title'] ?? $table->getTitle(),
+			],
+			'emoji' => [
+				'from' => $table->getEmoji(),
+				'to' => $updateScheme['emoji'] ?? $table->getEmoji(),
+			],
+			'description' => [
+				'from' => $table->getDescription(),
+				'to' => $updateScheme['description'] ?? $table->getDescription(),
+			],
+			'columns' => [
+				'addColumns' => $structureService->addedColumns(),
+				'removeColumns' => $structureService->removedColumns(),
+				'modifyColumns' => $structureService->modifiedColumns(),
+			],
+			'views' => [
+				'addViews' => $structureService->addedViews(),
+				'removeViews' => $structureService->removedViews(),
+				'modifyViews' => $structureService->modifiedViews(),
+			],
+			'columnOrderChanges' => $structureService->columnOrderChanges(),
+			'sortChanges' => $structureService->sortChanges(),
+		];
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param array $columns
+	 * @param array $views
+	 * @param array $columnOrder
+	 * @param array $sort
+	 * @param string|null $userId
+	 *
+	 * @return Table
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws BadRequestError
+	 */
+	public function updateTableStructure(int $tableId, array $columns, array $views, array $columnOrder = [], array $sort = [], ?string $userId = null): Table {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		// Check if the user has permission to manage the table
+		$table = $this->find($tableId, true);
+		if (!$this->permissionsService->canManageTable($table, $userId)) {
+			throw new PermissionError('PermissionError: can not manage table with id ' . $tableId);
+		}
+
+		// Validate the structure of the columns and views arrays
+		if (!isset($columns['addColumns']) || !is_array($columns['addColumns'])
+			|| !isset($columns['removeColumns']) || !is_array($columns['removeColumns'])
+			|| !isset($columns['modifyColumns']) || !is_array($columns['modifyColumns'])) {
+			throw new BadRequestError('Invalid columns structure provided.');
+		}
+
+		if (!isset($views['addViews']) || !is_array($views['addViews'])
+			|| !isset($views['removeViews']) || !is_array($views['removeViews'])
+			|| !isset($views['modifyViews']) || !is_array($views['modifyViews'])) {
+			throw new BadRequestError('Invalid views structure provided.');
+		}
+
+		// Add new columns
+		foreach ($columns['addColumns'] as $columnData) {
+			$this->columnService->importColumn($table, $columnData);
+		}
+
+		// Remove columns
+		foreach ($columns['removeColumns'] as $columnData) {
+			$this->columnService->delete($columnData['id']);
+		}
+
+		// Update existing columns
+		foreach ($columns['modifyColumns'] as $columnData) {
+			$fromColumn = $columnData['from'];
+			$toColumn = $columnData['to'];
+			$this->columnService->update($fromColumn['id'], $userId, ColumnDto::createFromArray($toColumn));
+		}
+
+		$updatedColumns = $this->columnService->findAllByTable($tableId, $userId, $table);
+		$columnsMap = [];
+		foreach ($updatedColumns as $column) {
+			$columnsMap[$column->getUuid()] = $column;
+		}
+
+		// Update column order
+		$columnSettings = ColumnSettings::createFromInputArray($columnOrder, $columnsMap);
+		$table->setColumnOrder(\json_encode($columnSettings->jsonSerialize()));
+
+		// Update sort rules
+		$sortRuleSet = SortRuleSet::createFromInputArray($sort, $columnsMap);
+		$table->setSort(\json_encode($sortRuleSet->jsonSerialize()));
+
+		try {
+			$table = $this->mapper->update($table);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		// Add views
+		foreach ($views['addViews'] as $view) {
+			$view['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($view['columnSettings'], $columnsMap)->jsonSerialize();
+			$view['sort'] = SortRuleSet::createFromInputArray($view['sort'], $columnsMap)->jsonSerialize();
+			$view['filter'] = FilterSet::createFromInputArray($view['filter'], $columnsMap)->jsonSerialize();
+			$this->viewService->importView($tableId, $view, $userId);
+		}
+
+		// Modify views
+		foreach ($views['modifyViews'] as $item) {
+			$fromView = $item['from'];
+			$toView = $item['to'];
+			$existingView = $this->viewService->find($fromView['id'], userId: $userId);
+			$this->viewService->update($existingView->getId(), ViewUpdateInput::fromInputArray($toView, $columnsMap), $userId);
+		}
+
+		// Remove views
+		foreach ($views['removeViews'] as $viewData) {
+			$this->viewService->delete($viewData['id']);
+		}
+
+		return $table;
 	}
 }

@@ -19,10 +19,13 @@ use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\ContextScheme;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -33,6 +36,8 @@ use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 class ContextService {
@@ -51,6 +56,8 @@ class ContextService {
 		private bool $isCLI,
 		protected INavigationManager $navigationManager,
 		protected IURLGenerator $urlGenerator,
+		private TableMapper $tableMapper,
+		private ViewMapper $viewMapper,
 	) {
 	}
 
@@ -643,5 +650,174 @@ class ContextService {
 		}
 
 		return $newContext;
+	}
+
+	/**
+	 * @param int $contextId
+	 *
+	 * @return ContextScheme
+	 *
+	 * @throws ContainerExceptionInterface
+	 * @throws Exception
+	 * @throws NotFoundError
+	 * @throws NotFoundExceptionInterface
+	 */
+	public function getScheme(int $contextId, string $userId): ContextScheme {
+		$context = $this->contextMapper->findById($contextId);
+		$tableService = \OCP\Server::get(TableService::class);
+		$viewService = \OCP\Server::get(ViewService::class);
+		$nodes = $context->getNodes();
+		$tables = [];
+
+		foreach ($nodes as &$node) {
+			if ($node['node_type'] === Application::NODE_TYPE_TABLE && !isset($tables[$node['node_id']])) {
+				try {
+					$table = $tableService->find($node['node_id']);
+					$tableScheme = $tableService->getScheme($node['node_id'], $userId)->jsonSerialize();
+					$tables[$node['node_id']] = $tableScheme;
+					$node['node_uuid'] = $table->getUuid();
+					$node['node_title'] = $table->getTitle();
+				} catch (InternalError|PermissionError|NotFoundError $e) {
+					$this->logger->error('Failed to enhance context scheme for table node: ' . $e->getMessage(), ['exception' => $e]);
+				}
+			}
+			if ($node['node_type'] === Application::NODE_TYPE_VIEW) {
+				try {
+					$view = $viewService->find($node['node_id']);
+					$node['node_uuid'] = $view->getUuid();
+					$node['node_title'] = $view->getTitle();
+					if (isset($tables[$view->getTableId()])) {
+						continue;
+					}
+					$tables[$view->getTableId()] = $tableService->getScheme($view->getTableId(), $userId)->jsonSerialize();
+				} catch (InternalError|PermissionError|NotFoundError $e) {
+					$this->logger->error('Failed to enhance context scheme for view node: ' . $e->getMessage(), ['exception' => $e]);
+				}
+			}
+		}
+
+		return new ContextScheme(
+			$context->getName(),
+			$context->getIcon(),
+			$context->getDescription(),
+			array_values($nodes),
+			$context->getPages(),
+			array_values($tables),
+		);
+	}
+
+	/**
+	 * @param int $contextId
+	 * @param array $updateScheme
+	 *
+	 * @return array|array[]
+	 *
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 */
+	public function compareSchemeChanges(int $contextId, array $updateScheme, string $userId): array {
+		$context = $this->contextMapper->findById($contextId);
+		$currentScheme = $this->getScheme($contextId, $userId);
+		$tableService = \OCP\Server::get(TableService::class);
+
+		$changes = [
+			'name' => [
+				'from' => $context->getName(),
+				'to' => $updateScheme['name'] ?? $context->getName()
+			],
+			'icon' => [
+				'from' => $context->getIcon(),
+				'to' => $updateScheme['icon'] ?? $context->getIcon()
+			],
+			'description' => [
+				'from' => $context->getDescription(),
+				'to' => $updateScheme['description'] ?? $context->getDescription()
+			],
+			'nodes' => [
+				'from' => $currentScheme->getNodes(),
+				'to' => $updateScheme['nodes'] ?? $currentScheme->getNodes()
+			],
+		];
+
+		$tables = $tableService->findAll();
+		$tablesMap = [];
+		foreach ($tables as $table) {
+			$tablesMap[$table->getUuid()] = $table;
+		}
+
+		// Detect new tables
+		foreach ($updateScheme['tables'] as $table) {
+			if (!isset($tablesMap[$table['uuid']])) {
+				$changes['addTables'][] = $table;
+			}
+		}
+
+		// Detect modify tables
+		foreach ($updateScheme['tables'] as $tableUpdateScheme) {
+			if (isset($tablesMap[$tableUpdateScheme['uuid']])) {
+				$tableLocalId = $tablesMap[$tableUpdateScheme['uuid']]->getId();
+				$tableLocalScheme = $tableService->getScheme($tableLocalId, $userId)->jsonSerialize();
+				if (json_encode($tableLocalScheme) !== json_encode($tableUpdateScheme)) {
+					$changes['modifyTables'][$tableUpdateScheme['uuid']] = $tableService->compareTableSchemeChanges($tableLocalId, $tableUpdateScheme);
+				}
+			}
+		}
+
+		return $changes;
+	}
+
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId): Context {
+		// Validate the structure of the columns and views arrays
+		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
+			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
+			throw new BadRequestError('Invalid tables structure provided.');
+		}
+
+		$tableService = \OCP\Server::get(TableService::class);
+		$viewService = \OCP\Server::get(ViewService::class);
+		$columnService = \OCP\Server::get(ColumnService::class);
+
+		foreach ($tables['addTables'] as $tableScheme) {
+			$table = $tableService->importTable($tableScheme, $userId);
+			foreach ($tableScheme['views'] as $viewData) {
+				$viewService->importView($table->getId(), $viewData, $userId);
+			}
+			foreach ($tableScheme['columns'] as $columnData) {
+				$columnService->importColumn($table, $columnData);
+			}
+		}
+
+		foreach ($tables['modifyTables'] as $tableScheme) {
+			$table = $this->tableMapper->findByUuid($tableScheme['uuid']);
+			$tableService->updateTableStructure($table->getId(), $tableScheme['columns'], $tableScheme['views'], $tableScheme['columnOrder'], $tableScheme['sort'], $userId);
+		}
+
+		// Resolve node ids for the new tables and views
+		$resolvedNodes = [];
+		foreach ($nodes as $node) {
+			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
+				$table = $this->tableMapper->findByUuid($node['node_uuid']);
+				$resolvedNodes[] = [
+					'id' => $table->getId(),
+					'type' => $node['node_type'],
+					'permissions' => $node['permissions'],
+				];
+			} elseif ($node['node_type'] === Application::NODE_TYPE_VIEW) {
+				$view = $this->viewMapper->findByUuid($node['node_uuid']);
+				$resolvedNodes[] = [
+					'id' => $view->getId(),
+					'type' => $node['node_type'],
+					'permissions' => $node['permissions'],
+				];
+			}
+		}
+
+		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
+
+		return $context;
 	}
 }
