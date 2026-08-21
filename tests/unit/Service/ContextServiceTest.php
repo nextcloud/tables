@@ -16,6 +16,8 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\ViewMapper;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\INavigationManager;
@@ -62,6 +64,8 @@ final class ContextServiceTest extends TestCase {
 			false,
 			$navigationManager,
 			$urlGenerator,
+			$this->createMock(TableMapper::class),
+			$this->createMock(ViewMapper::class),
 		);
 	}
 

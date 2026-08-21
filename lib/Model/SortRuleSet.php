@@ -30,7 +30,7 @@ class SortRuleSet implements JsonSerializable {
 	}
 
 	/**
-	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $data
+	 * @param list<array{columnId: int, columnUuid?: string, mode: 'ASC'|'DESC'}> $data
 	 * @throws InvalidArgumentException
 	 */
 	public static function createFromInputArray(array $data, array $columnsMap = []): self {

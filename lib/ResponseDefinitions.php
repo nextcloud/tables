@@ -15,6 +15,7 @@ namespace OCA\Tables;
 /**
  * @psalm-type TablesView = array{
  * 	id: int,
+ *  uuid: string,
  * 	title: string,
  * 	technicalName: string|null,
  * 	emoji: string|null,
@@ -46,6 +47,7 @@ namespace OCA\Tables;
  *
  * @psalm-type TablesTable = array{
  * 	id: int,
+ *  uuid: string,
  * 	title: string,
  * 	emoji: string|null,
  * 	ownership: string,
