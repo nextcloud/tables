@@ -787,7 +787,7 @@ class ContextService {
 				$viewService->importView($table->getId(), $viewData, $userId);
 			}
 			foreach ($tableScheme['columns'] as $columnData) {
-				$columnService->importColumn($table->getId(), $columnData);
+				$columnService->importColumn($table, $columnData);
 			}
 		}
 

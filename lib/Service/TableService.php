@@ -753,7 +753,7 @@ class TableService extends SuperService {
 		foreach ($views['modifyViews'] as $item) {
 			$fromView = $item['from'];
 			$toView = $item['to'];
-			$existingView = $this->viewService->find($fromView['id'], $userId);
+			$existingView = $this->viewService->find($fromView['id'], userId: $userId);
 			$this->viewService->update($existingView->getId(), ViewUpdateInput::fromInputArray($toView, $columnsMap), $userId);
 		}
 
