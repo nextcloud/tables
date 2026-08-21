@@ -281,13 +281,13 @@ class TableService extends SuperService {
 	 * @throws \InvalidArgumentException
 	 * @noinspection DuplicatedCode
 	 */
-	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null): Table {
+	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null, ?string $uuid = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // we can assume that the $userId is set
 		$title = (string)new Title($title);
 
 		$time = new DateTime();
 		$item = new Table();
-		$item->setUuid(null);
+		$item->setUuid($uuid);
 		$item->setTitle($title);
 		$item->setDescription($description);
 		if ($emoji) {

@@ -140,13 +140,14 @@ class ApiTablesController extends AOCSController {
 	 * @param list<TablesView> $views views
 	 * @param list<array{columnId: int, order: int, readonly: bool}> $columnOrder Default column order settings
 	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sort Default sort rules
+	 * @param ?string $uuid globally unique identifier
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
-	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
+	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = [], ?string $uuid = null): DataResponse {
 		try {
 			ColumnSettings::createFromInputArray($columnOrder);
 			SortRuleSet::createFromInputArray($sort);
@@ -155,7 +156,7 @@ class ApiTablesController extends AOCSController {
 		}
 		try {
 			$this->db->beginTransaction();
-			$table = $this->service->create($title, 'custom', $emoji, $description);
+			$table = $this->service->create($title, 'custom', $emoji, $description, uuid: $uuid);
 			$colMap = [];
 			foreach ($columns as $column) {
 				if (isset($column['uuid']) && !Uuid::isValid($column['uuid'])) {
@@ -223,6 +224,8 @@ class ApiTablesController extends AOCSController {
 					$view['emoji'],
 					$table,
 					$this->userId,
+					technicalName: $view['technicalName'] ?? null,
+					uuid: $view['uuid'] ?? null,
 				);
 
 				$inputColumnsArray = [];
