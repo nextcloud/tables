@@ -141,6 +141,10 @@ class FederationProvider implements ICloudFederationProvider {
 			$node->setDescription('');
 		}
 
+		if (property_exists($node, 'uuid')) {
+			$node->setUuid($metaData['uuid'] ?? null);
+		}
+
 		return $node;
 	}
 

@@ -145,7 +145,8 @@ class FederationService {
 			$node->getTitle(),
 			json_encode([
 				'emoji' => $node->getEmoji(),
-				'nodeType' => $share->getNodeType()
+				'nodeType' => $share->getNodeType(),
+				'uuid' => property_exists($node, 'uuid') ? $node->getUuid() : null,
 			]),
 			(string)$share->getNodeId(),
 			$ownerCloudId->getId(),
