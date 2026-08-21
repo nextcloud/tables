@@ -718,13 +718,14 @@ export default {
 
 .preview-card__meta-title {
 	font-weight: 600;
-	padding-left: 0 !important;
+	padding-inline-start: 0 !important;
 }
 
 .preview-card__meta--compare {
 	display: flex;
 	gap: calc(var(--default-grid-baseline) * 2);
 }
+
 .preview-card__meta--before,
 .preview-card__meta--after {
 	width: 100%;
@@ -733,7 +734,7 @@ export default {
 
 .preview-card__meta--before li,
 .preview-card__meta--after li {
-	padding-left: calc(var(--default-grid-baseline) * 2);
+	padding-inline-start: calc(var(--default-grid-baseline) * 2);
 }
 
 .preview-card__actions {
