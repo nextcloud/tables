@@ -43,11 +43,17 @@ export default {
 		'update:value',
 	],
 	computed: {
+		numberFractionDigits() {
+			const raw = Number(this.column?.numberDecimals ?? 0)
+			return Number.isFinite(raw)
+				? Math.min(100, Math.max(0, Math.trunc(raw)))
+				: 0
+		},
 		getStep() {
-			if (this.column?.numberDecimals === 0) {
+			if (this.numberFractionDigits === 0) {
 				return '1'
-			} else if (this.column?.numberDecimals > 0) {
-				return '.' + '0'.repeat(this.column.numberDecimals - 1) + '1'
+			} else if (this.numberFractionDigits > 0) {
+				return '.' + '0'.repeat(this.numberFractionDigits - 1) + '1'
 			} else {
 				return 'any'
 			}
@@ -95,7 +101,7 @@ export default {
 			} else {
 				parsedValue = inputValue
 			}
-			const roundedValue = parsedValue.toFixed(this.column?.numberDecimals)
+			const roundedValue = parsedValue.toFixed(this.numberFractionDigits)
 			let value = parseFloat(roundedValue)
 			if ((this.column?.numberMin !== null && this.column?.numberMin !== undefined) && value < this.column?.numberMin) {
 				value = this.column.numberMin
