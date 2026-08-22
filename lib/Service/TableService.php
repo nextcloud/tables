@@ -63,6 +63,7 @@ class TableService extends SuperService {
 		protected IL10N $l,
 		protected Defaults $themingDefaults,
 		private ActivityManager $activityManager,
+		private FederationService $federationService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -438,6 +439,9 @@ class TableService extends SuperService {
 			}
 		}
 
+		// notify federated shares about table deletion
+		$this->federationService->notifyNodeDelete($item, 'table');
+
 		// delete all shares for that table
 		$this->shareService->deleteAllForTable($item);
 
@@ -525,6 +529,10 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		// notify federated shares about table update
+		$this->federationService->notifyNodeUpdate($table, 'table');
+
 		try {
 			$this->enhanceTable($table, $userId);
 		} catch (InternalError|PermissionError $e) {

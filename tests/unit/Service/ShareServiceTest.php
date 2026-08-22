@@ -19,6 +19,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareCreate;
@@ -51,6 +52,7 @@ class ShareServiceTest extends TestCase {
 	private $shareManager;
 	protected $shareService;
 	private Share $publicShare;
+	private FederationService $federationService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -68,6 +70,7 @@ class ShareServiceTest extends TestCase {
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->hasher = $this->createMock(IHasher::class);
 		$this->shareManager = $this->createMock(IShareManager::class);
+		$this->federationService = $this->createMock(FederationService::class);
 
 		$this->shareService = new ShareService(
 			$this->permissionsService,
@@ -84,7 +87,8 @@ class ShareServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->userManager,
 			$this->hasher,
-			$this->shareManager
+			$this->shareManager,
+			$this->federationService,
 		);
 
 		$this->publicShare = new Share();
