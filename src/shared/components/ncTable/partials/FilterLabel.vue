@@ -56,7 +56,7 @@ export default {
 			return value
 		},
 		labelText() {
-			if (this.operator.id === FilterIds.IsEmpty) {
+			if (this.operator.noSearchValue) {
 				return this.operator.getOperatorLabel()
 			} else if (this.operator.id === FilterIds.ContainsItem) {
 				return this.operator.getOperatorLabel() + ' "' + this.getValue.map(item => item.label).join(', ') + '"'
