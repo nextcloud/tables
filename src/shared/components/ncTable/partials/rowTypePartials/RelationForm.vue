@@ -95,4 +95,16 @@ export default {
 .relation-form {
 	width: 100%;
 }
+
+:deep(.vs__selected) {
+	min-width: 0;
+	max-width: 100%;
+}
+
+:deep(.vs__selected .name-parts) {
+	display: flex !important;
+	align-items: center;
+	max-width: 100% !important;
+	min-width: 0;
+}
 </style>
