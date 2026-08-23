@@ -4,6 +4,7 @@
  */
 import { Filters } from './filter.js'
 import { MagicFields } from './magicFields.js'
+import { BACKEND_SORTABLE_TYPES } from './columnHandler.js'
 
 export class AbstractColumn {
 
@@ -27,20 +28,7 @@ export class AbstractColumn {
 	}
 
 	canSort() {
-		return typeof this.sort === 'function'
-	}
-
-	getNextSortsResult(nextSorts, rowA, rowB) {
-		if (!nextSorts) {
-			return 0
-		}
-		for (const sort of nextSorts) {
-			const result = sort(rowA, rowB)
-			if (result !== 0) {
-				return result
-			}
-		}
-		return 0
+		return BACKEND_SORTABLE_TYPES.has(this.type)
 	}
 
 	getPossibleOperators() {
@@ -49,26 +37,6 @@ export class AbstractColumn {
 
 	getPossibleMagicFields() {
 		return Object.values(MagicFields).filter(item => item.goodFor.includes(this.type))
-	}
-
-	isSearchStringFound(cellValue, cell, searchString) {
-		if (cellValue != null && cellValue.toLowerCase().includes(searchString)) {
-			cell.searchStringFound = true
-			return true
-		}
-		return false
-	}
-
-	isFilterFound(filterMethod, cell) {
-		if (filterMethod()) {
-			cell.filterFound = true
-			return true
-		}
-		return false
-	}
-
-	getValueString(valueObject) {
-		return valueObject.value
 	}
 
 	/**
