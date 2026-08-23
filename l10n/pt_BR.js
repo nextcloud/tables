@@ -258,7 +258,7 @@ OC.L10N.register(
     "%s (View)" : "%s (Visualização)",
     "Application %s" : "Aplicativo %s",
     "%s (Application)" : "%s (Aplicativo)",
-    "Unknown %s" : "Desconhecido %s",
+    "Unknown %s" : "%s desconhecido",
     "Read" : "Ler",
     "Update" : "Atualizar",
     "Create" : "Criar",
