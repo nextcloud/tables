@@ -210,11 +210,11 @@ class Row2Mapper {
 	 * @return int
 	 * @throws InternalError
 	 */
-	public function count(array $showColumnIds, int $tableId, ?array $filter = null, ?array $sort = null, ?string $search = null, ?string $userId = null): int {
+	public function count(array $showColumnIds, int $tableId, ?array $filter = null, ?array $sort = null, ?string $search = null, ?string $userId = null, ?array $rowIds = null): int {
 		try {
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
-			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, null, null, $showColumnIds, $search);
+			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, null, null, $showColumnIds, $search, $rowIds);
 
 			return count($wantedRowIdsArray);
 		} catch (DoesNotExistException $e) {

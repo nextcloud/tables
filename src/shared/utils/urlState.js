@@ -11,6 +11,7 @@ const QUERY_KEYS = {
 	search: 'search',
 	page: 'page',
 	perPage: 'perPage',
+	rowIds: 'rowIds',
 }
 
 const DEFAULT_ROWS_PER_PAGE = 100
@@ -38,7 +39,7 @@ function serializeSortRule(rule) {
 	}
 }
 
-export function buildUrlQuery(viewSetting, pageNumber, rowsPerPage) {
+export function buildUrlQuery(viewSetting, pageNumber, rowsPerPage, rowIds = null) {
 	const query = {}
 
 	if (viewSetting?.filter?.length) {
@@ -61,6 +62,10 @@ export function buildUrlQuery(viewSetting, pageNumber, rowsPerPage) {
 		query[QUERY_KEYS.perPage] = String(rowsPerPage)
 	}
 
+	if (rowIds && rowIds.length > 0) {
+		query[QUERY_KEYS.rowIds] = rowIds.join(',')
+	}
+
 	return query
 }
 
@@ -77,6 +82,7 @@ export function parseUrlQuery(query) {
 		searchString: null,
 		pageNumber: 1,
 		rowsPerPage: DEFAULT_ROWS_PER_PAGE,
+		rowIds: null,
 	}
 
 	if (query[QUERY_KEYS.filter]) {
@@ -116,6 +122,13 @@ export function parseUrlQuery(query) {
 	if (query[QUERY_KEYS.perPage]) {
 		const parsed = parseInt(query[QUERY_KEYS.perPage], 10)
 		state.rowsPerPage = isNaN(parsed) || parsed < 1 ? DEFAULT_ROWS_PER_PAGE : parsed
+	}
+
+	if (query[QUERY_KEYS.rowIds]) {
+		state.rowIds = String(query[QUERY_KEYS.rowIds])
+			.split(',')
+			.map(id => parseInt(id, 10))
+			.filter(id => !isNaN(id))
 	}
 
 	return state

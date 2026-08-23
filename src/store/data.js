@@ -239,7 +239,7 @@ export const useDataStore = defineStore('data', {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ tableId, viewId, filter = null, sort = null, search = null, limit = null, offset = null }) {
+		async loadRowsFromBE({ tableId, viewId, filter = null, sort = null, search = null, limit = null, offset = null, rowIds = null }) {
 			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
 			this.loading[stateId] = true
 			let res = null
@@ -265,6 +265,9 @@ export const useDataStore = defineStore('data', {
 			if (offset !== null) {
 				params.offset = offset
 			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
 
 			try {
 				const collection = viewId ? 'views' : 'tables'
@@ -286,7 +289,7 @@ export const useDataStore = defineStore('data', {
 			return true
 		},
 
-		async loadRowsCountFromBE({ tableId, viewId, filter = null, sort = null, search = null }) {
+		async loadRowsCountFromBE({ tableId, viewId, filter = null, sort = null, search = null, rowIds = null }) {
 			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
 			let res = null
 
@@ -304,6 +307,9 @@ export const useDataStore = defineStore('data', {
 			}
 			if (sort && sort.length > 0) {
 				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
 			}
 
 			try {
@@ -401,7 +407,7 @@ export const useDataStore = defineStore('data', {
 			return res.data
 		},
 
-		async loadPublicRowsFromBE({ token, filter = null, sort = null, search = null, limit = null, offset = null }) {
+		async loadPublicRowsFromBE({ token, filter = null, sort = null, search = null, limit = null, offset = null, rowIds = null }) {
 			const stateId = 'public-' + token
 			this.loading[stateId] = true
 			let res
@@ -427,6 +433,9 @@ export const useDataStore = defineStore('data', {
 			if (offset !== null) {
 				params.offset = offset
 			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
 
 			try {
 				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows'), { params })
@@ -439,7 +448,7 @@ export const useDataStore = defineStore('data', {
 			return true
 		},
 
-		async loadPublicRowsCountFromBE({ token, filter = null, sort = null, search = null }) {
+		async loadPublicRowsCountFromBE({ token, filter = null, sort = null, search = null, rowIds = null }) {
 			const stateId = 'public-' + token
 			let res = null
 
@@ -457,6 +466,9 @@ export const useDataStore = defineStore('data', {
 			}
 			if (sort && sort.length > 0) {
 				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
 			}
 
 			try {

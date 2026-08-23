@@ -67,7 +67,7 @@ class PublicRowOCSController extends AOCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/rows', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 20, period: 30)]
-	public function getRows(string $token, ?int $limit, ?int $offset, ?string $filter = null, ?string $sort = null, ?string $search = null): DataResponse {
+	public function getRows(string $token, ?int $limit, ?int $offset, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null): DataResponse {
 		try {
 			$shareToken = new ShareToken($token);
 			$share = $this->shareService->findByToken($shareToken);
@@ -88,6 +88,7 @@ class PublicRowOCSController extends AOCSController {
 				filter: $filter,
 				sort: $sort,
 				search: $search,
+				rowIds: $rowIds,
 			);
 
 			$rows = $this->rowService->findAllByQuery($queryData);

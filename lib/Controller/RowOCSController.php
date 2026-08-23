@@ -140,7 +140,7 @@ class RowOCSController extends AOCSController {
 		url: '/api/2/{nodeCollection}/{nodeId}/rows',
 		requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\\d+)']
 	)]
-	public function getRows(string $nodeCollection, int $nodeId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null): DataResponse {
+	public function getRows(string $nodeCollection, int $nodeId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null): DataResponse {
 		try {
 			if (($limit !== null && ($limit <= 0 || $limit > 500))
 				|| ($offset !== null && $offset < 0)
@@ -157,6 +157,7 @@ class RowOCSController extends AOCSController {
 				filter: $filter,
 				sort: $sort,
 				search: $search,
+				rowIds: $rowIds,
 			);
 
 			$rows = $this->rowService->findAllByQuery($queryData);

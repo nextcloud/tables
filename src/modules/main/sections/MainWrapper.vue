@@ -97,6 +97,7 @@ export default {
 			pageNumber: 1,
 			paginationOffset: 0,
 			applyUrlStateOnReload: false,
+			urlRowIds: null,
 		}
 	},
 
@@ -277,6 +278,7 @@ export default {
 							filter: this.viewSetting?.filter,
 							sort: this.viewSetting?.sorting,
 							search: this.viewSetting?.searchString,
+							rowIds: this.urlRowIds,
 						})
 						await this.loadRowsFromBE({
 							viewId: this.isView ? this.element.id : null,
@@ -286,6 +288,7 @@ export default {
 							search: this.viewSetting?.searchString,
 							limit: this.rowsPerPage,
 							offset: this.paginationOffset,
+							rowIds: this.urlRowIds,
 						})
 					} finally {
 						this.rowsLoading = false
@@ -314,10 +317,11 @@ export default {
 			}
 		},
 			applyUrlState() {
-			const { filter, sorting, searchString, pageNumber, rowsPerPage } = parseUrlQuery(this.$route.query)
+			const { filter, sorting, searchString, pageNumber, rowsPerPage, rowIds } = parseUrlQuery(this.$route.query)
 			this.pageNumber = pageNumber
 			this.rowsPerPage = rowsPerPage
 			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+			this.urlRowIds = rowIds
 			const viewSetting = {
 				filter,
 				sorting,
@@ -333,7 +337,7 @@ export default {
 		},
 
 		updateUrlFromState() {
-			const query = buildUrlQuery(this.viewSetting, this.pageNumber, this.rowsPerPage)
+			const query = buildUrlQuery(this.viewSetting, this.pageNumber, this.rowsPerPage, this.urlRowIds)
 			this.$router.replace({ query }).catch(() => {})
 		},
 
@@ -348,6 +352,11 @@ export default {
 				return
 			}
 			this.viewSettingInProgress = filterChanged || searchStringChanged
+
+			if (!this.viewSetting?.filter?.length && !this.viewSetting?.sorting?.length && !this.viewSetting?.searchString) {
+				this.urlRowIds = null
+			}
+
 			this.rowsLoading = true
 			try {
 				const viewId = this.isView ? this.element.id : null
@@ -362,6 +371,7 @@ export default {
 						filter: this.viewSetting?.filter,
 						sort: this.viewSetting?.sorting,
 						search: this.viewSetting?.searchString,
+						rowIds: this.urlRowIds,
 					})
 					await this.loadRowsFromBE({
 						viewId,
@@ -371,6 +381,7 @@ export default {
 						search: this.viewSetting?.searchString,
 						limit: this.rowsPerPage,
 						offset: this.paginationOffset,
+						rowIds: this.urlRowIds,
 					})
 				} else if (sortingChanged) {
 					this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
@@ -382,6 +393,7 @@ export default {
 						search: this.viewSetting?.searchString,
 						limit: this.rowsPerPage,
 						offset: this.paginationOffset,
+						rowIds: this.urlRowIds,
 					})
 				}
 			} finally {
@@ -413,6 +425,7 @@ export default {
 					sort: this.viewSetting?.sorting,
 					limit: this.rowsPerPage,
 					offset: this.paginationOffset,
+					rowIds: this.urlRowIds,
 				})
 			} finally {
 				this.rowsLoading = false

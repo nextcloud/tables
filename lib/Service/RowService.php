@@ -226,6 +226,7 @@ class RowService extends SuperService {
 			$sort,
 			$search,
 			$userId,
+			$rowQuery->getRowIds(),
 		);
 	}
 
@@ -260,6 +261,7 @@ class RowService extends SuperService {
 			$sort,
 			$search,
 			$userId,
+			$rowQuery->getRowIds(),
 		);
 	}
 
