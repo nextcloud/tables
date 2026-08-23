@@ -183,7 +183,7 @@ class Row2Mapper {
 		try {
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
-			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, $limit, $offset);
+			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, $limit, $offset, $showColumnIds, $search);
 
 			// Get rows without SQL sorting
 			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
@@ -1093,7 +1093,7 @@ class Row2Mapper {
 			$qbTmp->select('row_id')
 				->from('tables_row_cells_' . $columnType)
 				->where($qb->expr()->in('column_id', $columnIdsParam))
-				->andWhere($qb->expr()->like(
+				->andWhere($qb->expr()->iLike(
 					$qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR),
 					$searchParam
 				));

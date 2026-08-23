@@ -21,6 +21,7 @@ import { useTablesStore } from '../../../store/store.js'
 import { computed } from 'vue'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
+import { buildUrlQuery, parseUrlQuery } from '../../../shared/utils/urlState.js'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
 
@@ -67,6 +68,7 @@ export default {
 			paginationOffset: 0,
 			rowsLoading: false,
 			viewSettingInProgress: false,
+			applyUrlStateOnReload: false,
 			publicElement: {
 				id: 'public',
 				emoji: nodeData.emoji,
@@ -86,6 +88,7 @@ export default {
 
 	beforeMount() {
 		this.setPublicToken(this.token)
+		this.applyUrlStateOnReload = true
 		this.reload()
 	},
 
@@ -128,8 +131,15 @@ export default {
 			}
 
 			this.loading = true
-			this.pageNumber = 1
-			this.paginationOffset = 0
+
+			if (this.applyUrlStateOnReload) {
+				this.applyUrlStateOnReload = false
+				this.applyUrlState()
+			} else {
+				this.viewSetting = {}
+				this.pageNumber = 1
+				this.paginationOffset = 0
+			}
 
 			await this.loadPublicColumnsFromBE({ token: this.token })
 
@@ -154,6 +164,30 @@ export default {
 			}
 
 			this.loading = false
+			this.$nextTick(() => {
+				emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+			})
+		},
+
+		applyUrlState() {
+			const { filter, sorting, searchString, pageNumber, rowsPerPage } = parseUrlQuery(this.$route.query)
+			this.pageNumber = pageNumber
+			this.rowsPerPage = rowsPerPage
+			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+			const viewSetting = {
+				filter,
+				sorting,
+				searchString,
+			}
+			this.lastViewSettingFilter = viewSetting?.filter ? JSON.stringify(viewSetting.filter) : null
+			this.lastViewSettingSorting = viewSetting?.sorting ? JSON.stringify(viewSetting.sorting) : null
+			this.lastViewSettingSearchString = viewSetting?.searchString || null
+			this.viewSetting = viewSetting
+		},
+
+		updateUrlFromState() {
+			const query = buildUrlQuery(this.viewSetting, this.pageNumber, this.rowsPerPage)
+			this.$router.replace({ query }).catch(() => {})
 		},
 
 		async onViewSettingChanged(oldFilter, oldSorting, oldSearchString) {
@@ -201,11 +235,15 @@ export default {
 			} finally {
 				this.rowsLoading = false
 				this.viewSettingInProgress = false
+				this.updateUrlFromState()
 			}
 		},
 
 		async onPaginationChanged({ pageNumber, rowsPerPage }) {
 			if (this.loading || this.viewSettingInProgress || this.rowsLoading) {
+				return
+			}
+			if (this.pageNumber === pageNumber && this.rowsPerPage === rowsPerPage) {
 				return
 			}
 			this.pageNumber = pageNumber
@@ -226,6 +264,7 @@ export default {
 				})
 			} finally {
 				this.rowsLoading = false
+				this.updateUrlFromState()
 			}
 		},
 

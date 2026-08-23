@@ -49,6 +49,7 @@ import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
 import { showError } from '@nextcloud/dialogs'
+import { buildUrlQuery, parseUrlQuery } from '../../../shared/utils/urlState.js'
 
 export default {
 	name: 'MainWrapper',
@@ -95,6 +96,7 @@ export default {
 			rowsPerPage: 100,
 			pageNumber: 1,
 			paginationOffset: 0,
+			applyUrlStateOnReload: false,
 		}
 	},
 
@@ -133,6 +135,7 @@ export default {
 	},
 
 	beforeMount() {
+		this.applyUrlStateOnReload = true
 		this.reload(true)
 	},
 
@@ -209,12 +212,17 @@ export default {
 				// Since we show one page at a time, no need keep other tables in the store
 				this.clearState()
 
-				this.viewSetting = {}
-				if (this.element?.sort?.length) {
-					this.viewSetting.presetSorting = [...this.element.sort]
+				if (this.applyUrlStateOnReload) {
+					this.applyUrlStateOnReload = false
+					this.applyUrlState()
+				} else {
+					this.viewSetting = {}
+					if (this.element?.sort?.length) {
+						this.viewSetting.presetSorting = [...this.element.sort]
+					}
+					this.pageNumber = 1
+					this.paginationOffset = 0
 				}
-				this.pageNumber = 1
-				this.paginationOffset = 0
 
 				await this.loadColumnsFromBE({
 					view: this.isView ? this.element : null,
@@ -267,9 +275,36 @@ export default {
 				}
 				this.localLoading = false
 				this.reloadInProgress = false
+				this.$nextTick(() => {
+					emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+				})
 			}
 		},
-		async onViewSettingChanged(oldFilter, oldSorting, oldSearchString) {
+			applyUrlState() {
+			const { filter, sorting, searchString, pageNumber, rowsPerPage } = parseUrlQuery(this.$route.query)
+			this.pageNumber = pageNumber
+			this.rowsPerPage = rowsPerPage
+			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+			const viewSetting = {
+				filter,
+				sorting,
+				searchString,
+			}
+			if (this.element?.sort?.length) {
+				viewSetting.presetSorting = [...this.element.sort]
+			}
+			this.lastViewSettingFilter = viewSetting?.filter ? JSON.stringify(viewSetting.filter) : null
+			this.lastViewSettingSorting = viewSetting?.sorting ? JSON.stringify(viewSetting.sorting) : null
+			this.lastViewSettingSearchString = viewSetting?.searchString || null
+			this.viewSetting = viewSetting
+		},
+
+		updateUrlFromState() {
+			const query = buildUrlQuery(this.viewSetting, this.pageNumber, this.rowsPerPage)
+			this.$router.replace({ query }).catch(() => {})
+		},
+
+	async onViewSettingChanged(oldFilter, oldSorting, oldSearchString) {
 			if (this.reloadInProgress || this.rowsLoading || !this.element) {
 				return
 			}
@@ -319,10 +354,14 @@ export default {
 			} finally {
 				this.rowsLoading = false
 				this.viewSettingInProgress = false
+				this.updateUrlFromState()
 			}
 		},
 		async onPaginationChanged({ pageNumber, rowsPerPage }) {
 			if (!this.element || this.viewSettingInProgress || this.rowsLoading) {
+				return
+			}
+			if (this.pageNumber === pageNumber && this.rowsPerPage === rowsPerPage) {
 				return
 			}
 			this.pageNumber = pageNumber
@@ -344,6 +383,7 @@ export default {
 				})
 			} finally {
 				this.rowsLoading = false
+				this.updateUrlFromState()
 			}
 		},
 		async onReloadRequested() {
