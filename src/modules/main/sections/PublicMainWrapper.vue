@@ -7,7 +7,7 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else>
-			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
+			<PublicElement :element="publicElement" :columns="columns" :rows="rows" :total-rows="totalRows" :view-setting="viewSetting" @update:viewSetting="viewSetting = $event" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
 		</div>
 	</div>
 </template>
@@ -19,6 +19,7 @@ import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTa
 import { useDataStore } from '../../../store/data.js'
 import { useTablesStore } from '../../../store/store.js'
 import { computed } from 'vue'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
@@ -44,18 +45,28 @@ export default {
 
 	setup(props) {
 		const store = useDataStore()
-		const { getColumns, getRows } = storeToRefs(store)
+		const { getColumns, getRows, getTotalRows } = storeToRefs(store)
 
 		const stateKey = 'public-' + props.token
 		const rows = computed(() => getRows.value(false, stateKey))
 		const columns = computed(() => getColumns.value(false, stateKey))
+		const totalRows = computed(() => getTotalRows.value(false, stateKey))
 
-		return { rows, columns }
+		return { rows, columns, totalRows, dataStore: store }
 	},
 
 	data() {
 		return {
 			loading: false,
+			viewSetting: {},
+			lastViewSettingFilter: null,
+			lastViewSettingSorting: null,
+			lastViewSettingSearchString: null,
+			rowsPerPage: 100,
+			pageNumber: 1,
+			paginationOffset: 0,
+			rowsLoading: false,
+			viewSettingInProgress: false,
 			publicElement: {
 				id: 'public',
 				emoji: nodeData.emoji,
@@ -75,24 +86,146 @@ export default {
 
 	beforeMount() {
 		this.setPublicToken(this.token)
-		this.loadData()
+		this.reload()
+	},
+
+	mounted() {
+		subscribe('tables:pagination-changed', this.onPaginationChanged)
+	},
+
+	beforeUnmount() {
+		unsubscribe('tables:pagination-changed', this.onPaginationChanged)
+	},
+
+	watch: {
+		viewSetting: {
+			handler() {
+				const newFilter = this.viewSetting?.filter ? JSON.stringify(this.viewSetting.filter) : null
+				const newSorting = this.viewSetting?.sorting ? JSON.stringify(this.viewSetting.sorting) : null
+				const newSearchString = this.viewSetting?.searchString || null
+				if (newFilter === this.lastViewSettingFilter && newSorting === this.lastViewSettingSorting && newSearchString === this.lastViewSettingSearchString) {
+					return
+				}
+				const oldFilter = this.lastViewSettingFilter
+				const oldSorting = this.lastViewSettingSorting
+				const oldSearchString = this.lastViewSettingSearchString
+				this.lastViewSettingFilter = newFilter
+				this.lastViewSettingSorting = newSorting
+				this.lastViewSettingSearchString = newSearchString
+				this.onViewSettingChanged(oldFilter, oldSorting, oldSearchString)
+			},
+			deep: true,
+		},
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'setPublicToken']),
+		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'loadPublicRowsCountFromBE', 'setPublicToken']),
 		...mapActions(useTablesStore, ['validatePublicExportAccess']),
 
-		async loadData() {
+		async reload() {
+			if (!this.token) {
+				return
+			}
+
 			this.loading = true
+			this.pageNumber = 1
+			this.paginationOffset = 0
+
+			await this.loadPublicColumnsFromBE({ token: this.token })
+
+			this.rowsLoading = true
 			try {
-				await Promise.all([
-					this.loadPublicColumnsFromBE({ token: this.token }),
-					this.loadPublicRowsFromBE({ token: this.token }),
-				])
-			} catch (e) {
-				console.error('Error loading public data', e)
+				await this.loadPublicRowsCountFromBE({
+					token: this.token,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					search: this.viewSetting?.searchString,
+				})
+				await this.loadPublicRowsFromBE({
+					token: this.token,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					search: this.viewSetting?.searchString,
+					limit: this.rowsPerPage,
+					offset: this.paginationOffset,
+				})
 			} finally {
-				this.loading = false
+				this.rowsLoading = false
+			}
+
+			this.loading = false
+		},
+
+		async onViewSettingChanged(oldFilter, oldSorting, oldSearchString) {
+			if (this.loading || this.rowsLoading) {
+				return
+			}
+			const filterChanged = this.lastViewSettingFilter !== oldFilter
+			const sortingChanged = this.lastViewSettingSorting !== oldSorting
+			const searchStringChanged = this.lastViewSettingSearchString !== oldSearchString
+			if (!filterChanged && !sortingChanged && !searchStringChanged) {
+				return
+			}
+			this.viewSettingInProgress = filterChanged || searchStringChanged
+			this.rowsLoading = true
+			try {
+				if (filterChanged || searchStringChanged) {
+					this.pageNumber = 1
+					this.paginationOffset = 0
+					emit('tables:pagination-changed', { pageNumber: 1, rowsPerPage: this.rowsPerPage })
+					await this.loadPublicRowsCountFromBE({
+						token: this.token,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+					})
+					await this.loadPublicRowsFromBE({
+						token: this.token,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						limit: this.rowsPerPage,
+						offset: this.paginationOffset,
+					})
+				} else if (sortingChanged) {
+					this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+					await this.loadPublicRowsFromBE({
+						token: this.token,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						limit: this.rowsPerPage,
+						offset: this.paginationOffset,
+					})
+				}
+			} finally {
+				this.rowsLoading = false
+				this.viewSettingInProgress = false
+			}
+		},
+
+		async onPaginationChanged({ pageNumber, rowsPerPage }) {
+			if (this.loading || this.viewSettingInProgress || this.rowsLoading) {
+				return
+			}
+			this.pageNumber = pageNumber
+			if (rowsPerPage) {
+				this.rowsPerPage = rowsPerPage
+			}
+			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+
+			this.rowsLoading = true
+			try {
+				await this.loadPublicRowsFromBE({
+					token: this.token,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					search: this.viewSetting?.searchString,
+					limit: this.rowsPerPage,
+					offset: this.paginationOffset,
+				})
+			} finally {
+				this.rowsLoading = false
 			}
 		},
 

@@ -139,7 +139,7 @@ class RowOCSController extends AOCSController {
 		url: '/api/2/{nodeCollection}/{nodeId}/rows',
 		requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\\d+)']
 	)]
-	public function getRows(string $nodeCollection, int $nodeId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null): DataResponse {
+	public function getRows(string $nodeCollection, int $nodeId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null): DataResponse {
 		try {
 			if (($limit !== null && ($limit <= 0 || $limit > 500))
 				|| ($offset !== null && $offset < 0)
@@ -147,17 +147,16 @@ class RowOCSController extends AOCSController {
 				throw new InvalidArgumentException('Offset or limit parameter is out of bounds');
 			}
 
-			$queryData = new RowQuery(
-				nodeType: $nodeCollection === 'tables' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW,
+			$queryData = RowQuery::buildFromInput(
+				nodeType: $nodeCollection,
 				nodeId: $nodeId,
+				userId: $this->userId,
+				limit: $limit,
+				offset: $offset,
+				filter: $filter,
+				sort: $sort,
+				search: $search,
 			);
-			$queryData->setLimit($limit)
-				->setOffset($offset)
-				// the provided filter is set here; any filter defined on a view
-				// is merged in on the service level
-				->setFilter($this->parseFilter($filter))
-				->setSort($this->parseSort($sort))
-				->setUserId($this->userId);
 
 			$rows = $this->rowService->findAllByQuery($queryData);
 			return new DataResponse($this->rowService->formatRows($rows));
@@ -170,108 +169,33 @@ class RowOCSController extends AOCSController {
 		}
 	}
 
-	/**
-	 * Decode and validate the JSON encoded filter parameter.
-	 *
-	 * @return list<list<array{columnId: int, operator: string, value: string|int|float}>>|null
-	 * @throws InvalidArgumentException
-	 */
-	protected function parseFilter(?string $filter): ?array {
-		if ($filter === null || $filter === '') {
-			return null;
-		}
-		$decoded = json_decode($filter, true);
-		if (!is_array($decoded)) {
-			throw new InvalidArgumentException('Invalid filter supplied');
-		}
-		foreach ($decoded as $filterGroup) {
-			if (!is_array($filterGroup)) {
-				throw new InvalidArgumentException('Invalid filter supplied');
-			}
-			foreach ($filterGroup as $singleFilter) {
-				$this->assertFilterValue($singleFilter);
-			}
-		}
-		return $decoded;
-	}
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'nodeCollection')]
+	#[ApiRoute(
+		verb: 'GET',
+		url: '/api/2/{nodeCollection}/{nodeId}/rows/count',
+		requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\\d+)']
+	)]
+	public function countRows(string $nodeCollection, int $nodeId, ?string $filter = null, ?string $sort = null, ?string $search = null): DataResponse {
+		try {
+			$queryData = RowQuery::buildFromInput(
+				nodeType: $nodeCollection,
+				nodeId: $nodeId,
+				userId: $this->userId,
+				filter: $filter,
+				sort: $sort,
+				search: $search,
+			);
 
-	/**
-	 * Decode and validate the JSON encoded sort parameter.
-	 *
-	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>|null
-	 * @throws InvalidArgumentException
-	 */
-	protected function parseSort(?string $sort): ?array {
-		if ($sort === null || $sort === '') {
-			return null;
-		}
-		$decoded = json_decode($sort, true);
-		if (!is_array($decoded)) {
-			throw new InvalidArgumentException('Invalid sort data supplied');
-		}
-		foreach ($decoded as $singleSortRule) {
-			$this->assertSortValue($singleSortRule);
-		}
-		return $decoded;
-	}
-
-	/**
-	 * @throws InvalidArgumentException
-	 */
-	protected function assertFilterValue(mixed $filter): void {
-		if (!is_array($filter)
-			|| !isset($filter['columnId'], $filter['operator'], $filter['value'])
-			|| count($filter) !== 3
-		) {
-			throw new InvalidArgumentException('Invalid filter supplied');
-		}
-		// values higher than PHP_INT_MAX will be capped to PHP_INT_MAX on cast,
-		// checking it roughly is sufficient.
-		// the lower value boundary is the lowest meta column id in \OCA\Tables\Db\Column
-		$maxDigits = strlen((string)PHP_INT_MAX);
-		if (!is_numeric($filter['columnId'])
-			|| (int)$filter['columnId'] < -5
-			|| !preg_match('/^-?\\d{0,' . $maxDigits . '}$/', (string)$filter['columnId'])
-		) {
-			throw new InvalidArgumentException(sprintf('Invalid column id supplied: %s', (string)$filter['columnId']));
-		}
-		if (!in_array($filter['operator'], [
-			'begins-with',
-			'ends-with',
-			'contains',
-			'is-equal',
-			'is-greater-than',
-			'is-greater-than-or-equal',
-			'is-lower-than',
-			'is-lower-than-or-equal',
-			'is-empty',
-		], true)) {
-			throw new InvalidArgumentException('Invalid filter operator supplied');
+			$count = $this->rowService->countByQuery($queryData);
+			return new DataResponse(['count' => $count]);
+		} catch (DoesNotExistException $e) {
+			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		} catch (MultipleObjectsReturnedException|InvalidArgumentException $e) {
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		} catch (InternalError|\Exception $e) {
+			return $this->handleError($e);
 		}
 	}
 
-	/**
-	 * @throws InvalidArgumentException
-	 */
-	protected function assertSortValue(mixed $sort): void {
-		if (!is_array($sort)
-			|| !isset($sort['columnId'], $sort['mode'])
-			|| count($sort) !== 2
-		) {
-			throw new InvalidArgumentException('Invalid sort data supplied');
-		}
-		// values higher than PHP_INT_MAX will be capped to PHP_INT_MAX on cast,
-		// checking it roughly is sufficient.
-		// the lower value boundary is the lowest meta column id in \OCA\Tables\Db\Column
-		$maxDigits = strlen((string)PHP_INT_MAX);
-		if (!is_numeric($sort['columnId'])
-			|| (int)$sort['columnId'] < -5
-			|| !preg_match('/^-?\\d{0,' . $maxDigits . '}$/', (string)$sort['columnId'])
-		) {
-			throw new InvalidArgumentException('Invalid column id supplied');
-		}
-		if ($sort['mode'] !== 'DESC' && $sort['mode'] !== 'ASC') {
-			throw new InvalidArgumentException('Invalid sort mode supplied');
-		}
-	}
 }

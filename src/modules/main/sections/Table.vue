@@ -13,7 +13,7 @@
 			@toggle-share="$emit('toggle-share')"
 			@show-integration="$emit('show-integration')"
 			@create-view="createView" />
-		<DataTable v-model:view-setting="localViewSetting" :table="table" :columns="columns" :rows="rows"
+		<DataTable v-model:view-setting="localViewSetting" :table="table" :columns="columns" :rows="rows" :total-rows="totalRows"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
 			@download-csv="$emit('download-csv')"
@@ -52,6 +52,10 @@ export default {
 		},
 		rows: {
 			type: Array,
+			default: null,
+		},
+		totalRows: {
+			type: Number,
 			default: null,
 		},
 		viewSetting: {

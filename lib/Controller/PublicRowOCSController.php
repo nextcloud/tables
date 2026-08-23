@@ -8,13 +8,12 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Controller;
 
-use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\RowQuery;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
-use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Middleware\Attribute\AssertShareAccessIsAccessible;
 use OCA\Tables\Model\RowDataInput;
 use OCA\Tables\ResponseDefinitions;
@@ -67,7 +66,7 @@ class PublicRowOCSController extends AOCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/rows', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 20, period: 30)]
-	public function getRows(string $token, ?int $limit, ?int $offset): DataResponse {
+	public function getRows(string $token, ?int $limit, ?int $offset, ?string $filter = null, ?string $sort = null, ?string $search = null): DataResponse {
 		try {
 			$shareToken = new ShareToken($token);
 			$share = $this->shareService->findByToken($shareToken);
@@ -79,15 +78,71 @@ class PublicRowOCSController extends AOCSController {
 			$limit = $limit !== null ? max(0, min(500, $limit)) : null;
 			$offset = $offset !== null ? max(0, $offset) : null;
 
-			$nodeType = ConversionHelper::stringNodeType2Const($share->getNodeType());
-			if ($nodeType === Application::NODE_TYPE_TABLE) {
-				$rows = $this->rowService->findAllByTable($share->getNodeId(), '', $limit, $offset);
-			} elseif ($nodeType === Application::NODE_TYPE_VIEW) {
-				$rows = $this->rowService->findAllByView($share->getNodeId(), '', $limit, $offset);
-			}
+			$queryData = RowQuery::buildFromInput(
+				nodeType: $share->getNodeType(),
+				nodeId: $share->getNodeId(),
+				userId: '',
+				limit: $limit,
+				offset: $offset,
+				filter: $filter,
+				sort: $sort,
+				search: $search,
+			);
 
+			$rows = $this->rowService->findAllByQuery($queryData);
 			$formattedRows = $this->rowService->formatRowsForPublicShare($rows);
 			return new DataResponse($formattedRows);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Count rows from a link share
+	 *
+	 * @param string $token The share token
+	 * @param string|null $filter Optional: a JSON encoded filter parameter
+	 * @param string|null $sort Optional: a JSON encoded sort parameter
+	 * @param string|null $search Optional: a search string
+	 * @return DataResponse<Http::STATUS_OK, array{count: int}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Count is returned
+	 * 400: Invalid request parameters
+	 * 403: No permissions
+	 * 404: Not found
+	 * 500: Internal error
+	 */
+	#[PublicPage]
+	#[AssertShareAccessIsAccessible]
+	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/rows/count', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
+	#[OpenAPI]
+	#[AnonRateLimit(limit: 20, period: 30)]
+	public function countRows(string $token, ?string $filter = null, ?string $sort = null, ?string $search = null): DataResponse {
+		try {
+			$shareToken = new ShareToken($token);
+			$share = $this->shareService->findByToken($shareToken);
+
+			if (!$share->getPermissionRead()) {
+				return $this->handlePermissionError(new PermissionError('No read permission on this share'));
+			}
+
+			$queryData = RowQuery::buildFromInput(
+				nodeType: $share->getNodeType(),
+				nodeId: $share->getNodeId(),
+				userId: '',
+				filter: $filter,
+				sort: $sort,
+				search: $search,
+			);
+
+			$count = $this->rowService->countByQuery($queryData);
+			return new DataResponse(['count' => $count]);
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {
@@ -259,4 +314,5 @@ class PublicRowOCSController extends AOCSController {
 			return $this->handleError($e);
 		}
 	}
+
 }

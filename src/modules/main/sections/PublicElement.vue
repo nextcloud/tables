@@ -8,7 +8,7 @@
 		<TableDescription :description="element.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="element" />
-			<TableView v-else :rows="rows" :columns="columns" :element="element"
+			<TableView v-else :rows="rows" :columns="columns" :element="element" :total-rows="totalRows" :view-setting="localViewSetting" @update:view-setting="onViewSettingUpdate"
 				:can-read-rows="element.onSharePermissions.read"
 				:can-create-rows="element.onSharePermissions.create"
 				:can-edit-rows="element.onSharePermissions.update"
@@ -106,11 +106,20 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+		totalRows: {
+			type: Number,
+			default: null,
+		},
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
 	},
 
 	emits: [
 		'download-csv',
 		'download-filtered-csv',
+		'update:viewSetting',
 	],
 	data() {
 		return {
@@ -118,7 +127,14 @@ export default {
 			prefillData: null,
 			editRow: null,
 			rowsToDelete: null,
+			localViewSetting: this.viewSetting,
 		}
+	},
+
+	watch: {
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
+		},
 	},
 
 	computed: {
@@ -152,6 +168,10 @@ export default {
 
 	methods: {
 		t,
+		onViewSettingUpdate(viewSetting) {
+			this.localViewSetting = viewSetting
+			this.$emit('update:viewSetting', viewSetting)
+		},
 	},
 }
 </script>

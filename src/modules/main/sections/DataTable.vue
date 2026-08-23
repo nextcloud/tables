@@ -77,6 +77,7 @@
 				v-model:view-setting="localViewSetting"
 				v-model:selected-rows="localSelectedRows"
 				:rows="rows"
+				:total-rows="totalRows"
 				:columns="columns"
 				:element="table"
 				:is-view="false"
@@ -210,6 +211,10 @@ export default {
 		},
 		rows: {
 			type: Array,
+			default: null,
+		},
+		totalRows: {
+			type: Number,
 			default: null,
 		},
 		viewSetting: {

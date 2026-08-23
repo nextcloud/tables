@@ -164,6 +164,7 @@ export default {
 			const index = this.localViewSetting?.filter?.findIndex(item => item.columnId + item.operator.id + item.value === id)
 			if (index !== -1) {
 				this.localViewSetting.filter.splice(index, 1)
+				this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 			}
 		},
 		castToFilter(operatorId) {

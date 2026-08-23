@@ -52,7 +52,7 @@ import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
 import { NcButton, NcSelect, NcTextField } from '@nextcloud/vue'
 import { translate as t } from '@nextcloud/l10n'
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 export default {
 	name: 'PaginationBlock',
@@ -68,9 +68,9 @@ export default {
 	},
 
 	props: {
-		rows: {
-			type: Array,
-			default: () => [],
+		total: {
+			type: Number,
+			default: null,
 		},
 	},
 
@@ -83,7 +83,8 @@ export default {
 
 	computed: {
 		totalPages() {
-			return Math.max(1, Math.ceil(this.rows.length / this.rowsPerPage))
+			const total = this.total ?? 0
+			return Math.max(1, Math.ceil(total / this.rowsPerPage))
 		},
 	},
 
@@ -96,13 +97,24 @@ export default {
 			this.validatePageInput()
 			emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
 		},
-		rows() {
-			this.validatePageInput()
-		},
+	},
+
+	mounted() {
+		subscribe('tables:pagination-changed', this.handlePaginationChanged)
+	},
+
+	beforeUnmount() {
+		unsubscribe('tables:pagination-changed', this.handlePaginationChanged)
 	},
 
 	methods: {
 		t,
+		handlePaginationChanged({ pageNumber, rowsPerPage }) {
+			this.pageNumber = pageNumber
+			if (rowsPerPage) {
+				this.rowsPerPage = rowsPerPage
+			}
+		},
 		validatePageInput() {
 			// Ensure page number is within valid range
 			if (this.pageNumber < 1) {

@@ -24,7 +24,13 @@
 					<SearchForm :columns="columns" :search-string="getSearchString"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
-				<PaginationBlock :rows="rows" />
+				<NcButton v-if="config.canReadRows" :aria-label="t('tables', 'Reload rows')" type="tertiary" @click="onReload">
+					<template #icon>
+						<NcLoadingIcon v-if="rowsLoading" :size="20" />
+						<Refresh v-else :size="20" />
+					</template>
+				</NcButton>
+				<PaginationBlock :total="total" />
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -64,12 +70,13 @@
 </template>
 
 <script>
-import { NcButton, NcActions, NcActionButton } from '@nextcloud/vue'
-import { emit } from '@nextcloud/event-bus'
+import { NcButton, NcActions, NcActionButton, NcLoadingIcon } from '@nextcloud/vue'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
 import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
+import Refresh from 'vue-material-design-icons/Refresh.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
 import PaginationBlock from './PaginationBlock.vue'
@@ -83,10 +90,12 @@ export default {
 		NcActionButton,
 		SearchForm,
 		NcButton,
+		NcLoadingIcon,
 		Plus,
 		Check,
 		Delete,
 		TrayArrowDown,
+		Refresh,
 		PaginationBlock,
 	},
 
@@ -100,6 +109,10 @@ export default {
 		rows: {
 			type: Array,
 			default: () => [],
+		},
+		total: {
+			type: Number,
+			default: null,
 		},
 		allRows: {
 			type: Array,
@@ -140,6 +153,7 @@ export default {
 	data() {
 		return {
 			optionsDivWidth: null,
+			rowsLoading: false,
 		}
 	},
 
@@ -165,10 +179,12 @@ export default {
 	mounted() {
 		this.updateOptionsDivWidth()
 		window.addEventListener('resize', this.updateOptionsDivWidth)
+		subscribe('tables:rows-loading', this.setRowsLoading)
 	},
 
 	beforeUnmount() {
 		window.removeEventListener('resize', this.updateOptionsDivWidth)
+		unsubscribe('tables:rows-loading', this.setRowsLoading)
 	},
 
 	methods: {
@@ -179,6 +195,12 @@ export default {
 		},
 		exportFiltered() {
 			this.$emit('download-filtered-csv', this.rows)
+		},
+		onReload() {
+			emit('tables:reload')
+		},
+		setRowsLoading(loading) {
+			this.rowsLoading = loading
 		},
 		exportSelected() {
 			this.$emit('download-filtered-csv', this.getSelectedRows)

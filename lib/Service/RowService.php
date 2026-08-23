@@ -105,6 +105,7 @@ class RowService extends SuperService {
 		$userId = $rowQuery->getUserId() ?? '';
 		$filter = $rowQuery->getFilter();
 		$sort = $rowQuery->getSort();
+		$search = $rowQuery->getSearch();
 
 		if ($rowQuery->getNodeType() === Application::NODE_TYPE_VIEW) {
 			$view = $this->viewMapper->find($rowQuery->getNodeId());
@@ -130,6 +131,41 @@ class RowService extends SuperService {
 			$rowQuery->getOffset(),
 			$filter,
 			$sort,
+			$search,
+			$userId,
+		);
+	}
+
+	public function countByQuery(RowQuery $rowQuery): int {
+		$tableId = $rowQuery->getNodeId();
+		$userId = $rowQuery->getUserId() ?? '';
+		$filter = $rowQuery->getFilter();
+		$sort = $rowQuery->getSort();
+		$search = $rowQuery->getSearch();
+
+		if ($rowQuery->getNodeType() === Application::NODE_TYPE_VIEW) {
+			$view = $this->viewMapper->find($rowQuery->getNodeId());
+			$tableId = $view->getTableId();
+			$showColumnIds = $view->getColumnIds();
+
+			$filter = $this->mergeFilterWithViewFilter($filter, $view->getFilterArray());
+
+			if ($sort === null) {
+				$sort = $view->getSortArray();
+			}
+
+			$userId = $this->resolveFilterUserId($userId, $view);
+		} else {
+			$tableColumns = $this->columnMapper->findAllByTable($tableId);
+			$showColumnIds = array_map(static fn (Column $column) => $column->getId(), $tableColumns);
+		}
+
+		return $this->row2Mapper->count(
+			$showColumnIds,
+			$tableId,
+			$filter,
+			$sort,
+			$search,
 			$userId,
 		);
 	}

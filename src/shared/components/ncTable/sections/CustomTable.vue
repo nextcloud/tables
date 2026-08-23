@@ -72,6 +72,10 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+		totalRows: {
+			type: Number,
+			default: null,
+		},
 		columns: {
 			type: Array,
 			default: () => [],
@@ -121,6 +125,9 @@ export default {
 
 	computed: {
 		currentPageRows() {
+			if (this.totalRows !== null) {
+				return this.rows
+			}
 			return this.rows.slice((this.pageNumber - 1) * this.rowsPerPage, ((this.pageNumber - 1) * this.rowsPerPage) + this.rowsPerPage)
 		},
 	},

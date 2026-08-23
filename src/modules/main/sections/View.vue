@@ -11,6 +11,7 @@
 			<TableView v-else
 				v-model:view-setting="localViewSetting"
 				:rows="rows"
+				:total-rows="totalRows"
 				:columns="columns"
 				:element="view"
 				:is-view="true"
@@ -131,6 +132,10 @@ export default {
 		},
 		rows: {
 			type: Array,
+			default: null,
+		},
+		totalRows: {
+			type: Number,
 			default: null,
 		},
 		viewSetting: {
