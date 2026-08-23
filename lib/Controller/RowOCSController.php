@@ -26,6 +26,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception;
 use OCP\IL10N;
@@ -194,6 +195,53 @@ class RowOCSController extends AOCSController {
 		} catch (MultipleObjectsReturnedException|InvalidArgumentException $e) {
 			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
 		} catch (InternalError|\Exception $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Export all rows from a table or view as a CSV file
+	 *
+	 * @param string $nodeCollection 'tables' or 'views'
+	 * @param int $nodeId The table or view ID
+	 * @param ?string $filter JSON encoded list of filter groups (optional)
+	 * @param ?string $sort JSON encoded list of sort rules (optional)
+	 * @param ?string $search Search string (optional)
+	 * @param ?string $rowIds JSON encoded list of row IDs to export (optional)
+	 * @return DataDownloadResponse<Http::STATUS_OK, array{headers: array<string, string>}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: CSV file is returned
+	 * 400: Invalid request parameters
+	 * 403: No permissions
+	 * 404: Not found
+	 * 500: Internal error
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'nodeCollection')]
+	#[ApiRoute(
+		verb: 'GET',
+		url: '/api/2/{nodeCollection}/{nodeId}/rows/export',
+		requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)']
+	)]
+	public function exportRows(string $nodeCollection, int $nodeId, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null): DataDownloadResponse|DataResponse {
+		try {
+			$queryData = RowQuery::buildFromInput(
+				nodeType: $nodeCollection,
+				nodeId: $nodeId,
+				userId: $this->userId,
+				filter: $filter,
+				sort: $sort,
+				search: $search,
+				rowIds: $rowIds,
+			);
+
+			$csv = $this->rowService->exportCsv($queryData);
+			return new DataDownloadResponse($csv, 'export.csv', 'text/csv');
+		} catch (DoesNotExistException $e) {
+			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		} catch (MultipleObjectsReturnedException|InvalidArgumentException $e) {
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		} catch (InternalError|Exception $e) {
 			return $this->handleError($e);
 		}
 	}

@@ -25,6 +25,7 @@ use OCP\AppFramework\Http\Attribute\AnonRateLimit;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\Attribute\PublicPage;
+use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -143,6 +144,59 @@ class PublicRowOCSController extends AOCSController {
 
 			$count = $this->rowService->countByQuery($queryData);
 			return new DataResponse(['count' => $count]);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Export all rows from a link share as a CSV file
+	 *
+	 * @param string $token The share token
+	 * @param ?string $filter Optional: a JSON encoded filter parameter
+	 * @param ?string $sort Optional: a JSON encoded sort parameter
+	 * @param ?string $search Optional: a search string
+	 * @param ?string $rowIds Optional: a JSON encoded list of row IDs to export
+	 * @return DataDownloadResponse<Http::STATUS_OK, array{headers: array<string, string>}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: CSV file is returned
+	 * 400: Invalid request parameters
+	 * 403: No permissions
+	 * 404: Not found
+	 * 500: Internal error
+	 */
+	#[PublicPage]
+	#[AssertShareAccessIsAccessible]
+	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/rows/export', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
+	#[OpenAPI]
+	#[AnonRateLimit(limit: 20, period: 30)]
+	public function exportRows(string $token, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null): DataDownloadResponse|DataResponse {
+		try {
+			$shareToken = new ShareToken($token);
+			$share = $this->shareService->findByToken($shareToken);
+
+			if (!$share->getPermissionRead()) {
+				return $this->handlePermissionError(new PermissionError('No read permission on this share'));
+			}
+
+			$queryData = RowQuery::buildFromInput(
+				nodeType: $share->getNodeType(),
+				nodeId: $share->getNodeId(),
+				userId: '',
+				filter: $filter,
+				sort: $sort,
+				search: $search,
+				rowIds: $rowIds,
+			);
+
+			$csv = $this->rowService->exportCsv($queryData);
+			return new DataDownloadResponse($csv, 'export.csv', 'text/csv');
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {

@@ -21,6 +21,7 @@ class RowQuery {
 	protected ?array $filter = null;
 	protected ?array $sort = null;
 	protected ?string $search = null;
+	protected ?array $rowIds = null;
 
 	public function __construct(
 		protected int $nodeType,
@@ -90,21 +91,48 @@ class RowQuery {
 		return $this;
 	}
 
+	public function getRowIds(): ?array {
+		return $this->rowIds;
+	}
+
+	public function setRowIds(?array $rowIds): self {
+		$this->rowIds = $rowIds;
+		return $this;
+	}
+
 	/**
 	 * Build a RowQuery from request parameters.
 	 *
 	 * @return self
 	 * @throws InvalidArgumentException
 	 */
-	public static function buildFromInput(string $nodeType, int $nodeId, string $userId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null): self {
+	public static function buildFromInput(string $nodeType, int $nodeId, string $userId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null): self {
 		$rowQuery = new self(ConversionHelper::stringNodeType2Const($nodeType), $nodeId);
 		$rowQuery->setLimit($limit)
 			->setOffset($offset)
 			->setFilter(self::parseFilter($filter))
 			->setSort(self::parseSort($sort))
 			->setSearch($search !== '' && $search !== null ? $search : null)
+			->setRowIds(self::parseRowIds($rowIds))
 			->setUserId($userId);
 		return $rowQuery;
+	}
+
+	/**
+	 * Decode and validate the JSON encoded row ID list.
+	 *
+	 * @return list<int>|null
+	 * @throws InvalidArgumentException
+	 */
+	private static function parseRowIds(?string $rowIds): ?array {
+		if ($rowIds === null || $rowIds === '') {
+			return null;
+		}
+		$decoded = json_decode($rowIds, true);
+		if (!is_array($decoded) || array_filter($decoded, 'is_int') !== $decoded) {
+			throw new InvalidArgumentException('Invalid row IDs supplied');
+		}
+		return array_map('intval', $decoded);
 	}
 
 	/**

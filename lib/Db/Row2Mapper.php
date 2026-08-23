@@ -132,7 +132,7 @@ class Row2Mapper {
 	 * @return int[]
 	 * @throws InternalError
 	 */
-	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null, ?array $showColumnIds = null, ?string $search = null): array {
+	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null, ?array $showColumnIds = null, ?string $search = null, ?array $rowIds = null): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('sleeves.id')
@@ -145,6 +145,10 @@ class Row2Mapper {
 
 		if ($search !== null && $search !== '' && $showColumnIds) {
 			$this->addSearchToQuery($qb, $search, $showColumnIds);
+		}
+
+		if ($rowIds !== null && $rowIds !== []) {
+			$qb->andWhere($qb->expr()->in('sleeves.id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY)));
 		}
 
 		$this->addSortQueryForMultipleSleeveFinder($qb, 'sleeves', $sort);
@@ -179,11 +183,11 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $search = null, ?string $userId = null): array {
+	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $search = null, ?string $userId = null, ?array $rowIds = null): array {
 		try {
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
-			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, $limit, $offset, $showColumnIds, $search);
+			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, $limit, $offset, $showColumnIds, $search, $rowIds);
 
 			// Get rows without SQL sorting
 			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);

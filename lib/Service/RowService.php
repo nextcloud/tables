@@ -88,6 +88,99 @@ class RowService extends SuperService {
 	}
 
 	/**
+	 * Export all matching rows as a CSV string.
+	 *
+	 * @param RowQuery $rowQuery
+	 * @return string
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 */
+	public function exportCsv(RowQuery $rowQuery): string {
+		$tableId = $rowQuery->getNodeId();
+		$showColumnIds = [];
+		$filter = $rowQuery->getFilter();
+		$sort = $rowQuery->getSort();
+		$search = $rowQuery->getSearch();
+
+		if ($rowQuery->getNodeType() === Application::NODE_TYPE_VIEW) {
+			$view = $this->viewMapper->find($rowQuery->getNodeId());
+			$tableId = $view->getTableId();
+			$showColumnIds = $view->getColumnIds();
+			$filter = $this->mergeFilterWithViewFilter($filter, $view->getFilterArray());
+			if ($sort === null) {
+				$sort = $view->getSortArray();
+			}
+		} else {
+			$showColumnIds = array_map(static fn (Column $column) => $column->getId(), $this->columnMapper->findAllByTable($tableId));
+		}
+
+		$columns = $this->columnMapper->findAll($showColumnIds);
+		$columnsById = [];
+		foreach ($columns as $column) {
+			$columnsById[$column->getId()] = $column;
+		}
+
+		$orderedColumns = array_map(static fn (int $columnId) => $columnsById[$columnId], $showColumnIds);
+
+		$rows = $this->row2Mapper->findAll(
+			$showColumnIds,
+			$tableId,
+			null,
+			null,
+			$filter,
+			$sort,
+			$search,
+			$rowQuery->getUserId() ?? '',
+			$rowQuery->getRowIds(),
+		);
+
+		return $this->buildCsv($orderedColumns, $rows);
+	}
+
+	/**
+	 * @param Column[] $columns
+	 * @param Row2[] $rows
+	 */
+	private function buildCsv(array $columns, array $rows): string {
+		$handle = fopen('php://temp', 'r+');
+		if ($handle === false) {
+			throw new InternalError('Could not create CSV buffer.');
+		}
+
+		$headers = ['ID'];
+		foreach ($columns as $column) {
+			$headers[] = $column->getTitle();
+		}
+		fputcsv($handle, $headers);
+
+		foreach ($rows as $row) {
+			$cellValues = [];
+			foreach ($row->getData() as $cell) {
+				$cellValues[(int)$cell['columnId']] = $cell['value'];
+			}
+
+			$line = [(string)$row->getId()];
+			foreach ($columns as $column) {
+				$value = $cellValues[$column->getId()] ?? '';
+				if ($value === null) {
+					$value = '';
+				} elseif (!is_string($value)) {
+					$value = json_encode($value);
+				}
+				$line[] = $value;
+			}
+			fputcsv($handle, $line);
+		}
+
+		rewind($handle);
+		$csv = stream_get_contents($handle);
+		fclose($handle);
+		return $csv ?: '';
+	}
+
+	/**
 	 * Fetch rows for a table or view, applying the given filter and sort rules.
 	 *
 	 * When reading from a view, the provided filter is added to each of the

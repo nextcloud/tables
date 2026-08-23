@@ -325,6 +325,82 @@ export const useDataStore = defineStore('data', {
 			return true
 		},
 
+		async loadRowsForExportFromBE({ tableId, viewId, filter = null, sort = null, search = null, rowIds = null }) {
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
+			let res = null
+			try {
+				const collection = viewId ? 'views' : 'tables'
+				const nodeId = viewId ?? tableId
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/' + collection + '/' + nodeId + '/rows/export'), { params, responseType: 'text' })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load rows for export.'))
+				return false
+			}
+
+			if (typeof res?.data !== 'string') {
+				const e = new Error('Expected CSV text, but is not')
+				displayError(e, 'Format for exported rows not valid.')
+				return false
+			}
+
+			return res.data
+		},
+
+		async loadPublicRowsForExportFromBE({ token, filter = null, sort = null, search = null, rowIds = null }) {
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
+			let res = null
+			try {
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows/export'), { params, responseType: 'text' })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load public rows for export.'))
+				return false
+			}
+
+			if (typeof res?.data !== 'string') {
+				const e = new Error('Expected CSV text, but is not')
+				displayError(e, 'Format for exported public rows not valid.')
+				return false
+			}
+
+			return res.data
+		},
+
 		async loadPublicRowsFromBE({ token, filter = null, sort = null, search = null, limit = null, offset = null }) {
 			const stateId = 'public-' + token
 			this.loading[stateId] = true

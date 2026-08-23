@@ -62,7 +62,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@edit-column="col => $emit('edit-column', col)"
 				@delete-column="col => $emit('delete-column', col)"
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
-				@download-csv="data => downloadCsv(data, parsedColumns, table)">
+				@download-csv="$emit('download-csv')">
 				<template #actions>
 					<slot name="actions"
 						:is-filtered="isFilteredComputed"
@@ -101,7 +101,6 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 
 import Options from './sections/Options.vue'
 import CustomTable from './sections/CustomTable.vue'
-import exportTableMixin from './mixins/exportTableMixin.js'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Cancel from 'vue-material-design-icons/Cancel.vue'
@@ -116,7 +115,6 @@ export default {
 
 	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus, Cancel, FileDocumentEditOutline },
 
-	mixins: [exportTableMixin],
 
 	props: {
 		rows: {
@@ -211,6 +209,7 @@ export default {
 		'delete-column',
 		'delete-row',
 		'delete-selected-rows',
+		'download-csv',
 		'download-filtered-csv',
 		'edit-column',
 		'edit-row',

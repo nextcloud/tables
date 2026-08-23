@@ -122,7 +122,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'loadPublicRowsCountFromBE', 'setPublicToken']),
+		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'loadPublicRowsCountFromBE', 'loadPublicRowsForExportFromBE', 'setPublicToken']),
 		...mapActions(useTablesStore, ['validatePublicExportAccess']),
 
 		async reload() {
@@ -276,7 +276,12 @@ export default {
 				}
 				return
 			}
-			this.downloadCsv(this.rows, this.columns, 'public-export')
+			const csv = await this.loadPublicRowsForExportFromBE({
+				token: this.token,
+			})
+			if (csv) {
+				this.downloadFile(csv, 'public-export.csv')
+			}
 		},
 		async downloadFilteredCSV(rows) {
 			const access = await this.validatePublicExportAccess(this.token)
@@ -286,7 +291,27 @@ export default {
 				}
 				return
 			}
-			this.downloadCsv(rows, this.columns, 'public-export')
+
+			if (rows !== this.rows) {
+				const csv = await this.loadPublicRowsForExportFromBE({
+					token: this.token,
+					rowIds: rows.map(row => row.id),
+				})
+				if (csv) {
+					this.downloadFile(csv, 'public-export.csv')
+				}
+				return
+			}
+
+			const csv = await this.loadPublicRowsForExportFromBE({
+				token: this.token,
+				filter: this.viewSetting?.filter,
+				sort: this.viewSetting?.sorting,
+				search: this.viewSetting?.searchString,
+			})
+			if (csv) {
+				this.downloadFile(csv, 'public-export.csv')
+			}
 		},
 	},
 }

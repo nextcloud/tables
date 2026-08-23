@@ -150,7 +150,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE', 'loadRowsCountFromBE', 'loadRelationsFromBE']),
+		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE', 'loadRowsCountFromBE', 'loadRowsForExportFromBE', 'loadRelationsFromBE']),
 		...mapActions(useTablesStore, ['validateExportAccess']),
 		createColumn() {
 			emit('tables:column:create', { isView: this.isView, element: this.element })
@@ -168,7 +168,15 @@ export default {
 				return
 			}
 
-			this.downloadCsv(this.rows, this.columns, this.element.title)
+			const viewId = this.isView ? this.element.id : null
+			const tableId = !this.isView ? this.element.id : null
+			const csv = await this.loadRowsForExportFromBE({
+				viewId,
+				tableId,
+			})
+			if (csv) {
+				this.downloadFile(csv, this.element.title + '.csv')
+			}
 		},
 		async downloadFilteredCSV(rows) {
 			const access = await this.validateExportAccess({
@@ -183,7 +191,32 @@ export default {
 				return
 			}
 
-			this.downloadCsv(rows, this.columns, this.element.title)
+			if (rows !== this.rows) {
+				const viewId = this.isView ? this.element.id : null
+				const tableId = !this.isView ? this.element.id : null
+				const csv = await this.loadRowsForExportFromBE({
+					viewId,
+					tableId,
+					rowIds: rows.map(row => row.id),
+				})
+				if (csv) {
+					this.downloadFile(csv, this.element.title + '.csv')
+				}
+				return
+			}
+
+			const viewId = this.isView ? this.element.id : null
+			const tableId = !this.isView ? this.element.id : null
+			const csv = await this.loadRowsForExportFromBE({
+				viewId,
+				tableId,
+				filter: this.viewSetting?.filter,
+				sort: this.viewSetting?.sorting,
+				search: this.viewSetting?.searchString,
+			})
+			if (csv) {
+				this.downloadFile(csv, this.element.title + '.csv')
+			}
 		},
 		toggleShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
