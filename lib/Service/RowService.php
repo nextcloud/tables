@@ -131,8 +131,8 @@ class RowService extends SuperService {
 			null,
 			$filter,
 			$sort,
-			$search,
 			$rowQuery->getUserId() ?? '',
+			$search,
 			$rowQuery->getRowIds(),
 		);
 
@@ -224,8 +224,8 @@ class RowService extends SuperService {
 			$rowQuery->getOffset(),
 			$filter,
 			$sort,
-			$search,
 			$userId,
+			$search,
 			$rowQuery->getRowIds(),
 		);
 	}

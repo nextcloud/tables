@@ -115,7 +115,6 @@ export default {
 
 	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus, Cancel, FileDocumentEditOutline },
 
-
 	props: {
 		rows: {
 			type: Array,

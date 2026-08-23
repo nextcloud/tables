@@ -125,6 +125,8 @@ class RowOCSController extends AOCSController {
 	 * @psalm-param ?int<0,max> $offset Offset of the rows to be returned (optional)
 	 * @param ?string $filter JSON encoded list of filter groups. Definitions within a group are AND-connected, groups are OR-connected, e.g. `[[{"columnId":1,"operator":"contains","value":"foo"}]]` (optional)
 	 * @param ?string $sort JSON encoded list of sort rules, e.g. `[{"columnId":1,"mode":"ASC"}]` (optional)
+	 * @param ?string $search Search string (optional)
+	 * @param ?string $rowIds JSON encoded list of row IDs (optional)
 	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rows returned
@@ -142,12 +144,6 @@ class RowOCSController extends AOCSController {
 	)]
 	public function getRows(string $nodeCollection, int $nodeId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null): DataResponse {
 		try {
-			if (($limit !== null && ($limit <= 0 || $limit > 500))
-				|| ($offset !== null && $offset < 0)
-			) {
-				throw new InvalidArgumentException('Offset or limit parameter is out of bounds');
-			}
-
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $nodeCollection,
 				nodeId: $nodeId,
@@ -158,6 +154,7 @@ class RowOCSController extends AOCSController {
 				sort: $sort,
 				search: $search,
 				rowIds: $rowIds,
+				normalizePagination: true,
 			);
 
 			$rows = $this->rowService->findAllByQuery($queryData);
@@ -171,6 +168,22 @@ class RowOCSController extends AOCSController {
 		}
 	}
 
+	/**
+	 * [api v2] Count rows from a table or view
+	 *
+	 * @param 'tables'|'views' $nodeCollection Indicates whether to read from a table or a view
+	 * @psalm-param int<0,max> $nodeId The ID of the table or view
+	 * @param string|null $filter Optional: a JSON encoded filter parameter
+	 * @param string|null $sort Optional: a JSON encoded sort parameter
+	 * @param string|null $search Optional: a search string
+	 * @return DataResponse<Http::STATUS_OK, array{count: int}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Count is returned
+	 * 400: Invalid request parameters
+	 * 403: No permissions
+	 * 404: Not found
+	 * 500: Internal error
+	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'nodeCollection')]
 	#[ApiRoute(
@@ -209,7 +222,7 @@ class RowOCSController extends AOCSController {
 	 * @param ?string $sort JSON encoded list of sort rules (optional)
 	 * @param ?string $search Search string (optional)
 	 * @param ?string $rowIds JSON encoded list of row IDs to export (optional)
-	 * @return DataDownloadResponse<Http::STATUS_OK, array{headers: array<string, string>}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataDownloadResponse<Http::STATUS_OK, 'text/csv', array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: CSV file is returned
 	 * 400: Invalid request parameters

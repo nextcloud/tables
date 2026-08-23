@@ -87,20 +87,6 @@ export default {
 		}
 	},
 
-	beforeMount() {
-		this.setPublicToken(this.token)
-		this.applyUrlStateOnReload = true
-		this.reload()
-	},
-
-	mounted() {
-		subscribe('tables:pagination-changed', this.onPaginationChanged)
-	},
-
-	beforeUnmount() {
-		unsubscribe('tables:pagination-changed', this.onPaginationChanged)
-	},
-
 	watch: {
 		viewSetting: {
 			handler() {
@@ -120,6 +106,20 @@ export default {
 			},
 			deep: true,
 		},
+	},
+
+	beforeMount() {
+		this.setPublicToken(this.token)
+		this.applyUrlStateOnReload = true
+		this.reload()
+	},
+
+	mounted() {
+		subscribe('tables:pagination-changed', this.onPaginationChanged)
+	},
+
+	beforeUnmount() {
+		unsubscribe('tables:pagination-changed', this.onPaginationChanged)
 	},
 
 	methods: {

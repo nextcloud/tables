@@ -825,23 +825,6 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
-    readonly "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/rows": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly get?: never;
-        readonly put?: never;
-        /** [api v2] Create a new row in a table or a view */
-        readonly post: operations["rowocs-create-row"];
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
     readonly "/ocs/v2.php/apps/tables/api/2/config/table/{id}": {
         readonly parameters: {
             readonly query?: never;
@@ -931,6 +914,40 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/rows/count": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Count rows from a link share */
+        readonly get: operations["public_rowocs-count-rows"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/rows/export": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Export all rows from a link share as a CSV file */
+        readonly get: operations["public_rowocs-export-rows"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/rows/{rowId}": {
         readonly parameters: {
             readonly query?: never;
@@ -944,6 +961,64 @@ export type paths = {
         readonly post?: never;
         /** [api v2] Delete a row in a link share */
         readonly delete: operations["public_rowocs-delete-row"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/rows": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * [api v2] Get a number of rows from a table or view
+         * @description Both `filter` and `sort` are passed as JSON encoded strings.
+         *     The filter is a list of filter groups, each group being a list of single filter definitions. Definitions within a group are AND-connected, while the groups themselves are OR-connected.
+         *     When reading from a view, the provided filter is added to each of the view's existing filter groups, so the view's base rules are always enforced.
+         *     A provided sort order overrides the view's default sort order. The view's default sort order is only used when no sort order is provided.
+         */
+        readonly get: operations["rowocs-get-rows"];
+        readonly put?: never;
+        /** [api v2] Create a new row in a table or a view */
+        readonly post: operations["rowocs-create-row"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/rows/count": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Count rows from a table or view */
+        readonly get: operations["rowocs-count-rows"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/rows/export": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Export all rows from a table or view as a CSV file */
+        readonly get: operations["rowocs-export-rows"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
         readonly patch?: never;
@@ -7122,126 +7197,6 @@ export interface operations {
             };
         };
     };
-    readonly "rowocs-create-row": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path: {
-                /** @description Indicates whether to create a row on a table or view */
-                readonly nodeCollection: "tables" | "views";
-                /** @description The identifier of the targeted table or view */
-                readonly nodeId: number;
-            };
-            readonly cookie?: never;
-        };
-        readonly requestBody: {
-            readonly content: {
-                readonly "application/json": {
-                    /** @description An array containing the column identifiers and their values */
-                    readonly data: string | {
-                        readonly [key: string]: Record<string, never>;
-                    };
-                };
-            };
-        };
-        readonly responses: {
-            /** @description Row returned */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: components["schemas"]["Row"];
-                        };
-                    };
-                };
-            };
-            /** @description Invalid request parameters */
-            readonly 400: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permissions */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Internal error */
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
     readonly "config-get-table-config": {
         readonly parameters: {
             readonly query?: never;
@@ -7514,10 +7469,18 @@ export interface operations {
     readonly "public_rowocs-get-rows": {
         readonly parameters: {
             readonly query?: {
-                /** @description Optional: maximum number of results, capped at 500 */
+                /** @description Number of rows to return between 1 and 500, fetches all by default (optional) */
                 readonly limit?: number | null;
-                /** @description Optional: the offset for this operation */
+                /** @description Offset of the rows to be returned (optional) */
                 readonly offset?: number | null;
+                /** @description Optional: a JSON encoded filter parameter */
+                readonly filter?: string | null;
+                /** @description Optional: a JSON encoded sort parameter */
+                readonly sort?: string | null;
+                /** @description Optional: a search string */
+                readonly search?: string | null;
+                /** @description Optional: a JSON encoded list of row IDs */
+                readonly rowIds?: string | null;
             };
             readonly header: {
                 /** @description Required to be true for the API request to pass */
@@ -7647,6 +7610,210 @@ export interface operations {
                             readonly data: components["schemas"]["PublicRow"];
                         };
                     };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "public_rowocs-count-rows": {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Optional: a JSON encoded filter parameter */
+                readonly filter?: string | null;
+                /** @description Optional: a JSON encoded sort parameter */
+                readonly sort?: string | null;
+                /** @description Optional: a search string */
+                readonly search?: string | null;
+            };
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description The share token */
+                readonly token: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Count is returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                /** Format: int64 */
+                                readonly count: number;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "public_rowocs-export-rows": {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Optional: a JSON encoded filter parameter */
+                readonly filter?: string | null;
+                /** @description Optional: a JSON encoded sort parameter */
+                readonly sort?: string | null;
+                /** @description Optional: a search string */
+                readonly search?: string | null;
+                /** @description Optional: a JSON encoded list of row IDs to export */
+                readonly rowIds?: string | null;
+            };
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description The share token */
+                readonly token: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description CSV file is returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "text/csv": string;
                 };
             };
             /** @description Invalid request parameters */
@@ -7848,6 +8015,486 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["PublicRow"];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "rowocs-get-rows": {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Number of rows to return between 1 and 500, fetches all by default (optional) */
+                readonly limit?: number | null;
+                /** @description Offset of the rows to be returned (optional) */
+                readonly offset?: number | null;
+                /** @description JSON encoded list of filter groups. Definitions within a group are AND-connected, groups are OR-connected, e.g. `[[{"columnId":1,"operator":"contains","value":"foo"}]]` (optional) */
+                readonly filter?: string | null;
+                /** @description JSON encoded list of sort rules, e.g. `[{"columnId":1,"mode":"ASC"}]` (optional) */
+                readonly sort?: string | null;
+                /** @description Search string (optional) */
+                readonly search?: string | null;
+                /** @description JSON encoded list of row IDs (optional) */
+                readonly rowIds?: string | null;
+            };
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Indicates whether to read from a table or a view */
+                readonly nodeCollection: "tables" | "views";
+                /** @description The ID of the table or view */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Rows returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["Row"][];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "rowocs-create-row": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Indicates whether to create a row on a table or view */
+                readonly nodeCollection: "tables" | "views";
+                /** @description The identifier of the targeted table or view */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description An array containing the column identifiers and their values */
+                    readonly data: string | {
+                        readonly [key: string]: Record<string, never>;
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Row"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "rowocs-count-rows": {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Optional: a JSON encoded filter parameter */
+                readonly filter?: string | null;
+                /** @description Optional: a JSON encoded sort parameter */
+                readonly sort?: string | null;
+                /** @description Optional: a search string */
+                readonly search?: string | null;
+            };
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Indicates whether to read from a table or a view */
+                readonly nodeCollection: "tables" | "views";
+                /** @description The ID of the table or view */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Count is returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                /** Format: int64 */
+                                readonly count: number;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "rowocs-export-rows": {
+        readonly parameters: {
+            readonly query?: {
+                /** @description JSON encoded list of filter groups (optional) */
+                readonly filter?: string | null;
+                /** @description JSON encoded list of sort rules (optional) */
+                readonly sort?: string | null;
+                /** @description Search string (optional) */
+                readonly search?: string | null;
+                /** @description JSON encoded list of row IDs to export (optional) */
+                readonly rowIds?: string | null;
+            };
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description 'tables' or 'views' */
+                readonly nodeCollection: string;
+                /** @description The table or view ID */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description CSV file is returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "text/csv": string;
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
                         };
                     };
                 };

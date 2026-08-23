@@ -22,7 +22,8 @@ const DEFAULT_ROWS_PER_PAGE = 100
  * @param {object} viewSetting The view setting object.
  * @param {number} pageNumber The current page number.
  * @param {number} rowsPerPage The current rows per page.
- * @returns {object} A query object to be used with Vue Router.
+ * @param rule
+ * @return {object} A query object to be used with Vue Router.
  */
 function serializeFilterRule(rule) {
 	return {
@@ -73,7 +74,7 @@ export function buildUrlQuery(viewSetting, pageNumber, rowsPerPage, rowIds = nul
  * Parse the current URL query into a view state object.
  *
  * @param {object} query The Vue Router query object.
- * @returns {object} The parsed state.
+ * @return {object} The parsed state.
  */
 export function parseUrlQuery(query) {
 	const state = {

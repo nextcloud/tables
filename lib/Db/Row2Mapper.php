@@ -180,10 +180,11 @@ class Row2Mapper {
 	 * @param array|null $filter
 	 * @param array|null $sort
 	 * @param string|null $userId
+	 * @param string|null $search
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $search = null, ?string $userId = null, ?array $rowIds = null): array {
+	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null, ?string $search = null, ?array $rowIds = null): array {
 		try {
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
@@ -1093,14 +1094,16 @@ class Row2Mapper {
 
 		$qbSqlForColumnTypes = null;
 		foreach ($this->columnsHelper->columns as $columnType) {
+			$innerQb = $this->db->getQueryBuilder();
+			$innerQb->select('row_id')
+				->selectAlias($innerQb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'search_value')
+				->from('tables_row_cells_' . $columnType)
+				->where($innerQb->expr()->in('column_id', $columnIdsParam));
+
 			$qbTmp = $this->db->getQueryBuilder();
 			$qbTmp->select('row_id')
-				->from('tables_row_cells_' . $columnType)
-				->where($qb->expr()->in('column_id', $columnIdsParam))
-				->andWhere($qb->expr()->iLike(
-					$qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR),
-					$searchParam
-				));
+				->from($qbTmp->createFunction('(' . $innerQb->getSQL() . ')'), 't')
+				->where($qbTmp->expr()->iLike('t.search_value', $searchParam));
 
 			if ($qbSqlForColumnTypes) {
 				$qbSqlForColumnTypes .= ' UNION ALL ' . $qbTmp->getSQL() . ' ';

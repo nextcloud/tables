@@ -52,8 +52,12 @@ class PublicRowOCSController extends AOCSController {
 	 * [api v2] Fetch all rows from a link share
 	 *
 	 * @param string $token The share token
-	 * @param int|null $limit Optional: maximum number of results, capped at 500
-	 * @param int|null $offset Optional: the offset for this operation
+	 * @psalm-param ?int<1,500> $limit Number of rows to return between 1 and 500, fetches all by default (optional)
+	 * @psalm-param ?int<0,max> $offset Offset of the rows to be returned (optional)
+	 * @param string|null $filter Optional: a JSON encoded filter parameter
+	 * @param string|null $sort Optional: a JSON encoded sort parameter
+	 * @param string|null $search Optional: a search string
+	 * @param string|null $rowIds Optional: a JSON encoded list of row IDs
 	 * @return DataResponse<Http::STATUS_OK, list<TablesPublicRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Rows are returned
@@ -76,9 +80,6 @@ class PublicRowOCSController extends AOCSController {
 				return $this->handlePermissionError(new PermissionError('No read permission on this share'));
 			}
 
-			$limit = $limit !== null ? max(0, min(500, $limit)) : null;
-			$offset = $offset !== null ? max(0, $offset) : null;
-
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $share->getNodeType(),
 				nodeId: $share->getNodeId(),
@@ -89,6 +90,7 @@ class PublicRowOCSController extends AOCSController {
 				sort: $sort,
 				search: $search,
 				rowIds: $rowIds,
+				normalizePagination: true,
 			);
 
 			$rows = $this->rowService->findAllByQuery($queryData);
@@ -164,7 +166,7 @@ class PublicRowOCSController extends AOCSController {
 	 * @param ?string $sort Optional: a JSON encoded sort parameter
 	 * @param ?string $search Optional: a search string
 	 * @param ?string $rowIds Optional: a JSON encoded list of row IDs to export
-	 * @return DataDownloadResponse<Http::STATUS_OK, array{headers: array<string, string>}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataDownloadResponse<Http::STATUS_OK, 'text/csv', array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: CSV file is returned
 	 * 400: Invalid request parameters

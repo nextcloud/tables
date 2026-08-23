@@ -182,7 +182,7 @@ export default {
 		getSelectedRows() {
 			const rows = []
 			this.selectedRows.forEach(id => {
-				rows.push(this.getRowById(id))
+				rows.push(this.getRowById(id) || { id })
 			})
 			return rows
 		},

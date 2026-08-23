@@ -24,10 +24,7 @@ class RowDataInput implements ArrayAccess, Iterator {
 	/** @psalm-var array<array{'columnId': int, 'value': mixed}> */
 	protected array $data = [];
 
-	/**
-	 * @param array|float|int|null|string $value
-	 */
-	public function add(int $columnId, array|string|int|float|null $value): self {
+	public function add(int $columnId, mixed $value): self {
 		$this->data[] = [self::DATA_KEY => $columnId, self::DATA_VAL => $value];
 		return $this;
 	}

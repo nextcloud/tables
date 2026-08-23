@@ -103,10 +103,16 @@ class RowQuery {
 	/**
 	 * Build a RowQuery from request parameters.
 	 *
+	 * @param bool $normalizePagination Clamp limit and offset to valid ranges instead of throwing.
 	 * @return self
 	 * @throws InvalidArgumentException
 	 */
-	public static function buildFromInput(string $nodeType, int $nodeId, string $userId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null): self {
+	public static function buildFromInput(string $nodeType, int $nodeId, string $userId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null, ?string $search = null, ?string $rowIds = null, bool $normalizePagination = false): self {
+		if ($normalizePagination) {
+			$limit = $limit !== null ? max(0, min(500, $limit)) : null;
+			$offset = $offset !== null ? max(0, $offset) : null;
+		}
+
 		$rowQuery = new self(ConversionHelper::stringNodeType2Const($nodeType), $nodeId);
 		$rowQuery->setLimit($limit)
 			->setOffset($offset)
