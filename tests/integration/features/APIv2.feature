@@ -561,8 +561,8 @@ Feature: APIv2
       | t2    | table | read                |
     And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2" with permissions "read,create,update,delete,manage"
     When user "participant2-v2" transfers the Context "c1" to "participant3-v2"
-    Then the reported status is "403" 
-    
+    Then the reported status is "403"
+
   @api2 @contexts @contexts-ownership
   Scenario: Transfer an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
@@ -583,6 +583,30 @@ Feature: APIv2
     When user "participant3-v2" attempts to fetch Context "c1"
     Then the reported status is "404"
 
+
+  @api2 @rows @custom-filters
+  Scenario: Fetch rows with customFilters parameter containing array values
+    Given table "Tasks" with emoji "📋" exists for user "participant1-v2" as "tasks" via v2
+    Then column "status" exists with following properties
+      | type      | selection             |
+      | mandatory | 1                     |
+    And column "title" exists with following properties
+      | type      | text                  |
+      | subtype   | line                  |
+      | mandatory | 1                     |
+    And row exists with following values
+      | status  | Task A      |
+    And row exists with following values
+      | status  | Task B      |
+    And row exists with following values
+      | status  | Task C      |
+    When user "participant1-v2" fetches rows for table "tasks" with customFilters containing array values
+    Then the reported status is "200"
+    And the response contains at least the following rows
+      | title   |
+      | Task A  |
+      | Task B  |
+      | Task C  |
 
   @api1 @rows
   Scenario: Create and modify usergroup row via v1

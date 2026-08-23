@@ -86,6 +86,9 @@ export default {
 
 	computed: {
 		...mapState(useTablesStore, ['activeRowId']),
+		customFiltered() {
+			return this.$route.query.customFilters
+		},
 	},
 
 	watch: {
@@ -94,6 +97,9 @@ export default {
 		},
 		activeRowId() {
 			this.reload()
+		},
+		customFiltered() {
+			this.reload(true)
 		},
 	},
 
@@ -183,6 +189,7 @@ export default {
 					await this.loadRowsFromBE({
 						viewId: this.isView ? this.element.id : null,
 						tableId: !this.isView ? this.element.id : null,
+						customFilters: this.$route.query.customFilters,
 					})
 				} else {
 					await this.removeRows({
