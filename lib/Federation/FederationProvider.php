@@ -23,12 +23,12 @@ use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Federation\Exceptions\BadRequestException;
 use OCP\Federation\Exceptions\ProviderCouldNotAddShareException;
-use OCP\Federation\ICloudFederationProvider;
 use OCP\Federation\ICloudFederationShare;
 use OCP\Federation\ICloudIdManager;
+use OCP\Federation\ISignedCloudFederationProvider;
 use OCP\Share\Exceptions\ShareNotFound;
 
-class FederationProvider implements ICloudFederationProvider {
+class FederationProvider implements ISignedCloudFederationProvider {
 	public const PROVIDER_ID = 'tables';
 	public const SHARE_TYPE_USER = 'user';
 	public const NOTIFICATION_UPDATE_PERMISSIONS = 'update-permissions';
@@ -46,6 +46,16 @@ class FederationProvider implements ICloudFederationProvider {
 
 	public function getShareType(): string {
 		return self::PROVIDER_ID;
+	}
+
+	public function getFederationIdFromSharedSecret(string $sharedSecret, array $payload): string {
+		try {
+			$share = $this->shareMapper->findByToken(new ShareToken($sharedSecret));
+		} catch (DoesNotExistException) {
+			return '';
+		}
+
+		return $share->getSender();
 	}
 
 	/**
