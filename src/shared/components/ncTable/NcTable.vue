@@ -43,7 +43,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 <template>
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
-			<Options v-model:view-setting="localViewSetting" :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :total="totalRows" :columns="parsedColumns" :element-id="elementId"
+			<Options v-model:view-setting="localViewSetting" :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :rows-count="rowsCount" :columns="parsedColumns" :element-id="elementId"
 				:is-view="isView"
 				:selected-rows="localSelectedRows"
 				:show-options="parsedColumns.length !== 0" :config="config" @create-row="$emit('create-row')"
@@ -53,7 +53,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" v-model:view-setting="localViewSetting"
-				:columns="parsedColumns" :rows="getSearchedAndFilteredAndSortedRows" :total-rows="totalRows" :is-view="isView" :element-id="elementId"
+				:columns="parsedColumns" :rows="getSearchedAndFilteredAndSortedRows" :rows-count="rowsCount" :is-view="isView" :element-id="elementId"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@copy-row="rowId => $emit('copy-row', rowId)"
@@ -120,7 +120,7 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		totalRows: {
+		rowsCount: {
 			type: Number,
 			default: 0,
 		},

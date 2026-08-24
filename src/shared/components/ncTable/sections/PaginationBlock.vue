@@ -68,7 +68,7 @@ export default {
 	},
 
 	props: {
-		total: {
+		rowsCount: {
 			type: Number,
 			default: null,
 		},
@@ -83,8 +83,8 @@ export default {
 
 	computed: {
 		totalPages() {
-			const total = this.total ?? 0
-			return Math.max(1, Math.ceil(total / this.rowsPerPage))
+			const rowsCount = this.rowsCount ?? 0
+			return Math.max(1, Math.ceil(rowsCount / this.rowsPerPage))
 		},
 	},
 

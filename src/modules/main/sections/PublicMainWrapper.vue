@@ -7,7 +7,7 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else>
-			<PublicElement :element="publicElement" :columns="columns" :rows="rows" :total-rows="totalRows" :view-setting="viewSetting" @update:viewSetting="viewSetting = $event" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
+			<PublicElement :element="publicElement" :columns="columns" :rows="rows" :rows-count="rowsCount" :view-setting="viewSetting" @update:viewSetting="viewSetting = $event" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
 		</div>
 	</div>
 </template>
@@ -46,14 +46,14 @@ export default {
 
 	setup(props) {
 		const store = useDataStore()
-		const { getColumns, getRows, getTotalRows } = storeToRefs(store)
+		const { getColumns, getRows, getRowsCount } = storeToRefs(store)
 
 		const stateKey = 'public-' + props.token
 		const rows = computed(() => getRows.value(false, stateKey))
 		const columns = computed(() => getColumns.value(false, stateKey))
-		const totalRows = computed(() => getTotalRows.value(false, stateKey))
+		const rowsCount = computed(() => getRowsCount.value(false, stateKey))
 
-		return { rows, columns, totalRows, dataStore: store }
+		return { rows, columns, rowsCount, dataStore: store }
 	},
 
 	data() {

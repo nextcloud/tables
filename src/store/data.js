@@ -36,7 +36,7 @@ export const useDataStore = defineStore('data', {
 			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
 			return state.rows[stateId] ?? []
 		},
-		getTotalRows: (state) => (isView, elementId) => {
+		getRowsCount: (state) => (isView, elementId) => {
 			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
 			return state.rowCounts[stateId] ?? 0
 		},

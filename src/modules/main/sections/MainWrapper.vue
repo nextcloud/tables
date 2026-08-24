@@ -11,7 +11,7 @@
 				:view="element"
 				:columns="columns"
 				:rows="rows"
-				:total-rows="totalRows"
+				:rows-count="rowsCount"
 				:view-setting="viewSetting"
 				@update:viewSetting="viewSetting = $event"
 				@create-column="createColumn"
@@ -24,7 +24,7 @@
 				:table="element"
 				:columns="columns"
 				:rows="rows"
-				:total-rows="totalRows"
+				:rows-count="rowsCount"
 				:view-setting="viewSetting"
 				@update:viewSetting="viewSetting = $event"
 				@create-column="createColumn"
@@ -73,13 +73,13 @@ export default {
 	},
 	setup(props) {
 		const store = useDataStore()
-		const { getColumns, getRows, getTotalRows } = storeToRefs(store)
+		const { getColumns, getRows, getRowsCount } = storeToRefs(store)
 		// When using storeToRefs, only the top-level state is made reactive.
 		// To make nested dynamic keys reactive, you need to use a computed property or watch for changes.
 		const rows = computed(() => getRows.value(props.isView, props.element.id))
 		const columns = computed(() => getColumns.value(props.isView, props.element.id))
-		const totalRows = computed(() => getTotalRows.value(props.isView, props.element.id))
-		return { rows, columns, totalRows, dataStore: store }
+		const rowsCount = computed(() => getRowsCount.value(props.isView, props.element.id))
+		return { rows, columns, rowsCount, dataStore: store }
 	},
 
 	data() {

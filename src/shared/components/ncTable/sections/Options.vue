@@ -30,7 +30,7 @@
 						<Refresh v-else :size="20" />
 					</template>
 				</NcButton>
-				<PaginationBlock :total="total" />
+				<PaginationBlock :rows-count="rowsCount" />
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -129,7 +129,7 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		total: {
+		rowsCount: {
 			type: Number,
 			default: null,
 		},

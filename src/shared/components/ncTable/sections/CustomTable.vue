@@ -72,7 +72,7 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		totalRows: {
+		rowsCount: {
 			type: Number,
 			default: 0,
 		},
