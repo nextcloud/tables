@@ -74,7 +74,22 @@ export default {
 		},
 
 		isViewSettingSet() {
-			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
+			if (!this.viewSetting) {
+				return false
+			}
+			if (this.viewSetting.hiddenColumns?.length > 0) {
+				return true
+			}
+			if (this.viewSetting.searchString) {
+				return true
+			}
+			if (this.viewSetting.sorting?.some(rule => rule?.columnId)) {
+				return true
+			}
+			if (this.viewSetting.filter?.some(rule => rule?.columnId)) {
+				return true
+			}
+			return false
 		},
 	},
 

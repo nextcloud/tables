@@ -163,7 +163,22 @@ export default {
 	},
 	computed: {
 		isViewSettingSet() {
-			return !(!this.localViewSetting || ((!this.localViewSetting.hiddenColumns || this.localViewSetting.hiddenColumns.length === 0) && (!this.localViewSetting.sorting) && (!this.localViewSetting.filter || this.localViewSetting.filter.length === 0)))
+			if (!this.localViewSetting) {
+				return false
+			}
+			if (this.localViewSetting.hiddenColumns?.length > 0) {
+				return true
+			}
+			if (this.localViewSetting.searchString) {
+				return true
+			}
+			if (this.localViewSetting.sorting?.some(rule => rule?.columnId)) {
+				return true
+			}
+			if (this.localViewSetting.filter?.some(rule => rule?.columnId)) {
+				return true
+			}
+			return false
 		},
 	},
 	watch: {
