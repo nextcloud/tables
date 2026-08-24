@@ -49,7 +49,7 @@ class ColumnSettings implements JsonSerializable {
 			if (isset($inputColumnSetting['columnUuid']) && isset($columnsMap[$inputColumnSetting['columnUuid']]) && $columnsMap[$inputColumnSetting['columnUuid']] instanceof Column) {
 				$inputColumnSetting['columnId'] = $columnsMap[$inputColumnSetting['columnUuid']]->getId();
 			}
-			if (!isset($inputColumnSetting['columnId'])) {
+			if (!empty($columnsMap) && !isset($inputColumnSetting['columnId'])) {
 				continue;
 			}
 			$columnSettings[] = ColumnOrderInformation::fromArray($inputColumnSetting);
@@ -71,7 +71,7 @@ class ColumnSettings implements JsonSerializable {
 			if (isset($inputColumnSetting['columnUuid']) && isset($columnsMap[$inputColumnSetting['columnUuid']]) && $columnsMap[$inputColumnSetting['columnUuid']] instanceof Column) {
 				$inputColumnSetting['columnId'] = $columnsMap[$inputColumnSetting['columnUuid']]->getId();
 			}
-			if (!isset($inputColumnSetting['columnId'])) {
+			if (!empty($columnsMap) && !isset($inputColumnSetting['columnId'])) {
 				continue;
 			}
 			$columnSettings[] = ViewColumnInformation::fromArray($inputColumnSetting);

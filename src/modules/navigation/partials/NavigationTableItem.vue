@@ -52,7 +52,7 @@
 			<!-- IMPORT -->
 			<NcActionButton v-if="canCreateRowInElement(table)" :close-after-click="true"
 				@click="actionShowImport(table)">
-				{{ t('tables', 'Import') }}
+				{{ t('tables', 'Import rows') }}
 				<template #icon>
 					<Import :size="20" />
 				</template>

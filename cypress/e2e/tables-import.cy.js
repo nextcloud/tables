@@ -22,7 +22,7 @@ describe('Import csv', () => {
 
 	it('Import small csv from Files', () => {
 		cy.loadTable('Welcome to Nextcloud Tables!')
-		cy.clickOnTableThreeDotMenu('Import')
+		cy.clickOnTableThreeDotMenu('Import rows')
 		cy.get('.modal__content button').contains('Select from Files').click()
 		cy.get('.file-picker__files').contains('test-import-small').click()
 		cy.get('.file-picker button span').contains('Import').click()
@@ -46,7 +46,7 @@ describe('Import csv', () => {
 
 	it('Import large csv from Files', () => {
 		cy.loadTable('Welcome to Nextcloud Tables!')
-		cy.clickOnTableThreeDotMenu('Import')
+		cy.clickOnTableThreeDotMenu('Import rows')
 		cy.get('.modal__content button').contains('Select from Files').click()
 		cy.get('.file-picker__files').contains('test-import-large').click()
 		cy.get('.file-picker button span').contains('Import').click()
@@ -64,7 +64,7 @@ describe('Import csv', () => {
 
 	it('Import small csv from device', () => {
 		cy.loadTable('Welcome to Nextcloud Tables!')
-		cy.clickOnTableThreeDotMenu('Import')
+		cy.clickOnTableThreeDotMenu('Import rows')
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-small.csv', { force: true })
 
@@ -86,7 +86,7 @@ describe('Import csv', () => {
 
 	it('Import large csv from device', () => {
 		cy.loadTable('Welcome to Nextcloud Tables!')
-		cy.clickOnTableThreeDotMenu('Import')
+		cy.clickOnTableThreeDotMenu('Import rows')
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-large.csv', { force: true })
 
@@ -115,7 +115,7 @@ describe('Import csv', () => {
 			cy.writeFile('cypress/fixtures/test-import-update.csv', csv.map(row => row.join(',')).join('\n'))
 		})
 
-		cy.clickOnTableThreeDotMenu('Import')
+		cy.clickOnTableThreeDotMenu('Import rows')
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-update.csv', { force: true })
 
@@ -146,7 +146,7 @@ describe('Import csv', () => {
 		cy.writeFile('cypress/fixtures/test-import-with-extra.csv', csv.map(row => row.join(',')).join('\n'))
 
 		cy.loadTable('Welcome to Nextcloud Tables!')
-		cy.clickOnTableThreeDotMenu('Import')
+		cy.clickOnTableThreeDotMenu('Import rows')
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-with-extra.csv', { force: true })
 

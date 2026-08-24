@@ -125,6 +125,7 @@
 						</NcActionButton>
 						<NcActionButton v-if="canManageTable(table)"
 							:close-after-click="true"
+							data-cy="dataTableImportSchemeBtn"
 							@click="$emit('import-scheme', table)">
 							<template #icon>
 								<Import :size="20" decorative title="Import scheme" />
@@ -139,7 +140,7 @@
 							<template #icon>
 								<Import :size="20" decorative title="Import" />
 							</template>
-							{{ t('tables', 'Import') }}
+							{{ t('tables', 'Import rows') }}
 						</NcActionButton>
 						<NcActionButton v-if="canReadData(table)"
 							:close-after-click="true"
