@@ -214,10 +214,13 @@ export default {
 		},
 	},
 	watch: {
-		activeView() {
-			if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
-				this.isParentOfActiveView = true
-			}
+		activeView: {
+			immediate: true,
+			handler() {
+				if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
+					this.isParentOfActiveView = true
+				}
+			},
 		},
 		filterString() {
 			if (!this.isParentOfActiveView && this.filterString && !this.table.title.toLowerCase().includes(this.filterString.toLowerCase())) {
