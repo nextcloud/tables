@@ -83,7 +83,6 @@ class PublicRowOCSController extends AOCSController {
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $share->getNodeType(),
 				nodeId: $share->getNodeId(),
-				userId: '',
 				limit: $limit,
 				offset: $offset,
 				filter: $filter,
@@ -139,7 +138,6 @@ class PublicRowOCSController extends AOCSController {
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $share->getNodeType(),
 				nodeId: $share->getNodeId(),
-				userId: '',
 				filter: $filter,
 				sort: $sort,
 				search: $search,
@@ -191,7 +189,6 @@ class PublicRowOCSController extends AOCSController {
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $share->getNodeType(),
 				nodeId: $share->getNodeId(),
-				userId: '',
 				filter: $filter,
 				sort: $sort,
 				search: $search,

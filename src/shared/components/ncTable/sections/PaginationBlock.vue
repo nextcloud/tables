@@ -5,6 +5,12 @@
 <template>
 	<div class="pagination-block">
 		<div class="pagination-items">
+			<NcButton v-if="canReadRows" :aria-label="t('tables', 'Reload rows')" type="tertiary" @click="onReload">
+				<template #icon>
+					<NcLoadingIcon v-if="rowsLoading" :size="20" />
+					<Refresh v-else :size="20" />
+				</template>
+			</NcButton>
 			<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" :aria-label="t('tables', 'Go to first page')" @click="pageNumber = 1">
 				<template #icon>
 					<PageFirstIcon :size="20" />
@@ -50,7 +56,8 @@ import PageLastIcon from 'vue-material-design-icons/PageLast.vue'
 import PageFirstIcon from 'vue-material-design-icons/PageFirst.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
-import { NcButton, NcSelect, NcTextField } from '@nextcloud/vue'
+import Refresh from 'vue-material-design-icons/Refresh.vue'
+import { NcButton, NcLoadingIcon, NcSelect, NcTextField } from '@nextcloud/vue'
 import { translate as t } from '@nextcloud/l10n'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 
@@ -59,12 +66,14 @@ export default {
 
 	components: {
 		NcButton,
+		NcLoadingIcon,
 		PageLastIcon,
 		PageFirstIcon,
 		ChevronLeftIcon,
 		ChevronRightIcon,
 		NcSelect,
 		NcTextField,
+		Refresh,
 	},
 
 	props: {
@@ -72,12 +81,17 @@ export default {
 			type: Number,
 			default: null,
 		},
+		canReadRows: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	data() {
 		return {
 			pageNumber: 1,
 			rowsPerPage: 100,
+			rowsLoading: false,
 		}
 	},
 
@@ -101,14 +115,22 @@ export default {
 
 	mounted() {
 		subscribe('tables:pagination-changed', this.handlePaginationChanged)
+		subscribe('tables:rows-loading', this.setRowsLoading)
 	},
 
 	beforeUnmount() {
 		unsubscribe('tables:pagination-changed', this.handlePaginationChanged)
+		unsubscribe('tables:rows-loading', this.setRowsLoading)
 	},
 
 	methods: {
 		t,
+		onReload() {
+			emit('tables:reload')
+		},
+		setRowsLoading(loading) {
+			this.rowsLoading = loading
+		},
 		handlePaginationChanged({ pageNumber, rowsPerPage }) {
 			this.pageNumber = pageNumber
 			if (rowsPerPage) {

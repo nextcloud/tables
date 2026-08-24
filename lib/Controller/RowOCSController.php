@@ -147,7 +147,6 @@ class RowOCSController extends AOCSController {
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $nodeCollection,
 				nodeId: $nodeId,
-				userId: $this->userId,
 				limit: $limit,
 				offset: $offset,
 				filter: $filter,
@@ -155,6 +154,7 @@ class RowOCSController extends AOCSController {
 				search: $search,
 				rowIds: $rowIds,
 				normalizePagination: true,
+				userId: $this->userId,
 			);
 
 			$rows = $this->rowService->findAllByQuery($queryData);
@@ -196,10 +196,10 @@ class RowOCSController extends AOCSController {
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $nodeCollection,
 				nodeId: $nodeId,
-				userId: $this->userId,
 				filter: $filter,
 				sort: $sort,
 				search: $search,
+				userId: $this->userId,
 			);
 
 			$count = $this->rowService->countByQuery($queryData);
@@ -242,11 +242,11 @@ class RowOCSController extends AOCSController {
 			$queryData = RowQuery::buildFromInput(
 				nodeType: $nodeCollection,
 				nodeId: $nodeId,
-				userId: $this->userId,
 				filter: $filter,
 				sort: $sort,
 				search: $search,
 				rowIds: $rowIds,
+				userId: $this->userId,
 			);
 
 			$csv = $this->rowService->exportCsv($queryData);
