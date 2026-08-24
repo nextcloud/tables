@@ -250,6 +250,7 @@ export default {
 					elementId: this.richObject.id,
 					rows: this.richObject.rows,
 				})
+				return
 			}
  
 			try {
