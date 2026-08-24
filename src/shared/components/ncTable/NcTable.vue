@@ -122,7 +122,7 @@ export default {
 		},
 		totalRows: {
 			type: Number,
-			default: null,
+			default: 0,
 		},
 		columns: {
 			type: Array,

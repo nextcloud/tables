@@ -246,7 +246,7 @@ export default {
 				// Since we show one page at a time, no need keep other tables in the store
 				this.clearState()
 
-				if (this.applyUrlStateOnReload) {
+				if (this.applyUrlStateOnReload || isLastElementSameAndView) {
 					this.applyUrlStateOnReload = false
 					this.applyUrlState()
 				} else {
