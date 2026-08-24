@@ -147,7 +147,7 @@ function formatFilterValue(value: SchemeFilter['value']) {
 
 function prepareSchemeForImport(scheme: TableScheme, title: string) {
 	scheme.title = title
-	scheme.uuid = "01a0335f-1225-7514-b388-94ec806d3887"
+	scheme.uuid = '01a0335f-1225-7514-b388-94ec806d3887'
 
 	const importedView = scheme.views[0]
 	expect(importedView).toBeTruthy()
