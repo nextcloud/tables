@@ -601,15 +601,16 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function importTable(array $table, string $userId): Table {
+		$now = (new DateTime())->format('Y-m-d H:i:s');
 		$item = new Table();
 		$item->setUuid((isset($table['uuid']) && Uuid::isValid($table['uuid'])) ? $table['uuid'] : null);
 		$item->setTitle($table['title']);
 		$item->setEmoji($table['emoji']);
 		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
-		$item->setCreatedAt($table['createdAt']);
+		$item->setCreatedAt($table['createdAt'] ?? $now);
 		$item->setLastEditBy($userId);
-		$item->setLastEditAt($table['lastEditAt']);
+		$item->setLastEditAt($table['lastEditAt'] ?? $now);
 		$item->setArchived((bool)$table['archived']);
 		$item->setDescription($table['description']);
 		try {
@@ -632,13 +633,15 @@ class TableService extends SuperService {
 	 * @throws PermissionError
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
+	 * @throws BadRequestError
 	 */
 	public function compareTableSchemeChanges(int $id, array $updateScheme): array {
 		$table = $this->find($id);
+		$this->validateTableScheme($updateScheme);
 		$structureService = \OCP\Server::get(StructureService::class);
 		$structureService->resolveChangesForTable($id, $updateScheme);
 
-		return [
+		$compareData = [
 			'title' => [
 				'from' => $table->getTitle(),
 				'to' => $updateScheme['title'] ?? $table->getTitle(),
@@ -664,6 +667,20 @@ class TableService extends SuperService {
 			'columnOrderChanges' => $structureService->columnOrderChanges(),
 			'sortChanges' => $structureService->sortChanges(),
 		];
+
+		$compareData['hasChanges'] = !empty($compareData['columns']['addColumns'])
+			|| !empty($compareData['columns']['removeColumns'])
+			|| !empty($compareData['columns']['modifyColumns'])
+			|| !empty($compareData['views']['addViews'])
+			|| !empty($compareData['views']['removeViews'])
+			|| !empty($compareData['views']['modifyViews'])
+			|| !empty($compareData['columnOrderChanges'])
+			|| !empty($compareData['sortChanges'])
+			|| $compareData['title']['from'] !== $compareData['title']['to']
+			|| $compareData['emoji']['from'] !== $compareData['emoji']['to']
+			|| $compareData['description']['from'] !== $compareData['description']['to'];
+
+		return $compareData;
 	}
 
 	/**
@@ -710,6 +727,10 @@ class TableService extends SuperService {
 
 		// Remove columns
 		foreach ($columns['removeColumns'] as $columnData) {
+			$removeColumn = $this->columnService->find($columnData['id'], $userId);
+			if ($removeColumn->getTableId() !== $tableId) {
+				throw new BadRequestError('Column with id ' . $columnData['id'] . ' does not belong to table with id ' . $tableId);
+			}
 			$this->columnService->delete($columnData['id']);
 		}
 
@@ -717,6 +738,10 @@ class TableService extends SuperService {
 		foreach ($columns['modifyColumns'] as $columnData) {
 			$fromColumn = $columnData['from'];
 			$toColumn = $columnData['to'];
+			$updateColumn = $this->columnService->find($fromColumn['id'], $userId);
+			if ($updateColumn->getTableId() !== $tableId) {
+				throw new BadRequestError('Column with id ' . $fromColumn['id'] . ' does not belong to table with id ' . $tableId);
+			}
 			$this->columnService->update($fromColumn['id'], $userId, ColumnDto::createFromArray($toColumn));
 		}
 
@@ -759,9 +784,33 @@ class TableService extends SuperService {
 
 		// Remove views
 		foreach ($views['removeViews'] as $viewData) {
+			$removeView = $this->viewService->find($viewData['id'], userId: $userId);
+			if ($removeView->getTableId() !== $tableId) {
+				throw new BadRequestError('View with id ' . $viewData['id'] . ' does not belong to table with id ' . $tableId);
+			}
 			$this->viewService->delete($viewData['id']);
 		}
 
 		return $table;
+	}
+
+	/**
+	 * @param array $tableScheme
+	 * @return void
+	 * @throws BadRequestError
+	 */
+	public function validateTableScheme(array $tableScheme): void {
+		if (!isset($tableScheme['columns']) || !is_array($tableScheme['columns'])) {
+			throw new BadRequestError('Table scheme must include a valid columns array.');
+		}
+		if (!isset($tableScheme['views']) || !is_array($tableScheme['views'])) {
+			throw new BadRequestError('Table scheme must include a valid views array.');
+		}
+		if (!isset($tableScheme['columnOrder']) || !is_array($tableScheme['columnOrder'])) {
+			throw new BadRequestError('Table scheme must include a valid columnOrder array.');
+		}
+		if (!isset($tableScheme['sort']) || !is_array($tableScheme['sort'])) {
+			throw new BadRequestError('Table scheme must include a valid sort array.');
+		}
 	}
 }

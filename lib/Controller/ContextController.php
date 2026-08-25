@@ -331,11 +331,12 @@ class ContextController extends AOCSController {
 	 * @param int $contextId ID of the context
 	 * @psalm-param TablesContext $updateScheme New scheme of the context
 	 *
-	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * @CanManageContext
 	 *
 	 * 200: returning the changes that would be applied to the context scheme
+	 * 400: Bad request
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -347,8 +348,9 @@ class ContextController extends AOCSController {
 			return new DataResponse($changes);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
 		} catch (PermissionError $e) {
-			$this->db->rollBack();
 			return $this->handlePermissionError($e);
 		} catch (Exception|InternalError|\Throwable $e) {
 			return $this->handleError($e);

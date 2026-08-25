@@ -25,7 +25,10 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
+use OCA\Tables\Model\FilterSet;
+use OCA\Tables\Model\SortRuleSet;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -670,7 +673,7 @@ class ContextService {
 		$tables = [];
 
 		foreach ($nodes as &$node) {
-			if ($node['node_type'] === Application::NODE_TYPE_TABLE && !isset($tables[$node['node_id']])) {
+			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
 				try {
 					$table = $tableService->find($node['node_id']);
 					$tableScheme = $tableService->getScheme($node['node_id'], $userId)->jsonSerialize();
@@ -718,6 +721,7 @@ class ContextService {
 	 * @throws PermissionError
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
+	 * @throws BadRequestError
 	 */
 	public function compareSchemeChanges(int $contextId, array $updateScheme, string $userId): array {
 		$context = $this->contextMapper->findById($contextId);
@@ -749,20 +753,24 @@ class ContextService {
 			$tablesMap[$table->getUuid()] = $table;
 		}
 
+		$updateSchemeTables = $updateScheme['tables'] ?? [];
+		$changes['addTables'] = [];
+		$changes['modifyTables'] = [];
+
 		// Detect new tables
-		foreach ($updateScheme['tables'] as $table) {
+		foreach ($updateSchemeTables as $table) {
 			if (!isset($tablesMap[$table['uuid']])) {
 				$changes['addTables'][] = $table;
 			}
 		}
 
 		// Detect modify tables
-		foreach ($updateScheme['tables'] as $tableUpdateScheme) {
+		foreach ($updateSchemeTables as $tableUpdateScheme) {
 			if (isset($tablesMap[$tableUpdateScheme['uuid']])) {
 				$tableLocalId = $tablesMap[$tableUpdateScheme['uuid']]->getId();
-				$tableLocalScheme = $tableService->getScheme($tableLocalId, $userId)->jsonSerialize();
-				if (json_encode($tableLocalScheme) !== json_encode($tableUpdateScheme)) {
-					$changes['modifyTables'][$tableUpdateScheme['uuid']] = $tableService->compareTableSchemeChanges($tableLocalId, $tableUpdateScheme);
+				$tableChanges = $tableService->compareTableSchemeChanges($tableLocalId, $tableUpdateScheme);
+				if ($tableChanges['hasChanges']) {
+					$changes['modifyTables'][$tableUpdateScheme['uuid']] = $tableChanges;
 				}
 			}
 		}
@@ -770,6 +778,27 @@ class ContextService {
 		return $changes;
 	}
 
+	/**
+	 * @param int $contextId
+	 * @param string $name
+	 * @param string $iconName
+	 * @param string $description
+	 * @param array $nodes
+	 * @param array $tables
+	 * @param string $userId
+	 *
+	 * @return Context
+	 *
+	 * @throws BadRequestError
+	 * @throws ContainerExceptionInterface
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws NotFoundExceptionInterface
+	 * @throws PermissionError
+	 */
 	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId): Context {
 		// Validate the structure of the columns and views arrays
 		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
@@ -782,16 +811,29 @@ class ContextService {
 		$columnService = \OCP\Server::get(ColumnService::class);
 
 		foreach ($tables['addTables'] as $tableScheme) {
+			$tableService->validateTableScheme($tableScheme);
 			$table = $tableService->importTable($tableScheme, $userId);
-			foreach ($tableScheme['views'] as $viewData) {
-				$viewService->importView($table->getId(), $viewData, $userId);
-			}
 			foreach ($tableScheme['columns'] as $columnData) {
 				$columnService->importColumn($table, $columnData);
+			}
+			$newColumns = $columnService->findAllByTable($table->getId(), $userId, $table);
+			$columnsMap = [];
+			foreach ($newColumns as $column) {
+				$columnsMap[$column->getUuid()] = $column;
+			}
+			foreach ($tableScheme['views'] as $viewData) {
+				$viewData['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($viewData['columnSettings'], $columnsMap)->jsonSerialize();
+				$viewData['sort'] = SortRuleSet::createFromInputArray($viewData['sort'], $columnsMap)->jsonSerialize();
+				$viewData['filter'] = FilterSet::createFromInputArray($viewData['filter'], $columnsMap)->jsonSerialize();
+				$viewService->importView($table->getId(), $viewData, $userId);
 			}
 		}
 
 		foreach ($tables['modifyTables'] as $tableScheme) {
+			if (!isset($tableScheme['uuid'])) {
+				throw new BadRequestError('Table scheme must include a UUID for modification.');
+			}
+			$tableService->validateTableScheme($tableScheme);
 			$table = $this->tableMapper->findByUuid($tableScheme['uuid']);
 			$tableService->updateTableStructure($table->getId(), $tableScheme['columns'], $tableScheme['views'], $tableScheme['columnOrder'], $tableScheme['sort'], $userId);
 		}

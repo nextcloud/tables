@@ -28,7 +28,7 @@ class ContextScheme implements JsonSerializable {
 	}
 
 	public function getName(): ?string {
-		return $this->name | '';
+		return $this->name ?? '';
 	}
 
 	public function getIcon(): ?string {

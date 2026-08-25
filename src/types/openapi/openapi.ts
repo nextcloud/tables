@@ -5313,6 +5313,22 @@ export interface operations {
                     };
                 };
             };
+            /** @description Invalid request data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -7331,6 +7347,22 @@ export interface operations {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: {
                                 readonly [key: string]: Record<string, never>;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Bad request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
                             };
                         };
                     };

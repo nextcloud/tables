@@ -32,7 +32,7 @@ class FilterSet implements JsonSerializable {
 		$filterGroups = [];
 		foreach ($data as $inputFilterGroup) {
 			foreach ($inputFilterGroup as $j => $item) {
-				if (isset($columnsMap[$item['columnUuid']]) && $columnsMap[$item['columnUuid']] instanceof Column) {
+				if (isset($item['columnUuid']) && isset($columnsMap[$item['columnUuid']]) && $columnsMap[$item['columnUuid']] instanceof Column) {
 					$inputFilterGroup[$j]['columnId'] = $columnsMap[$item['columnUuid']]->getId();
 				}
 				if (!isset($inputFilterGroup[$j]['columnId']) && !empty($columnsMap)) {

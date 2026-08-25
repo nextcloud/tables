@@ -261,7 +261,7 @@ export default {
 				} else {
 					console.debug('error while importing', res)
 					this.importFailed = true
-					this.errorMessage = t('tables', res.data?.message || 'Could not import scheme due to unknown errors.')
+					this.errorMessage = t('tables', 'Could not import scheme due to unknown errors.')
 				}
 			} catch (e) {
 				this.importFailed = true

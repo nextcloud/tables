@@ -298,9 +298,10 @@ class ApiTablesController extends AOCSController {
 	 *
 	 * @param int $id identifier of the table
 	 * @psalm-param TablesTable $updateScheme the new schema of the table
-	 * @return DataResponse<Http::STATUS_OK, array{addedColumns: list<TablesColumn>, removedColumns: list<TablesColumn>, modifiedColumns: list<TablesColumn>}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, array{addedColumns: list<TablesColumn>, removedColumns: list<TablesColumn>, modifiedColumns: list<TablesColumn>}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: Changes preview returned
+	 * 400: Invalid request data
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -312,6 +313,8 @@ class ApiTablesController extends AOCSController {
 			return new DataResponse($changes);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError|Exception|\Throwable $e) {
@@ -368,7 +371,7 @@ class ApiTablesController extends AOCSController {
 				return $this->handleError($re);
 			}
 			return $this->handleBadRequestError($e);
-		} catch (InternalError|Exception $e) {
+		} catch (InternalError|Exception|\Throwable $e) {
 			try {
 				$this->db->rollBack();
 			} catch (\OCP\DB\Exception $e) {
