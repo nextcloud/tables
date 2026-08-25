@@ -66,9 +66,6 @@ class SelectionOption implements \JsonSerializable {
 	 * Generate a UUID when creating an option for the first time, existing ones are not replaced
 	 */
 	public function generateUuid(): void {
-		if ($this->uuid() !== null) {
-			return;
-		}
 		$this->setUuid(Uuid::v7()->toRfc4122());
 	}
 
