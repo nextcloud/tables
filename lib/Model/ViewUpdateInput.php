@@ -68,8 +68,9 @@ class ViewUpdateInput {
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 * } $data
+	 * @param array $columnsMap
 	 */
-	public static function fromInputArray(array $data): self {
+	public static function fromInputArray(array $data, array $columnsMap = []): self {
 		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort']);
 
 		if (isset($data['columns']) && !isset($data['columnSettings'])) {
@@ -90,9 +91,9 @@ class ViewUpdateInput {
 			technicalName: $data['technicalName'] ?? null,
 			description: $data['description'] ?? null,
 			emoji: ($data['emoji'] ?? null) ? new Emoji($data['emoji']) : null,
-			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings']) : null,
-			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter']) : null,
-			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort']) : null,
+			columnSettings: isset($data['columnSettings']) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings'], $columnsMap) : null,
+			filterSet: isset($data['filter']) ? FilterSet::createFromInputArray($data['filter'], $columnsMap) : null,
+			sortRuleSet: isset($data['sort']) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
 		);
 	}
 

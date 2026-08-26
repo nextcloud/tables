@@ -13,6 +13,7 @@ export class AbstractColumn {
 		this.createdAt = data.createdAt
 		this.createdBy = data.createdBy
 		this.id = data.id
+		this.uuid = data.uuid
 		this.lastEditAt = data.lastEditAt
 		this.lastEditBy = data.lastEditBy
 		this.mandatory = data.mandatory

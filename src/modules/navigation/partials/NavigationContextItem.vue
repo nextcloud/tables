@@ -1,6 +1,6 @@
 <!--
-  - SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
-  - SPDX-License-Identifier: AGPL-3.0-or-later
+	- SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+	- SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
 	<NcAppNavigationItem v-if="context" data-cy="navigationContextItem" :name="context.name"
@@ -21,6 +21,20 @@
 					<PlaylistEdit :size="20" />
 				</template>
 				{{ t('tables', 'Edit application') }}
+			</NcActionButton>
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextExportSchemeBtn"
+				@click="importContextScheme">
+				<template #icon>
+					<Import :size="20" />
+				</template>
+				{{ t('tables', 'Import scheme') }}
+			</NcActionButton>
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextExportSchemeBtn"
+				@click="exportContextScheme">
+				<template #icon>
+					<TrayArrowDown :size="20" />
+				</template>
+				{{ t('tables', 'Export scheme') }}
 			</NcActionButton>
 			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="transferContext">
 				<template #icon>
@@ -50,16 +64,21 @@ import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import FileSwapOutline from 'vue-material-design-icons/FileSwapOutline.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
+import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.ts'
 import rebuildNavigation from '../../../service/rebuild-navigation.js'
 import { useTablesStore } from '../../../store/store.js'
+import axios from '@nextcloud/axios'
+import { generateOcsUrl } from '@nextcloud/router'
+import Import from 'vue-material-design-icons/Import.vue'
 
 export default {
 	name: 'NavigationContextItem',
 
 	components: {
+		Import,
 		PlaylistEdit,
 		FileSwapOutline,
 		TableIcon,
@@ -68,6 +87,7 @@ export default {
 		NcAppNavigationItem,
 		NcActionButton,
 		NcActionCheckbox,
+		TrayArrowDown,
 	},
 
 	mixins: [permissionsMixin, svgHelper],
@@ -103,6 +123,24 @@ export default {
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
+		},
+		async importContextScheme() {
+			emit('tables:context:import-scheme', this.context.id)
+		},
+		async exportContextScheme() {
+			try {
+				const response = await axios.get(generateOcsUrl('apps/tables/api/2/contexts/' + this.context.id + '/scheme/export'))
+				const blob = new Blob([JSON.stringify(response.data?.ocs?.data || '')], { type: 'application/json' })
+				const url = window.URL.createObjectURL(blob)
+				const link = document.createElement('a')
+				link.href = url
+				link.setAttribute('download', `${this.context.name}.json`)
+				document.body.appendChild(link)
+				link.click()
+				document.body.removeChild(link)
+			} catch (error) {
+				console.error('Error exporting context scheme:', error)
+			}
 		},
 		async transferContext() {
 			emit('tables:context:transfer', this.context)

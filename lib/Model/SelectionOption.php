@@ -31,7 +31,7 @@ class SelectionOption implements \JsonSerializable {
 		}
 
 		if (isset($data['uuid']) && !$allowPassingUuid) {
-			throw new \InvalidArgumentException('It is forbidden to set the Uuid from external');
+			unset($data['uuid']);
 		}
 
 		$instance = new self((int)$data['id'], $data['label']);

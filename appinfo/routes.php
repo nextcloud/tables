@@ -136,6 +136,8 @@ return [
 		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
 		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],
 		['name' => 'ApiTables#transfer', 'url' => '/api/2/tables/{id}/transfer', 'verb' => 'PUT'],
+		['name' => 'ApiTables#previewSchemeChanges', 'url' => '/api/2/tables/{id}/scheme/preview-changes', 'verb' => 'POST'],
+		['name' => 'ApiTables#importScheme', 'url' => '/api/2/tables/{id}/scheme/import', 'verb' => 'POST'],
 
 		['name' => 'ApiColumns#index', 'url' => '/api/2/columns/{nodeType}/{nodeId}', 'verb' => 'GET'],
 		['name' => 'ApiColumns#show', 'url' => '/api/2/columns/{id}', 'verb' => 'GET'],
@@ -153,6 +155,9 @@ return [
 		['name' => 'Context#create', 'url' => '/api/2/contexts', 'verb' => 'POST'],
 		['name' => 'Context#update', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'PUT'],
 		['name' => 'Context#destroy', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'DELETE'],
+		['name' => 'Context#exportScheme', 'url' => '/api/2/contexts/{contextId}/scheme/export', 'verb' => 'GET'],
+		['name' => 'Context#previewSchemeChanges', 'url' => '/api/2/contexts/{contextId}/scheme/preview-changes', 'verb' => 'POST'],
+		['name' => 'Context#importScheme', 'url' => '/api/2/contexts/{contextId}/scheme/import', 'verb' => 'POST'],
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
 

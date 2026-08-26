@@ -17,23 +17,32 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
+use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesContext from ResponseDefinitions
+ * @psalm-import-type TablesTable from ResponseDefinitions
  */
 
 class ContextController extends AOCSController {
 	private ContextService $contextService;
+	private TableService $tableService;
+	private IDBConnection $db;
+	private ColumnService $columnService;
+	private ViewService $viewService;
 
 	public function __construct(
 		IRequest $request,
@@ -41,10 +50,18 @@ class ContextController extends AOCSController {
 		IL10N $n,
 		string $userId,
 		ContextService $contextService,
+		TableService $tableService,
+		IDBConnection $db,
+		ColumnService $columnService,
+		ViewService $viewService,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->contextService = $contextService;
+		$this->tableService = $tableService;
 		$this->userId = $userId;
+		$this->columnService = $columnService;
+		$this->viewService = $viewService;
+		$this->db = $db;
 	}
 
 	/**
@@ -237,7 +254,7 @@ class ContextController extends AOCSController {
 	 * @psalm-param int<0, 0> $newOwnerType
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(Application::PERMISSION_OWNER, null, 'context', 'contextId')]
+	#[RequirePermission(permission: Application::PERMISSION_OWNER, typeParam: 'context', idParam: 'contextId')]
 	public function transfer(int $contextId, string $newOwnerId, int $newOwnerType = 0): DataResponse {
 		try {
 			return new DataResponse($this->contextService->transfer($contextId, $newOwnerId, $newOwnerType)->jsonSerialize());
@@ -280,6 +297,104 @@ class ContextController extends AOCSController {
 		}
 
 		return new DataResponse($this->contextService->updateContentOrder($pageId, $content));
+	}
+
+	/**
+	 * [api v2] Export the scheme of a context
+	 *
+	 * @param int $contextId ID of the context
+	 *
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
+	 *
+	 * @CanManageContext
+	 *
+	 * 200: returning the scheme of the context
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
+	public function exportScheme(int $contextId): DataResponse {
+		try {
+			$contextScheme = $this->contextService->getScheme($contextId, $this->userId);
+			return new DataResponse($contextScheme->jsonSerialize());
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (Exception|\Throwable $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Preview the changes that would be applied to a context scheme
+	 *
+	 * @param int $contextId ID of the context
+	 * @psalm-param TablesContext $updateScheme New scheme of the context
+	 *
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 *
+	 * @CanManageContext
+	 *
+	 * 200: returning the changes that would be applied to the context scheme
+	 * 400: Bad request
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
+	public function previewSchemeChanges(int $contextId, array $updateScheme): DataResponse {
+		try {
+			$changes = $this->contextService->compareSchemeChanges($contextId, $updateScheme, $this->userId);
+			return new DataResponse($changes);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (Exception|InternalError|\Throwable $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Import the scheme of a context
+	 *
+	 * @param int $contextId ID of the context
+	 * @param string $name Title of the context
+	 * @param string $iconName Identifier of the context icon
+	 * @param string $description Description of the context
+	 * @param list<array{node_type: int, node_uuid: string, permissions: int}> $nodes Ordered meta data of the related nodes
+	 * @psalm-param array{addTables: list<TablesTable>, modifyTables: list<TablesTable>} $tables Tables to be added or modified
+	 *
+	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 *
+	 * 200: context updated successfully
+	 * 400: Bad request
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables): DataResponse {
+		try {
+			$this->db->beginTransaction();
+			$context = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId);
+			$this->db->commit();
+			return new DataResponse($context->jsonSerialize());
+		} catch (\InvalidArgumentException $e) {
+			$this->db->rollBack();
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		} catch (Exception|MultipleObjectsReturnedException $e) {
+			$this->db->rollBack();
+			return $this->handleError($e);
+		} catch (PermissionError $e) {
+			$this->db->rollBack();
+			return $this->handlePermissionError($e);
+		} catch (DoesNotExistException $e) {
+			$this->db->rollBack();
+			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		}
 	}
 
 	protected function isValidIcon(string $iconName): bool {
