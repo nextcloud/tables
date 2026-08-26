@@ -91,9 +91,9 @@ class ViewUpdateInput {
 			technicalName: $data['technicalName'] ?? null,
 			description: $data['description'] ?? null,
 			emoji: ($data['emoji'] ?? null) ? new Emoji($data['emoji']) : null,
-			columnSettings: ($data['columnSettings'] ?? null) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings'], $columnsMap) : null,
-			filterSet: ($data['filter'] ?? null) ? FilterSet::createFromInputArray($data['filter'], $columnsMap) : null,
-			sortRuleSet: ($data['sort'] ?? null) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
+			columnSettings: isset($data['columnSettings']) ? ColumnSettings::createViewSettingsFromInputArray($data['columnSettings'], $columnsMap) : null,
+			filterSet: isset($data['filter']) ? FilterSet::createFromInputArray($data['filter'], $columnsMap) : null,
+			sortRuleSet: isset($data['sort']) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
 		);
 	}
 

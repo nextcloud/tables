@@ -269,6 +269,14 @@
 							<li>
 								{{ t('tables', 'Technical name') }}: {{ viewEntry.view.from.technicalName || '' }}
 							</li>
+							<li>
+								{{ t('tables', 'Columns') }}:
+								<ul>
+									<li v-for="(column, colIndex) in viewEntry.view.from.columnSettings" :key="colIndex">
+										{{ getColumnTitle(column) }}
+									</li>
+								</ul>
+							</li>
 						</ul>
 						<ul class="preview-card__meta--after">
 							<li class="preview-card__meta-title">
@@ -283,12 +291,20 @@
 							<li>
 								{{ t('tables', 'Technical name') }}: {{ viewEntry.view.to.technicalName || '' }}
 							</li>
+							<li>
+								{{ t('tables', 'Columns') }}:
+								<ul>
+									<li v-for="(column, colIndex) in viewEntry.view.to.columnSettings" :key="colIndex">
+										{{ getColumnTitle(column) }}
+									</li>
+								</ul>
+							</li>
 						</ul>
 					</div>
 				</div>
 			</div>
 			<div v-else class="preview-empty">
-				{{ t('tables', 'No columns to change') }}
+				{{ t('tables', 'No views to change') }}
 			</div>
 		</div>
 
@@ -382,6 +398,7 @@
 <script>
 import { translate as t } from '@nextcloud/l10n'
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { MetaColumns } from '../../shared/components/ncTable/mixins/metaColumns.js'
 
 export default {
 	name: 'ImportTableSchemePreview',
@@ -627,6 +644,15 @@ export default {
 			}
 
 			this.$emit('update', payload)
+		},
+
+		getColumnTitle(column) {
+			if (column.columnTitle) {
+				return column.columnTitle;
+			}
+
+			const metaColumn = MetaColumns.find((item) => item.id === column.columnId)
+			return metaColumn ? metaColumn.title : '';
 		},
 	},
 }

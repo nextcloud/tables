@@ -8,9 +8,11 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
 class StructureService {
 
@@ -182,32 +184,52 @@ class StructureService {
 		$this->modifiedViews = [];
 
 		$existingViewMap = $this->getViewMap($currentSchema['views']);
-		$updatedViewMap = $this->getViewMap($updateSchema['views']);
-		$columnsMap = $this->getColumnsMapById($updateSchema['columns']);
+		$existingColumnMap = $this->getColumnsMapById($currentSchema['columns']);
 
-		foreach ($updateSchema['views'] as $i => $view) {
+		$updatedViewMap = $this->getViewMap($updateSchema['views']);
+		$updateColumnsMap = $this->getColumnsMapById($updateSchema['columns']);
+
+		$currentSchema['views'] = $this->prepareViewsData($currentSchema['views'], $existingColumnMap);
+		$updateSchema['views'] = $this->prepareViewsData($updateSchema['views'], $updateColumnsMap);
+
+		$this->determineAddedViews($existingViewMap, $updatedViewMap, $updateSchema);
+		$this->determineRemovedViews($existingViewMap, $updatedViewMap, $currentSchema);
+		$this->determineModifiedViews($existingViewMap, $updatedViewMap, $currentSchema, $updateSchema);
+	}
+
+	protected function prepareViewsData(array $views, array $columnsMap): array {
+		foreach ($views as $i => $view) {
+			if ($view instanceof \OCA\Tables\Db\View) {
+				$view = $view->jsonSerialize();
+				$views[$i] = $view;
+			}
 			foreach ($view['columnSettings'] as $j => $col) {
+				if ($col instanceof ViewColumnInformation) {
+					$col = $col->jsonSerialize();
+					$views[$i]['columnSettings'][$j] = $col;
+				}
 				if (isset($columnsMap[$col['columnId']])) {
-					$updateSchema['views'][$i]['columnSettings'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+					$views[$i]['columnSettings'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+					$views[$i]['columnSettings'][$j]['columnTitle'] = $columnsMap[$col['columnId']]['title'];
+					unset($views[$i]['columnSettings'][$j]['columnId']);
 				}
 			}
 			foreach ($view['sort'] as $j => $col) {
 				if (isset($columnsMap[$col['columnId']])) {
-					$updateSchema['views'][$i]['sort'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+					$views[$i]['sort'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+					unset($views[$i]['sort'][$j]['columnId']);
 				}
 			}
 			foreach ($view['filter'] as $j => $filterGroup) {
 				foreach ($filterGroup as $k => $col) {
 					if (isset($columnsMap[$col['columnId']])) {
-						$updateSchema['views'][$i]['filter'][$j][$k]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+						$views[$i]['filter'][$j][$k]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
+						unset($views[$i]['filter'][$j][$k]['columnId']);
 					}
 				}
 			}
 		}
-
-		$this->determineAddedViews($existingViewMap, $updatedViewMap, $updateSchema);
-		$this->determineRemovedViews($existingViewMap, $updatedViewMap, $currentSchema);
-		$this->determineModifiedViews($existingViewMap, $updatedViewMap, $currentSchema, $updateSchema);
+		return $views;
 	}
 
 	protected function getViewMap(array $currentSchemaViews): array {
