@@ -21,6 +21,7 @@ export const useDataStore = defineStore('data', {
 		loading: {},
 		rows: {},
 		columns: {},
+		rowCounts: {},
 		publicToken: null,
 		relations: {},
 		relationsLoading: {},
@@ -34,6 +35,10 @@ export const useDataStore = defineStore('data', {
 		getRows: (state) => (isView, elementId) => {
 			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
 			return state.rows[stateId] ?? []
+		},
+		getRowsCount: (state) => (isView, elementId) => {
+			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
+			return state.rowCounts[stateId] ?? 0
 		},
 		getRelations: (state) => (columnId) => {
 			if (state.relations[columnId] === undefined) {
@@ -52,6 +57,7 @@ export const useDataStore = defineStore('data', {
 			this.loading = {}
 			this.columns = {}
 			this.rows = {}
+			this.rowCounts = {}
 			this.publicToken = null
 			this.relations = {}
 			this.relationsLoading = {}
@@ -233,40 +239,251 @@ export const useDataStore = defineStore('data', {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ tableId, viewId }) {
+		async loadRowsFromBE({ tableId, viewId, filter = null, sort = null, search = null, limit = null, offset = null, rowIds = null }) {
 			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
 			this.loading[stateId] = true
 			let res = null
 
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (limit !== null) {
+				params.limit = limit
+			}
+			if (offset !== null) {
+				params.offset = offset
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
 			try {
-				if (viewId) {
-					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
-				} else {
-					res = await axios.get(generateUrl('/apps/tables/row/table/' + tableId))
-				}
+				const collection = viewId ? 'views' : 'tables'
+				const nodeId = viewId ?? tableId
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/' + collection + '/' + nodeId + '/rows'), { params })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load rows.'))
 				return false
 			}
 
-			this.rows[stateId] = res.data
+			if (!res?.data?.ocs?.data || !Array.isArray(res.data.ocs.data)) {
+				const e = new Error('Expected array, but is not')
+				displayError(e, 'Format for loaded rows not valid.')
+				return false
+			}
+
+			this.rows[stateId] = res.data.ocs.data
 			this.loading[stateId] = false
 			return true
 		},
 
-		async loadPublicRowsFromBE({ token }) {
+		async loadRowsCountFromBE({ tableId, viewId, filter = null, sort = null, search = null, rowIds = null }) {
+			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
+			let res = null
+
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
+			try {
+				const collection = viewId ? 'views' : 'tables'
+				const nodeId = viewId ?? tableId
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/' + collection + '/' + nodeId + '/rows/count'), { params })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load row count.'))
+				return false
+			}
+
+			if (!res?.data?.ocs?.data || typeof res.data.ocs.data.count !== 'number') {
+				const e = new Error('Expected count, but is not')
+				displayError(e, 'Format for loaded row count not valid.')
+				return false
+			}
+
+			this.rowCounts[stateId] = res.data.ocs.data.count
+			return true
+		},
+
+		async loadRowsForExportFromBE({ tableId, viewId, filter = null, sort = null, search = null, rowIds = null }) {
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
+			let res = null
+			try {
+				const collection = viewId ? 'views' : 'tables'
+				const nodeId = viewId ?? tableId
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/' + collection + '/' + nodeId + '/rows/export'), { params, responseType: 'text' })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load rows for export.'))
+				return false
+			}
+
+			if (typeof res?.data !== 'string') {
+				const e = new Error('Expected CSV text, but is not')
+				displayError(e, 'Format for exported rows not valid.')
+				return false
+			}
+
+			return res.data
+		},
+
+		async loadPublicRowsForExportFromBE({ token, filter = null, sort = null, search = null, rowIds = null }) {
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
+			let res = null
+			try {
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows/export'), { params, responseType: 'text' })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load public rows for export.'))
+				return false
+			}
+
+			if (typeof res?.data !== 'string') {
+				const e = new Error('Expected CSV text, but is not')
+				displayError(e, 'Format for exported public rows not valid.')
+				return false
+			}
+
+			return res.data
+		},
+
+		async loadPublicRowsFromBE({ token, filter = null, sort = null, search = null, limit = null, offset = null, rowIds = null }) {
 			const stateId = 'public-' + token
 			this.loading[stateId] = true
 			let res
 
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (limit !== null) {
+				params.limit = limit
+			}
+			if (offset !== null) {
+				params.offset = offset
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
 			try {
-				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows'))
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows'), { params })
 			} catch (e) {
 				return false
 			}
 
 			this.rows[stateId] = res.data.ocs.data
 			this.loading[stateId] = false
+			return true
+		},
+
+		async loadPublicRowsCountFromBE({ token, filter = null, sort = null, search = null, rowIds = null }) {
+			const stateId = 'public-' + token
+			let res = null
+
+			const params = {}
+			if (filter && filter.length > 0) {
+				const backendFilter = [filter.map(rule => ({
+					columnId: rule.columnId,
+					operator: rule.operator?.id ?? rule.operator,
+					value: rule.value,
+				}))]
+				params.filter = JSON.stringify(backendFilter)
+			}
+			if (search) {
+				params.search = search
+			}
+			if (sort && sort.length > 0) {
+				params.sort = JSON.stringify(sort)
+			}
+			if (rowIds && rowIds.length > 0) {
+				params.rowIds = JSON.stringify(rowIds)
+			}
+
+			try {
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows/count'), { params })
+			} catch (e) {
+				return false
+			}
+
+			if (!res?.data?.ocs?.data || typeof res.data.ocs.data.count !== 'number') {
+				const e = new Error('Expected count, but is not')
+				displayError(e, 'Format for loaded row count not valid.')
+				return false
+			}
+
+			this.rowCounts[stateId] = res.data.ocs.data.count
 			return true
 		},
 

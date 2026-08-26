@@ -20,6 +20,19 @@ export const ColumnTypes = {
 	Relation: 'relation',
 }
 
+export const BACKEND_SORTABLE_TYPES = new Set([
+	ColumnTypes.TextLine,
+	ColumnTypes.TextLink,
+	ColumnTypes.Selection,
+	ColumnTypes.SelectionMulti,
+	ColumnTypes.Number,
+	ColumnTypes.NumberStars,
+	ColumnTypes.NumberProgress,
+	ColumnTypes.DatetimeDate,
+	ColumnTypes.DatetimeTime,
+	ColumnTypes.Datetime,
+])
+
 export function getColumnWidthStyle(column) {
 	const width = column.customSettings?.width ? `min(${column.customSettings.width}px, 90vw)` : null
 

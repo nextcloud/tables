@@ -17,31 +17,4 @@ export default class UsergroupColumn extends AbstractUsergroupColumn {
 		this.usergroupSelectTeams = data.usergroupSelectTeams
 	}
 
-	getValueString(valueObject) {
-		valueObject = valueObject || this.value || null
-
-		const valueObjects = this.getObjects(valueObject.value)
-		let ret = ''
-		valueObjects?.forEach(obj => {
-			if (ret === '') {
-				ret = obj.id
-			} else {
-				ret += ', ' + obj.id
-			}
-		})
-		return ret
-	}
-
-	getObjects(values) {
-		const objects = []
-		values?.forEach(item => {
-			objects.push(item)
-		})
-		return objects
-	}
-
-	isSearchStringFound(cell, searchString) {
-		return super.isSearchStringFound(this.getValueString(cell), cell, searchString)
-	}
-
 }

@@ -8,8 +8,7 @@
 		<TableDescription :description="element.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="element" />
-			<TableView v-else :rows="rows" :columns="columns" :element="element"
-				:can-read-rows="element.onSharePermissions.read"
+			<TableView v-else :rows="rows" :columns="columns" :element="element" :rows-count="rowsCount" :view-setting="localViewSetting" :can-read-rows="element.onSharePermissions.read"
 				:can-create-rows="element.onSharePermissions.create"
 				:can-edit-rows="element.onSharePermissions.update"
 				:can-delete-rows="element.onSharePermissions.delete"
@@ -18,6 +17,7 @@
 				:can-delete-columns="false"
 				:can-delete-table="false"
 				:is-form-mode="isFormMode"
+				@update:view-setting="onViewSettingUpdate"
 				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)">
 				<template #actions="{ isFiltered, onExportFiltered }">
 					<NcActions :force-menu="true" type="tertiary">
@@ -106,11 +106,20 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+		rowsCount: {
+			type: Number,
+			default: null,
+		},
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
 	},
 
 	emits: [
 		'download-csv',
 		'download-filtered-csv',
+		'update:viewSetting',
 	],
 	data() {
 		return {
@@ -118,12 +127,19 @@ export default {
 			prefillData: null,
 			editRow: null,
 			rowsToDelete: null,
+			localViewSetting: this.viewSetting,
 		}
 	},
 
 	computed: {
 		isFormMode() {
 			return this.element.onSharePermissions.create && !this.element.onSharePermissions.read
+		},
+	},
+
+	watch: {
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
 		},
 	},
 
@@ -152,6 +168,10 @@ export default {
 
 	methods: {
 		t,
+		onViewSettingUpdate(viewSetting) {
+			this.localViewSetting = viewSetting
+			this.$emit('update:viewSetting', viewSetting)
+		},
 	},
 }
 </script>

@@ -132,7 +132,7 @@ class Row2Mapper {
 	 * @return int[]
 	 * @throws InternalError
 	 */
-	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null): array {
+	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null, ?array $showColumnIds = null, ?string $search = null, ?array $rowIds = null): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('sleeves.id')
@@ -141,6 +141,14 @@ class Row2Mapper {
 
 		if ($filter) {
 			$this->addFilterToQuery($qb, $filter, $userId);
+		}
+
+		if ($search !== null && $search !== '' && $showColumnIds) {
+			$this->addSearchToQuery($qb, $search, $showColumnIds);
+		}
+
+		if ($rowIds !== null && $rowIds !== []) {
+			$qb->andWhere($qb->expr()->in('sleeves.id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY)));
 		}
 
 		$this->addSortQueryForMultipleSleeveFinder($qb, 'sleeves', $sort);
@@ -161,7 +169,7 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
-		return array_map(fn (array $item) => $item['id'], $result->fetchAll());
+		return array_map(static fn (array $item) => $item['id'], $result->fetchAll());
 	}
 
 	/**
@@ -172,20 +180,44 @@ class Row2Mapper {
 	 * @param array|null $filter
 	 * @param array|null $sort
 	 * @param string|null $userId
+	 * @param string|null $search
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
+	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null, ?string $search = null, ?array $rowIds = null): array {
 		try {
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
-			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
+			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, $limit, $offset, $showColumnIds, $search, $rowIds);
 
 			// Get rows without SQL sorting
 			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
 
 			// Sort rows in PHP to preserve the order from getWantedRowIds
 			return $this->sortRowsByIds($rows, $wantedRowIdsArray);
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int[] $showColumnIds
+	 * @param int $tableId
+	 * @param array|null $filter
+	 * @param array|null $sort
+	 * @param string|null $search
+	 * @param string|null $userId
+	 * @return int
+	 * @throws InternalError
+	 */
+	public function count(array $showColumnIds, int $tableId, ?array $filter = null, ?array $sort = null, ?string $search = null, ?string $userId = null, ?array $rowIds = null): int {
+		try {
+			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
+
+			$wantedRowIdsArray = $this->getWantedRowIds($userId ?? '', $tableId, $filter, $sort, null, null, $showColumnIds, $search, $rowIds);
+
+			return count($wantedRowIdsArray);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -486,6 +518,23 @@ class Row2Mapper {
 				}
 				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
+			case 'contains-item':
+				$values = is_array($value) ? $value : [$value];
+				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+					$filterExpressions = [];
+					foreach ($values as $singleValue) {
+						$singleValue = (string)$singleValue;
+						$filterExpressions[] = $qb2->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($singleValue) . ']', IQueryBuilder::PARAM_STR));
+						$filterExpressions[] = $qb2->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($singleValue) . ',%'));
+						$filterExpressions[] = $qb2->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($singleValue) . ']%'));
+						$filterExpressions[] = $qb2->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($singleValue) . ',%'));
+					}
+					$filterExpression = $qb2->expr()->orX(...$filterExpressions);
+				} else {
+					$filterExpression = $qb2->expr()->in('value', $qb->createNamedParameter($values, IQueryBuilder::PARAM_STR_ARRAY));
+				}
+				$includeDefault = !empty(array_intersect((array)($defaultValue ?? []), $values));
+				break;
 			case 'does-not-contain':
 				if (is_array($value) && $column->getType() === Column::TYPE_USERGROUP) {
 					$filterExpressions = [];
@@ -593,7 +642,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string $value): IQueryBuilder {
+	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string|array $value): IQueryBuilder {
 		$qb2 = $this->db->getQueryBuilder();
 		$qb2->select('id');
 		$qb2->from('tables_row_sleeves');
@@ -1028,5 +1077,46 @@ class Row2Mapper {
 		}
 
 		return $sortedRows;
+	}
+
+	private function addSearchToQuery(IQueryBuilder $qb, string $search, array $showColumnIds): void {
+		$qb->andWhere(
+			$qb->expr()->in(
+				'sleeves.id',
+				$qb->createFunction($this->getSearchSubquery($qb, $search, $showColumnIds)->getSQL())
+			)
+		);
+	}
+
+	private function getSearchSubquery(IQueryBuilder $qb, string $search, array $showColumnIds): IQueryBuilder {
+		$searchParam = $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($search) . '%', IQueryBuilder::PARAM_STR, ':search');
+		$columnIdsParam = $qb->createNamedParameter($showColumnIds, IQueryBuilder::PARAM_INT_ARRAY, ':searchColumnIds');
+
+		$qbSqlForColumnTypes = null;
+		foreach ($this->columnsHelper->columns as $columnType) {
+			$innerQb = $this->db->getQueryBuilder();
+			$innerQb->select('row_id')
+				->selectAlias($innerQb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'search_value')
+				->from('tables_row_cells_' . $columnType)
+				->where($innerQb->expr()->in('column_id', $columnIdsParam));
+
+			$qbTmp = $this->db->getQueryBuilder();
+			$qbTmp->select('row_id')
+				->from($qbTmp->createFunction('(' . $innerQb->getSQL() . ')'), 't')
+				->where($qbTmp->expr()->iLike('t.search_value', $searchParam));
+
+			if ($qbSqlForColumnTypes) {
+				$qbSqlForColumnTypes .= ' UNION ALL ' . $qbTmp->getSQL() . ' ';
+			} else {
+				$qbSqlForColumnTypes = '(' . $qbTmp->getSQL();
+			}
+		}
+		$qbSqlForColumnTypes .= ')';
+
+		$searchQb = $this->db->getQueryBuilder();
+		$searchQb->select('row_id')
+			->from($qb->createFunction($qbSqlForColumnTypes), 't_search');
+
+		return $searchQb;
 	}
 }

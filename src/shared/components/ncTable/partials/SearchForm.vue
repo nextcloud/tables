@@ -45,8 +45,14 @@ export default {
 	],
 	data() {
 		return {
-			localValue: '',
+			localValue: this.searchString || '',
 		}
+	},
+
+	watch: {
+		searchString() {
+			this.localValue = this.searchString || ''
+		},
 	},
 
 	methods: {

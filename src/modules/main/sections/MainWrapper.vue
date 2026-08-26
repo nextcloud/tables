@@ -11,7 +11,9 @@
 				:view="element"
 				:columns="columns"
 				:rows="rows"
+				:rows-count="rowsCount"
 				:view-setting="viewSetting"
+				@update:viewSetting="viewSetting = $event"
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV"
@@ -22,7 +24,9 @@
 				:table="element"
 				:columns="columns"
 				:rows="rows"
+				:rows-count="rowsCount"
 				:view-setting="viewSetting"
+				@update:viewSetting="viewSetting = $event"
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV"
@@ -36,7 +40,7 @@
 <script>
 
 import { mapState, mapActions, storeToRefs } from 'pinia'
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import CustomView from './View.vue'
 import CustomTable from './Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -45,6 +49,7 @@ import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
 import { showError } from '@nextcloud/dialogs'
+import { buildUrlQuery, parseUrlQuery } from '../../../shared/utils/urlState.js'
 
 export default {
 	name: 'MainWrapper',
@@ -68,19 +73,31 @@ export default {
 	},
 	setup(props) {
 		const store = useDataStore()
-		const { getColumns, getRows } = storeToRefs(store)
+		const { getColumns, getRows, getRowsCount } = storeToRefs(store)
 		// When using storeToRefs, only the top-level state is made reactive.
 		// To make nested dynamic keys reactive, you need to use a computed property or watch for changes.
 		const rows = computed(() => getRows.value(props.isView, props.element.id))
 		const columns = computed(() => getColumns.value(props.isView, props.element.id))
-		return { rows, columns, dataStore: store }
+		const rowsCount = computed(() => getRowsCount.value(props.isView, props.element.id))
+		return { rows, columns, rowsCount, dataStore: store }
 	},
 
 	data() {
 		return {
 			localLoading: false,
+			reloadInProgress: false,
+			viewSettingInProgress: false,
 			lastActiveElement: null,
 			viewSetting: {},
+			lastViewSettingFilter: null,
+			lastViewSettingSorting: null,
+			lastViewSettingSearchString: null,
+			rowsLoading: false,
+			rowsPerPage: 100,
+			pageNumber: 1,
+			paginationOffset: 0,
+			applyUrlStateOnReload: false,
+			urlRowIds: null,
 		}
 	},
 
@@ -95,14 +112,46 @@ export default {
 		activeRowId() {
 			this.reload()
 		},
+		viewSetting: {
+			handler() {
+				const newFilter = this.viewSetting?.filter ? JSON.stringify(this.viewSetting.filter) : null
+				const newSorting = this.viewSetting?.sorting ? JSON.stringify(this.viewSetting.sorting) : null
+				const newSearchString = this.viewSetting?.searchString || null
+				if (newFilter === this.lastViewSettingFilter && newSorting === this.lastViewSettingSorting && newSearchString === this.lastViewSettingSearchString) {
+					return
+				}
+				const oldFilter = this.lastViewSettingFilter
+				const oldSorting = this.lastViewSettingSorting
+				const oldSearchString = this.lastViewSettingSearchString
+				this.lastViewSettingFilter = newFilter
+				this.lastViewSettingSorting = newSorting
+				this.lastViewSettingSearchString = newSearchString
+				this.onViewSettingChanged(oldFilter, oldSorting, oldSearchString)
+			},
+			deep: true,
+		},
+		rowsLoading() {
+			emit('tables:rows-loading', this.rowsLoading)
+		},
 	},
 
 	beforeMount() {
+		this.applyUrlStateOnReload = true
 		this.reload(true)
 	},
 
+	mounted() {
+		subscribe('tables:pagination-changed', this.onPaginationChanged)
+		subscribe('tables:reload', this.onReloadRequested)
+	},
+
+	beforeUnmount() {
+		unsubscribe('tables:pagination-changed', this.onPaginationChanged)
+		unsubscribe('tables:reload', this.onReloadRequested)
+	},
+
 	methods: {
-		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
+		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE', 'loadRowsCountFromBE', 'loadRowsForExportFromBE', 'loadRelationsFromBE']),
 		...mapActions(useTablesStore, ['validateExportAccess']),
 		createColumn() {
 			emit('tables:column:create', { isView: this.isView, element: this.element })
@@ -120,7 +169,15 @@ export default {
 				return
 			}
 
-			this.downloadCsv(this.rows, this.columns, this.element.title)
+			const viewId = this.isView ? this.element.id : null
+			const tableId = !this.isView ? this.element.id : null
+			const csv = await this.loadRowsForExportFromBE({
+				viewId,
+				tableId,
+			})
+			if (csv) {
+				this.downloadFile(csv, this.element.title + '.csv')
+			}
 		},
 		async downloadFilteredCSV(rows) {
 			const access = await this.validateExportAccess({
@@ -135,7 +192,32 @@ export default {
 				return
 			}
 
-			this.downloadCsv(rows, this.columns, this.element.title)
+			if (rows !== this.rows) {
+				const viewId = this.isView ? this.element.id : null
+				const tableId = !this.isView ? this.element.id : null
+				const csv = await this.loadRowsForExportFromBE({
+					viewId,
+					tableId,
+					rowIds: rows.map(row => row.id),
+				})
+				if (csv) {
+					this.downloadFile(csv, this.element.title + '.csv')
+				}
+				return
+			}
+
+			const viewId = this.isView ? this.element.id : null
+			const tableId = !this.isView ? this.element.id : null
+			const csv = await this.loadRowsForExportFromBE({
+				viewId,
+				tableId,
+				filter: this.viewSetting?.filter,
+				sort: this.viewSetting?.sorting,
+				search: this.viewSetting?.searchString,
+			})
+			if (csv) {
+				this.downloadFile(csv, this.element.title + '.csv')
+			}
 		},
 		toggleShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
@@ -158,14 +240,22 @@ export default {
 			const isLastElementSameAndView = this.element.id === this.lastActiveElement?.id && this.isView === this.lastActiveElement?.isView
 
 			if (!this.lastActiveElement || this.element.id !== this.lastActiveElement.id || isLastElementSameAndView || this.isView !== this.lastActiveElement.isView || force) {
+				this.reloadInProgress = true
 				this.localLoading = true
 
 				// Since we show one page at a time, no need keep other tables in the store
 				this.clearState()
 
-				this.viewSetting = {}
-				if (this.element?.sort?.length) {
-					this.viewSetting.presetSorting = [...this.element.sort]
+				if (this.applyUrlStateOnReload || isLastElementSameAndView) {
+					this.applyUrlStateOnReload = false
+					this.applyUrlState()
+				} else {
+					this.viewSetting = {}
+					if (this.element?.sort?.length) {
+						this.viewSetting.presetSorting = [...this.element.sort]
+					}
+					this.pageNumber = 1
+					this.paginationOffset = 0
 				}
 
 				await this.loadColumnsFromBE({
@@ -180,10 +270,29 @@ export default {
 				})
 
 				if (this.canReadData(this.element)) {
-					await this.loadRowsFromBE({
-						viewId: this.isView ? this.element.id : null,
-						tableId: !this.isView ? this.element.id : null,
-					})
+					this.rowsLoading = true
+					try {
+						await this.loadRowsCountFromBE({
+							viewId: this.isView ? this.element.id : null,
+							tableId: !this.isView ? this.element.id : null,
+							filter: this.viewSetting?.filter,
+							sort: this.viewSetting?.sorting,
+							search: this.viewSetting?.searchString,
+							rowIds: this.urlRowIds,
+						})
+						await this.loadRowsFromBE({
+							viewId: this.isView ? this.element.id : null,
+							tableId: !this.isView ? this.element.id : null,
+							filter: this.viewSetting?.filter,
+							sort: this.viewSetting?.sorting,
+							search: this.viewSetting?.searchString,
+							limit: this.rowsPerPage,
+							offset: this.paginationOffset,
+							rowIds: this.urlRowIds,
+						})
+					} finally {
+						this.rowsLoading = false
+					}
 				} else {
 					await this.removeRows({
 						isView: this.isView,
@@ -201,6 +310,152 @@ export default {
 					}
 				}
 				this.localLoading = false
+				this.reloadInProgress = false
+				this.$nextTick(() => {
+					emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+				})
+			}
+		},
+			applyUrlState() {
+			const { filter, sorting, searchString, pageNumber, rowsPerPage, rowIds } = parseUrlQuery(this.$route.query)
+			this.pageNumber = pageNumber
+			this.rowsPerPage = rowsPerPage
+			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+			this.urlRowIds = rowIds
+			const viewSetting = {
+				filter,
+				sorting,
+				searchString,
+			}
+			if (this.element?.sort?.length) {
+				viewSetting.presetSorting = [...this.element.sort]
+			}
+			this.lastViewSettingFilter = viewSetting?.filter ? JSON.stringify(viewSetting.filter) : null
+			this.lastViewSettingSorting = viewSetting?.sorting ? JSON.stringify(viewSetting.sorting) : null
+			this.lastViewSettingSearchString = viewSetting?.searchString || null
+			this.viewSetting = viewSetting
+		},
+
+		updateUrlFromState() {
+			const query = buildUrlQuery(this.viewSetting, this.pageNumber, this.rowsPerPage, this.urlRowIds)
+			this.$router.replace({ query }).catch(() => {})
+		},
+
+	async onViewSettingChanged(oldFilter, oldSorting, oldSearchString) {
+			if (this.reloadInProgress || this.rowsLoading || !this.element) {
+				return
+			}
+			const filterChanged = this.lastViewSettingFilter !== oldFilter
+			const sortingChanged = this.lastViewSettingSorting !== oldSorting
+			const searchStringChanged = this.lastViewSettingSearchString !== oldSearchString
+			if (!filterChanged && !sortingChanged && !searchStringChanged) {
+				return
+			}
+			this.viewSettingInProgress = filterChanged || searchStringChanged
+
+			if (!this.viewSetting?.filter?.length && !this.viewSetting?.sorting?.length && !this.viewSetting?.searchString) {
+				this.urlRowIds = null
+			}
+
+			this.rowsLoading = true
+			try {
+				const viewId = this.isView ? this.element.id : null
+				const tableId = !this.isView ? this.element.id : null
+				if (filterChanged || searchStringChanged) {
+					this.pageNumber = 1
+					this.paginationOffset = 0
+					emit('tables:pagination-changed', { pageNumber: 1, rowsPerPage: this.rowsPerPage })
+					await this.loadRowsCountFromBE({
+						viewId,
+						tableId,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						rowIds: this.urlRowIds,
+					})
+					await this.loadRowsFromBE({
+						viewId,
+						tableId,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						limit: this.rowsPerPage,
+						offset: this.paginationOffset,
+						rowIds: this.urlRowIds,
+					})
+				} else if (sortingChanged) {
+					this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+					await this.loadRowsFromBE({
+						viewId,
+						tableId,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						limit: this.rowsPerPage,
+						offset: this.paginationOffset,
+						rowIds: this.urlRowIds,
+					})
+				}
+			} finally {
+				this.rowsLoading = false
+				this.viewSettingInProgress = false
+				this.updateUrlFromState()
+			}
+		},
+		async onPaginationChanged({ pageNumber, rowsPerPage }) {
+			if (!this.element || this.viewSettingInProgress || this.rowsLoading) {
+				return
+			}
+			if (this.pageNumber === pageNumber && this.rowsPerPage === rowsPerPage) {
+				return
+			}
+			this.pageNumber = pageNumber
+			if (rowsPerPage) {
+				this.rowsPerPage = rowsPerPage
+			}
+			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+			this.rowsLoading = true
+			const viewId = this.isView ? this.element.id : null
+			const tableId = !this.isView ? this.element.id : null
+			try {
+				await this.loadRowsFromBE({
+					viewId,
+					tableId,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					limit: this.rowsPerPage,
+					offset: this.paginationOffset,
+					rowIds: this.urlRowIds,
+				})
+			} finally {
+				this.rowsLoading = false
+				this.updateUrlFromState()
+			}
+		},
+		async onReloadRequested() {
+			if (!this.element || this.rowsLoading) {
+				return
+			}
+			this.rowsLoading = true
+			const viewId = this.isView ? this.element.id : null
+			const tableId = !this.isView ? this.element.id : null
+			try {
+				await this.loadRowsCountFromBE({
+					viewId,
+					tableId,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+				})
+				await this.loadRowsFromBE({
+					viewId,
+					tableId,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					limit: this.rowsPerPage,
+					offset: this.paginationOffset,
+				})
+			} finally {
+				this.rowsLoading = false
 			}
 		},
 	},

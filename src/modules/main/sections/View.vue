@@ -11,6 +11,7 @@
 			<TableView v-else
 				v-model:view-setting="localViewSetting"
 				:rows="rows"
+				:rows-count="rowsCount"
 				:columns="columns"
 				:element="view"
 				:is-view="true"
@@ -133,6 +134,10 @@ export default {
 			type: Array,
 			default: null,
 		},
+		rowsCount: {
+			type: Number,
+			default: null,
+		},
 		viewSetting: {
 			type: Object,
 			default: null,
@@ -158,7 +163,22 @@ export default {
 	},
 	computed: {
 		isViewSettingSet() {
-			return !(!this.localViewSetting || ((!this.localViewSetting.hiddenColumns || this.localViewSetting.hiddenColumns.length === 0) && (!this.localViewSetting.sorting) && (!this.localViewSetting.filter || this.localViewSetting.filter.length === 0)))
+			if (!this.localViewSetting) {
+				return false
+			}
+			if (this.localViewSetting.hiddenColumns?.length > 0) {
+				return true
+			}
+			if (this.localViewSetting.searchString) {
+				return true
+			}
+			if (this.localViewSetting.sorting?.some(rule => rule?.columnId)) {
+				return true
+			}
+			if (this.localViewSetting.filter?.some(rule => rule?.columnId)) {
+				return true
+			}
+			return false
 		},
 	},
 	watch: {

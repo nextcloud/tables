@@ -6,6 +6,7 @@
 	<NcTable v-if="columns.length > 0"
 		v-model:view-setting="localViewSetting"
 		:rows="rows"
+		:rows-count="rowsCount"
 		:columns="columns"
 		:element-id="element.id"
 		:is-view="isView"
@@ -54,6 +55,10 @@ export default {
 		rows: {
 			type: Array,
 			default: () => [],
+		},
+		rowsCount: {
+			type: Number,
+			default: null,
 		},
 		columns: {
 			type: Array,

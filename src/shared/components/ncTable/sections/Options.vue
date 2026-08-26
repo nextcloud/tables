@@ -24,7 +24,7 @@
 					<SearchForm :columns="columns" :search-string="getSearchString"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
-				<PaginationBlock :rows="rows" />
+				<PaginationBlock :rows-count="rowsCount" :can-read-rows="config.canReadRows" />
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -43,6 +43,18 @@
 							<TrayArrowDown :size="20" />
 						</template>
 						{{ t('tables', 'Export filtered rows') }}
+					</NcActionButton>
+					<NcActionButton v-if="!sharedLinkUrl" :close-after-click="false" data-cy="shareSelectedBtn" @click="shareSelected">
+						<template #icon>
+							<ShareVariantOutline :size="20" />
+						</template>
+						{{ t('tables', 'Share selected rows') }}
+					</NcActionButton>
+					<NcActionButton v-else close-after-click data-cy="openSelectedBtn" @click="openSharedLink">
+						<template #icon>
+							<OpenInNew :size="20" />
+						</template>
+						{{ t('tables', 'Open') }}
 					</NcActionButton>
 					<NcActionButton v-if="config.canDeleteRows" close-after-click @click="deleteSelectedRows">
 						<template #icon>
@@ -70,6 +82,11 @@ import Plus from 'vue-material-design-icons/Plus.vue'
 import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/TrashCanOutline.vue'
 import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
+import ShareVariantOutline from 'vue-material-design-icons/ShareVariantOutline.vue'
+import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
+import { generateUrl, getBaseUrl } from '@nextcloud/router'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
 import PaginationBlock from './PaginationBlock.vue'
@@ -87,6 +104,8 @@ export default {
 		Check,
 		Delete,
 		TrayArrowDown,
+		ShareVariantOutline,
+		OpenInNew,
 		PaginationBlock,
 	},
 
@@ -100,6 +119,10 @@ export default {
 		rows: {
 			type: Array,
 			default: () => [],
+		},
+		rowsCount: {
+			type: Number,
+			default: null,
 		},
 		allRows: {
 			type: Array,
@@ -140,6 +163,8 @@ export default {
 	data() {
 		return {
 			optionsDivWidth: null,
+			sharedLinkUrl: null,
+			openLinkTimeout: null,
 		}
 	},
 
@@ -147,7 +172,7 @@ export default {
 		getSelectedRows() {
 			const rows = []
 			this.selectedRows.forEach(id => {
-				rows.push(this.getRowById(id))
+				rows.push(this.getRowById(id) || { id })
 			})
 			return rows
 		},
@@ -169,6 +194,7 @@ export default {
 
 	beforeUnmount() {
 		window.removeEventListener('resize', this.updateOptionsDivWidth)
+		this.clearOpenLink()
 	},
 
 	methods: {
@@ -182,6 +208,37 @@ export default {
 		},
 		exportSelected() {
 			this.$emit('download-filtered-csv', this.getSelectedRows)
+		},
+		async shareSelected() {
+			const rowIds = this.selectedRows.join(',')
+			const base = (this.isView ? 'view' : 'table') + '/{elementId}?rowIds={rowIds}'
+			const path = generateUrl('apps/tables/#/' + base, { elementId: this.elementId, rowIds })
+			const url = getBaseUrl() + path
+
+			try {
+				await navigator.clipboard.writeText(url)
+				showSuccess(t('tables', 'Link to selected rows copied to clipboard'))
+				this.sharedLinkUrl = url
+				this.openLinkTimeout = setTimeout(() => {
+					this.sharedLinkUrl = null
+					this.openLinkTimeout = null
+				}, 5000)
+			} catch (e) {
+				console.error('Could not copy selected row link to clipboard', e)
+				showError(t('tables', 'Could not copy link to clipboard'))
+			}
+		},
+		openSharedLink() {
+			if (this.sharedLinkUrl) {
+				window.open(this.sharedLinkUrl, '_blank', 'noopener,noreferrer')
+			}
+		},
+		clearOpenLink() {
+			if (this.openLinkTimeout) {
+				clearTimeout(this.openLinkTimeout)
+				this.openLinkTimeout = null
+				this.sharedLinkUrl = null
+			}
 		},
 		getRowById(rowId) {
 			const index = this.allRows.findIndex(row => row.id === rowId)

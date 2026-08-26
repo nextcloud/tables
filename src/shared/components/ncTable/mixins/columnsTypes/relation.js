@@ -5,7 +5,6 @@
 import { AbstractColumn } from '../columnClass.js'
 import { useDataStore } from '../../../../../store/data.js'
 import { useTablesStore } from '../../../../../store/store.js'
-import { FilterIds } from '../filter.js'
 import { ColumnTypes } from '../columnHandler.js'
 
 export default class RelationColumn extends AbstractColumn {
@@ -42,11 +41,6 @@ export default class RelationColumn extends AbstractColumn {
 		return value
 	}
 
-	getValueString(valueObject) {
-		valueObject = valueObject || this.value || null
-		return this.getLabel(valueObject.value)
-	}
-
 	getLabel(rowId) {
 		// Try to get relation data from the store
 		try {
@@ -70,30 +64,6 @@ export default class RelationColumn extends AbstractColumn {
 
 	default() {
 		return null
-	}
-
-	/**
-	 * Check if filter matches the cell value
-	 * @param {object} cell The cell to check
-	 * @param {object} filter The filter to apply
-	 * @return {boolean} Whether the filter matches
-	 */
-	isFilterFound(cell, filter) {
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		const cellLabel = this.getLabel(cell.value)
-		const filterMethod = {
-			[FilterIds.Contains]() { return cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
-			[FilterIds.DoesNotContain]() { return !cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
-			[FilterIds.IsEqual]() { return cellLabel === filterValue },
-			[FilterIds.IsNotEqual]() { return cellLabel !== filterValue },
-			[FilterIds.IsEmpty]() { return !cellLabel },
-		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
-	}
-
-	isSearchStringFound(cell, searchString) {
-		const value = this.getValueString(cell)
-		return super.isSearchStringFound(value, cell, searchString)
 	}
 
 }

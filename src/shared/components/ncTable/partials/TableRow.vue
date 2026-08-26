@@ -13,8 +13,8 @@
 				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns, columnWidths),
 			}"
 			:class="{
-				'search-result': getCell(col.id)?.searchStringFound,
-				'filter-result': getCell(col.id)?.filterFound,
+				'search-result': false,
+				'filter-result': false,
 				'fixed-width': col.customSettings?.width > 0,
 				'frozen-column': index <= pinnedColumnIndex,
 				'frozen-column--last': index === pinnedColumnIndex,

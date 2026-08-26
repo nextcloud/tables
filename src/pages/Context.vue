@@ -158,7 +158,7 @@ export default {
 
 	methods: {
 		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView']),
-		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE']),
+		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRowsForExportFromBE']),
 		contextSignature() {
 			const ctx = this.activeContext
 			return ctx ? `${ctx.id}:${Object.keys(ctx.nodes || {}).sort().join(',')}` : null
@@ -277,9 +277,13 @@ export default {
 				return
 			}
 
-			const rowId = this.getKey(isView, element.id)
-			const colId = this.getKey(isView, element.id)
-			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)
+			const csv = await this.loadRowsForExportFromBE({
+				tableId: isView ? null : element.id,
+				viewId: isView ? element.id : null,
+			})
+			if (csv) {
+				this.downloadFile(csv, element.title + '.csv')
+			}
 		},
 		async downloadFilteredCSV(rows, element, isView) {
 			const access = await this.validateExportAccess({
@@ -294,8 +298,14 @@ export default {
 				return
 			}
 
-			const colId = this.getKey(isView, element.id)
-			this.downloadCsv(rows, this.columns[colId], element.title)
+			const csv = await this.loadRowsForExportFromBE({
+				tableId: isView ? null : element.id,
+				viewId: isView ? element.id : null,
+				rowIds: rows.map(row => row.id),
+			})
+			if (csv) {
+				this.downloadFile(csv, element.title + '.csv')
+			}
 		},
 		getKey(isView, id) {
 			return isView ? 'view-' + id : id

@@ -7,7 +7,7 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else>
-			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
+			<PublicElement :element="publicElement" :columns="columns" :rows="rows" :rows-count="rowsCount" :view-setting="viewSetting" @update:viewSetting="viewSetting = $event" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
 		</div>
 	</div>
 </template>
@@ -19,7 +19,9 @@ import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTa
 import { useDataStore } from '../../../store/data.js'
 import { useTablesStore } from '../../../store/store.js'
 import { computed } from 'vue'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
+import { buildUrlQuery, parseUrlQuery } from '../../../shared/utils/urlState.js'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
 
@@ -44,18 +46,30 @@ export default {
 
 	setup(props) {
 		const store = useDataStore()
-		const { getColumns, getRows } = storeToRefs(store)
+		const { getColumns, getRows, getRowsCount } = storeToRefs(store)
 
 		const stateKey = 'public-' + props.token
 		const rows = computed(() => getRows.value(false, stateKey))
 		const columns = computed(() => getColumns.value(false, stateKey))
+		const rowsCount = computed(() => getRowsCount.value(false, stateKey))
 
-		return { rows, columns }
+		return { rows, columns, rowsCount, dataStore: store }
 	},
 
 	data() {
 		return {
 			loading: false,
+			viewSetting: {},
+			lastViewSettingFilter: null,
+			lastViewSettingSorting: null,
+			lastViewSettingSearchString: null,
+			rowsPerPage: 100,
+			pageNumber: 1,
+			paginationOffset: 0,
+			rowsLoading: false,
+			viewSettingInProgress: false,
+			applyUrlStateOnReload: false,
+			urlRowIds: null,
 			publicElement: {
 				id: 'public',
 				emoji: nodeData.emoji,
@@ -73,26 +87,197 @@ export default {
 		}
 	},
 
+	watch: {
+		viewSetting: {
+			handler() {
+				const newFilter = this.viewSetting?.filter ? JSON.stringify(this.viewSetting.filter) : null
+				const newSorting = this.viewSetting?.sorting ? JSON.stringify(this.viewSetting.sorting) : null
+				const newSearchString = this.viewSetting?.searchString || null
+				if (newFilter === this.lastViewSettingFilter && newSorting === this.lastViewSettingSorting && newSearchString === this.lastViewSettingSearchString) {
+					return
+				}
+				const oldFilter = this.lastViewSettingFilter
+				const oldSorting = this.lastViewSettingSorting
+				const oldSearchString = this.lastViewSettingSearchString
+				this.lastViewSettingFilter = newFilter
+				this.lastViewSettingSorting = newSorting
+				this.lastViewSettingSearchString = newSearchString
+				this.onViewSettingChanged(oldFilter, oldSorting, oldSearchString)
+			},
+			deep: true,
+		},
+	},
+
 	beforeMount() {
 		this.setPublicToken(this.token)
-		this.loadData()
+		this.applyUrlStateOnReload = true
+		this.reload()
+	},
+
+	mounted() {
+		subscribe('tables:pagination-changed', this.onPaginationChanged)
+	},
+
+	beforeUnmount() {
+		unsubscribe('tables:pagination-changed', this.onPaginationChanged)
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'setPublicToken']),
+		...mapActions(useDataStore, ['loadPublicColumnsFromBE', 'loadPublicRowsFromBE', 'loadPublicRowsCountFromBE', 'loadPublicRowsForExportFromBE', 'setPublicToken']),
 		...mapActions(useTablesStore, ['validatePublicExportAccess']),
 
-		async loadData() {
+		async reload() {
+			if (!this.token) {
+				return
+			}
+
 			this.loading = true
+
+			if (this.applyUrlStateOnReload) {
+				this.applyUrlStateOnReload = false
+				this.applyUrlState()
+			} else {
+				this.viewSetting = {}
+				this.pageNumber = 1
+				this.paginationOffset = 0
+			}
+
+			await this.loadPublicColumnsFromBE({ token: this.token })
+
+			this.rowsLoading = true
 			try {
-				await Promise.all([
-					this.loadPublicColumnsFromBE({ token: this.token }),
-					this.loadPublicRowsFromBE({ token: this.token }),
-				])
-			} catch (e) {
-				console.error('Error loading public data', e)
+				await this.loadPublicRowsCountFromBE({
+					token: this.token,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					search: this.viewSetting?.searchString,
+					rowIds: this.urlRowIds,
+				})
+				await this.loadPublicRowsFromBE({
+					token: this.token,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					search: this.viewSetting?.searchString,
+					limit: this.rowsPerPage,
+					offset: this.paginationOffset,
+					rowIds: this.urlRowIds,
+				})
 			} finally {
-				this.loading = false
+				this.rowsLoading = false
+			}
+
+			this.loading = false
+			this.$nextTick(() => {
+				emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+			})
+		},
+
+		applyUrlState() {
+			const { filter, sorting, searchString, pageNumber, rowsPerPage, rowIds } = parseUrlQuery(this.$route.query)
+			this.pageNumber = pageNumber
+			this.rowsPerPage = rowsPerPage
+			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+			this.urlRowIds = rowIds
+			const viewSetting = {
+				filter,
+				sorting,
+				searchString,
+			}
+			this.lastViewSettingFilter = viewSetting?.filter ? JSON.stringify(viewSetting.filter) : null
+			this.lastViewSettingSorting = viewSetting?.sorting ? JSON.stringify(viewSetting.sorting) : null
+			this.lastViewSettingSearchString = viewSetting?.searchString || null
+			this.viewSetting = viewSetting
+		},
+
+		updateUrlFromState() {
+			const query = buildUrlQuery(this.viewSetting, this.pageNumber, this.rowsPerPage, this.urlRowIds)
+			this.$router.replace({ query }).catch(() => {})
+		},
+
+		async onViewSettingChanged(oldFilter, oldSorting, oldSearchString) {
+			if (this.loading || this.rowsLoading) {
+				return
+			}
+			const filterChanged = this.lastViewSettingFilter !== oldFilter
+			const sortingChanged = this.lastViewSettingSorting !== oldSorting
+			const searchStringChanged = this.lastViewSettingSearchString !== oldSearchString
+			if (!filterChanged && !sortingChanged && !searchStringChanged) {
+				return
+			}
+			this.viewSettingInProgress = filterChanged || searchStringChanged
+
+			if (!this.viewSetting?.filter?.length && !this.viewSetting?.sorting?.length && !this.viewSetting?.searchString) {
+				this.urlRowIds = null
+			}
+
+			this.rowsLoading = true
+			try {
+				if (filterChanged || searchStringChanged) {
+					this.pageNumber = 1
+					this.paginationOffset = 0
+					emit('tables:pagination-changed', { pageNumber: 1, rowsPerPage: this.rowsPerPage })
+					await this.loadPublicRowsCountFromBE({
+						token: this.token,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						rowIds: this.urlRowIds,
+					})
+					await this.loadPublicRowsFromBE({
+						token: this.token,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						limit: this.rowsPerPage,
+						offset: this.paginationOffset,
+						rowIds: this.urlRowIds,
+					})
+				} else if (sortingChanged) {
+					this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+					await this.loadPublicRowsFromBE({
+						token: this.token,
+						filter: this.viewSetting?.filter,
+						sort: this.viewSetting?.sorting,
+						search: this.viewSetting?.searchString,
+						limit: this.rowsPerPage,
+						offset: this.paginationOffset,
+						rowIds: this.urlRowIds,
+					})
+				}
+			} finally {
+				this.rowsLoading = false
+				this.viewSettingInProgress = false
+				this.updateUrlFromState()
+			}
+		},
+
+		async onPaginationChanged({ pageNumber, rowsPerPage }) {
+			if (this.loading || this.viewSettingInProgress || this.rowsLoading) {
+				return
+			}
+			if (this.pageNumber === pageNumber && this.rowsPerPage === rowsPerPage) {
+				return
+			}
+			this.pageNumber = pageNumber
+			if (rowsPerPage) {
+				this.rowsPerPage = rowsPerPage
+			}
+			this.paginationOffset = (this.pageNumber - 1) * this.rowsPerPage
+
+			this.rowsLoading = true
+			try {
+				await this.loadPublicRowsFromBE({
+					token: this.token,
+					filter: this.viewSetting?.filter,
+					sort: this.viewSetting?.sorting,
+					search: this.viewSetting?.searchString,
+					limit: this.rowsPerPage,
+					offset: this.paginationOffset,
+					rowIds: this.urlRowIds,
+				})
+			} finally {
+				this.rowsLoading = false
+				this.updateUrlFromState()
 			}
 		},
 
@@ -104,7 +289,12 @@ export default {
 				}
 				return
 			}
-			this.downloadCsv(this.rows, this.columns, 'public-export')
+			const csv = await this.loadPublicRowsForExportFromBE({
+				token: this.token,
+			})
+			if (csv) {
+				this.downloadFile(csv, 'public-export.csv')
+			}
 		},
 		async downloadFilteredCSV(rows) {
 			const access = await this.validatePublicExportAccess(this.token)
@@ -114,7 +304,27 @@ export default {
 				}
 				return
 			}
-			this.downloadCsv(rows, this.columns, 'public-export')
+
+			if (rows !== this.rows) {
+				const csv = await this.loadPublicRowsForExportFromBE({
+					token: this.token,
+					rowIds: rows.map(row => row.id),
+				})
+				if (csv) {
+					this.downloadFile(csv, 'public-export.csv')
+				}
+				return
+			}
+
+			const csv = await this.loadPublicRowsForExportFromBE({
+				token: this.token,
+				filter: this.viewSetting?.filter,
+				sort: this.viewSetting?.sorting,
+				search: this.viewSetting?.searchString,
+			})
+			if (csv) {
+				this.downloadFile(csv, 'public-export.csv')
+			}
 		},
 	},
 }

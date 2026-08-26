@@ -22,6 +22,9 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 	}
 
 	public function filterValueToQueryParam(Column $column, mixed $value): mixed {
+		if (is_array($value)) {
+			return $value;
+		}
 		return $this->valueToJsonDbValue($column, $value);
 	}
 

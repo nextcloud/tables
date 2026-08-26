@@ -4,7 +4,6 @@
  */
 import { AbstractSelectionColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
-import { FilterIds } from '../filter.js'
 
 export default class SelectionMutliColumn extends AbstractSelectionColumn {
 
@@ -19,21 +18,6 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 			return []
 		}
 		return JSON.parse(this.selectionDefault)
-	}
-
-	getValueString(valueObject) {
-		valueObject = valueObject || this.value || null
-
-		const valueObjects = this.getObjects(valueObject.value)
-		let ret = ''
-		valueObjects?.forEach(obj => {
-			if (ret === '') {
-				ret = obj.label
-			} else {
-				ret += ', ' + obj.label
-			}
-		})
-		return ret
 	}
 
 	getDefaultObjects() {
@@ -60,31 +44,6 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 		if (i !== undefined) {
 			return this.selectionOptions[i] || null
 		}
-	}
-
-	isSearchStringFound(cell, searchString) {
-		return super.isSearchStringFound(this.getValueString(cell), cell, searchString)
-	}
-
-	isFilterFound(cell, filter) {
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		const valueString = this.getValueString(cell)
-
-		const filterMethod = {
-			[FilterIds.ContainsItem]() {
-				if ((!cell.value || !cell.value.length) && filter.value.length > 0) {
-					return false
-				}
-				const filterOptionIds = filter.value.map(option => option.id)
-				return cell.value.filter(v => filterOptionIds.includes(v)).length > 0
-			},
-			[FilterIds.Contains]() { return valueString?.includes(filterValue) },
-			[FilterIds.DoesNotContain]() { return !valueString?.includes(filterValue) },
-			[FilterIds.IsEqual]() { return valueString === filterValue },
-			[FilterIds.IsNotEqual]() { return valueString !== filterValue },
-			[FilterIds.IsEmpty]() { return !valueString },
-		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
 	}
 
 }
