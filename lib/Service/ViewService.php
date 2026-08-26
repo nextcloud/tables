@@ -202,7 +202,14 @@ class ViewService extends SuperService {
 	 * @throws PermissionError
 	 * @throws BadRequestError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null, ?string $technicalName = null): View {
+	public function create(
+		string $title,
+		?string $emoji,
+		Table $table,
+		?string $userId = null,
+		?string $technicalName = null,
+		?string $uuid = null,
+	): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -213,7 +220,7 @@ class ViewService extends SuperService {
 
 		$time = new DateTime();
 		$item = new View();
-		$item->setUuid(null);
+		$item->setUuid($uuid);
 		$item->setTitle($title);
 		if ($emoji) {
 			$item->setEmoji($emoji);
@@ -650,11 +657,11 @@ class ViewService extends SuperService {
 	 * @param array $view
 	 * @param string $userId
 	 *
-	 * @return void
+	 * @return View
 	 *
 	 * @throws InternalError
 	 */
-	public function importView(int $tableId, array $view, string $userId): void {
+	public function importView(int $tableId, array $view, string $userId): View {
 		$item = new View();
 		$item->setUuid((isset($view['uuid']) && Uuid::isValid($view['uuid'])) ? $view['uuid'] : null);
 		$item->setTableId($tableId);
@@ -665,6 +672,7 @@ class ViewService extends SuperService {
 			$this->assertTechnicalNameValid($technicalName);
 			$item->setTechnicalName($technicalName);
 		}
+		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
 		$item->setCreatedAt($view['createdAt']);
 		$item->setLastEditBy($userId);
@@ -674,11 +682,12 @@ class ViewService extends SuperService {
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
 		try {
-			$this->mapper->insert($item);
+			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
 				$item->setTechnicalName($this->buildDefaultTechnicalName($item->getId()));
-				$this->mapper->update($item);
+				$importedView = $this->mapper->update($item);
 			}
+			return $importedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->handleViewPersistDbException($e, 'importView insert error');
 		} catch (\Exception $e) {

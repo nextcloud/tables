@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcDialog v-if="showModal"
+	<NcDialog v-if="showModal && localRow"
 		data-cy="editRowModal"
 		:name="t('tables', 'Edit row')"
 		size="large"
@@ -172,9 +172,11 @@ export default {
 					return
 				}
 				if (this.$route.path.includes('/row/')) {
-					this.$router.replace(this.$route.path.split('/row/')[0])
+					const basePath = this.$route.path.split('/row/')[0]
+					this.$router.replace(basePath + '/row/' + newRow.id)
+				} else {
+					this.$router.push(this.$route.path + '/row/' + newRow.id)
 				}
-				this.$router.push(this.$route.path + '/row/' + newRow.id)
 				this.setActiveRowId(null)
 				this.loadValues()
 			}

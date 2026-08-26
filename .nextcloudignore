@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 /build/
 /cypress/
+/playwright/
+/playwright.config.ts
 /.devcontainer/
 /.git
 /.github

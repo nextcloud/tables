@@ -346,7 +346,7 @@ class Column extends EntitySuper implements JsonSerializable {
 			'usergroupSelectGroups' => $this->usergroupSelectGroups,
 			'usergroupSelectTeams' => $this->usergroupSelectTeams,
 			'showUserStatus' => $this->showUserStatus,
-			'customSettings' => $this->getCustomSettingsArray() ?: new \stdClass(),
+			'customSettings' => $this->getCustomSettingsArray() ?: [],
 		];
 	}
 

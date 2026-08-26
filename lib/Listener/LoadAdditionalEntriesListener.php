@@ -8,15 +8,15 @@
 namespace OCA\Tables\Listener;
 
 use OCA\Tables\Service\ContextService;
-use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\IUserSession;
+use OCP\Navigation\Events\LoadAdditionalEntriesEvent;
 
 /**
- * @template-implements IEventListener<Event|BeforeTemplateRenderedEvent>
+ * @template-implements IEventListener<Event|LoadAdditionalEntriesEvent>
  */
-class BeforeTemplateRenderedListener implements IEventListener {
+class LoadAdditionalEntriesListener implements IEventListener {
 	public function __construct(
 		protected IUserSession $userSession,
 		protected ContextService $contextService,
@@ -27,7 +27,7 @@ class BeforeTemplateRenderedListener implements IEventListener {
 	 * @inheritDoc
 	 */
 	public function handle(Event $event): void {
-		if (!$event instanceof BeforeTemplateRenderedEvent) {
+		if (!$event instanceof LoadAdditionalEntriesEvent) {
 			return;
 		}
 

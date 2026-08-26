@@ -5,6 +5,40 @@
 
 # Changelog
 
+## 2.2.2
+
+### Added
+* [Feat: Add technicalName to views (tables#2547)](https://github.com/nextcloud/tables/pull/2547)
+* [Migrate from Vue2 to Vue3 (tables#2836)](https://github.com/nextcloud/tables/pull/2836)
+
+### Fixed
+* [Fix sort stars and select (#8) (tables#2835)](https://github.com/nextcloud/tables/pull/2835)
+* [Fix: public link (tables#2854)](https://github.com/nextcloud/tables/pull/2854)
+* [Fix: Add support for OCP\\DB\\Schema (tables#2896)](https://github.com/nextcloud/tables/pull/2896)
+
+### Other
+* [Chore(deps): update dependency @nextcloud/eslint-config to v9 (main) (tables#2793)](https://github.com/nextcloud/tables/pull/2793)
+* [[main] Update nextcloud/ocp dependency (tables#2830)](https://github.com/nextcloud/tables/pull/2830)
+* [Chore(deps): update dependency @cypress/vue to ^6.0.3 (main) (tables#2842)](https://github.com/nextcloud/tables/pull/2842)
+* [Chore(deps): update dependency @nextcloud/vite-config to ^2.5.4 (main) (tables#2843)](https://github.com/nextcloud/tables/pull/2843)
+* [Fix(deps): update dependency @material-symbols/svg-400 to ^0.45.8 (main) (tables#2844)](https://github.com/nextcloud/tables/pull/2844)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^7.4.1 (main) (tables#2845)](https://github.com/nextcloud/tables/pull/2845)
+* [Fix(deps): update dependency papaparse to ^5.5.4 (main) (tables#2846)](https://github.com/nextcloud/tables/pull/2846)
+* [Fix(deps): update dependency symfony/uid to ^6.4.32 (main) (tables#2847)](https://github.com/nextcloud/tables/pull/2847)
+* [Chore(deps): update dependency @playwright/test to ^1.62.0 (main) (tables#2848)](https://github.com/nextcloud/tables/pull/2848)
+* [Chore(deps): update actions/checkout action to v7.0.1 (main) (tables#2860)](https://github.com/nextcloud/tables/pull/2860)
+* [Chore(deps): update dorny/paths-filter action to v4.0.2 (main) (tables#2861)](https://github.com/nextcloud/tables/pull/2861)
+* [Fix(deps): update dependency @material-symbols/svg-400 to ^0.45.9 (main) (tables#2862)](https://github.com/nextcloud/tables/pull/2862)
+* [Chore(deps): update dependency eslint to ^10.8.0 (main) (tables#2865)](https://github.com/nextcloud/tables/pull/2865)
+* [[main] Update nextcloud/ocp dependency (tables#2866)](https://github.com/nextcloud/tables/pull/2866)
+* [[main] Fix npm audit (tables#2867)](https://github.com/nextcloud/tables/pull/2867)
+* [Chore(deps): update dependency @playwright/test to ^1.62.1 (main) (tables#2872)](https://github.com/nextcloud/tables/pull/2872)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.62.4 (main) (tables#2873)](https://github.com/nextcloud/tables/pull/2873)
+* [Fix(deps): update dependency @material-symbols/svg-400 to ^0.45.10 (main) (tables#2874)](https://github.com/nextcloud/tables/pull/2874)
+* [Fix(deps): update tiptap to ^3.29.2 (main) (tables#2875)](https://github.com/nextcloud/tables/pull/2875)
+* [[main] Update nextcloud/ocp dependency (tables#2880)](https://github.com/nextcloud/tables/pull/2880)
+* [Chore(deps): update dependency dompurify to v3.4.13 [security] (main) (tables#2883)](https://github.com/nextcloud/tables/pull/2883)
+
 ## 2.2.1
 
 ### Added
