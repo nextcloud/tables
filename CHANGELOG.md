@@ -5,6 +5,35 @@
 
 # Changelog
 
+## 2.3.0
+
+### Added
+
+* [🕵 Add sharereview support (tables#2711)](https://github.com/nextcloud/tables/pull/2711)
+* [Table scheme import (tables#2888)](https://github.com/nextcloud/tables/pull/2888)
+* [Feat\(deps\): Add Nextcloud 36 support (tables#2917)](https://github.com/nextcloud/tables/pull/2917)
+
+### Fixed
+
+* [Feat\(navigation\): add LoadAdditionalEntriesListener (tables#2885)](https://github.com/nextcloud/tables/pull/2885)
+* [Fix: ignore client sent option UUID and generate new UUID on column update (tables#2899)](https://github.com/nextcloud/tables/pull/2899)
+* [Fix\(navigation\): keep parent table expanded when opening a view (tables#2913)](https://github.com/nextcloud/tables/pull/2913)
+
+### Other
+* [Chore\(deps\): update dependency cypress to ^15.19.0 \(main\) (tables#2863)](https://github.com/nextcloud/tables/pull/2863)
+* [Fix npm audit (tables#2881)](https://github.com/nextcloud/tables/pull/2881)
+* [Chore\(deps\): update dependency @nextcloud/e2e\-test\-server to ^0.5.1 \(main\) (tables#2892)](https://github.com/nextcloud/tables/pull/2892)
+* [Chore\(deps\): update dependency eslint to ^10.8.1 \(main\) (tables#2893)](https://github.com/nextcloud/tables/pull/2893)
+* [Fix\(deps\): update dependency dompurify to ^3.4.13 \(main\) (tables#2894)](https://github.com/nextcloud/tables/pull/2894)
+* [Chore: add playwright to .nextcloudignore (tables#2900)](https://github.com/nextcloud/tables/pull/2900)
+* [Chore\(deps\): update dependency phpunit/phpunit to v9.6.36 \(main\) (tables#2903)](https://github.com/nextcloud/tables/pull/2903)
+* [Chore\(deps\): update dependency cypress to ^15.20.1 \(main\) (tables#2904)](https://github.com/nextcloud/tables/pull/2904)
+* [Fix\(deps\): update dependency @material\-symbols/svg\-400 to ^0.46.0 \(main\) (tables#2905)](https://github.com/nextcloud/tables/pull/2905)
+* [Fix\(deps\): update dependency papaparse to ^5.6.0 \(main\) (tables#2906)](https://github.com/nextcloud/tables/pull/2906)
+* [Fix\(deps\): update tiptap to ^3.30.1 \(main\) (tables#2907)](https://github.com/nextcloud/tables/pull/2907)
+* [Update nextcloud/ocp dependency (tables#2911)](https://github.com/nextcloud/tables/pull/2911)
+* [Chore\(CI\): Adjust testing matrix for Nextcloud 35 on main (tables#2916)](https://github.com/nextcloud/tables/pull/2916)
+
 ## 2.2.2
 
 ### Added
