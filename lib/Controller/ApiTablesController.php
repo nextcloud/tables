@@ -168,6 +168,7 @@ class ApiTablesController extends AOCSController {
 					null,
 					new ColumnDto(
 						title: $column['title'],
+						technicalName: $column['technicalName'] ?? null,
 						type: $column['type'],
 						subtype: $column['subtype'],
 						mandatory: $column['mandatory'],
@@ -193,7 +194,6 @@ class ApiTablesController extends AOCSController {
 						showUserStatus: $column['showUserStatus'],
 						customSettings: empty($column['customSettings']) ? null : json_encode($column['customSettings']),
 						uuid: $column['uuid'] ?? null,
-						technicalName: $column['technicalName'] ?? null,
 					)
 				);
 				$colMap[$column['id']] = $col->getId();

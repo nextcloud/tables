@@ -304,10 +304,12 @@ class TableService extends SuperService {
 		// which are possible, but not encouraged.
 		// The chance is small, and the user just can click on import once more.
 		$applicableUuid = null;
-		try {
-			$this->mapper->findByUuid($uuid);
-		} catch (DoesNotExistException) {
-			$applicableUuid = $uuid;
+		if ($uuid !== null) {
+			try {
+				$this->mapper->findByUuid($uuid);
+			} catch (DoesNotExistException) {
+				$applicableUuid = $uuid;
+			}
 		}
 		$item->setUuid($applicableUuid);
 

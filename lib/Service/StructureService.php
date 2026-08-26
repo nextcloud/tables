@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
-use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
