@@ -20,6 +20,7 @@ use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\StructureService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
@@ -43,6 +44,7 @@ class ApiTablesController extends AOCSController {
 	private ViewService $viewService;
 	private IAppManager $appManager;
 	private IDBConnection $db;
+	private StructureService $structureService;
 
 	public function __construct(
 		IRequest $request,
@@ -53,6 +55,7 @@ class ApiTablesController extends AOCSController {
 		IL10N $n,
 		IAppManager $appManager,
 		IDBConnection $db,
+		StructureService $structureService,
 		string $userId) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->service = $service;
@@ -60,6 +63,7 @@ class ApiTablesController extends AOCSController {
 		$this->appManager = $appManager;
 		$this->viewService = $viewService;
 		$this->db = $db;
+		$this->structureService = $structureService;
 	}
 
 	/**
@@ -136,13 +140,14 @@ class ApiTablesController extends AOCSController {
 	 * @param list<TablesView> $views views
 	 * @param list<array{columnId: int, order: int, readonly: bool}> $columnOrder Default column order settings
 	 * @param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sort Default sort rules
+	 * @param ?string $uuid globally unique identifier
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
-	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
+	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = [], ?string $uuid = null): DataResponse {
 		try {
 			ColumnSettings::createFromInputArray($columnOrder);
 			SortRuleSet::createFromInputArray($sort);
@@ -151,7 +156,7 @@ class ApiTablesController extends AOCSController {
 		}
 		try {
 			$this->db->beginTransaction();
-			$table = $this->service->create($title, 'custom', $emoji, $description);
+			$table = $this->service->create($title, 'custom', $emoji, $description, uuid: $uuid);
 			$colMap = [];
 			foreach ($columns as $column) {
 				if (isset($column['uuid']) && !Uuid::isValid($column['uuid'])) {
@@ -163,6 +168,7 @@ class ApiTablesController extends AOCSController {
 					null,
 					new ColumnDto(
 						title: $column['title'],
+						technicalName: $column['technicalName'] ?? null,
 						type: $column['type'],
 						subtype: $column['subtype'],
 						mandatory: $column['mandatory'],
@@ -219,6 +225,8 @@ class ApiTablesController extends AOCSController {
 					$view['emoji'],
 					$table,
 					$this->userId,
+					technicalName: $view['technicalName'] ?? null,
+					uuid: $view['uuid'] ?? null,
 				);
 
 				$inputColumnsArray = [];
@@ -277,6 +285,94 @@ class ApiTablesController extends AOCSController {
 			}
 			return $this->handleBadRequestError($e);
 		} catch (InternalError|Exception $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $e) {
+				return $this->handleError($e);
+			}
+			return $this->handleError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Preview changes to a table scheme
+	 *
+	 * @param int $id identifier of the table
+	 * @psalm-param TablesTable $updateScheme the new schema of the table
+	 * @return DataResponse<Http::STATUS_OK, array{addedColumns: list<TablesColumn>, removedColumns: list<TablesColumn>, modifiedColumns: list<TablesColumn>}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 *
+	 * 200: Changes preview returned
+	 * 400: Invalid request data
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	public function previewSchemeChanges(int $id, array $updateScheme): DataResponse {
+		try {
+			$changes = $this->service->compareTableSchemeChanges($id, $updateScheme);
+			return new DataResponse($changes);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError|Exception|\Throwable $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
+	 * [api v2] import table scheme into existing table
+	 *
+	 * @param int $id Table ID
+	 * @param string $title Title of the table
+	 * @param string $emoji Emoji of the table
+	 * @param string $description description of the table
+	 * @param array{addColumns: list<TablesColumn>, modifyColumns: list<TablesColumn>, removeColumns: list<TablesColumn>} $columns definitions of columns to add, remove or modify
+	 * @param list<TablesView> $views Definition of the views
+	 * @param list<array{columnId: int, columnUuid: string}> $columnOrder Ordered meta data of the columns
+	 * @param list<array{columnId: int, columnUuid: string, mode: string}> $sort Meta data of the sort rules
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
+	 *
+	 * 200: Tables returned
+	 * 400: Invalid request data
+	 * 403: No permissions
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	public function importScheme(int $id, string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
+		try {
+			$this->db->beginTransaction();
+			$this->service->update($id, $title, $emoji, $description, null, $this->userId);
+			$table = $this->service->updateTableStructure($id, $columns, $views, $columnOrder, $sort, $this->userId);
+
+			$this->db->commit();
+			return new DataResponse($table->jsonSerialize());
+		} catch (PermissionError $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			return $this->handlePermissionError($e);
+		} catch (\InvalidArgumentException $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		} catch (BadRequestError $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $re) {
+				return $this->handleError($re);
+			}
+			return $this->handleBadRequestError($e);
+		} catch (InternalError|Exception|\Throwable $e) {
 			try {
 				$this->db->rollBack();
 			} catch (\OCP\DB\Exception $e) {

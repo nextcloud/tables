@@ -53,7 +53,14 @@
 			<!-- IMPORT -->
 			<NcActionButton v-if="canCreateRowInElement(table)" :close-after-click="true"
 				@click="actionShowImport(table)">
-				{{ t('tables', 'Import') }}
+				{{ t('tables', 'Import rows') }}
+				<template #icon>
+					<Import :size="20" />
+				</template>
+			</NcActionButton>
+			<NcActionButton v-if="canManageElement(table)" :close-after-click="true"
+				@click="actionShowSchemeImport(table)">
+				{{ t('tables', 'Import scheme') }}
 				<template #icon>
 					<Import :size="20" />
 				</template>
@@ -218,10 +225,13 @@ export default {
 		},
 	},
 	watch: {
-		activeView() {
-			if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
-				this.isParentOfActiveView = true
-			}
+		activeView: {
+			immediate: true,
+			handler() {
+				if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
+					this.isParentOfActiveView = true
+				}
+			},
 		},
 		filterString() {
 			if (!this.isParentOfActiveView && this.filterString && !this.table.title.toLowerCase().includes(this.filterString.toLowerCase())) {
@@ -261,6 +271,9 @@ export default {
 		},
 		async actionShowImport(table) {
 			emit('tables:modal:import', { element: table, isView: false })
+		},
+		async actionShowSchemeImport(table) {
+			emit('tables:modal:table-scheme-import', { table })
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })

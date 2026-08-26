@@ -255,7 +255,9 @@ class Column extends EntitySuper implements JsonSerializable {
 		$column->setNumberDecimals($data->getNumberDecimals());
 		$column->setNumberPrefix($data->getNumberPrefix() ?? '');
 		$column->setNumberSuffix($data->getNumberSuffix() ?? '');
-		$column->setSelectionOptionsCollection(SelectionOptions::createFromInputJsonString($data->getSelectionOptions() ?? '[]', $data->getSelectionDefault(), true));
+		$selectionOptions = SelectionOptions::createFromInputJsonString($data->getSelectionOptions() ?? '[]', $data->getSelectionDefault(), true);
+		$selectionOptions->assignServerManagedUuids();
+		$column->setSelectionOptionsCollection($selectionOptions);
 		$column->setDatetimeDefault($data->getDatetimeDefault());
 		$column->setUsergroupDefault($data->getUsergroupDefault());
 		$column->setUsergroupMultipleItems($data->getUsergroupMultipleItems());
@@ -344,7 +346,7 @@ class Column extends EntitySuper implements JsonSerializable {
 			'usergroupSelectGroups' => $this->usergroupSelectGroups,
 			'usergroupSelectTeams' => $this->usergroupSelectTeams,
 			'showUserStatus' => $this->showUserStatus,
-			'customSettings' => $this->getCustomSettingsArray() ?: new \stdClass(),
+			'customSettings' => $this->getCustomSettingsArray() ?: [],
 		];
 	}
 

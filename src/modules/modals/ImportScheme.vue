@@ -90,7 +90,8 @@ export default {
 						this.actionCancel()
 						return
 					}
-					showError(t('tables', res.data?.message || 'Could not import data due to unknown errors.'))
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import data due to unknown errors.'))
 				})
 			}
 

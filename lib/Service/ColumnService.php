@@ -432,9 +432,12 @@ class ColumnService extends SuperService {
 			$item->setNumberMax($columnDto->getNumberMax());
 			$item->setNumberDecimals($columnDto->getNumberDecimals());
 			if ($columnDto->getSelectionOptions() !== null || $columnDto->getSelectionDefault() !== null) {
-				$item->setSelectionOptionsCollection(SelectionOptions::createFromInputJsonString(
-					$columnDto->getSelectionOptions(), $columnDto->getSelectionDefault())
+				$selectionOptions = SelectionOptions::createFromInputJsonString(
+					$columnDto->getSelectionOptions(),
+					$columnDto->getSelectionDefault(),
 				);
+				$selectionOptions->assignServerManagedUuids($item->getSelectionOptionsCollection());
+				$item->setSelectionOptionsCollection($selectionOptions);
 			}
 			$item->setDatetimeDefault($columnDto->getDatetimeDefault());
 

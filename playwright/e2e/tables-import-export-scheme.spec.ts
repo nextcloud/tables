@@ -6,7 +6,7 @@
 import type { Page } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
 import * as fs from 'fs'
-import { ensureNavigationOpen } from '../support/commands'
+import {ensureNavigationOpen, uuidSuffix} from '../support/commands'
 
 interface SchemeColumn extends Record<string, unknown> {
 	id: number
@@ -147,6 +147,7 @@ function formatFilterValue(value: SchemeFilter['value']) {
 
 function prepareSchemeForImport(scheme: TableScheme, title: string) {
 	scheme.title = title
+	scheme.uuid = '01a0335f-1225-7514-b388-94ec806d' + uuidSuffix()
 
 	const importedView = scheme.views[0]
 	expect(importedView).toBeTruthy()
