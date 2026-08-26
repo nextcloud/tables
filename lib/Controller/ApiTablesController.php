@@ -193,6 +193,7 @@ class ApiTablesController extends AOCSController {
 						showUserStatus: $column['showUserStatus'],
 						customSettings: empty($column['customSettings']) ? null : json_encode($column['customSettings']),
 						uuid: $column['uuid'] ?? null,
+						technicalName: $column['technicalName'] ?? null,
 					)
 				);
 				$colMap[$column['id']] = $col->getId();
