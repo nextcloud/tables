@@ -53,10 +53,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server-versions: ['stable33', 'stable34', 'master']
+        server-versions: ['stable33', 'stable34', 'stable35', 'master']
         php-versions: ['8.3']
         databases: ['mysql']
         include:
+          # TODO: Worth reducing?
           - server-versions: 'stable33'
             php-versions: '8.4'
             databases: 'pgsql'
@@ -67,6 +68,12 @@ jobs:
             php-versions: '8.4'
             databases: 'pgsql'
           - server-versions: 'stable34'
+            php-versions: '8.4'
+            databases: 'sqlite'
+          - server-versions: 'stable35'
+            php-versions: '8.4'
+            databases: 'pgsql'
+          - server-versions: 'stable35'
             php-versions: '8.4'
             databases: 'sqlite'
           - server-versions: 'master'
