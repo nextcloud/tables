@@ -205,6 +205,7 @@ export default {
 			this.waitForReload = true
 			await this.loadContext({ id: this.contextId })
 			await this.loadTablesFromBE()
+			await this.loadViewsSharedWithMeFromBE()
 			this.waitForReload = false
 			this.actionCancel()
 		},
