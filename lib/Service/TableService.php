@@ -287,7 +287,6 @@ class TableService extends SuperService {
 
 		$time = new DateTime();
 		$item = new Table();
-		$item->setUuid($uuid);
 		$item->setTitle($title);
 		$item->setDescription($description);
 		if ($emoji) {
@@ -298,6 +297,20 @@ class TableService extends SuperService {
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		// avoid running into a UniqueConstraintViolation, because we may be
+		// inside a transaction, that otherwise might be canceled.
+		// Alternative approach would be to run this in a nested transaction,
+		// which are possible, but not encouraged.
+		// The chance is small, and the user just can click on import once more.
+		$applicableUuid = null;
+		try {
+			$this->mapper->findByUuid($uuid);
+		} catch (DoesNotExistException) {
+			$applicableUuid = $uuid;
+		}
+		$item->setUuid($applicableUuid);
+
 		try {
 			$newTable = $this->mapper->insert($item);
 		} catch (OcpDbException $e) {

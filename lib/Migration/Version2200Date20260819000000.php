@@ -39,7 +39,7 @@ class Version2200Date20260819000000 extends SimpleMigrationStep {
 				'comment' => 'UUIDv7 identifier to support structural updates across instances',
 			]);
 		}
-		if (!$table->hasUniqueConstraint('tables_tables_uuid_uniq')) {
+		if (!$table->hasIndex('tables_tables_uuid_uniq')) {
 			$table->addUniqueIndex(['uuid'], 'tables_tables_uuid_uniq');
 		}
 
