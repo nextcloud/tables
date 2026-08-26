@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Model;
 
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
+
 class SelectionOption implements \JsonSerializable {
 	private string $uuid;
 
@@ -30,12 +32,8 @@ class SelectionOption implements \JsonSerializable {
 			throw new \InvalidArgumentException('Option label is missing');
 		}
 
-		if (isset($data['uuid']) && !$allowPassingUuid) {
-			unset($data['uuid']);
-		}
-
 		$instance = new self((int)$data['id'], $data['label']);
-		if (isset($data['uuid'])) {
+		if ($allowPassingUuid && isset($data['uuid']) && is_string($data['uuid']) && $data['uuid'] !== '') {
 			$instance->setUuid($data['uuid']);
 		}
 		return $instance;
@@ -49,7 +47,32 @@ class SelectionOption implements \JsonSerializable {
 		return $this->label;
 	}
 
+	public function uuid(): ?string {
+		/** @psalm-suppress RedundantPropertyInitializationCheck */
+		return $this->uuid ?? null;
+	}
+
+	/**
+	 * If UUID is present, prefer the stored UUID
+	 */
+	public function applyStoredUuid(string $uuid): void {
+		if ($this->uuid() !== null || $uuid === '') {
+			return;
+		}
+		$this->setUuid($uuid);
+	}
+
+	/**
+	 * Generate a UUID when creating an option for the first time, existing ones are not replaced
+	 */
+	public function generateUuid(): void {
+		$this->setUuid(Uuid::v7()->toRfc4122());
+	}
+
 	protected function setUuid(string $uuid): void {
+		if ($this->uuid() !== null) {
+			return;
+		}
 		$this->uuid = $uuid;
 	}
 
