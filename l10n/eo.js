@@ -60,6 +60,7 @@ OC.L10N.register(
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Select from Files" : "Elekti el dosieroj",
     "Preview" : "Antaŭvidi",
+    "Import completed successfully." : "Enporto okazis sukcese",
     "Sort" : "Ordigi",
     "Advanced settings" : "Altanivela agordo",
     "Saving..." : "Konservado...",

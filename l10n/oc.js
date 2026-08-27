@@ -62,6 +62,7 @@ OC.L10N.register(
     "Select from Files" : "Seleccionar dels fichièrs",
     "Preview" : "Apercebut",
     "Failed" : "Fracàs",
+    "From" : "De",
     "Sort" : "Triar",
     "Advanced settings" : "Paramètres avançats",
     "Saving..." : "Enregistrament...",
