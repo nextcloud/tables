@@ -20,6 +20,9 @@ return RectorConfig::configure()
 		__DIR__ . '/lib/Vendor',
 		__DIR__ . '/tests/integration/vendor',
 	])
+	->withBootstrapFiles([
+		__DIR__ . '/tests/unit/ShareReview/Stubs.php',
+	])
 	->withPhpSets(php81: true)
 	->withTypeCoverageLevel(0)
 	->withSets([

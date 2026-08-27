@@ -299,17 +299,17 @@ class ColumnService extends SuperService {
 		try {
 			$entity = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {
-			$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+			$this->handleColumnPersistDbException($e, static::class . ' - ' . __FUNCTION__);
 		}
 		if ($entity->getTechnicalName() === null || $entity->getTechnicalName() === '') {
 			$entity->setTechnicalName($this->buildDefaultTechnicalName($entity->getId()));
 			try {
 				$entity = $this->mapper->update($entity);
 			} catch (\OCP\DB\Exception $e) {
-				$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+				$this->handleColumnPersistDbException($e, static::class . ' - ' . __FUNCTION__);
 			} catch (Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		}
 		if (isset($view) && $view) {
@@ -444,7 +444,7 @@ class ColumnService extends SuperService {
 
 				return $this->enhanceColumn($updatedColumn);
 			} catch (\OCP\DB\Exception $e) {
-				$this->handleColumnPersistDbException($e, get_class($this) . ' - ' . __FUNCTION__);
+				$this->handleColumnPersistDbException($e, static::class . ' - ' . __FUNCTION__);
 			}
 		} catch (BadRequestError $e) {
 			throw $e;

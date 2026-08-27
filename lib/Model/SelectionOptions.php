@@ -32,7 +32,7 @@ class SelectionOptions implements JsonSerializable, Iterator {
 		}
 
 		if (is_string($this->default)) {
-			$this->default = \json_decode($this->default(), true);
+			$this->default = \json_decode((string) $this->default(), true);
 		}
 
 		if (is_int($this->default)) {
@@ -127,7 +127,10 @@ class SelectionOptions implements JsonSerializable, Iterator {
 		return $this->default;
 	}
 
-	public function defaultSerialized(): string {
+	/**
+	 * @return false|string
+	 */
+	public function defaultSerialized(): string|false {
 		return \json_encode($this->default());
 	}
 

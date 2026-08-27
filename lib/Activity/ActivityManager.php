@@ -425,8 +425,10 @@ class ActivityManager {
 
 	/**
 	 * Send share events only to: event author, table owner, and shared-with receiver users.
+	 *
+	 * @param Row2|Table $object
 	 */
-	private function sendShareEventToUsers(IEvent $event, $object): void {
+	private function sendShareEventToUsers(IEvent $event, Table|Row2 $object): void {
 		if (!$object instanceof Table && !$object instanceof View) {
 			Server::get(LoggerInterface::class)->error('Could not send share activity. Invalid object type.', (array)$object);
 			return;
@@ -597,7 +599,7 @@ class ActivityManager {
 		return '';
 	}
 
-	private function formatTableActivity($l, string $subjectIdentifier, bool $ownActivity): ?string {
+	private function formatTableActivity(\OCP\IL10N $l, string $subjectIdentifier, bool $ownActivity): ?string {
 		return match ($subjectIdentifier) {
 			self::SUBJECT_TABLE_CREATE => $ownActivity ? $l->t('You have created a new table {table}') : $l->t('{user} has created a new table {table}'),
 			self::SUBJECT_TABLE_UPDATE => $ownActivity ? $l->t('You have updated the table {table}') : $l->t('{user} has updated the table {table}'),
@@ -608,7 +610,7 @@ class ActivityManager {
 		};
 	}
 
-	private function formatViewActivity($l, string $subjectIdentifier, bool $ownActivity): ?string {
+	private function formatViewActivity(\OCP\IL10N $l, string $subjectIdentifier, bool $ownActivity): ?string {
 		return match ($subjectIdentifier) {
 			self::SUBJECT_VIEW_CREATE => $ownActivity ? $l->t('You have created a new view {view} in table {table}') : $l->t('{user} has created a new view {view} in table {table}'),
 			self::SUBJECT_VIEW_UPDATE => $ownActivity ? $l->t('You have updated the view {view} in table {table}') : $l->t('{user} has updated the view {view} in table {table}'),
@@ -619,7 +621,7 @@ class ActivityManager {
 		};
 	}
 
-	private function formatRowActivity($l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewContext): ?string {
+	private function formatRowActivity(\OCP\IL10N $l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewContext): ?string {
 		switch ($subjectIdentifier) {
 			case self::SUBJECT_ROW_CREATE:
 				if ($isViewContext) {
@@ -684,7 +686,7 @@ class ActivityManager {
 			);
 	}
 
-	private function formatColumnActivity($l, string $subjectIdentifier, bool $ownActivity, bool $isViewContext): ?string {
+	private function formatColumnActivity(\OCP\IL10N $l, string $subjectIdentifier, bool $ownActivity, bool $isViewContext): ?string {
 		if ($isViewContext) {
 			return match ($subjectIdentifier) {
 				self::SUBJECT_COLUMN_CREATE => $ownActivity ? $l->t('You have created a new column {column} in view {view}') : $l->t('{user} has created a new column {column} in view {view}'),
@@ -702,7 +704,7 @@ class ActivityManager {
 		};
 	}
 
-	private function formatShareActivity($l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewObject, mixed $sharedWith): ?string {
+	private function formatShareActivity(\OCP\IL10N $l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewObject, mixed $sharedWith): ?string {
 		$sharedWithYou = $this->isSharedWithYou($subjectParams, $ownActivity);
 		$isLinkShare = $this->isLinkShare($sharedWith);
 

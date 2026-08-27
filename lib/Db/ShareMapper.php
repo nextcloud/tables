@@ -259,7 +259,7 @@ class ShareMapper extends QBMapper {
 			->orderBy('id', 'ASC');
 		$result = $qb->executeQuery();
 		try {
-			while (($row = $result->fetch()) !== false) {
+			while (($row = $result->fetchAssociative()) !== false) {
 				yield $row;
 			}
 		} finally {
@@ -279,7 +279,7 @@ class ShareMapper extends QBMapper {
 			->from($this->table);
 		$result = $qb->executeQuery();
 		$nodeIdsByType = [];
-		while (($row = $result->fetch()) !== false) {
+		while (($row = $result->fetchAssociative()) !== false) {
 			$nodeIdsByType[(string)$row['node_type']][] = (int)$row['node_id'];
 		}
 		$result->closeCursor();

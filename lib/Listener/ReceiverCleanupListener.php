@@ -19,8 +19,8 @@ use Psr\Log\LoggerInterface;
 /** @template-implements IEventListener<Event|UserDeletedEvent|GroupDeletedEvent|CircleDestroyedEvent> */
 class ReceiverCleanupListener implements IEventListener {
 	public function __construct(
-		private ShareMapper $shareMapper,
-		private LoggerInterface $logger,
+		private readonly ShareMapper $shareMapper,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 

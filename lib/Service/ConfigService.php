@@ -71,6 +71,8 @@ class ConfigService {
 	 *
 	 * @throws BadRequestError
 	 * @throws PermissionError
+	 *
+	 * @param bool|numeric|string $value
 	 */
 	public function set(string $key, mixed $value): void {
 		$userId = $this->getUserId();
