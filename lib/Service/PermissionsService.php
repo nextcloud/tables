@@ -485,7 +485,9 @@ class PermissionsService {
 				// We need to take possibly inherited permissions into account
 				try {
 					$view = $this->viewMapper->find($elementId);
-					$table = $this->tableMapper->find($view->getTableId());
+					if (!$view->isFederated()) {
+						$table = $this->tableMapper->find($view->getTableId());
+					}
 				} catch (DoesNotExistException $e) {
 					throw new NotFoundError($e->getMessage(), $e->getCode(), $e);
 				} catch (MultipleObjectsReturnedException|Exception $e) {
@@ -731,6 +733,10 @@ class PermissionsService {
 
 		if ($this->userIsElementOwner($element, $userId, $nodeType)) {
 			return true;
+		}
+
+		if ($nodeType === 'view' && $element->isFederated()) {
+			return false;
 		}
 
 		$shareNodeId = $nodeType === 'view' ? $element->getTableId() : $element->getId();

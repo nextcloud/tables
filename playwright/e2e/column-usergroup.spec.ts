@@ -11,7 +11,7 @@ const columnTitle = 'usergroup'
 const tableTitlePrefix = 'Test usergroup'
 
 const saveEditRow = async (page) => {
-	const editRowReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'PUT')
+	const editRowReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/api/2/tables/') && r.url().includes('/rows') && r.request().method() === 'PUT')
 	await page.locator('[data-cy="editRowSaveButton"]').click()
 	const editRowResponse = await editRowReqPromise
 	expect(editRowResponse.ok()).toBeTruthy()

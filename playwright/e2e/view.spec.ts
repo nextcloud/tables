@@ -137,7 +137,7 @@ test.describe('Interact with views', () => {
 		await expect(titleInput).toBeVisible({ timeout: 10000 })
 		await titleInput.clear()
 		await titleInput.fill('Changed row')
-		const saveReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/row/') && r.request().method() === 'PUT')
+		const saveReqPromise = page.waitForResponse(r => r.url().includes('/apps/tables/api/2/views/') && r.url().includes('/rows') && r.request().method() === 'PUT')
 		await titleInput.press('Enter')
 		await saveReqPromise
 

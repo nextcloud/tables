@@ -17,7 +17,8 @@
 		</template>
 
 		<template #counter>
-			<NcCounterBubble v-if="canReadData(table)" :count="table.rowsCount" />
+			<IconCloudOutline v-if="table.isFederated" :size="20" decorative />
+			<NcCounterBubble v-else-if="canReadData(table)" :count="table.rowsCount" />
 			<NcActionButton v-if="table.hasShares" icon="icon-share"
 				:class="{ 'margin-right': !(activeTable && table.id === activeTable.id) }" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
@@ -163,11 +164,14 @@ import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/RenameOutline.vue'
 import ActivityIcon from 'vue-material-design-icons/LightningBoltOutline.vue'
 import { generateUrl } from '@nextcloud/router'
+import IconCloudOutline from 'vue-material-design-icons/CloudOutline.vue'
 
 export default {
 
 	components: {
 		IconRename,
+		IconCloudOutline,
+		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
 		Star,
 		StarOutline,

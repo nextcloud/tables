@@ -63,6 +63,10 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setLastEditBy(string $lastEditBy)
  * @method getLastEditAt(): string
  * @method setLastEditAt(string $lastEditAt)
+ * @method getExternalId(): ?int
+ * @method setExternalId(?int $externalId)
+ * @method getShareToken(): ?string
+ * @method setShareToken(?string $shareToken)
  */
 class Table extends EntitySuper implements JsonSerializable {
 	protected ?string $uuid = null;
@@ -78,6 +82,9 @@ class Table extends EntitySuper implements JsonSerializable {
 
 	protected ?string $columnOrder = null; // json
 	protected ?string $sort = null; // json
+
+	protected ?int $externalId = null;
+	protected ?string $shareToken = null;
 
 	// virtual properties
 	protected ?bool $isShared = null;
@@ -96,6 +103,7 @@ class Table extends EntitySuper implements JsonSerializable {
 		$this->addType('id', 'integer');
 		$this->addType('uuid', 'string');
 		$this->addType('archived', 'boolean');
+		$this->addType('externalId', 'integer');
 	}
 
 	public function setter(string $name, array $args): void {
@@ -151,6 +159,7 @@ class Table extends EntitySuper implements JsonSerializable {
 				$this->getColumnOrderSettingsArray()
 			),
 			'sort' => $this->getSortArray(),
+			'isFederated' => $this->isFederated(),
 		];
 	}
 
@@ -210,5 +219,9 @@ class Table extends EntitySuper implements JsonSerializable {
 			return \json_decode($json, true) ?? [];
 		}
 		return [];
+	}
+
+	public function isFederated(): bool {
+		return $this->externalId !== null && $this->shareToken !== null;
 	}
 }

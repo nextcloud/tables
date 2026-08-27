@@ -43,6 +43,7 @@ namespace OCA\Tables;
  * 	},
  *  hasShares: bool,
  *  rowsCount: int,
+ *  isFederated: bool,
  * }
  *
  * @psalm-type TablesTable = array{
@@ -73,6 +74,7 @@ namespace OCA\Tables;
  *  columnsCount: int,
  *  columnOrder: list<array{columnId: int, order: int}>,
  *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
+ *  isFederated: bool,
  * }
  *
  * @psalm-type TablesIndex = array{
