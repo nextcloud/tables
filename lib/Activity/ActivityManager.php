@@ -642,7 +642,7 @@ class ActivityManager {
 		}
 	}
 
-	private function formatRowUpdateActivity($l, array $subjectParams, bool $ownActivity, bool $isViewContext): string {
+	private function formatRowUpdateActivity(\OCP\IL10N $l, array $subjectParams, bool $ownActivity, bool $isViewContext): string {
 		$visibleChangeCols = $this->getVisibleChangeCols($subjectParams);
 		$columns = '';
 		$count = 1;

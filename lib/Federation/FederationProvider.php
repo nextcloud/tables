@@ -36,11 +36,11 @@ class FederationProvider implements ISignedCloudFederationProvider {
 	public const NOTIFICATION_UPDATE_NODE = 'update-node';
 
 	public function __construct(
-		private TableMapper $tableMapper,
-		private ViewMapper $viewMapper,
-		private ShareMapper $shareMapper,
-		private ICloudIdManager $cloudIdManager,
-		private FederationService $federationService,
+		private readonly TableMapper $tableMapper,
+		private readonly ViewMapper $viewMapper,
+		private readonly ShareMapper $shareMapper,
+		private readonly ICloudIdManager $cloudIdManager,
+		private readonly FederationService $federationService,
 	) {
 	}
 

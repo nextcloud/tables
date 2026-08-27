@@ -128,7 +128,7 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function boot(IBootContext $context): void {
-		$context->injectFn([$this, 'registerCloudFederationProviderManager']);
+		$context->injectFn($this->registerCloudFederationProviderManager(...));
 	}
 
 	public function registerCloudFederationProviderManager(ICloudFederationProviderManager $manager): void {

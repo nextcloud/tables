@@ -31,16 +31,16 @@ use Psr\Log\LoggerInterface;
 
 class FederationService {
 	public function __construct(
-		private FederationProxy $proxy,
-		private ICloudIdManager $cloudIdManager,
-		private LoggerInterface $logger,
-		private ShareMapper $shareMapper,
-		private TableMapper $tableMapper,
-		private ViewMapper $viewMapper,
-		private UserHelper $userHelper,
-		private ICloudFederationProviderManager $federationProviderManager,
-		private ICloudFederationFactory $federationFactory,
-		private ConfigService $configService,
+		private readonly FederationProxy $proxy,
+		private readonly ICloudIdManager $cloudIdManager,
+		private readonly LoggerInterface $logger,
+		private readonly ShareMapper $shareMapper,
+		private readonly TableMapper $tableMapper,
+		private readonly ViewMapper $viewMapper,
+		private readonly UserHelper $userHelper,
+		private readonly ICloudFederationProviderManager $federationProviderManager,
+		private readonly ICloudFederationFactory $federationFactory,
+		private readonly ConfigService $configService,
 	) {
 	}
 
