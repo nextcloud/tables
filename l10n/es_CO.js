@@ -53,6 +53,7 @@ OC.L10N.register(
     "Select from Files" : "Seleccionar desde Archivos",
     "Preview" : "Previsualizar",
     "Import completed successfully." : "El importar terminón exitosamente.",
+    "Icon" : "Ícono",
     "Result" : "Resultado",
     "Sort" : "Ordenar",
     "Transfer" : "Transferencia",

@@ -39,6 +39,7 @@ OC.L10N.register(
     "Select from Files" : "Choaz diouz ar restr",
     "Preview" : "Ragwell",
     "Failed" : "C'hwitet",
+    "Icon" : "Skeudennig",
     "Sort" : "Renkañ",
     "Transfer" : "Treuzkas",
     "Filter" : "Filtre",

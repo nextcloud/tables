@@ -55,6 +55,7 @@ OC.L10N.register(
     "Preview" : "Previsualizar",
     "Failed" : "Falló",
     "Import completed successfully." : "El importar terminón exitosamente.",
+    "Icon" : "Ícono",
     "Result" : "Resultado",
     "Sort" : "Ordenar",
     "Filter" : "Filtrar",

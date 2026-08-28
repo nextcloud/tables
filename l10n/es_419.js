@@ -51,6 +51,7 @@ OC.L10N.register(
     "Select from Files" : "Seleccionar desde Archivos",
     "Preview" : "Previsualizar",
     "Import completed successfully." : "Importar completado con éxito",
+    "Icon" : "Ícono",
     "Result" : "Resultado",
     "Sort" : "Ordenar",
     "Filter" : "Filtrar",
