@@ -434,11 +434,11 @@ class Row2Mapper {
 		switch ($operator) {
 			case 'begins-with':
 				$includeDefault = str_starts_with((string)($defaultValue ?? ''), (string)$value);
-				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
+				$filterExpression = $qb->expr()->iLike('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'ends-with':
 				$includeDefault = str_ends_with((string)($defaultValue ?? ''), (string)$value);
-				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
+				$filterExpression = $qb->expr()->iLike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
 				break;
 			case 'contains':
 				$filterExpressions = [];
@@ -469,14 +469,14 @@ class Row2Mapper {
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->orX(
-						$qb->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
-						$qb->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
-						$qb->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
-						$qb->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
+						$qb->expr()->iLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
+						$qb->expr()->iLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
+						$qb->expr()->iLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
+						$qb->expr()->iLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
 					);
 					break;
 				}
-				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+				$filterExpression = $qb->expr()->iLike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'does-not-contain':
 				if (is_array($value) && $column->getType() === Column::TYPE_USERGROUP) {
@@ -514,14 +514,14 @@ class Row2Mapper {
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->andX(
-						$qb->expr()->notLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
-						$qb->expr()->notLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
-						$qb->expr()->notLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
-						$qb->expr()->notLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
+						$this->notILike($qb, 'value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
+						$this->notILike($qb, 'value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
+						$this->notILike($qb, 'value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
+						$this->notILike($qb, 'value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
 					);
 					break;
 				}
-				$filterExpression = $qb->expr()->notLike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+				$filterExpression = $this->notILike($qb, 'value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'is-equal':
 				$includeDefault = $defaultValue === $value;
@@ -602,6 +602,19 @@ class Row2Mapper {
 	}
 
 	/**
+	 * Helper method to use notILike if available, otherwise fall back to not(iLike(...))
+	 */
+	private function notILike(IQueryBuilder $qb, string $column, $parameter): string {
+		$expr = $qb->expr();
+		// Nextcloud v35 introduced shortcut method
+		if (method_exists($expr, 'notILike')) {
+			return $expr->notILike($column, $parameter);
+		}
+
+		return 'NOT (' . $expr->iLike($column, $parameter) . ')';
+	}
+
+	/**
 	 * @param string $operator
 	 * @param IQueryBuilder $qb
 	 * @param string $columnName
@@ -612,10 +625,10 @@ class Row2Mapper {
 	 */
 	private function getSqlOperator(string $operator, IQueryBuilder $qb, string $columnName, $value, $paramType): string {
 		return match ($operator) {
-			'begins-with' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType)),
-			'ends-with' => $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType)),
-			'contains' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
-			'does-not-contain' => $qb->expr()->notLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
+			'begins-with' => $qb->expr()->iLike($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType)),
+			'ends-with' => $qb->expr()->iLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType)),
+			'contains' => $qb->expr()->iLike($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
+			'does-not-contain' => $this->notILike($qb, $columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
 			'is-equal' => $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType)),
 			'is-not-equal' => $qb->expr()->neq($columnName, $qb->createNamedParameter($value, $paramType)),
 			'is-greater-than' => $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType)),

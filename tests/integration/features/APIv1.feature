@@ -553,6 +553,53 @@ Feature: APIv1
       | task             |
       | New general task |
 
+  @api1 @views @view-filters
+  Scenario: Case-insensitive filter with contains operator
+    Given table "Product List" with emoji "📦" exists for user "participant1" as "product-list"
+    Then column "name" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | Product name           |
+    Then row exists with following values
+      | name | Apple  |
+    Then row exists with following values
+      | name | Banana |
+    Then row exists with following values
+      | name | Orange |
+    And user "participant1" create view "Fruit Products" with emoji "🍎" for "product-list" as "fruit-products"
+    When user "participant1" sets columnSettings "name" to view "fruit-products"
+    And user "participant1" sets filter to view "fruit-products"
+      | column  | operator  | value |
+      | name    | contains | APP  |
+    Then view "fruit-products" has exactly the following rows
+      | name    |
+      | Apple   |
+
+  @api1 @views @view-filters
+  Scenario: Case-insensitive filter with does-not-contain operator
+    Given table "Produce List" with emoji "🥕" exists for user "participant1" as "produce-list"
+    Then column "name" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | Produce name           |
+    Then row exists with following values
+      | name | Apple  |
+    Then row exists with following values
+      | name | Banana |
+    Then row exists with following values
+      | name | Orange |
+    And user "participant1" create view "Produce Filtered" with emoji "🚫" for "produce-list" as "produce-filtered"
+    When user "participant1" sets columnSettings "name" to view "produce-filtered"
+    And user "participant1" sets filter to view "produce-filtered"
+      | column  | operator         | value |
+      | name    | does-not-contain | APP   |
+    Then view "produce-filtered" has exactly the following rows
+      | name    |
+      | Banana  |
+      | Orange  |
+
   @api1 @views @technical-name
   Scenario: Create and update view with technical name
     Given table "View technical name test" with emoji "🔧" exists for user "participant1" as "tech-name-table"
