@@ -4,7 +4,6 @@
  */
 import { AbstractColumn } from '../columnClass.js'
 import { useDataStore } from '../../../../../store/data.js'
-import { useTablesStore } from '../../../../../store/store.js'
 import { FilterIds } from '../filter.js'
 import { ColumnTypes } from '../columnHandler.js'
 
@@ -50,18 +49,12 @@ export default class RelationColumn extends AbstractColumn {
 	getLabel(rowId) {
 		// Try to get relation data from the store
 		try {
-			const tablesStore = useTablesStore()
 			const dataStore = useDataStore()
-
-			const activeElement = tablesStore.activeView || tablesStore.activeTable
-			if (!activeElement) {
-				return ''
-			}
 
 			const columnRelations = dataStore.getRelations(this.id)
 			const option = columnRelations[rowId]
 
-			return option ? option.label : undefined
+			return option ? option.label : ''
 		} catch (error) {
 			console.warn('Failed to get relation label:', error)
 			return ''

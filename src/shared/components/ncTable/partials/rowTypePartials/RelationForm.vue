@@ -81,6 +81,7 @@ export default {
 			await this.loadRelationsFromBE({
 				tableId: this.activeTable?.id,
 				viewId: this.activeView?.id,
+				force: true,
 			})
 		}
 	},

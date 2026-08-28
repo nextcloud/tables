@@ -159,7 +159,7 @@ export default {
 
 	methods: {
 		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView']),
-		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE']),
+		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		contextSignature() {
 			const ctx = this.activeContext
 			return ctx ? `${ctx.id}:${Object.keys(ctx.nodes || {}).sort().join(',')}` : null
@@ -218,6 +218,9 @@ export default {
 											viewId: null,
 											tableId: table.id,
 										})
+										await this.loadRelationsFromBE({
+											tableId: table.id,
+										})
 										table.key = (table.id).toString()
 										table.isView = false
 										this.contextResources.push(table)
@@ -233,6 +236,9 @@ export default {
 										await this.loadRowsFromBE({
 											viewId: view.id,
 											tableId: view.tableId,
+										})
+										await this.loadRelationsFromBE({
+											viewId: view.id,
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
