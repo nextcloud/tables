@@ -170,7 +170,7 @@ class FederationProxy {
 		);
 
 		if (!empty($parameters)) {
-			$options['json'] = json_decode((string) $options['body'], true);
+			$options['json'] = json_decode((string)$options['body'], true);
 			unset($options['body']);
 		}
 

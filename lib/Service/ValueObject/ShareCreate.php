@@ -22,7 +22,7 @@ class ShareCreate {
 		private readonly bool $permissionManage,
 		private readonly int $displayMode,
 		private readonly ?string $password = null,
-		private readonly ?ShareToken $shareToken = null,
+		private ?ShareToken $shareToken = null,
 	) {
 	}
 

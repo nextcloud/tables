@@ -31,7 +31,7 @@ class ResetPublicSharePermissions implements IRepairStep {
 	}
 
 	public function run(IOutput $output): void {
-		$appVersion = $this->appConfig->getValue(Application::APP_ID, 'installed_version', '0.0');
+		$appVersion = $this->appConfig->getValueString(Application::APP_ID, 'installed_version', '0.0');
 		if (\version_compare($appVersion, '2.0.2', '>=')) {
 			$output->info('Not applicable, skipping.');
 			return;

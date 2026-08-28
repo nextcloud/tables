@@ -180,6 +180,7 @@ class ShareService extends SuperService {
 	public function createLinkShare(Table|View $node, ?string $password = null): Share {
 		$this->assertPublicLinkSharingAllowed();
 
+		$lastError = null;
 		for ($i = 0; $i < 3; $i++) {
 			// there is the theoretical chance, that an existing share token would be re-used,
 			// so we take up to three attempts to try to generate it.
@@ -198,10 +199,11 @@ class ShareService extends SuperService {
 					$password,
 					$this->generateShareToken(),
 				));
-			} catch (InternalError) {
+			} catch (InternalError $e) {
+				$lastError = $e;
 			}
 		}
-		throw $e;
+		throw $lastError ?? new InternalError('Could not create link share');
 	}
 
 	public function checkPassword(Share $share, string $password): bool {

@@ -11,9 +11,15 @@ use JsonSerializable;
 
 class ContextScheme implements JsonSerializable {
 
-	public function __construct(protected ?string $name, protected ?string $icon, protected ?string $description, protected ?array $nodes = [], protected ?array $pages = [], protected ?array $tables = [])
-    {
-    }
+	public function __construct(
+		protected ?string $name,
+		protected ?string $icon,
+		protected ?string $description,
+		protected ?array $nodes = [],
+		protected ?array $pages = [],
+		protected ?array $tables = [],
+	) {
+	}
 
 	public function getName(): ?string {
 		return $this->name ?? '';

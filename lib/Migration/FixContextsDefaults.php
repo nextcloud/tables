@@ -36,7 +36,7 @@ class FixContextsDefaults implements IRepairStep {
 	 * @inheritDoc
 	 */
 	public function run(IOutput $output) {
-		$appVersion = $this->appConfig->getValue(Application::APP_ID, 'installed_version', '0.0');
+		$appVersion = $this->appConfig->getValueString(Application::APP_ID, 'installed_version', '0.0');
 		if (\version_compare($appVersion, '0.8.0-beta.1', '>')) {
 			$output->info('Not applicable, skipping.');
 			return;

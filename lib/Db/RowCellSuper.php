@@ -18,7 +18,7 @@ use OCP\AppFramework\Db\Entity;
  * @method getRowId(): int
  * @method setRowId(int $rowId)
  * @method getValue(): string
- * @method setValue(string $value)
+ * @method setValue(mixed $value)
  * @method getLastEditBy(): string
  * @method setLastEditBy(string $lastEditBy)
  * @method getLastEditAt(): string

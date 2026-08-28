@@ -82,15 +82,15 @@ class ActivityManager {
 	}
 
 	/**
-	 * @param Row2|Table $object
-	 * @param \OCA\Tables\Model\ImportStats[]|null|string $additionalParams
-	 * @param (array|null)[]|null|string $author
+	 * @param Row2|Table|View|Column $object
+	 * @param array<string, mixed>|null|string $additionalParams
+	 * @param string|null $author
 	 *
-	 * @psalm-param 'tables_row'|'tables_table' $objectType
-	 * @psalm-param array{importStats?: \OCA\Tables\Model\ImportStats}|null|string $additionalParams
-	 * @psalm-param array{before: array|null, after: array|null}|null|string $author
+	 * @psalm-param self::TABLES_OBJECT_* $objectType
+	 * @psalm-param array<string, mixed>|null|string $additionalParams
+	 * @psalm-param string|null $author
 	 */
-	public function triggerEvent(string $objectType, Table|Row2 $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
+	public function triggerEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
 		if ($author === null) {
 			$author = $this->userId;
 		}
@@ -107,8 +107,7 @@ class ActivityManager {
 	}
 
 	/**
-	 * @psalm-param 'tables_table' $objectType
-	 * @psalm-param 'table_update' $subject
+	 * @psalm-param self::TABLES_OBJECT_* $objectType
 	 */
 	public function triggerUpdateEvents(string $objectType, ChangeSet $changeSet, string $subject) {
 		$previousEntity = $changeSet->getBefore();
@@ -148,13 +147,14 @@ class ActivityManager {
 	}
 
 	/**
-	 * @psalm-param array{before?: mixed, after?: mixed} $additionalParams
-	 * @psalm-param 'tables_row'|'tables_table' $objectType
-	 * @psalm-param array{before: array|null, after: array|null}|null|string $author
+	 * @param Row2|Table|View|Column $object
+	 * @param string|null $author
 	 *
-	 * @param (array|null)[]|null|string $author
+	 * @psalm-param self::TABLES_OBJECT_* $objectType
+	 * @psalm-param array<string, mixed> $additionalParams
+	 * @psalm-param string|null $author
 	 */
-	private function createEvent(string $objectType, Row2|Table $object, string $subject, array $additionalParams = [], array|string|null $author = null) {
+	private function createEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array $additionalParams = [], array|string|null $author = null) {
 		if ($object instanceof Table) {
 			$objectTitle = $object->getTitle();
 			$table = $object;
@@ -315,7 +315,7 @@ class ActivityManager {
 		];
 	}
 
-	private function sendToUsers(IEvent $event, Row2|Table $object) {
+	private function sendToUsers(IEvent $event, Row2|Table|View|Column $object) {
 		// Handle share events with restricted recipients
 		$subject = $event->getSubject();
 		if (in_array($subject, [self::SUBJECT_SHARE_CREATE, self::SUBJECT_SHARE_UPDATE, self::SUBJECT_SHARE_DELETE], true)) {
@@ -426,9 +426,9 @@ class ActivityManager {
 	/**
 	 * Send share events only to: event author, table owner, and shared-with receiver users.
 	 *
-	 * @param Row2|Table $object
+	 * @param Row2|Table|View|Column $object
 	 */
-	private function sendShareEventToUsers(IEvent $event, Table|Row2 $object): void {
+	private function sendShareEventToUsers(IEvent $event, Row2|Table|View|Column $object): void {
 		if (!$object instanceof Table && !$object instanceof View) {
 			Server::get(LoggerInterface::class)->error('Could not send share activity. Invalid object type.', (array)$object);
 			return;

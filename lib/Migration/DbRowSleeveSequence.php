@@ -35,22 +35,22 @@ class DbRowSleeveSequence implements IRepairStep {
 	 * @inheritDoc
 	 */
 	public function run(IOutput $output) {
-		$legacyRowTransferRunComplete = $this->appConfig->getValue('tables', 'legacyRowTransferRunComplete', 'false') === 'true';
-		$sequenceRepairComplete = $this->appConfig->getValue('tables', 'sequenceRepairComplete', 'false') === 'true';
+		$legacyRowTransferRunComplete = $this->appConfig->getValueString('tables', 'legacyRowTransferRunComplete', 'false') === 'true';
+		$sequenceRepairComplete = $this->appConfig->getValueString('tables', 'sequenceRepairComplete', 'false') === 'true';
 		if (!$legacyRowTransferRunComplete || $sequenceRepairComplete) {
 			return;
 		}
 
 		$platform = $this->db->getDatabasePlatform();
 		if (!$platform->supportsSequences()) {
-			$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
+			$this->appConfig->setValueString('tables', 'sequenceRepairComplete', 'true');
 			return;
 		}
 
 		$newSequenceOffset = $this->getNewOffset();
 		if ($newSequenceOffset === null) {
 			// no data, no op
-			$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
+			$this->appConfig->setValueString('tables', 'sequenceRepairComplete', 'true');
 			return;
 		}
 
@@ -67,14 +67,14 @@ class DbRowSleeveSequence implements IRepairStep {
 			throw new \LogicException('Failed to find the correct sequence.');
 		} elseif (count($candidates) === 0) {
 			// 🤷
-			$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
+			$this->appConfig->setValueString('tables', 'sequenceRepairComplete', 'true');
 			return;
 		}
 		/** @var Sequence $sequence */
 		$sequence = $candidates[array_key_first($candidates)];
 
 		$this->db->executeStatement(sprintf('ALTER SEQUENCE %s RESTART START WITH %d', $sequence->getName(), $newSequenceOffset));
-		$this->appConfig->setValue('tables', 'sequenceRepairComplete', 'true');
+		$this->appConfig->setValueString('tables', 'sequenceRepairComplete', 'true');
 	}
 
 	protected function getNewOffset(): ?int {
