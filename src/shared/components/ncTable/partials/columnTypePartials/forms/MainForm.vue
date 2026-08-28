@@ -70,7 +70,7 @@
 				data-cy="columnAdvancedSettingsToggle"
 				:aria-expanded="showAdvanced"
 				:aria-label="advancedToggleLabel"
-				@click="showAdvanced = !showAdvanced">
+				@click="toggleAdvanced">
 				<template #icon>
 					<ChevronUp v-if="showAdvanced" :size="20" />
 					<ChevronDown v-else :size="20" />
@@ -93,7 +93,7 @@
 			</div>
 
 			<!-- warning for technical name changes -->
-			<div class="fix-col-4 space-T">
+			<div v-if="showTechnicalNameWarning" class="fix-col-4 space-T">
 				<NcNoteCard type="warning">
 					<p>{{ t('tables', 'Changing the technical name affects integrations and API. Make sure to update your services accordingly.') }}</p>
 				</NcNoteCard>
@@ -120,6 +120,7 @@
 import { NcButton, NcCheckboxRadioSwitch, NcNoteCard, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import { translate as t } from '@nextcloud/l10n'
+import { useStorage } from '@vueuse/core'
 import ChevronDown from 'vue-material-design-icons/ChevronDown.vue'
 import ChevronUp from 'vue-material-design-icons/ChevronUp.vue'
 import { useTablesStore } from '../../../../../../store/store.js'
@@ -149,6 +150,10 @@ export default {
 			default: null,
 		},
 		technicalName: {
+			type: String,
+			default: null,
+		},
+		originalTechnicalName: {
 			type: String,
 			default: null,
 		},
@@ -191,15 +196,24 @@ export default {
 		return {
 			COLUMN_WIDTH_MIN,
 			COLUMN_WIDTH_MAX,
-			showAdvanced: false,
 		}
+	},
+	created() {
+		this.showAdvancedStorage = useStorage('tables-column-advanced-settings', false)
 	},
 	computed: {
 		...mapState(useTablesStore, ['views', 'activeElement', 'isView']),
+		showAdvanced: {
+			get() { return this.showAdvancedStorage.value },
+			set(value) { this.showAdvancedStorage.value = value },
+		},
 		advancedToggleLabel() {
 			return this.showAdvanced
 				? t('tables', 'Hide advanced settings')
 				: t('tables', 'Show advanced settings')
+		},
+		showTechnicalNameWarning() {
+			return this.editColumn && (this.technicalName ?? '') !== (this.originalTechnicalName ?? '')
 		},
 		localTitle: {
 			get() { return this.title },
@@ -243,9 +257,6 @@ export default {
 
 	mounted() {
 		if (this.editColumn) {
-			if (this.technicalName || this.customSettings?.width) {
-				this.showAdvanced = true
-			}
 			return
 		}
 		if (!this.isView) {
@@ -256,6 +267,9 @@ export default {
 	},
 	methods: {
 		t,
+		toggleAdvanced() {
+			this.showAdvanced = !this.showAdvanced
+		},
 		expandAdvancedOnError(show) {
 			if (show) {
 				this.showAdvanced = true
