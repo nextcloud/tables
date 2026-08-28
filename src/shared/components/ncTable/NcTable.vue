@@ -334,12 +334,9 @@ export default {
 						cell = row.data.find(item => item && item.columnId === column.id)
 					}
 
-					// if we don't have a value for this cell
 					if (cell === undefined) {
-						if (searchString) {
-							searchStatus = false
-						}
-						cell = { columnId: column.id, value: null }
+						const defaultValue = typeof column.default === 'function' ? column.default() : null
+						cell = { columnId: column.id, value: column.parseValue(defaultValue) }
 					}
 					// cleanup possible old markers
 					delete cell.searchStringFound
