@@ -262,6 +262,7 @@ class ApiTablesController extends AOCSController {
 
 				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray(
 					array_merge($inputColumnsArray, [
+						'description' => $view['description'] ?? '',
 						'sort' => $newSort,
 						'filter' => $newFilter,
 					])
