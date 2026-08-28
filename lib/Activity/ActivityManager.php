@@ -55,6 +55,7 @@ class ActivityManager {
 	public const SUBJECT_COLUMN_DELETE = 'column_delete';
 
 	public const SUBJECT_IMPORT_FINISHED = 'import_finished';
+	public const SUBJECT_IMPORT_FAILED = 'import_failed';
 
 	public const SUBJECT_SHARE_CREATE = 'share_create';
 	public const SUBJECT_SHARE_UPDATE = 'share_update';

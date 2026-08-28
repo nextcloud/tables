@@ -324,6 +324,37 @@ class Notifier implements INotifier {
 					: $l->t('{user} has imported file to table {table}');
 				break;
 
+			case ActivityManager::SUBJECT_IMPORT_FAILED:
+				$link = $hasViewContext ? $richParams['view']['link'] : $richParams['table']['link'];
+				$recipient = $notification->getUser();
+				$isActivityOwner = $params['author'] === $recipient;
+				if ($hasViewContext) {
+					$parsedSubject = $isActivityOwner
+						? $l->t('Your import to view {view} has failed', [
+							$richParams['view']['name'] ?? '',
+						])
+						: $l->t('{user}\'s import to view {view} has failed', [
+							$richParams['user']['name'] ?? '',
+							$richParams['view']['name'] ?? '',
+						]);
+					$subject = $isActivityOwner
+						? $l->t('Your import to view {view} has failed')
+						: $l->t('{user}\'s import to view {view} has failed');
+					break;
+				}
+				$parsedSubject = $isActivityOwner
+					? $l->t('Your import to table {table} has failed', [
+						$richParams['table']['name'] ?? '',
+					])
+					: $l->t('{user}\'s import to table {table} has failed', [
+						$richParams['user']['name'] ?? '',
+						$richParams['table']['name'] ?? '',
+					]);
+				$subject = $isActivityOwner
+					? $l->t('Your import to table {table} has failed')
+					: $l->t('{user}\'s import to table {table} has failed');
+				break;
+
 			default:
 				throw new UnknownNotificationException();
 		}

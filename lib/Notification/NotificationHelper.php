@@ -92,7 +92,7 @@ class NotificationHelper {
 			]
 		];
 
-		if ($subject === ActivityManager::SUBJECT_IMPORT_FINISHED) {
+		if ($subject === ActivityManager::SUBJECT_IMPORT_FINISHED || $subject === ActivityManager::SUBJECT_IMPORT_FAILED) {
 			$notification = $this->generateNotification(
 				subject: $subject,
 				subjectParams: $subjectParams,
@@ -125,7 +125,7 @@ class NotificationHelper {
 			],
 		];
 
-		if ($subject === ActivityManager::SUBJECT_IMPORT_FINISHED) {
+		if ($subject === ActivityManager::SUBJECT_IMPORT_FINISHED || $subject === ActivityManager::SUBJECT_IMPORT_FAILED) {
 			$subjectParams['isViewContext'] = true;
 			$subjectParams['view'] = [
 				'id' => $object->getId(),
