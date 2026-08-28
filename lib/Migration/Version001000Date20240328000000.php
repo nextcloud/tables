@@ -30,6 +30,6 @@ class Version001000Date20240328000000 extends SimpleMigrationStep {
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
 		// Register background job to convert column format
-		$this->jobList->add("OCA\Tables\BackgroundJob\ConvertViewColumnsFormat");
+		$this->jobList->add(\OCA\Tables\BackgroundJob\ConvertViewColumnsFormat::class);
 	}
 }

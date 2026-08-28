@@ -12,11 +12,12 @@ use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\IReferenceProvider;
 
 class ContentReferenceProvider implements IReferenceProvider {
-	private ContentReferenceHelper $referenceHelper;
-	private ReferenceManager $referenceManager;
+	private readonly ReferenceManager $referenceManager;
 
-	public function __construct(ContentReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
-		$this->referenceHelper = $referenceHelper;
+	public function __construct(
+		private readonly ContentReferenceHelper $referenceHelper,
+		ReferenceManager $referenceManager,
+	) {
 		$this->referenceManager = $referenceManager;
 	}
 

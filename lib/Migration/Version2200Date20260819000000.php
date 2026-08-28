@@ -19,10 +19,9 @@ use OCP\Migration\SimpleMigrationStep;
 use Override;
 
 class Version2200Date20260819000000 extends SimpleMigrationStep {
-	private IDBConnection $connection;
-
-	public function __construct(IDBConnection $connection) {
-		$this->connection = $connection;
+	public function __construct(
+		private readonly IDBConnection $connection,
+	) {
 	}
 
 	#[Override]

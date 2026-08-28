@@ -25,17 +25,14 @@ use Psr\Log\LoggerInterface;
  */
 
 class ConfigController extends AOCSController {
-	private ConfigService $configService;
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
 		IL10N $n,
 		string $userId,
-		ConfigService $configService,
+		private readonly ConfigService $configService,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
-		$this->configService = $configService;
 	}
 
 	/**

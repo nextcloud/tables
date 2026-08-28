@@ -17,9 +17,10 @@ class SelectionMultiBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value (array|string|null)
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		if ($value === null) {
 			return json_encode([]);
 		}
@@ -28,7 +29,7 @@ class SelectionMultiBusiness extends SuperBusiness {
 
 		$wasString = false;
 		if (is_string($value)) {
-			$value = array_map('trim', explode(',', $value));
+			$value = array_map(trim(...), explode(',', $value));
 			$wasString = true;
 		}
 
@@ -80,7 +81,7 @@ class SelectionMultiBusiness extends SuperBusiness {
 
 		$wasString = false;
 		if (is_string($value)) {
-			$value = array_map('trim', explode(',', $value));
+			$value = array_map(trim(...), explode(',', $value));
 			$wasString = true;
 		}
 

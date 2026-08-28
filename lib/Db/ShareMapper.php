@@ -20,11 +20,12 @@ use Psr\Log\LoggerInterface;
 /** @template-extends QBMapper<Share> */
 class ShareMapper extends QBMapper {
 	protected string $table = 'tables_shares';
-	protected LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, IDBConnection $db) {
+	public function __construct(
+		protected LoggerInterface $logger,
+		IDBConnection $db,
+	) {
 		parent::__construct($db, $this->table, Share::class);
-		$this->logger = $logger;
 	}
 
 	/**
@@ -258,7 +259,7 @@ class ShareMapper extends QBMapper {
 			->orderBy('id', 'ASC');
 		$result = $qb->executeQuery();
 		try {
-			while (($row = $result->fetch()) !== false) {
+			while (($row = $result->fetchAssociative()) !== false) {
 				yield $row;
 			}
 		} finally {
@@ -278,7 +279,7 @@ class ShareMapper extends QBMapper {
 			->from($this->table);
 		$result = $qb->executeQuery();
 		$nodeIdsByType = [];
-		while (($row = $result->fetch()) !== false) {
+		while (($row = $result->fetchAssociative()) !== false) {
 			$nodeIdsByType[(string)$row['node_type']][] = (int)$row['node_id'];
 		}
 		$result->closeCursor();

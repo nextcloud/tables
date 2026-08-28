@@ -30,11 +30,11 @@ class TableTemplateService {
 
 	public function __construct(
 		protected LoggerInterface $logger,
-		private IL10N $l,
-		private ColumnService $columnService,
-		private ?string $userId,
-		private RowService $rowService,
-		private ViewService $viewService,
+		private readonly IL10N $l,
+		private readonly ColumnService $columnService,
+		private readonly ?string $userId,
+		private readonly RowService $rowService,
+		private readonly ViewService $viewService,
 		protected Defaults $themingDefaults,
 	) {
 	}
@@ -493,13 +493,9 @@ class TableTemplateService {
 	 * @return list<array{columnId: int, order: int}>
 	 */
 	private function columnsToInputArray(array $columns): array {
-		$columns = array_filter($columns, static function ($item) {
-			return $item instanceof Column;
-		});
+		$columns = array_filter($columns, static fn ($item) => $item instanceof Column);
 		return array_map(
-			static function (Column $column, int $index): array {
-				return ['columnId' => $column->getId(), 'order' => $index];
-			},
+			static fn (Column $column, int $index): array => ['columnId' => $column->getId(), 'order' => $index],
 			array_values($columns), array_keys(array_values($columns))
 		);
 	}
@@ -813,7 +809,7 @@ class TableTemplateService {
 			$this->logger->warning('Exception occurred while creating a row: ' . $e->getMessage());
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 

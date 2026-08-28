@@ -39,9 +39,9 @@ class RowOCSController extends AOCSController {
 		IL10N $n,
 		string $userId,
 		protected RowService $rowService,
-		private TableService $tableService,
-		private ViewService $viewService,
-		private FederationService $federationService,
+		private readonly TableService $tableService,
+		private readonly ViewService $viewService,
+		private readonly FederationService $federationService,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
 	}

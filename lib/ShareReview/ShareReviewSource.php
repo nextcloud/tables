@@ -43,12 +43,12 @@ class ShareReviewSource implements IShareReviewSource {
 	private ?array $permissionCatalog = null;
 
 	public function __construct(
-		private ShareMapper $shareMapper,
-		private TableMapper $tableMapper,
-		private ViewMapper $viewMapper,
-		private ContextMapper $contextMapper,
-		private IL10N $l10n,
-		private LoggerInterface $logger,
+		private readonly ShareMapper $shareMapper,
+		private readonly TableMapper $tableMapper,
+		private readonly ViewMapper $viewMapper,
+		private readonly ContextMapper $contextMapper,
+		private readonly IL10N $l10n,
+		private readonly LoggerInterface $logger,
 		private readonly ShareService $shareService,
 		private readonly IEventDispatcher $eventDispatcher,
 	) {

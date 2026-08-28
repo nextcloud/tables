@@ -14,9 +14,10 @@ class NumberStarsBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value (null|int|string)
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		return json_encode((int)$value);
 	}
 

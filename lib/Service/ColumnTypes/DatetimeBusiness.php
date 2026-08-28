@@ -16,9 +16,10 @@ class DatetimeBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value (string|null)
 	 * @param Column $column
-	 * @return string
+	 *
+	 * @return false|string
 	 */
-	public function parseValue($value, Column $column): string {
+	public function parseValue($value, Column $column): string|false {
 		if ($value === '' || $value === null) {
 			return '';
 		}
@@ -53,7 +54,7 @@ class DatetimeBusiness extends SuperBusiness {
 
 		try {
 			new DateTime($value);
-		} catch (Exception $e) {
+		} catch (Exception) {
 			return false;
 		}
 		return true;

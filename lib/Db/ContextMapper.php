@@ -156,7 +156,7 @@ class ContextMapper extends QBMapper {
 		$qb = $this->getFindContextBaseQuery($userId);
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		$contextIds = [];
 		foreach ($r as $row) {
@@ -206,7 +206,7 @@ class ContextMapper extends QBMapper {
 		));
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		$contextIds = [];
 		foreach ($r as $row) {
@@ -238,7 +238,7 @@ class ContextMapper extends QBMapper {
 		$qb->andWhere($qb->expr()->eq('c.id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		if (empty($r)) {
 			throw new NotFoundError('Context does not exist');
@@ -258,7 +258,7 @@ class ContextMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('r.node_type', $qb->createNamedParameter($nodeType)));
 
 		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		$r = $result->fetchAllAssociative();
 
 		$contextIds = [];
 		foreach ($r as $row) {
@@ -300,7 +300,7 @@ class ContextMapper extends QBMapper {
 		foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
-			foreach ($result->fetchAll() as $row) {
+			foreach ($result->fetchAllAssociative() as $row) {
 				$map[(int)$row['id']] = (string)$row['name'];
 			}
 			$result->closeCursor();

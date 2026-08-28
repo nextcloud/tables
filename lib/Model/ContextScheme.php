@@ -11,20 +11,14 @@ use JsonSerializable;
 
 class ContextScheme implements JsonSerializable {
 
-	protected ?string $name = null;
-	protected ?string $icon = null;
-	protected ?string $description = null;
-	protected ?array $nodes = null;
-	protected ?array $pages = null;
-	protected ?array $tables = null;
-
-	public function __construct(string $name, string $icon, string $description, array $nodes = [], array $pages = [], array $tables = []) {
-		$this->name = $name;
-		$this->icon = $icon;
-		$this->description = $description;
-		$this->nodes = $nodes;
-		$this->pages = $pages;
-		$this->tables = $tables;
+	public function __construct(
+		protected ?string $name,
+		protected ?string $icon,
+		protected ?string $description,
+		protected ?array $nodes = [],
+		protected ?array $pages = [],
+		protected ?array $tables = [],
+	) {
 	}
 
 	public function getName(): ?string {

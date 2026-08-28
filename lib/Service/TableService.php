@@ -111,7 +111,7 @@ class TableService extends SuperService {
 				$allTables[$tutorialTable->getId()] = $tutorialTable;
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|OcpDbException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		}
 
@@ -186,21 +186,21 @@ class TableService extends SuperService {
 			try {
 				$shares = $this->shareService->findAll('table', $table->getId());
 				$table->setHasShares(count($shares) !== 0);
-			} catch (InternalError $e) {
+			} catch (InternalError) {
 			}
 		}
 
 		// add the rows count
 		try {
 			$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
-		} catch (PermissionError $e) {
+		} catch (PermissionError) {
 			$table->setRowsCount(0);
 		}
 
 		// add the column count
 		try {
 			$table->setColumnsCount($this->columnService->getColumnsCount($table->getId()));
-		} catch (PermissionError $e) {
+		} catch (PermissionError) {
 			$table->setColumnsCount(0);
 		}
 
@@ -224,11 +224,11 @@ class TableService extends SuperService {
 				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
 				$table->setIsShared(true);
 				$table->setOnSharePermissions($permissions);
-			} catch (NotFoundError $e) {
+			} catch (NotFoundError) {
 				try {
 					$table->setOnSharePermissions($this->permissionsService->getPermissionArrayForNodeFromContexts($table->getId(), 'table', $userId));
 					$table->setIsShared(true);
-				} catch (NotFoundError $e) {
+				} catch (NotFoundError) {
 				}
 			}
 		} else {
@@ -325,7 +325,7 @@ class TableService extends SuperService {
 				$table = $this->tableTemplateService->makeTemplate($newTable, $template);
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|OcpDbException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
 			$table = $this->addOwnerDisplayName($newTable);
@@ -335,7 +335,7 @@ class TableService extends SuperService {
 			$this->enhanceTable($table, $userId);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		$this->activityManager->triggerEvent(
 			objectType: ActivityManager::TABLES_OBJECT_TABLE,
@@ -367,10 +367,10 @@ class TableService extends SuperService {
 			$table = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -417,10 +417,10 @@ class TableService extends SuperService {
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -433,7 +433,7 @@ class TableService extends SuperService {
 			$this->rowService->deleteAllByTable($id, $userId);
 		} catch (PermissionError|OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// delete all views for that table
@@ -443,7 +443,7 @@ class TableService extends SuperService {
 			$this->viewService->deleteAllByTable($item, $userId);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// delete all columns for that table
@@ -451,14 +451,14 @@ class TableService extends SuperService {
 			$columns = $this->columnService->findAllByTable($id, $userId, $item);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		foreach ($columns as $column) {
 			try {
 				$this->columnService->delete($column->id, true, $userId);
 			} catch (InternalError $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		}
 
@@ -476,7 +476,7 @@ class TableService extends SuperService {
 			$this->mapper->delete($item);
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		$event = new TableDeletedEvent(table: $item);
@@ -512,10 +512,10 @@ class TableService extends SuperService {
 			$table = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -550,7 +550,7 @@ class TableService extends SuperService {
 			$table = $this->mapper->update($table);
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// notify federated shares about table update
@@ -560,7 +560,7 @@ class TableService extends SuperService {
 			$this->enhanceTable($table, $userId);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		$changes->setAfter($table);
 		$this->activityManager->triggerUpdateEvents(
@@ -587,7 +587,7 @@ class TableService extends SuperService {
 				$this->enhanceTable($table, $userId);
 			}
 			return $tables;
-		} catch (InternalError|PermissionError|OcpDbException $e) {
+		} catch (InternalError|PermissionError|OcpDbException) {
 			return [];
 		}
 	}
@@ -786,7 +786,7 @@ class TableService extends SuperService {
 			$table = $this->mapper->update($table);
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// Add views

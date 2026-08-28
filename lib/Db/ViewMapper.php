@@ -27,7 +27,7 @@ class ViewMapper extends QBMapper {
 
 	public function __construct(
 		IDBConnection $db,
-		private UserHelper $userHelper,
+		private readonly UserHelper $userHelper,
 	) {
 		parent::__construct($db, $this->table, View::class);
 		$this->cache = new CappedMemoryCache();
@@ -226,7 +226,7 @@ class ViewMapper extends QBMapper {
 		foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
-			foreach ($result->fetchAll() as $row) {
+			foreach ($result->fetchAllAssociative() as $row) {
 				$map[(int)$row['id']] = (string)$row['title'];
 			}
 			$result->closeCursor();

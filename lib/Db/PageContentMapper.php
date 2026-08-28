@@ -49,7 +49,7 @@ class PageContentMapper extends QBMapper {
 			));
 
 		$result = $qb->executeQuery();
-		$r = $result->fetch();
+		$r = $result->fetchAssociative();
 		return $r ? $this->mapRowToEntity($r) : null;
 	}
 

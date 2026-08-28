@@ -81,7 +81,16 @@ class ActivityManager {
 	) {
 	}
 
-	public function triggerEvent($objectType, $object, $subject, $additionalParams = [], $author = null) {
+	/**
+	 * @param Row2|Table|View|Column $object
+	 * @param array<string, mixed>|null|string $additionalParams
+	 * @param string|null $author
+	 *
+	 * @psalm-param self::TABLES_OBJECT_* $objectType
+	 * @psalm-param array<string, mixed>|null|string $additionalParams
+	 * @psalm-param string|null $author
+	 */
+	public function triggerEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
 		if ($author === null) {
 			$author = $this->userId;
 		}
@@ -92,19 +101,22 @@ class ActivityManager {
 			if ($event !== null) {
 				$this->sendToUsers($event, $object);
 			}
-		} catch (\Exception $e) {
+		} catch (\Exception) {
 			// Ignore exception for undefined activities on update events
 		}
 	}
 
-	public function triggerUpdateEvents($objectType, ChangeSet $changeSet, $subject) {
+	/**
+	 * @psalm-param self::TABLES_OBJECT_* $objectType
+	 */
+	public function triggerUpdateEvents(string $objectType, ChangeSet $changeSet, string $subject) {
 		$previousEntity = $changeSet->getBefore();
 		$entity = $changeSet->getAfter();
 		$events = [];
 
 		if ($previousEntity !== null) {
 			foreach ($entity->getUpdatedFields() as $field => $value) {
-				$getter = 'get' . ucfirst($field);
+				$getter = 'get' . ucfirst((string)$field);
 				$subjectComplete = $subject . '_' . $field;
 				$changes = [
 					'before' => $previousEntity->$getter(),
@@ -116,7 +128,7 @@ class ActivityManager {
 						if ($event !== null) {
 							$events[] = $event;
 						}
-					} catch (\Exception $e) {
+					} catch (\Exception) {
 						// Ignore exception for undefined activities on update events
 					}
 				}
@@ -124,7 +136,7 @@ class ActivityManager {
 		} else {
 			try {
 				$events = [$this->createEvent($objectType, $entity, $subject)];
-			} catch (\Exception $e) {
+			} catch (\Exception) {
 				// Ignore exception for undefined activities on update events
 			}
 		}
@@ -134,7 +146,15 @@ class ActivityManager {
 		}
 	}
 
-	private function createEvent($objectType, $object, $subject, $additionalParams = [], $author = null) {
+	/**
+	 * @param Row2|Table|View|Column $object
+	 * @param string|null $author
+	 *
+	 * @psalm-param self::TABLES_OBJECT_* $objectType
+	 * @psalm-param array<string, mixed> $additionalParams
+	 * @psalm-param string|null $author
+	 */
+	private function createEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array $additionalParams = [], array|string|null $author = null) {
 		if ($object instanceof Table) {
 			$objectTitle = $object->getTitle();
 			$table = $object;
@@ -158,7 +178,7 @@ class ActivityManager {
 		 */
 		$eventType = 'tables';
 		$subjectParams = [
-			'author' => $author === null ? $this->userId : $author,
+			'author' => $author ?? $this->userId,
 			'table' => $table,
 			'objectType' => $objectType,
 		];
@@ -295,7 +315,7 @@ class ActivityManager {
 		];
 	}
 
-	private function sendToUsers(IEvent $event, $object) {
+	private function sendToUsers(IEvent $event, Row2|Table|View|Column $object) {
 		// Handle share events with restricted recipients
 		$subject = $event->getSubject();
 		if (in_array($subject, [self::SUBJECT_SHARE_CREATE, self::SUBJECT_SHARE_UPDATE, self::SUBJECT_SHARE_DELETE], true)) {
@@ -405,8 +425,10 @@ class ActivityManager {
 
 	/**
 	 * Send share events only to: event author, table owner, and shared-with receiver users.
+	 *
+	 * @param Row2|Table|View|Column $object
 	 */
-	private function sendShareEventToUsers(IEvent $event, $object): void {
+	private function sendShareEventToUsers(IEvent $event, Row2|Table|View|Column $object): void {
 		if (!$object instanceof Table && !$object instanceof View) {
 			Server::get(LoggerInterface::class)->error('Could not send share activity. Invalid object type.', (array)$object);
 			return;
@@ -539,7 +561,7 @@ class ActivityManager {
 		return $columnIds;
 	}
 
-	public function getActivitySubject($language, $subjectIdentifier, $subjectParams = [], $ownActivity = false) {
+	public function getActivitySubject(string $language, $subjectIdentifier, array $subjectParams = [], bool $ownActivity = false) {
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 		$isViewContext = $subjectParams['isViewContext'] ?? false;
 		$isViewObject = ($subjectParams['objectType'] ?? null) === self::TABLES_OBJECT_VIEW;
@@ -577,7 +599,7 @@ class ActivityManager {
 		return '';
 	}
 
-	private function formatTableActivity($l, string $subjectIdentifier, bool $ownActivity): ?string {
+	private function formatTableActivity(\OCP\IL10N $l, string $subjectIdentifier, bool $ownActivity): ?string {
 		return match ($subjectIdentifier) {
 			self::SUBJECT_TABLE_CREATE => $ownActivity ? $l->t('You have created a new table {table}') : $l->t('{user} has created a new table {table}'),
 			self::SUBJECT_TABLE_UPDATE => $ownActivity ? $l->t('You have updated the table {table}') : $l->t('{user} has updated the table {table}'),
@@ -588,7 +610,7 @@ class ActivityManager {
 		};
 	}
 
-	private function formatViewActivity($l, string $subjectIdentifier, bool $ownActivity): ?string {
+	private function formatViewActivity(\OCP\IL10N $l, string $subjectIdentifier, bool $ownActivity): ?string {
 		return match ($subjectIdentifier) {
 			self::SUBJECT_VIEW_CREATE => $ownActivity ? $l->t('You have created a new view {view} in table {table}') : $l->t('{user} has created a new view {view} in table {table}'),
 			self::SUBJECT_VIEW_UPDATE => $ownActivity ? $l->t('You have updated the view {view} in table {table}') : $l->t('{user} has updated the view {view} in table {table}'),
@@ -599,7 +621,7 @@ class ActivityManager {
 		};
 	}
 
-	private function formatRowActivity($l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewContext): ?string {
+	private function formatRowActivity(\OCP\IL10N $l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewContext): ?string {
 		switch ($subjectIdentifier) {
 			case self::SUBJECT_ROW_CREATE:
 				if ($isViewContext) {
@@ -620,7 +642,7 @@ class ActivityManager {
 		}
 	}
 
-	private function formatRowUpdateActivity($l, array $subjectParams, bool $ownActivity, bool $isViewContext): string {
+	private function formatRowUpdateActivity(\OCP\IL10N $l, array $subjectParams, bool $ownActivity, bool $isViewContext): string {
 		$visibleChangeCols = $this->getVisibleChangeCols($subjectParams);
 		$columns = '';
 		$count = 1;
@@ -664,7 +686,7 @@ class ActivityManager {
 			);
 	}
 
-	private function formatColumnActivity($l, string $subjectIdentifier, bool $ownActivity, bool $isViewContext): ?string {
+	private function formatColumnActivity(\OCP\IL10N $l, string $subjectIdentifier, bool $ownActivity, bool $isViewContext): ?string {
 		if ($isViewContext) {
 			return match ($subjectIdentifier) {
 				self::SUBJECT_COLUMN_CREATE => $ownActivity ? $l->t('You have created a new column {column} in view {view}') : $l->t('{user} has created a new column {column} in view {view}'),
@@ -682,7 +704,7 @@ class ActivityManager {
 		};
 	}
 
-	private function formatShareActivity($l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewObject, mixed $sharedWith): ?string {
+	private function formatShareActivity(\OCP\IL10N $l, string $subjectIdentifier, array $subjectParams, bool $ownActivity, bool $isViewObject, mixed $sharedWith): ?string {
 		$sharedWithYou = $this->isSharedWithYou($subjectParams, $ownActivity);
 		$isLinkShare = $this->isLinkShare($sharedWith);
 
@@ -766,7 +788,7 @@ class ActivityManager {
 		return is_array($sharedWith) && ($sharedWith['type'] ?? null) === ShareReceiverType::LINK;
 	}
 
-	public function getActivityMessage($language, $subjectIdentifier) {
+	public function getActivityMessage(string $language, $subjectIdentifier) {
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 
 		switch ($subjectIdentifier) {

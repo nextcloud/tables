@@ -30,16 +30,16 @@ use SensitiveParameter;
 
 class FederationProxy {
 	public function __construct(
-		private IClientService $clientService,
-		private IUserSession $userSession,
-		private IConfig $config,
-		private IFactory $l10nFactory,
-		private LoggerInterface $logger,
-		private ICloudFederationProviderManager $federationProviderManager,
-		private ICloudFederationFactory $federationFactory,
-		private ICloudIdManager $cloudIdManager,
-		private ISignatureManager $signatureManager,
-		private ISignatoryManager $signatoryManager,
+		private readonly IClientService $clientService,
+		private readonly IUserSession $userSession,
+		private readonly IConfig $config,
+		private readonly IFactory $l10nFactory,
+		private readonly LoggerInterface $logger,
+		private readonly ICloudFederationProviderManager $federationProviderManager,
+		private readonly ICloudFederationFactory $federationFactory,
+		private readonly ICloudIdManager $cloudIdManager,
+		private readonly ISignatureManager $signatureManager,
+		private readonly ISignatoryManager $signatoryManager,
 	) {
 	}
 
@@ -170,7 +170,7 @@ class FederationProxy {
 		);
 
 		if (!empty($parameters)) {
-			$options['json'] = json_decode($options['body'], true);
+			$options['json'] = json_decode((string)$options['body'], true);
 			unset($options['body']);
 		}
 

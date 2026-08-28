@@ -16,14 +16,11 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 class V1Api {
-	private RowService $rowService;
-	private ColumnService $columnService;
-	private ?string $userId;
-
-	public function __construct(ColumnService $columnService, RowService $rowService, ?string $userId) {
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->userId = $userId;
+	public function __construct(
+		private readonly ColumnService $columnService,
+		private readonly RowService $rowService,
+		private ?string $userId,
+	) {
 	}
 
 	/**
