@@ -604,7 +604,7 @@ class Row2Mapper {
 	/**
 	 * Helper method to use notILike if available, otherwise fall back to not(iLike(...))
 	 */
-	private function notILike(IQueryBuilder $qb, string $column, $parameter): string {
+	private function notILike(IQueryBuilder $qb, string $column, \OCP\DB\QueryBuilder\IParameter $parameter): string {
 		$expr = $qb->expr();
 		// Nextcloud v35 introduced shortcut method
 		if (method_exists($expr, 'notILike')) {

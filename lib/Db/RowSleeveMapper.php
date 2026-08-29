@@ -147,7 +147,7 @@ class RowSleeveMapper extends QBMapper {
 			$qb->setParameter('tableIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			try {
 				$result = $qb->executeQuery();
-				while ($row = $result->fetch()) {
+				while ($row = $result->fetchAssociative()) {
 					$counts[(int)$row['table_id']] = (int)$row['counter'];
 				}
 				$result->closeCursor();
