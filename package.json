@@ -77,7 +77,7 @@
     "@nextcloud/vite-config": "^2.5.4",
     "@playwright/test": "^1.62.1",
     "@vue/tsconfig": "^0.5.1",
-    "cypress": "^15.20.1",
+    "cypress": "^15.21.0",
     "cypress-downloadfile": "^1.2.4",
     "cypress-vite": "^1.10.2",
     "eslint": "^10.9.0",
