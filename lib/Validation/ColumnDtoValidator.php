@@ -16,8 +16,8 @@ class ColumnDtoValidator {
 	 */
 	public function validate(ColumnDto $columnDto): void {
 		$textMaxLength = $columnDto->getTextMaxLength();
-		if ($textMaxLength !== null && $textMaxLength < 0) {
-			throw new BadRequestError('Maximum text length must be greater than or equal to 0.');
+		if ($textMaxLength !== null && $textMaxLength < -1) {
+			throw new BadRequestError('Maximum text length must be greater than or equal to 0, or -1 for no limit.');
 		}
 
 		$numberMin = $columnDto->getNumberMin();
