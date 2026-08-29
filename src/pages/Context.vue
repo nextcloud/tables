@@ -22,15 +22,15 @@
 			<div class="resources">
 				<div v-for="resource in contextResources" :key="resource.key">
 					<div v-if="!resource.isView" class="resource">
-						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting.sync="resourceViewSettings[resource.key]" @create-column="createColumn(false, resource)"
+						<TableWrapper v-model:view-setting="resourceViewSettings[resource.key]" :table="resource" :columns="columns[resource.key]"
+							:rows="rows[resource.key]" @create-column="createColumn(false, resource)"
 							@import-scheme="openImportSchemeModal(resource)"
 							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 					</div>
 					<div v-else-if="resource.isView" class="resource">
-						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting.sync="resourceViewSettings[resource.key]" @create-column="createColumn(true, resource)"
+						<CustomView v-model:view-setting="resourceViewSettings[resource.key]" :view="resource" :columns="columns[resource.key]"
+							:rows="rows[resource.key]" @create-column="createColumn(true, resource)"
 							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
 					</div>
@@ -224,7 +224,7 @@ export default {
 										})
 										table.key = (table.id).toString()
 										table.isView = false
-										this.$set(this.resourceViewSettings, table.key, this.createViewSetting(false, table))
+										this.resourceViewSettings[table.key] = this.createViewSetting(false, table)
 										this.contextResources.push(table)
 									}
 
@@ -244,7 +244,7 @@ export default {
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
-										this.$set(this.resourceViewSettings, view.key, this.createViewSetting(true, view))
+										this.resourceViewSettings[view.key] = this.createViewSetting(true, view)
 										this.contextResources.push(view)
 									}
 								}

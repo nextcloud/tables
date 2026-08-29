@@ -268,7 +268,7 @@ export default {
 			},
 			set(value) {
 				this.ensureMutableViewSettings()
-				this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', value ?? null)
+				this.mutableView.viewSettings.cardBackgroundSource = value ?? null
 			},
 		},
 		titleSourceValue: {
@@ -277,7 +277,7 @@ export default {
 			},
 			set(value) {
 				this.ensureMutableViewSettings()
-				this.$set(this.mutableView.viewSettings, 'cardTitleSource', value ?? null)
+				this.mutableView.viewSettings.cardTitleSource = value ?? null
 			},
 		},
 		saveText() {
@@ -495,8 +495,8 @@ export default {
 			const secondColumnId = this.mutableView.columnSettings?.[1]?.columnId ?? firstColumnId
 			const backgroundSource = this.mutableView.viewSettings.cardBackgroundSource ?? this.viewSetting?.viewSettings?.cardBackgroundSource ?? firstColumnId
 			const titleSource = this.mutableView.viewSettings.cardTitleSource ?? this.viewSetting?.viewSettings?.cardTitleSource ?? secondColumnId
-			this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', backgroundSource)
-			this.$set(this.mutableView.viewSettings, 'cardTitleSource', titleSource)
+			this.mutableView.viewSettings.cardBackgroundSource = backgroundSource
+			this.mutableView.viewSettings.cardTitleSource = titleSource
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
@@ -505,10 +505,10 @@ export default {
 		},
 		ensureMutableViewSettings() {
 			if (!this.mutableView.viewSettings) {
-				this.$set(this.mutableView, 'viewSettings', {
+				this.mutableView.viewSettings = {
 					cardBackgroundSource: null,
 					cardTitleSource: null,
-				})
+				}
 			}
 		},
 		resolveCardSourceValue(stored, fallbackIndex) {
@@ -521,8 +521,8 @@ export default {
 		},
 		persistCardSourceFallbacks() {
 			this.ensureMutableViewSettings()
-			this.$set(this.mutableView.viewSettings, 'cardBackgroundSource', this.resolveCardSourceValue(this.mutableView.viewSettings.cardBackgroundSource, 0))
-			this.$set(this.mutableView.viewSettings, 'cardTitleSource', this.resolveCardSourceValue(this.mutableView.viewSettings.cardTitleSource, 1))
+			this.mutableView.viewSettings.cardBackgroundSource = this.resolveCardSourceValue(this.mutableView.viewSettings.cardBackgroundSource, 0)
+			this.mutableView.viewSettings.cardTitleSource = this.resolveCardSourceValue(this.mutableView.viewSettings.cardTitleSource, 1)
 		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
