@@ -18,7 +18,7 @@
     "nextcloud/ocp": "dev-stable33",
     "staabm/annotate-pull-request-from-checkstyle": "^1.8.7",
     "phpunit/phpunit": "9.6.36",
-    "psalm/phar": "^6.16"
+    "psalm/phar": "^6.16.1"
   },
   "config": {
     "optimize-autoloader": true,
