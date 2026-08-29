@@ -9,10 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\ShareReview;
 
-use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ShareMapper;
-use OCA\Tables\Db\TableMapper;
-use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\ShareService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception;
@@ -20,12 +17,20 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
-use OCP\Share\ShareReview\IShareReviewSource;
+use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
+use OCP\Share\ShareReview\ShareReviewPage;
 use OCP\Share\ShareReview\ShareReviewPermission;
+use OCP\Share\ShareReview\ShareReviewQuery;
 use Psr\Log\LoggerInterface;
 
-class ShareReviewSource implements IShareReviewSource {
+/**
+ * Tables' table, view and application shares as share-review shares, with the
+ * paginated query contract evaluated in SQL on the share table joined with
+ * the three node tables.
+ */
+class ShareReviewSource implements IPaginatedShareReviewSource {
 
 	private const NODE_TYPE_TABLE = 'table';
 	private const NODE_TYPE_VIEW = 'view';
@@ -39,14 +44,29 @@ class ShareReviewSource implements IShareReviewSource {
 	public const PERMISSION_DELETE = 'tables:delete';
 	public const PERMISSION_MANAGE = 'tables:manage';
 
+	/** Native receiver type to IShare type. */
+	private const RECEIVER_TYPES = [
+		'user' => IShare::TYPE_USER,
+		'group' => IShare::TYPE_GROUP,
+		self::RECEIVER_TYPE_LINK => IShare::TYPE_LINK,
+		'circle' => IShare::TYPE_CIRCLE,
+		'remote' => IShare::TYPE_REMOTE,
+	];
+
+	/** Opaque share-review permission id to the share column that grants it. */
+	private const PERMISSION_COLUMNS = [
+		self::PERMISSION_READ => 'permission_read',
+		self::PERMISSION_UPDATE => 'permission_update',
+		self::PERMISSION_CREATE => 'permission_create',
+		self::PERMISSION_DELETE => 'permission_delete',
+		self::PERMISSION_MANAGE => 'permission_manage',
+	];
+
 	/** @var array<string, ShareReviewPermission>|null */
 	private ?array $permissionCatalog = null;
 
 	public function __construct(
 		private readonly ShareMapper $shareMapper,
-		private readonly TableMapper $tableMapper,
-		private readonly ViewMapper $viewMapper,
-		private readonly ContextMapper $contextMapper,
 		private readonly IL10N $l10n,
 		private readonly LoggerInterface $logger,
 		private readonly ShareService $shareService,
@@ -55,51 +75,86 @@ class ShareReviewSource implements IShareReviewSource {
 	}
 
 	public function getName(): string {
+		// Stable id: keys the review state and the access-check event, so it
+		// must not depend on the locale — the translated label is getDisplayName()
+		return 'Tables';
+	}
+
+	public function getDisplayName(): string {
 		return $this->l10n->t('Tables');
 	}
 
 	/**
+	 * All shares, read page by page in a stable order.
+	 *
 	 * @return list<ShareReviewEntry>
 	 */
 	public function getShares(): array {
+		// enumerated on the immutable id order, so concurrent edits (which
+		// move last_edit_at) can neither duplicate nor skip rows
+		$entries = [];
 		try {
-			$nodeIdsByType = $this->shareMapper->findSharedNodeIdsByType();
-		} catch (Exception $e) {
-			$this->logger->error('Tables ShareReview: failed to fetch shared node IDs: {message}', ['message' => $e->getMessage()]);
-			return [];
-		}
-
-		try {
-			$tableNames = $this->tableMapper->findIdToTitleMap($nodeIdsByType[self::NODE_TYPE_TABLE] ?? []);
-		} catch (Exception $e) {
-			$this->logger->error('Tables ShareReview: failed to fetch table names: {message}', ['message' => $e->getMessage()]);
-			$tableNames = [];
-		}
-
-		try {
-			$viewNames = $this->viewMapper->findIdToTitleMap($nodeIdsByType[self::NODE_TYPE_VIEW] ?? []);
-		} catch (Exception $e) {
-			$this->logger->error('Tables ShareReview: failed to fetch view names: {message}', ['message' => $e->getMessage()]);
-			$viewNames = [];
-		}
-
-		try {
-			$contextNames = $this->contextMapper->findIdToNameMap($nodeIdsByType[self::NODE_TYPE_CONTEXT] ?? []);
-		} catch (Exception $e) {
-			$this->logger->error('Tables ShareReview: failed to fetch application names: {message}', ['message' => $e->getMessage()]);
-			$contextNames = [];
-		}
-
-		$formatted = [];
-		try {
-			foreach ($this->shareMapper->findAllRaw() as $share) {
-				$formatted[] = $this->buildEntry($share, $tableNames, $viewNames, $contextNames);
+			foreach ($this->shareMapper->findAllForShareReview() as $row) {
+				$entries[] = $this->buildEntry($row);
 			}
 		} catch (Exception $e) {
 			$this->logger->error('Tables ShareReview: failed to fetch shares: {message}', ['message' => $e->getMessage()]);
 			return [];
 		}
-		return $formatted;
+		return $entries;
+	}
+
+	public function queryShares(ShareReviewQuery $query): ShareReviewPage {
+		try {
+			$rows = $this->shareMapper->findPageForShareReview($query, $this->receiverTypes($query), $this->permissionColumns($query));
+			$counts = $this->shareMapper->countForShareReview($query, $this->receiverTypes($query), $this->permissionColumns($query));
+		} catch (Exception $e) {
+			$this->logger->error('Tables ShareReview: failed to fetch shares: {message}', ['message' => $e->getMessage()]);
+			return new ShareReviewPage([], new ShareReviewCounts(0, 0));
+		}
+		return new ShareReviewPage(array_map($this->buildEntry(...), $rows), $counts);
+	}
+
+	public function countShares(ShareReviewQuery $query): ShareReviewCounts {
+		try {
+			return $this->shareMapper->countForShareReview($query, $this->receiverTypes($query), $this->permissionColumns($query));
+		} catch (Exception $e) {
+			$this->logger->error('Tables ShareReview: failed to count shares: {message}', ['message' => $e->getMessage()]);
+			return new ShareReviewCounts(0, 0);
+		}
+	}
+
+	public function countSharesByType(ShareReviewQuery $query): array {
+		try {
+			$nativeCounts = $this->shareMapper->countByTypeForShareReview($query, $this->receiverTypes($query), $this->permissionColumns($query));
+		} catch (Exception $e) {
+			$this->logger->error('Tables ShareReview: failed to count shares by type: {message}', ['message' => $e->getMessage()]);
+			return [];
+		}
+		$counts = [];
+		foreach ($nativeCounts as $receiverType => $count) {
+			// unknown native types are excluded here as they are from the
+			// shareTypes filter, so count and filtered list always agree
+			if (!isset(self::RECEIVER_TYPES[$receiverType])) {
+				continue;
+			}
+			$type = self::RECEIVER_TYPES[$receiverType];
+			$counts[$type] = ($counts[$type] ?? 0) + $count;
+		}
+		return $counts;
+	}
+
+	public function getShare(string $shareId): ?ShareReviewEntry {
+		if (!ctype_digit($shareId)) {
+			return null;
+		}
+		try {
+			$share = $this->shareMapper->findForShareReview((int)$shareId);
+		} catch (Exception $e) {
+			$this->logger->error('Tables ShareReview: failed to fetch share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
+			return null;
+		}
+		return $share === null ? null : $this->buildEntry($share);
 	}
 
 	public function deleteShare(string $shareId): bool {
@@ -126,21 +181,46 @@ class ShareReviewSource implements IShareReviewSource {
 	}
 
 	/**
-	 * @param array<string, mixed> $share
-	 * @param array<int, string> $tableNames
-	 * @param array<int, string> $viewNames
-	 * @param array<int, string> $contextNames
+	 * The native receiver types a shareTypes filter selects; a requested type
+	 * tables never produces matches nothing.
+	 *
+	 * @return list<string>|null null = no type filter
 	 */
-	private function buildEntry(array $share, array $tableNames, array $viewNames, array $contextNames): ShareReviewEntry {
+	private function receiverTypes(ShareReviewQuery $query): ?array {
+		if ($query->shareTypes === null) {
+			return null;
+		}
+		return array_keys(array_intersect(self::RECEIVER_TYPES, $query->shareTypes));
+	}
+
+	/**
+	 * The permission columns an opaque permission-id filter selects; ids of
+	 * other apps match nothing.
+	 *
+	 * @return list<string>|null null = no permission filter
+	 */
+	private function permissionColumns(ShareReviewQuery $query): ?array {
+		if ($query->permissionIds === null) {
+			return null;
+		}
+		return array_values(array_intersect_key(self::PERMISSION_COLUMNS, array_fill_keys($query->permissionIds, true)));
+	}
+
+	/**
+	 * @param array<string, mixed> $share
+	 */
+	private function buildEntry(array $share): ShareReviewEntry {
 		return new ShareReviewEntry(
 			id: (string)$share['id'],
-			object: $this->resolveObjectName($share, $tableNames, $viewNames, $contextNames),
+			object: $this->resolveObjectName($share),
 			initiator: (string)$share['sender'],
 			type: $this->mapReceiverType((string)$share['receiver_type']),
 			recipient: $share['receiver_type'] === self::RECEIVER_TYPE_LINK
 				? (string)$share['token']
 				: (string)$share['receiver'],
-			lastModifiedTimestamp: strtotime($this->resolveShareTime($share)) ?: 0,
+			// last_edit_at is set on insert and bumped on every update; created_at
+			// only covers rows a migration left without it
+			lastModifiedTimestamp: strtotime((string)($share['last_edit_at'] ?? $share['created_at'] ?? '')) ?: 0,
 			permissions: $this->buildPermissions($share),
 			hasPassword: $share['password'] !== null,
 		);
@@ -148,21 +228,19 @@ class ShareReviewSource implements IShareReviewSource {
 
 	/**
 	 * @param array<string, mixed> $share
-	 * @param array<int, string> $tableNames
-	 * @param array<int, string> $viewNames
-	 * @param array<int, string> $contextNames
 	 */
-	private function resolveObjectName(array $share, array $tableNames, array $viewNames, array $contextNames): string {
+	private function resolveObjectName(array $share): string {
 		$nodeId = (int)$share['node_id'];
 		$nodeType = (string)$share['node_type'];
+		$name = isset($share['node_name']) ? (string)$share['node_name'] : null;
 		if ($nodeType === self::NODE_TYPE_TABLE) {
-			return $this->l10n->t('%s (Table)', [$tableNames[$nodeId] ?? $this->l10n->t('Table %s', [$nodeId])]);
+			return $this->l10n->t('%s (Table)', [$name ?? $this->l10n->t('Table %s', [$nodeId])]);
 		}
 		if ($nodeType === self::NODE_TYPE_VIEW) {
-			return $this->l10n->t('%s (View)', [$viewNames[$nodeId] ?? $this->l10n->t('View %s', [$nodeId])]);
+			return $this->l10n->t('%s (View)', [$name ?? $this->l10n->t('View %s', [$nodeId])]);
 		}
 		if ($nodeType === self::NODE_TYPE_CONTEXT) {
-			return $this->l10n->t('%s (Application)', [$contextNames[$nodeId] ?? $this->l10n->t('Application %s', [$nodeId])]);
+			return $this->l10n->t('%s (Application)', [$name ?? $this->l10n->t('Application %s', [$nodeId])]);
 		}
 		$this->logger->warning(
 			'Tables ShareReview: unknown node type {type} for share node {id}',
@@ -172,33 +250,14 @@ class ShareReviewSource implements IShareReviewSource {
 	}
 
 	private function mapReceiverType(string $receiverType): int {
-		if ($receiverType === 'user') {
-			return IShare::TYPE_USER;
-		}
-		if ($receiverType === 'group') {
-			return IShare::TYPE_GROUP;
-		}
-		if ($receiverType === 'link') {
-			return IShare::TYPE_LINK;
-		}
-		if ($receiverType === 'circle') {
-			return IShare::TYPE_CIRCLE;
+		if (isset(self::RECEIVER_TYPES[$receiverType])) {
+			return self::RECEIVER_TYPES[$receiverType];
 		}
 		$this->logger->warning(
 			'Tables ShareReview: unknown receiver type {type}, falling back to user share type',
 			['type' => $receiverType]
 		);
 		return IShare::TYPE_USER;
-	}
-
-	/** @param array<string, mixed> $share */
-	private function resolveShareTime(array $share): string {
-		$createdAt = (string)($share['created_at'] ?? '1970-01-01 01:00:00');
-		$lastEditAt = isset($share['last_edit_at']) ? (string)$share['last_edit_at'] : null;
-		if ($lastEditAt !== null && $lastEditAt > $createdAt) {
-			return $lastEditAt;
-		}
-		return $createdAt;
 	}
 
 	/**

@@ -9,10 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\ShareReview;
 
-use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ShareMapper;
-use OCA\Tables\Db\TableMapper;
-use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\ShareReview\ShareReviewSource;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -21,18 +18,17 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
+use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
 use OCP\Share\ShareReview\ShareReviewPermission;
+use OCP\Share\ShareReview\ShareReviewQuery;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 final class ShareReviewSourceTest extends TestCase {
 	private MockObject $shareMapper;
-	private MockObject $tableMapper;
-	private MockObject $viewMapper;
-	private MockObject $contextMapper;
-	private MockObject $l10n;
 	private MockObject $logger;
 	private MockObject $shareService;
 	private MockObject $eventDispatcher;
@@ -41,24 +37,12 @@ final class ShareReviewSourceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->shareMapper = $this->createMock(ShareMapper::class);
-		$this->tableMapper = $this->createMock(TableMapper::class);
-		$this->viewMapper = $this->createMock(ViewMapper::class);
-		$this->contextMapper = $this->createMock(ContextMapper::class);
-		$this->l10n = $this->createMock(IL10N::class);
-		$this->l10n->method('t')->willReturnCallback(fn (string $text, array $params = []) => vsprintf($text, $params));
+		$l10n = $this->createMock(IL10N::class);
+		$l10n->method('t')->willReturnCallback(fn (string $text, array $params = []) => vsprintf($text, $params));
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->shareService = $this->createMock(ShareService::class);
 		$this->eventDispatcher = $this->createMock(IEventDispatcher::class);
-		$this->source = new ShareReviewSource(
-			$this->shareMapper,
-			$this->tableMapper,
-			$this->viewMapper,
-			$this->contextMapper,
-			$this->l10n,
-			$this->logger,
-			$this->shareService,
-			$this->eventDispatcher,
-		);
+		$this->source = new ShareReviewSource($this->shareMapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher);
 	}
 
 	/** @param array<string, mixed> $overrides */
@@ -70,6 +54,7 @@ final class ShareReviewSourceTest extends TestCase {
 			'receiver_type' => 'user',
 			'node_id' => 10,
 			'node_type' => 'table',
+			'node_name' => 'My Table',
 			'token' => null,
 			'password' => null,
 			'permission_read' => 1,
@@ -83,39 +68,29 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	/** @param list<array<string, mixed>> $rows */
-	private function stubShareRows(array $rows): void {
-		$this->shareMapper->method('findAllRaw')->willReturnCallback(static function () use ($rows): \Generator {
-			yield from $rows;
-		});
-		$nodeIdsByType = [];
-		foreach ($rows as $row) {
-			$nodeIdsByType[(string)$row['node_type']][] = (int)$row['node_id'];
-		}
-		$this->shareMapper->method('findSharedNodeIdsByType')->willReturn($nodeIdsByType);
+	private function stubPage(array $rows): void {
+		$this->shareMapper->method('findPageForShareReview')->willReturn($rows);
+		$this->shareMapper->method('countForShareReview')->willReturn(new ShareReviewCounts(count($rows), count($rows)));
 	}
 
-	private function stubNameMappers(array $tableNames = [], array $viewNames = [], array $contextNames = []): void {
-		$this->tableMapper->method('findIdToTitleMap')->willReturn($tableNames);
-		$this->viewMapper->method('findIdToTitleMap')->willReturn($viewNames);
-		$this->contextMapper->method('findIdToNameMap')->willReturn($contextNames);
+	private function firstEntry(array $row): ShareReviewEntry {
+		$this->stubPage([$row]);
+		return $this->source->queryShares(new ShareReviewQuery())->entries[0];
 	}
 
-	public function testGetSharesEmpty(): void {
-		$this->stubShareRows([]);
-		$this->stubNameMappers();
+	public function testGetNameIsStableWhileGetDisplayNameIsTranslated(): void {
+		$l10n = $this->createMock(IL10N::class);
+		$l10n->method('t')->willReturnCallback(static fn (string $text, array $params = []) => $text === 'Tables' ? 'Tabellen' : vsprintf($text, $params));
+		$source = new ShareReviewSource($this->shareMapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher);
 
-		$this->assertSame([], $this->source->getShares());
+		$this->assertInstanceOf(IPaginatedShareReviewSource::class, $source);
+		$this->assertSame('Tables', $source->getName());
+		$this->assertSame('Tabellen', $source->getDisplayName());
 	}
 
-	public function testGetSharesUserShare(): void {
-		$this->stubShareRows([$this->makeShareRow()]);
-		$this->stubNameMappers(tableNames: [10 => 'My Table']);
+	public function testUserShareOfATable(): void {
+		$share = $this->firstEntry($this->makeShareRow());
 
-		$shares = $this->source->getShares();
-
-		$this->assertCount(1, $shares);
-		$share = $shares[0];
-		$this->assertInstanceOf(ShareReviewEntry::class, $share);
 		$this->assertSame('1', $share->id);
 		$this->assertSame('My Table (Table)', $share->object);
 		$this->assertSame('alice', $share->initiator);
@@ -127,263 +102,161 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->assertSame('', $share->action);
 	}
 
-	public function testShareTimeUsesLastEditWhenNewer(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['created_at' => '2026-01-15 12:00:00', 'last_edit_at' => '2026-06-01 08:00:00']),
-		]);
-		$this->stubNameMappers(tableNames: [10 => 'T']);
+	public function testLinkShareUsesTheTokenAsRecipientAndCarriesThePasswordFlag(): void {
+		$share = $this->firstEntry($this->makeShareRow(['receiver_type' => 'link', 'receiver' => '', 'token' => 'abc123', 'password' => 'hash']));
 
-		$this->assertSame(strtotime('2026-06-01 08:00:00'), $this->source->getShares()[0]->lastModifiedTimestamp);
+		$this->assertSame(IShare::TYPE_LINK, $share->type);
+		$this->assertSame('abc123', $share->recipient);
+		$this->assertTrue($share->hasPassword);
 	}
 
-	public function testShareTimeUsesCreatedAtWhenLastEditEquals(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['created_at' => '2026-01-15 12:00:00', 'last_edit_at' => '2026-01-15 12:00:00']),
-		]);
-		$this->stubNameMappers(tableNames: [10 => 'T']);
-
-		$this->assertSame(strtotime('2026-01-15 12:00:00'), $this->source->getShares()[0]->lastModifiedTimestamp);
+	public function testViewContextAndDeletedNodesAreLabelled(): void {
+		$this->assertSame('Open Tasks (View)', $this->firstEntry($this->makeShareRow(['node_type' => 'view', 'node_name' => 'Open Tasks']))->object);
+		$this->assertSame('Project X (Application)', $this->contextObject());
 	}
 
-	public function testShareTimeUsesCreatedAtWhenLastEditIsNull(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['created_at' => '2026-01-15 12:00:00', 'last_edit_at' => null]),
-		]);
-		$this->stubNameMappers(tableNames: [10 => 'T']);
-
-		$this->assertSame(strtotime('2026-01-15 12:00:00'), $this->source->getShares()[0]->lastModifiedTimestamp);
+	private function contextObject(): string {
+		$mapper = $this->createMock(ShareMapper::class);
+		$mapper->method('findPageForShareReview')->willReturn([$this->makeShareRow(['node_type' => 'context', 'node_name' => 'Project X'])]);
+		$mapper->method('countForShareReview')->willReturn(new ShareReviewCounts(1, 1));
+		$l10n = $this->createMock(IL10N::class);
+		$l10n->method('t')->willReturnCallback(fn (string $text, array $params = []) => vsprintf($text, $params));
+		$source = new ShareReviewSource($mapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher);
+		return $source->queryShares(new ShareReviewQuery())->entries[0]->object;
 	}
 
-	public function testGetSharesLinkShare(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['receiver_type' => 'link', 'token' => 'abc123token', 'password' => 'hashed_pw']),
-		]);
-		$this->stubNameMappers(tableNames: [10 => 'Shared Table']);
-
-		$shares = $this->source->getShares();
-
-		$this->assertCount(1, $shares);
-		$this->assertSame(IShare::TYPE_LINK, $shares[0]->type);
-		$this->assertSame('abc123token', $shares[0]->recipient);
-		$this->assertTrue($shares[0]->hasPassword);
+	public function testDeletedNodeFallsBackToTheIdLabel(): void {
+		$this->assertSame('Table 10 (Table)', $this->firstEntry($this->makeShareRow(['node_name' => null]))->object);
 	}
 
-	public function testGetSharesContextShare(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['node_type' => 'context', 'node_id' => 99]),
-		]);
-		$this->stubNameMappers(contextNames: [99 => 'My Context']);
-
-		$shares = $this->source->getShares();
-
-		$this->assertCount(1, $shares);
-		$this->assertSame('My Context (Application)', $shares[0]->object);
-	}
-
-	public function testGetSharesMixedNodeTypes(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['id' => 1, 'node_type' => 'table', 'node_id' => 10]),
-			$this->makeShareRow(['id' => 2, 'node_type' => 'view', 'node_id' => 20]),
-			$this->makeShareRow(['id' => 3, 'node_type' => 'context', 'node_id' => 30]),
-		]);
-		$this->stubNameMappers(
-			tableNames: [10 => 'Table One'],
-			viewNames: [20 => 'View One'],
-			contextNames: [30 => 'Context One'],
-		);
-
-		$shares = $this->source->getShares();
-
-		$this->assertCount(3, $shares);
-		$this->assertSame('Table One (Table)', $shares[0]->object);
-		$this->assertSame('View One (View)', $shares[1]->object);
-		$this->assertSame('Context One (Application)', $shares[2]->object);
-	}
-
-	public function testGetSharesDeletedNode(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['node_type' => 'table', 'node_id' => 42]),
-		]);
-		$this->stubNameMappers();
-
-		$shares = $this->source->getShares();
-
-		$this->assertCount(1, $shares);
-		$this->assertSame('Table 42 (Table)', $shares[0]->object);
-	}
-
-	public function testGetSharesUnknownNodeTypeLogsWarning(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['node_type' => 'dashboard', 'node_id' => 5]),
-		]);
-		$this->stubNameMappers();
+	public function testUnknownNodeTypeLogsWarning(): void {
 		$this->logger->expects($this->once())->method('warning');
 
-		$shares = $this->source->getShares();
-
-		$this->assertCount(1, $shares);
-		$this->assertSame('Unknown 5', $shares[0]->object);
+		$this->assertSame('Unknown 10', $this->firstEntry($this->makeShareRow(['node_type' => 'other']))->object);
 	}
 
-	public function testGetSharesUnknownReceiverTypeLogsWarning(): void {
-		$this->stubShareRows([
-			$this->makeShareRow(['receiver_type' => 'email', 'receiver' => 'bob@example.com']),
-		]);
-		$this->stubNameMappers(tableNames: [10 => 'My Table']);
+	public function testUnknownReceiverTypeLogsWarningAndFallsBackToUser(): void {
 		$this->logger->expects($this->once())->method('warning');
 
-		$shares = $this->source->getShares();
-
-		$this->assertCount(1, $shares);
-		$this->assertSame(IShare::TYPE_USER, $shares[0]->type);
+		$this->assertSame(IShare::TYPE_USER, $this->firstEntry($this->makeShareRow(['receiver_type' => 'martian']))->type);
 	}
 
-	public function testGetSharesReturnsEmptyOnDbException(): void {
-		$this->shareMapper->method('findAllRaw')->willThrowException($this->createMock(Exception::class));
-		$this->logger->expects($this->once())->method('error');
+	public function testGroupCircleAndRemoteTypes(): void {
+		$this->assertSame(IShare::TYPE_GROUP, $this->firstEntry($this->makeShareRow(['receiver_type' => 'group']))->type);
+		$this->assertSame(IShare::TYPE_CIRCLE, $this->contextTypeOf('circle'));
+		$this->assertSame(IShare::TYPE_REMOTE, $this->contextTypeOf('remote'));
+	}
+
+	private function contextTypeOf(string $receiverType): int {
+		$mapper = $this->createMock(ShareMapper::class);
+		$mapper->method('findPageForShareReview')->willReturn([$this->makeShareRow(['receiver_type' => $receiverType])]);
+		$mapper->method('countForShareReview')->willReturn(new ShareReviewCounts(1, 1));
+		$l10n = $this->createMock(IL10N::class);
+		$l10n->method('t')->willReturnCallback(fn (string $text, array $params = []) => vsprintf($text, $params));
+		return (new ShareReviewSource($mapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher))->queryShares(new ShareReviewQuery())->entries[0]->type;
+	}
+
+	public function testQuerySharesTranslatesTypesAndPermissionIdsToNativeFilters(): void {
+		$query = new ShareReviewQuery(shareTypes: [IShare::TYPE_LINK, IShare::TYPE_EMAIL, IShare::TYPE_USER], permissionIds: [ShareReviewSource::PERMISSION_MANAGE, 'deck:read', ShareReviewSource::PERMISSION_READ]);
+		$counts = new ShareReviewCounts(9, 2);
+		$this->shareMapper->expects($this->once())
+			->method('findPageForShareReview')
+			->with($query, ['user', 'link'], ['permission_read', 'permission_manage'])
+			->willReturn([$this->makeShareRow(['id' => 3])]);
+		$this->shareMapper->expects($this->once())
+			->method('countForShareReview')
+			->with($query, ['user', 'link'], ['permission_read', 'permission_manage'])
+			->willReturn($counts);
+
+		$page = $this->source->queryShares($query);
+
+		$this->assertSame($counts, $page->counts);
+		$this->assertSame('3', $page->entries[0]->id);
+	}
+
+	public function testForeignTypesAndPermissionIdsMatchNothing(): void {
+		$query = new ShareReviewQuery(shareTypes: [IShare::TYPE_EMAIL], permissionIds: ['deck:read']);
+		$this->shareMapper->expects($this->once())->method('countForShareReview')->with($query, [], [])->willReturn(new ShareReviewCounts(4, 0));
+
+		$this->assertSame(0, $this->source->countShares($query)->filteredCount);
+	}
+
+	public function testGetSharesStreamsTheFullIdOrderedList(): void {
+		$rows = array_map(fn (int $id) => $this->makeShareRow(['id' => $id]), range(1, ShareReviewQuery::MAX_LIMIT + 1));
+		$this->shareMapper->expects($this->once())
+			->method('findAllForShareReview')
+			->willReturnCallback(static function () use ($rows): \Generator {
+				yield from $rows;
+			});
+
+		$this->assertCount(ShareReviewQuery::MAX_LIMIT + 1, $this->source->getShares());
+	}
+
+	public function testDbExceptionsDegradeToEmptyResults(): void {
+		$this->shareMapper->method('findAllForShareReview')->willThrowException($this->createMock(Exception::class));
+		$this->shareMapper->method('findPageForShareReview')->willThrowException($this->createMock(Exception::class));
+		$this->shareMapper->method('countForShareReview')->willThrowException($this->createMock(Exception::class));
+		$this->shareMapper->method('countByTypeForShareReview')->willThrowException($this->createMock(Exception::class));
+		$this->logger->expects($this->exactly(4))->method('error');
 
 		$this->assertSame([], $this->source->getShares());
+		$this->assertSame([], $this->source->queryShares(new ShareReviewQuery())->entries);
+		$this->assertSame(0, $this->source->countShares(new ShareReviewQuery())->totalCount);
+		$this->assertSame([], $this->source->countSharesByType(new ShareReviewQuery()));
 	}
 
-	public function testGetSharesReturnsEmptyWhenNodeIdLookupFails(): void {
-		$this->shareMapper->method('findSharedNodeIdsByType')->willThrowException($this->createMock(Exception::class));
-		$this->shareMapper->expects($this->never())->method('findAllRaw');
-		$this->logger->expects($this->once())->method('error');
+	public function testCountSharesByTypeMapsReceiverTypesAndSkipsUnknownOnes(): void {
+		$this->shareMapper->method('countByTypeForShareReview')->willReturn(['user' => 3, 'link' => 1, 'remote' => 4, 'martian' => 2]);
 
-		$this->assertSame([], $this->source->getShares());
+		// unknown native types are excluded from the shareTypes filter, so
+		// the counts must exclude them too
+		$this->assertSame([IShare::TYPE_USER => 3, IShare::TYPE_LINK => 1, IShare::TYPE_REMOTE => 4], $this->source->countSharesByType(new ShareReviewQuery()));
 	}
 
-	public function testDeleteShareNonNumericReturnsFalse(): void {
-		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+	public function testGetShareIsAKeyedLookup(): void {
+		$this->shareMapper->expects($this->never())->method('findPageForShareReview');
+		$this->shareMapper->expects($this->once())->method('findForShareReview')->with(7)
+			->willReturn($this->makeShareRow(['id' => 7, 'node_type' => 'view', 'node_name' => 'Open Tasks', 'receiver' => 'carol']));
 
-		$this->assertFalse($this->source->deleteShare('abc'));
+		$entry = $this->source->getShare('7');
+
+		$this->assertNotNull($entry);
+		$this->assertSame('7', $entry->id);
+		$this->assertSame('Open Tasks (View)', $entry->object);
+		$this->assertSame('carol', $entry->recipient);
 	}
 
-	public function testDeleteShareEventNotHandledReturnsFalse(): void {
-		$this->eventDispatcher->expects($this->once())
-			->method('dispatchTyped')
-			->with($this->isInstanceOf(ShareReviewAccessCheckEvent::class));
-		$this->shareService->expects($this->never())->method('deleteForShareReview');
+	public function testGetShareUnknownOrInvalidIdReturnsNull(): void {
+		$this->shareMapper->method('findForShareReview')->willReturn(null);
 
-		$this->assertFalse($this->source->deleteShare('7'));
-	}
-
-	public function testDeleteShareEventDeniedReturnsFalse(): void {
-		$this->eventDispatcher->expects($this->once())
-			->method('dispatchTyped')
-			->with($this->isInstanceOf(ShareReviewAccessCheckEvent::class))
-			->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-				$event->denyAccess('not a share-review operator');
-			});
-		$this->shareService->expects($this->never())->method('deleteForShareReview');
-
-		$this->assertFalse($this->source->deleteShare('7'));
-	}
-
-	public function testDeleteShareEventGrantedReturnsTrue(): void {
-		$this->eventDispatcher->expects($this->once())
-			->method('dispatchTyped')
-			->with($this->isInstanceOf(ShareReviewAccessCheckEvent::class))
-			->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-				$event->grantAccess();
-			});
-		$this->shareService->expects($this->once())->method('deleteForShareReview')->with(7);
-
-		$this->assertTrue($this->source->deleteShare('7'));
-	}
-
-	public function testDeleteShareDoesNotExistReturnsFalse(): void {
-		$this->eventDispatcher->expects($this->once())
-			->method('dispatchTyped')
-			->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-				$event->grantAccess();
-			});
-		$this->shareService->expects($this->once())
-			->method('deleteForShareReview')
-			->willThrowException($this->createMock(DoesNotExistException::class));
-
-		$this->assertFalse($this->source->deleteShare('7'));
-	}
-
-	public function testDeleteShareDbExceptionReturnsFalse(): void {
-		$this->eventDispatcher->expects($this->once())
-			->method('dispatchTyped')
-			->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-				$event->grantAccess();
-			});
-		$this->shareService->expects($this->once())
-			->method('deleteForShareReview')
-			->willThrowException($this->createMock(Exception::class));
-		$this->logger->expects($this->once())->method('error');
-
-		$this->assertFalse($this->source->deleteShare('7'));
+		$this->assertNull($this->source->getShare('7'));
+		$this->assertNull($this->source->getShare('abc'));
+		$this->assertNull($this->source->getShare('1e3'));
 	}
 
 	public function testPermissionsAllFlagsFalseFallsBackToRead(): void {
-		$this->stubShareRows([$this->makeShareRow([
-			'permission_read' => 0,
-			'permission_create' => 0,
-			'permission_update' => 0,
-			'permission_delete' => 0,
-			'permission_manage' => 0,
-		])]);
-		$this->stubNameMappers(tableNames: [10 => 'T']);
+		$share = $this->firstEntry($this->makeShareRow(['permission_read' => 0]));
 
-		$this->assertSame(
-			[ShareReviewSource::PERMISSION_READ],
-			$this->permissionIds($this->source->getShares()[0]->permissions)
-		);
+		$this->assertSame([ShareReviewSource::PERMISSION_READ], $this->permissionIds($share->permissions));
 	}
 
 	public function testPermissionsManageOnlyEmitsManageWithReadFallback(): void {
-		$this->stubShareRows([$this->makeShareRow([
-			'permission_read' => 0,
-			'permission_create' => 0,
-			'permission_update' => 0,
-			'permission_delete' => 0,
-			'permission_manage' => 1,
-		])]);
-		$this->stubNameMappers(tableNames: [10 => 'T']);
+		$share = $this->firstEntry($this->makeShareRow(['permission_read' => 0, 'permission_manage' => 1]));
 
-		$permissions = $this->source->getShares()[0]->permissions;
-		$this->assertSame(
-			[ShareReviewSource::PERMISSION_READ, ShareReviewSource::PERMISSION_MANAGE],
-			$this->permissionIds($permissions)
-		);
-		$this->assertSame('Manage', $permissions[1]->displayName);
-		$this->assertNotNull($permissions[1]->hint);
-		$this->assertSame(30, $permissions[1]->priority);
-	}
-
-	public function testPermissionsManageFlagOffEmitsNoManagePermission(): void {
-		$this->stubShareRows([$this->makeShareRow([
-			'permission_read' => 1,
-			'permission_manage' => 0,
-		])]);
-		$this->stubNameMappers(tableNames: [10 => 'T']);
-
-		$this->assertNotContains(
-			ShareReviewSource::PERMISSION_MANAGE,
-			$this->permissionIds($this->source->getShares()[0]->permissions)
-		);
+		$this->assertSame([ShareReviewSource::PERMISSION_READ, ShareReviewSource::PERMISSION_MANAGE], $this->permissionIds($share->permissions));
 	}
 
 	public function testPermissionsAllFlagsTrueEmitsFullSet(): void {
-		$this->stubShareRows([$this->makeShareRow([
-			'permission_read' => 1,
-			'permission_create' => 1,
-			'permission_update' => 1,
-			'permission_delete' => 1,
-			'permission_manage' => 1,
-		])]);
-		$this->stubNameMappers(tableNames: [10 => 'T']);
+		$share = $this->firstEntry($this->makeShareRow(['permission_create' => 1, 'permission_update' => 1, 'permission_delete' => 1, 'permission_manage' => 1]));
 
-		$permissions = $this->source->getShares()[0]->permissions;
-		$this->assertSame(
-			[ShareReviewSource::PERMISSION_READ, ShareReviewSource::PERMISSION_UPDATE, ShareReviewSource::PERMISSION_CREATE, ShareReviewSource::PERMISSION_DELETE, ShareReviewSource::PERMISSION_MANAGE],
-			$this->permissionIds($permissions)
-		);
-		$this->assertSame('Manage', $permissions[4]->displayName);
+		$this->assertSame([
+			ShareReviewSource::PERMISSION_READ,
+			ShareReviewSource::PERMISSION_UPDATE,
+			ShareReviewSource::PERMISSION_CREATE,
+			ShareReviewSource::PERMISSION_DELETE,
+			ShareReviewSource::PERMISSION_MANAGE,
+		], $this->permissionIds($share->permissions));
+		$this->assertSame('Administer the shared table and its sharing', $share->permissions[4]->hint);
 	}
 
 	public function testPermissionIdentifiers(): void {
@@ -400,5 +273,55 @@ final class ShareReviewSourceTest extends TestCase {
 	 */
 	private function permissionIds(array $permissions): array {
 		return array_map(static fn (ShareReviewPermission $permission): string => $permission->id, $permissions);
+	}
+
+	public function testDeleteShareNonNumericReturnsFalse(): void {
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+
+		$this->assertFalse($this->source->deleteShare('abc'));
+	}
+
+	public function testDeleteShareEventNotHandledReturnsFalse(): void {
+		$this->eventDispatcher->expects($this->once())->method('dispatchTyped')->with($this->isInstanceOf(ShareReviewAccessCheckEvent::class));
+		$this->shareService->expects($this->never())->method('deleteForShareReview');
+
+		$this->assertFalse($this->source->deleteShare('7'));
+	}
+
+	public function testDeleteShareEventDeniedReturnsFalse(): void {
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
+			$event->denyAccess('not in group');
+		});
+		$this->shareService->expects($this->never())->method('deleteForShareReview');
+
+		$this->assertFalse($this->source->deleteShare('7'));
+	}
+
+	public function testDeleteShareEventGrantedReturnsTrue(): void {
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
+			$event->grantAccess();
+		});
+		$this->shareService->expects($this->once())->method('deleteForShareReview')->with(7);
+
+		$this->assertTrue($this->source->deleteShare('7'));
+	}
+
+	public function testDeleteShareDoesNotExistReturnsFalse(): void {
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
+			$event->grantAccess();
+		});
+		$this->shareService->method('deleteForShareReview')->willThrowException(new DoesNotExistException('gone'));
+
+		$this->assertFalse($this->source->deleteShare('7'));
+	}
+
+	public function testDeleteShareDbExceptionReturnsFalse(): void {
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
+			$event->grantAccess();
+		});
+		$this->shareService->method('deleteForShareReview')->willThrowException($this->createMock(Exception::class));
+		$this->logger->expects($this->once())->method('error');
+
+		$this->assertFalse($this->source->deleteShare('7'));
 	}
 }
