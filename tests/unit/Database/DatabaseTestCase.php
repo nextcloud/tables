@@ -450,11 +450,7 @@ abstract class DatabaseTestCase extends TestCase {
 			}
 			return json_encode($convertedValues);
 		} else {
-			// Single selection - convert to ID
-			if (isset($optionMapping[$value])) {
-				return $optionMapping[$value];
-			}
-			return null;
+			return $optionMapping[$value] ?? null;
 		}
 	}
 
