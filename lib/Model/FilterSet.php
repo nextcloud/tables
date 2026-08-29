@@ -31,6 +31,9 @@ class FilterSet implements JsonSerializable {
 	public static function createFromInputArray(array $data, array $columnsMap = []): self {
 		$filterGroups = [];
 		foreach ($data as $inputFilterGroup) {
+			if (!is_array($inputFilterGroup)) {
+				throw new InvalidArgumentException('Each filter group entry must be an array');
+			}
 			foreach ($inputFilterGroup as $j => $item) {
 				if (isset($item['columnUuid']) && isset($columnsMap[$item['columnUuid']]) && $columnsMap[$item['columnUuid']] instanceof Column) {
 					$inputFilterGroup[$j]['columnId'] = $columnsMap[$item['columnUuid']]->getId();

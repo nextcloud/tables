@@ -52,6 +52,7 @@ class SortRuleSet implements JsonSerializable {
 			if (!isset($inputSortRule['columnId'], $inputSortRule['mode'])) {
 				throw new InvalidArgumentException('Required sort parameters are missing');
 			}
+			self::assertColumnIdInBounds($inputSortRule['columnId']);
 
 			$sortRules[] = new SortRule(
 				columnId: (int)$inputSortRule['columnId'],
@@ -59,6 +60,19 @@ class SortRuleSet implements JsonSerializable {
 			);
 		}
 		return new self($sortRules);
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	private static function assertColumnIdInBounds(mixed $columnId): void {
+		$maxDigits = strlen((string)PHP_INT_MAX);
+		if (!is_numeric($columnId)
+			|| (int)$columnId < -5
+			|| !preg_match('/^-?\\d{0,' . $maxDigits . '}$/', (string)$columnId)
+		) {
+			throw new InvalidArgumentException(sprintf('Invalid column id supplied: %s', (string)$columnId));
+		}
 	}
 
 	/**

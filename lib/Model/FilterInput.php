@@ -22,7 +22,7 @@ final class FilterInput {
 	) {
 	}
 
-	public static function fromRequestValue(mixed $value): self {
+	public static function fromRequestValue(string $value): self {
 		if ($value === null || $value === '') {
 			return new self([]);
 		}

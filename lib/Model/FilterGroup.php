@@ -36,6 +36,7 @@ class FilterGroup implements JsonSerializable {
 			if (!isset($filterInput['columnId'], $filterInput['operator'], $filterInput['value'])) {
 				throw new InvalidArgumentException('Required input fields are missing');
 			}
+			self::assertColumnIdInBounds($filterInput['columnId']);
 			try {
 				$filters[] = new Filter(
 					(int)$filterInput['columnId'],
@@ -47,6 +48,19 @@ class FilterGroup implements JsonSerializable {
 			}
 		}
 		return new self($filters);
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	private static function assertColumnIdInBounds(mixed $columnId): void {
+		$maxDigits = strlen((string)PHP_INT_MAX);
+		if (!is_numeric($columnId)
+			|| (int)$columnId < -5
+			|| !preg_match('/^-?\\d{0,' . $maxDigits . '}$/', (string)$columnId)
+		) {
+			throw new InvalidArgumentException(sprintf('Invalid column id supplied: %s', (string)$columnId));
+		}
 	}
 
 	public function jsonSerialize(): array {
