@@ -322,14 +322,12 @@ class TablesMigratorTest extends TestCase {
 			],
 		];
 
-		$importSource->method('getFileContents')->willReturnCallback(static function (string $file) use ($tableData, $columns, $views): string {
-			return match ($file) {
+		$importSource->method('getFileContents')->willReturnCallback(static fn(string $file): string => match ($file) {
 				'tables.json' => json_encode([$tableData]),
 				'columns.json' => json_encode($columns),
 				'views.json' => json_encode($views),
 				default => json_encode([]),
-			};
-		});
+			});
 
 		$newTable = new Table();
 		$newTable->setId(100);
