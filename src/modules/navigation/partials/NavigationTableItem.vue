@@ -171,7 +171,7 @@ export default {
 	components: {
 		IconRename,
 		IconCloudOutline,
-		// eslint-disable-next-line vue/no-reserved-component-names
+
 		Table,
 		Star,
 		StarOutline,
