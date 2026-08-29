@@ -139,10 +139,10 @@
 				:show-share-sender="false"
 				:draggable="canReorderViews"
 				:class="{ 'view-drop-target': dragOverIndex === index }"
-				@dragstart.native="onViewDragStart(index)"
-				@dragover.native.prevent="onViewDragOver(index)"
-				@drop.native.prevent="onViewDrop"
-				@dragend.native="onViewDragEnd" />
+				@dragstart="onViewDragStart(index)"
+				@dragover.prevent="onViewDragOver(index)"
+				@drop.prevent="onViewDrop"
+				@dragend="onViewDragEnd" />
 		</ul>
 	</NcAppNavigationItem>
 </template>
