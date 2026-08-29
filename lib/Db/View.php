@@ -70,12 +70,15 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setExternalId(?int $externalId)
  * @method getShareToken(): ?string
  * @method setShareToken(?string $shareToken)
+ * @method getSidebarOrder(): ?int
+ * @method setSidebarOrder(?int $sidebarOrder)
  */
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?string $technicalName = null;
 	protected ?int $tableId = null;
+	protected ?int $sidebarOrder = null;
 	protected ?string $createdBy = null;
 	protected ?string $createdAt = null;
 	protected ?string $lastEditBy = null;
@@ -104,6 +107,7 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->addType('id', 'integer');
 		$this->addType('uuid', 'string');
 		$this->addType('tableId', 'integer');
+		$this->addType('sidebarOrder', 'integer');
 	}
 
 	public function setter(string $name, array $args): void {
@@ -239,6 +243,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'isFederated' => $this->isFederated(),
+			'sidebarOrder' => $this->sidebarOrder,
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

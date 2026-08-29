@@ -1403,6 +1403,8 @@ export type components = {
             /** Format: int64 */
             readonly rowsCount: number;
             readonly isFederated: boolean;
+            /** Format: int64 */
+            readonly sidebarOrder: number | null;
         };
     };
     responses: never;

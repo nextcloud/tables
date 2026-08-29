@@ -999,7 +999,8 @@
                     "onSharePermissions",
                     "hasShares",
                     "rowsCount",
-                    "isFederated"
+                    "isFederated",
+                    "sidebarOrder"
                 ],
                 "properties": {
                     "id": {
@@ -1214,6 +1215,11 @@
                     },
                     "isFederated": {
                         "type": "boolean"
+                    },
+                    "sidebarOrder": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
                     }
                 }
             }
