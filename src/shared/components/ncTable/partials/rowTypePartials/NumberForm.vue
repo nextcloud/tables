@@ -7,12 +7,22 @@
 		<div v-if="column.numberPrefix" class="prefix">
 			{{ column.numberPrefix }}
 		</div>
-		<input v-model="localValue"
-			type="number"
-			:min="column.numberMin"
-			:max="column.numberMax"
-			:readonly="column.viewColumnInformation?.readonly"
-			:step="getStep">
+		<div class="number-input">
+			<input v-model="localValue"
+				type="number"
+				class="number-input__field"
+				:class="{ 'number-input__field--error': hasRangeError }"
+				:min="column.numberMin"
+				:max="column.numberMax"
+				:readonly="column.viewColumnInformation?.readonly"
+				:step="getStep"
+				:aria-invalid="hasRangeError"
+				@blur="formatValue"
+				@keyup.enter="formatValue">
+			<p v-if="hasRangeError" class="number-input__hint" role="alert">
+				{{ rangeHintText }}
+			</p>
+		</div>
 		<div v-if="column.numberSuffix" class="suffix">
 			{{ column.numberSuffix }}
 		</div>
@@ -21,6 +31,7 @@
 
 <script>
 import RowFormWrapper from './RowFormWrapper.vue'
+import { translate as t } from '@nextcloud/l10n'
 import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 export default {
 
@@ -52,6 +63,37 @@ export default {
 				return 'any'
 			}
 		},
+		hasMin() {
+			return this.column?.numberMin !== null && this.column?.numberMin !== undefined
+		},
+		hasMax() {
+			return this.column?.numberMax !== null && this.column?.numberMax !== undefined
+		},
+		hasRangeError() {
+			const value = this.parseValue(this.localValue)
+			if (value === null) {
+				return false
+			}
+			if (this.hasMin && value < this.column.numberMin) {
+				return true
+			}
+			if (this.hasMax && value > this.column.numberMax) {
+				return true
+			}
+			return false
+		},
+		rangeHintText() {
+			const min = this.column?.numberMin
+			const max = this.column?.numberMax
+			if (this.hasMin && this.hasMax) {
+				return t('tables', 'Enter a value between {min} and {max}.', { min, max })
+			} else if (this.hasMin) {
+				return t('tables', 'Enter a value of {min} or more.', { min })
+			} else if (this.hasMax) {
+				return t('tables', 'Enter a value of {max} or less.', { max })
+			}
+			return ''
+		},
 		localValue: {
 			get() {
 				if (this.value !== null) {
@@ -65,16 +107,13 @@ export default {
 					}
 				}
 			},
-			set(v) { this.$emit('update:value', this.parseValue(v)) },
+			set(v) {
+				this.$emit('update:value', v === '' ? null : v)
+			},
 		},
 	},
 
 	watch: {
-		localValue() {
-			const value = this.parseValue(this.localValue)
-			this.localValue = value
-			this.$emit('update:value', value)
-		},
 		value() {
 			this.localValue = this.value
 		},
@@ -85,6 +124,15 @@ export default {
 	},
 
 	methods: {
+		t,
+		// Normalise the input (decimal separator + rounding) without clamping.
+		// Out-of-range values are surfaced via hasRangeError instead of being
+		// silently replaced by the min/max value.
+		formatValue() {
+			const parsedValue = this.parseValue(this.localValue)
+			this.localValue = parsedValue
+			this.$emit('update:value', parsedValue)
+		},
 		parseValue(inputValue) {
 			if (inputValue === null || inputValue === '') {
 				return null
@@ -95,15 +143,11 @@ export default {
 			} else {
 				parsedValue = inputValue
 			}
+			if (isNaN(parsedValue)) {
+				return null
+			}
 			const roundedValue = parsedValue.toFixed(this.column?.numberDecimals)
-			let value = parseFloat(roundedValue)
-			if ((this.column?.numberMin !== null && this.column?.numberMin !== undefined) && value < this.column?.numberMin) {
-				value = this.column.numberMin
-			}
-			if ((this.column?.numberMax !== null && this.column?.numberMax !== undefined) && value > this.column?.numberMax) {
-				value = this.column.numberMax
-			}
-			return value
+			return parseFloat(roundedValue)
 		},
 	},
 }
@@ -116,6 +160,27 @@ export default {
 
 .suffix {
 	padding-inline-start: calc(var(--default-grid-baseline) * 2);
+}
+
+.number-input {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-width: 0;
+
+	&__field {
+		width: 100%;
+
+		&--error {
+			border-color: var(--color-error) !important;
+		}
+	}
+
+	&__hint {
+		margin-block-start: calc(var(--default-grid-baseline) * 1);
+		color: var(--color-error);
+		font-size: 0.9em;
+	}
 }
 
 </style>
