@@ -118,7 +118,7 @@ class Version2020Date20260428000000 extends SimpleMigrationStep {
 			->where($qb->expr()->eq('archived', $qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL)));
 
 		$result = $qb->executeQuery();
-		$archivedTables = $result->fetchAll();
+		$archivedTables = $result->fetchAllAssociative();
 		$result->closeCursor();
 
 		if (empty($archivedTables)) {
@@ -144,7 +144,7 @@ class Version2020Date20260428000000 extends SimpleMigrationStep {
 				->andWhere($shareQb->expr()->eq('receiver_type', $shareQb->createNamedParameter('user')));
 
 			$shareResult = $shareQb->executeQuery();
-			while ($shareRow = $shareResult->fetch()) {
+			while ($shareRow = $shareResult->fetchAssociative()) {
 				$receiverId = $shareRow['receiver'];
 				if ($receiverId !== $ownerId) {
 					$inserted += $this->upsertArchiveRecord($receiverId, 0, $tableId, true);

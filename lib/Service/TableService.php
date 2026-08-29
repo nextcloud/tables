@@ -323,7 +323,7 @@ class TableService extends SuperService {
 			$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_TABLE, $id, $isOwner);
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		return $this->getTableForUser($id, $userId);
 	}
@@ -347,7 +347,7 @@ class TableService extends SuperService {
 			$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_TABLE, $id, $isOwner, $entityArchived);
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		return $this->getTableForUser($id, $userId);
 	}
