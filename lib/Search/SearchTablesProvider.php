@@ -79,7 +79,7 @@ class SearchTablesProvider implements IProvider {
 		);
 
 		// look for tables
-		$tables = $this->tableService->search($term, $limit, $offset);
+		$tables = $this->tableService->search($term, $limit, $offset, $user->getUID());
 		$formattedTablesResults = array_map(fn (Table $table): SearchResultEntry => new SearchResultEntry(
 			$appIconUrl,
 			$table->getEmoji() . ' ' . $table->getTitle(),
@@ -90,7 +90,7 @@ class SearchTablesProvider implements IProvider {
 		), $tables);
 
 		// look for views
-		$views = $this->viewService->search($term, $limit, $offset);
+		$views = $this->viewService->search($term, $limit, $offset, $user->getUID());
 		$formattedViewResults = array_map(fn (View $view): SearchResultEntry => new SearchResultEntry(
 			$viewIconUrl,
 			$view->getEmoji() . ' ' . $view->getTitle(),
