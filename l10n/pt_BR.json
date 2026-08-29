@@ -473,7 +473,7 @@
     "Could not import due to unknown errors." : "Não foi possível importar devido a erros desconhecidos.",
     "Import application scheme" : "Importar esquema de aplicativo",
     "Preview application scheme changes" : "Pré-visualizar as alterações do esquema de aplicativo",
-    "No file selected for import." : "Nenhum arquivo selecionar para importação.",
+    "No file selected for import." : "Nenhum arquivo selecionado para importação.",
     "No scheme data to import." : "Não há dados de esquema para importar.",
     "Could not import scheme due to unknown errors." : "Não foi possível importar o esquema devido a erros desconhecidos.",
     "The selected file is not valid JSON." : "O arquivo selecionado não é JSON válido.",
