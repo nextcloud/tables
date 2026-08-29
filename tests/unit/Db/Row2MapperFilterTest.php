@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\View;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -268,5 +269,54 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 
 		// Should return all test rows when no filter is applied
 		$this->assertCount(5, $rows, 'Empty filter should return all rows');
+	}
+
+	private function buildConvertedFilter(array $filter): array {
+		$convertedFilter = [];
+		if (isset($filter[0]) && is_array($filter[0]) && isset($filter[0][0])) {
+			foreach ($filter as $filterGroup) {
+				$convertedFilter[] = $this->convertFilterColumnNamesToIds($filterGroup);
+			}
+		} else {
+			$convertedFilter[] = $this->convertFilterColumnNamesToIds($filter);
+		}
+		return $convertedFilter;
+	}
+
+	/**
+	 * @dataProvider filterDataProvider
+	 */
+	public function testCountRowsForViewMatchesFilteredRows($filter, array $expectedNameOrder, string $description): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+
+		$convertedFilter = $this->buildConvertedFilter($filter);
+
+		$view = new View();
+		$view->setTableId(self::$testTableId);
+		$view->setFilterArray($convertedFilter);
+
+		$rows = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, null, null, $convertedFilter, null, 'test_user');
+		$count = $this->mapper->countRowsForView($view, 'test_user');
+
+		$this->assertSame(count($expectedNameOrder), $count, 'countRowsForView should return ' . count($expectedNameOrder) . " for: $description");
+		$this->assertSame(count($rows), $count, "countRowsForView should match findAll row count for: $description");
+	}
+
+	public function testCountRowsForViewWithoutFilter(): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+
+		$view = new View();
+		$view->setTableId(self::$testTableId);
+		$view->setFilterArray([]);
+
+		$this->assertSame(5, $this->mapper->countRowsForView($view, 'test_user'), 'View without filters should count all table rows');
+	}
+
+	public function testCountRowsForTables(): void {
+		$this->assertSame([], $this->mapper->countRowsForTables([]), 'Empty input should return an empty map');
+
+		$counts = $this->mapper->countRowsForTables([self::$testTableId, 999999]);
+		$this->assertSame(5, $counts[self::$testTableId] ?? 0, 'Batch count should match the table row count');
+		$this->assertArrayNotHasKey(999999, $counts, 'Tables without rows should be absent from the map');
 	}
 }

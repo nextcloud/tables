@@ -10,10 +10,22 @@ import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { getCurrentUser } from '@nextcloud/auth'
+import { useTablesStore } from './store.js'
 
 function genStateKey(isView, elementId) {
 	elementId = elementId.toString()
 	return isView ? 'view-' + elementId : elementId
+}
+
+const VIEW_COUNT_REFRESH_DELAY = 500
+const viewCountRefreshTimers = new Map()
+
+function canManageTable(table) {
+	if (!table.isShared) {
+		return true
+	}
+	return !!table.onSharePermissions?.manage || table.ownership === getCurrentUser()?.uid
 }
 
 export const useDataStore = defineStore('data', {
@@ -233,6 +245,30 @@ export const useDataStore = defineStore('data', {
 		},
 
 		// ROWS
+		syncElementRowsCount({ isView, elementId }) {
+			const stateId = genStateKey(isView, elementId)
+			const count = (this.rows[stateId] ?? []).length
+			useTablesStore().setElementRowsCount({ isView, elementId, count })
+		},
+
+		refreshTableViewCounts(tableId) {
+			if (!tableId) {
+				return
+			}
+			const table = useTablesStore().getTable(tableId)
+			if (!table || !canManageTable(table)) {
+				return
+			}
+			const existingTimer = viewCountRefreshTimers.get(tableId)
+			if (existingTimer) {
+				clearTimeout(existingTimer)
+			}
+			viewCountRefreshTimers.set(tableId, setTimeout(() => {
+				viewCountRefreshTimers.delete(tableId)
+				useTablesStore().reloadViewsOfTable({ tableId })
+			}, VIEW_COUNT_REFRESH_DELAY))
+		},
+
 		async loadRowsFromBE({ tableId, viewId }) {
 			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
 			this.loading[stateId] = true
@@ -251,6 +287,7 @@ export const useDataStore = defineStore('data', {
 
 			this.rows[stateId] = res.data
 			this.loading[stateId] = false
+			this.syncElementRowsCount({ isView: !!viewId, elementId: viewId ?? tableId })
 			return true
 		},
 
@@ -298,6 +335,9 @@ export const useDataStore = defineStore('data', {
 				const updatedRows = this.rows[stateId].map(r => r.id === row.id ? row : r)
 				this.rows[stateId] = updatedRows
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
+				this.syncElementRowsCount({ isView, elementId })
+				const parentTableId = row?.tableId ?? (isView ? useTablesStore().getView(elementId)?.tableId : elementId)
+				this.refreshTableViewCounts(parentTableId)
 			}
 
 			return true
@@ -338,6 +378,13 @@ export const useDataStore = defineStore('data', {
 				const newIndex = this.rows[stateId].length
 				this.rows[stateId][newIndex] = row
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
+				this.syncElementRowsCount({ isView: !!viewId, elementId: viewId ?? tableId })
+				const tablesStore = useTablesStore()
+				const parentTableId = viewId ? (row?.tableId ?? tablesStore.getView(viewId)?.tableId) : tableId
+				if (viewId && parentTableId) {
+					tablesStore.addToTableRowsCount({ tableId: parentTableId, delta: 1 })
+				}
+				this.refreshTableViewCounts(parentTableId)
 			}
 
 			return true
@@ -382,6 +429,13 @@ export const useDataStore = defineStore('data', {
 			if (stateId && this.rows[stateId]) {
 				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
 				this.rows[stateId] = filteredRows
+				this.syncElementRowsCount({ isView, elementId })
+				const tablesStore = useTablesStore()
+				const parentTableId = viewId ? tablesStore.getView(viewId)?.tableId : elementId
+				if (viewId && parentTableId) {
+					tablesStore.addToTableRowsCount({ tableId: parentTableId, delta: -1 })
+				}
+				this.refreshTableViewCounts(parentTableId)
 			}
 			return true
 		},
