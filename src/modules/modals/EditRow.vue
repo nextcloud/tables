@@ -294,10 +294,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.modal-mask {
-	z-index: 9999;
-}
-
 .modal__content {
 	padding: 20px;
 
