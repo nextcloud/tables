@@ -46,7 +46,7 @@ export default {
 				return true
 			}
 
-			if ((element.isShared && element.onSharePermissions.read) || element?.ownership === getCurrentUser().uid) {
+			if ((element.isShared && element?.onSharePermissions?.read) || element?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
@@ -60,7 +60,7 @@ export default {
 			if (!element.isShared) {
 				return true
 			}
-			if ((element.isShared && element.onSharePermissions.create) || element?.ownership === getCurrentUser().uid) {
+			if ((element.isShared && element?.onSharePermissions?.create) || element?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
@@ -70,7 +70,7 @@ export default {
 			if (!element) {
 				return false
 			}
-			if (!element.isShared || element.ownership === getCurrentUser().uid || this.canManageElement(element)) {
+			if (!element.isShared || element?.ownership === getCurrentUser().uid || this.canManageElement(element)) {
 				return true
 			}
 
@@ -83,7 +83,7 @@ export default {
 			}
 			if (this.canManageTable(element) || this.canManageElement(element)) return true
 			return element.isShared === false
-				|| (element.isShared === true && (element.onSharePermissions.delete === true || element.ownership === getCurrentUser().uid))
+				|| (element.isShared === true && (element?.onSharePermissions?.delete === true || element?.ownership === getCurrentUser().uid))
 		},
 		canUpdateData(element) {
 			if (!element) {
@@ -91,7 +91,7 @@ export default {
 			}
 			if (this.canManageTable(element) || this.canManageElement(element)) return true
 			return element.isShared === false
-				|| (element.isShared === true && (element.onSharePermissions.update === true || element.ownership === getCurrentUser().uid))
+				|| (element.isShared === true && (element?.onSharePermissions?.update === true || element?.ownership === getCurrentUser().uid))
 		},
 		ownsContext(context) {
 			return context?.owner === getCurrentUser().uid

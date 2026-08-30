@@ -51,20 +51,16 @@ export default {
 		...mapState(useTablesStore, ['activeTable', 'activeView']),
 		loading() {
 			const dataStore = useDataStore()
-			const activeElement = this.activeView || this.activeTable
-			if (activeElement) {
-				return dataStore.getRelationsLoading(!!this.activeView, activeElement.id)
+			const elementId = this.activeView?.id ?? this.activeTable?.id ?? this.column?.tableId
+			if (elementId) {
+				return dataStore.getRelationsLoading(!!this.activeView, elementId)
 			}
 			return false
 		},
 		relationOptions() {
 			const dataStore = useDataStore()
-			const activeElement = this.activeView || this.activeTable
-			if (activeElement) {
-				const columnRelations = dataStore.getRelations(this.column.id)
-				return Object.values(columnRelations)
-			}
-			return []
+			const columnRelations = dataStore.getRelations(this.column?.id)
+			return Object.values(columnRelations)
 		},
 		localValue: {
 			get() {
@@ -76,11 +72,12 @@ export default {
 		},
 	},
 	async mounted() {
-		const activeElement = this.activeView || this.activeTable
-		if (activeElement) {
+		const viewId = this.activeView?.id ?? null
+		const tableId = this.activeTable?.id ?? this.column?.tableId ?? null
+		if (viewId || tableId) {
 			await this.loadRelationsFromBE({
-				tableId: this.activeTable?.id,
-				viewId: this.activeView?.id,
+				tableId,
+				viewId,
 				force: true,
 			})
 		}
