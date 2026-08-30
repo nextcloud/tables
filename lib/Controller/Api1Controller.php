@@ -296,7 +296,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
-	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViews(int $tableId): DataResponse {
 		try {
