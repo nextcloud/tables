@@ -5194,6 +5194,13 @@
                             "format": "int64",
                             "nullable": true
                         }
+                    },
+                    {
+                        "name": "if-modified-since",
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -5209,6 +5216,9 @@
                                 }
                             }
                         }
+                    },
+                    "304": {
+                        "description": "Not modified"
                     },
                     "403": {
                         "description": "No permissions",
