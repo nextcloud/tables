@@ -218,6 +218,16 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 				['Charlie'],
 				'Filter skills equal to exactly Python (id 3)'
 			],
+			'skills is-empty' => [
+				[['columnId' => 'skills', 'operator' => 'is-empty', 'value' => '']],
+				['Diana'],
+				'Filter empty skills'
+			],
+			'skills is-not-empty' => [
+				[['columnId' => 'skills', 'operator' => 'is-not-empty', 'value' => '']],
+				['Alice', 'Bob', 'Charlie', 'Eve'],
+				'Filter non-empty skills'
+			],
 
 			// Selection checkbox column (is_available)
 			'available is checked' => [

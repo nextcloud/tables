@@ -29,6 +29,7 @@ export default class TextLongColumn extends AbstractTextColumn {
 			[FilterIds.Contains]() { return cellValue && cellValue.includes(filterValue) },
 			[FilterIds.DoesNotContain]() { return cellValue && !cellValue.includes(filterValue) },
 			[FilterIds.IsEmpty]() { return !cell.value },
+			[FilterIds.IsNotEmpty]() { return !!cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
