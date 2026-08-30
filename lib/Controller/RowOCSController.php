@@ -158,6 +158,12 @@ class RowOCSController extends AOCSController {
 	)]
 	public function getRows(string $nodeCollection, int $nodeId, ?int $limit = null, ?int $offset = null, ?string $filter = null, ?string $sort = null): DataResponse {
 		try {
+			if (($limit !== null && ($limit <= 0 || $limit > 500))
+				|| ($offset !== null && $offset < 0)
+			) {
+				throw new InvalidArgumentException('Offset or limit parameter is out of bounds');
+			}
+
 			$queryData = new RowQuery(
 				nodeType: $nodeCollection === 'tables' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW,
 				nodeId: $nodeId,

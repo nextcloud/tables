@@ -5,6 +5,33 @@ Feature: RowOCS
     Given user "participant1-v2" exists
     Given user "participant2-v2" exists
     Given user "participant3-v2" exists
+    Given user "alice" exists
+    Given user "bob" exists
+    Given user "clarence" exists
+    Given user "dany" exists
+    Given user "elias" exists
+    Given user "fran" exists
+    Given user "george" exists
+    Given user "hannah" exists
+    Given user "ines" exists
+    Given user "jamie" exists
+    Given user "kate" exists
+    Given user "lena" exists
+    Given user "moe" exists
+    Given user "nora" exists
+    Given user "otto" exists
+    Given user "pierre" exists
+    Given user "quinn" exists
+    Given user "roberta" exists
+    Given user "samir" exists
+    Given user "teresa" exists
+    Given user "udai" exists
+    Given user "vera" exists
+    Given user "xuan" exists
+    Given user "yvonne" exists
+    Given user "zara" exists
+    Given user "ahmad" exists
+    Given user "bertram" exists
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And column "one" exists with following properties
       | type          | text                    |
