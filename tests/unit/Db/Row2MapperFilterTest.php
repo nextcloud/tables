@@ -229,6 +229,18 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 				'Filter non-empty skills'
 			],
 
+			'status contains-item Active,Pending' => [
+				[['columnId' => 'status', 'operator' => 'contains-item', 'value' => '[0,2]']],
+				['Alice', 'Charlie', 'Diana', 'Eve'],
+				'Filter status containing one of Active (0) or Pending (2)'
+			],
+
+			'skills contains-item PHP,SQL' => [
+				[['columnId' => 'skills', 'operator' => 'contains-item', 'value' => '[0,2]']],
+				['Alice'],
+				'Filter skills containing one of PHP (0) or SQL (2)'
+			],
+
 			// Selection checkbox column (is_available)
 			'available is checked' => [
 				[['columnId' => 'is_available', 'operator' => 'is-equal', 'value' => '@checked']],

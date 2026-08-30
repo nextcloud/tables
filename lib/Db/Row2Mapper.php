@@ -478,6 +478,36 @@ class Row2Mapper {
 				}
 				$filterExpression = $qb->expr()->iLike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
+			case 'contains-item':
+				$filterItems = $value;
+				if (!is_array($filterItems)) {
+					$filterItems = json_decode((string)$filterItems, true) ?? null;
+					if (is_string($filterItems)) {
+						$filterItems = json_decode($filterItems, true) ?? null;
+					}
+					if (!is_array($filterItems) || $filterItems === []) {
+						$filterItems = [(string)$value];
+					}
+				}
+				$filterExpressions = [];
+				$includeDefault = false;
+				foreach ($filterItems as $filterItem) {
+					if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+						$filterItem = str_replace(['"', '\''], '', (string)$filterItem);
+						$filterExpressions[] = $qb2->expr()->orX(
+							$qb->expr()->iLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($filterItem) . ']')),
+							$qb->expr()->iLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($filterItem) . ',%')),
+							$qb->expr()->iLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($filterItem) . ']%')),
+							$qb->expr()->iLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($filterItem) . ',%'))
+						);
+						$includeDefault = $includeDefault || str_contains((string)($defaultValue ?? ''), $filterItem);
+					} else {
+						$filterExpressions[] = $qb->expr()->eq('value', $qb->createNamedParameter($filterItem, $paramType));
+						$includeDefault = $includeDefault || ((string)($defaultValue ?? '') === (string)$filterItem);
+					}
+				}
+				$filterExpression = $qb2->expr()->orX(...$filterExpressions);
+				break;
 			case 'does-not-contain':
 				if (is_array($value) && $column->getType() === Column::TYPE_USERGROUP) {
 					$filterExpressions = [];

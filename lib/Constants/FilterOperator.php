@@ -12,6 +12,7 @@ enum FilterOperator: string {
 	case BEGINS_WITH = 'begins-with';
 	case ENDS_WITH = 'ends-with';
 	case CONTAINS = 'contains';
+	case CONTAINS_ITEM = 'contains-item';
 	case DOES_NOT_CONTAIN = 'does-not-contain';
 	case IS_EQUAL = 'is-equal';
 	case IS_NOT_EQUAL = 'is-not-equal';
