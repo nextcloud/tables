@@ -77,7 +77,7 @@ export default {
 		...mapState(useTablesStore, ['activeTable', 'activeView']),
 		allRelations() {
 			const dataStore = useDataStore()
-			return dataStore.getRelations(this.column.id) || {}
+			return dataStore.getRelations(this.column.id).values || {}
 		},
 		currentOption() {
 			if (!this.value) {
@@ -86,12 +86,13 @@ export default {
 			return this.allRelations[this.value]
 		},
 		relationLabel() {
-			return this.currentOption ? this.currentOption.label : null
+			return this.currentOption ? this.currentOption.value : null
 		},
 		relationOptions() {
 			const activeElement = this.activeView || this.activeTable
-			if (activeElement) {
-				return Object.values(this.allRelations || {}).map(option => ({ ...option, id: parseInt(option.id) }))
+			if (activeElement && !this.loading) {
+				return Object.values(this.allRelations || {})
+					.map(relation => ({ id: relation.id, label: relation.value }))
 			}
 			return []
 		},
@@ -124,17 +125,6 @@ export default {
 			this.startEditing()
 			// Stop the event from propagating to avoid immediate click outside
 			event.stopPropagation()
-		},
-
-		startEditing() {
-			if (!this.canEditCell()) {
-				return false
-			}
-			this.isEditing = true
-			this.editValue = this.value ? parseInt(this.value) : null
-			this.$nextTick(() => {
-				this.$refs.editingContainer?.focus()
-			})
 		},
 
 		async saveChanges() {
