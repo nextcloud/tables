@@ -3708,6 +3708,7 @@ export interface operations {
                 readonly offset?: number | null;
             };
             readonly header?: {
+                /** @description Respond with 304 Not Modified if the table has not been edited since this date */
                 readonly "if-modified-since"?: string;
             };
             readonly path: {

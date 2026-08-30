@@ -5198,6 +5198,7 @@
                     {
                         "name": "if-modified-since",
                         "in": "header",
+                        "description": "Respond with 304 Not Modified if the table has not been edited since this date",
                         "schema": {
                             "type": "string"
                         }

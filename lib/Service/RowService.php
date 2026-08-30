@@ -271,7 +271,7 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->userId);
-			$this->tableMapper->touch($tableId, $this->userId);
+			$this->touchTable($tableId, $this->userId);
 			$this->attachAliasPayload($insertedRow, $columns);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
@@ -705,7 +705,7 @@ class RowService extends SuperService {
 		}
 
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
-		$this->tableMapper->touch($item->getTableId(), $this->userId);
+		$this->touchTable($item->getTableId(), $this->userId);
 		$this->attachAliasPayload($updatedRow, $columns);
 
 		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
@@ -804,7 +804,7 @@ class RowService extends SuperService {
 		try {
 			$columns = $this->loadColumnsForData($item->getData() ?? []);
 			$deletedRow = $this->row2Mapper->delete($item);
-			$this->tableMapper->touch($item->getTableId(), $userId);
+			$this->touchTable($item->getTableId(), $userId);
 			$this->attachAliasPayload($item, $columns);
 
 			$event = new RowDeletedEvent($item, $item->getData());
@@ -846,7 +846,7 @@ class RowService extends SuperService {
 		$columns = $this->columnMapper->findAllByTable($tableId);
 
 		$this->row2Mapper->deleteAllForTable($tableId, $columns);
-		$this->tableMapper->touch($tableId, $userId ?? $this->userId);
+		$this->touchTable($tableId, $userId ?? $this->userId);
 	}
 
 	/**
@@ -862,7 +862,18 @@ class RowService extends SuperService {
 	 */
 	public function deleteColumnDataFromRows(Column $column):void {
 		$this->row2Mapper->deleteDataForColumn($column);
-		$this->tableMapper->touch($column->getTableId(), $this->userId);
+		$this->touchTable($column->getTableId(), $this->userId);
+	}
+
+	/**
+	 * Updates the table's last-modified metadata.
+	 */
+	private function touchTable(int $tableId, ?string $userId): void {
+		try {
+			$this->tableMapper->touch($tableId, $userId);
+		} catch (Exception $e) {
+			$this->logger->warning('Failed to update last modified timestamp for table ' . $tableId . ': ' . $e->getMessage(), ['exception' => $e]);
+		}
 	}
 
 	/**

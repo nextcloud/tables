@@ -40,6 +40,7 @@ use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
+use OCP\AppFramework\Http\Attribute\RequestHeader;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Constants;
@@ -1257,18 +1258,22 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
+	#[RequestHeader(name: 'if-modified-since', description: 'Respond with 304 Not Modified if the table has not been edited since this date')]
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
-			$table = $this->tableService->find($tableId);
+			$table = $this->tableService->find($tableId, true);
 			$lastEditAt = $table->getLastEditAt();
 			$lastModified = $lastEditAt !== null && $lastEditAt !== '' ? new \DateTime($lastEditAt) : null;
 
 			if ($lastModified !== null) {
-				$ifModifiedSince = $this->request->getHeader('IF_MODIFIED_SINCE');
-				if ($ifModifiedSince !== '' && trim($ifModifiedSince) === $lastModified->format(Constants::DATE_RFC7231)) {
-					$response = new DataResponse([], Http::STATUS_NOT_MODIFIED);
-					$response->setLastModified($lastModified);
-					return $response;
+				$ifModifiedSince = trim($this->request->getHeader('if-modified-since'));
+				if ($ifModifiedSince !== '') {
+					$modifiedSince = \DateTime::createFromFormat(Constants::DATE_RFC7231, $ifModifiedSince);
+					if ($modifiedSince !== false && $lastModified->getTimestamp() <= $modifiedSince->getTimestamp()) {
+						$response = new DataResponse([], Http::STATUS_NOT_MODIFIED);
+						$response->setLastModified($lastModified);
+						return $response;
+					}
 				}
 			}
 

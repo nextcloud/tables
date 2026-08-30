@@ -219,18 +219,11 @@ class TableMapper extends QBMapper {
 		return $entity;
 	}
 
-	public function update(Entity $entity): Table {
-		/** @var Table $entity */
-		$entity = parent::update($entity);
-		$this->cache[(string)$entity->getId()] = $entity;
-		return $entity;
-	}
-
 	/**
 	 * @throws Exception
 	 */
 	public function touch(int $id, ?string $userId = null, ?\DateTimeInterface $time = null): void {
-		$time = $time ?? new \DateTime();
+		$time ??= new \DateTime();
 		$qb = $this->db->getQueryBuilder();
 		$qb->update($this->table)
 			->set('last_edit_at', $qb->createNamedParameter($time->format('Y-m-d H:i:s'), IQueryBuilder::PARAM_STR))
