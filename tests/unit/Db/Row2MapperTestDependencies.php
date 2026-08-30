@@ -157,7 +157,7 @@ trait Row2MapperTestDependencies {
 						'department' => 'Finance',
 						'score' => 88.7,
 						'status' => 'Pending',
-						'skills' => ['Excel', 'Accounting', 'Analysis'],
+						'skills' => [],
 						'is_available' => '"false"',
 						'experience_years' => 3
 					]

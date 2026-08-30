@@ -564,6 +564,11 @@ class Row2Mapper {
 						$qb->expr()->isNull('value'),
 						$qb->expr()->eq('value', $qb->createNamedParameter('', $paramType))
 					);
+				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+					$filterExpression = $qb2->expr()->orX(
+						$qb->expr()->isNull('value'),
+						$qb->expr()->eq('value', $qb->createNamedParameter('[]', $paramType))
+					);
 				} else {
 					$filterExpression = $qb->expr()->isNull('value');
 				}
@@ -574,6 +579,11 @@ class Row2Mapper {
 					$filterExpression = $qb2->expr()->andX(
 						$qb->expr()->isNotNull('value'),
 						$qb->expr()->neq('value', $qb->createNamedParameter('', $paramType))
+					);
+				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+					$filterExpression = $qb2->expr()->andX(
+						$qb->expr()->isNotNull('value'),
+						$qb->expr()->neq('value', $qb->createNamedParameter('[]', $paramType))
 					);
 				} else {
 					$filterExpression = $qb->expr()->isNotNull('value');
