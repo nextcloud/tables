@@ -13,23 +13,23 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\RelationService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
-use Psr\Log\LoggerInterface;
 
 class AnalyticsDatasource implements IDatasource {
 
 	public function __construct(
 		private readonly IL10N $l10n,
-		private readonly LoggerInterface $logger,
 		private readonly TableService $tableService,
 		private readonly ViewService $viewService,
 		private readonly ColumnService $columnService,
 		private readonly RowService $rowService,
+		private readonly RelationService $relationService,
 		protected ?string $userId,
 	) {
 	}
@@ -253,6 +253,7 @@ class AnalyticsDatasource implements IDatasource {
 	private function formatValue(Column $column, mixed $value): mixed {
 		return match ($column->getType()) {
 			Column::TYPE_SELECTION => $this->formatSelectionValue($column, $value),
+			Column::TYPE_RELATION => $this->formatRelationValue($column, $value),
 			Column::TYPE_TEXT => $this->formatTextValue($column, $value),
 			Column::TYPE_USERGROUP => $this->formatUsergroupValue($value),
 			default => $value,
@@ -370,6 +371,17 @@ class AnalyticsDatasource implements IDatasource {
 		}
 
 		return implode(', ', array_filter($labels, static fn (string $label): bool => $label !== ''));
+	}
+
+	private function formatRelationValue(Column $column, mixed $value): string {
+		if ($value === null || $value === '') {
+			return '';
+		}
+
+		$relationData = $this->relationService->getRelationData($column);
+		$valueId = (int)$value;
+
+		return $relationData[$valueId]['label'] ?? (string)$value;
 	}
 
 	private function parseDefaultValue(?string $value): mixed {
