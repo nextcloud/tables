@@ -904,7 +904,7 @@ class ShareService extends SuperService {
 	public function deleteAllForContext(Context $context): void {
 		try {
 			$this->atomic(function () use ($context): void {
-				$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
+				$shares = $this->mapper->findAllSharesForNode('context', $context->getId());
 				foreach ($shares as $share) {
 					$this->contextNavigationMapper->deleteByShareId($share->getId());
 				}
