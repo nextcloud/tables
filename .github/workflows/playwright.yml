@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server-versions: ['stable33', 'stable34', 'master']
+        server-versions: ['stable33', 'stable34', 'stable35', 'master']
 
     name: Playwright (${{ matrix.server-versions }})
 
