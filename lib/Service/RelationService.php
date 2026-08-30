@@ -30,12 +30,12 @@ class RelationService {
 	private array $cacheRelationData = [];
 
 	public function __construct(
-		private ColumnMapper $columnMapper,
-		private ViewMapper $viewMapper,
-		private Row2Mapper $row2Mapper,
-		private ColumnService $columnService,
-		private IUserSession $userSession,
-		private LoggerInterface $logger,
+		private readonly ColumnMapper $columnMapper,
+		private readonly ViewMapper $viewMapper,
+		private readonly Row2Mapper $row2Mapper,
+		private readonly ColumnService $columnService,
+		private readonly IUserSession $userSession,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
@@ -126,9 +126,7 @@ class RelationService {
 				$settings = $column->getCustomSettingsObject(RelationSettings::class);
 				$targetKey = $this->buildRelationCacheKey($settings->relationType, $settings->targetId, $settings->labelColumn);
 
-				if (!isset($fetchedTargets[$targetKey])) {
-					$fetchedTargets[$targetKey] = $this->fetchRelationValuesForTarget($column);
-				}
+				$fetchedTargets[$targetKey] ??= $this->fetchRelationValuesForTarget($column);
 
 				$result[$column->getId()] = $fetchedTargets[$targetKey];
 			} catch (\InvalidArgumentException $e) {
@@ -199,7 +197,7 @@ class RelationService {
 		try {
 			$targetColumn = $this->columnMapper->find($settings->labelColumn);
 			$rows = $this->fetchRowsForTarget($settings, [$settings->labelColumn]);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->cacheRelationData[$cacheKey] = [];
 			return [];
 		}
