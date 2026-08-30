@@ -47,6 +47,10 @@ export const useDataStore = defineStore('data', {
 			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
 			return state.rows[stateId] ?? []
 		},
+		hasRows: (state) => (isView, elementId) => {
+			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
+			return Object.hasOwn(state.rows, stateId)
+		},
 		getRelations: (state) => (columnId) => {
 			if (state.relations[columnId] === undefined) {
 				state.relations[columnId] = {}
@@ -103,18 +107,38 @@ export const useDataStore = defineStore('data', {
 			this.loading[stateId] = false
 			return columns
 		},
-		
+
+		async loadViewWithColumnSettings(view) {
+			if (!view || Array.isArray(view.columnSettings)) {
+				return view
+			}
+
+			const cachedView = useTablesStore().getView(parseInt(view.id))
+			if (cachedView && Array.isArray(cachedView.columnSettings)) {
+				return { ...view, ...cachedView }
+			}
+
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/view/' + view.id))
+				return { ...view, ...res.data }
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load view.'))
+				return view
+			}
+		},
+
 		async loadColumnsFromBE({ view, tableId }) {
-			let allColumns = await this.getColumnsFromBE({ tableId, viewId: view?.id })
-			if (view) {
+			const viewWithColumnSettings = await this.loadViewWithColumnSettings(view)
+			let allColumns = await this.getColumnsFromBE({ tableId, viewId: viewWithColumnSettings?.id })
+			if (viewWithColumnSettings) {
 				// Meta columns aren't real DB columns, so they never come back
 				// from the fetch above -- append any this view has settings for.
-				const columnSettingsMap = view.columnSettings?.reduce((acc, item) => {
+				const columnSettingsMap = viewWithColumnSettings.columnSettings?.reduce((acc, item) => {
 					acc[item.columnId] = item
 					return acc
 				}, {}) ?? {}
 				allColumns = allColumns.concat(MetaColumns.filter(col => columnSettingsMap[col.id]))
-		
+
 				// Real columns carry their own order via viewColumnInformation;
 				// meta columns fall back to columnSettingsMap since they were
 				// just concatenated above and never went through server-side
@@ -127,11 +151,11 @@ export const useDataStore = defineStore('data', {
 			} else {
 				// no view: keep the backend-ordered result (ColumnService::findAllByTable already applies columnOrder)
 			}
-			const stateId = genStateKey(!!(view?.id), view?.id ?? tableId)
+			const stateId = genStateKey(!!(viewWithColumnSettings?.id), viewWithColumnSettings?.id ?? tableId)
 			this.columns[stateId] = allColumns
 			return true
 		},
-		
+
 		async loadPublicColumnsFromBE({ token }) {
 			const stateId = 'public-' + token
 			this.loading[stateId] = true

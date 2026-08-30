@@ -3,10 +3,10 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="icon-label-container">
-		<IconTable v-if="type === 'table'" :size="40" />
-		<IconView v-if="type === 'view'" :size="40" />
-		<IconRow v-if="type === 'row'" :size="40" />
+	<div class="icon-label-container" :class="{ 'icon-label-container--compact': compact }">
+		<IconTable v-if="type === 'table'" :size="iconSize" />
+		<IconView v-if="type === 'view'" :size="iconSize" />
+		<IconRow v-if="type === 'row'" :size="iconSize" />
 
 		<div class="content">
 			<div class="labels">
@@ -45,33 +45,43 @@ export default {
 
 	props: {
 		label: {
-		      type: String,
-		      default: '',
-		    },
+			type: String,
+			default: '',
+		},
 		type: {
-		      type: String,
-		      default: 'table',
-		    },
+			type: String,
+			default: 'table',
+		},
 		emoji: {
-		      type: String,
-		      default: null,
-		    },
+			type: String,
+			default: null,
+		},
 		owner: {
-		      type: String,
-		      default: null,
-		    },
+			type: String,
+			default: null,
+		},
 		ownerDisplayName: {
-		      type: String,
-		      default: null,
-		    },
+			type: String,
+			default: null,
+		},
 		rowsCount: {
-		      type: Number,
-		      default: null,
-		    },
+			type: Number,
+			default: null,
+		},
 		subline: {
-		      type: String,
-		      default: null,
-		    },
+			type: String,
+			default: null,
+		},
+		compact: {
+			type: Boolean,
+			default: false,
+		},
+	},
+
+	computed: {
+		iconSize() {
+			return this.compact ? 28 : 40
+		},
 	},
 
 	methods: {
@@ -86,8 +96,40 @@ export default {
 	.icon-label-container {
 		display: flex;
 		align-items: center;
+		min-width: 0;
+
 		img, :deep(svg) {
+			flex: 0 0 auto;
 			margin-inline-end: calc(var(--default-grid-baseline) * 2);
+		}
+	}
+
+	.icon-label-container--compact {
+		width: 100%;
+		overflow: hidden;
+
+		.content {
+			display: flex;
+			align-items: center;
+			min-width: 0;
+			gap: calc(var(--default-grid-baseline) * 2);
+		}
+
+		.content .labels {
+			overflow: hidden;
+			margin-bottom: 0;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			font-size: inherit;
+		}
+
+		.content .details {
+			flex: 0 0 auto;
+			align-items: center;
+		}
+
+		.subline {
+			display: none;
 		}
 	}
 

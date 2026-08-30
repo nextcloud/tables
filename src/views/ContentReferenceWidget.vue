@@ -18,11 +18,11 @@
 		</div>
 		<div v-if="rows && rows.length > 0" class="nc-table">
 			<NcTable
+				v-model:view-setting="localViewSetting"
 				:rows="filteredRows"
 				:columns="columns"
 				:element-id="richObject.id"
 				:is-view="isView"
-				v-model:view-setting="localViewSetting"
 				v-bind="tablePermissions"
 				@edit-row="editRow"
 				@copy-row="copyRow"
@@ -43,7 +43,7 @@
 			@cancel="rowToDelete = null" />
 	</div>
 </template>
- 
+
 <script>
 import NcTable from '../shared/components/ncTable/NcTable.vue'
 import Options from '../shared/components/ncTable/sections/Options.vue'
@@ -55,9 +55,10 @@ import { useResizeObserver } from '@vueuse/core'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
- 
+import { NODE_TYPE_VIEW } from '../shared/constants.ts'
+
 export default {
- 
+
 	components: {
 		NcTable,
 		Options,
@@ -65,9 +66,9 @@ export default {
 		DeleteRows,
 		NcLoadingIcon,
 	},
- 
+
 	mixins: [permissionsMixin],
- 
+
 	props: {
 		richObjectType: {
 			type: String,
@@ -82,7 +83,7 @@ export default {
 			default: true,
 		},
 	},
- 
+
 	data() {
 		return {
 			searchExp: null,
@@ -95,10 +96,12 @@ export default {
 			dataStore: null,
 		}
 	},
- 
+
 	computed: {
 		isView() {
-			return Boolean(this.richObject?.type)
+			return this.richObject?.type === NODE_TYPE_VIEW
+				|| this.richObject?.type === String(NODE_TYPE_VIEW)
+				|| this.richObject?.type === 'view'
 		},
 		tablePermissions() {
 			return {
@@ -133,9 +136,8 @@ export default {
 		},
 		// Use computed property to get rows from store or richObject
 		rows() {
-			// First try to get from the store
 			const storeRows = this.getRows
-			if (storeRows && storeRows.length > 0) {
+			if (this.dataStore?.hasRows(this.isView, this.richObject.id)) {
 				return storeRows
 			}
 			// Fallback to richObject rows or local rows
@@ -153,7 +155,7 @@ export default {
 			return this.richObject?.columns || []
 		},
 	},
- 
+
 	watch: {
 		richObject: {
 			deep: true,
@@ -177,7 +179,7 @@ export default {
 			},
 		},
 	},
- 
+
 	async mounted() {
 		useResizeObserver(this.$el, (entries) => {
 			const entry = entries[0]
@@ -185,13 +187,13 @@ export default {
 			// In Vue 3 $el can be a fragment/comment node (no style), so guard it.
 			this.$el?.style?.setProperty?.('--widget-content-width', `${width}px`)
 		})
- 
+
 		this.tablesStore = useTablesStore()
 		this.dataStore = useDataStore()
- 
+
 		await Promise.all([this.loadRows(), this.loadColumns()])
 	},
- 
+
 	methods: {
 		// { tableId } or { viewId } payload for loadRowsFromBE
 		elementIdPayload() {
@@ -240,19 +242,18 @@ export default {
 		},
 		async loadRows() {
 			if (!this.dataStore) return
- 
+
 			// Paint from cached snapshot immediately, but it can be stale --
 			// always reconcile with the backend below.
-			if (this.richObject.rows) {
+			if (Array.isArray(this.richObject.rows)) {
 				this.localRows = this.richObject.rows
 				this.dataStore.seedRows({
 					isView: this.isView,
 					elementId: this.richObject.id,
 					rows: this.richObject.rows,
 				})
-				return
 			}
- 
+
 			try {
 				await this.dataStore.loadRowsFromBE(this.elementIdPayload())
 				// No need to set local rows as the computed property will use store data

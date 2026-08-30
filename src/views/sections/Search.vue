@@ -24,6 +24,7 @@
 			</template>
 			<template #selected-option="props">
 				<SearchAndSelectOption
+					compact
 					:label="props.label"
 					:emoji="props.emoji"
 					:owner="props.owner"
