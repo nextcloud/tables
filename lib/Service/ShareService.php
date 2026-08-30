@@ -79,12 +79,10 @@ class ShareService extends SuperService {
 	 * @throws InternalError
 	 * @return Share[]
 	 */
-	public function findAll(string $nodeType, int $nodeId, ?string $userId = null, bool $enhanceShares = true): array {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
+	public function findAll(string $nodeType, int $nodeId, bool $enhanceShares = true): array {
 		try {
 			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
-			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId, $excluded);
+			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $excluded);
 
 			return $enhanceShares ? $this->addReceiverDisplayNames($shares) : $shares;
 		} catch (Exception $e) {
@@ -920,7 +918,7 @@ class ShareService extends SuperService {
 	 * @return Share[]
 	 */
 	public function changeSenderForNode(string $nodeType, int $nodeId, string $newOwnerUserId, ?string $userId = null): array {
-		$sharesForTable = $this->findAll($nodeType, $nodeId, $userId, false);
+		$sharesForTable = $this->findAll($nodeType, $nodeId, false);
 		$newShares = [];
 
 		foreach ($sharesForTable as $share) {
@@ -982,7 +980,7 @@ class ShareService extends SuperService {
 	 */
 	public function findSharedWithUserIds(int $elementId, string $elementType): array {
 		try {
-			$shares = $this->mapper->findAllSharesForNode($elementType, $elementId, '');
+			$shares = $this->mapper->findAllSharesForNode($elementType, $elementId);
 			$sharedWithUserIds = [];
 
 			foreach ($shares as $share) {
