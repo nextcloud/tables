@@ -40,8 +40,10 @@ use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
+use OCP\AppFramework\Http\Attribute\RequestHeader;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\Constants;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -1244,9 +1246,10 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
-	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_NOT_MODIFIED, array{}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Rows returned
+	 * 304: Not modified
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -1255,13 +1258,39 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
+	#[RequestHeader(name: 'if-modified-since', description: 'Respond with 304 Not Modified if the table has not been edited since this date')]
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
-			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset)));
+			$table = $this->tableService->find($tableId, true);
+			$lastEditAt = $table->getLastEditAt();
+			$lastModified = $lastEditAt !== null && $lastEditAt !== '' ? new \DateTime($lastEditAt) : null;
+
+			if ($lastModified !== null) {
+				$ifModifiedSince = trim($this->request->getHeader('if-modified-since'));
+				if ($ifModifiedSince !== '') {
+					$modifiedSince = \DateTime::createFromFormat(Constants::DATE_RFC7231, $ifModifiedSince);
+					if ($modifiedSince !== false && $lastModified->getTimestamp() <= $modifiedSince->getTimestamp()) {
+						$response = new DataResponse([], Http::STATUS_NOT_MODIFIED);
+						$response->setLastModified($lastModified);
+						return $response;
+					}
+				}
+			}
+
+			$rows = $this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset);
+			$response = new DataResponse($this->rowService->formatRows($rows));
+			if ($lastModified !== null) {
+				$response->setLastModified($lastModified);
+			}
+			return $response;
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (NotFoundError $e) {
+			$this->logger->warning('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
