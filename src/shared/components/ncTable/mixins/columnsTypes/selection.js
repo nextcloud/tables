@@ -20,13 +20,12 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 	}
 
 	getLabel(id) {
-		const i = this.selectionOptions?.findIndex((obj) => obj.id === id)
-		return this.selectionOptions[i]?.label
+		return this.getOptionObject(id)?.label
 	}
 
-	isDeletedLabel(value) {
-		const i = this.selectionOptions?.findIndex((obj) => obj.id === value)
-		return !!this.selectionOptions[i]?.deleted
+	getOptionObject(id) {
+		if (id === null || id === undefined) return null
+		return this.selectionOptions?.find((obj) => obj.id === id) || { id, label: String(id), deleted: true }
 	}
 
 	sort(mode, nextSorts) {
