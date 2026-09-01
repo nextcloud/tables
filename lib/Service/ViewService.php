@@ -204,7 +204,11 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
-		$item->setLayout(in_array($layout, ['tiles', 'gallery'], true) ? $layout : null);
+		try {
+			$item->setLayout(ViewUpdateInput::normalizeLayout($layout));
+		} catch (InvalidArgumentException $e) {
+			throw new BadRequestError($e->getMessage());
+		}
 		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);

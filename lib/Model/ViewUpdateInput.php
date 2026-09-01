@@ -147,7 +147,7 @@ class ViewUpdateInput {
 		]);
 	}
 
-	private static function normalizeLayout(mixed $layout): ?string {
+	public static function normalizeLayout(mixed $layout): ?string {
 		if ($layout === null || $layout === '') {
 			return null;
 		}
