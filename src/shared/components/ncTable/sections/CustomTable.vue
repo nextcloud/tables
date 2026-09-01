@@ -4,6 +4,9 @@
 -->
 <template>
 	<div class="container" :class="{ 'container--cards': currentLayout !== 'table' }">
+		<div v-if="currentLayout !== 'table' && config.showActions" class="card-layout__actions">
+			<slot name="actions" />
+		</div>
 		<table v-if="currentLayout === 'table'" class="tables-list__table">
 			<thead class="tables-list__thead">
 				<TableHeader v-model:view-setting="localViewSetting"
@@ -462,6 +465,13 @@ export default {
 .container--cards {
 	width: var(--app-content-width, 100%);
 	max-width: var(--app-content-width, 100%);
+}
+
+.card-layout__actions {
+	display: flex;
+	justify-content: flex-end;
+	padding-inline: calc(var(--default-grid-baseline) * 2);
+	padding-top: 8px;
 }
 
 .card-layout {
