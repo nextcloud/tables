@@ -5,6 +5,13 @@
 
 # Changelog
 
+## v1.1.0
+
+### Fixed
+* [[stable1.0] apply remove share for users/teams/groups by @backportbot[bot] (tables#2800)](https://github.com/nextcloud/tables/pull/2800)
+* [[stable1.0] fix public share by @samin-z (tables#2869)](https://github.com/nextcloud/tables/pull/2869)
+* [[stable1.0] fix: add validation for columnDto by @backportbot[bot] (tables#2715)](https://github.com/nextcloud/tables/pull/2715)
+
 ## v1.0.9
 
 ### Fixed
