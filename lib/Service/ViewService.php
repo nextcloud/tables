@@ -264,11 +264,16 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not update view with id ' . $id);
 			}
 
+			$cardSourcesRequested = false;
 			foreach ($data->updateDetail() as $parameter => $value) {
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
 					$this->assertInputColumnsAreValid($view, $userId, $value);
+				}
+
+				if ($parameter === ViewUpdatableParameters::VIEW_SETTINGS) {
+					$cardSourcesRequested = true;
 				}
 
 				if ($parameter === ViewUpdatableParameters::TECHNICAL_NAME) {
@@ -283,7 +288,11 @@ class ViewService extends SuperService {
 				$view->$setterMethod($insertableValue);
 			}
 
-			$this->assertCardSourceColumnsAreValid($view);
+			if ($cardSourcesRequested) {
+				$this->assertCardSourceColumnsAreValid($view, $userId);
+			} else {
+				$this->dropOrphanedCardSources($view, $userId);
+			}
 
 			$time = new DateTime();
 			$view->setLastEditBy($userId);
@@ -335,8 +344,25 @@ class ViewService extends SuperService {
 	 * Ensures that card view settings reference columns that are part of the view.
 	 * @throws InvalidArgumentException
 	 */
-	protected function assertCardSourceColumnsAreValid(View $view): void {
+	/**
+	 * The columns a card source may point at. A view that has not had its columns configured
+	 * still must not accept an id from somebody else's table, so the columns available to the
+	 * view are used while it has no selection of its own.
+	 *
+	 * @return list<int>
+	 */
+	private function getCardSourceCandidateIds(View $view, string $userId): array {
 		$viewColumnIds = $view->getColumnIds();
+		if (!empty($viewColumnIds)) {
+			return $viewColumnIds;
+		}
+
+		$columnService = \OCP\Server::get(ColumnService::class);
+		return array_map(static fn (Column $column) => $column->getId(), $columnService->findAllByManagedView($view, $userId));
+	}
+
+	protected function assertCardSourceColumnsAreValid(View $view, string $userId): void {
+		$viewColumnIds = $this->getCardSourceCandidateIds($view, $userId);
 		if (empty($viewColumnIds)) {
 			return;
 		}
@@ -352,6 +378,32 @@ class ViewService extends SuperService {
 		if ($titleSource !== null && !in_array($titleSource, $viewColumnIds, true)) {
 			throw new InvalidArgumentException('Invalid cardTitleSource column ID: ' . $titleSource);
 		}
+	}
+
+	/**
+	 * Clears card sources that the updated column set no longer contains.
+	 */
+	protected function dropOrphanedCardSources(View $view, string $userId): void {
+		$viewColumnIds = $this->getCardSourceCandidateIds($view, $userId);
+		if (empty($viewColumnIds)) {
+			return;
+		}
+
+		$viewSettings = $view->getViewSettingsObject();
+		$backgroundSource = $viewSettings->getCardBackgroundSource();
+		$titleSource = $viewSettings->getCardTitleSource();
+
+		$keptBackgroundSource = in_array($backgroundSource, $viewColumnIds, true) ? $backgroundSource : null;
+		$keptTitleSource = in_array($titleSource, $viewColumnIds, true) ? $titleSource : null;
+
+		if ($keptBackgroundSource === $backgroundSource && $keptTitleSource === $titleSource) {
+			return;
+		}
+
+		$view->setViewSettings(json_encode(ViewSettings::createFromInputArray([
+			'cardBackgroundSource' => $keptBackgroundSource,
+			'cardTitleSource' => $keptTitleSource,
+		])->jsonSerialize()));
 	}
 
 	/**
