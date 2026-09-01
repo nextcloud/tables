@@ -297,10 +297,12 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->assertSame([], $this->source->countSharesByInitiator(new ShareReviewQuery(), 5));
 	}
 
-	public function testDeleteShareNonNumericReturnsFalse(): void {
+	public function testDeleteShareNonCanonicalIdReturnsFalse(): void {
 		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
 
 		$this->assertFalse($this->source->deleteShare('abc'));
+		$this->assertFalse($this->source->deleteShare('1e3'), 'only ids the source emits are accepted');
+		$this->assertFalse($this->source->deleteShare('7.5'));
 	}
 
 	public function testDeleteShareEventNotHandledReturnsFalse(): void {
