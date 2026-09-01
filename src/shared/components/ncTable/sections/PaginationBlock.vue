@@ -52,7 +52,7 @@ import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
 import { NcButton, NcSelect, NcTextField } from '@nextcloud/vue'
 import { translate as t } from '@nextcloud/l10n'
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 export default {
 	name: 'PaginationBlock',
@@ -78,6 +78,7 @@ export default {
 		return {
 			pageNumber: 1,
 			rowsPerPage: 100,
+			isAdoptingPagination: false,
 		}
 	},
 
@@ -90,19 +91,50 @@ export default {
 	watch: {
 		pageNumber() {
 			this.validatePageInput()
-			emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+			this.emitPaginationChanged()
 		},
 		rowsPerPage() {
 			this.validatePageInput()
-			emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+			this.emitPaginationChanged()
 		},
 		rows() {
 			this.validatePageInput()
 		},
 	},
 
+	mounted() {
+		subscribe('tables:pagination-changed', this.adoptPagination)
+	},
+
+	beforeUnmount() {
+		unsubscribe('tables:pagination-changed', this.adoptPagination)
+	},
+
 	methods: {
 		t,
+		emitPaginationChanged() {
+			if (this.isAdoptingPagination) {
+				return
+			}
+			emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+		},
+		// Keeps several pagination controls of the same table in sync.
+		adoptPagination({ pageNumber, rowsPerPage }) {
+			if (rowsPerPage === this.rowsPerPage && pageNumber === this.pageNumber) {
+				return
+			}
+
+			this.isAdoptingPagination = true
+			if (rowsPerPage) {
+				this.rowsPerPage = rowsPerPage
+			}
+			if (pageNumber) {
+				this.pageNumber = pageNumber
+			}
+			this.$nextTick(() => {
+				this.isAdoptingPagination = false
+			})
+		},
 		validatePageInput() {
 			// Ensure page number is within valid range
 			if (this.pageNumber < 1) {
