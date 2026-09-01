@@ -8,7 +8,7 @@
 		<TableDescription :description="element.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="element" />
-			<TableView v-else :rows="rows" :columns="columns" :element="element"
+			<TableView v-else v-model:view-setting="localViewSetting" :rows="rows" :columns="columns" :element="element"
 				:can-read-rows="element.onSharePermissions.read"
 				:can-create-rows="element.onSharePermissions.create"
 				:can-edit-rows="element.onSharePermissions.update"
@@ -118,12 +118,19 @@ export default {
 			prefillData: null,
 			editRow: null,
 			rowsToDelete: null,
+			localViewSetting: this.buildViewSetting(),
 		}
 	},
 
 	computed: {
 		isFormMode() {
 			return this.element.onSharePermissions.create && !this.element.onSharePermissions.read
+		},
+	},
+
+	watch: {
+		element() {
+			this.localViewSetting = this.buildViewSetting()
 		},
 	},
 
@@ -152,6 +159,16 @@ export default {
 
 	methods: {
 		t,
+
+		buildViewSetting() {
+			return {
+				layout: this.element?.layout ?? 'table',
+				viewSettings: {
+					cardBackgroundSource: this.element?.viewSettings?.cardBackgroundSource ?? null,
+					cardTitleSource: this.element?.viewSettings?.cardTitleSource ?? null,
+				},
+			}
+		},
 	},
 }
 </script>
