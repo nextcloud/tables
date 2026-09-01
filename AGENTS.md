@@ -104,7 +104,9 @@ Routes are defined in `appinfo/routes.php` (~100 routes covering the full REST A
 
 ### Frontend (Vue.js — `src/`)
 
-Single-page app built with **Vue 2.7**, **Vue Router 3**, and **Pinia** (state management). Compiled with **Vite**.
+Single-page app built with **Vue 3**, **Vue Router 4**, and **Pinia** (state management). Compiled with **Vite**.
+
+Components use the Options API. Lifecycle hooks follow the Vue 3 names — use `beforeUnmount`, not the Vue 2 `beforeDestroy`.
 
 - **`src/store/store.js`** — Primary Pinia store (tables, columns, views, shares, contexts).
 - **`src/store/data.js`** — Row/cell data state.
