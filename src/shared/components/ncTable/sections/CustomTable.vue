@@ -53,7 +53,11 @@
 					@delete-row="rowId => $emit('delete-row', rowId)" />
 			</transition-group>
 		</table>
-		<div v-else class="card-layout" :class="`card-layout--${currentLayout}`">
+		<div v-else
+			ref="cardLayout"
+			class="card-layout"
+			:class="[`card-layout--${currentLayout}`, { 'card-layout--no-image': !hasCardBackground }]"
+			:style="{ '--card-title-lines': cardTitleLines }">
 			<button v-for="row in currentPageRows"
 				:key="row.id"
 				type="button"
@@ -67,7 +71,7 @@
 						class="layout-card__image">
 					<div v-else class="layout-card__no-image" />
 					<div class="layout-card__title-banner">
-						{{ getCardTitle(row) }}
+						<span class="layout-card__title-text">{{ getCardTitle(row) }}</span>
 					</div>
 				</div>
 				<div v-if="currentLayout === 'gallery'" class="layout-card__body" data-cy="galleryLayoutBody">
@@ -91,6 +95,12 @@ import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import PaginationBlock from './PaginationBlock.vue'
 import { translate as t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
+
+// Share of the card image the title banner may cover before the text is ellipsized.
+const MAX_TITLE_BANNER_SHARE = 0.6
+const MAX_TITLE_LINES = 6
+// An enlarged text size must not push the title below this many lines.
+const MIN_TITLE_LINES = 2
 
 export default {
 	name: 'CustomTable',
@@ -148,6 +158,7 @@ export default {
 			localViewSetting: this.viewSetting,
 			pageNumber: 1,
 			rowsPerPage: 100,
+			cardTitleLines: 2,
 			rowAnimation: false,
 			pinnedColumnId: null,
 			columnWidths: null,
@@ -155,6 +166,10 @@ export default {
 	},
 
 	computed: {
+		hasCardBackground() {
+			return this.localViewSetting?.viewSettings?.cardBackgroundSource !== null
+				&& this.localViewSetting?.viewSettings?.cardBackgroundSource !== undefined
+		},
 		currentLayout() {
 			return ['tiles', 'gallery'].includes(this.localViewSetting?.layout) ? this.localViewSetting.layout : 'table'
 		},
@@ -176,6 +191,10 @@ export default {
 		currentLayout() {
 			this.pageNumber = 1
 			emit('tables:pagination-changed', { pageNumber: 1, rowsPerPage: this.rowsPerPage })
+			this.$nextTick(() => this.observeCardLayout())
+		},
+		hasCardBackground() {
+			this.$nextTick(() => this.updateCardTitleLines())
 		},
 		totalPages(newTotalPages) {
 			if (this.pageNumber > newTotalPages) {
@@ -192,11 +211,14 @@ export default {
 	},
 
 	mounted() {
+		this.cardResizeObserver = new ResizeObserver(() => this.updateCardTitleLines())
+		this.$nextTick(() => this.observeCardLayout())
 		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		subscribe('tables:row:animate', this.enableRowAnimation)
 		subscribe('tables:pagination-changed', this.handlePaginationChanged)
 	},
 	beforeUnmount() {
+		this.cardResizeObserver?.disconnect()
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		unsubscribe('tables:row:animate', this.enableRowAnimation)
 		unsubscribe('tables:pagination-changed', this.handlePaginationChanged)
@@ -207,6 +229,42 @@ export default {
 		setPinnedColumn(columnId) {
 			this.pinnedColumnId = this.pinnedColumnId === columnId ? null : columnId
 		},
+		observeCardLayout() {
+			const container = this.$refs.cardLayout
+			if (!container || !this.cardResizeObserver) {
+				return
+			}
+			this.cardResizeObserver.disconnect()
+			this.cardResizeObserver.observe(container)
+			// The container keeps its size when only the text size changes, so watch the title too.
+			const title = container.querySelector('.layout-card__title-text')
+			if (title) {
+				this.cardResizeObserver.observe(title)
+			}
+			this.updateCardTitleLines()
+		},
+
+		updateCardTitleLines() {
+			const container = this.$refs.cardLayout
+			const wrapper = container?.querySelector('.layout-card__image-wrapper')
+			const banner = container?.querySelector('.layout-card__title-banner')
+			if (!wrapper || !banner) {
+				return
+			}
+			const bannerStyle = window.getComputedStyle(banner)
+			const lineHeight = parseFloat(bannerStyle.lineHeight)
+			if (!lineHeight) {
+				return
+			}
+			const padding = parseFloat(bannerStyle.paddingTop) + parseFloat(bannerStyle.paddingBottom)
+			const imageHeight = wrapper.getBoundingClientRect().height
+			const share = this.hasCardBackground ? MAX_TITLE_BANNER_SHARE : 1
+			const keepMinimum = MIN_TITLE_LINES * lineHeight + padding
+			const available = Math.min(imageHeight, Math.max(imageHeight * share, keepMinimum)) - padding
+			const lines = Math.floor(available / lineHeight)
+			this.cardTitleLines = Math.min(MAX_TITLE_LINES, Math.max(1, lines))
+		},
+
 		measureColumnWidths() {
 			const headerRow = this.$el?.querySelector?.('thead tr')
 			if (!headerRow) return
@@ -324,8 +382,10 @@ export default {
 			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[1] ?? this.columns[0] ?? null
 		},
 		getBackgroundColumn() {
+			// No fallback: a card without a configured background shows no image, which is what
+			// hasCardBackground reports to the styling.
 			const preferredColumnId = this.localViewSetting?.viewSettings?.cardBackgroundSource
-			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[0] ?? null
+			return this.columns.find(column => column.id === preferredColumnId) ?? null
 		},
 		getCardTitle(row) {
 			const titleColumn = this.getTitleColumn()
@@ -415,12 +475,15 @@ export default {
 	text-align: start;
 	cursor: pointer;
 	color: var(--color-main-text);
+	display: flex;
+	flex-direction: column;
 }
 
 .layout-card__image-wrapper {
 	position: relative;
 	aspect-ratio: 3 / 2;
 	background: var(--color-background-dark);
+	flex: 0 0 auto;
 }
 
 .layout-card__image {
@@ -428,6 +491,8 @@ export default {
 	height: 100%;
 	object-fit: cover;
 	display: block;
+	/* Hides the fallback a broken image would paint; the alt attribute stays. */
+	color: transparent;
 }
 
 .layout-card__no-image {
@@ -443,17 +508,39 @@ export default {
 	inset-inline: 0;
 	bottom: 0;
 	padding: 12px;
-	background: rgba(0,0,0,0.4);
+	/* Keeps white text at WCAG AA (4.5:1) over any image, including a white one. */
+	background: rgba(0, 0, 0, 0.55);
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 	color: #fff;
 	text-align: start;
 	font-weight: 600;
-	display: flex;
-	justify-content: flex-start;
+	line-height: 1.35;
+	max-height: 100%;
+	overflow: hidden;
+}
+
+.card-layout--no-image .layout-card__title-banner {
+	background: transparent;
+	color: var(--color-main-text);
+	text-shadow: none;
+}
+
+.card-layout--tiles.card-layout--no-image .layout-card__title-banner {
+	top: 0;
+	bottom: auto;
+}
+
+.layout-card__title-text {
+	display: -webkit-box;
+	-webkit-line-clamp: var(--card-title-lines, 2);
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	overflow-wrap: anywhere;
 }
 
 .layout-card__body {
 	padding: 12px;
-	max-height: 168px;
+	flex: 1 1 auto;
 	overflow: hidden;
 }
 
