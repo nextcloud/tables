@@ -102,7 +102,7 @@ class ViewUpdateInput {
 		}
 
 		$layout = self::normalizeLayout($data['layout'] ?? null);
-		$viewSettings = self::createViewSettingsFromInputData($data);
+		$viewSettings = self::createViewSettingsFromInputData($data, $columnsMap);
 
 		return new self(
 			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
@@ -118,7 +118,7 @@ class ViewUpdateInput {
 		);
 	}
 
-	private static function createViewSettingsFromInputData(array $data): ?ViewSettings {
+	private static function createViewSettingsFromInputData(array $data, array $columnsMap = []): ?ViewSettings {
 		if (array_key_exists('viewSettings', $data)) {
 			if ($data['viewSettings'] === null) {
 				return new ViewSettings();
@@ -126,7 +126,7 @@ class ViewUpdateInput {
 			if (!is_array($data['viewSettings'])) {
 				throw new \InvalidArgumentException('Invalid viewSettings value.');
 			}
-			return ViewSettings::createFromInputArray($data['viewSettings']);
+			return ViewSettings::createFromInputArray($data['viewSettings'], $columnsMap);
 		}
 
 		$legacyKeys = ['cardBackgroundSource', 'cardTitleSource'];
