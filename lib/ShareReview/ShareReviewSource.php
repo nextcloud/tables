@@ -158,7 +158,10 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 	}
 
 	public function deleteShare(string $shareId): bool {
-		if (!is_numeric($shareId)) {
+		// ctype_digit, like getShare(): is_numeric would also accept 1e3 or
+		// 7.5, which (int) casts to a different id than the one the access
+		// check event and any audit record carry
+		if (!ctype_digit($shareId)) {
 			return false;
 		}
 
