@@ -11,6 +11,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
 class StructureService {
@@ -211,6 +212,22 @@ class StructureService {
 					$views[$i]['columnSettings'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
 					$views[$i]['columnSettings'][$j]['columnTitle'] = $columnsMap[$col['columnId']]['title'];
 					unset($views[$i]['columnSettings'][$j]['columnId']);
+				}
+			}
+			if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+				foreach (ViewSettings::SOURCE_KEYS as $sourceKey) {
+					$sourceId = $view['viewSettings'][$sourceKey] ?? null;
+					if ($sourceId === null) {
+						continue;
+					}
+
+					// The scheme travels to another instance, where a column id of this one addresses
+					// something else entirely. A source that has no uuid to carry it is therefore
+					// dropped rather than exported as a bare number.
+					unset($views[$i]['viewSettings'][$sourceKey]);
+					if (isset($columnsMap[$sourceId])) {
+						$views[$i]['viewSettings'][$sourceKey . 'Uuid'] = $columnsMap[$sourceId]['uuid'];
+					}
 				}
 			}
 			foreach ($view['sort'] as $j => $col) {
