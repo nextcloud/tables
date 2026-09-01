@@ -5,6 +5,12 @@
 
 # Changelog
 
+## 0.9.12
+
+### Fixed
+* [stable0.9] fix: view filter by @backportbot[bot] in https://github.com/nextcloud/tables/pull/2693
+* [stable0.9] fix public share by @samin-z in https://github.com/nextcloud/tables/pull/2870
+
 ## 0.9.11
 
 ### Fixed
