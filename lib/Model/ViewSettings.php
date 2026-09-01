@@ -11,6 +11,7 @@ namespace OCA\Tables\Model;
 
 use InvalidArgumentException;
 use JsonSerializable;
+use OCA\Tables\Db\Column;
 
 class ViewSettings implements JsonSerializable {
 	public function __construct(
@@ -20,13 +21,34 @@ class ViewSettings implements JsonSerializable {
 	}
 
 	/**
-	 * @param array{cardBackgroundSource?: int|null, cardTitleSource?: int|null} $data
+	 * @param array{cardBackgroundSource?: int|null, cardTitleSource?: int|null, cardBackgroundSourceUuid?: string, cardTitleSourceUuid?: string} $data
+	 * @param array<string, Column> $columnsMap
 	 */
-	public static function createFromInputArray(array $data): self {
+	public static function createFromInputArray(array $data, array $columnsMap = []): self {
 		return new self(
-			cardBackgroundSource: self::nullableIntFromArray($data, 'cardBackgroundSource'),
-			cardTitleSource: self::nullableIntFromArray($data, 'cardTitleSource'),
+			cardBackgroundSource: self::resolveSource($data, 'cardBackgroundSource', $columnsMap),
+			cardTitleSource: self::resolveSource($data, 'cardTitleSource', $columnsMap),
 		);
+	}
+
+	/**
+	 * A scheme carries the column uuid, because the ids of the table it was exported from mean
+	 * nothing here. A source that no longer resolves is dropped rather than kept, as a stale id
+	 * would otherwise point at an unrelated column.
+	 *
+	 * @param array<string, Column> $columnsMap
+	 */
+	private static function resolveSource(array $data, string $key, array $columnsMap): ?int {
+		$uuidKey = $key . 'Uuid';
+		if (array_key_exists($uuidKey, $data)) {
+			$uuid = $data[$uuidKey];
+			if (!is_string($uuid) || !isset($columnsMap[$uuid])) {
+				return null;
+			}
+			return $columnsMap[$uuid]->getId();
+		}
+
+		return self::nullableIntFromArray($data, $key);
 	}
 
 	public function getCardBackgroundSource(): ?int {

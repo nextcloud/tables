@@ -213,6 +213,15 @@ class StructureService {
 					unset($views[$i]['columnSettings'][$j]['columnId']);
 				}
 			}
+			if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+				foreach (['cardBackgroundSource', 'cardTitleSource'] as $sourceKey) {
+					$sourceId = $view['viewSettings'][$sourceKey] ?? null;
+					if ($sourceId !== null && isset($columnsMap[$sourceId])) {
+						$views[$i]['viewSettings'][$sourceKey . 'Uuid'] = $columnsMap[$sourceId]['uuid'];
+						unset($views[$i]['viewSettings'][$sourceKey]);
+					}
+				}
+			}
 			foreach ($view['sort'] as $j => $col) {
 				if (isset($columnsMap[$col['columnId']])) {
 					$views[$i]['sort'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];

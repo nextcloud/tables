@@ -28,6 +28,7 @@ use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\TableScheme;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
@@ -796,6 +797,7 @@ class TableService extends SuperService {
 
 		// Add views
 		foreach ($views['addViews'] as $view) {
+			$view['viewSettings'] = ViewSettings::createFromInputArray($view['viewSettings'] ?? [], $columnsMap)->jsonSerialize();
 			$view['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($view['columnSettings'], $columnsMap)->jsonSerialize();
 			$view['sort'] = SortRuleSet::createFromInputArray($view['sort'], $columnsMap)->jsonSerialize();
 			$view['filter'] = FilterSet::createFromInputArray($view['filter'], $columnsMap)->jsonSerialize();
