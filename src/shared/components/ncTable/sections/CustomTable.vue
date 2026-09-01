@@ -235,6 +235,11 @@ export default {
 		currentLayout() {
 			this.pageNumber = 1
 		},
+		totalPages(newTotalPages) {
+			if (this.pageNumber > newTotalPages) {
+				this.pageNumber = Math.max(1, newTotalPages)
+			}
+		},
 		pinnedColumnId(newVal) {
 			if (newVal !== null) {
 				this.$nextTick(() => this.measureColumnWidths())
@@ -242,12 +247,6 @@ export default {
 				this.columnWidths = null
 			}
 		},
-	},
-
-	updated() {
-		if (this.pageNumber > this.totalPages || this.totalPages === 1) {
-			this.pageNumber = this.totalPages
-		}
 	},
 
 	mounted() {
