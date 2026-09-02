@@ -11,6 +11,7 @@ use Exception;
 use OC\Collaboration\Reference\LinkReferenceProvider;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\View;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -128,6 +129,11 @@ class ContentReferenceHelper extends ReferenceHelper {
 
 			$referenceInfo['link'] = $referenceText;
 			$reference->setUrl($referenceText);
+
+			if ($element instanceof View) {
+				$referenceInfo['layout'] = $element->getLayoutNormalized();
+				$referenceInfo['viewSettings'] = $element->getViewSettingsObject()->jsonSerialize();
+			}
 
 			// add Columns
 			try {
