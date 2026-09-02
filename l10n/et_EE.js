@@ -481,6 +481,8 @@ OC.L10N.register(
     "Value parsing errors" : "Väärtuse töötlemise vead",
     "Row creation errors" : "Rea lisamise vead",
     "Import table scheme" : "Impordi tabeli skeema",
+    "Preview table scheme changes" : "Tabeli skeema muudatuste eelvaade",
+    "Import table scheme from a file" : "Impordi tabeli skeema failist",
     "New Columns" : "Uued veerud",
     "Technical name" : "Tehniline nimi",
     "Change Columns" : "Muuda veerge",
