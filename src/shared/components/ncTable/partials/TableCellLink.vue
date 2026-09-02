@@ -8,7 +8,19 @@
 			@click="handleStartEditing"
 			@keydown.enter="handleStartEditing"
 			@keydown.space.prevent="handleStartEditing">
-			<LinkWidget :thumbnail-url="getValueObject.thumbnailUrl"
+			<a v-if="showImagePreview"
+				:href="imagePreviewLink"
+				target="_blank"
+				:title="imagePreviewLabel"
+				class="cell-link__preview-link"
+				:style="imagePreviewStyle"
+				rel="noreferrer noopener">
+				<img :src="imagePreviewSrc"
+					:alt="imagePreviewLabel"
+					class="cell-link__preview"
+					@error="handlePreviewError">
+			</a>
+			<LinkWidget v-else :thumbnail-url="linkWidgetThumbnailUrl"
 				:icon-url="getValueObject.icon"
 				:title="getValueObject.title"
 				:subline="getValueObject.subline"
@@ -58,7 +70,7 @@
 <script>
 import { NcTextField, NcSelect } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
-import { generateOcsUrl } from '@nextcloud/router'
+import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { translate as t } from '@nextcloud/l10n'
 import debounce from 'debounce'
 import generalHelper from '../../../mixins/generalHelper.js'
@@ -68,6 +80,7 @@ import displayError from '../../../utils/displayError.js'
 import { showError } from '@nextcloud/dialogs'
 import LinkWidget from './LinkWidget.vue'
 import { ALLOWED_PROTOCOLS } from '../../../constants.ts'
+import { normalizeImagePreviewSize } from '../../../utils/imagePreviewSize.js'
 
 export default {
 	name: 'TableCellLink',
@@ -103,10 +116,79 @@ export default {
 			providerLoading: {},
 			isInitialEditClick: false,
 			allowedProtocols: ALLOWED_PROTOCOLS,
+			imagePreviewFailed: false,
 		}
 	},
 
 	computed: {
+		fileId() {
+			const valueObject = this.getValueObject
+			if (valueObject?.providerId !== 'files') {
+				return null
+			}
+
+			if (valueObject?.attributes?.fileId) {
+				return valueObject.attributes.fileId
+			}
+
+			const url = valueObject?.resourceUrl || valueObject?.value || ''
+			const match = url.match(/\/f\/(\d+)(?:[/?#]|$)/) || url.match(/[?&]fileid=(\d+)/) || url.match(/[?&]openfile=(\d+)/)
+			return match ? match[1] : null
+		},
+		showImagePreview() {
+			return !!this.imagePreviewSrc && !this.imagePreviewFailed
+		},
+		linkWidgetThumbnailUrl() {
+			return this.imagePreviewFailed ? null : this.getValueObject.thumbnailUrl
+		},
+		imagePreviewSize() {
+			return normalizeImagePreviewSize(this.column?.customSettings?.imagePreviewSize)
+		},
+		imagePreviewStyle() {
+			return {
+				'--image-preview-size': this.imagePreviewSize + 'px',
+			}
+		},
+		imagePreviewSrc() {
+			if (!this.column?.customSettings?.showPreview || !this.isFilesImageLink) {
+				return null
+			}
+
+			if (this.fileId) {
+				const previewParameters = new URLSearchParams({
+					fileId: String(this.fileId),
+					x: String(this.imagePreviewSize),
+					y: String(this.imagePreviewSize),
+					a: '1',
+				})
+				return generateUrl('/core/preview') + '?' + previewParameters.toString()
+			}
+			if (this.getValueObject?.thumbnailUrl) {
+				return this.getValueObject.thumbnailUrl
+			}
+			return null
+		},
+		imagePreviewLink() {
+			return this.getValueObject?.resourceUrl || this.getValueObject?.value
+		},
+		imagePreviewLabel() {
+			return this.getValueObject?.title || t('tables', 'Image preview')
+		},
+		isFilesImageLink() {
+			if (this.getValueObject?.providerId !== 'files') {
+				return false
+			}
+
+			return this.imageFileNameCandidates.some(candidate => this.hasImageExtension(candidate))
+		},
+		imageFileNameCandidates() {
+			return [
+				this.getValueObject?.title,
+				this.getValueObject?.attributes?.path,
+				this.getValueObject?.resourceUrl,
+				this.getValueObject?.value,
+			].filter(Boolean)
+		},
 		getValueObject() {
 			if (this.hasJsonStructure(this.value)) {
 				const valueObject = JSON.parse(this.value)
@@ -193,6 +275,9 @@ export default {
 				document.removeEventListener('click', this.handleClickOutside)
 				this.isInitialEditClick = false
 			}
+		},
+		imagePreviewSrc() {
+			this.imagePreviewFailed = false
 		},
 	},
 
@@ -331,6 +416,19 @@ export default {
 			this.results = this.results.filter(item => item.providerId !== providerId)
 		},
 
+		hasImageExtension(value) {
+			try {
+				const { pathname } = new URL(value, window.location.origin)
+				return /\.(apng|avif|bmp|gif|heic|heif|ico|jpe?g|png|svg|tiff?|webp)$/i.test(pathname)
+			} catch (e) {
+				return /\.(apng|avif|bmp|gif|heic|heif|ico|jpe?g|png|svg|tiff?|webp)$/i.test(value)
+			}
+		},
+
+		handlePreviewError() {
+			this.imagePreviewFailed = true
+		},
+
 		async saveChanges() {
 			if (this.localLoading) {
 				return
@@ -377,6 +475,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.cell-link__preview-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--image-preview-size);
+	height: var(--image-preview-size);
+	max-width: 100%;
+	line-height: 0;
+	vertical-align: middle;
+}
+
+.cell-link__preview {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
 .cell-link {
 	width: 100%;
 
