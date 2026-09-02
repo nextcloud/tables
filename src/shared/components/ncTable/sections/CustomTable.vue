@@ -105,6 +105,7 @@ import { NcRichText } from '@nextcloud/vue'
 import { ColumnTypes } from '../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
+import { getCurrentUser } from '@nextcloud/auth'
 
 // Share of the card image the title banner may cover before the text is ellipsized.
 const MAX_TITLE_BANNER_SHARE = 0.6
@@ -177,8 +178,15 @@ export default {
 	},
 
 	computed: {
+		// A preview is served against the viewer's session. Without one, as on a public link,
+		// it can never load, so the card is laid out as if it had no image at all rather than
+		// reserving space for something that will stay empty.
+		canRenderPreviews() {
+			return getCurrentUser() !== null
+		},
 		hasCardBackground() {
-			return this.localViewSetting?.viewSettings?.cardBackgroundSource !== null
+			return this.canRenderPreviews
+				&& this.localViewSetting?.viewSettings?.cardBackgroundSource !== null
 				&& this.localViewSetting?.viewSettings?.cardBackgroundSource !== undefined
 		},
 		currentLayout() {
@@ -334,6 +342,9 @@ export default {
 			return row?.data?.find(item => item?.columnId === columnId) ?? null
 		},
 		getPreviewUrl(row) {
+			if (!this.canRenderPreviews) {
+				return null
+			}
 			const backgroundColumn = this.getBackgroundColumn()
 			const rawValue = this.getCell(row, backgroundColumn?.id)?.value
 			if (rawValue === null || rawValue === undefined || rawValue === '') {
