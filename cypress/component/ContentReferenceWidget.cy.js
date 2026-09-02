@@ -77,7 +77,7 @@ describe('ContentReferenceWidget', () => {
 
 	it('can edit a row', () => {
 		mountContentWidget(richObject)
-		
+
 		// Load a fixture which is used to reply to the edit row request
 		cy.fixture('widgets/editRow.json')
 			.then((rowData) => {
@@ -110,9 +110,34 @@ describe('ContentReferenceWidget', () => {
 		cy.get('@rows').first().children().as('editedRow')
 		cy.get('@editedRow').first().contains('Giraffe')
 	})
+	it('renders a view saved as tiles without falling back to the table', () => {
+		mountWidget({ ...richObject, layout: 'tiles', viewSettings: { cardBackgroundSource: null, cardTitleSource: 159 } })
+
+		cy.get('[data-cy="tilesLayoutCard"]').should('have.length', richObject.rows.length)
+		cy.get('[data-cy="contentReferenceWidget"] tr[data-cy="customTableRow"]').should('not.exist')
+	})
+
+	it('renders a view saved as a gallery without falling back to the table', () => {
+		mountWidget({ ...richObject, layout: 'gallery', viewSettings: { cardBackgroundSource: null, cardTitleSource: 159 } })
+
+		cy.get('[data-cy="galleryLayoutCard"]').should('have.length', richObject.rows.length)
+		cy.get('[data-cy="contentReferenceWidget"] tr[data-cy="customTableRow"]').should('not.exist')
+	})
+
+	it('keeps the table layout when the reference carries none', () => {
+		mountContentWidget(richObject)
+
+		cy.get('[data-cy="contentReferenceWidget"] tr[data-cy="customTableRow"]').should('have.length', richObject.rows.length)
+		cy.get('[data-cy$="LayoutCard"]').should('not.exist')
+	})
 })
 
-function mountContentWidget(richObject) {
+/**
+ * Mounts the widget without assuming a particular layout.
+ *
+ * @param {object} richObject the reference payload to render
+ */
+function mountWidget(richObject) {
 	cy.reply('**/apps/tables/row/table/*', richObject.rows)
 
 	cy.mount(ContentReferenceWidget, {
@@ -121,8 +146,18 @@ function mountContentWidget(richObject) {
 		},
 	})
 
-	// Get some often used elements
 	cy.get('[data-cy="contentReferenceWidget"] .options').as('options')
+}
+
+/**
+ * Mounts the widget and aliases the table elements the row tests rely on.
+ *
+ * @param {object} richObject the reference payload to render
+ */
+function mountContentWidget(richObject) {
+	mountWidget(richObject)
+
+	// Get some often used elements
 	cy.get('[data-cy="contentReferenceWidget"] .NcTable table').as('table')
 	cy.get('@table').find('tr[data-cy="customTableRow"]').as('rows')
 }
