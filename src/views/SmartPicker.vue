@@ -113,6 +113,8 @@ export default {
 				title: '',
 				type: '',
 				id: '',
+				layout: 'table',
+				viewSettings: null,
 				columns: [],
 				rows: [],
 			},
@@ -156,6 +158,7 @@ export default {
 
 				await this.loadColumnsForContentPreview()
 				await this.loadRowsForContentPreview()
+				await this.loadLayoutForContentPreview()
 
 				this.previewLoading = false
 			} else {
@@ -203,6 +206,22 @@ export default {
 				this.richObject.rows = res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch rows for content preview.'))
+			}
+		},
+
+		async loadLayoutForContentPreview() {
+			if (this.value === null || this.value.type !== 'view') {
+				this.richObject.layout = 'table'
+				this.richObject.viewSettings = null
+				return
+			}
+
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/api/1/views/' + this.value.value))
+				this.richObject.layout = res.data?.layout ?? 'table'
+				this.richObject.viewSettings = res.data?.viewSettings ?? null
+			} catch (e) {
+				displayError(e, t('tables', 'Could not fetch the layout for content preview.'))
 			}
 		},
 	},
