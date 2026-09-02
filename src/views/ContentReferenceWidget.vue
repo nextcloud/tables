@@ -88,7 +88,10 @@ export default {
 		return {
 			searchExp: null,
 			localRows: [], // Keep as fallback only
-			localViewSetting: {},
+			localViewSetting: {
+				layout: this.richObject?.layout ?? 'table',
+				viewSettings: this.richObject?.viewSettings ?? null,
+			},
 			showCopyRow: false,
 			copyPrefillData: null,
 			rowToDelete: null,
