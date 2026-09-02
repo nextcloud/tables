@@ -71,14 +71,22 @@
 						class="layout-card__image">
 					<div v-else class="layout-card__no-image" />
 					<div class="layout-card__title-banner">
-						<span class="layout-card__title-text">{{ getCardTitle(row) }}</span>
+						<NcRichText v-if="isRichColumn(getTitleColumn())"
+							class="layout-card__title-text"
+							:text="getCardTitle(row)"
+							:use-markdown="true" />
+						<span v-else class="layout-card__title-text">{{ getCardTitle(row) }}</span>
 					</div>
 				</div>
 				<div v-if="currentLayout === 'gallery'" class="layout-card__body" data-cy="galleryLayoutBody">
 					<ul class="layout-card__metadata">
 						<li v-for="item in getGalleryMetadata(row)" :key="`${row.id}-${item.columnId}`" data-cy="galleryMetadataItem">
 							<span class="layout-card__metadata-label">{{ item.title }}</span>
-							<span class="layout-card__metadata-value">{{ item.value }}</span>
+							<NcRichText v-if="item.isRich"
+								class="layout-card__metadata-value"
+								:text="item.value"
+								:use-markdown="true" />
+							<span v-else class="layout-card__metadata-value">{{ item.value }}</span>
 						</li>
 					</ul>
 				</div>
@@ -93,6 +101,8 @@ import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import PaginationBlock from './PaginationBlock.vue'
+import { NcRichText } from '@nextcloud/vue'
+import { ColumnTypes } from '../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 
@@ -109,6 +119,7 @@ export default {
 		TableRow,
 		TableHeader,
 		PaginationBlock,
+		NcRichText,
 	},
 
 	props: {
@@ -364,6 +375,10 @@ export default {
 
 			return null
 		},
+		isRichColumn(column) {
+			return column?.type === ColumnTypes.TextRich
+		},
+
 		getDisplayValue(column, row) {
 			if (!column) {
 				return ''
@@ -401,6 +416,7 @@ export default {
 					columnId: column.id,
 					title: column.title,
 					value: this.getDisplayValue(column, row),
+					isRich: this.isRichColumn(column),
 				}))
 				.filter(item => item.value !== '')
 				.slice(0, 6)
@@ -536,6 +552,31 @@ export default {
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 	overflow-wrap: anywhere;
+}
+
+/* Markdown brings block elements with it. In a title they have to stay on the text flow or the
+   line clamp has nothing to count, and in the metadata they must not add their own spacing. */
+.layout-card__title-text :deep(*) {
+	display: inline;
+	margin: 0;
+	padding: 0;
+	font-size: inherit;
+}
+
+.layout-card__metadata-value :deep(p),
+.layout-card__metadata-value :deep(h1),
+.layout-card__metadata-value :deep(h2),
+.layout-card__metadata-value :deep(h3),
+.layout-card__metadata-value :deep(h4),
+.layout-card__metadata-value :deep(blockquote) {
+	margin: 0;
+	font-size: inherit;
+}
+
+.layout-card__metadata-value :deep(ul),
+.layout-card__metadata-value :deep(ol) {
+	margin: 0;
+	padding-inline-start: 1.2em;
 }
 
 .layout-card__body {
