@@ -48,11 +48,24 @@ class TextLinkBusiness extends SuperBusiness {
 		$data = json_decode((string)$value, true);
 		if ($data !== null) {
 			if (isset($data['resourceUrl'])) {
-				return json_encode(json_encode([
+				$parsed = [
 					'title' => $data['title'] ?? $data['resourceUrl'],
 					'value' => $data['resourceUrl'],
 					'providerId' => $data['providerId'] ?? 'url',
-				]));
+				];
+				$settings = json_decode($column->getCustomSettings() ?? '', true);
+				if (is_array($settings) && !empty($settings['showPreview'])) {
+					if (!empty($data['thumbnailUrl'])) {
+						$parsed['thumbnailUrl'] = $data['thumbnailUrl'];
+					}
+					if (!empty($data['icon'])) {
+						$parsed['icon'] = $data['icon'];
+					}
+					if (isset($data['attributes']) && is_array($data['attributes'])) {
+						$parsed['attributes'] = $data['attributes'];
+					}
+				}
+				return json_encode(json_encode($parsed));
 			}
 			// at least title and resUrl have to be set
 			if (isset($data['title']) && isset($data['value'])) {
