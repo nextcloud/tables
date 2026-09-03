@@ -90,6 +90,7 @@ OC.L10N.register(
     "Remove from favorites" : "Fjarlægja úr eftirlætum",
     "Copy" : "Afrita",
     "Favorites" : "Eftirlæti",
+    "Applications" : "Forrit",
     "Clear filter" : "Hreinsa síu",
     "Copy internal link to clipboard" : "Afrita innri tengil á klippispjald",
     "Internal link" : "Innri tengill",
