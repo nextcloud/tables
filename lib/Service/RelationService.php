@@ -104,9 +104,7 @@ class RelationService {
 			}
 
 			$target = sprintf('%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn']);
-			if (!isset($groups[$target])) {
-				$groups[$target] = [];
-			}
+			$groups[$target] ??= [];
 			$groups[$target][] = $column;
 		}
 
