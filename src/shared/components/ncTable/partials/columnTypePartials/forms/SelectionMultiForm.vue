@@ -9,7 +9,7 @@
 				{{ t('tables', 'Options') }}
 			</div>
 			<div v-for="opt in mutableColumn.selectionOptions" :key="opt.id" class="col-4 inline" data-cy="selectionOption">
-				<NcCheckboxRadioSwitch v-model="mutableColumn.selectionDefault" :value="'' + opt.id" name="defaultValues" />
+				<NcCheckboxRadioSwitch v-model="mutableColumn.selectionDefault" :value="opt.id" name="defaultValues" />
 				<input :value="opt.label" data-cy="selectionOptionLabel" @input="updateLabel(opt.id, $event)">
 				<NcButton type="tertiary" :aria-label="t('tables', 'Delete option')" @click="deleteOption(opt.id)">
 					<template #icon>
@@ -57,20 +57,14 @@ export default {
 	watch: {
 		column() {
 			this.mutableColumn = this.column
+			this.normalizeSelectionDefault()
 		},
 	},
 	created() {
 		if (!this.mutableColumn.selectionOptions || this.mutableColumn.selectionOptions?.length === 0) {
 			this.mutableColumn.selectionOptions = this.loadDefaultOptions()
 		}
-		if (!this.mutableColumn.selectionDefault) {
-			this.mutableColumn.selectionDefault = []
-		} else if (typeof this.mutableColumn.selectionDefault === 'string') {
-			this.mutableColumn.selectionDefault = JSON.parse(this.mutableColumn.selectionDefault)
-		}
-		if (!Array.isArray(this.mutableColumn.selectionDefault)) {
-			this.mutableColumn.selectionDefault = []
-		}
+		this.normalizeSelectionDefault()
 	},
 	methods: {
 		t,
@@ -108,6 +102,21 @@ export default {
 			} else {
 				return 0
 			}
+		},
+		normalizeSelectionDefault() {
+			let selectionDefault = this.mutableColumn.selectionDefault
+			if (!selectionDefault) {
+				this.mutableColumn.selectionDefault = []
+				return
+			}
+
+			if (typeof selectionDefault === 'string') {
+				selectionDefault = JSON.parse(selectionDefault)
+			}
+
+			this.mutableColumn.selectionDefault = Array.isArray(selectionDefault)
+				? [...new Set(selectionDefault.map(id => parseInt(id)).filter(id => !Number.isNaN(id)))]
+				: []
 		},
 		deleteOption(id) {
 			this.mutableColumn.selectionOptions = this.mutableColumn.selectionOptions.filter(opt => opt.id !== id)
