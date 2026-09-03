@@ -661,9 +661,7 @@ class RowService extends SuperService {
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
-			if ($tableId === null) {
-				$tableId = $item->getTableId();
-			}
+			$tableId ??= $item->getTableId();
 			if ($tableId !== $item->getTableId()) {
 				$e = new \Exception('Row does not belong to table with id ' . $tableId);
 				$this->logger->error($e->getMessage(), ['exception' => $e]);

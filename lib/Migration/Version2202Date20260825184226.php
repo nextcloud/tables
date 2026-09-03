@@ -88,9 +88,7 @@ class Version2202Date20260825184226 extends SimpleMigrationStep {
 		}
 
 		foreach ($selectionOptions as &$selectionOption) {
-			if (!isset($selectionOption['uuid'])) {
-				$selectionOption['uuid'] = Uuid::v7()->toRfc4122();
-			}
+			$selectionOption['uuid'] ??= Uuid::v7()->toRfc4122();
 
 		}
 		unset($selectionOption);

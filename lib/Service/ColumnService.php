@@ -614,9 +614,7 @@ class ColumnService extends SuperService {
 	public function findOrCreateColumnsByTitleForTableAsArray(?int $tableId, ?int $viewId, array $titles, array $dataTypes, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
 		$result = [];
 
-		if ($userId === null) {
-			$userId = $this->userId;
-		}
+		$userId ??= $this->userId;
 		if ($viewId) {
 			$allColumns = $this->findAllByView($viewId, $userId);
 		} elseif ($tableId) {
@@ -638,10 +636,7 @@ class ColumnService extends SuperService {
 				}
 				$result[$i] = '';
 			}
-			// if there are no columns at all
-			if (!isset($result[$i])) {
-				$result[$i] = '';
-			}
+			$result[$i] ??= '';
 			// if column was not found
 			if ($result[$i] === '' && $createUnknownColumns && $dataTypes[$i]['type'] !== Column::TYPE_META_ID) {
 				$description = $this->l->t('This column was automatically created by the import service.');

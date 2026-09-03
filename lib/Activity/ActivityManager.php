@@ -91,9 +91,7 @@ class ActivityManager {
 	 * @psalm-param string|null $author
 	 */
 	public function triggerEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
-		if ($author === null) {
-			$author = $this->userId;
-		}
+		$author ??= $this->userId;
 
 		try {
 			$event = $this->createEvent($objectType, $object, $subject, $additionalParams, $author);
