@@ -6,7 +6,8 @@
 import type { Page } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
 import * as fs from 'fs'
-import {ensureNavigationOpen, uuidSuffix} from '../support/commands'
+import { randomUUID } from 'node:crypto'
+import { ensureNavigationOpen } from '../support/commands'
 
 interface SchemeColumn extends Record<string, unknown> {
 	id: number
@@ -16,6 +17,14 @@ interface SchemeColumn extends Record<string, unknown> {
 interface TableSummary {
 	id: number
 	title: string
+}
+
+interface ImportSchemeResponse {
+	ocs?: {
+		data?: {
+			id?: number
+		}
+	}
 }
 
 interface SchemeColumnSetting {
@@ -145,9 +154,19 @@ function formatFilterValue(value: SchemeFilter['value']) {
 	return String(value)
 }
 
+function refreshSchemeUuids(scheme: TableScheme) {
+	scheme.uuid = randomUUID()
+	for (const column of scheme.columns) {
+		column.uuid = randomUUID()
+	}
+	for (const view of scheme.views) {
+		view.uuid = randomUUID()
+	}
+}
+
 function prepareSchemeForImport(scheme: TableScheme, title: string) {
 	scheme.title = title
-	scheme.uuid = '01a0335f-1225-7514-b388-94ec806d' + uuidSuffix()
+	refreshSchemeUuids(scheme)
 
 	const importedView = scheme.views[0]
 	expect(importedView).toBeTruthy()
@@ -162,6 +181,10 @@ function prepareSchemeForImport(scheme: TableScheme, title: string) {
 	}
 
 	return importedView
+}
+
+function uniqueImportTitle(title: string) {
+	return `${title} ${randomUUID().slice(0, 8)}`
 }
 
 async function importSchemeViaUi(page: Page, scheme: TableScheme) {
@@ -190,23 +213,36 @@ async function importSchemeViaUi(page: Page, scheme: TableScheme) {
 			&& response.request().method() === 'POST',
 	)
 	await importDialog.getByRole('button', { name: /^Import$/ }).click()
-	await importReqPromise
+	const importResponse = await importReqPromise
+	expect(importResponse.ok()).toBeTruthy()
+	const importResponseBody = await importResponse.json() as ImportSchemeResponse
+	const importedTableId = importResponseBody.ocs?.data?.id
+	expect(importedTableId).toBeTruthy()
 
 	await page.goto('/index.php/apps/tables')
 	await expect(page.locator('.icon-loading').first()).toBeHidden()
 	await ensureNavigationOpen(page)
+
+	return importedTableId
+}
+
+function findNavigationTableItem(page: Page, tableId: number, title: string) {
+	return page
+		.locator('[data-cy="navigationTableItem"]')
+		.filter({
+			has: page.locator(`a[href="#/table/${tableId}"]`),
+			hasText: title,
+		})
 }
 
 test.describe('Import Export Scheme', () => {
 	test('Import table from scheme', async ({ userPage: { page } }) => {
 		const scheme = await getTutorialScheme(page)
-		const importedView = prepareSchemeForImport(scheme, 'Imported scheme table')
+		const importedView = prepareSchemeForImport(scheme, uniqueImportTitle('Imported scheme table'))
 
-		await importSchemeViaUi(page, scheme)
+		const importedTableId = await importSchemeViaUi(page, scheme)
 
-		const todoListItem = page
-			.locator('[data-cy="navigationTableItem"]')
-			.filter({ hasText: scheme.title })
+		const todoListItem = findNavigationTableItem(page, importedTableId, scheme.title)
 		await expect(todoListItem).toBeVisible({ timeout: 10000 })
 
 		await todoListItem.locator('a').first().click()
@@ -266,8 +302,8 @@ test.describe('Import Export Scheme', () => {
 
 	test('Export scheme to json', async ({ userPage: { page } }) => {
 		const sourceScheme = await getTutorialScheme(page)
-		prepareSchemeForImport(sourceScheme, 'Imported scheme export')
-		await importSchemeViaUi(page, sourceScheme)
+		prepareSchemeForImport(sourceScheme, uniqueImportTitle('Imported scheme export'))
+		const importedTableId = await importSchemeViaUi(page, sourceScheme)
 
 		const columnFieldsToIgnore = [
 			'id',
@@ -281,9 +317,7 @@ test.describe('Import Export Scheme', () => {
 			'technicalName',
 		]
 
-		const todoListItem = page
-			.locator('[data-cy="navigationTableItem"]')
-			.filter({ hasText: sourceScheme.title })
+		const todoListItem = findNavigationTableItem(page, importedTableId, sourceScheme.title)
 		await expect(todoListItem).toBeVisible({ timeout: 10000 })
 		await todoListItem.locator('a').first().click()
 		await expect(page.locator('.row.first-row')).toBeVisible()
