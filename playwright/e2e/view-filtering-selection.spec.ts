@@ -25,7 +25,7 @@ const tableTitle = 'View filtering test table'
 interface FilterConfig {
   column: string;
   operator: string;
-  value: string;
+  value: string | string[];
 }
 
 type FilterGroup = FilterConfig[];
@@ -72,12 +72,15 @@ async function setupFilteringTable(page: Page) {
 	await addRow('sevenths row', 'sel2', ['A', 'C', 'B', 'D'], false)
 }
 
-async function selectFilterOption(page: Page, index: number, title: string) {
+async function selectFilterOption(page: Page, index: number, title: string | string[]) {
+	const titles = Array.isArray(title) ? title : [title]
 	await page
 		.locator('.modal-container .filter-group .v-select.select')
 		.nth(index)
 		.click()
-	await page.locator(`ul.vs__dropdown-menu li span[title="${title}"]`).click()
+	for (const t of titles) {
+		await page.locator(`ul.vs__dropdown-menu li span[title="${t}"]`).click()
+	}
 }
 
 async function createFilteredView(
@@ -352,6 +355,72 @@ test.describe('Filtering in a view by selection columns', () => {
 			'sevenths row',
 		])
 		await expectMissingRows(page, ['second row', 'fourth row'])
+	})
+
+	test('Filter view for single selection - contains items with one value', async () => {
+		await loadTable(page, tableTitle)
+		await createFilteredView(page, 'Filter single selection contains items 1', [
+			[{ column: 'selection', operator: 'Contains items', value: 'sel2' }],
+		])
+
+		await expectVisibleRows(page, ['second row', 'sevenths row'])
+		await expectMissingRows(page, [
+			'first row',
+			'third row',
+			'fourth row',
+			'fifths row',
+			'sixths row',
+		])
+	})
+
+	test('Filter view for single selection - contains items with few values', async () => {
+		await loadTable(page, tableTitle)
+		await createFilteredView(page, 'Filter single selection contains items 2', [
+			[{ column: 'selection', operator: 'Contains items', value: ['sel1', 'sel2'] }],
+		])
+
+		await expectVisibleRows(page, [
+			'first row',
+			'second row',
+			'sixths row',
+			'sevenths row',
+		])
+		await expectMissingRows(page, [
+			'third row',
+			'fourth row',
+			'fifths row',
+		])
+	})
+
+	test('Filter view for multi selection - contains items with one value', async () => {
+		await loadTable(page, tableTitle)
+		await createFilteredView(page, 'Filter multi selection contains items 1', [
+			[{ column: 'multi selection', operator: 'Contains items', value: 'A' }],
+		])
+
+		await expectVisibleRows(page, ['first row', 'fourth row', 'sevenths row'])
+		await expectMissingRows(page, [
+			'second row',
+			'third row',
+			'fifths row',
+			'sixths row',
+		])
+	})
+
+	test('Filter view for multi selection - contains items with few values', async () => {
+		await loadTable(page, tableTitle)
+		await createFilteredView(page, 'Filter multi selection contains items 2', [
+			[{ column: 'multi selection', operator: 'Contains items', value: ['A', 'B'] }],
+		])
+
+		await expectVisibleRows(page, [
+			'first row',
+			'second row',
+			'third row',
+			'fourth row',
+			'sevenths row',
+		])
+		await expectMissingRows(page, ['fifths row', 'sixths row'])
 	})
 
 	test('Filter view for selection check', async () => {
