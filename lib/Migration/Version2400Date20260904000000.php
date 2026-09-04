@@ -127,6 +127,30 @@ class Version2400Date20260904000000 extends SimpleMigrationStep {
 			return;
 		}
 
+		// Build all per-iteration queries once and rebind parameters inside the loop
+		$shareQb = $this->connection->getQueryBuilder();
+		$shareQb->select('receiver')
+			->from('tables_shares')
+			->where($shareQb->expr()->eq('node_id', $shareQb->createParameter('nodeId')))
+			->andWhere($shareQb->expr()->eq('node_type', $shareQb->createNamedParameter(Application::NODE_TYPE_TABLE, IQueryBuilder::PARAM_INT)))
+			->andWhere($shareQb->expr()->eq('receiver_type', $shareQb->createNamedParameter('user')));
+
+		$checkQb = $this->connection->getQueryBuilder();
+		$checkQb->select('id')
+			->from('tables_archive_user')
+			->where($checkQb->expr()->eq('user_id', $checkQb->createParameter('userId')))
+			->andWhere($checkQb->expr()->eq('node_type', $checkQb->createNamedParameter(Application::NODE_TYPE_TABLE, IQueryBuilder::PARAM_INT)))
+			->andWhere($checkQb->expr()->eq('node_id', $checkQb->createParameter('nodeId')));
+
+		$insertQb = $this->connection->getQueryBuilder();
+		$insertQb->insert('tables_archive_user')
+			->values([
+				'user_id' => $insertQb->createParameter('userId'),
+				'node_type' => $insertQb->createNamedParameter(Application::NODE_TYPE_TABLE, IQueryBuilder::PARAM_INT),
+				'node_id' => $insertQb->createParameter('nodeId'),
+				'archived' => $insertQb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL),
+			]);
+
 		$inserted = 0;
 
 		foreach ($archivedTables as $tableRow) {
@@ -134,21 +158,15 @@ class Version2400Date20260904000000 extends SimpleMigrationStep {
 			$ownerId = $tableRow['ownership'];
 
 			// Insert owner record
-			$inserted += $this->upsertArchiveRecord($ownerId, Application::NODE_TYPE_TABLE, $tableId, true);
+			$inserted += $this->upsertArchiveRecord($checkQb, $insertQb, $ownerId, $tableId);
 
 			// Insert direct user-share recipient records
-			$shareQb = $this->connection->getQueryBuilder();
-			$shareQb->select('receiver')
-				->from('tables_shares')
-				->where($shareQb->expr()->eq('node_id', $shareQb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
-				->andWhere($shareQb->expr()->eq('node_type', $shareQb->createNamedParameter(Application::NODE_TYPE_TABLE, IQueryBuilder::PARAM_INT)))
-				->andWhere($shareQb->expr()->eq('receiver_type', $shareQb->createNamedParameter('user')));
-
+			$shareQb->setParameter('nodeId', $tableId, IQueryBuilder::PARAM_INT);
 			$shareResult = $shareQb->executeQuery();
 			while ($shareRow = $shareResult->fetchAssociative()) {
 				$receiverId = $shareRow['receiver'];
 				if ($receiverId !== $ownerId) {
-					$inserted += $this->upsertArchiveRecord($receiverId, Application::NODE_TYPE_TABLE, $tableId, true);
+					$inserted += $this->upsertArchiveRecord($checkQb, $insertQb, $receiverId, $tableId);
 				}
 			}
 			$shareResult->closeCursor();
@@ -158,33 +176,23 @@ class Version2400Date20260904000000 extends SimpleMigrationStep {
 	}
 
 	/**
-	 * Insert a `tables_archive_user` record if it does not already exist.
+	 * Insert a `tables_archive_user` record if it does not already exist,
+	 * rebinding the prepared check/insert queries for the given user and table.
 	 * Returns 1 if a new record was inserted, 0 if it already existed.
 	 *
 	 * @throws Exception
 	 */
-	private function upsertArchiveRecord(string $userId, int $nodeType, int $nodeId, bool $archived): int {
+	private function upsertArchiveRecord(IQueryBuilder $checkQb, IQueryBuilder $insertQb, string $userId, int $tableId): int {
 		// Check for existing record first to avoid unique-index violation
-		$checkQb = $this->connection->getQueryBuilder();
-		$checkQb->select('id')
-			->from('tables_archive_user')
-			->where($checkQb->expr()->eq('user_id', $checkQb->createNamedParameter($userId)))
-			->andWhere($checkQb->expr()->eq('node_type', $checkQb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)))
-			->andWhere($checkQb->expr()->eq('node_id', $checkQb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)));
-
+		$checkQb->setParameter('userId', $userId, IQueryBuilder::PARAM_STR);
+		$checkQb->setParameter('nodeId', $tableId, IQueryBuilder::PARAM_INT);
 		$existing = $checkQb->executeQuery()->fetchOne();
 		if ($existing !== false) {
 			return 0;
 		}
 
-		$insertQb = $this->connection->getQueryBuilder();
-		$insertQb->insert('tables_archive_user')
-			->values([
-				'user_id' => $insertQb->createNamedParameter($userId),
-				'node_type' => $insertQb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT),
-				'node_id' => $insertQb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT),
-				'archived' => $insertQb->createNamedParameter($archived, IQueryBuilder::PARAM_BOOL),
-			]);
+		$insertQb->setParameter('userId', $userId, IQueryBuilder::PARAM_STR);
+		$insertQb->setParameter('nodeId', $tableId, IQueryBuilder::PARAM_INT);
 		$insertQb->executeStatement();
 		return 1;
 	}
