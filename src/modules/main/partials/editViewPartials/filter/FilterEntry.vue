@@ -30,6 +30,7 @@
 				v-model="searchValue"
 				class="select-field"
 				:options="magicFields"
+				:multiple="isContainsItemOperator"
 				:loading="relationsLoading"
 				:aria-label-combobox="getValuePlaceholder"
 				:placeholder="getValuePlaceholder"
@@ -73,6 +74,7 @@ import Moment from '@nextcloud/moment'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
 import { AdditionalInputTypes } from '../../../../../shared/components/ncTable/mixins/magicFields.js'
+import { FilterIds } from '../../../../../shared/components/ncTable/mixins/filter.js'
 import { useDataStore } from '../../../../../store/data.js'
 
 export default {
@@ -119,6 +121,11 @@ export default {
 		},
 		searchValue: {
 			get() {
+				// ContainsItem expects an array of selected option objects
+				if (this.isContainsItemOperator) {
+					return Array.isArray(this.filterEntry?.value) ? this.filterEntry.value : []
+				}
+
 				// if no value is set, just return ''
 				if (this.filterEntry?.value === null || this.filterEntry?.value === '') {
 					return ''
@@ -133,7 +140,9 @@ export default {
 				return this.filterEntry.value
 			},
 			set(searchValue) {
-				if (typeof searchValue === 'object' && searchValue?.id) {
+				if (this.isContainsItemOperator) {
+					this.mutableFilterEntry.value = Array.isArray(searchValue) ? searchValue : []
+				} else if (typeof searchValue === 'object' && searchValue?.id) {
 					this.mutableFilterEntry.value = searchValue.id
 				} else if (typeof searchValue === 'string') {
 					this.mutableFilterEntry.value = searchValue
@@ -173,6 +182,9 @@ export default {
 				return []
 			}
 		},
+		isContainsItemOperator() {
+			return this.selectedOperator?.id === FilterIds.ContainsItem
+		},
 		relationsLoading() {
 			if (this.selectedColumn?.type === ColumnTypes.Relation && this.columns?.length > 0) {
 				const dataStore = useDataStore()
@@ -199,6 +211,9 @@ export default {
 					return fields
 				}
 			} else if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) === 'selection') {
+				if (this.isContainsItemOperator) {
+					return this.selectedColumn.selectionOptions || []
+				}
 				const options = []
 				this.selectedColumn.selectionOptions?.forEach(item => {
 					options.push({
@@ -278,7 +293,7 @@ export default {
 	},
 	methods: {
 		getMagicFieldId() {
-			if (!this.filterEntry?.value) return null
+			if (!this.filterEntry?.value || typeof this.filterEntry.value !== 'string') return null
 			return this.filterEntry.value.split(':')[0]
 		},
 		applyAdditionalInput() {
