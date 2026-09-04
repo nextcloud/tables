@@ -45,22 +45,6 @@ class UserArchiveMapper extends QBMapper {
 	}
 
 	/**
-	 * Fetch all per-user archive overrides for a given node.
-	 *
-	 * @return UserArchive[]
-	 * @throws Exception
-	 */
-	public function findAllForNode(int $nodeType, int $nodeId): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)))
-			->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)));
-
-		return $this->findEntities($qb);
-	}
-
-	/**
 	 * Fetch all per-user archive overrides for a given user and node type,
 	 * filtered to a specific set of node IDs.
 	 *

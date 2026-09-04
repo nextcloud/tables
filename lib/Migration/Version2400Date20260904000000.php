@@ -85,7 +85,7 @@ class Version2400Date20260904000000 extends SimpleMigrationStep {
 			// Unique index: one override row per (user, node_type, node_id) triple
 			$table->addUniqueIndex(['user_id', 'node_type', 'node_id'], 'archive_user_unique_idx');
 
-			// Secondary index to support deleteAllForNode() / findAllForNode() queries
+			// Secondary index to support deleteAllForNode() queries
 			// that filter on (node_type, node_id) without a leading user_id.
 			$table->addIndex(['node_type', 'node_id'], 'archive_user_node_idx');
 		}

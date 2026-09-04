@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Db;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\UserArchiveMapper;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 
 class UserArchiveMapperTest extends DatabaseTestCase {
 	private UserArchiveMapper $mapper;
@@ -30,6 +31,15 @@ class UserArchiveMapperTest extends DatabaseTestCase {
 	private function cleanupArchiveData(): void {
 		$qb = $this->connection->getQueryBuilder();
 		$qb->delete('tables_archive_user')->executeStatement();
+	}
+
+	private function countForNode(int $nodeType, int $nodeId): int {
+		$qb = $this->connection->getQueryBuilder();
+		$qb->select($qb->func()->count('*'))
+			->from('tables_archive_user')
+			->where($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)));
+		return (int)$qb->executeQuery()->fetchOne();
 	}
 
 	// -------------------------------------------------------------------------
@@ -94,8 +104,7 @@ class UserArchiveMapperTest extends DatabaseTestCase {
 		$this->assertTrue($result->isArchived());
 
 		// Confirm only one row
-		$all = $this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 1);
-		$this->assertCount(1, $all);
+		$this->assertSame(1, $this->countForNode(Application::NODE_TYPE_TABLE, 1));
 	}
 
 	public function testUpsertDoesNotAffectOtherUsers(): void {
@@ -107,33 +116,6 @@ class UserArchiveMapperTest extends DatabaseTestCase {
 
 		$this->assertTrue($alice->isArchived());
 		$this->assertFalse($bob->isArchived());
-	}
-
-	// -------------------------------------------------------------------------
-	// findAllForNode
-	// -------------------------------------------------------------------------
-
-	public function testFindAllForNodeReturnsAllUsers(): void {
-		$this->mapper->upsert('alice', Application::NODE_TYPE_TABLE, 5, true);
-		$this->mapper->upsert('bob', Application::NODE_TYPE_TABLE, 5, false);
-		$this->mapper->upsert('carol', Application::NODE_TYPE_TABLE, 5, true);
-
-		$results = $this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 5);
-		$this->assertCount(3, $results);
-	}
-
-	public function testFindAllForNodeIsScopedToNodeId(): void {
-		$this->mapper->upsert('alice', Application::NODE_TYPE_TABLE, 5, true);
-		$this->mapper->upsert('alice', Application::NODE_TYPE_TABLE, 6, true);
-
-		$results = $this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 5);
-		$this->assertCount(1, $results);
-		$this->assertSame(5, $results[0]->getNodeId());
-	}
-
-	public function testFindAllForNodeReturnsEmptyWhenNone(): void {
-		$results = $this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 999);
-		$this->assertEmpty($results);
 	}
 
 	// -------------------------------------------------------------------------
@@ -205,8 +187,7 @@ class UserArchiveMapperTest extends DatabaseTestCase {
 
 		$this->mapper->deleteAllForNode(Application::NODE_TYPE_TABLE, 8);
 
-		$remaining = $this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 8);
-		$this->assertEmpty($remaining);
+		$this->assertSame(0, $this->countForNode(Application::NODE_TYPE_TABLE, 8));
 	}
 
 	public function testDeleteAllForNodeDoesNotAffectOtherNodes(): void {
@@ -215,8 +196,8 @@ class UserArchiveMapperTest extends DatabaseTestCase {
 
 		$this->mapper->deleteAllForNode(Application::NODE_TYPE_TABLE, 8);
 
-		$this->assertEmpty($this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 8));
-		$this->assertCount(1, $this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 9));
+		$this->assertSame(0, $this->countForNode(Application::NODE_TYPE_TABLE, 8));
+		$this->assertSame(1, $this->countForNode(Application::NODE_TYPE_TABLE, 9));
 	}
 
 	public function testDeleteAllForNodeDoesNotAffectOtherNodeTypes(): void {
@@ -225,7 +206,7 @@ class UserArchiveMapperTest extends DatabaseTestCase {
 
 		$this->mapper->deleteAllForNode(Application::NODE_TYPE_TABLE, 8);
 
-		$this->assertEmpty($this->mapper->findAllForNode(Application::NODE_TYPE_TABLE, 8));
-		$this->assertCount(1, $this->mapper->findAllForNode(Application::NODE_TYPE_CONTEXT, 8));
+		$this->assertSame(0, $this->countForNode(Application::NODE_TYPE_TABLE, 8));
+		$this->assertSame(1, $this->countForNode(Application::NODE_TYPE_CONTEXT, 8));
 	}
 }
