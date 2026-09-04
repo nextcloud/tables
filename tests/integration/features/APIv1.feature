@@ -600,6 +600,63 @@ Feature: APIv1
       | Banana  |
       | Orange  |
 
+  @api1 @views @view-filters
+  Scenario: Save and apply contains-item filter for single selection column
+    Given table "Team Features" with emoji "✨" exists for user "participant1" as "team-features"
+    Then column "team" exists with following properties
+      | type             | selection                                                                                   |
+      | mandatory        | 1                                                                                           |
+      | description      | The team responsible                                                                        |
+      | selectionOptions | [{"id":0,"label":"Office team"},{"id":1,"label":"Dev team"},{"id":2,"label":"Design team"}] |
+    Then row exists with following values
+      | team | 0 |
+    Then row exists with following values
+      | team | 1 |
+    Then row exists with following values
+      | team | 2 |
+    And user "participant1" create view "Office or Design" with emoji "👔" for "team-features" as "single-team-view"
+    When user "participant1" sets columnSettings "team" to view "single-team-view"
+    And user "participant1" sets filter to view "single-team-view"
+      | column | operator      | value                                                           |
+      | team   | contains-item | [{"id":0,"label":"Office team"},{"id":2,"label":"Design team"}] |
+    Then view "single-team-view" has exactly the following rows
+      | team |
+      | 0    |
+      | 2    |
+
+  @api1 @views @view-filters
+  Scenario: Save and apply contains-item filter for multi selection column
+    Given table "Team Skills" with emoji "🛠" exists for user "participant1" as "team-skills"
+    Then column "member" exists with following properties
+      | type        | text            |
+      | subtype     | line            |
+      | mandatory   | 1               |
+      | description | The team member |
+    Then column "skills" exists with following properties
+      | type             | selection                                                                                                    |
+      | subtype          | multi                                                                                                        |
+      | mandatory        | 1                                                                                                            |
+      | description      | The skills available                                                                                         |
+      | selectionOptions | [{"id":0,"label":"Backend"},{"id":1,"label":"Frontend"},{"id":2,"label":"DevOps"},{"id":3,"label":"Design"}] |
+    Then row exists with following values
+      | member | Alice          |
+      | skills | Backend,DevOps |
+    Then row exists with following values
+      | member | Bob             |
+      | skills | Frontend,DevOps |
+    Then row exists with following values
+      | member | Charlie         |
+      | skills | Frontend,Design |
+    And user "participant1" create view "Backend or DevOps" with emoji "👷" for "team-skills" as "backend-devops-view"
+    When user "participant1" sets columnSettings "member" to view "backend-devops-view"
+    And user "participant1" sets filter to view "backend-devops-view"
+      | column | operator      | value                                                  |
+      | skills | contains-item | [{"id":0,"label":"Backend"},{"id":2,"label":"DevOps"}] |
+    Then view "backend-devops-view" has exactly the following rows
+      | member |
+      | Alice  |
+      | Bob    |
+
   @api1 @views @technical-name
   Scenario: Create and update view with technical name
     Given table "View technical name test" with emoji "🔧" exists for user "participant1" as "tech-name-table"

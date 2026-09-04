@@ -230,15 +230,27 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 			],
 
 			'status contains-item Active,Pending' => [
-				[['columnId' => 'status', 'operator' => 'contains-item', 'value' => '[0,2]']],
+				[['columnId' => 'status', 'operator' => 'contains-item', 'value' => '[{"id":0,"label":"Active"},{"id":2,"label":"Pending"}]']],
 				['Alice', 'Charlie', 'Diana', 'Eve'],
 				'Filter status containing one of Active (0) or Pending (2)'
 			],
 
 			'skills contains-item PHP,SQL' => [
-				[['columnId' => 'skills', 'operator' => 'contains-item', 'value' => '[0,2]']],
+				[['columnId' => 'skills', 'operator' => 'contains-item', 'value' => '[{"id":0,"label":"PHP"},{"id":2,"label":"SQL"}]']],
 				['Alice'],
 				'Filter skills containing one of PHP (0) or SQL (2)'
+			],
+
+			'status contains-item Active,Pending by ids' => [
+				[['columnId' => 'status', 'operator' => 'contains-item', 'value' => '[0,2]']],
+				['Alice', 'Charlie', 'Diana', 'Eve'],
+				'Filter status containing one of Active (0) or Pending (2) by plain ids'
+			],
+
+			'skills contains-item PHP,SQL by ids' => [
+				[['columnId' => 'skills', 'operator' => 'contains-item', 'value' => '[0,2]']],
+				['Alice'],
+				'Filter skills containing one of PHP (0) or SQL (2) by plain ids'
 			],
 
 			// Selection checkbox column (is_available)

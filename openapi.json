@@ -1144,6 +1144,7 @@
                                             "ends-with",
                                             "contains",
                                             "does-not-contain",
+                                            "contains-item",
                                             "is-equal",
                                             "is-not-equal",
                                             "is-greater-than",
@@ -1165,6 +1166,28 @@
                                             {
                                                 "type": "number",
                                                 "format": "double"
+                                            },
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "id",
+                                                        "label"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "label": {
+                                                            "type": "string"
+                                                        },
+                                                        "uuid": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -2385,6 +2408,7 @@
                                                                     "ends-with",
                                                                     "contains",
                                                                     "does-not-contain",
+                                                                    "contains-item",
                                                                     "is-equal",
                                                                     "is-not-equal",
                                                                     "is-greater-than",
@@ -2406,6 +2430,28 @@
                                                                     {
                                                                         "type": "number",
                                                                         "format": "double"
+                                                                    },
+                                                                    {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "type": "object",
+                                                                            "required": [
+                                                                                "id",
+                                                                                "label"
+                                                                            ],
+                                                                            "properties": {
+                                                                                "id": {
+                                                                                    "type": "integer",
+                                                                                    "format": "int64"
+                                                                                },
+                                                                                "label": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "uuid": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        }
                                                                     }
                                                                 ]
                                                             }
