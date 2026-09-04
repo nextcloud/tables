@@ -1580,9 +1580,12 @@ class FeatureContext implements Context {
 	 */
 	public function createRow(?TableNode $properties = null): void {
 		$props = [];
+		$expectedValues = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
+			$column = $this->collectionManager->getByAlias('column', $row[0]);
+			$columnId = $column['id'];
 			$props[$columnId] = $row[1];
+			$expectedValues[$columnId] = $this->normalizeExpectedCellValue($column, $row[1]);
 		}
 
 		$this->sendRequest(
@@ -1596,7 +1599,7 @@ class FeatureContext implements Context {
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		foreach ($newRow['data'] as $cell) {
-			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+			$this->assertRowCellValue($expectedValues[$cell['columnId']], $cell['value']);
 		}
 
 		$this->sendRequest(
@@ -1607,18 +1610,45 @@ class FeatureContext implements Context {
 		$rowToVerify = $this->getDataFromResponse($this->response);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		foreach ($rowToVerify['data'] as $cell) {
-			// I am afraid this is usergroupcolumn specific, but not generic
-			if (is_array($cell['value'])) {
-				$retrieved = json_encode(array_reduce($cell['value'], function (array $carry, string $item): array {
-					$carry[] = json_decode($item, true);
-					return $carry;
-				}, []));
-			} else {
-				$retrieved = $cell['value'];
-			}
-
-			Assert::assertEquals($props[$cell['columnId']], $retrieved);
+			$this->assertRowCellValue($expectedValues[$cell['columnId']], $cell['value']);
 		}
+	}
+
+	/**
+	 * @param array $column
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	private function normalizeExpectedCellValue(array $column, mixed $value): mixed {
+		if (($column['type'] ?? null) === 'selection' && ($column['subtype'] ?? null) === 'multi' && is_string($value)) {
+			$labels = array_map('trim', explode(',', $value));
+			$ids = [];
+			foreach ($column['selectionOptions'] ?? [] as $option) {
+				if (in_array($option['label'], $labels, true)) {
+					$ids[] = (int)$option['id'];
+				}
+			}
+			sort($ids, SORT_NUMERIC);
+			return $ids;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * @param mixed $expected
+	 * @param mixed $actual
+	 * @return void
+	 */
+	private function assertRowCellValue(mixed $expected, mixed $actual): void {
+		if (is_array($actual) && !is_array($expected)) {
+			$actual = json_encode(array_reduce($actual, function (array $carry, string $item): array {
+				$carry[] = json_decode($item, true);
+				return $carry;
+			}, []));
+		}
+
+		Assert::assertEquals($expected, $actual);
 	}
 
 	/**
