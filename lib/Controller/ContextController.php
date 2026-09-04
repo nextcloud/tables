@@ -271,7 +271,7 @@ class ContextController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
-	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_CONTEXT, idParam: 'contextId')]
+	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'context', idParam: 'contextId')]
 	public function archiveContext(int $contextId): DataResponse {
 		try {
 			return new DataResponse($this->contextService->archiveContext($contextId, $this->userId)->jsonSerialize());
@@ -299,7 +299,7 @@ class ContextController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
-	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_CONTEXT, idParam: 'contextId')]
+	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'context', idParam: 'contextId')]
 	public function unarchiveContext(int $contextId): DataResponse {
 		try {
 			return new DataResponse($this->contextService->unarchiveContext($contextId, $this->userId)->jsonSerialize());
