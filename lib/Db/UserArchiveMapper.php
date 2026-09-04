@@ -59,6 +59,7 @@ class UserArchiveMapper extends QBMapper {
 		if (empty($nodeIds)) {
 			return [];
 		}
+		$nodeIds = array_values(array_unique($nodeIds));
 
 		$results = [];
 		$qb = $this->db->getQueryBuilder();
