@@ -13,6 +13,7 @@ namespace OCA\Tables\Migration;
 
 use Closure;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Helper\ConversionHelper;
 use OCP\DB\Exception;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -132,7 +133,7 @@ class Version2400Date20260904000000 extends SimpleMigrationStep {
 		$shareQb->select('receiver')
 			->from('tables_shares')
 			->where($shareQb->expr()->eq('node_id', $shareQb->createParameter('nodeId')))
-			->andWhere($shareQb->expr()->eq('node_type', $shareQb->createNamedParameter(Application::NODE_TYPE_TABLE, IQueryBuilder::PARAM_INT)))
+			->andWhere($shareQb->expr()->eq('node_type', $shareQb->createNamedParameter(ConversionHelper::constNodeType2String(Application::NODE_TYPE_TABLE))))
 			->andWhere($shareQb->expr()->eq('receiver_type', $shareQb->createNamedParameter('user')));
 
 		$checkQb = $this->connection->getQueryBuilder();
