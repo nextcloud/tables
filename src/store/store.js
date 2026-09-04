@@ -125,7 +125,7 @@ export const useTablesStore = defineStore('store', {
 		},
 		setContext(context) {
 			const index = this.contexts.findIndex(c => c.id === context.id)
-			this.contexts.splice(index, 1, context)
+			this.contexts[index] = context
 		},
 		setActiveRowId(rowId) {
 			this.activeRowId = rowId
