@@ -8,7 +8,6 @@ import { expect, type Locator, type Page } from '@playwright/test'
 const IS_CI = !!process.env.CI
 const ACTION_TIMEOUT = IS_CI ? 30000 : 10000
 const APP_LOAD_TIMEOUT = IS_CI ? 45000 : 10000
-let uuidCounter = 0;
 
 function escapeRegExp(value: string) {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -1137,9 +1136,4 @@ export async function fillInValueSelectionCheck(
 			`.modal__content [data-cy="${columnTitle}"] [data-cy="selectionCheckFormSwitch"]`,
 		)
 		.click()
-}
-
-export function uuidSuffix() {
-	uuidCounter++
-	return '0000' + uuidCounter
 }
