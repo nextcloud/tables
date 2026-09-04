@@ -108,6 +108,8 @@ Single-page app built with **Vue 3**, **Vue Router 4**, and **Pinia** (state man
 
 Components use the Options API. Lifecycle hooks follow the Vue 3 names — use `beforeUnmount`, not the Vue 2 `beforeDestroy`.
 
+Pinia store actions that look up an item with `findIndex()` must guard the `-1` case before indexing. On Vue 3, direct array index assignment (`this.items[index] = item`) is reactive — do not use `splice()` workarounds.
+
 - **`src/store/store.js`** — Primary Pinia store (tables, columns, views, shares, contexts).
 - **`src/store/data.js`** — Row/cell data state.
 - **`src/modules/`** — UI regions: `navigation/` (left sidebar with contexts/tables), `main/` (table grid view), `sidebar/` (right panel), `modals/` (all dialogs).
@@ -284,3 +286,31 @@ return new DataResponse($this->service->update(..., $columnSettingsObj, $sortObj
 **Value objects must throw, not silently coerce.**
 
 `fromArray()` / `__construct()` methods on value objects must throw `\InvalidArgumentException` when required fields are missing or have an incompatible type. Do not add silent casts like `(int)$data['columnId']` that accept garbage input without error — that hides bugs and lets invalid data propagate to the database. The correct pattern is to call `static::assertRequiredFields($data)` (which throws) before casting.
+
+### RequirePermission for contexts
+
+`PermissionMiddleware` only accepts the integer constants `NODE_TYPE_TABLE` and `NODE_TYPE_VIEW` for the `type` argument; contexts are detected via the string `'context'`. Context endpoints must therefore use the string-based `typeParam` form — never `type: Application::NODE_TYPE_CONTEXT` (an integer), which the middleware rejects as an invalid node type at request time:
+
+```php
+#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'context', idParam: 'contextId')]
+```
+
+### node_type column types differ per table
+
+`tables_shares.node_type` stores strings (`'table'`, `'view'`, `'context'`), while other tables (e.g. `tables_archive_user.node_type`) store the integer `Application::NODE_TYPE_*` constants. Never compare one against the other directly; convert with `ConversionHelper::constNodeType2String()` / `stringNodeType2Const()`. On MySQL an int-vs-string comparison silently loose-casts and matches wrong rows; on PostgreSQL it errors.
+
+### Per-user resolved state in API responses
+
+When a feature stores per-user overrides (e.g. personal archiving), every endpoint returning that entity must resolve the per-user value for the requesting user — including single-item GET endpoints. Use the per-user variant (e.g. `TableService::getTableForUser($id, $userId)`) instead of the plain `find($id)`, which returns only the entity-level flag.
+
+### Migration file naming
+
+Migration class names encode the app version they ship in (`Version2400...` = 2.4.0) plus a date stamp. Before merging a long-lived PR, rename its migration to the current target app version and a current date so it sorts after all migrations already released on main.
+
+### Cleanup of materialized per-user state on access loss
+
+Group and circle shares stay receiver-targeted and access is resolved dynamically; only materialized per-user rows (like archive overrides) need cleanup. When adding such per-user metadata, also wire the cleanup listeners: `OCP\Group\Events\UserRemovedEvent`, `OCA\Circles\Events\CircleMemberRemovedEvent`, `GroupDeletedEvent`/`CircleDestroyedEvent`, share deletion, and user deletion — verifying remaining access via `PermissionsService` before deleting (see `ArchiveCleanupService`).
+
+### Atomic upserts
+
+For insert-or-update of a single row use `IDBConnection::setValues()`, which is portable across MySQL, PostgreSQL, SQLite, and Oracle — never read-modify-write or vendor-specific SQL like `INSERT ... ON DUPLICATE KEY UPDATE`.
