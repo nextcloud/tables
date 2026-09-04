@@ -142,6 +142,8 @@ class ArchiveService {
 	 *    to the entity-level flag and their override row is deleted.
 	 * 2. If the entity flag changes as a result, the outgoing owner receives a
 	 *    preservation record so their view is unchanged after the transfer.
+	 *    Callers must clean this up via removeUserOverride() when the transfer
+	 *    leaves the outgoing owner without access to the node.
 	 *
 	 * Must be called inside the same atomic block as the ownership-column
 	 * update so that archive state and ownership are always consistent.
@@ -175,6 +177,18 @@ class ArchiveService {
 		}
 
 		return $newArchived;
+	}
+
+	/**
+	 * Remove a single user's archive override for a node.
+	 *
+	 * Used after ownership transfers when the outgoing owner no longer has
+	 * access to the node, so no orphaned override rows are left behind.
+	 *
+	 * @throws Exception
+	 */
+	public function removeUserOverride(string $userId, int $nodeType, int $nodeId): void {
+		$this->userArchiveMapper->deleteForUser($userId, $nodeType, $nodeId);
 	}
 
 	/**

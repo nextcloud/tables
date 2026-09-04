@@ -206,6 +206,17 @@ class ArchiveServiceTest extends TestCase {
 		$this->assertTrue($result);
 	}
 
+	// removeUserOverride
+	// -------------------------------------------------------------------------
+
+	public function testRemoveUserOverrideDeletesTheUsersRecord(): void {
+		$this->mapper->expects($this->once())
+			->method('deleteForUser')
+			->with('old', Application::NODE_TYPE_TABLE, 10);
+
+		$this->service->removeUserOverride('old', Application::NODE_TYPE_TABLE, 10);
+	}
+
 	// -------------------------------------------------------------------------
 	// Helpers
 	// -------------------------------------------------------------------------

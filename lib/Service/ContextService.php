@@ -450,6 +450,9 @@ class ContextService {
 				}
 				$context = $this->contextMapper->update($context);
 				$this->shareService->transferSharesForContext($contextId, $newOwnerId, $oldOwnerId);
+				if (!$this->permissionsService->canAccessContextById($contextId, $oldOwnerId)) {
+					$this->archiveService->removeUserOverride($oldOwnerId, Application::NODE_TYPE_CONTEXT, $contextId);
+				}
 				return $context;
 			}, $this->dbc);
 		} catch (\Exception $e) {

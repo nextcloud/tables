@@ -472,6 +472,9 @@ class TableService extends SuperService {
 				}
 				$table = $this->mapper->update($table);
 				$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
+				if (!$this->permissionsService->canReadTable($table, $oldOwnerId)) {
+					$this->archiveService->removeUserOverride($oldOwnerId, Application::NODE_TYPE_TABLE, $id);
+				}
 				return $table;
 			}, $this->dbc);
 		} catch (\Exception $e) {
