@@ -89,48 +89,49 @@ class ArchiveService {
 	 * Overwrite the `archived` property on each table with the per-user
 	 * resolved value for $userId.
 	 *
-	 * Uses a single bulk DB query (chunked for Oracle compatibility) regardless
-	 * of how many tables are in the array.
-	 *
 	 * @param Table[] $tables
 	 * @return Table[]
 	 * @throws Exception
 	 */
 	public function enrichTablesWithArchiveState(array $tables, string $userId): array {
-		$nodeIds = array_map(fn (Table $t) => $t->getId(), $tables);
-		$overrides = $this->userArchiveMapper->findAllOverridesForUser($userId, Application::NODE_TYPE_TABLE, $nodeIds);
-
-		foreach ($tables as $table) {
-			$override = $overrides[$table->getId()] ?? null;
-			$archived = $override !== null ? $override->isArchived() : $table->isArchived();
-			$table->setArchived($archived);
-		}
-
-		return $tables;
+		return $this->overrideArchivedFlags($tables, $userId, Application::NODE_TYPE_TABLE);
 	}
 
 	/**
 	 * Overwrite the `archived` property on each context with the per-user
 	 * resolved value for $userId.
 	 *
-	 * Uses a single bulk DB query (chunked for Oracle compatibility) regardless
-	 * of how many contexts are in the array.
-	 *
 	 * @param Context[] $contexts
 	 * @return Context[]
 	 * @throws Exception
 	 */
 	public function enrichContextsWithArchiveState(array $contexts, string $userId): array {
-		$nodeIds = array_map(fn (Context $c) => $c->getId(), $contexts);
-		$overrides = $this->userArchiveMapper->findAllOverridesForUser($userId, Application::NODE_TYPE_CONTEXT, $nodeIds);
+		return $this->overrideArchivedFlags($contexts, $userId, Application::NODE_TYPE_CONTEXT);
+	}
 
-		foreach ($contexts as $context) {
-			$override = $overrides[$context->getId()] ?? null;
-			$archived = $override !== null ? $override->isArchived() : $context->isArchived();
-			$context->setArchived($archived);
+	/**
+	 * Overwrite the `archived` property on each entity with the per-user
+	 * resolved value for $userId.
+	 *
+	 * Uses a single bulk DB query (chunked for Oracle compatibility) regardless
+	 * of how many entities are in the array.
+	 *
+	 * @template T of Table|Context
+	 * @param T[] $entities
+	 * @return T[]
+	 * @throws Exception
+	 */
+	private function overrideArchivedFlags(array $entities, string $userId, int $nodeType): array {
+		$nodeIds = array_map(static fn (Table|Context $entity) => $entity->getId(), $entities);
+		$overrides = $this->userArchiveMapper->findAllOverridesForUser($userId, $nodeType, $nodeIds);
+
+		foreach ($entities as $entity) {
+			$override = $overrides[$entity->getId()] ?? null;
+			$archived = $override !== null ? $override->isArchived() : $entity->isArchived();
+			$entity->setArchived($archived);
 		}
 
-		return $contexts;
+		return $entities;
 	}
 
 	/**
