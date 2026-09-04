@@ -11,6 +11,9 @@ export default {
 		},
 		// views have the flag manageTable set if the user has manage rights for the corresponding table
 		canManageTable(element) {
+			if (!element) {
+				return false
+			}
 			if (!element.isShared) {
 				return true
 			}
@@ -21,6 +24,9 @@ export default {
 		},
 
 		canManageElement(element) {
+			if (!element) {
+				return false
+			}
 			if (this.canManageTable(element)) return true
 			if (!element.isShared) {
 				return true
@@ -32,30 +38,39 @@ export default {
 		},
 
 		canReadData(element) {
+			if (!element) {
+				return false
+			}
 			if (this.canManageTable(element) || this.canDeleteData(element) || this.canUpdateData(element) || this.canManageElement(element)) return true
 			if (!element.isShared) {
 				return true
 			}
 
-			if ((element.isShared && element.onSharePermissions.read) || element?.ownership === getCurrentUser().uid) {
+			if ((element.isShared && element?.onSharePermissions?.read) || element?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
 		},
 
 		canCreateRowInElement(element) {
+			if (!element) {
+				return false
+			}
 			if (this.canManageTable(element) || this.canManageElement(element)) return true
 			if (!element.isShared) {
 				return true
 			}
-			if ((element.isShared && element.onSharePermissions.create) || element?.ownership === getCurrentUser().uid) {
+			if ((element.isShared && element?.onSharePermissions?.create) || element?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
 		},
 
 		canShareElement(element) {
-			if (!element.isShared || element.ownership === getCurrentUser().uid || this.canManageElement(element)) {
+			if (!element) {
+				return false
+			}
+			if (!element.isShared || element?.ownership === getCurrentUser().uid || this.canManageElement(element)) {
 				return true
 			}
 
@@ -63,17 +78,23 @@ export default {
 		},
 
 		canDeleteData(element) {
+			if (!element) {
+				return false
+			}
 			if (this.canManageTable(element) || this.canManageElement(element)) return true
 			return element.isShared === false
-				|| (element.isShared === true && (element.onSharePermissions.delete === true || element.ownership === getCurrentUser().uid))
+				|| (element.isShared === true && (element?.onSharePermissions?.delete === true || element?.ownership === getCurrentUser().uid))
 		},
 		canUpdateData(element) {
+			if (!element) {
+				return false
+			}
 			if (this.canManageTable(element) || this.canManageElement(element)) return true
 			return element.isShared === false
-				|| (element.isShared === true && (element.onSharePermissions.update === true || element.ownership === getCurrentUser().uid))
+				|| (element.isShared === true && (element?.onSharePermissions?.update === true || element?.ownership === getCurrentUser().uid))
 		},
 		ownsContext(context) {
-			return context.owner === getCurrentUser().uid
+			return context?.owner === getCurrentUser().uid
 		},
 
 	},

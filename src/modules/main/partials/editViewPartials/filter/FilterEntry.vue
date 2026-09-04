@@ -271,7 +271,10 @@ export default {
 		},
 	},
 	beforeMount() {
-		this.loadRelationsFromBE({ tableId: this.columns[0].tableId })
+		const tableId = this.columns?.[0]?.tableId
+		if (tableId) {
+			this.loadRelationsFromBE({ tableId })
+		}
 	},
 	methods: {
 		getMagicFieldId() {

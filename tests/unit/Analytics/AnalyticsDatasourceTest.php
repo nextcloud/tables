@@ -17,13 +17,13 @@ namespace OCA\Tables\Analytics;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\RelationService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\IL10N;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 
 final class AnalyticsDatasourceTest extends TestCase {
 	private IL10N|MockObject $l10n;
@@ -31,6 +31,7 @@ final class AnalyticsDatasourceTest extends TestCase {
 	private ViewService|MockObject $viewService;
 	private ColumnService|MockObject $columnService;
 	private RowService|MockObject $rowService;
+	private RelationService|MockObject $relationService;
 	private AnalyticsDatasource $datasource;
 
 	protected function setUp(): void {
@@ -42,14 +43,15 @@ final class AnalyticsDatasourceTest extends TestCase {
 		$this->viewService = $this->createMock(ViewService::class);
 		$this->columnService = $this->createMock(ColumnService::class);
 		$this->rowService = $this->createMock(RowService::class);
+		$this->relationService = $this->createMock(RelationService::class);
 
 		$this->datasource = new AnalyticsDatasource(
 			$this->l10n,
-			$this->createMock(LoggerInterface::class),
 			$this->tableService,
 			$this->viewService,
 			$this->columnService,
 			$this->rowService,
+			$this->relationService,
 			'user1',
 		);
 	}
@@ -146,6 +148,44 @@ final class AnalyticsDatasourceTest extends TestCase {
 				1,
 			],
 		], $result['data']);
+	}
+
+	public function testReadDataFormatsRelationValuesForAnalytics(): void {
+		$this->columnService
+			->expects($this->once())
+			->method('findAllByTable')
+			->with(123, 'user1')
+			->willReturn([
+				$this->createColumn(1, 'Name', 'text'),
+				$this->createColumn(2, 'Customer', 'relation'),
+			]);
+
+		$this->relationService
+			->expects($this->once())
+			->method('getRelationData')
+			->willReturn([
+				42 => ['id' => 42, 'label' => 'Acme Corp'],
+				43 => ['id' => 43, 'label' => 'Globex'],
+			]);
+
+		$row = new Row2();
+		$row->setData([
+			['columnId' => 1, 'value' => 'Order 1'],
+			['columnId' => 2, 'value' => 42],
+		]);
+
+		$this->rowService
+			->expects($this->once())
+			->method('findAllByTable')
+			->with(123, 'user1', null, null)
+			->willReturn([$row]);
+
+		$result = $this->datasource->readData([
+			'tableId' => '123',
+			'user_id' => 'user1',
+		]);
+
+		self::assertSame([['Order 1', 'Acme Corp', 1]], $result['data']);
 	}
 
 	public function testReadDataFormatsDefaultValuesForAnalytics(): void {

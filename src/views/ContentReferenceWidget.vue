@@ -191,7 +191,7 @@ export default {
 		this.tablesStore = useTablesStore()
 		this.dataStore = useDataStore()
 
-		await Promise.all([this.loadRows(), this.loadColumns()])
+		await Promise.all([this.loadRows(), this.loadColumns(), this.loadRelations()])
 	},
 
 	methods: {
@@ -271,6 +271,19 @@ export default {
 				}
 			} catch (error) {
 				console.error('Error loading columns:', error)
+			}
+		},
+		async loadRelations() {
+			if (!this.dataStore) return
+
+			const isView = Boolean(this.richObject.type)
+			try {
+				await this.dataStore.loadRelationsFromBE({
+					tableId: isView ? null : this.richObject.id,
+					viewId: isView ? this.richObject.id : null,
+				})
+			} catch (error) {
+				console.error('Error loading relations:', error)
 			}
 		},
 	},

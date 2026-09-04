@@ -86,22 +86,23 @@ export default {
 
 	watch: {
 		text(value) {
-			if (value.trim() !== this.localValue.trim()) {
-				this.localValue = value
+			const newValue = value ?? ''
+			if (newValue.trim() !== (this.localValue ?? '').trim()) {
+				this.localValue = newValue
 
 				// reset editor if content is empty
 				// otherwise the (empty) content will not be updated
-				if (value === '') {
+				if (newValue === '') {
 					this.setupEditor()
 				} else {
-					this.editor?.setContent(value)
+					this.editor?.setContent(newValue)
 				}
 			}
 		},
 	},
 
 	async mounted() {
-		this.localValue = this.text
+		this.localValue = this.text ?? ''
 		this.setupLazyInitialization()
 	},
 
