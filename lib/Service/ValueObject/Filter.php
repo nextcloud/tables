@@ -16,7 +16,7 @@ class Filter implements JsonSerializable {
 	public function __construct(
 		protected readonly int $columnId,
 		protected readonly FilterOperator $operator,
-		protected readonly string $value,
+		protected readonly string|int|float $value,
 	) {
 	}
 

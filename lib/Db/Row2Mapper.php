@@ -153,7 +153,7 @@ class Row2Mapper {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
-		return array_map(fn (array $item) => $item['id'], $result->fetchAllAssociative());
+		return array_map(static fn (array $item) => $item['id'], $result->fetchAllAssociative());
 	}
 
 	/**
@@ -692,9 +692,7 @@ class Row2Mapper {
 
 			$column = $this->columnMapper->find($rowData['column_id']);
 			$columnType = $column->getType();
-			if (!isset($cellMapperCache[$columnType])) {
-				$cellMapperCache[$columnType] = $this->getCellMapperFromType($columnType);
-			}
+			$cellMapperCache[$columnType] ??= $this->getCellMapperFromType($columnType);
 			$value = $cellMapperCache[$columnType]->formatRowData($column, $rowData);
 			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
 			if ($cellMapperCache[$columnType]->hasMultipleValues()) {
