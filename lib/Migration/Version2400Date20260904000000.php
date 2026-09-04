@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Migration;
 
 use Closure;
+use OCA\Tables\AppInfo\Application;
 use OCP\DB\Exception;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -133,21 +134,21 @@ class Version2400Date20260904000000 extends SimpleMigrationStep {
 			$ownerId = $tableRow['ownership'];
 
 			// Insert owner record
-			$inserted += $this->upsertArchiveRecord($ownerId, 0, $tableId, true);
+			$inserted += $this->upsertArchiveRecord($ownerId, Application::NODE_TYPE_TABLE, $tableId, true);
 
 			// Insert direct user-share recipient records
 			$shareQb = $this->connection->getQueryBuilder();
 			$shareQb->select('receiver')
 				->from('tables_shares')
 				->where($shareQb->expr()->eq('node_id', $shareQb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
-				->andWhere($shareQb->expr()->eq('node_type', $shareQb->createNamedParameter(0, IQueryBuilder::PARAM_INT)))
+				->andWhere($shareQb->expr()->eq('node_type', $shareQb->createNamedParameter(Application::NODE_TYPE_TABLE, IQueryBuilder::PARAM_INT)))
 				->andWhere($shareQb->expr()->eq('receiver_type', $shareQb->createNamedParameter('user')));
 
 			$shareResult = $shareQb->executeQuery();
 			while ($shareRow = $shareResult->fetchAssociative()) {
 				$receiverId = $shareRow['receiver'];
 				if ($receiverId !== $ownerId) {
-					$inserted += $this->upsertArchiveRecord($receiverId, 0, $tableId, true);
+					$inserted += $this->upsertArchiveRecord($receiverId, Application::NODE_TYPE_TABLE, $tableId, true);
 				}
 			}
 			$shareResult->closeCursor();
