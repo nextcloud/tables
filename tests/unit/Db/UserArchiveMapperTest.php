@@ -149,6 +149,43 @@ class UserArchiveMapperTest extends DatabaseTestCase {
 	}
 
 	// -------------------------------------------------------------------------
+	// findUserIdsForNode
+	// -------------------------------------------------------------------------
+
+	public function testFindUserIdsForNodeReturnsAllHolders(): void {
+		$this->mapper->upsert('alice', Application::NODE_TYPE_TABLE, 5, true);
+		$this->mapper->upsert('bob', Application::NODE_TYPE_TABLE, 5, false);
+		$this->mapper->upsert('carol', Application::NODE_TYPE_TABLE, 6, true);
+
+		$userIds = $this->mapper->findUserIdsForNode(Application::NODE_TYPE_TABLE, 5);
+
+		sort($userIds);
+		$this->assertSame(['alice', 'bob'], $userIds);
+	}
+
+	public function testFindUserIdsForNodeReturnsEmptyWhenNone(): void {
+		$this->assertSame([], $this->mapper->findUserIdsForNode(Application::NODE_TYPE_TABLE, 999));
+	}
+
+	// -------------------------------------------------------------------------
+	// deleteAllForUser
+	// -------------------------------------------------------------------------
+
+	public function testDeleteAllForUserRemovesAllNodesAndTypes(): void {
+		$this->mapper->upsert('alice', Application::NODE_TYPE_TABLE, 1, true);
+		$this->mapper->upsert('alice', Application::NODE_TYPE_TABLE, 2, false);
+		$this->mapper->upsert('alice', Application::NODE_TYPE_CONTEXT, 3, true);
+		$this->mapper->upsert('bob', Application::NODE_TYPE_TABLE, 1, true);
+
+		$this->mapper->deleteAllForUser('alice');
+
+		$this->assertNull($this->mapper->findForUser('alice', Application::NODE_TYPE_TABLE, 1));
+		$this->assertNull($this->mapper->findForUser('alice', Application::NODE_TYPE_TABLE, 2));
+		$this->assertNull($this->mapper->findForUser('alice', Application::NODE_TYPE_CONTEXT, 3));
+		$this->assertNotNull($this->mapper->findForUser('bob', Application::NODE_TYPE_TABLE, 1));
+	}
+
+	// -------------------------------------------------------------------------
 	// deleteForUser
 	// -------------------------------------------------------------------------
 

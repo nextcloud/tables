@@ -98,6 +98,41 @@ class UserArchiveMapper extends QBMapper {
 	}
 
 	/**
+	 * Fetch the IDs of all users holding an archive override for a node.
+	 *
+	 * @return string[]
+	 * @throws Exception
+	 */
+	public function findUserIdsForNode(int $nodeType, int $nodeId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('user_id')
+			->from($this->table)
+			->where($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)));
+
+		$result = $qb->executeQuery();
+		$userIds = array_map(static fn (array $row) => (string)$row['user_id'], $result->fetchAllAssociative());
+		$result->closeCursor();
+		return $userIds;
+	}
+
+	/**
+	 * Remove every archive override a user holds, on any node.
+	 *
+	 * Called when the user account is deleted, so no orphaned rows remain
+	 * for nodes owned by other users.
+	 *
+	 * @throws Exception
+	 */
+	public function deleteAllForUser(string $userId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->table)
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+
+		$qb->executeStatement();
+	}
+
+	/**
 	 * Remove the per-user archive override for a single user.
 	 *
 	 * @throws Exception
