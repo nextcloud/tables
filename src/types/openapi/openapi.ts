@@ -1387,8 +1387,13 @@ export type components = {
                 /** Format: int64 */
                 readonly columnId: number;
                 /** @enum {string} */
-                readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
-                readonly value: string | number;
+                readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "contains-item" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
+                readonly value: string | number | readonly {
+                    /** Format: int64 */
+                    readonly id: number;
+                    readonly label: string;
+                    readonly uuid?: string;
+                }[];
             }[])[];
             readonly isShared: boolean;
             readonly favorite: boolean;
@@ -2078,8 +2083,13 @@ export interface operations {
                             /** Format: int64 */
                             readonly columnId: number;
                             /** @enum {string} */
-                            readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
-                            readonly value: string | number;
+                            readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "contains-item" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
+                            readonly value: string | number | readonly {
+                                /** Format: int64 */
+                                readonly id: number;
+                                readonly label: string;
+                                readonly uuid?: string;
+                            }[];
                         }[])[];
                     };
                 };

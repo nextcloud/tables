@@ -3198,11 +3198,18 @@ class FeatureContext implements Context {
 			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 
 			// Add filter condition to array
+			$value = $row[2];
+			if (str_starts_with((string)$value, '[') || str_starts_with((string)$value, '{')) {
+				$decoded = json_decode((string)$value, true);
+				if (json_last_error() === JSON_ERROR_NONE) {
+					$value = $decoded;
+				}
+			}
 			$filterArray[] = [
 				[
 					'columnId' => $columnId,
 					'operator' => $row[1],
-					'value' => $row[2]
+					'value' => $value
 				]
 			];
 		}
