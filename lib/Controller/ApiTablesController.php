@@ -86,7 +86,7 @@ class ApiTablesController extends AOCSController {
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function show(int $id): DataResponse {
 		try {
-			return new DataResponse($this->service->find($id)->jsonSerialize());
+			return new DataResponse($this->service->getTableForUser($id, $this->userId)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {

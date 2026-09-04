@@ -38,7 +38,7 @@ class TableController extends Controller {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function show(int $id): DataResponse {
-		return $this->handleError(fn () => $this->service->find($id));
+		return $this->handleError(fn () => $this->service->getTableForUser($id, $this->userId));
 	}
 
 	#[NoAdminRequired]
