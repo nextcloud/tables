@@ -169,7 +169,12 @@ class ContextService {
 		// Load directly from mapper to get entity-level archived (bypasses per-user enrichment)
 		$context = $this->contextMapper->findById($contextId, $userId);
 		$isOwner = $context->getOwnerId() === $userId;
-		$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner);
+		try {
+			$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
 		return $this->findById($contextId, $userId);
 	}
 
@@ -190,7 +195,12 @@ class ContextService {
 		$context = $this->contextMapper->findById($contextId, $userId);
 		$isOwner = $context->getOwnerId() === $userId;
 		$entityArchived = $context->isArchived(); // entity-level flag, not per-user
-		$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner, $entityArchived);
+		try {
+			$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner, $entityArchived);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
 		return $this->findById($contextId, $userId);
 	}
 
