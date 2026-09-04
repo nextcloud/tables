@@ -93,22 +93,19 @@ class UserArchiveMapper extends QBMapper {
 	/**
 	 * Insert or update a per-user archive override.
 	 *
+	 * Uses IDBConnection::setValues() so insert-or-update happens as one
+	 * portable atomic operation instead of a read-modify-write cycle.
+	 *
 	 * @throws Exception
 	 */
 	public function upsert(string $userId, int $nodeType, int $nodeId, bool $archived): void {
-		$existing = $this->findForUser($userId, $nodeType, $nodeId);
-
-		if ($existing !== null) {
-			$existing->setArchived($archived);
-			$this->update($existing);
-		} else {
-			$entity = new UserArchive();
-			$entity->setUserId($userId);
-			$entity->setNodeType($nodeType);
-			$entity->setNodeId($nodeId);
-			$entity->setArchived($archived);
-			$this->insert($entity);
-		}
+		$this->db->setValues($this->table, [
+			'user_id' => $userId,
+			'node_type' => $nodeType,
+			'node_id' => $nodeId,
+		], [
+			'archived' => $archived,
+		]);
 	}
 
 	/**
