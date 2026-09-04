@@ -13,8 +13,12 @@ use OCA\Tables\Controller\ContextController;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
+use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Http;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -39,6 +43,10 @@ class ContextControllerArchiveTest extends TestCase {
 			$n,
 			'alice',
 			$this->contextService,
+			$this->createMock(TableService::class),
+			$this->createMock(IDBConnection::class),
+			$this->createMock(ColumnService::class),
+			$this->createMock(ViewService::class),
 		);
 	}
 
