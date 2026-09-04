@@ -15,6 +15,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\StructureService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\App\IAppManager;
@@ -47,6 +48,7 @@ class ApiTablesControllerArchiveTest extends TestCase {
 			$n,
 			$this->createMock(IAppManager::class),
 			$this->createMock(IDBConnection::class),
+			$this->createMock(StructureService::class),
 			'alice',
 		);
 	}
