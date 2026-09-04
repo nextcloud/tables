@@ -74,11 +74,12 @@ async function setupFilteringTable(page: Page) {
 
 async function selectFilterOption(page: Page, index: number, title: string | string[]) {
 	const titles = Array.isArray(title) ? title : [title]
-	await page
-		.locator('.modal-container .filter-group .v-select.select')
-		.nth(index)
-		.click()
 	for (const t of titles) {
+		await page
+			.locator('.modal-container .filter-group .v-select.select')
+			.nth(index)
+			.locator('.vs__open-indicator')
+			.click()
 		await page.locator(`ul.vs__dropdown-menu li span[title="${t}"]`).click()
 	}
 }
