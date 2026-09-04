@@ -78,9 +78,7 @@
 					</template>
 
 					<template #counter>
-						<NcCounterBubble>
-							{{ getArchivedContexts.length }}
-						</NcCounterBubble>
+						<NcCounterBubble :count="getArchivedContexts.length" />
 					</template>
 
 					<NavigationContextItem v-for="context in getArchivedContexts" :key="context.id"
