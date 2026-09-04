@@ -355,6 +355,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.tables.findIndex(t => t.id === id)
+			if (index === -1) {
+				return true
+			}
 			const table = this.tables[index]
 			table.archived = true
 			this.setTable(table)
@@ -371,6 +374,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.tables.findIndex(t => t.id === id)
+			if (index === -1) {
+				return true
+			}
 			const table = this.tables[index]
 			table.archived = false
 			this.setTable(table)
@@ -387,6 +393,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.contexts.findIndex(c => c.id === id)
+			if (index === -1) {
+				return true
+			}
 			const context = this.contexts[index]
 			context.archived = true
 			this.setContext(context)
@@ -403,6 +412,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.contexts.findIndex(c => c.id === id)
+			if (index === -1) {
+				return true
+			}
 			const context = this.contexts[index]
 			context.archived = false
 			this.setContext(context)
