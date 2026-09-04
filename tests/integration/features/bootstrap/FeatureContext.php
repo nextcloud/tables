@@ -3134,6 +3134,42 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * Resolves a view link through the core reference API.
+	 *
+	 * That endpoint enhances the view and reads its rows within one request, which
+	 * is the combination that previously handed share recipients the rows their
+	 * view filter excludes.
+	 *
+	 * @When the user :user resolves a reference to view :viewAlias, it has exactly these rows :rowAliasList
+	 */
+	public function referenceToViewHasExactlyThoseRows(string $user, string $viewAlias, string $rowAliasList): void {
+		$this->setCurrentUser($user);
+		$view = $this->collectionManager->getByAlias('view', $viewAlias);
+		$reference = sprintf('%sapps/tables/#/view/%d', $this->baseUrl, $view['id']);
+
+		$this->sendOcsRequest('GET', '/references/resolve?reference=' . urlencode($reference));
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$payload = $this->getDataFromResponse($this->response);
+		$richObject = $payload['ocs']['data']['references'][$reference]['richObject'] ?? null;
+		Assert::assertIsArray($richObject, sprintf('Reference to view "%s" was not resolved', $viewAlias));
+
+		$expectedIds = array_map(
+			fn (string $rowAlias): int => (int)$this->collectionManager->getByAlias('row', trim($rowAlias))['id'],
+			explode(',', $rowAliasList)
+		);
+		sort($expectedIds);
+
+		$actualIds = array_map(
+			static fn (array $row): int => (int)$row['id'],
+			$richObject['rows'] ?? []
+		);
+		sort($actualIds);
+
+		Assert::assertSame($expectedIds, $actualIds);
+	}
+
+	/**
 	 * @Then :nodeType :nodeAlias has exactly these rows :rowAliasList in exactly this order
 	 */
 	public function nodeHasExactlyThoseSortedRows(string $nodeType, string $nodeAlias, string $rowAliasList): void {

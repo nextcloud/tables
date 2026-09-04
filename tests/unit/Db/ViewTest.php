@@ -9,10 +9,14 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Db;
 
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\View;
+use OCA\Tables\Model\Permissions;
 use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase {
+	private const FILTER = [[['columnId' => 33, 'operator' => 'is-equal', 'value' => 'red']]];
+
 	public function testAViewWithoutALayoutRendersAsATable(): void {
 		$this->assertSame('table', (new View())->getLayoutNormalized());
 	}
@@ -102,5 +106,88 @@ class ViewTest extends TestCase {
 			['columnId' => 3, 'order' => 1, 'readonly' => false, 'mandatory' => false],
 		]));
 		$this->assertSame([3, 5], $view->jsonSerialize()['columns']);
+	}
+
+	private function makeFilteredView(array $sort = []): View {
+		$view = new View();
+		$view->setColumnsArray([32, 33]);
+		$view->setFilterArray(self::FILTER);
+		$view->setSortArray($sort);
+		return $view;
+	}
+
+	private function makeSharedView(bool $manageTable, array $sort = []): View {
+		$view = $this->makeFilteredView($sort);
+		$view->setIsShared(true);
+		$view->setOnSharePermissions(new Permissions(read: true, manageTable: $manageTable));
+		return $view;
+	}
+
+	public function testOwnerSeesFilterAndSort(): void {
+		$view = $this->makeFilteredView([['columnId' => 33, 'mode' => 'ASC']]);
+
+		$serialised = $view->jsonSerialize();
+
+		$this->assertSame(self::FILTER, $serialised['filter']);
+		$this->assertSame([['columnId' => 33, 'mode' => 'ASC']], $serialised['sort']);
+	}
+
+	public function testRecipientWithoutTableManageGetsNoFilterDetails(): void {
+		$serialised = $this->makeSharedView(false)->jsonSerialize();
+
+		$this->assertSame([], $serialised['filter']);
+	}
+
+	/**
+	 * The filter must survive serialisation: ViewMapper caches the entity for the
+	 * whole request and RowService::findAllByView() builds its query from it, so a
+	 * blanked filter would return rows the view excludes.
+	 */
+	public function testSerialisingForRecipientKeepsFilterOnEntity(): void {
+		$view = $this->makeSharedView(false);
+
+		$view->jsonSerialize();
+
+		$this->assertSame(self::FILTER, $view->getFilterArray());
+	}
+
+	public function testRecipientWithTableManageSeesFilter(): void {
+		$serialised = $this->makeSharedView(true)->jsonSerialize();
+
+		$this->assertSame(self::FILTER, $serialised['filter']);
+	}
+
+	public function testRecipientKeepsSortOnVisibleAndMetaColumns(): void {
+		$sort = [
+			['columnId' => 33, 'mode' => 'ASC'],
+			['columnId' => Column::TYPE_META_ID, 'mode' => 'DESC'],
+		];
+
+		$serialised = $this->makeSharedView(false, $sort)->jsonSerialize();
+
+		$this->assertSame($sort, $serialised['sort']);
+	}
+
+	public function testRecipientGetsNoSortWhenItStartsOnHiddenColumn(): void {
+		$sort = [
+			['columnId' => 99, 'mode' => 'ASC'],
+			['columnId' => 33, 'mode' => 'DESC'],
+		];
+
+		$serialised = $this->makeSharedView(false, $sort)->jsonSerialize();
+
+		$this->assertSame([], $serialised['sort']);
+	}
+
+	public function testRecipientSortStopsAtFirstHiddenColumn(): void {
+		$sort = [
+			['columnId' => 33, 'mode' => 'DESC'],
+			['columnId' => 99, 'mode' => 'ASC'],
+			['columnId' => Column::TYPE_META_ID, 'mode' => 'DESC'],
+		];
+
+		$serialised = $this->makeSharedView(false, $sort)->jsonSerialize();
+
+		$this->assertSame([['columnId' => 33, 'mode' => 'DESC']], $serialised['sort']);
 	}
 }
