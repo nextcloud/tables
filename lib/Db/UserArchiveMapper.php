@@ -15,6 +15,12 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<UserArchive> */
 class UserArchiveMapper extends QBMapper {
+	/**
+	 * Oracle enforces a hard limit of 1000 items per IN clause; 997 matches
+	 * the chunk size of the existing ShareMapper::findAllSharesFor() pattern.
+	 */
+	private const DB_CHUNK_SIZE = 997;
+
 	protected string $table = 'tables_archive_user';
 
 	public function __construct(IDBConnection $db) {
@@ -58,10 +64,8 @@ class UserArchiveMapper extends QBMapper {
 	 * Fetch all per-user archive overrides for a given user and node type,
 	 * filtered to a specific set of node IDs.
 	 *
-	 * Oracle enforces a hard limit of 1000 items per IN clause. The method
-	 * chunks $nodeIds into batches of 997 (matching the existing
-	 * ShareMapper::findAllSharesFor() pattern) and merges results in PHP to
-	 * stay within this limit transparently.
+	 * Chunks $nodeIds into batches of DB_CHUNK_SIZE and merges results in
+	 * PHP to stay within the Oracle IN-clause limit transparently.
 	 *
 	 * @param int[] $nodeIds IDs to restrict the lookup to
 	 * @return array<int, UserArchive> Keyed by node_id for O(1) map lookup
@@ -80,7 +84,7 @@ class UserArchiveMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->in('node_id', $qb->createParameter('chunk')));
 
-		foreach (array_chunk($nodeIds, 997) as $chunk) {
+		foreach (array_chunk($nodeIds, self::DB_CHUNK_SIZE) as $chunk) {
 			$qb->setParameter('chunk', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			foreach ($this->findEntities($qb) as $entity) {
 				$results[$entity->getNodeId()] = $entity;
