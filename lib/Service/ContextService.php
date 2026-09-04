@@ -92,8 +92,17 @@ class ContextService {
 		return $contexts;
 	}
 
+	/**
+	 * @return Context[]
+	 */
 	public function findForNavigation(string $userId): array {
-		return $this->contextMapper->findForNavBar($userId);
+		$contexts = $this->contextMapper->findForNavBar($userId);
+		try {
+			$this->archiveService->enrichContextsWithArchiveState($contexts, $userId);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+		return array_values(array_filter($contexts, static fn (Context $context) => !$context->isArchived()));
 	}
 
 	public function addToNavigation(string $userId): void {
