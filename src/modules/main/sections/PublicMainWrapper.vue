@@ -61,6 +61,8 @@ export default {
 				emoji: nodeData.emoji,
 				title: nodeData.title,
 				description: nodeData.description,
+				layout: nodeData.layout ?? 'table',
+				viewSettings: nodeData.viewSettings ?? null,
 				isShared: false, // Setting as false to hide the user bubble
 				onSharePermissions: {
 					read: sharePermissions.read,

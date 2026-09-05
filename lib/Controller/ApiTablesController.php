@@ -216,6 +216,7 @@ class ApiTablesController extends AOCSController {
 					$this->userId,
 					technicalName: $view['technicalName'] ?? null,
 					uuid: $view['uuid'] ?? null,
+					layout: $view['layout'] ?? null,
 				);
 
 				$inputColumnsArray = [];
@@ -245,13 +246,17 @@ class ApiTablesController extends AOCSController {
 					return $filter;
 				}, $filters), $view['filter']);
 
-				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray(
-					array_merge($inputColumnsArray, [
-						'description' => $view['description'] ?? '',
-						'sort' => $newSort,
-						'filter' => $newFilter,
-					])
-				));
+				$inputData = array_merge($inputColumnsArray, [
+					'description' => $view['description'] ?? '',
+					'sort' => $newSort,
+					'filter' => $newFilter,
+					'layout' => $view['layout'] ?? null,
+				]);
+				if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+					$inputData['viewSettings'] = $this->remapViewSettings($view['viewSettings'], $colMap);
+				}
+
+				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray($inputData));
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
@@ -278,6 +283,16 @@ class ApiTablesController extends AOCSController {
 			}
 			return $this->handleError($e);
 		}
+	}
+
+	private function remapViewSettings(array $viewSettings, array $colMap): array {
+		foreach (['cardBackgroundSource', 'cardTitleSource'] as $sourceKey) {
+			if (isset($viewSettings[$sourceKey]) && is_int($viewSettings[$sourceKey]) && $viewSettings[$sourceKey] > 0) {
+				$viewSettings[$sourceKey] = $colMap[$viewSettings[$sourceKey]] ?? null;
+			}
+		}
+
+		return $viewSettings;
 	}
 
 	/**
