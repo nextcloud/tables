@@ -67,7 +67,7 @@
     "npm": "^11.3.0"
   },
   "devDependencies": {
-    "@cypress/vue": "^6.0.3",
+    "@cypress/vue": "^7.0.0",
     "@nextcloud/babel-config": "^1.3.0",
     "@nextcloud/browserslist-config": "^3.1.2",
     "@nextcloud/cypress": "^1.1.0",
