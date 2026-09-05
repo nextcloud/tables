@@ -12,10 +12,10 @@
 			</div>
 		</div>
 		<template #actions>
-			<NcButton :aria-label="cancelTitle" :type="cancelClass" @click="$emit('cancel')">
+			<NcButton :aria-label="cancelTitle" :variant="cancelClass" @click="$emit('cancel')">
 				{{ cancelTitle }}
 			</NcButton>
-			<NcButton :type="confirmClass" :aria-label="confirmTitle" @click="$emit('confirm')">
+			<NcButton :variant="confirmClass" :aria-label="confirmTitle" @click="$emit('confirm')">
 				{{ confirmTitle }}
 			</NcButton>
 		</template>
@@ -59,7 +59,9 @@ export default {
 		},
 		confirmClass: {
 			type: String,
-			default: 'success', // primary, secondary, tertiary, tertiary-no-background, tertiary-on-primary, error, warning, success
+			// NcButton visual variant: primary, secondary, tertiary, tertiary-no-background,
+			// tertiary-on-primary, error, warning, success
+			default: 'success',
 		},
 	},
 	emits: ['cancel', 'confirm'],

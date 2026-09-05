@@ -127,7 +127,10 @@
 			</NcActionButton>
 
 			<!-- DELETE -->
-			<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="deleteTable()">
+			<NcActionButton v-if="canManageElement(table)"
+				class="action--error"
+				:close-after-click="true"
+				@click="deleteTable()">
 				{{ t('tables', 'Delete table') }}
 				<template #icon>
 					<DeleteOutline :size="20" />
@@ -414,5 +417,11 @@ export default {
 
 .view-drop-target {
 	border-top: 2px solid var(--color-primary-element);
+}
+
+.action--error {
+	:deep(.action-button) {
+		color: var(--color-text-error, var(--color-error));
+	}
 }
 </style>
