@@ -861,27 +861,15 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param int $tableId
-	 * @return int
-	 *
-	 * @throws PermissionError
-	 */
-	public function getRowsCount(int $tableId): int {
-		if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
-			return $this->row2Mapper->countRowsForTable($tableId);
-		} else {
-			throw new PermissionError('no read access for counting to table id = ' . $tableId);
-		}
-	}
-
-	/**
 	 * @param int[] $tableIds
+	 * @param string|null $userId
 	 * @return array<int, int>
 	 */
-	public function getRowsCountForTables(array $tableIds): array {
+	public function getRowsCountForTables(array $tableIds, ?string $userId = null): array {
+		$userId = $this->permissionsService->preCheckUserId($userId);
 		$readableTableIds = array_values(array_filter(
 			$tableIds,
-			fn (int $tableId): bool => $this->permissionsService->canReadRowsByElementId($tableId, 'table'),
+			fn (int $tableId): bool => $this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId),
 		));
 
 		$counts = $this->row2Mapper->countRowsForTables($readableTableIds);
@@ -895,12 +883,13 @@ class RowService extends SuperService {
 
 	/**
 	 * @param View $view
-	 * @param string $userId
+	 * @param string|null $userId
 	 * @return int
 	 *
 	 * @throws PermissionError
 	 */
-	public function getViewRowsCount(View $view, string $userId): int {
+	public function getViewRowsCount(View $view, ?string $userId = null): int {
+		$userId = $this->permissionsService->preCheckUserId($userId);
 		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view', $userId)) {
 			try {
 				return $this->row2Mapper->countRowsForView($view, $userId);
