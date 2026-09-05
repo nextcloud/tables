@@ -61,6 +61,7 @@ class ContextService {
 		protected IURLGenerator $urlGenerator,
 		private TableMapper $tableMapper,
 		private ViewMapper $viewMapper,
+		private ArchiveService $archiveService,
 	) {
 	}
 
@@ -80,11 +81,28 @@ class ContextService {
 			$this->logger->warning($error);
 			throw new InternalError($error);
 		}
-		return $this->contextMapper->findAll($userId);
+		$contexts = $this->contextMapper->findAll($userId);
+		if ($userId !== null) {
+			try {
+				$this->archiveService->enrichContextsWithArchiveState($contexts, $userId);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
+		}
+		return $contexts;
 	}
 
+	/**
+	 * @return Context[]
+	 */
 	public function findForNavigation(string $userId): array {
-		return $this->contextMapper->findForNavBar($userId);
+		$contexts = $this->contextMapper->findForNavBar($userId);
+		try {
+			$this->archiveService->enrichContextsWithArchiveState($contexts, $userId);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+		return array_values(array_filter($contexts, static fn (Context $context) => !$context->isArchived()));
 	}
 
 	public function addToNavigation(string $userId): void {
@@ -125,7 +143,65 @@ class ContextService {
 			throw new InternalError($error);
 		}
 
-		return $this->contextMapper->findById($id, $userId);
+		$context = $this->contextMapper->findById($id, $userId);
+		if ($userId !== null) {
+			try {
+				$this->archiveService->enrichContextsWithArchiveState([$context], $userId);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
+		}
+		return $context;
+	}
+
+	/**
+	 * Archive a context for the given user.
+	 *
+	 * If the user is the owner the entity flag is set and all per-user
+	 * overrides are cleared; otherwise a personal override is stored.
+	 * Access is validated by the mapper (NotFoundError if no access).
+	 *
+	 * @throws Exception
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function archiveContext(int $contextId, string $userId): Context {
+		// Load directly from mapper to get entity-level archived (bypasses per-user enrichment)
+		$context = $this->contextMapper->findById($contextId, $userId);
+		$isOwner = $context->getOwnerId() === $userId;
+		try {
+			$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		return $this->findById($contextId, $userId);
+	}
+
+	/**
+	 * Unarchive a context for the given user.
+	 *
+	 * If the user is the owner the entity flag is cleared and all per-user
+	 * overrides are reset; otherwise the personal override is removed or
+	 * set to false if the owner has archived the context.
+	 * Access is validated by the mapper (NotFoundError if no access).
+	 *
+	 * @throws Exception
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function unarchiveContext(int $contextId, string $userId): Context {
+		// Load directly from mapper to get entity-level archived (bypasses per-user enrichment)
+		$context = $this->contextMapper->findById($contextId, $userId);
+		$isOwner = $context->getOwnerId() === $userId;
+		$entityArchived = $context->isArchived(); // entity-level flag, not per-user
+		try {
+			$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_CONTEXT, $contextId, $isOwner, $entityArchived);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		return $this->findById($contextId, $userId);
 	}
 
 	/**
@@ -323,6 +399,7 @@ class ContextService {
 				$this->pageMapper->deleteByPageId($pageId);
 			}
 			$this->contextMapper->delete($context);
+			$this->archiveService->deleteNodeArchiveOverrides(Application::NODE_TYPE_CONTEXT, $context->getId());
 		}, $this->dbc);
 		return $context;
 	}
@@ -359,13 +436,23 @@ class ContextService {
 		}
 
 		$oldOwnerId = $context->getOwnerId();
+		$oldArchived = $context->isArchived();
 		$context->setOwnerId($newOwnerId);
 		$context->setOwnerType($newOwnerType);
 
 		try {
-			$context = $this->atomic(function () use ($context, $contextId, $newOwnerId, $oldOwnerId) {
+			$context = $this->atomic(function () use ($context, $contextId, $newOwnerId, $oldOwnerId, $oldArchived) {
+				$newArchived = $this->archiveService->prepareOwnershipTransfer(
+					$oldOwnerId, $newOwnerId, Application::NODE_TYPE_CONTEXT, $contextId, $oldArchived
+				);
+				if ($newArchived !== $oldArchived) {
+					$context->setArchived($newArchived);
+				}
 				$context = $this->contextMapper->update($context);
 				$this->shareService->transferSharesForContext($contextId, $newOwnerId, $oldOwnerId);
+				if (!$this->permissionsService->canAccessContextById($contextId, $oldOwnerId)) {
+					$this->archiveService->removeUserOverride($oldOwnerId, Application::NODE_TYPE_CONTEXT, $contextId);
+				}
 				return $context;
 			}, $this->dbc);
 		} catch (\Exception $e) {

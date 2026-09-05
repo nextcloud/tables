@@ -138,6 +138,8 @@ return [
 		['name' => 'ApiTables#transfer', 'url' => '/api/2/tables/{id}/transfer', 'verb' => 'PUT'],
 		['name' => 'ApiTables#previewSchemeChanges', 'url' => '/api/2/tables/{id}/scheme/preview-changes', 'verb' => 'POST'],
 		['name' => 'ApiTables#importScheme', 'url' => '/api/2/tables/{id}/scheme/import', 'verb' => 'POST'],
+		['name' => 'ApiTables#archiveTable', 'url' => '/api/2/tables/{id}/archive', 'verb' => 'POST'],
+		['name' => 'ApiTables#unarchiveTable', 'url' => '/api/2/tables/{id}/archive', 'verb' => 'DELETE'],
 
 		['name' => 'ApiColumns#index', 'url' => '/api/2/columns/{nodeType}/{nodeId}', 'verb' => 'GET'],
 		['name' => 'ApiColumns#show', 'url' => '/api/2/columns/{id}', 'verb' => 'GET'],
@@ -159,6 +161,8 @@ return [
 		['name' => 'Context#previewSchemeChanges', 'url' => '/api/2/contexts/{contextId}/scheme/preview-changes', 'verb' => 'POST'],
 		['name' => 'Context#importScheme', 'url' => '/api/2/contexts/{contextId}/scheme/import', 'verb' => 'POST'],
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
+		['name' => 'Context#archiveContext', 'url' => '/api/2/contexts/{contextId}/archive', 'verb' => 'POST'],
+		['name' => 'Context#unarchiveContext', 'url' => '/api/2/contexts/{contextId}/archive', 'verb' => 'DELETE'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
 
 		['name' => 'Config#getTableConfig', 'url' => '/api/2/config/table/{id}', 'verb' => 'GET'],

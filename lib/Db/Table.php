@@ -130,6 +130,10 @@ class Table extends EntitySuper implements JsonSerializable {
 		$this->markFieldUpdated('uuid');
 	}
 
+	public function isArchived(): bool {
+		return $this->archived;
+	}
+
 	/**
 	 * @psalm-return TablesTable
 	 */
