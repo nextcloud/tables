@@ -22,7 +22,7 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	}
 
 	/**
-	 * @param mixed $value (array|string|null)
+	 * @param mixed $value (array|string|int|null)
 	 * @param Column|null $column
 	 *
 	 * @return false|string
@@ -30,26 +30,15 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	public function parseValue($value, ?Column $column = null): string|false {
 		if (!$column) {
 			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . self::class, ['exception' => new \Exception()]);
-			return '';
+			return json_encode([]);
 		}
 
-		$relationData = $this->relationService->getRelationData($column);
-		// try to find value by label
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
-		if (!empty($matchingRelation)) {
-			return json_encode(reset($matchingRelation)['id']);
-		}
-
-		// if not found, try to find by id
-		if (is_numeric($value) && isset($relationData[(int)$value])) {
-			return json_encode($value);
-		}
-
-		return '';
+		$ids = $this->normalizeToIds($value, $column);
+		return json_encode($ids);
 	}
 
 	/**
-	 * @param mixed $value (array|string|null)
+	 * @param mixed $value (array|string|int|null)
 	 * @param Column|null $column
 	 * @return bool
 	 */
@@ -58,42 +47,98 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . self::class, ['exception' => new \Exception()]);
 			return false;
 		}
-		if ($value === null) {
+		if ($value === null || $value === '' || $value === []) {
 			return true;
 		}
 
-		$relationData = $this->relationService->getRelationData($column);
-		// try to find value by label
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
-		if (!empty($matchingRelation)) {
+		try {
+			$this->normalizeToIds($value, $column, throwOnInvalid: true);
 			return true;
+		} catch (BadRequestError) {
+			return false;
 		}
-		// if not found, try to find by id
-		if (is_numeric($value) && isset($relationData[(int)$value])) {
-			return true;
-		}
-
-		return false;
 	}
 
 	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
-		if ($value === null || $value === '') {
+		if ($value === null || $value === '' || $value === []) {
 			return;
 		}
-		// Validate that the value exists in the target table/view
-		$relationData = $this->relationService->getRelationData($column);
 
-		// Try to find value by label first
+		$ids = $this->normalizeToIds($value, $column, throwOnInvalid: true);
+		$allowMultiple = (bool)($column->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
+
+		if (!$allowMultiple && count($ids) > 1) {
+			throw new BadRequestError('Relation column does not allow multiple values');
+		}
+	}
+
+	/**
+	 * Resolve labels/ids into a de-duplicated list of related row ids.
+	 *
+	 * Accepts:
+	 * - null / '' / [] → []
+	 * - single int/string id or label (legacy single-value clients)
+	 * - array of ints/strings (ids or labels)
+	 * - comma-separated string of labels/ids (import)
+	 *
+	 * @return list<int>
+	 * @throws BadRequestError
+	 */
+	private function normalizeToIds(mixed $value, Column $column, bool $throwOnInvalid = false): array {
+		if ($value === null || $value === '' || $value === []) {
+			return [];
+		}
+
+		if (is_string($value)) {
+			$decoded = json_decode($value, true);
+			if (json_last_error() === JSON_ERROR_NONE) {
+				$value = $decoded;
+			} elseif (str_contains($value, ',')) {
+				$value = array_map(trim(...), explode(',', $value));
+			} else {
+				$value = [$value];
+			}
+		}
+
+		if (!is_array($value)) {
+			$value = [$value];
+		}
+
+		$relationData = $this->relationService->getRelationData($column);
+		$ids = [];
+
+		foreach ($value as $item) {
+			if ($item === null || $item === '') {
+				continue;
+			}
+
+			$resolvedId = $this->resolveRelationId($item, $relationData);
+			if ($resolvedId === null) {
+				if ($throwOnInvalid) {
+					throw new BadRequestError('Relation value does not exist in the target table/view');
+				}
+				continue;
+			}
+			$ids[] = $resolvedId;
+		}
+
+		return array_values(array_unique($ids, SORT_NUMERIC));
+	}
+
+	/**
+	 * @param array<int|string, array{id: int, label: string}> $relationData
+	 */
+	private function resolveRelationId(mixed $value, array $relationData): ?int {
+		// Match by label first (import / human-friendly input)
 		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
 		if (!empty($matchingRelation)) {
-			return;
+			return (int)reset($matchingRelation)['id'];
 		}
 
-		// If not found by label, try to find by id
 		if (is_numeric($value) && isset($relationData[(int)$value])) {
-			return;
+			return (int)$value;
 		}
 
-		throw new BadRequestError('Relation value does not exist in the target table/view');
+		return null;
 	}
 }

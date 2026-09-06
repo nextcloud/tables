@@ -95,6 +95,62 @@ test.describe('Test column relation', () => {
 		).toBeVisible()
 	})
 
+	test('Create multi relation column and select multiple values', async ({ userPage: { page } }) => {
+		const multiSourceTitle = 'Multi relation source'
+		const multiTargetTitle = 'Multi relation target'
+		const multiRelationTitle = 'Refers to many'
+
+		await page.goto('/index.php/apps/tables')
+
+		await createTable(page, multiSourceTitle)
+		await loadTable(page, multiSourceTitle)
+		await createTextLineColumn(page, sourceColumnTitle, '', '', true)
+
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, sourceColumnTitle, 'Alice')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+		await openCreateRowModal(page)
+		await fillInValueTextLine(page, sourceColumnTitle, 'Bob')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+
+		await createTable(page, multiTargetTitle)
+		await loadTable(page, multiTargetTitle)
+
+		await openCreateColumnModal(page, true)
+		await page.locator('[data-cy="columnTypeFormInput"]').clear()
+		await page.locator('[data-cy="columnTypeFormInput"]').fill(multiRelationTitle)
+		await page.locator('.columnTypeSelection .vs__open-indicator').click()
+		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').filter({ hasText: 'Relation' }).click()
+
+		await selectFromVueDropdown(page, 'Select target', multiSourceTitle)
+		await page.waitForResponse(
+			r => r.url().includes('/apps/tables/api/1/tables/')
+				&& r.url().includes('/columns')
+				&& r.request().method() === 'GET',
+		)
+		await selectFromVueDropdown(page, 'Select label for relation selection', sourceColumnTitle)
+		await page.locator('[data-cy="relationMultipleSwitch"]').click()
+
+		await page.locator('[data-cy="createColumnSaveBtn"]').click()
+		await expect(
+			page.locator('[data-cy="ncTable"] table tr th').filter({ hasText: multiRelationTitle }),
+		).toBeVisible()
+
+		const relationOptionsResponse = page.waitForResponse(
+			r => r.url().includes('/apps/tables/api/1/')
+				&& r.url().includes('/relations')
+				&& r.request().method() === 'GET',
+		)
+		await openCreateRowModal(page)
+		await relationOptionsResponse
+		await selectFromVueDropdown(page, 'Select relation value', 'Alice')
+		await selectFromVueDropdown(page, 'Select relation value', 'Bob')
+		await page.locator('[data-cy="createRowSaveButton"]').click()
+		await expect(
+			page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'Alice' }).filter({ hasText: 'Bob' }),
+		).toBeVisible()
+	})
+
 	test('Relation labels render inside an application context', async ({ userPage: { page } }) => {
 		await page.goto('/index.php/apps/tables')
 

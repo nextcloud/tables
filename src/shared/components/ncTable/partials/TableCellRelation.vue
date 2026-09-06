@@ -5,12 +5,20 @@
 <template>
 	<div class="cell-relation">
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
-			<div v-if="isDeleted">
-				<span class="deleted">{{ value }}</span>
-				<span class="cursor-help" :title="t('tables', 'This relation does not exist anymore.')">&nbsp;⚠️</span>
+			<div v-if="hasDeletedRelations" class="relation-labels">
+				<span v-for="(entry, index) in displayEntries" :key="`${entry.id}-${index}`" class="relation-label">
+					<template v-if="entry.deleted">
+						<span class="deleted">{{ entry.id }}</span>
+						<span class="cursor-help" :title="t('tables', 'This relation does not exist anymore.')">&nbsp;⚠️</span>
+					</template>
+					<template v-else>
+						{{ entry.label }}
+					</template>
+					<span v-if="index < displayEntries.length - 1">, </span>
+				</span>
 			</div>
-			<div v-else>
-				{{ relationLabel }}
+			<div v-else class="relation-labels">
+				{{ relationLabels }}
 			</div>
 		</div>
 		<div v-else
@@ -23,9 +31,12 @@
 				:options="relationOptions"
 				:clearable="!column.mandatory"
 				:reduce="(option) => option.id"
+				:multiple="allowMultiple"
+				:close-on-select="!allowMultiple"
 				:aria-label-combobox="t('tables', 'Select relation value')"
 				:disabled="localLoading || !canEditCell()"
-				style="width: 100%;" />
+				style="width: 100%;"
+				data-cy="relationCellSelect" />
 			<div v-if="localLoading" class="loading-indicator">
 				<div class="icon-loading-small icon-loading-inline" />
 			</div>
@@ -61,7 +72,7 @@ export default {
 		},
 
 		value: {
-			type: Number,
+			type: [Number, Array],
 			default: null,
 		},
 	},
@@ -69,24 +80,42 @@ export default {
 	data() {
 		return {
 			isInitialEditClick: false,
-			editValue: this.value ? parseInt(this.value) : null,
+			editValue: null,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['activeTable', 'activeView']),
+		allowMultiple() {
+			return !!this.column.customSettings?.allowMultiple
+		},
+		valueIds() {
+			if (this.value === null || this.value === undefined || this.value === '') {
+				return []
+			}
+			const list = Array.isArray(this.value) ? this.value : [this.value]
+			return list.map(id => parseInt(id)).filter(id => !Number.isNaN(id))
+		},
 		allRelations() {
 			const dataStore = useDataStore()
 			return dataStore.getRelations(this.column.id) || {}
 		},
-		currentOption() {
-			if (!this.value) {
-				return null
-			}
-			return this.allRelations[this.value]
+		displayEntries() {
+			return this.valueIds.map(id => {
+				const option = this.allRelations[id]
+				return option
+					? { id, label: option.label, deleted: false }
+					: { id, label: null, deleted: true }
+			})
 		},
-		relationLabel() {
-			return this.currentOption ? this.currentOption.label : null
+		relationLabels() {
+			return this.displayEntries
+				.filter(entry => !entry.deleted)
+				.map(entry => entry.label)
+				.join(', ')
+		},
+		hasDeletedRelations() {
+			return this.displayEntries.some(entry => entry.deleted)
 		},
 		relationOptions() {
 			const activeElement = this.activeView || this.activeTable
@@ -95,21 +124,15 @@ export default {
 			}
 			return []
 		},
-		isDeleted() {
-			return !!this.value && !this.currentOption
-		},
 	},
 
 	watch: {
 		isEditing(isEditing) {
 			if (isEditing) {
-				// Add click outside listener after the current event loop
-				// to avoid the same click that triggered editing from closing the editor
 				this.$nextTick(() => {
 					document.addEventListener('click', this.handleClickOutside)
 				})
 			} else {
-				// Remove click outside listener
 				document.removeEventListener('click', this.handleClickOutside)
 				this.isInitialEditClick = false
 			}
@@ -122,7 +145,6 @@ export default {
 		handleStartEditing(event) {
 			this.isInitialEditClick = true
 			this.startEditing()
-			// Stop the event from propagating to avoid immediate click outside
 			event.stopPropagation()
 		},
 
@@ -131,7 +153,8 @@ export default {
 				return false
 			}
 			this.isEditing = true
-			this.editValue = this.value ? parseInt(this.value) : null
+			const ids = [...this.valueIds]
+			this.editValue = this.allowMultiple ? ids : (ids[0] ?? null)
 			this.$nextTick(() => {
 				this.$refs.editingContainer?.focus()
 			})
@@ -142,7 +165,16 @@ export default {
 				return
 			}
 
-			const success = await this.updateCellValue(this.editValue)
+			let newValue = this.editValue === null || this.editValue === undefined
+				? []
+				: (Array.isArray(this.editValue) ? this.editValue : [this.editValue])
+			newValue = newValue.map(id => parseInt(id)).filter(id => !Number.isNaN(id))
+
+			if (!this.allowMultiple) {
+				newValue = newValue.slice(0, 1)
+			}
+
+			const success = await this.updateCellValue(newValue)
 
 			if (!success) {
 				this.cancelEdit()
@@ -153,13 +185,11 @@ export default {
 		},
 
 		handleClickOutside(event) {
-			// Ignore the initial click that started editing
 			if (this.isInitialEditClick) {
 				this.isInitialEditClick = false
 				return
 			}
 
-			// Check if the click is outside the editing container
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
 				this.saveChanges()
 			}

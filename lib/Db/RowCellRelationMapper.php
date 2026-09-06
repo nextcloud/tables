@@ -21,16 +21,26 @@ class RowCellRelationMapper extends RowCellMapperSuper {
 	}
 
 	/**
-	 * @inheritDoc
+	 * Relation values are stored as one cell row per related id (usergroup-style),
+	 * so single- and multi-select columns share the same storage shape.
 	 */
 	public function hasMultipleValues(): bool {
-		return false;
+		return true;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	public function getDbParamType() {
 		return IQueryBuilder::PARAM_INT;
+	}
+
+	public function formatRowData(Column $column, array $row) {
+		$value = $row['value'];
+		if ($value === null || $value === '') {
+			return null;
+		}
+		return (int)$value;
+	}
+
+	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
+		$cell->setValue($data === null || $data === '' ? null : (int)$data);
 	}
 }

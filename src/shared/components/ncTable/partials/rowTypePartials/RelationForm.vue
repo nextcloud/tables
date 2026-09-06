@@ -10,9 +10,12 @@
 			:clearable="!column.mandatory"
 			:reduce="(option) => option.id"
 			:loading="loading"
+			:multiple="allowMultiple"
+			:close-on-select="!allowMultiple"
 			:aria-label-combobox="t('tables', 'Select relation value')"
 			:label-outside="true"
-			:disabled="column.readonly || isCardView" />
+			:disabled="column.readonly || isCardView"
+			data-cy="relationRowSelect" />
 	</RowFormWrapper>
 </template>
 
@@ -36,7 +39,7 @@ export default {
 			required: true,
 		},
 		value: {
-			type: [String, Number],
+			type: [String, Number, Array],
 			default: null,
 		},
 		isCardView: {
@@ -49,6 +52,9 @@ export default {
 	],
 	computed: {
 		...mapState(useTablesStore, ['activeTable', 'activeView']),
+		allowMultiple() {
+			return !!this.column.customSettings?.allowMultiple
+		},
 		loading() {
 			const dataStore = useDataStore()
 			const elementId = this.activeView?.id ?? this.activeTable?.id ?? this.column?.tableId
@@ -60,14 +66,26 @@ export default {
 		relationOptions() {
 			const dataStore = useDataStore()
 			const columnRelations = dataStore.getRelations(this.column?.id)
-			return Object.values(columnRelations)
+			return Object.values(columnRelations).map(option => ({
+				...option,
+				id: parseInt(option.id),
+			}))
 		},
 		localValue: {
 			get() {
-				return this.value ? parseInt(this.value) : null
+				const ids = this.normalizeIds(this.value)
+				if (this.allowMultiple) {
+					return ids
+				}
+				return ids.length > 0 ? ids[0] : null
 			},
 			set(value) {
-				this.$emit('update:value', value)
+				let ids = this.normalizeIds(value)
+				if (!this.allowMultiple) {
+					ids = ids.slice(0, 1)
+				}
+				// Always persist as an array (multi-row cell storage)
+				this.$emit('update:value', ids)
 			},
 		},
 	},
@@ -83,8 +101,17 @@ export default {
 		}
 	},
 	methods: {
-		...mapActions(useDataStore, ['loadRelationsFromBE']),
 		t,
+		...mapActions(useDataStore, ['loadRelationsFromBE']),
+		normalizeIds(value) {
+			if (value === null || value === undefined || value === '') {
+				return []
+			}
+			const list = Array.isArray(value) ? value : [value]
+			return list
+				.map(id => parseInt(id))
+				.filter(id => !Number.isNaN(id))
+		},
 	},
 }
 </script>

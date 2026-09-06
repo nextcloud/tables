@@ -15,45 +15,43 @@ export default class RelationColumn extends AbstractColumn {
 		this.subtype = ''
 	}
 
+	get allowMultiple() {
+		return !!this.customSettings?.allowMultiple
+	}
+
 	/**
 	 * Format the value for display
 	 * @param {unknown} value The value to format
 	 * @return {string} The formatted value
 	 */
 	formatValue(value) {
-		if (value === null || value === undefined) {
+		const ids = this.normalizeIds(value)
+		if (ids.length === 0) {
 			return ''
 		}
-		// For single relations, return the value as is
-		return String(value)
+		return ids.map(id => this.getLabel(id) || String(id)).join(', ')
 	}
 
 	/**
 	 * Parse the value from input
 	 * @param {unknown} value The value to parse
-	 * @return {unknown} The parsed value
+	 * @return {number[]} The parsed value
 	 */
 	parseValue(value) {
-		if (value === null || value === undefined || value === '') {
-			return null
-		}
-		// For single relations, return the value as is
-		return value
+		return this.normalizeIds(value)
 	}
 
 	getValueString(valueObject) {
 		valueObject = valueObject || this.value || null
-		return this.getLabel(valueObject.value)
+		const ids = this.normalizeIds(valueObject?.value ?? valueObject)
+		return ids.map(id => this.getLabel(id) || String(id)).filter(Boolean).join(', ')
 	}
 
 	getLabel(rowId) {
-		// Try to get relation data from the store
 		try {
 			const dataStore = useDataStore()
-
 			const columnRelations = dataStore.getRelations(this.id)
 			const option = columnRelations[rowId]
-
 			return option ? option.label : ''
 		} catch (error) {
 			console.warn('Failed to get relation label:', error)
@@ -61,8 +59,18 @@ export default class RelationColumn extends AbstractColumn {
 		}
 	}
 
+	normalizeIds(value) {
+		if (value === null || value === undefined || value === '') {
+			return []
+		}
+		const list = Array.isArray(value) ? value : [value]
+		return list
+			.map(id => parseInt(id))
+			.filter(id => !Number.isNaN(id))
+	}
+
 	default() {
-		return null
+		return []
 	}
 
 	/**
@@ -73,7 +81,7 @@ export default class RelationColumn extends AbstractColumn {
 	 */
 	isFilterFound(cell, filter) {
 		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
-		const cellLabel = this.getLabel(cell.value)?.toLowerCase()
+		const cellLabel = this.getValueString(cell)?.toLowerCase()
 		const filterMethod = {
 			[FilterIds.Contains]() { return cellLabel?.includes(filterValue) },
 			[FilterIds.DoesNotContain]() { return !cellLabel?.includes(filterValue) },
