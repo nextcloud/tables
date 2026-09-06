@@ -80,15 +80,34 @@ export default class RelationColumn extends AbstractColumn {
 	 * @return {boolean} Whether the filter matches
 	 */
 	isFilterFound(cell, filter) {
-		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
-		const cellLabel = this.getValueString(cell)?.toLowerCase()
+		const rawFilter = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const filterValue = String(rawFilter ?? '').toLowerCase()
+		const ids = this.normalizeIds(cell?.value ?? cell)
+		const labels = ids.map(id => (this.getLabel(id) || String(id)).toLowerCase())
+		const filterId = Number.parseInt(String(rawFilter), 10)
+		const filterIsNumericId = String(rawFilter) === String(filterId) && !Number.isNaN(filterId)
+		const hasId = filterIsNumericId && ids.includes(filterId)
+		const hasExactLabel = labels.includes(filterValue)
+		const hasPartialLabel = labels.some(label => label.includes(filterValue))
+		const allowMultiple = this.allowMultiple
+
 		const filterMethod = {
-			[FilterIds.Contains]() { return cellLabel?.includes(filterValue) },
-			[FilterIds.DoesNotContain]() { return !cellLabel?.includes(filterValue) },
-			[FilterIds.IsEqual]() { return cellLabel === filterValue },
-			[FilterIds.IsNotEqual]() { return cellLabel !== filterValue },
-			[FilterIds.IsEmpty]() { return !cellLabel },
-			[FilterIds.IsNotEmpty]() { return !!cellLabel },
+			[FilterIds.Contains]() { return hasId || hasPartialLabel },
+			[FilterIds.DoesNotContain]() { return !hasId && !hasPartialLabel },
+			[FilterIds.IsEqual]() {
+				if (filterIsNumericId) {
+					return allowMultiple ? ids.includes(filterId) : (ids.length === 1 && ids[0] === filterId)
+				}
+				return allowMultiple ? hasExactLabel : (labels.length === 1 && labels[0] === filterValue)
+			},
+			[FilterIds.IsNotEqual]() {
+				if (filterIsNumericId) {
+					return allowMultiple ? !ids.includes(filterId) : !(ids.length === 1 && ids[0] === filterId)
+				}
+				return allowMultiple ? !hasExactLabel : !(labels.length === 1 && labels[0] === filterValue)
+			},
+			[FilterIds.IsEmpty]() { return ids.length === 0 },
+			[FilterIds.IsNotEmpty]() { return ids.length > 0 },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

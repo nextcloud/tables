@@ -465,6 +465,12 @@ class Row2Mapper {
 					break;
 				}
 
+				if ($column->getType() === Column::TYPE_RELATION) {
+					$includeDefault = false;
+					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter((int)$value, IQueryBuilder::PARAM_INT));
+					break;
+				}
+
 				$includeDefault = str_contains((string)($defaultValue ?? ''), (string)$value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
@@ -510,6 +516,19 @@ class Row2Mapper {
 							$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
 						);
 				}
+				if ($column->getType() === Column::TYPE_RELATION) {
+					$qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter((int)$value, IQueryBuilder::PARAM_INT)));
+
+					return $this->db->getQueryBuilder()
+						->selectAlias('sl3.id', 'row_id')
+						->from('tables_row_sleeves', 'sl3')
+						->where(
+							$qb->expr()->eq('sl3.table_id', $qb->createNamedParameter($column->getTableId(), IQueryBuilder::PARAM_INT))
+						)
+						->andWhere(
+							$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
+						);
+				}
 				$includeDefault = !str_contains((string)($defaultValue ?? ''), (string)$value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
@@ -530,6 +549,11 @@ class Row2Mapper {
 					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']', $paramType));
 					break;
 				}
+				if ($column->getType() === Column::TYPE_RELATION) {
+					$includeDefault = false;
+					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter((int)$value, IQueryBuilder::PARAM_INT));
+					break;
+				}
 				$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType));
 				break;
 			case 'is-not-equal':
@@ -538,6 +562,19 @@ class Row2Mapper {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb->expr()->neq('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']', $paramType));
 					break;
+				}
+				if ($column->getType() === Column::TYPE_RELATION) {
+					$qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter((int)$value, IQueryBuilder::PARAM_INT)));
+
+					return $this->db->getQueryBuilder()
+						->selectAlias('sl3.id', 'row_id')
+						->from('tables_row_sleeves', 'sl3')
+						->where(
+							$qb->expr()->eq('sl3.table_id', $qb->createNamedParameter($column->getTableId(), IQueryBuilder::PARAM_INT))
+						)
+						->andWhere(
+							$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
+						);
 				}
 				$filterExpression = $qb->expr()->neq('value', $qb->createNamedParameter($value, $paramType));
 				break;
@@ -711,7 +748,18 @@ class Row2Mapper {
 		}
 
 		foreach ($rowValues as $compositeKey => $value) {
-			$rows[$keyToRowId[$compositeKey]]->addCell($keyToColumnId[$compositeKey], $value);
+			$columnId = $keyToColumnId[$compositeKey];
+			try {
+				$column = $this->columnMapper->find($columnId);
+				if ($column->getType() === Column::TYPE_RELATION
+					&& !(bool)($column->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false)
+					&& is_array($value)) {
+					$value = $value[0] ?? null;
+				}
+			} catch (DoesNotExistException) {
+				// Column may have been deleted; keep aggregated value as-is
+			}
+			$rows[$keyToRowId[$compositeKey]]->addCell($columnId, $value);
 		}
 
 		return array_values($rows);

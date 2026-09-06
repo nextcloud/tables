@@ -76,4 +76,18 @@ class RelationBusinessTest extends TestCase {
 		$this->business->validateValue([13, 14], $column, 'admin', 1, null);
 		$this->addToAssertionCount(1);
 	}
+
+	public function testCanBeParsedDisplayValueKeepsPartialMatches(): void {
+		$this->assertTrue($this->business->canBeParsedDisplayValue('Alice, Unknown', $this->column));
+		$result = json_decode($this->business->parseValue('Alice, Unknown', $this->column), true);
+		$this->assertSame([13], $result);
+	}
+
+	public function testCanBeParsedDisplayValueRejectsAllInvalid(): void {
+		$this->assertFalse($this->business->canBeParsedDisplayValue('Unknown', $this->column));
+	}
+
+	public function testCanBeParsedStillRejectsPartialInvalid(): void {
+		$this->assertFalse($this->business->canBeParsed('Alice, Unknown', $this->column));
+	}
 }

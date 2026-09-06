@@ -43,4 +43,37 @@ class RowCellRelationMapper extends RowCellMapperSuper {
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
 		$cell->setValue($data === null || $data === '' ? null : (int)$data);
 	}
+
+	/**
+	 * Keep only the first related value per row (lowest cell id).
+	 * Used when allowMultiple is turned off on an existing column.
+	 */
+	public function truncateToSingleValuePerRow(int $columnId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id', 'row_id')
+			->from($this->table)
+			->where($qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)))
+			->orderBy('row_id', 'ASC')
+			->addOrderBy('id', 'ASC');
+
+		$result = $qb->executeQuery();
+		$seenRows = [];
+		$idsToDelete = [];
+		while ($row = $result->fetchAssociative()) {
+			$rowId = (int)$row['row_id'];
+			if (isset($seenRows[$rowId])) {
+				$idsToDelete[] = (int)$row['id'];
+			} else {
+				$seenRows[$rowId] = true;
+			}
+		}
+		$result->closeCursor();
+
+		foreach (array_chunk($idsToDelete, 500) as $chunk) {
+			$deleteQb = $this->db->getQueryBuilder();
+			$deleteQb->delete($this->table)
+				->where($deleteQb->expr()->in('id', $deleteQb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)));
+			$deleteQb->executeStatement();
+		}
+	}
 }

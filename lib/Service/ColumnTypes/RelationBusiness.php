@@ -59,6 +59,22 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 	}
 
+	/**
+	 * Import / display parsing keeps valid relation targets when some labels fail.
+	 */
+	public function canBeParsedDisplayValue($value, Column $column): bool {
+		if ($value === null || $value === '' || $value === []) {
+			return true;
+		}
+
+		try {
+			$this->normalizeToIds($value, $column, throwOnInvalid: true);
+			return true;
+		} catch (BadRequestError) {
+			return $this->normalizeToIds($value, $column, throwOnInvalid: false) !== [];
+		}
+	}
+
 	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
 		if ($value === null || $value === '' || $value === []) {
 			return;

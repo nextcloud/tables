@@ -13,6 +13,7 @@ use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\RowCellRelationMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
@@ -54,6 +55,7 @@ class ColumnService extends SuperService {
 		private readonly IL10N $l,
 		private readonly UserHelper $userHelper,
 		private readonly ColumnDtoValidator $columnDtoValidator,
+		private readonly RowCellRelationMapper $rowCellRelationMapper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -423,11 +425,17 @@ class ColumnService extends SuperService {
 			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
 			$this->validateCustomSettings($columnDto->getCustomSettings());
+			$previousAllowMultiple = (bool)($item->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
 			$item->setCustomSettings($columnDto->getCustomSettings());
 
 			$this->updateMetadata($item, $userId);
 			try {
 				$updatedColumn = $this->mapper->update($item);
+
+				$newAllowMultiple = (bool)($updatedColumn->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
+				if ($updatedColumn->getType() === Column::TYPE_RELATION && $previousAllowMultiple && !$newAllowMultiple) {
+					$this->rowCellRelationMapper->truncateToSingleValuePerRow($updatedColumn->getId());
+				}
 
 				$this->activityManager->triggerEvent(
 					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
