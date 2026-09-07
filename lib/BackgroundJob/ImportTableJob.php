@@ -12,6 +12,7 @@ use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ImportService;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\QueuedJob;
 use OCP\IUserManager;
@@ -74,14 +75,20 @@ class ImportTableJob extends QueuedJob {
 			$this->userSession->setUser($oldUser);
 		}
 
-		if (!$tableId && $viewId) {
-			$tableId = $this->viewMapper->find($viewId)->getTableId();
+		try {
+			if (!$tableId && $viewId) {
+				$tableId = $this->viewMapper->find($viewId)->getTableId();
+			}
+			$table = $this->tableMapper->find($tableId);
+		} catch (DoesNotExistException $e) {
+			$this->logger->warning('Could not trigger import-finished activity, table or view no longer exists: ' . $e->getMessage(), ['exception' => $e]);
+			return;
 		}
 
 		if ($importSuccess) {
 			$this->activityManager->triggerEvent(
 				objectType: ActivityManager::TABLES_OBJECT_TABLE,
-				object: $this->tableMapper->find($tableId),
+				object: $table,
 				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
 				additionalParams: [
 					'importStats' => $importStats,
