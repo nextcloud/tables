@@ -11,14 +11,18 @@ namespace OCA\Tables\Tests\Unit\ShareReview;
 
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Service\ShareService;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\ShareReview\ShareReviewSource;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
+use OCP\IUser;
+use OCP\IUserSession;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\ShareReviewActionContext;
 use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
 use OCP\Share\ShareReview\ShareReviewPermission;
@@ -32,6 +36,8 @@ final class ShareReviewSourceTest extends TestCase {
 	private MockObject $logger;
 	private MockObject $shareService;
 	private MockObject $eventDispatcher;
+	private MockObject $auditLog;
+	private MockObject $userSession;
 	private ShareReviewSource $source;
 
 	protected function setUp(): void {
@@ -42,7 +48,9 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->shareService = $this->createMock(ShareService::class);
 		$this->eventDispatcher = $this->createMock(IEventDispatcher::class);
-		$this->source = new ShareReviewSource($this->shareMapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher);
+		$this->auditLog = $this->createMock(AuditLogServiceInterface::class);
+		$this->userSession = $this->createMock(IUserSession::class);
+		$this->source = new ShareReviewSource($this->shareMapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher, $this->auditLog, $this->userSession);
 	}
 
 	/** @param array<string, mixed> $overrides */
@@ -81,7 +89,7 @@ final class ShareReviewSourceTest extends TestCase {
 	public function testGetNameIsStableWhileGetDisplayNameIsTranslated(): void {
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(static fn (string $text, array $params = []) => $text === 'Tables' ? 'Tabellen' : vsprintf($text, $params));
-		$source = new ShareReviewSource($this->shareMapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher);
+		$source = new ShareReviewSource($this->shareMapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher, $this->auditLog, $this->userSession);
 
 		$this->assertInstanceOf(IPaginatedShareReviewSource::class, $source);
 		$this->assertSame('Tables', $source->getName());
@@ -121,7 +129,7 @@ final class ShareReviewSourceTest extends TestCase {
 		$mapper->method('countForShareReview')->willReturn(new ShareReviewCounts(1, 1));
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(fn (string $text, array $params = []) => vsprintf($text, $params));
-		$source = new ShareReviewSource($mapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher);
+		$source = new ShareReviewSource($mapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher, $this->auditLog, $this->userSession);
 		return $source->queryShares(new ShareReviewQuery())->entries[0]->object;
 	}
 
@@ -153,7 +161,7 @@ final class ShareReviewSourceTest extends TestCase {
 		$mapper->method('countForShareReview')->willReturn(new ShareReviewCounts(1, 1));
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(fn (string $text, array $params = []) => vsprintf($text, $params));
-		return (new ShareReviewSource($mapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher))->queryShares(new ShareReviewQuery())->entries[0]->type;
+		return (new ShareReviewSource($mapper, $l10n, $this->logger, $this->shareService, $this->eventDispatcher, $this->auditLog, $this->userSession))->queryShares(new ShareReviewQuery())->entries[0]->type;
 	}
 
 	public function testQuerySharesTranslatesTypesAndPermissionIdsToNativeFilters(): void {
@@ -305,46 +313,91 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->assertFalse($this->source->deleteShare('7.5'));
 	}
 
-	public function testDeleteShareEventNotHandledReturnsFalse(): void {
-		$this->eventDispatcher->expects($this->once())->method('dispatchTyped')->with($this->isInstanceOf(ShareReviewAccessCheckEvent::class));
+	/** Stand in for the listener: decide the dispatched access-check event */
+	private function decideAccessCheck(callable $decide): void {
+		$this->eventDispatcher->expects($this->once())->method('dispatchTyped')
+			->with($this->isInstanceOf(ShareReviewAccessCheckEvent::class))
+			->willReturnCallback($decide);
+	}
+
+	public function testDeleteShareEventDefaultsToAnOperatorDeletionBySessionUser(): void {
+		$captured = null;
+		$this->decideAccessCheck(static function (ShareReviewAccessCheckEvent $event) use (&$captured): void {
+			$captured = $event;
+		});
+
+		$this->assertFalse($this->source->deleteShare('7'));
+		$this->assertSame('7', $captured->getShareId());
+		$this->assertSame(ShareReviewAccessCheckEvent::ACTION_DELETE, $captured->getAction());
+		$this->assertNull($captured->getActingUserId());
+		$this->assertSame(ShareReviewAccessCheckEvent::SCOPE_OPERATOR, $captured->getScope());
+	}
+
+	public function testDeleteShareForwardsTheActionContextIntoTheEvent(): void {
+		$captured = null;
+		$this->decideAccessCheck(static function (ShareReviewAccessCheckEvent $event) use (&$captured): void {
+			$captured = $event;
+			$event->denyAccess('not the initiator');
+		});
+
+		$this->source->deleteShare('7', new ShareReviewActionContext('alice', ShareReviewAccessCheckEvent::SCOPE_SELF));
+
+		$this->assertSame('alice', $captured->getActingUserId());
+		$this->assertSame(ShareReviewAccessCheckEvent::SCOPE_SELF, $captured->getScope());
+	}
+
+	public function testDeleteShareEventNotHandledReturnsFalseAndAuditsTheDenial(): void {
+		$this->decideAccessCheck(static function (): void {
+		});
 		$this->shareService->expects($this->never())->method('deleteForShareReview');
+		$this->auditLog->expects($this->once())->method('log')
+			->with($this->stringContains('denied'), ['7', '']);
 
 		$this->assertFalse($this->source->deleteShare('7'));
 	}
 
 	public function testDeleteShareEventDeniedReturnsFalse(): void {
-		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-			$event->denyAccess('not in group');
-		});
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->denyAccess('not in group'));
 		$this->shareService->expects($this->never())->method('deleteForShareReview');
+		$this->auditLog->expects($this->once())->method('log')->with($this->stringContains('denied'));
 
 		$this->assertFalse($this->source->deleteShare('7'));
 	}
 
-	public function testDeleteShareEventGrantedReturnsTrue(): void {
-		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-			$event->grantAccess();
-		});
+	public function testDeleteShareEventGrantedReturnsTrueAndAudits(): void {
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess());
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('admin');
+		$this->userSession->method('getUser')->willReturn($user);
 		$this->shareService->expects($this->once())->method('deleteForShareReview')->with(7);
+		$this->auditLog->expects($this->once())->method('log')
+			->with($this->stringContains('deleted'), $this->callback(static fn (array $parameters): bool => count($parameters) === 5 && $parameters[0] === '7' && $parameters[4] === 'admin'));
 
 		$this->assertTrue($this->source->deleteShare('7'));
 	}
 
-	public function testDeleteShareDoesNotExistReturnsFalse(): void {
-		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-			$event->grantAccess();
-		});
+	public function testDeleteShareAuditsTheActingUserOfTheContextInsteadOfTheSession(): void {
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess());
+		$this->userSession->expects($this->never())->method('getUser');
+		$this->auditLog->expects($this->once())->method('log')
+			->with($this->anything(), $this->callback(static fn (array $parameters): bool => $parameters[4] === 'alice'));
+
+		$this->assertTrue($this->source->deleteShare('7', new ShareReviewActionContext('alice')));
+	}
+
+	public function testDeleteShareDoesNotExistReturnsFalseWithoutAuditingADeletion(): void {
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess());
 		$this->shareService->method('deleteForShareReview')->willThrowException(new DoesNotExistException('gone'));
+		$this->auditLog->expects($this->never())->method('log');
 
 		$this->assertFalse($this->source->deleteShare('7'));
 	}
 
 	public function testDeleteShareDbExceptionReturnsFalse(): void {
-		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event): void {
-			$event->grantAccess();
-		});
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess());
 		$this->shareService->method('deleteForShareReview')->willThrowException($this->createMock(Exception::class));
 		$this->logger->expects($this->once())->method('error');
+		$this->auditLog->expects($this->never())->method('log');
 
 		$this->assertFalse($this->source->deleteShare('7'));
 	}
