@@ -5,113 +5,414 @@
 
 import { test as base } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
-import type { BrowserContext, Page } from '@playwright/test'
-import { createRandomUser } from '../support/api'
+import type { APIRequestContext, BrowserContext, Page } from '@playwright/test'
+import { createRandomUser, type TestUser } from '../support/api'
 import { login } from '../support/login'
-import {
-	createTable,
-	createTextLineColumn,
-	createView,
-	fillInValueTextLine,
-	loadView,
-	openCreateRowModal,
-} from '../support/commands'
+import { fillInValueTextLine, openCreateRowModal } from '../support/commands'
+
+const API = '/index.php/apps/tables/api/1'
+
+/**
+ * Call the Tables app API with basic auth, the way an API consumer would.
+ */
+async function api(
+	request: APIRequestContext,
+	user: TestUser,
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+	path: string,
+	data?: unknown,
+) {
+	return request.fetch(API + path, {
+		method,
+		headers: {
+			Authorization: 'Basic ' + Buffer.from(`${user.userId}:${user.password}`).toString('base64'),
+			Accept: 'application/json',
+			...(data === undefined ? {} : { 'Content-Type': 'application/json' }),
+		},
+		data,
+	})
+}
+
+async function apiJson(
+	request: APIRequestContext,
+	user: TestUser,
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+	path: string,
+	data?: unknown,
+) {
+	const res = await api(request, user, method, path, data)
+	expect(res.ok(), `${method} ${path} → ${res.status()} ${await res.text()}`).toBeTruthy()
+	return res.json()
+}
+
+const textCondition = (columnId: number, value: string) => ({
+	groups: [{ conditions: [{ columnId, columnType: 'text-line', operator: 'contains', value }] }],
+})
 
 test.describe('Conditional formatting', () => {
 	test.describe.configure({ mode: 'serial' })
+	test.setTimeout(90000)
 
 	let context: BrowserContext
 	let page: Page
+	let user: TestUser
+	let stranger: TestUser
+	let strangerApi: APIRequestContext
+	let tableId: number
+	let viewId: number
+	let nameColumnId: number
+	let scoreColumnId: number
 
 	// @ts-expect-error - Playwright complex types mismatch in this environment
-	base.beforeAll(async ({ browser, baseURL }) => {
+	base.beforeAll(async ({ browser, baseURL, playwright }) => {
 		context = await browser.newContext({ baseURL })
 		page = await context.newPage()
 
-		const user = await createRandomUser(page.request)
+		const provisioning = await playwright.request.newContext({ baseURL })
+		user = await createRandomUser(provisioning)
+		stranger = await createRandomUser(provisioning)
+		await provisioning.dispose()
+		strangerApi = await playwright.request.newContext({ baseURL })
+
+		const table = await apiJson(page.request, user, 'POST', '/tables', {
+			title: 'Fmt test table',
+			emoji: '🎨',
+			template: 'custom',
+		})
+		tableId = table.id
+
+		const name = await apiJson(page.request, user, 'POST', `/tables/${tableId}/columns`, {
+			title: 'Name',
+			type: 'text',
+			subtype: 'line',
+			mandatory: false,
+		})
+		nameColumnId = name.id
+		const score = await apiJson(page.request, user, 'POST', `/tables/${tableId}/columns`, {
+			title: 'Score',
+			type: 'number',
+			mandatory: false,
+		})
+		scoreColumnId = score.id
+
+		const view = await apiJson(page.request, user, 'POST', `/tables/${tableId}/views`, {
+			title: 'Fmt test view',
+			emoji: '🎨',
+		})
+		viewId = view.id
+		await apiJson(page.request, user, 'PUT', `/views/${viewId}`, {
+			data: { columnSettings: [{ columnId: nameColumnId, order: 0 }, { columnId: scoreColumnId, order: 1 }] },
+		})
+
+		await context.clearCookies()
 		await login(page, user)
 	}, 120000)
 
 	test.afterAll(async () => {
+		await strangerApi?.dispose()
 		await context?.close()
 	})
 
-	test.beforeEach(async () => {
-		await page.goto('/index.php/apps/tables')
-		await page.keyboard.press('Escape')
+	test.describe('API', () => {
+		let rowRuleSetId: string
+		let columnRuleSetId: string
+		let ruleId: string
+
+		test('creates a row-target rule set with generated id and sort order', async () => {
+			const created = await apiJson(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets`, {
+				title: 'Highlights',
+				targetType: 'row',
+				targetCol: null,
+				mode: 'first-match',
+				enabled: true,
+				rules: [],
+			})
+			rowRuleSetId = created.id
+
+			expect(created.id).toMatch(/^[0-9a-f-]{36}$/)
+			expect(created.sortOrder).toBe(0)
+			expect(created.targetType).toBe('row')
+			expect(created.broken).toBe(false)
+			expect(created.rules).toEqual([])
+		})
+
+		test('rejects a column-target rule set without a target column', async () => {
+			const res = await api(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets`, {
+				title: 'Column',
+				targetType: 'column',
+				mode: 'first-match',
+			})
+			expect(res.status()).toBe(400)
+			expect((await res.json()).message).toContain('targetCol is required')
+		})
+
+		test('creates a column-target rule set', async () => {
+			const created = await apiJson(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets`, {
+				title: 'Score color',
+				targetType: 'column',
+				targetCol: scoreColumnId,
+				mode: 'all-matches',
+			})
+			columnRuleSetId = created.id
+
+			expect(created.targetCol).toBe(scoreColumnId)
+			expect(created.sortOrder).toBe(1)
+		})
+
+		test('creates a rule and exposes it through the view payload', async () => {
+			const rule = await apiJson(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules`, {
+				title: 'Red when highlighted',
+				enabled: true,
+				condition: textCondition(nameColumnId, 'highlight'),
+				style: { backgroundColor: '#ff0000', textColor: '#ffffff', fontWeight: 'bold' },
+			})
+			ruleId = rule.id
+
+			expect(rule.id).toMatch(/^[0-9a-f-]{36}$/)
+			expect(rule.format).toEqual({ backgroundColor: '#ff0000', textColor: '#ffffff', fontWeight: 'bold' })
+			expect(rule.broken).toBe(false)
+
+			const view = await apiJson(page.request, user, 'GET', `/views/${viewId}`)
+			const stored = view.formatting.find((rs: { id: string }) => rs.id === rowRuleSetId)
+			expect(stored.rules).toHaveLength(1)
+			expect(stored.rules[0].id).toBe(ruleId)
+			expect(stored.rules[0].condition.groups[0].conditions[0].columnId).toBe(nameColumnId)
+		})
+
+		test('rejects unknown operators, unknown style keys and foreign columns', async () => {
+			const badOperator = await api(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules`, {
+				title: 'x',
+				condition: { groups: [{ conditions: [{ columnId: nameColumnId, columnType: 'text-line', operator: 'no-such-operator' }] }] },
+				style: {},
+			})
+			expect(badOperator.status()).toBe(400)
+			expect((await badOperator.json()).message).toContain('Unknown operator')
+
+			const badStyle = await api(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules`, {
+				title: 'x',
+				condition: textCondition(nameColumnId, 'a'),
+				style: { border: '1px' },
+			})
+			expect(badStyle.status()).toBe(400)
+			expect((await badStyle.json()).message).toContain('Unknown style key')
+
+			const foreignColumn = await api(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules`, {
+				title: 'x',
+				condition: textCondition(999999, 'a'),
+				style: {},
+			})
+			expect(foreignColumn.ok()).toBeFalsy()
+		})
+
+		test('reorders rule sets and persists the new sort order', async () => {
+			await apiJson(page.request, user, 'PUT', `/views/${viewId}/formatting/reorder`, {
+				orderedIds: [columnRuleSetId, rowRuleSetId],
+			})
+
+			const view = await apiJson(page.request, user, 'GET', `/views/${viewId}`)
+			expect(view.formatting.map((rs: { id: string }) => rs.id)).toEqual([columnRuleSetId, rowRuleSetId])
+			expect(view.formatting.map((rs: { sortOrder: number }) => rs.sortOrder)).toEqual([0, 1])
+		})
+
+		test('updates a rule set in place and keeps its id', async () => {
+			const updated = await apiJson(page.request, user, 'PUT', `/views/${viewId}/formatting/rulesets/${columnRuleSetId}`, {
+				title: 'Score color (off)',
+				targetType: 'column',
+				targetCol: scoreColumnId,
+				mode: 'all-matches',
+				enabled: false,
+				rules: [],
+			})
+			expect(updated.id).toBe(columnRuleSetId)
+			expect(updated.enabled).toBe(false)
+			expect(updated.title).toBe('Score color (off)')
+		})
+
+		test('updates and deletes a rule', async () => {
+			const updated = await apiJson(page.request, user, 'PUT', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules/${ruleId}`, {
+				title: 'Renamed',
+				enabled: false,
+				condition: textCondition(nameColumnId, 'highlight'),
+				style: { fontStyle: 'italic' },
+			})
+			expect(updated.id).toBe(ruleId)
+			expect(updated.enabled).toBe(false)
+			expect(updated.format).toEqual({ fontStyle: 'italic' })
+
+			const missing = await api(page.request, user, 'PUT', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules/does-not-exist`, {
+				title: 'x',
+				condition: textCondition(nameColumnId, 'a'),
+				style: {},
+			})
+			expect(missing.status()).toBe(404)
+
+			await apiJson(page.request, user, 'DELETE', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules/${ruleId}`)
+			const view = await apiJson(page.request, user, 'GET', `/views/${viewId}`)
+			expect(view.formatting.find((rs: { id: string }) => rs.id === rowRuleSetId).rules).toEqual([])
+		})
+
+		test('refuses formatting changes from a user without manage rights', async () => {
+			const res = await api(strangerApi, stranger, 'POST', `/views/${viewId}/formatting/rulesets`, {
+				title: 'Nope',
+				targetType: 'row',
+				mode: 'first-match',
+			})
+			expect([403, 404]).toContain(res.status())
+		})
+
+		test('marks rules broken when a referenced column is deleted', async () => {
+			const rule = await apiJson(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}/rules`, {
+				title: 'Depends on Score',
+				condition: { groups: [{ conditions: [{ columnId: scoreColumnId, columnType: 'number', operator: 'is-greater-than', value: 10 }] }] },
+				style: { backgroundColor: '#00ff00' },
+			})
+
+			await apiJson(page.request, user, 'DELETE', `/columns/${scoreColumnId}`)
+
+			const view = await apiJson(page.request, user, 'GET', `/views/${viewId}`)
+			const stored = view.formatting
+				.find((rs: { id: string }) => rs.id === rowRuleSetId)
+				.rules.find((r: { id: string }) => r.id === rule.id)
+			expect(stored.broken).toBe(true)
+			expect(stored.enabled).toBe(false)
+
+			await apiJson(page.request, user, 'DELETE', `/views/${viewId}/formatting/rulesets/${rowRuleSetId}`)
+			await apiJson(page.request, user, 'DELETE', `/views/${viewId}/formatting/rulesets/${columnRuleSetId}`)
+			const cleaned = await apiJson(page.request, user, 'GET', `/views/${viewId}`)
+			expect(cleaned.formatting).toEqual([])
+		})
 	})
 
-	test.setTimeout(90000)
+	test.describe('UI', () => {
+		const highlightedRow = () => page.locator('tr[data-cy="customTableRow"]').filter({ hasText: 'highlight-me' }).first()
+		const plainRow = () => page.locator('tr[data-cy="customTableRow"]').filter({ hasText: 'plain' }).first()
+		const dialog = () => page.getByRole('dialog').filter({ hasText: 'Conditional Formatting' })
 
-	test('Format rules button is visible on a view', async () => {
-		await createTable(page, 'Fmt test table')
-		await createTextLineColumn(page, 'Name', '', '', false)
-		await createView(page, 'Fmt test view')
-		await loadView(page, 'Fmt test view')
+		const openView = async () => {
+			await page.goto(`/index.php/apps/tables/#/view/${viewId}`)
+			await expect(page.locator('[data-cy="createRowBtn"]').first()).toBeVisible()
+		}
 
-		await expect(page.locator('button[aria-label="Format rules"]')).toBeVisible()
-	})
+		test.beforeEach(async () => {
+			await openView()
+		})
 
-	test('Open formatting manager modal from toolbar', async () => {
-		await loadView(page, 'Fmt test view')
+		test('Create sample rows for the formatting checks', async () => {
+			for (const name of ['highlight-me', 'plain']) {
+				await openCreateRowModal(page)
+				await fillInValueTextLine(page, 'Name', name)
+				await page.locator('[data-cy="createRowSaveButton"]').click()
+				await expect(page.locator('[data-cy="createRowModal"]')).toBeHidden()
+			}
+			await expect(highlightedRow()).toBeVisible()
+			await expect(plainRow()).toBeVisible()
+		})
 
-		await page.locator('button[aria-label="Format rules"]').click()
-		await expect(page.getByRole('dialog').filter({ hasText: 'Conditional Formatting' })).toBeVisible()
-		await page.keyboard.press('Escape')
-	})
+		test('Format rules button is visible on a view', async () => {
+			await expect(page.locator('button[aria-label="Format rules"]')).toBeVisible()
+		})
 
-	test('Create rule set and rule, verify row style applied', async () => {
-		await loadView(page, 'Fmt test view')
+		test('Open formatting manager modal from toolbar', async () => {
+			await page.locator('button[aria-label="Format rules"]').click()
+			await expect(dialog()).toBeVisible()
+			await expect(dialog().getByText('No rule sets yet')).toBeVisible()
+			await page.keyboard.press('Escape')
+			await expect(dialog()).toBeHidden()
+		})
 
-		// Create a row first
-		await openCreateRowModal(page)
-		await fillInValueTextLine(page, 'Name', 'highlight-me')
-		await page.locator('[data-cy="createRowSaveButton"]').click()
-		await expect(page.locator('[data-cy="createRowModal"]')).toBeHidden()
+		test('Create rule set and rule, verify row style applied', async () => {
+			await page.locator('button[aria-label="Format rules"]').click()
+			const modal = dialog()
+			await expect(modal).toBeVisible()
 
-		// Open formatting manager
-		await page.locator('button[aria-label="Format rules"]').click()
-		const modal = page.getByRole('dialog').filter({ hasText: 'Conditional Formatting' })
-		await expect(modal).toBeVisible()
+			const createRuleSet = page.waitForResponse(r => r.url().includes('/formatting/rulesets') && r.request().method() === 'POST')
+			await modal.getByRole('button', { name: 'Add rule set' }).click()
+			await createRuleSet
 
-		// Create a new rule set
-		await modal.getByRole('button', { name: 'New rule set' }).click()
+			const editor = modal.locator('.rule-set-editor')
+			await expect(editor).toBeVisible()
+			await editor.getByRole('button', { name: 'Add rule', exact: true }).click()
 
-		// Wait for the rule set editor to appear
-		const editor = modal.locator('.formatting-manager__editor')
-		await expect(editor).toBeVisible()
+			const ruleEditor = editor.locator('.rule-editor').first()
+			await ruleEditor.getByPlaceholder('Rule name').fill('Highlight matches')
+			await ruleEditor.getByRole('button', { name: 'Add condition', exact: true }).click()
 
-		// Add a rule via the RuleSetEditor (click Add rule or similar)
-		// The editor should show RuleSetEditor when a rule set is selected
-		// Close modal for now — the rest is covered by unit tests
-		await page.keyboard.press('Escape')
-	})
+			await ruleEditor.locator('[data-cy="filterEntryColumn"]').click()
+			await page.locator('ul.vs__dropdown-menu li span[title="Name"]').click()
+			await expect(ruleEditor.locator('[data-cy="filterEntryColumn"]')).toContainText('Name')
+			const operatorSelect = ruleEditor.locator('[data-cy="filterEntryOperator"]')
+			await expect(operatorSelect).toBeVisible()
+			await operatorSelect.locator('input').fill('Contains')
+			await operatorSelect.locator('input').press('Enter')
+			await expect(operatorSelect).toContainText('Contains')
 
-	test('Toggle rule set enabled from column header popover', async () => {
-		await loadView(page, 'Fmt test view')
+			const valueSelect = ruleEditor.locator('[data-cy="filterEntrySeachValue"]')
+			await expect(valueSelect).toBeVisible()
+			await valueSelect.locator('input').fill('highlight')
+			await valueSelect.locator('input').press('Enter')
+			await expect(valueSelect).toContainText('highlight')
 
-		// Find the Name column header
-		const nameHeader = page.locator('thead th').filter({ hasText: 'Name' }).first()
-		await expect(nameHeader).toBeVisible()
+			await ruleEditor.getByPlaceholder('#rrggbb').first().fill('#ff0000')
+			await ruleEditor.getByPlaceholder('#rrggbb').first().press('Tab')
 
-		// If there are active rule sets for this column, the dot indicator appears
-		// This test verifies the popover opens when a dot is clicked
-		// (the dot is only visible when there are formatting rules for the column)
-	})
+			const createRule = page.waitForResponse(r => /\/formatting\/rulesets\/[^/]+\/rules$/.test(r.url()) && r.request().method() === 'POST')
+			await ruleEditor.getByRole('button', { name: 'Save rule', exact: true }).click()
+			const ruleResponse = await createRule
+			expect(ruleResponse.ok(), await ruleResponse.text()).toBeTruthy()
 
-	test('Broken indicator visible for rule set after column is deleted', async () => {
-		// Create a new table + view with an extra column, create a rule set referencing it,
-		// then delete the column and verify the rule set shows a broken indicator.
-		// This flow is complex and covered by PHP service tests in the unit layer;
-		// here we do a smoke test that the broken indicator CSS class exists in the component.
+			await page.keyboard.press('Escape')
+			await expect(modal).toBeHidden()
 
-		await loadView(page, 'Fmt test view')
-		await page.locator('button[aria-label="Format rules"]').click()
-		const modal = page.getByRole('dialog').filter({ hasText: 'Conditional Formatting' })
-		await expect(modal).toBeVisible()
+			await expect(highlightedRow()).toHaveCSS('background-color', 'rgb(255, 0, 0)')
+			await expect(plainRow()).not.toHaveCSS('background-color', 'rgb(255, 0, 0)')
+		})
 
-		// If there are any broken rule sets they would show .formatting-rule-set-list-item--broken
-		// No assertion here since this state depends on previous test teardown
-		await page.keyboard.press('Escape')
+		test('Toggle rule set enabled from column header popover', async () => {
+			await expect(highlightedRow()).toHaveCSS('background-color', 'rgb(255, 0, 0)')
+
+			const dot = page.locator('.formatting-column-popover__dot').first()
+			await expect(dot).toBeVisible()
+			await dot.hover()
+
+			const popover = page.locator('.formatting-column-popover')
+			await expect(popover).toBeVisible()
+			await expect(popover.getByText('New rule set')).toBeVisible()
+
+			const update = page.waitForResponse(r => /\/formatting\/rulesets\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT')
+			await popover.locator('.checkbox-radio-switch').first().click()
+			await update
+
+			await expect(highlightedRow()).not.toHaveCSS('background-color', 'rgb(255, 0, 0)')
+		})
+
+		test('Broken indicator visible for rule after its column is deleted', async () => {
+			const view = await apiJson(page.request, user, 'GET', `/views/${viewId}`)
+			const ruleSet = view.formatting[0]
+			await apiJson(page.request, user, 'PUT', `/views/${viewId}/formatting/rulesets/${ruleSet.id}`, {
+				...ruleSet,
+				enabled: true,
+			})
+			const extra = await apiJson(page.request, user, 'POST', `/tables/${tableId}/columns`, {
+				title: 'Extra',
+				type: 'text',
+				subtype: 'line',
+				mandatory: false,
+				selectedViewIds: [viewId],
+			})
+			await apiJson(page.request, user, 'POST', `/views/${viewId}/formatting/rulesets/${ruleSet.id}/rules`, {
+				title: 'Depends on Extra',
+				condition: textCondition(extra.id, 'x'),
+				style: { fontWeight: 'bold' },
+			})
+			await apiJson(page.request, user, 'DELETE', `/columns/${extra.id}`)
+
+			await page.reload()
+			await openView()
+
+			const dot = page.locator('.formatting-column-popover__dot').first()
+			await expect(dot).toBeVisible()
+			await dot.hover()
+			await expect(page.locator('.formatting-column-popover').getByRole('img', { name: 'Broken rule' })).toBeVisible()
+		})
 	})
 })
