@@ -7723,7 +7723,9 @@
                                     },
                                     "condition": {
                                         "type": "object",
-                                        "default": {},
+                                        "default": {
+                                            "groups": []
+                                        },
                                         "description": "Condition set definition",
                                         "required": [
                                             "groups"
@@ -7804,7 +7806,7 @@
                                             }
                                         }
                                     },
-                                    "format": {
+                                    "style": {
                                         "type": "object",
                                         "default": {},
                                         "description": "Style definition",
@@ -7998,7 +8000,9 @@
                                     },
                                     "condition": {
                                         "type": "object",
-                                        "default": {},
+                                        "default": {
+                                            "groups": []
+                                        },
                                         "description": "Condition set definition",
                                         "required": [
                                             "groups"
@@ -8079,7 +8083,7 @@
                                             }
                                         }
                                     },
-                                    "format": {
+                                    "style": {
                                         "type": "object",
                                         "default": {},
                                         "description": "Style definition",

@@ -5103,7 +5103,9 @@ export interface operations {
                     readonly enabled?: boolean;
                     /**
                      * @description Condition set definition
-                     * @default {}
+                     * @default {
+                     *       "groups": []
+                     *     }
                      */
                     readonly condition?: {
                         readonly groups: readonly {
@@ -5121,7 +5123,7 @@ export interface operations {
                      * @description Style definition
                      * @default {}
                      */
-                    readonly format?: {
+                    readonly style?: {
                         readonly backgroundColor?: string;
                         readonly textColor?: string;
                         /** @enum {string} */
@@ -5230,7 +5232,9 @@ export interface operations {
                     readonly enabled?: boolean;
                     /**
                      * @description Condition set definition
-                     * @default {}
+                     * @default {
+                     *       "groups": []
+                     *     }
                      */
                     readonly condition?: {
                         readonly groups: readonly {
@@ -5248,7 +5252,7 @@ export interface operations {
                      * @description Style definition
                      * @default {}
                      */
-                    readonly format?: {
+                    readonly style?: {
                         readonly backgroundColor?: string;
                         readonly textColor?: string;
                         /** @enum {string} */
