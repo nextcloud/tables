@@ -11,10 +11,12 @@ namespace OCA\Tables\ShareReview;
 
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Service\ShareService;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
+use OCP\IUserSession;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\IPaginatedShareReviewSource;
@@ -72,6 +74,8 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 		private readonly LoggerInterface $logger,
 		private readonly ShareService $shareService,
 		private readonly IEventDispatcher $eventDispatcher,
+		private readonly AuditLogServiceInterface $auditLog,
+		private readonly IUserSession $userSession,
 	) {
 	}
 
@@ -188,18 +192,36 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 		$this->eventDispatcher->dispatchTyped($event);
 
 		if (!$event->isHandled() || !$event->isGranted()) {
+			$this->auditLog->log('Tables share deletion through share review denied: share "%1$s", user "%2$s"', [
+				$shareId,
+				$this->actingUser($context),
+			]);
 			return false;
 		}
 
+		// described before the deletion, so the audit entry names what was removed
+		$entry = $this->getShare($shareId);
 		try {
 			$this->shareService->deleteForShareReview((int)$shareId);
-			return true;
 		} catch (DoesNotExistException) {
 			return false;
 		} catch (Exception $e) {
 			$this->logger->error('Tables ShareReview: failed to delete share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
 			return false;
 		}
+		$this->auditLog->log('Tables share deleted through share review: share "%1$s", node "%2$s", share type "%3$s", receiver "%4$s", user "%5$s"', [
+			$shareId,
+			$entry?->object ?? '',
+			$entry === null ? '' : (string)$entry->type,
+			$entry?->recipient ?? '',
+			$this->actingUser($context),
+		]);
+		return true;
+	}
+
+	/** The user the deletion is performed for, as named in the audit log */
+	private function actingUser(?ShareReviewActionContext $context): string {
+		return $context?->actingUserId ?? $this->userSession->getUser()?->getUID() ?? '';
 	}
 
 	/**
