@@ -33,7 +33,7 @@
 						type="switch"
 						data-cy="linkShowPreviewSwitch"
 						:disabled="!canShowImagePreviews">
-						{{ t('tables', 'Show image previews') }}
+						{{ t('tables', 'Show previews') }}
 					</NcCheckboxRadioSwitch>
 				</div>
 				<p class="span">
@@ -130,10 +130,10 @@ export default {
 		},
 		imagePreviewDescription() {
 			if (this.canShowImagePreviews) {
-				return t('tables', 'Shows previews for image files selected from Files. Other links keep their title.')
+				return t('tables', 'Shows previews for files selected from Files when a preview is available.')
 			}
 
-			return t('tables', 'Enable the Files provider to show image previews.')
+			return t('tables', 'Enable the Files provider to show previews.')
 		},
 		isImagePreviewSizeInvalid() {
 			return this.showPreview && !isImagePreviewSizeValid(this.imagePreviewSize)

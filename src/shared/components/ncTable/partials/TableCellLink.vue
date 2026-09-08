@@ -150,7 +150,7 @@ export default {
 			}
 		},
 		imagePreviewSrc() {
-			if (!this.column?.customSettings?.showPreview || !this.isFilesImageLink) {
+			if (!this.column?.customSettings?.showPreview || !this.isFilesPreviewLink) {
 				return null
 			}
 
@@ -172,22 +172,11 @@ export default {
 			return this.getValueObject?.resourceUrl || this.getValueObject?.value
 		},
 		imagePreviewLabel() {
-			return this.getValueObject?.title || t('tables', 'Image preview')
+			return this.getValueObject?.title || t('tables', 'Preview')
 		},
-		isFilesImageLink() {
-			if (this.getValueObject?.providerId !== 'files') {
-				return false
-			}
-
-			return this.imageFileNameCandidates.some(candidate => this.hasImageExtension(candidate))
-		},
-		imageFileNameCandidates() {
-			return [
-				this.getValueObject?.title,
-				this.getValueObject?.attributes?.path,
-				this.getValueObject?.resourceUrl,
-				this.getValueObject?.value,
-			].filter(Boolean)
+		isFilesPreviewLink() {
+			// Show a preview whenever Files provides one (server sets thumbnailUrl only when a preview is available)
+			return this.getValueObject?.providerId === 'files' && !!this.getValueObject?.thumbnailUrl
 		},
 		getValueObject() {
 			if (this.hasJsonStructure(this.value)) {
@@ -414,15 +403,6 @@ export default {
 
 		removeResultsByProviderId(providerId) {
 			this.results = this.results.filter(item => item.providerId !== providerId)
-		},
-
-		hasImageExtension(value) {
-			try {
-				const { pathname } = new URL(value, window.location.origin)
-				return /\.(apng|avif|bmp|gif|heic|heif|ico|jpe?g|png|svg|tiff?|webp)$/i.test(pathname)
-			} catch (e) {
-				return /\.(apng|avif|bmp|gif|heic|heif|ico|jpe?g|png|svg|tiff?|webp)$/i.test(value)
-			}
 		},
 
 		handlePreviewError() {
