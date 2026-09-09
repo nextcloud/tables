@@ -315,10 +315,8 @@ class TablesMigratorTest extends TestCase {
 			],
 			[
 				'tableId' => 1,
-				'title' => 'Legacy settings',
+				'title' => 'Without settings',
 				'columnSettings' => [['columnId' => 11, 'order' => 0]],
-				'cardBackgroundSource' => 11,
-				'cardTitleSource' => 10,
 			],
 		];
 
@@ -366,8 +364,7 @@ class TablesMigratorTest extends TestCase {
 			$importedViews[0]['viewSettings']
 		);
 		$this->assertSame(20, $importedViews[0]['columnSettings'][0]['columnId']);
-		$this->assertSame(21, $importedViews[1]['cardBackgroundSource']);
-		$this->assertSame(20, $importedViews[1]['cardTitleSource']);
+		$this->assertArrayNotHasKey('viewSettings', $importedViews[1]);
 		$this->assertSame(21, $importedViews[1]['columnSettings'][0]['columnId']);
 	}
 }
