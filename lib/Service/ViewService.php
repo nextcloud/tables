@@ -16,6 +16,7 @@ use JsonSerializable;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
@@ -781,7 +782,11 @@ class ViewService extends SuperService {
 		$item->setColumns(json_encode($view['columnSettings']));
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
-		$item->setLayout(in_array($view['layout'] ?? null, ['tiles', 'gallery'], true) ? $view['layout'] : null);
+		// A scheme may carry a layout this version does not know, which is dropped rather
+		// than rejected so the rest of the view still imports.
+		// Resolved the same way the write path resolves it, so import and create agree: an
+		// explicit layout is stored as given, anything absent or unknown stays null.
+		$item->setLayout(ViewLayout::tryFromMixed($view['layout'] ?? null)?->value);
 		$item->setViewSettings(json_encode($this->createImportedViewSettings($view)));
 		try {
 			$importedView = $this->mapper->insert($item);

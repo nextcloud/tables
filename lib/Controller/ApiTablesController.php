@@ -9,6 +9,7 @@ namespace OCA\Tables\Controller;
 
 use Exception;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
@@ -212,9 +213,7 @@ class ApiTablesController extends AOCSController {
 			foreach ($views as $view) {
 				// A layout this version does not know is dropped rather than rejected, so the rest
 				// of the scheme still imports.
-				$schemeLayout = in_array($view['layout'] ?? null, ['table', 'tiles', 'gallery'], true)
-					? $view['layout']
-					: null;
+				$schemeLayout = ViewLayout::tryFromMixed($view['layout'] ?? null)?->value;
 				$newView = $this->viewService->create(
 					$view['title'],
 					$view['emoji'],
