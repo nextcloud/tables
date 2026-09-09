@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import NcTable from '../../src/shared/components/ncTable/NcTable.vue'
+import { h } from 'vue'
 
 const ROWS_PER_PAGE = 100
 const ROW_COUNT = 150
@@ -79,6 +80,29 @@ describe('Pagination', () => {
 
 		cy.get('[data-cy="galleryLayoutCard"]').should('have.length', ROWS_PER_PAGE)
 		cy.get(FOOTER_PAGINATION).should('exist')
+	})
+
+	it('leaves a second table on the screen on its own page', () => {
+		const rows = buildRows(richObject, ROW_COUNT)
+		cy.mount({
+			render() {
+				return h('div', [
+					h('div', { class: 'first' }, [
+						h(NcTable, { rows, columns: richObject.columns, elementId: 1, isView: false, viewSetting: CARD_LAYOUT }),
+					]),
+					h('div', { class: 'second' }, [
+						h(NcTable, { rows, columns: richObject.columns, elementId: 2, isView: false, viewSetting: CARD_LAYOUT }),
+					]),
+				])
+			},
+		})
+
+		cy.get(`.first ${FOOTER_PAGINATION}`)
+			.find('button[aria-label="Go to next page"]')
+			.click()
+
+		cy.get(`.first ${FOOTER_PAGINATION} ${PAGE_INPUT}`).should('have.value', '2')
+		cy.get(`.second ${FOOTER_PAGINATION} ${PAGE_INPUT}`).should('have.value', '1')
 	})
 
 	it('falls back to a valid page when the row set shrinks', () => {
