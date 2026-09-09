@@ -24,7 +24,7 @@
 					<SearchForm :columns="columns" :search-string="getSearchString"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
-				<PaginationBlock :rows="rows" />
+				<PaginationBlock :rows="rows" :element-id="elementId" :is-view="isView" />
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">

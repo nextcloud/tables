@@ -12,6 +12,8 @@
 			<Options
 				:config="tablePermissions"
 				:rows="filteredRows"
+				:element-id="richObject.id"
+				:is-view="isView"
 				:show-options="true"
 				@create-row="createRow"
 				@set-search-string="search" />
