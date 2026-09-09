@@ -46,6 +46,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 			<Options v-model:view-setting="localViewSetting" :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId"
 				:layout="layout"
 				:view-settings="viewSettings"
+				:can-switch-layout="canSwitchLayout"
 				:is-view="isView"
 				:selected-rows="localSelectedRows"
 				:show-options="parsedColumns.length !== 0" :config="config" @create-row="$emit('create-row')"
@@ -156,6 +157,10 @@ export default {
 		layout: {
 			type: String,
 			default: null,
+		},
+		canSwitchLayout: {
+			type: Boolean,
+			default: true,
 		},
 		viewSettings: {
 			type: Object,
