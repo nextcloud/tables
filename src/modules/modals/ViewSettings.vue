@@ -76,9 +76,9 @@
 					<NcSelect
 						v-model="backgroundSourceValue"
 						:options="cardSourceOptions"
-						:clearable="false"
 						label="title"
 						:reduce="option => option.id"
+						:placeholder="t('tables', 'No image')"
 						:aria-label-combobox="t('tables', 'Background source')" />
 				</div>
 				<div class="layout-source-settings__item">
@@ -88,9 +88,9 @@
 					<NcSelect
 						v-model="titleSourceValue"
 						:options="cardSourceOptions"
-						:clearable="false"
 						label="title"
 						:reduce="option => option.id"
+						:placeholder="t('tables', 'Automatic')"
 						:aria-label-combobox="t('tables', 'Title source')" />
 				</div>
 			</div>
@@ -264,7 +264,7 @@ export default {
 		},
 		backgroundSourceValue: {
 			get() {
-				return this.resolveCardSourceValue(this.mutableView?.viewSettings?.cardBackgroundSource, 0)
+				return this.resolveCardSource(this.mutableView?.viewSettings?.cardBackgroundSource)
 			},
 			set(value) {
 				this.ensureMutableViewSettings()
@@ -273,7 +273,9 @@ export default {
 		},
 		titleSourceValue: {
 			get() {
-				return this.resolveCardSourceValue(this.mutableView?.viewSettings?.cardTitleSource, 1)
+				// Only what was actually chosen: offering the column the rendering falls back to
+				// would show a value the save does not write.
+				return this.resolveCardSource(this.mutableView?.viewSettings?.cardTitleSource)
 			},
 			set(value) {
 				this.ensureMutableViewSettings()
@@ -332,6 +334,17 @@ export default {
 		},
 	},
 	watch: {
+		// A card source has to be cleared once its column leaves the view, not merely hidden
+		// from the select: the stale id would still be saved and the backend rejects it.
+		selectedColumns() {
+			if (!this.columns || !Array.isArray(this.selectedColumns) || !this.mutableView?.viewSettings) {
+				return
+			}
+
+			const settings = this.mutableView.viewSettings
+			settings.cardBackgroundSource = this.resolveCardSource(settings.cardBackgroundSource)
+			settings.cardTitleSource = this.resolveCardSource(settings.cardTitleSource)
+		},
 		title() {
 			if (this.title.length >= 200) {
 				showError(t('tables', 'The title character limit is 200 characters. Please use a shorter title.'))
@@ -456,7 +469,6 @@ export default {
 					readonly: col.viewColumnInformation?.readonly,
 					mandatory: col.viewColumnInformation?.mandatory ?? false,
 				}))
-			this.persistCardSourceFallbacks()
 			const data = {
 				data: {
 					title: this.title,
@@ -493,12 +505,6 @@ export default {
 			this.technicalNameInvalidError = false
 			this.layout = this.mutableView?.layout ?? 'table'
 			this.ensureMutableViewSettings()
-			const firstColumnId = this.mutableView.columnSettings?.[0]?.columnId ?? null
-			const secondColumnId = this.mutableView.columnSettings?.[1]?.columnId ?? firstColumnId
-			const backgroundSource = this.mutableView.viewSettings.cardBackgroundSource ?? this.viewSetting?.viewSettings?.cardBackgroundSource ?? firstColumnId
-			const titleSource = this.mutableView.viewSettings.cardTitleSource ?? this.viewSetting?.viewSettings?.cardTitleSource ?? secondColumnId
-			this.mutableView.viewSettings.cardBackgroundSource = backgroundSource
-			this.mutableView.viewSettings.cardTitleSource = titleSource
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
@@ -513,18 +519,12 @@ export default {
 				}
 			}
 		},
-		resolveCardSourceValue(stored, fallbackIndex) {
-			if (stored !== null && stored !== undefined) {
-				const exists = this.cardSourceOptions.some(option => option.id === stored)
-				if (exists) return stored
+		resolveCardSource(stored) {
+			if (stored === null || stored === undefined) {
+				return null
 			}
 
-			return this.cardSourceOptions[fallbackIndex]?.id ?? this.cardSourceOptions[0]?.id ?? null
-		},
-		persistCardSourceFallbacks() {
-			this.ensureMutableViewSettings()
-			this.mutableView.viewSettings.cardBackgroundSource = this.resolveCardSourceValue(this.mutableView.viewSettings.cardBackgroundSource, 0)
-			this.mutableView.viewSettings.cardTitleSource = this.resolveCardSourceValue(this.mutableView.viewSettings.cardTitleSource, 1)
+			return this.cardSourceOptions.some(option => option.id === stored) ? stored : null
 		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
