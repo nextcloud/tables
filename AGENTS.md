@@ -254,6 +254,15 @@ On import/export, selection option IDs change. `ColumnService::importColumn()` m
 
 When a stored rule, filter, or condition references a column or option that no longer exists (due to deletion, type change, or import remapping), mark it `broken: true` instead of deleting it. Surface the broken state in the UI. Provide an auto-clear path that removes the flag when the rule is next saved in a valid state.
 
+**Exception — presentational references.** A reference that only selects how a row is *displayed*, rather than which rows or values are returned, is dropped to `null` instead. Card sources (`viewSettings.cardBackgroundSource`, `viewSettings.cardTitleSource`) are the current case, handled in `ViewSettings::resolveSource()`, `ApiTablesController::remapViewSettings()` and `TablesMigrator::remapViewCardSource()`.
+
+Two reasons this differs from a filter or sort rule:
+
+- Column ids are only unique per instance, so an id that fails to remap on import is not merely stale — after import it may address a live column of an unrelated table. Keeping it would point the card at someone else's data, which is worse than losing the setting.
+- Losing it degrades gracefully. A view with no card sources renders the text-only card layout, which is a supported state the UI already handles, so there is no broken condition for the user to repair.
+
+A reference that changes which rows or values are returned still follows the rule above.
+
 ### XSS / CSS injection
 
 - Never use `v-html`, `innerHTML`, `eval`, or `new Function` with user-supplied values.
