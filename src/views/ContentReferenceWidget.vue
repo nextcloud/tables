@@ -21,6 +21,8 @@
 		<div v-if="rows && rows.length > 0" class="nc-table">
 			<NcTable
 				v-model:view-setting="localViewSetting"
+				:layout="richObject.layout"
+				:view-settings="richObject.viewSettings"
 				:rows="filteredRows"
 				:columns="columns"
 				:element-id="richObject.id"
@@ -90,10 +92,7 @@ export default {
 		return {
 			searchExp: null,
 			localRows: [], // Keep as fallback only
-			localViewSetting: {
-				layout: this.richObject?.layout ?? 'table',
-				viewSettings: this.richObject?.viewSettings ?? null,
-			},
+			localViewSetting: {},
 			showCopyRow: false,
 			copyPrefillData: null,
 			rowToDelete: null,
