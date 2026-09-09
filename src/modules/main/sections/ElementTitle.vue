@@ -80,7 +80,16 @@ export default {
 
 	methods: {
 		resetLocalAdjustments() {
-			this.$emit('update:viewSetting', {})
+			// The layout and its card sources are the view's saved configuration rather than a
+			// local tweak, so only the adjustments isViewSettingSet reports are cleared.
+			const preserved = {}
+			if (this.viewSetting?.layout !== undefined) {
+				preserved.layout = this.viewSetting.layout
+			}
+			if (this.viewSetting?.viewSettings !== undefined) {
+				preserved.viewSettings = this.viewSetting.viewSettings
+			}
+			this.$emit('update:viewSetting', preserved)
 		},
 	},
 }
