@@ -41,6 +41,7 @@ OC.L10N.register(
     "Text" : "Teks",
     "Link" : "Tautan",
     "Selection" : "Pilihan",
+    "Users and groups" : "Pengguna dan grup",
     "Move" : "Pindah",
     "Metadata" : "Metadata",
     "Move up" : "Pindah ke atas",
