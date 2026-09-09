@@ -167,18 +167,7 @@ export default {
 				// Since we show one page at a time, no need keep other tables in the store
 				this.clearState()
 
-				this.viewSetting = {
-					layout: this.isView ? (this.element?.layout ?? 'table') : 'table',
-				}
-				if (this.isView) {
-					this.viewSetting = {
-						...this.viewSetting,
-						viewSettings: {
-							cardBackgroundSource: this.element?.viewSettings?.cardBackgroundSource ?? null,
-							cardTitleSource: this.element?.viewSettings?.cardTitleSource ?? null,
-						},
-					}
-				}
+				this.viewSetting = {}
 				if (this.element?.sort?.length) {
 					this.viewSetting.presetSorting = [...this.element.sort]
 				}

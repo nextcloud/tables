@@ -224,7 +224,7 @@ export default {
 										})
 										table.key = (table.id).toString()
 										table.isView = false
-										this.resourceViewSettings[table.key] = this.createViewSetting(false, table)
+										this.resourceViewSettings[table.key] = this.createViewSetting(table)
 										this.contextResources.push(table)
 									}
 
@@ -244,7 +244,7 @@ export default {
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
-										this.resourceViewSettings[view.key] = this.createViewSetting(true, view)
+										this.resourceViewSettings[view.key] = this.createViewSetting(view)
 										this.contextResources.push(view)
 									}
 								}
@@ -274,17 +274,8 @@ export default {
 		createColumn(isView, element) {
 			emit('tables:column:create', { isView, element })
 		},
-		createViewSetting(isView, element) {
-			const viewSetting = {
-				layout: isView ? (element?.layout ?? 'table') : 'table',
-			}
-
-			if (isView) {
-				viewSetting.viewSettings = {
-					cardBackgroundSource: element?.viewSettings?.cardBackgroundSource ?? null,
-					cardTitleSource: element?.viewSettings?.cardTitleSource ?? null,
-				}
-			}
+		createViewSetting(element) {
+			const viewSetting = {}
 
 			if (element?.sort?.length) {
 				viewSetting.presetSorting = [...element.sort]

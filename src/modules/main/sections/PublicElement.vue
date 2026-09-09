@@ -122,7 +122,7 @@ export default {
 			prefillData: null,
 			editRow: null,
 			rowsToDelete: null,
-			localViewSetting: this.buildViewSetting(),
+			localViewSetting: {},
 		}
 	},
 
@@ -134,7 +134,7 @@ export default {
 
 	watch: {
 		element() {
-			this.localViewSetting = this.buildViewSetting()
+			this.localViewSetting = {}
 		},
 	},
 
@@ -156,16 +156,6 @@ export default {
 
 	methods: {
 		t,
-
-		buildViewSetting() {
-			return {
-				layout: this.element?.layout ?? 'table',
-				viewSettings: {
-					cardBackgroundSource: this.element?.viewSettings?.cardBackgroundSource ?? null,
-					cardTitleSource: this.element?.viewSettings?.cardTitleSource ?? null,
-				},
-			}
-		},
 	},
 }
 </script>

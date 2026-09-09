@@ -44,6 +44,8 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options v-model:view-setting="localViewSetting" :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId"
+				:layout="layout"
+				:view-settings="viewSettings"
 				:is-view="isView"
 				:selected-rows="localSelectedRows"
 				:show-options="parsedColumns.length !== 0" :config="config" @create-row="$emit('create-row')"
@@ -53,6 +55,8 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" v-model:view-setting="localViewSetting"
+				:layout="layout"
+				:view-settings="viewSettings"
 				:columns="parsedColumns" :rows="getSearchedAndFilteredAndSortedRows" :is-view="isView" :element-id="elementId"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
@@ -148,6 +152,14 @@ export default {
 		downloadTitle: {
 			type: String,
 			default: t('tables', 'Download'),
+		},
+		layout: {
+			type: String,
+			default: null,
+		},
+		viewSettings: {
+			type: Object,
+			default: null,
 		},
 		viewSetting: {
 			type: Object,
