@@ -94,7 +94,7 @@
 				</div>
 			</button>
 		</div>
-		<PaginationBlock v-if="totalPages > 1 && currentLayout !== 'table'" class="pagination-footer" :rows="rows" />
+		<PaginationBlock v-if="totalPages > 1 && currentLayout !== 'table'" class="pagination-footer" :rows="rows" :element-id="elementId" :is-view="isView" />
 	</div>
 </template>
 
@@ -103,6 +103,7 @@ import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import PaginationBlock from './PaginationBlock.vue'
+import { PAGINATION_CHANGED, isSamePaginationTarget } from '../mixins/paginationScope.js'
 import { NcRichText } from '@nextcloud/vue'
 import { ColumnTypes } from '../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
@@ -213,7 +214,12 @@ export default {
 		},
 		currentLayout() {
 			this.pageNumber = 1
-			emit('tables:pagination-changed', { pageNumber: 1, rowsPerPage: this.rowsPerPage })
+			emit(PAGINATION_CHANGED, {
+				pageNumber: 1,
+				rowsPerPage: this.rowsPerPage,
+				elementId: this.elementId,
+				isView: this.isView,
+			})
 			this.$nextTick(() => this.observeCardLayout())
 		},
 		hasCardBackground() {
@@ -238,13 +244,13 @@ export default {
 		this.$nextTick(() => this.observeCardLayout())
 		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		subscribe('tables:row:animate', this.enableRowAnimation)
-		subscribe('tables:pagination-changed', this.handlePaginationChanged)
+		subscribe(PAGINATION_CHANGED, this.handlePaginationChanged)
 	},
 	beforeUnmount() {
 		this.cardResizeObserver?.disconnect()
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		unsubscribe('tables:row:animate', this.enableRowAnimation)
-		unsubscribe('tables:pagination-changed', this.handlePaginationChanged)
+		unsubscribe(PAGINATION_CHANGED, this.handlePaginationChanged)
 	},
 
 	methods: {
@@ -299,10 +305,14 @@ export default {
 				this.columnWidths = widths
 			}
 		},
-		handlePaginationChanged({ pageNumber, rowsPerPage }) {
-			this.pageNumber = pageNumber
-			if (rowsPerPage) {
-				this.rowsPerPage = rowsPerPage
+		handlePaginationChanged(payload) {
+			if (!isSamePaginationTarget(this, payload)) {
+				return
+			}
+
+			this.pageNumber = payload.pageNumber
+			if (payload.rowsPerPage) {
+				this.rowsPerPage = payload.rowsPerPage
 			}
 		},
 		deselectAllRows(elementId, isView) {
