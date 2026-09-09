@@ -64,9 +64,7 @@ class PermissionsService {
 	 * @throws InternalError
 	 */
 	public function preCheckUserId(?string $userId = null, bool $canBeEmpty = true): string {
-		if ($userId === null) {
-			$userId = $this->userId;
-		}
+		$userId ??= $this->userId;
 
 		if ($userId === null) {
 			$e = new \Exception();

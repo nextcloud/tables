@@ -103,9 +103,7 @@ class ContextMapper extends QBMapper {
 				'display_mode_default' => (int)$item['display_mode_default'],
 			];
 			if ($userId !== null) {
-				if ($item['display_mode'] === null) {
-					$item['display_mode'] = $item['display_mode_default'];
-				}
+				$item['display_mode'] ??= $item['display_mode_default'];
 				$carry[$item['share_id']]['display_mode'] = (int)$item['display_mode'];
 			}
 			return $carry;
@@ -130,9 +128,7 @@ class ContextMapper extends QBMapper {
 				// empty Context
 				return $carry;
 			}
-			if (!isset($carry[$item['page_id']])) {
-				$carry[$item['page_id']] = ['content' => []];
-			}
+			$carry[$item['page_id']] ??= ['content' => []];
 			$carry[$item['page_id']]['id'] = (int)$item['page_id'];
 			$carry[$item['page_id']]['page_type'] = $item['page_type'];
 			if ($item['node_rel_id'] !== null) {

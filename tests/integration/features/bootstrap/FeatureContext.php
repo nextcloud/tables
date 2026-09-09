@@ -2173,9 +2173,7 @@ class FeatureContext implements Context {
 	}
 
 	protected function getUserCookieJar($user) {
-		if (!isset($this->cookieJars[$user])) {
-			$this->cookieJars[$user] = new CookieJar();
-		}
+		$this->cookieJars[$user] ??= new CookieJar();
 		return $this->cookieJars[$user];
 	}
 

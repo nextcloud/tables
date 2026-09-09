@@ -120,9 +120,7 @@ class TableService extends SuperService {
 
 			// clean duplicates
 			foreach ($sharedTables as $sharedTable) {
-				if (!isset($allTables[$sharedTable->getId()])) {
-					$allTables[$sharedTable->getId()] = $sharedTable;
-				}
+				$allTables[$sharedTable->getId()] ??= $sharedTable;
 			}
 		}
 
