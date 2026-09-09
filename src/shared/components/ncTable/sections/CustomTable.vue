@@ -3,11 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="container" :class="{ 'container--cards': currentLayout !== 'table' }">
-		<div v-if="currentLayout !== 'table' && config.showActions" class="card-layout__actions">
+	<div class="container" :class="{ 'container--cards': !isTableLayout }">
+		<div v-if="!isTableLayout && config.showActions" class="card-layout__actions">
 			<slot name="actions" />
 		</div>
-		<table v-if="currentLayout === 'table'" class="tables-list__table">
+		<table v-if="isTableLayout" class="tables-list__table">
 			<thead class="tables-list__thead">
 				<TableHeader v-model:view-setting="localViewSetting"
 					:columns="columns"
@@ -94,7 +94,7 @@
 				</div>
 			</button>
 		</div>
-		<PaginationBlock v-if="totalPages > 1 && currentLayout !== 'table'" class="pagination-footer" :rows="rows" :element-id="elementId" :is-view="isView" />
+		<PaginationBlock v-if="totalPages > 1 && !isTableLayout" class="pagination-footer" :rows="rows" :element-id="elementId" :is-view="isView" />
 	</div>
 </template>
 
@@ -109,6 +109,7 @@ import { ColumnTypes } from '../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
+import { CARD_LAYOUTS, LAYOUT_TABLE } from '../../../constants.ts'
 
 // Share of the card image the title banner may cover before the text is ellipsized.
 // Cards start from a 220px minimum, so this still covers them at a doubled pixel ratio.
@@ -196,7 +197,10 @@ export default {
 				&& this.localViewSetting?.viewSettings?.cardBackgroundSource !== undefined
 		},
 		currentLayout() {
-			return ['tiles', 'gallery'].includes(this.localViewSetting?.layout) ? this.localViewSetting.layout : 'table'
+			return CARD_LAYOUTS.includes(this.localViewSetting?.layout) ? this.localViewSetting.layout : LAYOUT_TABLE
+		},
+		isTableLayout() {
+			return this.currentLayout === LAYOUT_TABLE
 		},
 		currentPageRows() {
 			return this.rows.slice((this.pageNumber - 1) * this.rowsPerPage, ((this.pageNumber - 1) * this.rowsPerPage) + this.rowsPerPage)

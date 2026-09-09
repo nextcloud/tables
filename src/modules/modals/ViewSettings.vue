@@ -60,9 +60,9 @@
 					<tr class="layout-options__selection">
 						<td colspan="3">
 							<NcRadioGroup v-model="layout" :label="t('tables', 'Layout')" hide-label>
-								<NcRadioGroupButton :label="t('tables', 'Table')" value="table" data-cy="viewLayoutTable" />
-								<NcRadioGroupButton :label="t('tables', 'Tile')" value="tiles" data-cy="viewLayoutTiles" />
-								<NcRadioGroupButton :label="t('tables', 'Gallery')" value="gallery" data-cy="viewLayoutGallery" />
+								<NcRadioGroupButton :label="t('tables', 'Table')" :value="LAYOUT_TABLE" data-cy="viewLayoutTable" />
+								<NcRadioGroupButton :label="t('tables', 'Tile')" :value="LAYOUT_TILES" data-cy="viewLayoutTiles" />
+								<NcRadioGroupButton :label="t('tables', 'Gallery')" :value="LAYOUT_GALLERY" data-cy="viewLayoutGallery" />
 							</NcRadioGroup>
 						</td>
 					</tr>
@@ -173,6 +173,7 @@ import { mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
+import { LAYOUT_GALLERY, LAYOUT_TABLE, LAYOUT_TILES } from '../../shared/constants.ts'
 
 export default {
 	name: 'ViewSettings',
@@ -226,7 +227,7 @@ export default {
 			technicalName: '',
 			originalTechnicalName: '',
 			technicalNameInvalidError: false,
-			layout: 'table',
+			layout: LAYOUT_TABLE,
 			errorTitle: false,
 			selectedColumns: [],
 			allColumns: [],
@@ -240,6 +241,9 @@ export default {
 		}
 	},
 	computed: {
+		LAYOUT_TABLE: () => LAYOUT_TABLE,
+		LAYOUT_TILES: () => LAYOUT_TILES,
+		LAYOUT_GALLERY: () => LAYOUT_GALLERY,
 		mutableFilters: {
 			get() {
 				return this.mutableView.filter
@@ -306,7 +310,7 @@ export default {
 			}
 			// The layout a viewer switched to is a local adjustment like the others, so saving
 			// the modified view keeps it rather than falling back to the stored one.
-			mergedViewSettings.layout = this.viewSetting.layout ?? this.view.layout ?? 'table'
+			mergedViewSettings.layout = this.viewSetting.layout ?? this.view.layout ?? LAYOUT_TABLE
 			if (this.viewSetting.sorting) {
 				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
 			} else {
@@ -503,7 +507,7 @@ export default {
 			this.technicalName = this.mutableView?.technicalName ?? ''
 			this.originalTechnicalName = this.mutableView?.technicalName ?? ''
 			this.technicalNameInvalidError = false
-			this.layout = this.mutableView?.layout ?? 'table'
+			this.layout = this.mutableView?.layout ?? LAYOUT_TABLE
 			this.ensureMutableViewSettings()
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null

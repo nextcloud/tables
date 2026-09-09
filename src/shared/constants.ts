@@ -51,3 +51,10 @@ export const USERGROUP_TYPE = {
 
 export const COLUMN_WIDTH_MIN = 50
 export const COLUMN_WIDTH_MAX = 1000
+
+// from ViewLayout.php
+export const LAYOUT_TABLE = 'table'
+export const LAYOUT_TILES = 'tiles'
+export const LAYOUT_GALLERY = 'gallery'
+// The layouts that render rows as cards rather than as table rows.
+export const CARD_LAYOUTS = [LAYOUT_TILES, LAYOUT_GALLERY]

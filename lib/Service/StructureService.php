@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -326,7 +327,7 @@ class StructureService {
 			'columnSettings' => $view['columnSettings'],
 			'sort' => $view['sort'],
 			'filter' => $view['filter'],
-			'layout' => in_array($view['layout'] ?? null, ['tiles', 'gallery'], true) ? $view['layout'] : 'table',
+			'layout' => ViewLayout::normalize($view['layout'] ?? null)->value,
 			'viewSettings' => [
 				'cardBackgroundSource' => $viewSettings['cardBackgroundSource'] ?? null,
 				'cardTitleSource' => $viewSettings['cardTitleSource'] ?? null,

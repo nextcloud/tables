@@ -25,6 +25,7 @@ import MainWrapper from '../modules/main/sections/MainWrapper.vue'
 import MainModals from '../modules/modals/Modals.vue'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
+import { CARD_LAYOUTS } from '../shared/constants.ts'
 
 export default {
 
@@ -43,7 +44,7 @@ export default {
 	computed: {
 		...mapState(useTablesStore, ['activeViewId', 'activeView']),
 		isCardLayout() {
-			return ['tiles', 'gallery'].includes(this.activeView?.layout)
+			return CARD_LAYOUTS.includes(this.activeView?.layout)
 		},
 	},
 
