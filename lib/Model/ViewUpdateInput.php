@@ -11,6 +11,7 @@ namespace OCA\Tables\Model;
 
 use Generator;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Service\ValueObject\Emoji;
 use OCA\Tables\Service\ValueObject\Title;
@@ -141,7 +142,7 @@ class ViewUpdateInput {
 			throw new \InvalidArgumentException('Invalid layout value.');
 		}
 
-		if (!in_array($layout, ['table', 'tiles', 'gallery'], true)) {
+		if (ViewLayout::tryFrom($layout) === null) {
 			throw new \InvalidArgumentException('Invalid layout value.');
 		}
 
