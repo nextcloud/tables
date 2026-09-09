@@ -360,20 +360,11 @@ class ViewService extends SuperService {
 
 	/**
 	 * Ensures that card view settings reference columns that are part of the view.
+	 *
+	 * @param list<int> $viewColumnIds the columns a card source may point at
 	 * @throws InvalidArgumentException
 	 */
-	/**
-	 * The columns a card source may point at. A view that has not had its columns configured
-	 * still must not accept an id from somebody else's table, so the columns available to the
-	 * view are used while it has no selection of its own.
-	 *
-	 * @return list<int>
-	 */
 	protected function assertCardSourceColumnsAreValid(View $view, array $viewColumnIds): void {
-		if (empty($viewColumnIds)) {
-			return;
-		}
-
 		$viewSettings = $view->getViewSettingsObject();
 
 		$backgroundSource = $viewSettings->getCardBackgroundSource();
