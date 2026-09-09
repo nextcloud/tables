@@ -76,4 +76,26 @@ class RowCellRelationMapper extends RowCellMapperSuper {
 			$deleteQb->executeStatement();
 		}
 	}
+
+	/**
+	 * Whether any table row has no related value for this column.
+	 */
+	public function hasRowsWithoutValue(int $columnId, int $tableId): bool {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('sl.id')
+			->from('tables_row_sleeves', 'sl')
+			->leftJoin('sl', $this->table, 'c', $qb->expr()->andX(
+				$qb->expr()->eq('sl.id', 'c.row_id'),
+				$qb->expr()->eq('c.column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)),
+				$qb->expr()->isNotNull('c.value'),
+			))
+			->where($qb->expr()->eq('sl.table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->isNull('c.id'))
+			->setMaxResults(1);
+
+		$result = $qb->executeQuery();
+		$hasEmpty = $result->fetchOne() !== false;
+		$result->closeCursor();
+		return $hasEmpty;
+	}
 }

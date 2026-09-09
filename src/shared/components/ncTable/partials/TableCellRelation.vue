@@ -29,7 +29,7 @@
 			@keydown.escape.stop="cancelEdit">
 			<NcSelect v-model="editValue"
 				:options="relationOptions"
-				:clearable="!column.mandatory"
+				:clearable="!isMandatory"
 				:reduce="(option) => option.id"
 				:multiple="allowMultiple"
 				:close-on-select="!allowMultiple"
@@ -46,6 +46,7 @@
 
 <script>
 import { translate as t } from '@nextcloud/l10n'
+import { showError } from '@nextcloud/dialogs'
 import { NcSelect } from '@nextcloud/vue'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import { useDataStore } from '../../../../store/data.js'
@@ -88,6 +89,9 @@ export default {
 		...mapState(useTablesStore, ['activeTable', 'activeView']),
 		allowMultiple() {
 			return !!this.column.customSettings?.allowMultiple
+		},
+		isMandatory() {
+			return !!(this.column?.viewColumnInformation?.mandatory ?? this.column?.mandatory)
 		},
 		valueIds() {
 			if (this.value === null || this.value === undefined || this.value === '') {
@@ -172,6 +176,13 @@ export default {
 
 			if (!this.allowMultiple) {
 				newValue = newValue.slice(0, 1)
+			}
+
+			if (this.isMandatory && newValue.length === 0) {
+				showError(t('tables', 'This column is mandatory and cannot be empty.'))
+				this.cancelEdit()
+				this.localLoading = false
+				return
 			}
 
 			const success = await this.updateCellValue(newValue)

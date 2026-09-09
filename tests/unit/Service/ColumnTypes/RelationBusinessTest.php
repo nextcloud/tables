@@ -73,8 +73,18 @@ class RelationBusinessTest extends TestCase {
 	public function testValidateValueAllowsMultipleWhenEnabled(): void {
 		$column = $this->createMock(Column::class);
 		$column->method('getCustomSettingsArray')->willReturn([Column::RELATION_ALLOW_MULTIPLE => true]);
+		$column->method('getMandatory')->willReturn(false);
 		$this->business->validateValue([13, 14], $column, 'admin', 1, null);
 		$this->addToAssertionCount(1);
+	}
+
+	public function testValidateValueRejectsEmptyWhenMandatory(): void {
+		$column = $this->createMock(Column::class);
+		$column->method('getCustomSettingsArray')->willReturn([]);
+		$column->method('getMandatory')->willReturn(true);
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('Relation column is mandatory and cannot be empty');
+		$this->business->validateValue([], $column, 'admin', 1, null);
 	}
 
 	public function testCanBeParsedDisplayValueKeepsPartialMatches(): void {

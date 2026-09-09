@@ -376,6 +376,9 @@ class ColumnService extends SuperService {
 			$this->columnDtoValidator->validate($columnDto);
 			$title = $this->normalizeTitle($columnDto->getTitle(), false);
 
+			$wasMandatory = (bool)$item->getMandatory();
+			$previousAllowMultiple = (bool)($item->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
+
 			if ($title !== null) {
 				$item->setTitle($title);
 			}
@@ -425,14 +428,22 @@ class ColumnService extends SuperService {
 			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
 			$this->validateCustomSettings($columnDto->getCustomSettings());
-			$previousAllowMultiple = (bool)($item->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
 			$item->setCustomSettings($columnDto->getCustomSettings());
+
+			$willBeMandatory = $columnDto->isMandatory() !== null ? (bool)$columnDto->isMandatory() : $wasMandatory;
+			$newAllowMultiple = (bool)($item->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
+			if ($item->getType() === Column::TYPE_RELATION && $willBeMandatory && !$wasMandatory) {
+				if ($this->rowCellRelationMapper->hasRowsWithoutValue($item->getId(), $item->getTableId())) {
+					throw new BadRequestError(
+						'Cannot make this relation column mandatory while some rows have no related value.'
+					);
+				}
+			}
 
 			$this->updateMetadata($item, $userId);
 			try {
 				$updatedColumn = $this->mapper->update($item);
 
-				$newAllowMultiple = (bool)($updatedColumn->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
 				if ($updatedColumn->getType() === Column::TYPE_RELATION && $previousAllowMultiple && !$newAllowMultiple) {
 					$this->rowCellRelationMapper->truncateToSingleValuePerRow($updatedColumn->getId());
 				}

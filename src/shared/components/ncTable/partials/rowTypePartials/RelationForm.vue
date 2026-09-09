@@ -3,11 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2" :readonly="column.readonly">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory" :description="column.description" :width="2" :readonly="column.readonly">
 		<NcSelect
 			v-model="localValue"
 			:options="relationOptions"
-			:clearable="!column.mandatory"
+			:clearable="!isMandatory"
 			:reduce="(option) => option.id"
 			:loading="loading"
 			:multiple="allowMultiple"
@@ -54,6 +54,9 @@ export default {
 		...mapState(useTablesStore, ['activeTable', 'activeView']),
 		allowMultiple() {
 			return !!this.column.customSettings?.allowMultiple
+		},
+		isMandatory() {
+			return !!(this.column?.viewColumnInformation?.mandatory ?? this.column?.mandatory)
 		},
 		loading() {
 			const dataStore = useDataStore()

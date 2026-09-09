@@ -76,11 +76,18 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	}
 
 	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
-		if ($value === null || $value === '' || $value === []) {
+		$ids = ($value === null || $value === '' || $value === [])
+			? []
+			: $this->normalizeToIds($value, $column, throwOnInvalid: true);
+
+		if ($column->getMandatory() && $ids === []) {
+			throw new BadRequestError('Relation column is mandatory and cannot be empty');
+		}
+
+		if ($ids === []) {
 			return;
 		}
 
-		$ids = $this->normalizeToIds($value, $column, throwOnInvalid: true);
 		$allowMultiple = (bool)($column->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
 
 		if (!$allowMultiple && count($ids) > 1) {

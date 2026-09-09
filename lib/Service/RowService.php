@@ -519,6 +519,12 @@ class RowService extends SuperService {
 			$defaultValue = $column->getSelectionDefault();
 			return $defaultValue !== null && $defaultValue !== '' && $defaultValue !== '[]';
 		}
+		if ($column->getType() === Column::TYPE_RELATION) {
+			if (is_array($value)) {
+				return count($value) > 0;
+			}
+			return $value !== null && $value !== '';
+		}
 		return $value !== [];
 	}
 
