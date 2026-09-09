@@ -53,6 +53,23 @@ class ViewSettings implements JsonSerializable {
 		return self::nullableIntFromArray($data, $key);
 	}
 
+	/**
+	 * Reads back what an earlier write stored. A value that no longer parses is dropped rather
+	 * than rejected, so one malformed row cannot fail every endpoint that serialises the view.
+	 */
+	public static function createFromStoredArray(array $data): self {
+		return new self(
+			cardBackgroundSource: self::intOrNull($data, 'cardBackgroundSource'),
+			cardTitleSource: self::intOrNull($data, 'cardTitleSource'),
+		);
+	}
+
+	private static function intOrNull(array $data, string $key): ?int {
+		$value = $data[$key] ?? null;
+
+		return is_int($value) ? $value : null;
+	}
+
 	public function getCardBackgroundSource(): ?int {
 		return $this->cardBackgroundSource;
 	}
