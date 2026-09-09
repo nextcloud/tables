@@ -9,7 +9,7 @@
 		</div>
 
 		<div v-else-if="activeView">
-			<MainWrapper :element="activeView" :is-view="true" />
+			<MainWrapper :element="activeView" :is-view="true" @update:layout="localLayout = $event" />
 		</div>
 
 		<ErrorMessage v-else-if="errorMessage" :message="errorMessage" />
@@ -38,13 +38,14 @@ export default {
 	data() {
 		return {
 			errorMessage: null,
+			localLayout: null,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['activeViewId', 'activeView']),
 		isCardLayout() {
-			return CARD_LAYOUTS.includes(this.activeView?.layout)
+			return CARD_LAYOUTS.includes(this.localLayout ?? this.activeView?.layout)
 		},
 	},
 
@@ -53,6 +54,7 @@ export default {
 			immediate: true,
 			handler() {
 				this.errorMessage = null
+				this.localLayout = null
 				this.checkView()
 			},
 		},
