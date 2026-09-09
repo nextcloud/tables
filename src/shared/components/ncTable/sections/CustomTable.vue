@@ -480,13 +480,12 @@ export default {
 			if (!valueObject || valueObject.value === null || valueObject.value === undefined || valueObject.value === '') {
 				return ''
 			}
-			if (typeof column.getValueString === 'function') {
-				return String(column.getValueString(valueObject) ?? '')
-			}
-			return String(valueObject.value)
+			return String(column.getValueString(valueObject) ?? '')
 		},
 		getTitleColumn() {
 			const preferredColumnId = this.localViewSetting?.viewSettings?.cardTitleSource
+			// Without a configured source the second column is the better guess: the first one
+			// commonly holds the image a card shows as its background.
 			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[1] ?? this.columns[0] ?? null
 		},
 		getBackgroundColumn() {

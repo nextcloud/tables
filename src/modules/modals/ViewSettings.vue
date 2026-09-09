@@ -55,19 +55,13 @@
 		</NcAppSettingsSection>
 
 		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="layout" :name="t('tables', 'Layout')">
-			<table class="layout-options" role="presentation">
-				<tbody>
-					<tr class="layout-options__selection">
-						<td colspan="3">
-							<NcRadioGroup v-model="layout" :label="t('tables', 'Layout')" hide-label>
-								<NcRadioGroupButton :label="t('tables', 'Table')" :value="LAYOUT_TABLE" data-cy="viewLayoutTable" />
-								<NcRadioGroupButton :label="t('tables', 'Tile')" :value="LAYOUT_TILES" data-cy="viewLayoutTiles" />
-								<NcRadioGroupButton :label="t('tables', 'Gallery')" :value="LAYOUT_GALLERY" data-cy="viewLayoutGallery" />
-							</NcRadioGroup>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			<div class="layout-options">
+				<NcRadioGroup v-model="layout" :label="t('tables', 'Layout')" hide-label>
+					<NcRadioGroupButton :label="t('tables', 'Table')" :value="LAYOUT_TABLE" data-cy="viewLayoutTable" />
+					<NcRadioGroupButton :label="t('tables', 'Tile')" :value="LAYOUT_TILES" data-cy="viewLayoutTiles" />
+					<NcRadioGroupButton :label="t('tables', 'Gallery')" :value="LAYOUT_GALLERY" data-cy="viewLayoutGallery" />
+				</NcRadioGroup>
+			</div>
 			<div class="layout-source-settings">
 				<div class="layout-source-settings__item">
 					<div class="layout-source-settings__label">
@@ -560,18 +554,12 @@ export default {
 }
 
 .layout-options {
-	width: 100%;
-	table-layout: fixed;
-	border-collapse: separate;
-	border-spacing: 12px 8px;
+	display: flex;
+	justify-content: center;
+	padding-block: 8px;
 }
 
-.layout-options td {
-	text-align: center;
-	vertical-align: middle;
-}
-
-.layout-options__selection :deep(.checkbox-radio-switch) {
+.layout-options :deep(.checkbox-radio-switch) {
 	display: inline-flex;
 }
 
@@ -583,11 +571,6 @@ export default {
 
 .layout-source-settings__label {
 	margin-bottom: 6px;
-	font-weight: 600;
-	color: var(--color-text-maxcontrast);
-}
-
-.layout-options__title td {
 	font-weight: 600;
 	color: var(--color-text-maxcontrast);
 }
