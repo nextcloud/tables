@@ -22,6 +22,7 @@ import { computed } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
+import { LAYOUT_TABLE } from '../../../shared/constants.ts'
 
 const nodeData = loadState('tables', 'nodeData', null)
 const sharePermissions = loadState('tables', 'sharePermissions', null)
@@ -61,7 +62,7 @@ export default {
 				emoji: nodeData.emoji,
 				title: nodeData.title,
 				description: nodeData.description,
-				layout: nodeData.layout ?? 'table',
+				layout: nodeData.layout ?? LAYOUT_TABLE,
 				viewSettings: nodeData.viewSettings ?? null,
 				isShared: false, // Setting as false to hide the user bubble
 				onSharePermissions: {
