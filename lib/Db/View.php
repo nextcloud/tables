@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
@@ -224,7 +225,7 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	public function getLayoutNormalized(): string {
-		return in_array($this->layout, ['tiles', 'gallery'], true) ? $this->layout : 'table';
+		return ViewLayout::normalize($this->layout)->value;
 	}
 
 	public function getViewSettingsObject(): ViewSettings {
