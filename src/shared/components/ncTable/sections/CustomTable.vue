@@ -109,7 +109,8 @@ import { ColumnTypes } from '../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
-import { CARD_LAYOUTS, LAYOUT_GALLERY, LAYOUT_TABLE } from '../../../constants.ts'
+import { LAYOUT_GALLERY, LAYOUT_TABLE } from '../../../constants.ts'
+import { resolveLayout } from '../../../utils/viewSetting.js'
 
 // Share of the card image the title banner may cover before the text is ellipsized.
 // Cards start from a 220px minimum, so this still covers them at a doubled pixel ratio.
@@ -205,12 +206,8 @@ export default {
 		hasCardBackground() {
 			return this.canRenderPreviews && (this.viewSettings?.cardBackgroundSource ?? null) !== null
 		},
-		// A viewer may switch layout for themselves; that choice lives in the local view
-		// setting and is never saved, so it falls back to the layout of the view itself.
 		currentLayout() {
-			const layout = this.localViewSetting?.layout ?? this.layout
-
-			return CARD_LAYOUTS.includes(layout) ? layout : LAYOUT_TABLE
+			return resolveLayout(this.localViewSetting, this.layout)
 		},
 		isTableLayout() {
 			return this.currentLayout === LAYOUT_TABLE

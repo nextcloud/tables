@@ -12,6 +12,7 @@
 			<Options
 				:config="tablePermissions"
 				:rows="filteredRows"
+				:can-switch-layout="false"
 				:element-id="richObject.id"
 				:is-view="isView"
 				:show-options="true"
@@ -19,10 +20,12 @@
 				@set-search-string="search" />
 		</div>
 		<div v-if="rows && rows.length > 0" class="nc-table">
+			<!-- An embedded view is a snapshot of how it was saved, so it is not reflowed here. -->
 			<NcTable
 				v-model:view-setting="localViewSetting"
 				:layout="richObject.layout"
 				:view-settings="richObject.viewSettings"
+				:can-switch-layout="false"
 				:rows="filteredRows"
 				:columns="columns"
 				:element-id="richObject.id"
