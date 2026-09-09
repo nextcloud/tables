@@ -27,6 +27,37 @@
 				<PaginationBlock :rows="rows" :element-id="elementId" :is-view="isView" />
 			</div>
 
+			<NcActions v-if="showLayoutToggle"
+				class="layout-toggle"
+				:force-menu="true"
+				data-cy="layoutToggle"
+				:aria-label="t('tables', 'Switch layout')"
+				:title="t('tables', 'Switch layout')">
+				<template #icon>
+					<ViewGridOutline v-if="activeLayout === LAYOUT_TILES" :size="20" />
+					<ViewGalleryOutline v-else-if="activeLayout === LAYOUT_GALLERY" :size="20" />
+					<ViewListOutline v-else :size="20" />
+				</template>
+				<NcActionButton close-after-click data-cy="layoutToggleTable" @click="setLayout(LAYOUT_TABLE)">
+					<template #icon>
+						<ViewListOutline :size="20" />
+					</template>
+					{{ t('tables', 'Table') }}
+				</NcActionButton>
+				<NcActionButton close-after-click data-cy="layoutToggleTiles" @click="setLayout(LAYOUT_TILES)">
+					<template #icon>
+						<ViewGridOutline :size="20" />
+					</template>
+					{{ t('tables', 'Tiles') }}
+				</NcActionButton>
+				<NcActionButton close-after-click data-cy="layoutToggleGallery" @click="setLayout(LAYOUT_GALLERY)">
+					<template #icon>
+						<ViewGalleryOutline :size="20" />
+					</template>
+					{{ t('tables', 'Gallery') }}
+				</NcActionButton>
+			</NcActions>
+
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
 				<div style="padding: 10px; color: var(--color-text-maxcontrast);">
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
@@ -73,6 +104,11 @@ import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
 import PaginationBlock from './PaginationBlock.vue'
+import ViewListOutline from 'vue-material-design-icons/ViewListOutline.vue'
+import ViewGridOutline from 'vue-material-design-icons/ViewGridOutline.vue'
+import ViewGalleryOutline from 'vue-material-design-icons/ViewGalleryOutline.vue'
+import { CARD_LAYOUTS, LAYOUT_GALLERY, LAYOUT_TABLE, LAYOUT_TILES } from '../../../constants.ts'
+import { resolveLayout } from '../../../utils/viewSetting.js'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 
 export default {
@@ -88,6 +124,9 @@ export default {
 		Delete,
 		TrayArrowDown,
 		PaginationBlock,
+		ViewListOutline,
+		ViewGridOutline,
+		ViewGalleryOutline,
 	},
 
 	mixins: [viewportHelper],
@@ -121,6 +160,18 @@ export default {
 			type: Array,
 			default: null,
 		},
+		layout: {
+			type: String,
+			default: null,
+		},
+		canSwitchLayout: {
+			type: Boolean,
+			default: true,
+		},
+		viewSettings: {
+			type: Object,
+			default: null,
+		},
 		viewSetting: {
 			type: Object,
 			default: null,
@@ -132,6 +183,7 @@ export default {
 	},
 
 	emits: [
+		'update:viewSetting',
 		'create-row',
 		'delete-selected-rows',
 		'download-filtered-csv',
@@ -144,6 +196,27 @@ export default {
 	},
 
 	computed: {
+		LAYOUT_TABLE: () => LAYOUT_TABLE,
+		LAYOUT_TILES: () => LAYOUT_TILES,
+		LAYOUT_GALLERY: () => LAYOUT_GALLERY,
+		// What the view itself is saved with, ignoring any local switch.
+		savedLayout() {
+			return resolveLayout(null, this.layout)
+		},
+		activeLayout() {
+			return resolveLayout(this.viewSetting, this.layout)
+		},
+		// Switching layout is a reading preference anyone may use, but it is only offered
+		// where the view was set up for cards: without a title source the cards would carry
+		// nothing but row numbers.
+		showLayoutToggle() {
+			if (!this.canSwitchLayout || !this.isView || !(this.columns?.length > 0)) {
+				return false
+			}
+
+			return (this.viewSettings?.cardTitleSource ?? null) !== null
+				|| CARD_LAYOUTS.includes(this.layout)
+		},
 		getSelectedRows() {
 			const rows = []
 			this.selectedRows.forEach(id => {
@@ -172,6 +245,21 @@ export default {
 	},
 
 	methods: {
+		// The choice stays in the local view setting, so it is never persisted and is
+		// dropped again by "Reset local adjustments".
+		setLayout(layout) {
+			const viewSetting = { ...(this.viewSetting ?? {}) }
+
+			// Picking the layout the view is already saved with is not an adjustment, so it
+			// leaves nothing behind for "Reset local adjustments" to offer.
+			if (layout === this.savedLayout) {
+				delete viewSetting.layout
+			} else {
+				viewSetting.layout = layout
+			}
+
+			this.$emit('update:viewSetting', viewSetting)
+		},
 		t,
 		n,
 		updateOptionsDivWidth() {
@@ -278,4 +366,8 @@ export default {
 	}
 }
 
+.layout-toggle {
+	margin-inline-start: auto;
+	align-self: center;
+}
 </style>

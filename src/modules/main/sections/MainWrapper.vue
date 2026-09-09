@@ -8,10 +8,10 @@
 
 		<div v-else>
 			<CustomView v-if="isView"
+				v-model:view-setting="viewSetting"
 				:view="element"
 				:columns="columns"
 				:rows="rows"
-				:view-setting="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV"
@@ -19,10 +19,10 @@
 				@toggle-share="toggleShare"
 				@show-integration="showIntegration" />
 			<CustomTable v-else
+				v-model:view-setting="viewSetting"
 				:table="element"
 				:columns="columns"
 				:rows="rows"
-				:view-setting="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
 				@import-scheme="openImportSchemeModal"
@@ -67,6 +67,8 @@ export default {
 			default: false,
 		},
 	},
+
+	emits: ['update:layout'],
 	setup(props) {
 		const store = useDataStore()
 		const { getColumns, getRows } = storeToRefs(store)
@@ -92,6 +94,11 @@ export default {
 	watch: {
 		element() {
 			this.reload()
+		},
+		// The layout a viewer picks for themselves lives in the local view setting, so the
+		// page around this wrapper cannot read it from the store and is told instead.
+		'viewSetting.layout'(layout) {
+			this.$emit('update:layout', layout ?? null)
 		},
 		activeRowId() {
 			this.reload()
