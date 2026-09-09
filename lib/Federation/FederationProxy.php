@@ -160,7 +160,7 @@ class FederationProxy {
 
 	private function prepareSignedRequestOptions(string $verb, string $url, ?string $accessToken, array $parameters = []): array {
 		$options = $this->generateDefaultRequestOptions($accessToken);
-		$options['body'] = !empty($parameters) ? json_encode($parameters) : '';
+		$options['body'] = !empty($parameters) ? json_encode($parameters) : '{}';
 
 		$options = $this->signatureManager->signOutgoingRequestIClientPayload(
 			$this->signatoryManager,
