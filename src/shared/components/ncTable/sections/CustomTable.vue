@@ -148,6 +148,15 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		// The layout the view is saved with, and the columns its cards read.
+		layout: {
+			type: String,
+			default: null,
+		},
+		viewSettings: {
+			type: Object,
+			default: null,
+		},
 		viewSetting: {
 			type: Object,
 			default: null,
@@ -194,12 +203,14 @@ export default {
 			return getCurrentUser() !== null
 		},
 		hasCardBackground() {
-			return this.canRenderPreviews
-				&& this.localViewSetting?.viewSettings?.cardBackgroundSource !== null
-				&& this.localViewSetting?.viewSettings?.cardBackgroundSource !== undefined
+			return this.canRenderPreviews && (this.viewSettings?.cardBackgroundSource ?? null) !== null
 		},
+		// A viewer may switch layout for themselves; that choice lives in the local view
+		// setting and is never saved, so it falls back to the layout of the view itself.
 		currentLayout() {
-			return CARD_LAYOUTS.includes(this.localViewSetting?.layout) ? this.localViewSetting.layout : LAYOUT_TABLE
+			const layout = this.localViewSetting?.layout ?? this.layout
+
+			return CARD_LAYOUTS.includes(layout) ? layout : LAYOUT_TABLE
 		},
 		isTableLayout() {
 			return this.currentLayout === LAYOUT_TABLE
@@ -483,7 +494,7 @@ export default {
 			return String(column.getValueString(valueObject) ?? '')
 		},
 		getTitleColumn() {
-			const preferredColumnId = this.localViewSetting?.viewSettings?.cardTitleSource
+			const preferredColumnId = this.viewSettings?.cardTitleSource
 			// Without a configured source the second column is the better guess: the first one
 			// commonly holds the image a card shows as its background.
 			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[1] ?? this.columns[0] ?? null
@@ -491,7 +502,7 @@ export default {
 		getBackgroundColumn() {
 			// No fallback: a card without a configured background shows no image, which is what
 			// hasCardBackground reports to the styling.
-			const preferredColumnId = this.localViewSetting?.viewSettings?.cardBackgroundSource
+			const preferredColumnId = this.viewSettings?.cardBackgroundSource
 			return this.columns.find(column => column.id === preferredColumnId) ?? null
 		},
 		// Stops at what a card shows rather than reading every column of every row first:
