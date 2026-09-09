@@ -104,7 +104,7 @@ class FederationProviderTest extends TestCase {
 		$share->method('getOwner')->willReturn('admin@nextcloud.local');
 		$share->method('getShareSecret')->willReturn('secret456');
 		$share->method('getSharedBy')->willReturn('admin@nextcloud.local');
-		$share->method('getDescription')->willReturn(json_encode(['emoji' => '🦆', 'nodeType' => 'view']));
+		$share->method('getDescription')->willReturn(json_encode(['emoji' => '🦆', 'nodeType' => 'view', 'layout' => 'gallery']));
 
 		$this->viewMapper->expects($this->once())
 			->method('insert')
@@ -113,6 +113,7 @@ class FederationProviderTest extends TestCase {
 				$this->assertEquals('Federation View', $view->getTitle());
 				$this->assertEquals(5, $view->getExternalId());
 				$this->assertEquals('🦆', $view->getEmoji());
+				$this->assertEquals('gallery', $view->getLayout());
 				return $view;
 			});
 
@@ -177,6 +178,39 @@ class FederationProviderTest extends TestCase {
 
 		$this->assertEquals('New Title', $table->getTitle());
 		$this->assertEquals('🦆', $table->getEmoji());
+	}
+
+	public function testNotificationReceivedNodeUpdateAppliesLayout(): void {
+		$view = new View();
+		$view->setId(1);
+		$view->setExternalId(2);
+		$view->setShareToken('abcdefghijklmnop');
+		$view->setLayout('table');
+
+		$this->viewMapper->method('findByExternalIdAndToken')->willReturn($view);
+		$this->viewMapper->expects($this->exactly(2))->method('update')->with($view);
+
+		$this->provider->notificationReceived(
+			FederationProvider::NOTIFICATION_UPDATE_NODE,
+			'2',
+			[
+				'sharedSecret' => 'abcdefghijklmnop',
+				'nodeType' => 'view',
+				'layout' => 'tiles',
+			]
+		);
+		$this->assertEquals('tiles', $view->getLayout());
+
+		$this->provider->notificationReceived(
+			FederationProvider::NOTIFICATION_UPDATE_NODE,
+			'2',
+			[
+				'sharedSecret' => 'abcdefghijklmnop',
+				'nodeType' => 'view',
+				'layout' => 'carousel',
+			]
+		);
+		$this->assertEquals('tiles', $view->getLayout(), 'an unknown layout is ignored');
 	}
 
 	public function testNotificationReceiveNodeDelete(): void {
