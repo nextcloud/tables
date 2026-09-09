@@ -828,9 +828,6 @@ class ViewService extends SuperService {
 			return ViewSettings::createFromInputArray($view['viewSettings']);
 		}
 
-		return ViewSettings::createFromInputArray([
-			'cardBackgroundSource' => $view['cardBackgroundSource'] ?? null,
-			'cardTitleSource' => $view['cardTitleSource'] ?? null,
-		]);
+		return new ViewSettings();
 	}
 }

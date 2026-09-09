@@ -129,22 +129,7 @@ class ViewUpdateInput {
 			return ViewSettings::createFromInputArray($data['viewSettings'], $columnsMap);
 		}
 
-		$legacyKeys = ['cardBackgroundSource', 'cardTitleSource'];
-		$hasLegacySettings = false;
-		foreach ($legacyKeys as $legacyKey) {
-			if (array_key_exists($legacyKey, $data)) {
-				$hasLegacySettings = true;
-				break;
-			}
-		}
-		if (!$hasLegacySettings) {
-			return null;
-		}
-
-		return ViewSettings::createFromInputArray([
-			'cardBackgroundSource' => $data['cardBackgroundSource'] ?? null,
-			'cardTitleSource' => $data['cardTitleSource'] ?? null,
-		]);
+		return null;
 	}
 
 	public static function normalizeLayout(mixed $layout): ?string {
