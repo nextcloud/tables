@@ -200,11 +200,15 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	private function getArray(?string $json): array {
-		if ($json !== '' && $json !== null && $json !== 'null') {
-			return \json_decode($json, true);
-		} else {
+		if ($json === '' || $json === null || $json === 'null') {
 			return [];
 		}
+
+		// Valid JSON that is not an object still has to satisfy the return type, so a
+		// scalar is treated as no value rather than raising a TypeError on read.
+		$decoded = \json_decode($json, true);
+
+		return is_array($decoded) ? $decoded : [];
 	}
 
 	public function setColumnsArray(array $array):void {
@@ -224,7 +228,7 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	public function getViewSettingsObject(): ViewSettings {
-		return ViewSettings::createFromInputArray($this->getArray($this->getViewSettings()));
+		return ViewSettings::createFromStoredArray($this->getArray($this->getViewSettings()));
 	}
 
 	private function getSharePermissions(): ?Permissions {
