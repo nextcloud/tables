@@ -156,9 +156,11 @@ export default {
 			if (this.renderMode === 'content') {
 				this.previewLoading = true
 
-				await this.loadColumnsForContentPreview()
-				await this.loadRowsForContentPreview()
-				await this.loadLayoutForContentPreview()
+				await Promise.all([
+					this.loadColumnsForContentPreview(),
+					this.loadRowsForContentPreview(),
+					this.loadLayoutForContentPreview(),
+				])
 
 				this.previewLoading = false
 			} else {
