@@ -176,6 +176,7 @@ export default {
 			pageNumber: 1,
 			rowsPerPage: 100,
 			cardTitleLines: 2,
+			pendingTitleMeasure: null,
 			rowAnimation: false,
 			pinnedColumnId: null,
 			columnWidths: null,
@@ -225,6 +226,15 @@ export default {
 		hasCardBackground() {
 			this.$nextTick(() => this.updateCardTitleLines())
 		},
+		// Paging replaces the card holding the observed title, so follow it. The page
+		// bounds are watched rather than the sliced rows, which change on every edit,
+		// insert and delete without moving the observed card.
+		pageNumber() {
+			this.$nextTick(() => this.observeCardLayout())
+		},
+		rowsPerPage() {
+			this.$nextTick(() => this.observeCardLayout())
+		},
 		totalPages(newTotalPages) {
 			if (this.pageNumber > newTotalPages) {
 				this.pageNumber = Math.max(1, newTotalPages)
@@ -240,13 +250,19 @@ export default {
 	},
 
 	mounted() {
-		this.cardResizeObserver = new ResizeObserver(() => this.updateCardTitleLines())
+		// Writing the line count resizes the very title being observed, so the measurement
+		// is deferred to the next frame and the observer sees a settled layout.
+		this.cardResizeObserver = new ResizeObserver(() => {
+			window.cancelAnimationFrame(this.pendingTitleMeasure)
+			this.pendingTitleMeasure = window.requestAnimationFrame(() => this.updateCardTitleLines())
+		})
 		this.$nextTick(() => this.observeCardLayout())
 		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		subscribe('tables:row:animate', this.enableRowAnimation)
 		subscribe(PAGINATION_CHANGED, this.handlePaginationChanged)
 	},
 	beforeUnmount() {
+		window.cancelAnimationFrame(this.pendingTitleMeasure)
 		this.cardResizeObserver?.disconnect()
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 		unsubscribe('tables:row:animate', this.enableRowAnimation)
@@ -265,7 +281,9 @@ export default {
 			}
 			this.cardResizeObserver.disconnect()
 			this.cardResizeObserver.observe(container)
-			// The container keeps its size when only the text size changes, so watch the title too.
+			// The container keeps its size when only the text size changes, so watch a title too.
+			// One is enough: all cards share a line budget through --card-title-lines, which is
+			// what keeps the banners of a row aligned.
 			const title = container.querySelector('.layout-card__title-text')
 			if (title) {
 				this.cardResizeObserver.observe(title)
