@@ -268,12 +268,14 @@ class ViewService extends SuperService {
 			// Resolved at most once: the column check and the card source rules both need it,
 			// and it costs a query.
 			$managedColumnIds = null;
+			$columnSelectionChanged = false;
 			foreach ($data->updateDetail() as $parameter => $value) {
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
 					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
 					$this->assertInputColumnsAreValid($value, $managedColumnIds);
+					$columnSelectionChanged = true;
 				}
 
 				if ($parameter === ViewUpdatableParameters::VIEW_SETTINGS) {
@@ -292,16 +294,18 @@ class ViewService extends SuperService {
 				$view->$setterMethod($insertableValue);
 			}
 
-			$candidateIds = $view->getColumnIds();
-			if (empty($candidateIds)) {
-				$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
-				$candidateIds = $managedColumnIds;
-			}
+			if ($cardSourcesRequested || $columnSelectionChanged) {
+				$candidateIds = $view->getColumnIds();
+				if (empty($candidateIds)) {
+					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
+					$candidateIds = $managedColumnIds;
+				}
 
-			if ($cardSourcesRequested) {
-				$this->assertCardSourceColumnsAreValid($view, $candidateIds);
-			} else {
-				$this->dropOrphanedCardSources($view, $candidateIds);
+				if ($cardSourcesRequested) {
+					$this->assertCardSourceColumnsAreValid($view, $candidateIds);
+				} else {
+					$this->dropOrphanedCardSources($view, $candidateIds);
+				}
 			}
 
 			$time = new DateTime();
