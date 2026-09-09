@@ -342,6 +342,9 @@ class Row2Mapper {
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
+				if (is_array($filter['value'])) {
+					continue;
+				}
 				if (str_starts_with((string)$filter['value'], '@')) {
 					$columnId = (int)($filter['columnId'] ?? 0);
 					$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
@@ -477,6 +480,49 @@ class Row2Mapper {
 					break;
 				}
 				$filterExpression = $qb->expr()->iLike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+				break;
+			case 'contains-item':
+				$filterItems = $value;
+				if (!is_array($filterItems)) {
+					$filterItems = json_decode((string)$filterItems, true) ?? null;
+					if (is_string($filterItems)) {
+						$filterItems = json_decode($filterItems, true) ?? null;
+					}
+					if (!is_array($filterItems) || $filterItems === []) {
+						$filterItems = [(string)$value];
+					}
+				}
+
+				// The value may be a list of option objects (e.g. from the UI)
+				// or a list of plain ids. Make sure we work with the option ids.
+				$filterItems = array_map(static function ($filterItem) {
+					if (is_array($filterItem) && isset($filterItem['id'])) {
+						return (string)$filterItem['id'];
+					}
+					if (is_object($filterItem) && isset($filterItem->id)) {
+						return (string)$filterItem->id;
+					}
+					return (string)$filterItem;
+				}, $filterItems);
+
+				$filterExpressions = [];
+				$includeDefault = false;
+				foreach ($filterItems as $filterItem) {
+					if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+						$filterItem = str_replace(['"', '\''], '', $filterItem);
+						$filterExpressions[] = $qb2->expr()->orX(
+							$qb->expr()->iLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($filterItem) . ']')),
+							$qb->expr()->iLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($filterItem) . ',%')),
+							$qb->expr()->iLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($filterItem) . ']%')),
+							$qb->expr()->iLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($filterItem) . ',%'))
+						);
+						$includeDefault = $includeDefault || str_contains((string)($defaultValue ?? ''), $filterItem);
+					} else {
+						$filterExpressions[] = $qb->expr()->eq('value', $qb->createNamedParameter($filterItem, $paramType));
+						$includeDefault = $includeDefault || ((string)($defaultValue ?? '') === (string)$filterItem);
+					}
+				}
+				$filterExpression = $qb2->expr()->orX(...$filterExpressions);
 				break;
 			case 'does-not-contain':
 				if (is_array($value) && $column->getType() === Column::TYPE_USERGROUP) {
