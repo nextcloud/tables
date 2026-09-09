@@ -110,6 +110,8 @@ import { generateUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 
 // Share of the card image the title banner may cover before the text is ellipsized.
+// Cards start from a 220px minimum, so this still covers them at a doubled pixel ratio.
+const CARD_PREVIEW_SIZE = 512
 const MAX_TITLE_BANNER_SHARE = 0.6
 const MAX_TITLE_LINES = 6
 // An enlarged text size must not push the title below this many lines.
@@ -367,26 +369,42 @@ export default {
 				if (typeof candidate !== 'string' || candidate.length === 0) {
 					continue
 				}
-				const normalized = candidate.replace(/\\\//g, '/')
-				// A file reference only ever names a file on this server, so the id is safe to take
-				// from any spelling of the link and is always resolved against this server.
-				const fileIdMatch = normalized.match(/[?&]fileId=(\d+)/i) ?? normalized.match(/\/f\/(\d+)/)
-				if (fileIdMatch) {
-					return generateUrl(`/core/preview?fileId=${fileIdMatch[1]}&x=512&y=512&a=true`)
-				}
-				// A ready made preview URL is used as it stands, so it must not leave this server:
-				// a cell is user supplied and a foreign host would be fetched by every viewer.
-				try {
-					const url = new URL(normalized, window.location.origin)
-					if (url.origin === window.location.origin && url.pathname.endsWith('/core/preview')) {
-						return url.pathname + url.search
-					}
-				} catch (err) {
-					// not a URL, nothing to render
+				const fileId = this.getLocalFileId(candidate.replace(/\\\//g, '/'))
+				if (fileId !== null) {
+					return generateUrl(`/core/preview?fileId=${fileId}&x=${CARD_PREVIEW_SIZE}&y=${CARD_PREVIEW_SIZE}&a=true`)
 				}
 			}
 
 			return null
+		},
+		/**
+		 * The id of a file on this server that the given cell value names, or null.
+		 *
+		 * A cell is user supplied, so a foreign host is never followed: it would be fetched by
+		 * every viewer of the card. The id is read out of the link and the preview URL rebuilt
+		 * from it, so no attacker chosen path or query string reaches the request.
+		 *
+		 * @param {string} value the raw cell value
+		 * @return {string|null} the file id, or null when the value names no local file
+		 */
+		getLocalFileId(value) {
+			let url
+			try {
+				url = new URL(value, window.location.origin)
+			} catch (err) {
+				return null
+			}
+			if (url.origin !== window.location.origin) {
+				return null
+			}
+
+			for (const [key, param] of url.searchParams) {
+				if (key.toLowerCase() === 'fileid' && /^\d+$/.test(param)) {
+					return param
+				}
+			}
+
+			return url.pathname.match(/\/f\/(\d+)\/?$/)?.[1] ?? null
 		},
 		isRichColumn(column) {
 			return column?.type === ColumnTypes.TextRich
