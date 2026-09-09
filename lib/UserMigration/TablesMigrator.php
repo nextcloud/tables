@@ -364,13 +364,13 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	}
 
 	private function remapViewCardSources(array $view, array $columnIdMap): array {
-		if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
-			$view['viewSettings'] = ViewSettings::remapSources($view['viewSettings'], $columnIdMap);
-
+		if (!isset($view['viewSettings']) || !is_array($view['viewSettings'])) {
 			return $view;
 		}
 
-		return ViewSettings::remapSources($view, $columnIdMap);
+		$view['viewSettings'] = ViewSettings::remapSources($view['viewSettings'], $columnIdMap);
+
+		return $view;
 	}
 
 	/**
