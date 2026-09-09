@@ -65,6 +65,9 @@ class ViewTest extends TestCase {
 			'never written' => [null],
 			'empty' => [''],
 			'json null' => ['null'],
+			'a scalar rather than an object' => ['5'],
+			'a string rather than an object' => ['"gallery"'],
+			'sources of the wrong type' => ['{"cardBackgroundSource":"3","cardTitleSource":[]}'],
 		];
 	}
 }
