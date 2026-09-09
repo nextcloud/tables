@@ -55,6 +55,7 @@ class ActivityManager {
 	public const SUBJECT_COLUMN_DELETE = 'column_delete';
 
 	public const SUBJECT_IMPORT_FINISHED = 'import_finished';
+	public const SUBJECT_IMPORT_FAILED = 'import_failed';
 
 	public const SUBJECT_SHARE_CREATE = 'share_create';
 	public const SUBJECT_SHARE_UPDATE = 'share_update';
@@ -809,7 +810,8 @@ class ActivityManager {
 	}
 
 	public function findRecipientsByElement(Table|View $element): array {
-		$cacheKey = 'element_recipients_' . $element->getId();
+		$elementType = $element instanceof Table ? 'table' : 'view';
+		$cacheKey = 'element_recipients_' . $elementType . '_' . $element->getId();
 		$cached = $this->cache->get($cacheKey);
 		if ($cached !== null) {
 			return $cached;
@@ -822,13 +824,7 @@ class ActivityManager {
 			$recipients[] = $owner;
 		}
 
-		if ($element instanceof View) {
-			$recipients = array_merge($recipients, $this->shareService->findSharedWithUserIds($element->getId(), 'view'));
-		}
-		if ($element instanceof Table) {
-			$recipients = array_merge($recipients, $this->shareService->findSharedWithUserIds($element->getId(), 'table'));
-		}
-
+		$recipients = array_merge($recipients, $this->shareService->findSharedWithUserIds($element->getId(), $elementType));
 		$recipients = array_unique($recipients);
 		$this->cache->set($cacheKey, $recipients);
 		return $recipients;
