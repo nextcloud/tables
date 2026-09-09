@@ -58,31 +58,31 @@
 			class="card-layout"
 			:class="[`card-layout--${currentLayout}`, { 'card-layout--no-image': !hasCardBackground }]"
 			:style="{ '--card-title-lines': cardTitleLines }">
-			<button v-for="row in currentPageRows"
-				:key="row.id"
+			<button v-for="card in cards"
+				:key="card.id"
 				type="button"
 				class="layout-card"
 				:data-cy="`${currentLayout}LayoutCard`"
-				@click="$emit('edit-row', row.id)">
+				@click="$emit('edit-row', card.id)">
 				<div class="layout-card__image-wrapper">
-					<img v-if="getPreviewUrl(row)"
-						:src="getPreviewUrl(row)"
-						:alt="getCardTitle(row)"
+					<img v-if="card.previewUrl"
+						:src="card.previewUrl"
+						:alt="card.title"
 						loading="lazy"
 						decoding="async"
 						class="layout-card__image">
 					<div v-else class="layout-card__no-image" />
 					<div class="layout-card__title-banner">
-						<NcRichText v-if="isRichColumn(getTitleColumn())"
+						<NcRichText v-if="hasRichTitle"
 							class="layout-card__title-text"
-							:text="getCardTitle(row)"
+							:text="card.title"
 							:use-markdown="true" />
-						<span v-else class="layout-card__title-text">{{ getCardTitle(row) }}</span>
+						<span v-else class="layout-card__title-text">{{ card.title }}</span>
 					</div>
 				</div>
-				<div v-if="currentLayout === 'gallery'" class="layout-card__body" data-cy="galleryLayoutBody">
+				<div v-if="isGalleryLayout" class="layout-card__body" data-cy="galleryLayoutBody">
 					<ul class="layout-card__metadata">
-						<li v-for="item in getGalleryMetadata(row)" :key="`${row.id}-${item.columnId}`" data-cy="galleryMetadataItem">
+						<li v-for="item in card.metadata" :key="`${card.id}-${item.columnId}`" data-cy="galleryMetadataItem">
 							<span class="layout-card__metadata-label">{{ item.title }}</span>
 							<NcRichText v-if="item.isRich"
 								class="layout-card__metadata-value"
@@ -109,7 +109,7 @@ import { ColumnTypes } from '../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
-import { CARD_LAYOUTS, LAYOUT_TABLE } from '../../../constants.ts'
+import { CARD_LAYOUTS, LAYOUT_GALLERY, LAYOUT_TABLE } from '../../../constants.ts'
 
 // Share of the card image the title banner may cover before the text is ellipsized.
 // Cards start from a 220px minimum, so this still covers them at a doubled pixel ratio.
@@ -118,6 +118,8 @@ const MAX_TITLE_BANNER_SHARE = 0.6
 const MAX_TITLE_LINES = 6
 // An enlarged text size must not push the title below this many lines.
 const MIN_TITLE_LINES = 2
+// Metadata rows a gallery card lists below its title.
+const MAX_GALLERY_METADATA_ITEMS = 6
 
 export default {
 	name: 'CustomTable',
@@ -201,6 +203,38 @@ export default {
 		},
 		isTableLayout() {
 			return this.currentLayout === LAYOUT_TABLE
+		},
+		// Every card value is derived once here: the template would otherwise run
+		// getPreviewUrl twice per row, each doing a JSON parse and a column lookup.
+		cards() {
+			if (this.isTableLayout) {
+				return []
+			}
+
+			const titleColumn = this.getTitleColumn()
+			const backgroundColumn = this.getBackgroundColumn()
+			const metadataColumns = this.isGalleryLayout
+				? this.columns.filter(column => column.id !== titleColumn?.id && column.id !== backgroundColumn?.id)
+				: []
+
+			return this.currentPageRows.map(row => {
+				// Indexed once per row: the helpers below would otherwise scan row.data again for
+				// every column, which is a full pass per cell on a wide table.
+				const cells = new Map((row?.data ?? []).map(cell => [cell?.columnId, cell]))
+
+				return {
+					id: row.id,
+					previewUrl: this.getPreviewUrl(cells, backgroundColumn),
+					title: this.getDisplayValue(titleColumn, cells) || `${t('tables', 'Row')} ${row.id}`,
+					metadata: this.getGalleryMetadata(metadataColumns, cells),
+				}
+			})
+		},
+		isGalleryLayout() {
+			return this.currentLayout === LAYOUT_GALLERY
+		},
+		hasRichTitle() {
+			return this.isRichColumn(this.getTitleColumn())
 		},
 		currentPageRows() {
 			return this.rows.slice((this.pageNumber - 1) * this.rowsPerPage, ((this.pageNumber - 1) * this.rowsPerPage) + this.rowsPerPage)
@@ -374,15 +408,11 @@ export default {
 		disableRowAnimation() {
 			this.rowAnimation = false
 		},
-		getCell(row, columnId) {
-			return row?.data?.find(item => item?.columnId === columnId) ?? null
-		},
-		getPreviewUrl(row) {
+		getPreviewUrl(cells, backgroundColumn) {
 			if (!this.canRenderPreviews) {
 				return null
 			}
-			const backgroundColumn = this.getBackgroundColumn()
-			const rawValue = this.getCell(row, backgroundColumn?.id)?.value
+			const rawValue = cells.get(backgroundColumn?.id)?.value
 			if (rawValue === null || rawValue === undefined || rawValue === '') {
 				return null
 			}
@@ -442,11 +472,11 @@ export default {
 			return column?.type === ColumnTypes.TextRich
 		},
 
-		getDisplayValue(column, row) {
+		getDisplayValue(column, cells) {
 			if (!column) {
 				return ''
 			}
-			const valueObject = this.getCell(row, column.id)
+			const valueObject = cells.get(column.id)
 			if (!valueObject || valueObject.value === null || valueObject.value === undefined || valueObject.value === '') {
 				return ''
 			}
@@ -465,24 +495,30 @@ export default {
 			const preferredColumnId = this.localViewSetting?.viewSettings?.cardBackgroundSource
 			return this.columns.find(column => column.id === preferredColumnId) ?? null
 		},
-		getCardTitle(row) {
-			const titleColumn = this.getTitleColumn()
-			return this.getDisplayValue(titleColumn, row) || `${t('tables', 'Row')} ${row.id}`
-		},
-		getGalleryMetadata(row) {
-			const titleColumnId = this.getTitleColumn()?.id
-			const backgroundColumnId = this.getBackgroundColumn()?.id
-			return this.columns
-				.filter(column => column.id !== titleColumnId)
-				.filter(column => column.id !== backgroundColumnId)
-				.map(column => ({
+		// Stops at what a card shows rather than reading every column of every row first:
+		// the value of a cell is a string conversion, and a wide table has many to spare.
+		getGalleryMetadata(metadataColumns, cells) {
+			const metadata = []
+
+			for (const column of metadataColumns) {
+				if (metadata.length === MAX_GALLERY_METADATA_ITEMS) {
+					break
+				}
+
+				const value = this.getDisplayValue(column, cells)
+				if (value === '') {
+					continue
+				}
+
+				metadata.push({
 					columnId: column.id,
 					title: column.title,
-					value: this.getDisplayValue(column, row),
+					value,
 					isRich: this.isRichColumn(column),
-				}))
-				.filter(item => item.value !== '')
-				.slice(0, 6)
+				})
+			}
+
+			return metadata
 		},
 	},
 }
