@@ -58,27 +58,39 @@
 			class="card-layout"
 			:class="[`card-layout--${currentLayout}`, { 'card-layout--no-image': !hasCardBackground }]"
 			:style="{ '--card-title-lines': cardTitleLines }">
-			<button v-for="card in cards"
+			<!-- The card is a plain container: a button role would make its list and any rich
+				text link presentational, so neither would reach assistive technology. The title
+				below is the real control; clicking the card is a convenience on top. -->
+			<div v-for="card in cards"
 				:key="card.id"
-				type="button"
 				class="layout-card"
 				:data-cy="`${currentLayout}LayoutCard`"
-				@click="$emit('edit-row', card.id)">
+				@click="activateCard(card.id, $event)">
 				<div class="layout-card__image-wrapper">
 					<img v-if="card.previewUrl"
 						:src="card.previewUrl"
-						:alt="card.title"
+						:alt="t('tables', 'Preview of the row image')"
 						loading="lazy"
 						decoding="async"
 						class="layout-card__image">
 					<div v-else class="layout-card__no-image" />
-					<div class="layout-card__title-banner">
+					<div :id="card.titleId" class="layout-card__title-banner">
 						<NcRichText v-if="hasRichTitle"
 							class="layout-card__title-text"
 							:text="card.title"
 							:use-markdown="true" />
 						<span v-else class="layout-card__title-text">{{ card.title }}</span>
 					</div>
+					<!-- The control overlays the image instead of wrapping the title: a button around
+						the title could not hold a rich text link, and its own click would reach the
+						card handler and open the row twice. It takes its name from the title element
+						rather than carrying a second copy of the string, so the two cannot drift
+						apart; like any stretched card action, the title is still read as text before
+						the control that shares its name. -->
+					<button type="button"
+						class="layout-card__open"
+						:aria-labelledby="card.titleId"
+						:data-cy="`${currentLayout}LayoutCardTitle`" />
 				</div>
 				<div v-if="isGalleryLayout" class="layout-card__body" data-cy="galleryLayoutBody">
 					<ul class="layout-card__metadata">
@@ -92,7 +104,7 @@
 						</li>
 					</ul>
 				</div>
-			</button>
+			</div>
 		</div>
 		<PaginationBlock v-if="totalPages > 1 && !isTableLayout" class="pagination-footer" :rows="rows" :element-id="elementId" :is-view="isView" />
 	</div>
@@ -225,6 +237,8 @@ export default {
 				? this.columns.filter(column => column.id !== titleColumn?.id && column.id !== backgroundColumn?.id)
 				: []
 
+			const scope = `${this.isView ? 'view' : 'table'}-${this.elementId}`
+
 			return this.currentPageRows.map(row => {
 				// Indexed once per row: the helpers below would otherwise scan row.data again for
 				// every column, which is a full pass per cell on a wide table.
@@ -232,17 +246,19 @@ export default {
 
 				return {
 					id: row.id,
+					// Several tables can share a page, so the id the control points at must be unique.
+					titleId: `tables-card-title-${scope}-${row.id}`,
 					previewUrl: this.getPreviewUrl(cells, backgroundColumn),
 					title: this.getDisplayValue(titleColumn, cells) || `${t('tables', 'Row')} ${row.id}`,
 					metadata: this.getGalleryMetadata(metadataColumns, cells),
 				}
 			})
 		},
-		isGalleryLayout() {
-			return this.currentLayout === LAYOUT_GALLERY
-		},
 		hasRichTitle() {
 			return this.isRichColumn(this.getTitleColumn())
+		},
+		isGalleryLayout() {
+			return this.currentLayout === LAYOUT_GALLERY
 		},
 		currentPageRows() {
 			return this.rows.slice((this.pageNumber - 1) * this.rowsPerPage, ((this.pageNumber - 1) * this.rowsPerPage) + this.rowsPerPage)
@@ -416,6 +432,15 @@ export default {
 		disableRowAnimation() {
 			this.rowAnimation = false
 		},
+		// Rich text may put a link in a card. A click on one follows the link and must not
+		// also open the row, so only clicks outside a link activate the card.
+		activateCard(rowId, event) {
+			if (event.target?.closest?.('a')) {
+				return
+			}
+
+			this.$emit('edit-row', rowId)
+		},
 		getPreviewUrl(cells, backgroundColumn) {
 			if (!this.canRenderPreviews) {
 				return null
@@ -586,6 +611,11 @@ export default {
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
+.layout-card__open:focus-visible {
+	outline: 2px solid var(--color-main-text);
+	outline-offset: -2px;
+}
+
 .layout-card {
 	width: 100%;
 	max-width: 100%;
@@ -627,6 +657,8 @@ export default {
 
 .layout-card__title-banner {
 	position: absolute;
+	/* Above the overlay so a link in a rich title stays clickable. */
+	z-index: 1;
 	inset-inline: 0;
 	bottom: 0;
 	padding: 12px;
@@ -650,6 +682,16 @@ export default {
 .card-layout--tiles.card-layout--no-image .layout-card__title-banner {
 	top: 0;
 	bottom: auto;
+}
+
+.layout-card__open {
+	position: absolute;
+	inset: 0;
+	appearance: none;
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
 }
 
 .layout-card__title-text {
