@@ -819,6 +819,57 @@ class ShareService extends SuperService {
 		}
 	}
 
+	/**
+	 * Set or remove the password of one share on behalf of a trusted
+	 * share-review operation. The caller verifies access through
+	 * ShareReviewAccessCheckEvent first; the password is stored hashed, as on
+	 * every other path.
+	 *
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if $id does not exist
+	 * @throws Exception on database failure
+	 */
+	public function updatePasswordForShareReview(int $id, ?string $password): void {
+		$share = $this->mapper->find($id);
+		$share->setPassword($password === null || $password === '' ? null : $this->hasher->hash($password));
+		$share->setLastEditAt((new DateTime())->format('Y-m-d H:i:s'));
+		$this->mapper->update($share);
+		$this->triggerShareActivity($share, ActivityManager::SUBJECT_SHARE_UPDATE);
+	}
+
+	/**
+	 * Re-create a share from the values a share-review snapshot carries. The
+	 * caller verifies access first. The stored password hash is inserted
+	 * as-is, so the original password keeps working, and a link share keeps
+	 * its token — the row it belonged to is gone, so the public URL survives
+	 * the round trip.
+	 *
+	 * @param array{sender: string, receiver: string, receiverType: string, nodeId: int, nodeType: string, token: ?string, password: ?string, permissions: array<string, bool>} $snapshot
+	 * @throws Exception on database failure
+	 */
+	public function restoreForShareReview(array $snapshot): int {
+		$time = new DateTime();
+		$share = new Share();
+		$share->setSender($snapshot['sender']);
+		$share->setReceiver($snapshot['receiver']);
+		$share->setReceiverType($snapshot['receiverType']);
+		$share->setNodeId($snapshot['nodeId']);
+		$share->setNodeType($snapshot['nodeType']);
+		$share->setToken($snapshot['token']);
+		$share->setPassword($snapshot['password']);
+		$share->setPermissionRead($snapshot['permissions']['read']);
+		$share->setPermissionCreate($snapshot['permissions']['create']);
+		$share->setPermissionUpdate($snapshot['permissions']['update']);
+		$share->setPermissionDelete($snapshot['permissions']['delete']);
+		$share->setPermissionManage($snapshot['permissions']['manage']);
+		$share->setCreatedAt($time->format('Y-m-d H:i:s'));
+		$share->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		/** @var Share $restored */
+		$restored = $this->mapper->insert($share);
+		$this->triggerShareActivity($restored, ActivityManager::SUBJECT_SHARE_CREATE);
+		return (int)$restored->getId();
+	}
+
 	public function deleteAllForTable(Table $table):void {
 		try {
 			$this->mapper->deleteByNode($table->getId(), 'table');
