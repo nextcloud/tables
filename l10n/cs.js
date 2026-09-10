@@ -348,7 +348,7 @@ OC.L10N.register(
     "This might take a while..." : "Toto může chvíli trvat …",
     "Failed" : "Nezdařilo se",
     "Loading table data" : "Načítání dat tabulky",
-    "Import completed successfully." : "Import byl úspěšně dokončen",
+    "Import completed successfully." : "Import úspěšně dokončen.",
     "Back" : "Zpět",
     "From" : "Od",
     "To" : "Do",
