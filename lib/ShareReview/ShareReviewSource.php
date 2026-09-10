@@ -20,6 +20,8 @@ use OCP\IUserSession;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\IShareReviewSourceRemediation;
+use OCP\Share\ShareReview\IShareReviewSourceSnapshot;
 use OCP\Share\ShareReview\ShareReviewActionContext;
 use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
@@ -33,7 +35,7 @@ use Psr\Log\LoggerInterface;
  * paginated query contract evaluated in SQL on the share table joined with
  * the three node tables.
  */
-class ShareReviewSource implements IPaginatedShareReviewSource {
+class ShareReviewSource implements IPaginatedShareReviewSource, IShareReviewSourceRemediation, IShareReviewSourceSnapshot {
 
 	private const NODE_TYPE_TABLE = 'table';
 	private const NODE_TYPE_VIEW = 'view';
@@ -48,6 +50,9 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 	public const PERMISSION_MANAGE = 'tables:manage';
 
 	/** Native receiver type to IShare type. */
+	/** Format version of the opaque snapshot this source writes and reads */
+	private const SNAPSHOT_VERSION = 1;
+
 	private const RECEIVER_TYPES = [
 		'user' => IShare::TYPE_USER,
 		'group' => IShare::TYPE_GROUP,
@@ -217,6 +222,137 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 			$this->actingUser($context),
 		]);
 		return true;
+	}
+
+	public function canSetPassword(): bool {
+		return true;
+	}
+
+	/** Tables shares have no expiration date */
+	public function canSetExpiration(): bool {
+		return false;
+	}
+
+	public function setPassword(string $shareId, ?string $password, ?ShareReviewActionContext $context = null): bool {
+		if (!ctype_digit($shareId)) {
+			return false;
+		}
+		$share = $this->rawShare($shareId);
+		// only a link share carries a password, so anything else is refused
+		// before the access check is dispatched
+		if ($share === null || (string)$share['receiver_type'] !== 'link') {
+			return false;
+		}
+		if (!$this->accessGranted($shareId, ShareReviewAccessCheckEvent::ACTION_REMEDIATE, $context)) {
+			$this->auditLog->log('Tables share remediation through share review denied: share "%1$s", field "password", user "%2$s"', [
+				$shareId,
+				$this->actingUser($context),
+			]);
+			return false;
+		}
+		try {
+			$this->shareService->updatePasswordForShareReview((int)$shareId, $password);
+		} catch (DoesNotExistException) {
+			return false;
+		} catch (Exception $e) {
+			$this->logger->error('Tables ShareReview: failed to remediate share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
+			return false;
+		}
+		$this->auditLog->log('Tables share remediated through share review: share "%1$s", field "password", change "%2$s", user "%3$s"', [
+			$shareId,
+			$password === null || $password === '' ? 'removed' : 'set',
+			$this->actingUser($context),
+		]);
+		return true;
+	}
+
+	public function setExpiration(string $shareId, ?int $expirationTimestamp, ?ShareReviewActionContext $context = null): bool {
+		return false;
+	}
+
+	public function serializeShare(string $shareId): ?string {
+		if (!ctype_digit($shareId)) {
+			return null;
+		}
+		$share = $this->rawShare($shareId);
+		if ($share === null) {
+			return null;
+		}
+		$snapshot = json_encode([
+			'v' => self::SNAPSHOT_VERSION,
+			'sender' => (string)$share['sender'],
+			'receiver' => (string)$share['receiver'],
+			'receiverType' => (string)$share['receiver_type'],
+			'nodeId' => (int)$share['node_id'],
+			'nodeType' => (string)$share['node_type'],
+			'token' => $share['token'] === null ? null : (string)$share['token'],
+			'password' => $share['password'] === null ? null : (string)$share['password'],
+			'permissions' => [
+				'read' => (bool)$share['permission_read'],
+				'create' => (bool)$share['permission_create'],
+				'update' => (bool)$share['permission_update'],
+				'delete' => (bool)$share['permission_delete'],
+				'manage' => (bool)$share['permission_manage'],
+			],
+		]);
+		return $snapshot === false ? null : $snapshot;
+	}
+
+	public function restoreShare(string $snapshot, ?ShareReviewActionContext $context = null): bool {
+		$data = json_decode($snapshot, true);
+		if (!is_array($data) || ($data['v'] ?? null) !== self::SNAPSHOT_VERSION) {
+			return false;
+		}
+		// an application (context) share also owns per-user navigation rows,
+		// which are user state a snapshot does not carry
+		if (($data['nodeType'] ?? '') === 'context') {
+			return false;
+		}
+		if (!$this->accessGranted('', ShareReviewAccessCheckEvent::ACTION_RESTORE, $context)) {
+			$this->auditLog->log('Tables share restore through share review denied: node "%1$s" "%2$s", user "%3$s"', [
+				(string)($data['nodeType'] ?? ''),
+				(string)($data['nodeId'] ?? ''),
+				$this->actingUser($context),
+			]);
+			return false;
+		}
+		try {
+			$id = $this->shareService->restoreForShareReview($data);
+		} catch (Exception $e) {
+			$this->logger->error('Tables ShareReview: failed to restore a share: {message}', ['message' => $e->getMessage()]);
+			return false;
+		}
+		$this->auditLog->log('Tables share restored through share review: share "%1$s", node "%2$s" "%3$s", receiver "%4$s", user "%5$s"', [
+			(string)$id,
+			(string)$data['nodeType'],
+			(string)$data['nodeId'],
+			(string)$data['receiver'],
+			$this->actingUser($context),
+		]);
+		return true;
+	}
+
+	/** @return array<string, mixed>|null the raw share row */
+	private function rawShare(string $shareId): ?array {
+		try {
+			return $this->shareMapper->findForShareReview((int)$shareId);
+		} catch (Exception $e) {
+			$this->logger->error('Tables ShareReview: failed to fetch share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
+			return null;
+		}
+	}
+
+	/** Dispatch the gate for one action and report whether it granted */
+	private function accessGranted(string $shareId, string $action, ?ShareReviewActionContext $context): bool {
+		$event = new ShareReviewAccessCheckEvent(
+			'Tables',
+			$shareId,
+			$action,
+			$context?->actingUserId,
+			$context?->scope ?? ShareReviewAccessCheckEvent::SCOPE_OPERATOR,
+		);
+		$this->eventDispatcher->dispatchTyped($event);
+		return $event->isHandled() && $event->isGranted();
 	}
 
 	/** The user the deletion is performed for, as named in the audit log */
