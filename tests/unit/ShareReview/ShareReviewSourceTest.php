@@ -22,6 +22,8 @@ use OCP\IUserSession;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\IShareReviewSourceRemediation;
+use OCP\Share\ShareReview\IShareReviewSourceSnapshot;
 use OCP\Share\ShareReview\ShareReviewActionContext;
 use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
@@ -281,6 +283,151 @@ final class ShareReviewSourceTest extends TestCase {
 	 */
 	private function permissionIds(array $permissions): array {
 		return array_map(static fn (ShareReviewPermission $permission): string => $permission->id, $permissions);
+	}
+
+	private function linkRow(array $overrides = []): array {
+		return array_merge([
+			'id' => 7,
+			'sender' => 'alice',
+			'receiver' => '',
+			'receiver_type' => 'link',
+			'node_id' => 3,
+			'node_type' => 'table',
+			'token' => 'tok123',
+			'password' => 'hash',
+			'permission_read' => true,
+			'permission_create' => false,
+			'permission_update' => false,
+			'permission_delete' => false,
+			'permission_manage' => false,
+		], $overrides);
+	}
+
+	public function testTheSourceOffersPasswordRemediationOnly(): void {
+		$this->assertInstanceOf(IShareReviewSourceRemediation::class, $this->source);
+		$this->assertTrue($this->source->canSetPassword());
+		$this->assertFalse($this->source->canSetExpiration(), 'tables shares have no expiration date');
+		$this->assertFalse($this->source->setExpiration('7', 1798761599));
+	}
+
+	public function testSetPasswordGatesOnTheAccessCheckAndAudits(): void {
+		$this->shareMapper->method('findForShareReview')->with(7)->willReturn($this->linkRow());
+		$captured = null;
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event) use (&$captured): void {
+			$captured = $event;
+			$event->grantAccess();
+		});
+		$this->shareService->expects($this->once())->method('updatePasswordForShareReview')->with(7, 'hunter2');
+		$this->auditLog->expects($this->once())->method('log')
+			->with($this->stringContains('remediated'), $this->callback(static fn (array $p): bool => $p[0] === '7' && $p[1] === 'set'));
+
+		$this->assertTrue($this->source->setPassword('7', 'hunter2'));
+		$this->assertSame(ShareReviewAccessCheckEvent::ACTION_REMEDIATE, $captured->getAction());
+	}
+
+	public function testRemovingThePasswordIsAuditedAsRemoved(): void {
+		$this->shareMapper->method('findForShareReview')->willReturn($this->linkRow());
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(
+			static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess()
+		);
+		$this->auditLog->expects($this->once())->method('log')
+			->with($this->anything(), $this->callback(static fn (array $p): bool => $p[1] === 'removed'));
+
+		$this->assertTrue($this->source->setPassword('7', null));
+	}
+
+	public function testOnlyLinkSharesCanBeRemediatedAndNoEventIsDispatched(): void {
+		$this->shareMapper->method('findForShareReview')->willReturn($this->linkRow(['receiver_type' => 'user', 'receiver' => 'bob']));
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+		$this->auditLog->expects($this->never())->method('log');
+
+		$this->assertFalse($this->source->setPassword('7', 'hunter2'));
+	}
+
+	public function testRemediationDeniedByTheAccessCheckIsAudited(): void {
+		$this->shareMapper->method('findForShareReview')->willReturn($this->linkRow());
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(
+			static fn (ShareReviewAccessCheckEvent $event) => $event->denyAccess('not an operator')
+		);
+		$this->shareService->expects($this->never())->method('updatePasswordForShareReview');
+		$this->auditLog->expects($this->once())->method('log')->with($this->stringContains('denied'));
+
+		$this->assertFalse($this->source->setPassword('7', 'hunter2'));
+	}
+
+	public function testRemediationOfANonCanonicalIdIsRefused(): void {
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+
+		$this->assertFalse($this->source->setPassword('7.5', 'hunter2'));
+	}
+
+	public function testSerializeAndRestoreRoundTripAShare(): void {
+		$this->assertInstanceOf(IShareReviewSourceSnapshot::class, $this->source);
+		$this->shareMapper->method('findForShareReview')->willReturn($this->linkRow());
+
+		$snapshot = $this->source->serializeShare('7');
+
+		$this->assertIsString($snapshot);
+		$data = json_decode($snapshot, true);
+		$this->assertSame(1, $data['v']);
+		$this->assertSame('tok123', $data['token'], 'the token is kept so the public URL survives the round trip');
+		$this->assertSame('hash', $data['password'], 'the stored hash is carried, never a plaintext password');
+		$this->assertSame(['read' => true, 'create' => false, 'update' => false, 'delete' => false, 'manage' => false], $data['permissions']);
+
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(
+			static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess()
+		);
+		$this->shareService->expects($this->once())->method('restoreForShareReview')
+			->with($this->callback(static fn (array $d): bool => $d['nodeId'] === 3 && $d['receiverType'] === 'link'))
+			->willReturn(99);
+		$this->auditLog->expects($this->once())->method('log')->with($this->stringContains('restored'));
+
+		$this->assertTrue($this->source->restoreShare($snapshot));
+	}
+
+	public function testSerializeOfAMissingShareIsNull(): void {
+		$this->shareMapper->method('findForShareReview')->willReturn(null);
+
+		$this->assertNull($this->source->serializeShare('7'));
+		$this->assertNull($this->source->serializeShare('abc'));
+	}
+
+	public function testRestoreRejectsAForeignOrUnversionedSnapshot(): void {
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+
+		$this->assertFalse($this->source->restoreShare('not json'));
+		$this->assertFalse($this->source->restoreShare('{"v":99,"nodeType":"table"}'));
+	}
+
+	public function testRestoreRefusesAnApplicationShare(): void {
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+
+		// a context share also owns per-user navigation rows a snapshot cannot carry
+		$this->assertFalse($this->source->restoreShare('{"v":1,"nodeType":"context","nodeId":1}'));
+	}
+
+	public function testRestoreDeniedByTheAccessCheckIsAudited(): void {
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(
+			static fn (ShareReviewAccessCheckEvent $event) => $event->denyAccess('not an operator')
+		);
+		$this->shareService->expects($this->never())->method('restoreForShareReview');
+		$this->auditLog->expects($this->once())->method('log')->with($this->stringContains('denied'));
+
+		$this->assertFalse($this->source->restoreShare('{"v":1,"nodeType":"table","nodeId":3,"receiver":"","receiverType":"link"}'));
+	}
+
+	public function testRestoreForwardsTheActionContext(): void {
+		$captured = null;
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (ShareReviewAccessCheckEvent $event) use (&$captured): void {
+			$captured = $event;
+			$event->denyAccess('no');
+		});
+
+		$this->source->restoreShare('{"v":1,"nodeType":"table","nodeId":3}', new ShareReviewActionContext('alice', ShareReviewAccessCheckEvent::SCOPE_SELF));
+
+		$this->assertSame(ShareReviewAccessCheckEvent::ACTION_RESTORE, $captured->getAction());
+		$this->assertSame('alice', $captured->getActingUserId());
+		$this->assertSame(ShareReviewAccessCheckEvent::SCOPE_SELF, $captured->getScope());
 	}
 
 	public function testCountSharesByInitiatorDelegatesWithTheLimit(): void {
