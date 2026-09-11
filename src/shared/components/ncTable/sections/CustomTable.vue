@@ -319,14 +319,14 @@ export default {
 			this.pendingTitleMeasure = window.requestAnimationFrame(() => this.updateCardTitleLines())
 		})
 		this.$nextTick(() => this.observeCardLayout())
-		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
+		subscribe('tables:selected-rows:deselect', this.handleDeselectAllRows)
 		subscribe('tables:row:animate', this.enableRowAnimation)
 		subscribe(PAGINATION_CHANGED, this.handlePaginationChanged)
 	},
 	beforeUnmount() {
 		window.cancelAnimationFrame(this.pendingTitleMeasure)
 		this.cardResizeObserver?.disconnect()
-		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
+		unsubscribe('tables:selected-rows:deselect', this.handleDeselectAllRows)
 		unsubscribe('tables:row:animate', this.enableRowAnimation)
 		unsubscribe(PAGINATION_CHANGED, this.handlePaginationChanged)
 	},
@@ -394,6 +394,11 @@ export default {
 			if (payload.rowsPerPage) {
 				this.rowsPerPage = payload.rowsPerPage
 			}
+		},
+		// A named handler, so beforeUnmount can actually remove it: unsubscribe compares by
+		// reference and a fresh arrow function never matches the one that was subscribed.
+		handleDeselectAllRows({ elementId, isView }) {
+			this.deselectAllRows(elementId, isView)
 		},
 		deselectAllRows(elementId, isView) {
 			if (parseInt(elementId) === parseInt(this.elementId) && isView === this.isView) {
