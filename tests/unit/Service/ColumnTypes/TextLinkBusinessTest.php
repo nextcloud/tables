@@ -82,6 +82,33 @@ class TextLinkBusinessTest extends TestCase {
 		])), $this->textLinkBusiness->parseValue(json_encode([
 			'resourceUrl' => 'https://nextcloud.com'
 		]), $column));
+
+		$column->setCustomSettings(json_encode([
+			'showPreview' => true,
+		]));
+		self::assertEquals(json_encode(json_encode([
+			'title' => 'photo.jpg',
+			'value' => 'https://nextcloud.test/apps/files/f/123',
+			'providerId' => 'files',
+			'thumbnailUrl' => 'https://nextcloud.test/core/preview?fileId=123',
+			'icon' => 'icon-image',
+			'attributes' => [
+				'fileId' => '123',
+				'path' => '/Photos/photo.jpg',
+			],
+		])), $this->textLinkBusiness->parseValue(json_encode([
+			'title' => 'photo.jpg',
+			'resourceUrl' => 'https://nextcloud.test/apps/files/f/123',
+			'providerId' => 'files',
+			'thumbnailUrl' => 'https://nextcloud.test/core/preview?fileId=123',
+			'icon' => 'icon-image',
+			'attributes' => [
+				'fileId' => '123',
+				'path' => '/Photos/photo.jpg',
+			],
+		]), $column));
+
+		$column->setCustomSettings(null);
 		self::assertEquals(json_encode(json_encode([
 			'title' => 'Test link',
 			'value' => 'https://nextcloud.com',

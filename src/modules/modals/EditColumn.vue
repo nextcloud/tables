@@ -75,8 +75,14 @@ import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandle
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../store/data.js'
-import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
+import {
+	COLUMN_WIDTH_MAX,
+	COLUMN_WIDTH_MIN,
+	IMAGE_PREVIEW_SIZE_MAX,
+	IMAGE_PREVIEW_SIZE_MIN,
+} from '../../shared/constants.js'
 import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
+import { isImagePreviewSizeValid, normalizeImagePreviewSize } from '../../shared/utils/imagePreviewSize.js'
 
 export default {
 	name: 'EditColumn',
@@ -192,6 +198,14 @@ export default {
 				return
 			}
 
+			if (this.isTextLinkColumn(this.editColumn)
+				&& this.editColumn.customSettings?.showPreview
+				&& this.editColumn.customSettings?.imagePreviewSize !== undefined
+				&& !isImagePreviewSizeValid(this.editColumn.customSettings?.imagePreviewSize)) {
+				showError(t('tables', 'Cannot save column. Image preview size must be between {min} and {max}.', { min: IMAGE_PREVIEW_SIZE_MIN, max: IMAGE_PREVIEW_SIZE_MAX }))
+				return
+			}
+
 			await this.updateLocalColumn()
 			this.reset()
 			this.$emit('close')
@@ -221,6 +235,10 @@ export default {
 
 			data.technicalName = this.normalizeTechnicalName(data.technicalName)
 			data.customSettings = { ...data.customSettings, width: data.customSettings.width }
+			if (this.isTextLinkColumn(this.column)
+				&& (data.customSettings.showPreview || data.customSettings.imagePreviewSize !== undefined)) {
+				data.customSettings.imagePreviewSize = normalizeImagePreviewSize(data.customSettings.imagePreviewSize)
+			}
 			const res = await this.updateColumn({
 				id: this.editColumn.id,
 				isView: this.isView,
@@ -237,6 +255,9 @@ export default {
 		},
 		isTechnicalNameValid() {
 			return isTechnicalNameValid(this.editColumn.technicalName)
+		},
+		isTextLinkColumn(column) {
+			return column?.type === ColumnTypes.TextLink || (column?.type === 'text' && column?.subtype === 'link')
 		},
 	},
 }
