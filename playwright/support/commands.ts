@@ -318,11 +318,24 @@ export async function createContext(
 	showInNav: boolean = false,
 ) {
 	await ensureNavigationOpen(page)
-	await page
+
+	const createApplicationButton = page
 		.getByRole('button', { name: /^Create application$/ })
 		.first()
-		.click({ force: true })
-	await expect(page.locator('[data-cy="createContextModal"]')).toBeVisible()
+	const createContextModal = page.locator('[data-cy="createContextModal"]')
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		await createApplicationButton.waitFor({ state: 'visible' })
+		await createApplicationButton.click({ timeout: 5000 }).catch(() => {})
+		const opened = await createContextModal
+			.waitFor({ state: 'visible', timeout: 3000 })
+			.then(() => true)
+			.catch(() => false)
+		if (opened) {
+			break
+		}
+		await ensureNavigationOpen(page)
+	}
+	await expect(createContextModal).toBeVisible()
 
 	const input = page.locator('[data-cy="createContextTitle"]')
 	await input.clear()

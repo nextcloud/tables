@@ -67,12 +67,13 @@ test.describe('Test column relation', () => {
 		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').filter({ hasText: 'Relation' }).click()
 
 		// configure the relation to point at the source table and use 'Name' as label
-		await selectFromVueDropdown(page, 'Select target', sourceTableTitle)
-		await page.waitForResponse(
+		const targetColumnsResponse = page.waitForResponse(
 			r => r.url().includes('/apps/tables/api/1/tables/')
 				&& r.url().includes('/columns')
 				&& r.request().method() === 'GET',
 		)
+		await selectFromVueDropdown(page, 'Select target', sourceTableTitle)
+		await targetColumnsResponse
 		await selectFromVueDropdown(page, 'Select label for relation selection', sourceColumnTitle)
 
 		await page.locator('[data-cy="createColumnSaveBtn"]').click()
@@ -121,12 +122,13 @@ test.describe('Test column relation', () => {
 		await page.locator('.columnTypeSelection .vs__open-indicator').click()
 		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').filter({ hasText: 'Relation' }).click()
 
-		await selectFromVueDropdown(page, 'Select target', contextSourceTitle)
-		await page.waitForResponse(
+		const targetColumnsResponse = page.waitForResponse(
 			r => r.url().includes('/apps/tables/api/1/tables/')
 				&& r.url().includes('/columns')
 				&& r.request().method() === 'GET',
 		)
+		await selectFromVueDropdown(page, 'Select target', contextSourceTitle)
+		await targetColumnsResponse
 		await selectFromVueDropdown(page, 'Select label for relation selection', sourceColumnTitle)
 
 		await page.locator('[data-cy="createColumnSaveBtn"]').click()
