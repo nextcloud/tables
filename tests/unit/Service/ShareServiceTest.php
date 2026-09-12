@@ -20,6 +20,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Service\ArchiveCleanupService;
 use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
@@ -95,6 +96,7 @@ class ShareServiceTest extends TestCase {
 			$this->shareManager,
 			$this->federationService,
 			$this->auditLogService,
+			$this->createMock(ArchiveCleanupService::class),
 		);
 
 		$this->publicShare = new Share();

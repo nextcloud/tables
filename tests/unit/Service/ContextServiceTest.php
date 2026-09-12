@@ -38,6 +38,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $pageContentMapper;
 	private MockObject $userManager;
 	private MockObject $auditLogService;
+	private MockObject $archiveService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -54,6 +55,7 @@ final class ContextServiceTest extends TestCase {
 		$shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
+		$this->archiveService = $this->createMock(ArchiveService::class);
 
 		$this->service = new ContextService(
 			$this->contextMapper,
@@ -66,12 +68,61 @@ final class ContextServiceTest extends TestCase {
 			$this->auditLogService,
 			$dbConnection,
 			$shareService,
+			$this->createMock(ArchiveCleanupService::class),
 			false,
 			$navigationManager,
 			$urlGenerator,
 			$this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
+			$this->archiveService,
 		);
+	}
+
+	public function testOwnerArchivingAnApplicationIsAudited(): void {
+		$context = new Context();
+		$context->setId(7);
+		$context->setOwnerId('alice');
+		$context->setArchived(false);
+		$this->contextMapper->method('findById')->willReturn($context);
+
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(
+				Operation::ContextArchived,
+				'Tables application with ID %s was archived',
+				['contextId' => 7],
+			);
+
+		$this->service->archiveContext(7, 'alice');
+	}
+
+	// a receiver only stores a private override, which is nobody else's business
+	public function testArchivingByAReceiverIsNotAudited(): void {
+		$context = new Context();
+		$context->setId(7);
+		$context->setOwnerId('alice');
+		$context->setArchived(false);
+		$this->contextMapper->method('findById')->willReturn($context);
+
+		$this->auditLogService->expects($this->never())->method('log');
+
+		$this->service->archiveContext(7, 'bob');
+	}
+
+	// the receiver's own override must be resolved into the returned entity, so the
+	// response carries their state rather than the shared owner-level flag
+	public function testArchivingByAReceiverResolvesPerUserStateInResponse(): void {
+		$context = new Context();
+		$context->setId(7);
+		$context->setOwnerId('alice');
+		$context->setArchived(false);
+		$this->contextMapper->method('findById')->willReturn($context);
+
+		$this->archiveService->expects($this->once())
+			->method('enrichContextsWithArchiveState')
+			->with([$context], 'bob');
+
+		$this->service->archiveContext(7, 'bob');
 	}
 
 	public function testTransferLogsPreviousAndNewOwner(): void {
