@@ -125,6 +125,13 @@ export const useTablesStore = defineStore('store', {
 		},
 		setContext(context) {
 			const index = this.contexts.findIndex(c => c.id === context.id)
+			if (index === -1) {
+				// Loading one application by its URL fetches it before the list is there, and
+				// contexts[-1] would name a property rather than append: the getters iterate,
+				// so they would never see it and the page would render empty.
+				this.contexts.push(context)
+				return
+			}
 			this.contexts[index] = context
 		},
 		setActiveRowId(rowId) {
