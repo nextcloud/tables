@@ -468,6 +468,12 @@ class Row2Mapper {
 					break;
 				}
 
+				if ($column->getType() === Column::TYPE_RELATION) {
+					$includeDefault = false;
+					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter((int)$value, IQueryBuilder::PARAM_INT));
+					break;
+				}
+
 				$includeDefault = str_contains((string)($defaultValue ?? ''), (string)$value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
@@ -556,6 +562,9 @@ class Row2Mapper {
 							$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
 						);
 				}
+				if ($column->getType() === Column::TYPE_RELATION) {
+					return $this->getRelationExclusionFilter($qb, $qb2, $column, (int)$value);
+				}
 				$includeDefault = !str_contains((string)($defaultValue ?? ''), (string)$value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
@@ -576,6 +585,11 @@ class Row2Mapper {
 					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']', $paramType));
 					break;
 				}
+				if ($column->getType() === Column::TYPE_RELATION) {
+					$includeDefault = false;
+					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter((int)$value, IQueryBuilder::PARAM_INT));
+					break;
+				}
 				$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType));
 				break;
 			case 'is-not-equal':
@@ -584,6 +598,9 @@ class Row2Mapper {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb->expr()->neq('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']', $paramType));
 					break;
+				}
+				if ($column->getType() === Column::TYPE_RELATION) {
+					return $this->getRelationExclusionFilter($qb, $qb2, $column, (int)$value);
 				}
 				$filterExpression = $qb->expr()->neq('value', $qb->createNamedParameter($value, $paramType));
 				break;
@@ -647,6 +664,23 @@ class Row2Mapper {
 				])),
 			),
 		);
+	}
+
+	/**
+	 * Rows that do not have the given related id among their relation cell values.
+	 */
+	private function getRelationExclusionFilter(IQueryBuilder $qb, IQueryBuilder $qb2, Column $column, int $value): IQueryBuilder {
+		$qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter($value, IQueryBuilder::PARAM_INT)));
+
+		return $this->db->getQueryBuilder()
+			->selectAlias('sl3.id', 'row_id')
+			->from('tables_row_sleeves', 'sl3')
+			->where(
+				$qb->expr()->eq('sl3.table_id', $qb->createNamedParameter($column->getTableId(), IQueryBuilder::PARAM_INT))
+			)
+			->andWhere(
+				$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
+			);
 	}
 
 	/**
@@ -727,7 +761,7 @@ class Row2Mapper {
 		}
 
 		$rowValues = [];
-		$keyToColumnId = [];
+		$keyToColumn = [];
 		$keyToRowId = [];
 		$cellMapperCache = [];
 
@@ -752,12 +786,17 @@ class Row2Mapper {
 			} else {
 				$rowValues[$compositeKey] = $value;
 			}
-			$keyToColumnId[$compositeKey] = $rowData['column_id'];
+			$keyToColumn[$compositeKey] = $column;
 			$keyToRowId[$compositeKey] = $rowData['row_id'];
 		}
 
 		foreach ($rowValues as $compositeKey => $value) {
-			$rows[$keyToRowId[$compositeKey]]->addCell($keyToColumnId[$compositeKey], $value);
+			$column = $keyToColumn[$compositeKey];
+			$columnType = $column->getType();
+			if ($cellMapperCache[$columnType]->hasMultipleValues() && is_array($value)) {
+				$value = $cellMapperCache[$columnType]->formatAggregatedValues($column, $value);
+			}
+			$rows[$keyToRowId[$compositeKey]]->addCell($column->getId(), $value);
 		}
 
 		return array_values($rows);

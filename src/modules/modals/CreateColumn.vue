@@ -409,6 +409,7 @@ export default {
 				data.customSettings.relationType = this.column.customSettings.relationType
 				data.customSettings.targetId = this.column.customSettings.targetId
 				data.customSettings.labelColumn = this.column.customSettings.labelColumn
+				data.customSettings.allowMultiple = !!this.column.customSettings.allowMultiple
 			}
 			return data
 		},

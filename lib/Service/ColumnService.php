@@ -13,6 +13,7 @@ use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\RowCellRelationMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
@@ -54,6 +55,7 @@ class ColumnService extends SuperService {
 		private readonly IL10N $l,
 		private readonly UserHelper $userHelper,
 		private readonly ColumnDtoValidator $columnDtoValidator,
+		private readonly RowCellRelationMapper $rowCellRelationMapper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -374,6 +376,9 @@ class ColumnService extends SuperService {
 			$this->columnDtoValidator->validate($columnDto);
 			$title = $this->normalizeTitle($columnDto->getTitle(), false);
 
+			$wasMandatory = (bool)$item->getMandatory();
+			$previousAllowMultiple = (bool)($item->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
+
 			if ($title !== null) {
 				$item->setTitle($title);
 			}
@@ -425,9 +430,23 @@ class ColumnService extends SuperService {
 			$this->validateCustomSettings($columnDto->getCustomSettings());
 			$item->setCustomSettings($columnDto->getCustomSettings());
 
+			$willBeMandatory = $columnDto->isMandatory() !== null ? (bool)$columnDto->isMandatory() : $wasMandatory;
+			$newAllowMultiple = (bool)($item->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
+			if ($item->getType() === Column::TYPE_RELATION && $willBeMandatory && !$wasMandatory) {
+				if ($this->rowCellRelationMapper->hasRowsWithoutValue($item->getId(), $item->getTableId())) {
+					throw new BadRequestError(
+						'Cannot make this relation column mandatory while some rows have no related value.'
+					);
+				}
+			}
+
 			$this->updateMetadata($item, $userId);
 			try {
 				$updatedColumn = $this->mapper->update($item);
+
+				if ($updatedColumn->getType() === Column::TYPE_RELATION && $previousAllowMultiple && !$newAllowMultiple) {
+					$this->rowCellRelationMapper->truncateToSingleValuePerRow($updatedColumn->getId());
+				}
 
 				$this->activityManager->triggerEvent(
 					objectType: ActivityManager::TABLES_OBJECT_COLUMN,

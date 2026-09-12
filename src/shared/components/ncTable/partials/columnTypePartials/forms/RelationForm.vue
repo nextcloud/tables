@@ -5,10 +5,10 @@
 <template>
 	<div style="width: 100%">
 		<div class="row space-T">
-			<div class="fix-col-4 title">
+			<div class="from-col-4 title">
 				{{ t('tables', 'Relation type') }}
 			</div>
-			<div class="fix-col-4">
+			<div class="from-col-4">
 				<NcSelect v-model="customSettings.relationType"
 					:options="relationTypeOptions"
 					:reduce="(option) => option.id"
@@ -21,10 +21,10 @@
 		</div>
 
 		<div class="row space-T">
-			<div class="fix-col-4 title">
+			<div class="from-col-4 title">
 				{{ t('tables', 'Target') }}
 			</div>
-			<div class="fix-col-4">
+			<div class="from-col-4">
 				<NcSelect v-model="customSettings.targetId"
 					:options="availableTargets"
 					:reduce="(option) => option.id"
@@ -37,10 +37,10 @@
 		</div>
 
 		<div class="row space-T">
-			<div class="fix-col-4 title">
+			<div class="from-col-4 title">
 				{{ t('tables', 'Label for relation selection') }}
 			</div>
-			<div class="fix-col-4">
+			<div class="from-col-4">
 				<NcSelect v-model="customSettings.labelColumn"
 					:options="availableLabelColumns"
 					:reduce="(option) => option.id"
@@ -55,11 +55,26 @@
 			<IconInformation :size="16" class="info-icon" />
 			<span>{{ t('tables', 'Only text and number columns can be used as label') }}</span>
 		</div>
+
+		<div class="row space-T">
+			<div class="from-col-4 title">
+				{{ t('tables', 'Select multiple items') }}
+			</div>
+			<div class="from-col-4 space-L-small" data-cy="relationMultipleSwitch">
+				<NcCheckboxRadioSwitch v-model="customSettings.allowMultiple"
+					type="switch"
+					@update:model-value="updateCustomSettings" />
+			</div>
+		</div>
+		<div v-if="showAllowMultipleWarning" class="info-text warning-text" data-cy="relationMultipleWarning">
+			<IconInformation :size="16" class="info-icon" />
+			<span>{{ allowMultipleWarningText }}</span>
+		</div>
 	</div>
 </template>
 
 <script>
-import { NcSelect } from '@nextcloud/vue'
+import { NcSelect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { translate as t } from '@nextcloud/l10n'
 import { mapState } from 'pinia'
 import { useTablesStore } from '../../../../../../store/store.js'
@@ -73,6 +88,7 @@ export default {
 	components: {
 		IconInformation,
 		NcSelect,
+		NcCheckboxRadioSwitch,
 	},
 	props: {
 		column: {
@@ -86,10 +102,12 @@ export default {
 	data() {
 		return {
 			customSettings: {
-				targetId: this.column.customSettings.targetId ?? null,
-				labelColumn: this.column.customSettings.labelColumn ?? null,
-				relationType: this.column.customSettings.relationType ?? 'table',
+				targetId: this.column.customSettings?.targetId ?? null,
+				labelColumn: this.column.customSettings?.labelColumn ?? null,
+				relationType: this.column.customSettings?.relationType ?? 'table',
+				allowMultiple: this.column.customSettings?.allowMultiple ?? false,
 			},
+			originallyAllowMultiple: !!this.column.customSettings?.allowMultiple,
 			loadingColumns: false,
 			relationTypeOptions: [
 				{ id: 'table', label: t('tables', 'Table') },
@@ -116,6 +134,22 @@ export default {
 			}
 
 			return []
+		},
+		isExistingColumn() {
+			return !!(this.column.id && this.column.id > 0)
+		},
+		showAllowMultipleWarning() {
+			if (!this.isExistingColumn) {
+				return false
+			}
+			// Warn while multi is on, or after turning multi off before save
+			return this.customSettings.allowMultiple || this.originallyAllowMultiple
+		},
+		allowMultipleWarningText() {
+			if (this.originallyAllowMultiple && !this.customSettings.allowMultiple) {
+				return t('tables', 'Saving will keep only the first related value in each row. Extra values will be removed.')
+			}
+			return t('tables', 'If you turn this off later, only the first related value will be kept in each row. Extra values will be removed.')
 		},
 	},
 	async mounted() {
@@ -187,5 +221,10 @@ export default {
 	.info-icon {
 		flex-shrink: 0;
 	}
+}
+
+.warning-text {
+	margin-top: calc(var(--default-grid-baseline) * 1);
+	color: var(--color-warning-text, var(--color-warning));
 }
 </style>
