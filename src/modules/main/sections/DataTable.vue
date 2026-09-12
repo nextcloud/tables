@@ -198,6 +198,8 @@ import { mapState } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
 import { useTablesStore } from '../../../store/store.js'
 
+import { hasLocalViewAdjustments } from '../../../shared/utils/viewSetting.js'
+
 export default {
 	components: {
 		IconTool,
@@ -268,7 +270,7 @@ export default {
 			return this.views.some(v => v.tableId === this.table.id)
 		},
 		isViewSettingSet() {
-			return !(!this.localViewSetting || ((!this.localViewSetting.hiddenColumns || this.localViewSetting.hiddenColumns.length === 0) && (!this.localViewSetting.sorting) && (!this.localViewSetting.filter || this.localViewSetting.filter.length === 0)))
+			return hasLocalViewAdjustments(this.localViewSetting)
 		},
 	},
 

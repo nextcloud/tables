@@ -102,6 +102,8 @@ import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
 import ElementTitle from './ElementTitle.vue'
 import TableDescription from './TableDescription.vue'
 
+import { hasLocalViewAdjustments } from '../../../shared/utils/viewSetting.js'
+
 export default {
 	components: {
 		TableDescription,
@@ -158,7 +160,7 @@ export default {
 	},
 	computed: {
 		isViewSettingSet() {
-			return !(!this.localViewSetting || ((!this.localViewSetting.hiddenColumns || this.localViewSetting.hiddenColumns.length === 0) && (!this.localViewSetting.sorting) && (!this.localViewSetting.filter || this.localViewSetting.filter.length === 0)))
+			return hasLocalViewAdjustments(this.localViewSetting)
 		},
 	},
 	watch: {

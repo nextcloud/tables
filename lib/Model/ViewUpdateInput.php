@@ -11,6 +11,7 @@ namespace OCA\Tables\Model;
 
 use Generator;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Service\ValueObject\Emoji;
 use OCA\Tables\Service\ValueObject\Title;
@@ -31,6 +32,8 @@ class ViewUpdateInput {
 		protected readonly ?FilterSet $filterSet = null,
 		protected readonly ?SortRuleSet $sortRuleSet = null,
 		protected readonly ?int $sidebarOrder = null,
+		protected readonly ?string $layout = null,
+		protected readonly ?ViewSettings $viewSettings = null,
 	) {
 	}
 
@@ -59,6 +62,12 @@ class ViewUpdateInput {
 		if ($this->sortRuleSet) {
 			yield ViewUpdatableParameters::SORT => $this->sortRuleSet;
 		}
+		if ($this->layout !== null) {
+			yield ViewUpdatableParameters::LAYOUT => $this->layout;
+		}
+		if ($this->viewSettings !== null) {
+			yield ViewUpdatableParameters::VIEW_SETTINGS => $this->viewSettings;
+		}
 	}
 
 	/**
@@ -70,13 +79,15 @@ class ViewUpdateInput {
 	 *     columns?: list<int>,
 	 *     columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
+	 *     layout?: 'table'|'tiles'|'gallery'|null,
+	 *     viewSettings?: array{cardBackgroundSource?: int|null, cardTitleSource?: int|null}|string,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'contains-item'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float|list<array{id: int, label: string, uuid?: string}>}>>,
 	 *     sidebarOrder?: int
 	 * } $data
 	 * @param array $columnsMap
 	 */
 	public static function fromInputArray(array $data, array $columnsMap = []): self {
-		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort']);
+		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort', 'viewSettings']);
 
 		if (isset($data['columns']) && !isset($data['columnSettings'])) {
 			$logger = Server::get(LoggerInterface::class);
@@ -91,6 +102,9 @@ class ViewUpdateInput {
 			$data['columnSettings'] = $value;
 		}
 
+		$layout = self::normalizeLayout($data['layout'] ?? null);
+		$viewSettings = self::createViewSettingsFromInputData($data, $columnsMap);
+
 		return new self(
 			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
 			technicalName: $data['technicalName'] ?? null,
@@ -100,7 +114,39 @@ class ViewUpdateInput {
 			filterSet: isset($data['filter']) ? FilterSet::createFromInputArray($data['filter'], $columnsMap) : null,
 			sortRuleSet: isset($data['sort']) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
 			sidebarOrder: (array_key_exists('sidebarOrder', $data) && $data['sidebarOrder'] !== null) ? (int)$data['sidebarOrder'] : null,
+			layout: $layout,
+			viewSettings: $viewSettings,
 		);
+	}
+
+	private static function createViewSettingsFromInputData(array $data, array $columnsMap = []): ?ViewSettings {
+		if (array_key_exists('viewSettings', $data)) {
+			if ($data['viewSettings'] === null) {
+				return new ViewSettings();
+			}
+			if (!is_array($data['viewSettings'])) {
+				throw new \InvalidArgumentException('Invalid viewSettings value.');
+			}
+			return ViewSettings::createFromInputArray($data['viewSettings'], $columnsMap);
+		}
+
+		return null;
+	}
+
+	public static function normalizeLayout(mixed $layout): ?string {
+		if ($layout === null || $layout === '') {
+			return null;
+		}
+
+		if (!is_string($layout)) {
+			throw new \InvalidArgumentException('Invalid layout value.');
+		}
+
+		if (ViewLayout::tryFrom($layout) === null) {
+			throw new \InvalidArgumentException('Invalid layout value.');
+		}
+
+		return $layout;
 	}
 
 	protected static function transformJsonToArrayInPayload(array $input, array $keys): array {

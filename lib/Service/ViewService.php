@@ -16,6 +16,7 @@ use JsonSerializable;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
@@ -31,6 +32,7 @@ use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -185,6 +187,7 @@ class ViewService extends SuperService {
 		?string $userId = null,
 		?string $technicalName = null,
 		?string $uuid = null,
+		?string $layout = null,
 	): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
@@ -202,6 +205,11 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
+		try {
+			$item->setLayout(ViewUpdateInput::normalizeLayout($layout));
+		} catch (InvalidArgumentException $e) {
+			throw new BadRequestError($e->getMessage());
+		}
 		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -257,23 +265,48 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not update view with id ' . $id);
 			}
 
+			$cardSourcesRequested = false;
+			// Resolved at most once: the column check and the card source rules both need it,
+			// and it costs a query.
+			$managedColumnIds = null;
+			$columnSelectionChanged = false;
 			foreach ($data->updateDetail() as $parameter => $value) {
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
-					$this->assertInputColumnsAreValid($view, $userId, $value);
+					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
+					$this->assertInputColumnsAreValid($value, $managedColumnIds);
+					$columnSelectionChanged = true;
+				}
+
+				if ($parameter === ViewUpdatableParameters::VIEW_SETTINGS) {
+					$cardSourcesRequested = true;
 				}
 
 				if ($parameter === ViewUpdatableParameters::TECHNICAL_NAME) {
 					$this->assertTechnicalNameValid($value);
 				}
 
-				if ($value instanceof JsonSerializable) {
-					$insertableValue = json_encode($value);
-				}
+				$insertableValue = $value instanceof JsonSerializable
+					? json_encode($value)
+					: $value;
 
 				$setterMethod = 'set' . ucfirst((string)$parameter->value);
-				$view->$setterMethod($insertableValue ?? $value);
+				$view->$setterMethod($insertableValue);
+			}
+
+			if ($cardSourcesRequested || $columnSelectionChanged) {
+				$candidateIds = $view->getColumnIds();
+				if (empty($candidateIds)) {
+					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
+					$candidateIds = $managedColumnIds;
+				}
+
+				if ($cardSourcesRequested) {
+					$this->assertCardSourceColumnsAreValid($view, $candidateIds);
+				} else {
+					$this->dropOrphanedCardSources($view, $candidateIds);
+				}
 			}
 
 			$time = new DateTime();
@@ -305,14 +338,22 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * @throws InvalidArgumentException
-	 * @throws PermissionError
+	 * The ids of the columns the view may use.
+	 *
+	 * ColumnService depends on this service, so it is looked up rather than injected.
+	 *
+	 * @return list<int>
 	 */
-	protected function assertInputColumnsAreValid(View $view, string $userId, ColumnSettings $columnSettings): void {
+	private function findManagedColumnIds(View $view, string $userId): array {
 		$columnService = \OCP\Server::get(ColumnService::class);
-		$availableColumns = $columnService->findAllByManagedView($view, $userId);
-		$availableColumnIds = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
 
+		return array_map(static fn (Column $column) => $column->getId(), $columnService->findAllByManagedView($view, $userId));
+	}
+
+	/**
+	 * @param list<int> $availableColumnIds
+	 */
+	protected function assertInputColumnsAreValid(ColumnSettings $columnSettings, array $availableColumnIds): void {
 		foreach ($columnSettings->columnInformation() as $columnInfo) {
 			if (!in_array($columnInfo->getId(), $availableColumnIds, true)
 				&& !Column::isValidMetaTypeId($columnInfo->getId())
@@ -320,6 +361,53 @@ class ViewService extends SuperService {
 				throw new InvalidArgumentException('Invalid column ID provided: ' . $columnInfo->getId());
 			}
 		}
+	}
+
+	/**
+	 * Ensures that card view settings reference columns that are part of the view.
+	 *
+	 * @param list<int> $viewColumnIds the columns a card source may point at
+	 * @throws InvalidArgumentException
+	 */
+	protected function assertCardSourceColumnsAreValid(View $view, array $viewColumnIds): void {
+		$viewSettings = $view->getViewSettingsObject();
+
+		$backgroundSource = $viewSettings->getCardBackgroundSource();
+		if ($backgroundSource !== null && !in_array($backgroundSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardBackgroundSource column ID: ' . $backgroundSource);
+		}
+
+		$titleSource = $viewSettings->getCardTitleSource();
+		if ($titleSource !== null && !in_array($titleSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardTitleSource column ID: ' . $titleSource);
+		}
+	}
+
+	/**
+	 * Clears card sources that the updated column set no longer contains.
+	 */
+	protected function dropOrphanedCardSources(View $view, array $viewColumnIds): void {
+		// Unlike the assertion, this one writes: with no candidates to compare against it
+		// leaves the stored sources alone rather than clearing them on a bad lookup.
+		if (empty($viewColumnIds)) {
+			return;
+		}
+
+		$viewSettings = $view->getViewSettingsObject();
+		$backgroundSource = $viewSettings->getCardBackgroundSource();
+		$titleSource = $viewSettings->getCardTitleSource();
+
+		$keptBackgroundSource = in_array($backgroundSource, $viewColumnIds, true) ? $backgroundSource : null;
+		$keptTitleSource = in_array($titleSource, $viewColumnIds, true) ? $titleSource : null;
+
+		if ($keptBackgroundSource === $backgroundSource && $keptTitleSource === $titleSource) {
+			return;
+		}
+
+		$view->setViewSettings(json_encode(new ViewSettings(
+			cardBackgroundSource: $keptBackgroundSource,
+			cardTitleSource: $keptTitleSource,
+		)));
 	}
 
 	/**
@@ -581,10 +669,22 @@ class ViewService extends SuperService {
 				columnSettings: new ColumnSettings($applicableViewColumnInformationRecords),
 				filterSet: FilterSet::createFromInputArray($applicableFilterArray),
 				sortRuleSet: SortRuleSet::createFromInputArray($filteredSortingRules),
+				viewSettings: $this->removeColumnFromViewSettings($view->getViewSettingsObject(), $columnId),
 			);
 
 			$this->update($view->getId(), $viewUpdateInput);
 		}
+	}
+
+	private function removeColumnFromViewSettings(ViewSettings $viewSettings, int $columnId): ViewSettings {
+		return new ViewSettings(
+			cardBackgroundSource: $viewSettings->getCardBackgroundSource() === $columnId
+				? null
+				: $viewSettings->getCardBackgroundSource(),
+			cardTitleSource: $viewSettings->getCardTitleSource() === $columnId
+				? null
+				: $viewSettings->getCardTitleSource(),
+		);
 	}
 
 	protected function removeColumnFromFilters(array $originalFilterSetArray, int $columnId): array {
@@ -682,6 +782,12 @@ class ViewService extends SuperService {
 		$item->setColumns(json_encode($view['columnSettings']));
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
+		// A scheme may carry a layout this version does not know, which is dropped rather
+		// than rejected so the rest of the view still imports.
+		// Resolved the same way the write path resolves it, so import and create agree: an
+		// explicit layout is stored as given, anything absent or unknown stays null.
+		$item->setLayout(ViewLayout::tryFromMixed($view['layout'] ?? null)?->value);
+		$item->setViewSettings(json_encode($this->createImportedViewSettings($view)));
 		try {
 			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
@@ -724,5 +830,13 @@ class ViewService extends SuperService {
 
 		$this->logger->error($e->getMessage(), ['exception' => $e]);
 		throw new InternalError($context . ': ' . $e->getMessage());
+	}
+
+	private function createImportedViewSettings(array $view): ViewSettings {
+		if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+			return ViewSettings::createFromInputArray($view['viewSettings']);
+		}
+
+		return new ViewSettings();
 	}
 }

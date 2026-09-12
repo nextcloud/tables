@@ -37,6 +37,8 @@ import TextIcon from 'vue-material-design-icons/Text.vue'
 import FilterRemove from 'vue-material-design-icons/FilterRemoveOutline.vue'
 import NcSmallButton from '../../../shared/components/ncSmallButton/NcSmallButton.vue'
 
+import { hasLocalViewAdjustments } from '../../../shared/utils/viewSetting.js'
+
 export default {
 	name: 'ElementTitle',
 
@@ -74,12 +76,14 @@ export default {
 		},
 
 		isViewSettingSet() {
-			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
+			return hasLocalViewAdjustments(this.viewSetting)
 		},
 	},
 
 	methods: {
 		resetLocalAdjustments() {
+			// Everything in here is a local tweak, the layout override included: dropping it
+			// returns the view to the layout it is saved with.
 			this.$emit('update:viewSetting', {})
 		},
 	},

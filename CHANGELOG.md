@@ -5,6 +5,12 @@
 
 # Changelog
 
+## 2.4.0
+
+### Added
+
+* [🖼️ Add persistent per\-view layout modes \(table / tiles / gallery\) (tables#2407)](https://github.com/nextcloud/tables/pull/2407)
+
 ## 2.3.0
 
 ### Added

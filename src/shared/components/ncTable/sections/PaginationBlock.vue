@@ -52,7 +52,8 @@ import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
 import { NcButton, NcSelect, NcTextField } from '@nextcloud/vue'
 import { translate as t } from '@nextcloud/l10n'
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { PAGINATION_CHANGED, isSamePaginationTarget } from '../mixins/paginationScope.js'
 
 export default {
 	name: 'PaginationBlock',
@@ -72,12 +73,21 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	data() {
 		return {
 			pageNumber: 1,
 			rowsPerPage: 100,
+			lastSyncedPagination: null,
 		}
 	},
 
@@ -90,19 +100,65 @@ export default {
 	watch: {
 		pageNumber() {
 			this.validatePageInput()
-			emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+			this.emitPaginationChanged()
 		},
 		rowsPerPage() {
 			this.validatePageInput()
-			emit('tables:pagination-changed', { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage })
+			this.emitPaginationChanged()
 		},
 		rows() {
 			this.validatePageInput()
 		},
 	},
 
+	mounted() {
+		subscribe(PAGINATION_CHANGED, this.adoptPagination)
+	},
+
+	beforeUnmount() {
+		unsubscribe(PAGINATION_CHANGED, this.adoptPagination)
+	},
+
 	methods: {
 		t,
+		emitPaginationChanged() {
+			// A value that was just adopted is not echoed back, so two controls of the same
+			// table cannot keep answering each other.
+			if (this.lastSyncedPagination?.pageNumber === this.pageNumber
+				&& this.lastSyncedPagination?.rowsPerPage === this.rowsPerPage) {
+				return
+			}
+
+			this.lastSyncedPagination = { pageNumber: this.pageNumber, rowsPerPage: this.rowsPerPage }
+			emit(PAGINATION_CHANGED, {
+				pageNumber: this.pageNumber,
+				rowsPerPage: this.rowsPerPage,
+				elementId: this.elementId,
+				isView: this.isView,
+			})
+		},
+		// Keeps several pagination controls of the same table in sync.
+		adoptPagination(payload) {
+			if (!isSamePaginationTarget(this, payload)) {
+				return
+			}
+
+			const { pageNumber, rowsPerPage } = payload
+			if (rowsPerPage === this.rowsPerPage && pageNumber === this.pageNumber) {
+				return
+			}
+
+			this.lastSyncedPagination = {
+				pageNumber: pageNumber ?? this.pageNumber,
+				rowsPerPage: rowsPerPage ?? this.rowsPerPage,
+			}
+			if (rowsPerPage) {
+				this.rowsPerPage = rowsPerPage
+			}
+			if (pageNumber) {
+				this.pageNumber = pageNumber
+			}
+		},
 		validatePageInput() {
 			// Ensure page number is within valid range
 			if (this.pageNumber < 1) {

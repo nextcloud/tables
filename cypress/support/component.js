@@ -13,6 +13,11 @@ import '../styleguide/assets/default.css'
 import '../styleguide/assets/additional.css'
 import '../styleguide/assets/icons.css'
 
+// Components ask @nextcloud/auth whether anyone is signed in, and it reads the uid off
+// <head> once and caches it. Setting it here, before any spec module is evaluated, lets the
+// components render as they do for a logged in viewer.
+document.head.setAttribute('data-user', 'admin')
+
 const pinia = createPinia()
 
 const prepareOptions = (options = {}) => {
