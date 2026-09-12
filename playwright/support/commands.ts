@@ -13,8 +13,8 @@ function escapeRegExp(value: string) {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-async function setCheckboxState(control: Locator, checked: boolean) {
-	if ((await control.count()) === 0) {
+async function setCheckboxState(control: Locator, checked: boolean, optional = false) {
+	if (optional && (await control.count()) === 0) {
 		return
 	}
 
@@ -318,11 +318,24 @@ export async function createContext(
 	showInNav: boolean = false,
 ) {
 	await ensureNavigationOpen(page)
-	await page
+
+	const createApplicationButton = page
 		.getByRole('button', { name: /^Create application$/ })
 		.first()
-		.click({ force: true })
-	await expect(page.locator('[data-cy="createContextModal"]')).toBeVisible()
+	const createContextModal = page.locator('[data-cy="createContextModal"]')
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		await createApplicationButton.waitFor({ state: 'visible' })
+		await createApplicationButton.click({ timeout: 5000 }).catch(() => {})
+		const opened = await createContextModal
+			.waitFor({ state: 'visible', timeout: 3000 })
+			.then(() => true)
+			.catch(() => false)
+		if (opened) {
+			break
+		}
+		await ensureNavigationOpen(page)
+	}
+	await expect(createContextModal).toBeVisible()
 
 	const input = page.locator('[data-cy="createContextTitle"]')
 	await input.clear()
@@ -542,6 +555,7 @@ export async function createUsergroupColumn(
 	await setCheckboxState(
 		page.getByRole('checkbox', { name: /^Teams$/ }),
 		selectCircles,
+		true,
 	)
 	await setCheckboxState(
 		page.getByRole('checkbox', { name: /^Users$/ }),
@@ -606,17 +620,17 @@ export async function createTextLinkColumn(
 	await expect(page.getByText('Allowed types')).toBeVisible()
 
 	await setCheckboxState(
-		page.getByRole('checkbox', { name: /^URL$/i }),
+		page.getByRole('switch', { name: /^URL$/i }),
 		false,
 	)
 	await setCheckboxState(
-		page.getByRole('checkbox', { name: /^Files$/i }),
+		page.getByRole('switch', { name: /^Files$/i }),
 		false,
 	)
 
 	for (const provider of ressourceProvider) {
 		await setCheckboxState(
-			page.getByRole('checkbox', {
+			page.getByRole('switch', {
 				name: new RegExp(`^${escapeRegExp(provider)}$`, 'i'),
 			}),
 			true,

@@ -12,6 +12,7 @@ use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ImportService;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\QueuedJob;
 use OCP\IUserManager;
@@ -47,6 +48,20 @@ class ImportTableJob extends QueuedJob {
 		$userId = $argument['user_id'];
 		$tableId = $argument['table_id'];
 		$viewId = $argument['view_id'];
+
+		try {
+			$view = $viewId ? $this->viewMapper->find($viewId) : null;
+			$targetTableId = $view?->getTableId() ?? $tableId;
+			if ($targetTableId === null) {
+				$this->logger->error('Import job was scheduled without a table or view id, skipping.');
+				return;
+			}
+			$table = $this->tableMapper->find($targetTableId);
+		} catch (DoesNotExistException $e) {
+			$this->logger->warning('Import skipped, table or view no longer exists: ' . $e->getMessage(), ['exception' => $e]);
+			return;
+		}
+
 		$oldUser = $this->userSession->getUser();
 		$importSuccess = false;
 
@@ -74,14 +89,10 @@ class ImportTableJob extends QueuedJob {
 			$this->userSession->setUser($oldUser);
 		}
 
-		if (!$tableId && $viewId) {
-			$tableId = $this->viewMapper->find($viewId)->getTableId();
-		}
-
 		if ($importSuccess) {
 			$this->activityManager->triggerEvent(
 				objectType: ActivityManager::TABLES_OBJECT_TABLE,
-				object: $this->tableMapper->find($tableId),
+				object: $table,
 				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
 				additionalParams: [
 					'importStats' => $importStats,
@@ -93,17 +104,17 @@ class ImportTableJob extends QueuedJob {
 			$notifySubject = ActivityManager::SUBJECT_IMPORT_FAILED;
 		}
 
-		if ($viewId) {
+		if ($view !== null) {
 			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_VIEW,
-				object: $this->viewMapper->find($viewId),
+				object: $view,
 				subject: $notifySubject,
 				author: $userId
 			);
 		} else {
 			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_TABLE,
-				object: $this->tableMapper->find($tableId),
+				object: $table,
 				subject: $notifySubject,
 				author: $userId
 			);
