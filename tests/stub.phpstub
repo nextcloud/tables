@@ -71,12 +71,30 @@ namespace OCP\Share\ShareReview\Events {
 namespace OCA\Circles\Model {
 	class Circle {
 		abstract public function getSingleId(): string {}
+		/** @return list<Member> */
+		abstract public function getInheritedMembers(): array {}
+	}
+	class Member {
+		public const TYPE_SINGLE = 0;
+		public const TYPE_USER = 1;
+		public const TYPE_GROUP = 2;
+		public const TYPE_MAIL = 4;
+		public const TYPE_CONTACT = 8;
+		public const TYPE_CIRCLE = 16;
+		public const TYPE_APP = 10000;
+		abstract public function getUserId(): string {}
+		abstract public function getUserType(): int {}
+		abstract public function getBasedOn(): ?Circle {}
 	}
 }
 
 namespace OCA\Circles\Events {
 	class CircleDestroyedEvent extends \OCP\EventDispatcher\Event {
 		public function getCircle(): \OCA\Circles\Model\Circle {}
+	}
+	class CircleMemberRemovedEvent extends \OCP\EventDispatcher\Event {
+		public function getCircle(): \OCA\Circles\Model\Circle {}
+		public function getMember(): ?\OCA\Circles\Model\Member {}
 	}
 }
 
