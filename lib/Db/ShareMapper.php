@@ -302,6 +302,28 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
+	 * Find the distinct nodes shared with a given receiver.
+	 *
+	 * @return list<array{nodeType: string, nodeId: int}>
+	 * @throws Exception
+	 */
+	public function findNodesByReceiver(string $receiver, string $receiverType): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->selectDistinct(['node_type', 'node_id'])
+			->from($this->table)
+			->where($qb->expr()->eq('receiver', $qb->createNamedParameter($receiver, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)));
+
+		$result = $qb->executeQuery();
+		$nodes = [];
+		while ($row = $result->fetchAssociative()) {
+			$nodes[] = ['nodeType' => (string)$row['node_type'], 'nodeId' => (int)$row['node_id']];
+		}
+		$result->closeCursor();
+		return $nodes;
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function deleteByReceiver(string $receiver, string $receiverType): int {

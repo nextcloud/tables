@@ -21,6 +21,7 @@ class ConversionHelper {
 		return match ($nodeType) {
 			Application::NODE_TYPE_TABLE => 'table',
 			Application::NODE_TYPE_VIEW => 'view',
+			Application::NODE_TYPE_CONTEXT => 'context',
 			default => throw new InvalidArgumentException('Invalid node type'),
 		};
 	}
@@ -33,6 +34,23 @@ class ConversionHelper {
 			'table', 'tables' => Application::NODE_TYPE_TABLE,
 			'view', 'views' => Application::NODE_TYPE_VIEW,
 			default => throw new InvalidArgumentException('Invalid node type'),
+		};
+	}
+
+	/**
+	 * Map a node type as stored in `tables_shares`, which unlike the node
+	 * types above also covers contexts.
+	 *
+	 * Returns null for anything unknown so callers can skip it. Kept separate
+	 * from stringNodeType2Const() on purpose: that method doubles as a
+	 * validation gate for endpoints that only handle tables and views.
+	 */
+	public static function shareNodeType2Const(string $nodeType): ?int {
+		return match ($nodeType) {
+			'table', 'tables' => Application::NODE_TYPE_TABLE,
+			'view', 'views' => Application::NODE_TYPE_VIEW,
+			'context', 'contexts' => Application::NODE_TYPE_CONTEXT,
+			default => null,
 		};
 	}
 
