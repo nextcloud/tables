@@ -36,6 +36,23 @@ class ConversionHelper {
 		};
 	}
 
+	/**
+	 * Map a node type as stored in `tables_shares`, which unlike the node
+	 * types above also covers contexts.
+	 *
+	 * Returns null for anything unknown so callers can skip it. Kept separate
+	 * from stringNodeType2Const() on purpose: that method doubles as a
+	 * validation gate for endpoints that only handle tables and views.
+	 */
+	public static function shareNodeType2Const(string $nodeType): ?int {
+		return match ($nodeType) {
+			'table', 'tables' => Application::NODE_TYPE_TABLE,
+			'view', 'views' => Application::NODE_TYPE_VIEW,
+			'context', 'contexts' => Application::NODE_TYPE_CONTEXT,
+			default => null,
+		};
+	}
+
 	public static function object2String(Table|View $node): string {
 		if ($node instanceof Table) {
 			return 'table';

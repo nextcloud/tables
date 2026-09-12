@@ -76,6 +76,7 @@ class TableService extends SuperService {
 		private FederationService $federationService,
 		private AuditLogServiceInterface $auditLogService,
 		private ArchiveService $archiveService,
+		private ArchiveCleanupService $archiveCleanupService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -352,8 +353,9 @@ class TableService extends SuperService {
 	/**
 	 * Archive a table for the given user.
 	 *
-	 * If the user is the owner the entity flag is set and all per-user
-	 * overrides are cleared; otherwise a personal override is stored.
+	 * If the user is the owner the entity flag is set, which is the default for
+	 * everyone who never made a choice of their own; a stored override keeps its
+	 * user on their own choice. Anyone else only stores a personal override.
 	 *
 	 * @throws InternalError
 	 * @throws NotFoundError
@@ -366,9 +368,10 @@ class TableService extends SuperService {
 	/**
 	 * Unarchive a table for the given user.
 	 *
-	 * If the user is the owner the entity flag is cleared and all per-user
-	 * overrides are reset; otherwise the personal override is removed or
-	 * set to false if the owner has archived the table.
+	 * If the user is the owner the entity flag is cleared, which is the default for
+	 * everyone who never made a choice of their own; a stored override keeps its
+	 * user on their own choice. Anyone else has their personal override removed, or
+	 * set to false while the owner has archived the table.
 	 *
 	 * @throws InternalError
 	 * @throws NotFoundError
@@ -408,6 +411,14 @@ class TableService extends SuperService {
 		}
 
 		if ($isOwner && $entityArchived !== $archived) {
+			// Logged before the announcement, which swallows its own failures: an
+			// owner-level flip is a shared change and must leave an audit trail even
+			// when the activity or federation notice cannot be delivered.
+			$this->auditLogService->log(
+				$archived ? Operation::TableArchived : Operation::TableUnarchived,
+				$archived ? 'Table with ID: %s was archived' : 'Table with ID: %s was unarchived',
+				['tableId' => $id],
+			);
 			$this->announceArchiveChange($table, $userId, $archived, $changes);
 		}
 
@@ -567,15 +578,16 @@ class TableService extends SuperService {
 				}
 				$table = $this->mapper->update($table);
 				$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
-				if (!$this->permissionsService->canReadTable($table, $previousOwnerUserId)) {
-					$this->archiveService->removeUserOverride($previousOwnerUserId, Application::NODE_TYPE_TABLE, $id);
-				}
 				return $table;
 			}, $this->dbc);
 		} catch (\Exception $e) {
 			$this->logger->error('Failed to transfer table ownership: ' . $e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Failed to transfer table ownership: ' . $e->getMessage());
 		}
+
+		// Outside the transaction on purpose: the access check reads shares and group
+		// memberships, and a failure there must not take the completed transfer with it.
+		$this->archiveCleanupService->removeOverrideIfStale($previousOwnerUserId, Application::NODE_TYPE_TABLE, $id);
 
 		$event = new TableOwnershipTransferredEvent(
 			table: $table,
@@ -584,6 +596,14 @@ class TableService extends SuperService {
 		);
 
 		$this->eventDispatcher->dispatchTyped($event);
+
+		// The transfer may have promoted the new owner's override to the shared flag,
+		// so the response has to carry the requesting user's own state, not that flag.
+		try {
+			$this->archiveService->enrichTablesWithArchiveState([$table], $userId);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
 
 		return $table;
 	}
