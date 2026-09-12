@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Federation;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Constants\ViewLayout;
@@ -20,6 +21,7 @@ use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\FederationDisabledError;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Service\ArchiveService;
 use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\ShareToken;
@@ -45,6 +47,7 @@ class FederationProvider implements ISignedCloudFederationProvider {
 		private readonly ICloudIdManager $cloudIdManager,
 		private readonly FederationService $federationService,
 		private readonly AuditLogServiceInterface $auditLogService,
+		private readonly ArchiveService $archiveService,
 	) {
 	}
 
@@ -234,6 +237,10 @@ class FederationProvider implements ISignedCloudFederationProvider {
 		$nodeType = $notification['nodeType'];
 		$node = $this->findNodeByExternalIdAndToken($providerId, $notification, $nodeType);
 		$this->shareMapper->deleteByNode($node->getId(), $nodeType);
+		if ($nodeType === 'table') {
+			// The share rows go first, so no later event could reach these.
+			$this->archiveService->deleteNodeArchiveOverrides(Application::NODE_TYPE_TABLE, $node->getId());
+		}
 		$this->getMapperForNodeType($nodeType)->delete($node);
 	}
 
