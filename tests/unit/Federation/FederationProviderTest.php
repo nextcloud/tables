@@ -19,6 +19,7 @@ use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\FederationDisabledError;
 use OCA\Tables\Federation\FederationProvider;
+use OCA\Tables\Service\ArchiveService;
 use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\Federation\Exceptions\ProviderCouldNotAddShareException;
@@ -52,6 +53,7 @@ class FederationProviderTest extends TestCase {
 			$this->cloudIdManager,
 			$this->federationService,
 			$this->auditLogService,
+			$this->createMock(ArchiveService::class),
 		);
 	}
 

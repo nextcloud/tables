@@ -18,6 +18,7 @@ use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Listener\ReceiverCleanupListener;
+use OCA\Tables\Service\ArchiveCleanupService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -35,6 +36,7 @@ use Psr\Log\LoggerInterface;
 class ReceiverCleanupListenerTest extends DatabaseTestCase {
 	private ShareMapper $shareMapper;
 	private ContextNavigationMapper $navigationMapper;
+	private ArchiveCleanupService&MockObject $archiveCleanupService;
 	private LoggerInterface&MockObject $logger;
 	/** @var int[] */
 	private array $shareIds = [];
@@ -43,6 +45,7 @@ class ReceiverCleanupListenerTest extends DatabaseTestCase {
 		parent::setUp();
 		$this->shareMapper = new ShareMapper($this->createMock(LoggerInterface::class), $this->connectionAdapter);
 		$this->navigationMapper = new ContextNavigationMapper($this->connectionAdapter);
+		$this->archiveCleanupService = $this->createMock(ArchiveCleanupService::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 	}
 
@@ -70,6 +73,7 @@ class ReceiverCleanupListenerTest extends DatabaseTestCase {
 		$this->navigation($toGroup, 'stays');
 
 		$this->logger->expects($this->never())->method('warning');
+		$this->archiveCleanupService->expects($this->once())->method('cleanupDeletedUser')->with('gone');
 		$this->listener()->handle(new UserDeletedEvent($this->user('gone')));
 
 		$this->assertSame([$toStays, $toGroup], $this->storedShares());
@@ -84,6 +88,7 @@ class ReceiverCleanupListenerTest extends DatabaseTestCase {
 		$this->navigation($toUser, '');
 
 		$this->logger->expects($this->never())->method('warning');
+		$this->archiveCleanupService->expects($this->once())->method('purgeShareNodeOverrides')->with('context', 990801);
 		$group = $this->createMock(IGroup::class);
 		$group->method('getGID')->willReturn('team');
 		$this->listener()->handle(new GroupDeletedEvent($group));
@@ -103,6 +108,7 @@ class ReceiverCleanupListenerTest extends DatabaseTestCase {
 		$this->navigation($toGroup, '');
 
 		$this->logger->expects($this->never())->method('warning');
+		$this->archiveCleanupService->expects($this->once())->method('purgeShareNodeOverrides')->with('context', 990801);
 		$circle = $this->createMock(Circle::class);
 		$circle->method('getSingleId')->willReturn('team-single-id');
 		$event = $this->createMock(CircleDestroyedEvent::class);
@@ -132,7 +138,7 @@ class ReceiverCleanupListenerTest extends DatabaseTestCase {
 	}
 
 	private function listener(?ContextNavigationMapper $navigationMapper = null): ReceiverCleanupListener {
-		return new ReceiverCleanupListener($this->shareMapper, $navigationMapper ?? $this->navigationMapper, $this->logger);
+		return new ReceiverCleanupListener($this->shareMapper, $navigationMapper ?? $this->navigationMapper, $this->archiveCleanupService, $this->logger);
 	}
 
 	private function user(string $uid): IUser {
