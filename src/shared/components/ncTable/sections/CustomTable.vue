@@ -13,6 +13,7 @@
 					:config="config"
 					:pinned-column-id="pinnedColumnId"
 					:column-widths="columnWidths"
+					:view-id="isView ? elementId : null"
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-column="col => $emit('edit-column', col)"
