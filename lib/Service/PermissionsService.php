@@ -613,6 +613,18 @@ class PermissionsService {
 		return $nodeType . ':' . $nodeId . ':' . $userId;
 	}
 
+	/**
+	 * Drop what this request already resolved about a user's access to a node.
+	 *
+	 * The memo is only sound while the shares it was built from are unchanged, and
+	 * a request that deletes a share usually resolved the permissions first, to be
+	 * allowed to delete it at all.
+	 */
+	public function forgetCachedPermissions(int $nodeId, string $nodeType, string $userId): void {
+		$cacheKey = $this->buildPermissionCacheKey($nodeId, $nodeType, $userId);
+		unset($this->sharedPermissionsByNode[$cacheKey], $this->contextPermissionsByNode[$cacheKey]);
+	}
+
 	private function hasPermission(int $existingPermissions, string $permissionName): bool {
 		$constantName = 'PERMISSION_' . strtoupper($permissionName);
 		try {
