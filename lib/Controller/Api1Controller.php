@@ -191,7 +191,10 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function getTable(int $tableId): DataResponse {
 		try {
-			return new DataResponse($this->tableService->find($tableId)->jsonSerialize());
+			$table = $this->userId === null
+				? $this->tableService->find($tableId)
+				: $this->tableService->getTableForUser($tableId, $this->userId);
+			return new DataResponse($table->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -213,7 +216,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param string|null $title New table title
 	 * @param string|null $emoji New table emoji
-	 * @param bool $archived Whether the table is archived
+	 * @param bool|null $archived Whether the table is archived; the state is kept unchanged when omitted
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
@@ -226,7 +229,7 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
-	public function updateTable(int $tableId, ?string $title = null, ?string $emoji = null, ?bool $archived = false): DataResponse {
+	public function updateTable(int $tableId, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
 		try {
 			return new DataResponse($this->tableService->update($tableId, $title, $emoji, null, $archived, $this->userId)->jsonSerialize());
 		} catch (InvalidArgumentException $e) {
