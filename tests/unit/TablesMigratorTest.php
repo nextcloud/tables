@@ -36,6 +36,7 @@ use OCP\IUser;
 use OCP\UserMigration\IExportDestination;
 use OCP\UserMigration\IImportSource;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 
 class TablesMigratorTest extends TestCase {
@@ -60,6 +61,7 @@ class TablesMigratorTest extends TestCase {
 	private $rowService;
 	private $contextService;
 	private $shareService;
+	private $logger;
 
 	protected function setUp(): void {
 		$this->l10n = $this->createMock(IL10N::class);
@@ -82,6 +84,7 @@ class TablesMigratorTest extends TestCase {
 		$this->rowService = $this->createMock(RowService::class);
 		$this->contextService = $this->createMock(ContextService::class);
 		$this->shareService = $this->createMock(ShareService::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->migrator = new TablesMigrator(
 			$this->l10n,
@@ -103,7 +106,8 @@ class TablesMigratorTest extends TestCase {
 			$this->columnService,
 			$this->rowService,
 			$this->contextService,
-			$this->shareService
+			$this->shareService,
+			$this->logger
 		);
 	}
 
