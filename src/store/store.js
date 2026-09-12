@@ -117,14 +117,23 @@ export const useTablesStore = defineStore('store', {
 		},
 		setTable(table) {
 			const index = this.tables.findIndex(t => t.id === table.id)
-			this.tables.splice(index, 1, table)
+			if (index === -1) {
+				return
+			}
+			this.tables[index] = table
 		},
 		setView(view) {
 			const index = this.views.findIndex(v => v.id === view.id)
+			if (index === -1) {
+				return
+			}
 			this.views[index] = view
 		},
 		setContext(context) {
 			const index = this.contexts.findIndex(c => c.id === context.id)
+			if (index === -1) {
+				return
+			}
 			this.contexts[index] = context
 		},
 		setActiveRowId(rowId) {
@@ -278,6 +287,9 @@ export const useTablesStore = defineStore('store', {
 			const table = res.data
 			const tables = this.tables
 			const index = tables.findIndex(t => t.id === table.id)
+			if (index === -1) {
+				return true
+			}
 			this.tables[index] = table
 			return true
 		},
@@ -344,6 +356,66 @@ export const useTablesStore = defineStore('store', {
 			this.setTable(table)
 
 			return true
+		},
+
+		/**
+		 * Archive or unarchive a table or an application.
+		 *
+		 * The endpoints answer with the authoritative per-user state, so the
+		 * response decides the stored value rather than the requested one.
+		 *
+		 * @param {object} params parameters
+		 * @param {'tables'|'contexts'} params.collection node collection to address
+		 * @param {number} params.id node id
+		 * @param {boolean} params.archived target state
+		 * @return {Promise<boolean>} whether the call succeeded
+		 */
+		async setArchiveState({ collection, id, archived }) {
+			const isTable = collection === 'tables'
+			const url = generateOcsUrl(`/apps/tables/api/2/${collection}/${id}/archive`)
+			const errorMessage = isTable
+				? (archived ? t('tables', 'Could not archive table.') : t('tables', 'Could not unarchive table.'))
+				: (archived ? t('tables', 'Could not archive application.') : t('tables', 'Could not unarchive application.'))
+
+			let res = null
+			try {
+				res = (await (archived ? axios.post(url) : axios.delete(url))).data.ocs
+			} catch (e) {
+				displayError(e, errorMessage)
+				return false
+			}
+
+			const items = isTable ? this.tables : this.contexts
+			const index = items.findIndex(item => item.id === id)
+			if (index === -1) {
+				return true
+			}
+
+			const item = items[index]
+			item.archived = res.data?.archived ?? archived
+			if (isTable) {
+				this.setTable(item)
+			} else {
+				this.setContext(item)
+			}
+
+			return true
+		},
+
+		async archiveTable({ id }) {
+			return await this.setArchiveState({ collection: 'tables', id, archived: true })
+		},
+
+		async unarchiveTable({ id }) {
+			return await this.setArchiveState({ collection: 'tables', id, archived: false })
+		},
+
+		async archiveContext({ id }) {
+			return await this.setArchiveState({ collection: 'contexts', id, archived: true })
+		},
+
+		async unarchiveContext({ id }) {
+			return await this.setArchiveState({ collection: 'contexts', id, archived: false })
 		},
 
 		async shareContext({ id, previousReceivers, receivers, displayMode }) {
@@ -433,6 +505,9 @@ export const useTablesStore = defineStore('store', {
 
 			const context = res.data.ocs.data
 			const index = this.contexts.findIndex(c => c.id === context.id)
+			if (index === -1) {
+				return true
+			}
 			this.contexts[index] = context
 
 			return true

@@ -49,6 +49,7 @@ final class ContextServiceTest extends TestCase {
 		$shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
+		$archiveService = $this->createMock(ArchiveService::class);
 
 		$this->service = new ContextService(
 			$this->contextMapper,
@@ -61,11 +62,13 @@ final class ContextServiceTest extends TestCase {
 			$eventDispatcher,
 			$dbConnection,
 			$shareService,
+			$this->createMock(ArchiveCleanupService::class),
 			false,
 			$navigationManager,
 			$urlGenerator,
 			$this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
+			$archiveService,
 		);
 	}
 

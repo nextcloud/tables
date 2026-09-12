@@ -71,6 +71,7 @@ class ShareService extends SuperService {
 		private readonly IHasher $hasher,
 		private readonly IShareManager $shareManager,
 		private readonly FederationService $federationService,
+		private readonly ArchiveCleanupService $archiveCleanupService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -731,6 +732,9 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		$this->archiveCleanupService->cleanupAfterShareDeletion($item);
+
 		return $item;
 	}
 
@@ -817,6 +821,7 @@ class ShareService extends SuperService {
 		if ($share->getNodeType() === 'context') {
 			$this->contextNavigationMapper->deleteByShareId($share->getId());
 		}
+		$this->archiveCleanupService->cleanupAfterShareDeletion($share);
 	}
 
 	public function deleteAllForTable(Table $table):void {

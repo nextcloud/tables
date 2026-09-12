@@ -55,8 +55,8 @@ class RenameTable extends Command {
 			->addOption(
 				'archived',
 				'a',
-				InputOption::VALUE_NONE,
-				'Archived'
+				InputOption::VALUE_NEGATABLE,
+				'Archive (--archived) or unarchive (--no-archived) the table; the state is kept unchanged when omitted'
 			)
 		;
 	}
