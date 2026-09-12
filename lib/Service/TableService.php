@@ -75,6 +75,7 @@ class TableService extends SuperService {
 		private ActivityManager $activityManager,
 		private FederationService $federationService,
 		private AuditLogServiceInterface $auditLogService,
+		private ArchiveService $archiveService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -156,6 +157,14 @@ class TableService extends SuperService {
 				if ($table->getIsShared()) {
 					$table->setHasShares(false);
 				}
+			}
+		}
+
+		if ($userId !== '') {
+			try {
+				$this->archiveService->enrichTablesWithArchiveState(array_values($allTables), $userId);
+			} catch (OcpDbException $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}
 		}
 
@@ -280,6 +289,160 @@ class TableService extends SuperService {
 	}
 
 	/**
+	 * Fetch a single table and resolve the per-user `archived` flag.
+	 *
+	 * Use this instead of `find()` when the caller needs the correct per-user
+	 * archive state (e.g. GET /tables/{id} API endpoints).
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function getTableForUser(int $id, string $userId): Table {
+		$table = $this->find($id, false, $userId);
+		try {
+			$this->archiveService->enrichTablesWithArchiveState([$table], $userId);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+		return $table;
+	}
+
+	/**
+	 * Apply the legacy `archived` flag of the update endpoints with the same
+	 * per-user semantics the dedicated archive endpoints use.
+	 *
+	 * An owner toggles the entity-level flag, which everyone who never made a
+	 * choice of their own follows; a stored override keeps its user on their
+	 * own choice. Anyone else only changes their own override and leaves the
+	 * shared flag alone.
+	 *
+	 * Returns whether this touched the shared table, i.e. an owner actually
+	 * flipped the entity flag. A non-owner's private override, or an owner
+	 * repeating the current state, changes nothing anyone else can observe and
+	 * must not surface as a shared edit (bumped metadata, activity, federation).
+	 *
+	 * @throws InternalError
+	 */
+	private function applyArchivedOnUpdate(Table $table, bool $archived, string $userId): bool {
+		$nodeId = $table->getId();
+		$entityArchived = $table->isArchived();
+		// an empty user id is a CLI call (occ) and acts with owner-level rights
+		$isOwner = $userId === '' || $table->getOwnership() === $userId;
+		try {
+			if ($archived) {
+				$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_TABLE, $nodeId, $isOwner, $entityArchived);
+			} else {
+				$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_TABLE, $nodeId, $isOwner, $entityArchived);
+			}
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		if ($isOwner) {
+			// ArchiveService already wrote the shared flag; keep the in-memory
+			// entity consistent for the response and the activity diff.
+			$table->setArchived($archived);
+			return $entityArchived !== $archived;
+		}
+		return false;
+	}
+
+	/**
+	 * Archive a table for the given user.
+	 *
+	 * If the user is the owner the entity flag is set and all per-user
+	 * overrides are cleared; otherwise a personal override is stored.
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function archiveTable(int $id, string $userId): Table {
+		return $this->setArchivedForUser($id, $userId, true);
+	}
+
+	/**
+	 * Unarchive a table for the given user.
+	 *
+	 * If the user is the owner the entity flag is cleared and all per-user
+	 * overrides are reset; otherwise the personal override is removed or
+	 * set to false if the owner has archived the table.
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function unarchiveTable(int $id, string $userId): Table {
+		return $this->setArchivedForUser($id, $userId, false);
+	}
+
+	/**
+	 * Shared implementation of archiveTable() and unarchiveTable().
+	 *
+	 * An owner changes the shared flag, which is a change to the table like
+	 * any other: it bumps the edit metadata, reaches the activity stream and
+	 * is announced to federated receivers. A personal override changes nothing
+	 * anyone else can observe, so it stays silent.
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	private function setArchivedForUser(int $id, string $userId, bool $archived): Table {
+		$table = $this->find($id, true, $userId);
+		$isOwner = $table->getOwnership() === $userId;
+		$entityArchived = $table->isArchived(); // entity-level flag, not per-user
+		$changes = new ChangeSet($table);
+
+		try {
+			if ($archived) {
+				$this->archiveService->archiveForUser($userId, Application::NODE_TYPE_TABLE, $id, $isOwner, $entityArchived);
+			} else {
+				$this->archiveService->unarchiveForUser($userId, Application::NODE_TYPE_TABLE, $id, $isOwner, $entityArchived);
+			}
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		if ($isOwner && $entityArchived !== $archived) {
+			$this->announceArchiveChange($table, $userId, $archived, $changes);
+		}
+
+		return $this->getTableForUser($id, $userId);
+	}
+
+	/**
+	 * Record an owner-level archive change the way TableService::update() does.
+	 *
+	 * The flag itself was already written by ArchiveService, so this only
+	 * refreshes the edit metadata and emits the notifications. Failures are
+	 * logged rather than raised: the archive state is already stored and must
+	 * not be rolled back because a notification could not be delivered.
+	 */
+	private function announceArchiveChange(Table $table, string $userId, bool $archived, ChangeSet $changes): void {
+		try {
+			$table->setArchived($archived);
+			$table->setLastEditBy($userId);
+			$table->setLastEditAt((new DateTime())->format('Y-m-d H:i:s'));
+			$table = $this->mapper->update($table);
+
+			$this->federationService->notifyNodeUpdate($table, 'table');
+
+			$changes->setAfter($table);
+			$this->activityManager->triggerUpdateEvents(
+				objectType: ActivityManager::TABLES_OBJECT_TABLE,
+				changeSet: $changes,
+				subject: ActivityManager::SUBJECT_TABLE_UPDATE
+			);
+		} catch (\Throwable $e) {
+			$this->logger->error('Could not announce the archive change: ' . $e->getMessage(), ['exception' => $e]);
+		}
+	}
+
+	/**
 	 * @param string $title
 	 * @param string $template
 	 * @param string|null $emoji
@@ -391,12 +554,22 @@ class TableService extends SuperService {
 		}
 
 		$previousOwnerUserId = $table->getOwnership();
+		$wasOwnerArchived = $table->isArchived();
 		$table->setOwnership($newOwnerUserId);
 
 		try {
-			$table = $this->atomic(function () use ($table, $id, $newOwnerUserId, $userId) {
+			$table = $this->atomic(function () use ($table, $id, $newOwnerUserId, $userId, $previousOwnerUserId, $wasOwnerArchived) {
+				$newArchived = $this->archiveService->prepareOwnershipTransfer(
+					$previousOwnerUserId, $newOwnerUserId, Application::NODE_TYPE_TABLE, $id, $wasOwnerArchived
+				);
+				if ($newArchived !== $wasOwnerArchived) {
+					$table->setArchived($newArchived);
+				}
 				$table = $this->mapper->update($table);
 				$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
+				if (!$this->permissionsService->canReadTable($table, $previousOwnerUserId)) {
+					$this->archiveService->removeUserOverride($previousOwnerUserId, Application::NODE_TYPE_TABLE, $id);
+				}
 				return $table;
 			}, $this->dbc);
 		} catch (\Exception $e) {
@@ -492,6 +665,13 @@ class TableService extends SuperService {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		// remove per-user archive overrides for this table
+		try {
+			$this->archiveService->deleteNodeArchiveOverrides(Application::NODE_TYPE_TABLE, $id);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+
 		$event = new TableDeletedEvent(table: $item);
 
 		$this->eventDispatcher->dispatchTyped($event);
@@ -539,36 +719,48 @@ class TableService extends SuperService {
 		$changes = new ChangeSet($table);
 		$wasArchived = $table->getArchived();
 		$time = new DateTime();
+		$hasSharedChange = false;
 		if ($title !== null) {
 			$title = (string)new Title($title);
 			$table->setTitle($title);
+			$hasSharedChange = true;
 		}
 		if ($emoji !== null) {
 			$table->setEmoji($emoji);
+			$hasSharedChange = true;
 		}
 		if ($archived !== null) {
-			$table->setArchived($archived);
+			// a non-owner's archive is private; only an owner-level flag flip is shared
+			$hasSharedChange = $this->applyArchivedOnUpdate($table, $archived, $userId) || $hasSharedChange;
 		}
 		if ($description !== null) {
 			$table->setDescription($description);
+			$hasSharedChange = true;
 		}
 		if ($columnSettings !== null) {
 			$table->setColumnOrder(\json_encode($columnSettings->jsonSerialize()));
+			$hasSharedChange = true;
 		}
 		if ($sort !== null) {
 			$table->setSort(\json_encode($sort->jsonSerialize()));
-		}
-		$table->setLastEditBy($userId);
-		$table->setLastEditAt($time->format('Y-m-d H:i:s'));
-		try {
-			$table = $this->mapper->update($table);
-		} catch (OcpDbException $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			$hasSharedChange = true;
 		}
 
-		// notify federated shares about table update
-		$this->federationService->notifyNodeUpdate($table, 'table');
+		// A private per-user archive override leaves the shared table untouched,
+		// so skip the edit-metadata bump, persist, federation notice and activity.
+		if ($hasSharedChange) {
+			$table->setLastEditBy($userId);
+			$table->setLastEditAt($time->format('Y-m-d H:i:s'));
+			try {
+				$table = $this->mapper->update($table);
+			} catch (OcpDbException $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+
+			// notify federated shares about table update
+			$this->federationService->notifyNodeUpdate($table, 'table');
+		}
 
 		try {
 			$this->enhanceTable($table, $userId);
@@ -576,18 +768,31 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
-		$changes->setAfter($table);
-		$this->activityManager->triggerUpdateEvents(
-			objectType: ActivityManager::TABLES_OBJECT_TABLE,
-			changeSet: $changes,
-			subject: ActivityManager::SUBJECT_TABLE_UPDATE
-		);
-		if ($archived !== null && $archived !== $wasArchived) {
+		if ($hasSharedChange) {
+			$changes->setAfter($table);
+			$this->activityManager->triggerUpdateEvents(
+				objectType: ActivityManager::TABLES_OBJECT_TABLE,
+				changeSet: $changes,
+				subject: ActivityManager::SUBJECT_TABLE_UPDATE
+			);
+		}
+		// A private per-user override leaves the shared flag alone, so only an
+		// owner-level flip is worth an audit entry.
+		if ($table->getArchived() !== $wasArchived) {
 			$this->auditLogService->log(
-				$archived ? Operation::TableArchived : Operation::TableUnarchived,
-				$archived ? 'Table with ID: %s was archived' : 'Table with ID: %s was unarchived',
+				$table->getArchived() ? Operation::TableArchived : Operation::TableUnarchived,
+				$table->getArchived() ? 'Table with ID: %s was archived' : 'Table with ID: %s was unarchived',
 				['tableId' => $table->getId()],
 			);
+		}
+		// Resolve the per-user archived state only after the activity diff and the
+		// audit entry are built, so the response reflects the requesting user's state.
+		if ($userId !== '') {
+			try {
+				$this->archiveService->enrichTablesWithArchiveState([$table], $userId);
+			} catch (OcpDbException $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
 		}
 		return $table;
 	}
@@ -834,6 +1039,14 @@ class TableService extends SuperService {
 				throw new BadRequestError('View with id ' . $viewData['id'] . ' does not belong to table with id ' . $tableId);
 			}
 			$this->viewService->delete($viewData['id']);
+		}
+
+		// The caller returns this table straight to the client, which must see its own
+		// archived state rather than the shared flag.
+		try {
+			$this->archiveService->enrichTablesWithArchiveState([$table], $userId);
+		} catch (OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 		}
 
 		return $table;
