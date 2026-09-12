@@ -27,6 +27,10 @@ if (!interface_exists(\OCP\Share\ShareReview\IShareReviewSource::class)) {
 	require_once __DIR__ . '/ShareReview/Stubs.php';
 }
 
+if (!class_exists(\OCA\Circles\Model\Member::class)) {
+	require_once __DIR__ . '/Circles/Stubs.php';
+}
+
 if (!class_exists(TestCase::class)) {
 	require_once('PHPUnit/Autoload.php');
 }

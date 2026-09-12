@@ -74,6 +74,7 @@ class ShareService extends SuperService {
 		private readonly IShareManager $shareManager,
 		private readonly FederationService $federationService,
 		private readonly AuditLogServiceInterface $auditLogService,
+		private readonly ArchiveCleanupService $archiveCleanupService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -740,6 +741,7 @@ class ShareService extends SuperService {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		$this->logShareChange(Operation::ShareDeleted, 'Share %s of %s %s for %s "%s" was deleted', $item);
+		$this->archiveCleanupService->cleanupAfterShareDeletion($item);
 		return $item;
 	}
 
@@ -847,6 +849,7 @@ class ShareService extends SuperService {
 			$this->contextNavigationMapper->deleteByShareId($share->getId());
 		}
 		$this->logShareChange(Operation::ShareDeleted, 'Share %s of %s %s for %s "%s" was deleted through the share review', $share);
+		$this->archiveCleanupService->cleanupAfterShareDeletion($share);
 	}
 
 	public function deleteAllForTable(Table $table):void {

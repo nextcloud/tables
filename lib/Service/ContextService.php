@@ -159,8 +159,9 @@ class ContextService {
 	/**
 	 * Archive a context for the given user.
 	 *
-	 * If the user is the owner the entity flag is set and all per-user
-	 * overrides are cleared; otherwise a personal override is stored.
+	 * If the user is the owner the entity flag is set, which is the default for
+	 * everyone who never made a choice of their own; a stored override keeps its
+	 * user on their own choice. Anyone else only stores a personal override.
 	 * Access is validated by the mapper (NotFoundError if no access).
 	 *
 	 * @throws Exception
@@ -174,9 +175,10 @@ class ContextService {
 	/**
 	 * Unarchive a context for the given user.
 	 *
-	 * If the user is the owner the entity flag is cleared and all per-user
-	 * overrides are reset; otherwise the personal override is removed or
-	 * set to false if the owner has archived the context.
+	 * If the user is the owner the entity flag is cleared, which is the default for
+	 * everyone who never made a choice of their own; a stored override keeps its
+	 * user on their own choice. Anyone else has their personal override removed, or
+	 * set to false while the owner has archived the context.
 	 * Access is validated by the mapper (NotFoundError if no access).
 	 *
 	 * @throws Exception
@@ -507,13 +509,16 @@ class ContextService {
 				}
 				$context = $this->contextMapper->update($context);
 				$this->shareService->transferSharesForContext($contextId, $newOwnerId, $oldOwnerId);
-				$this->archiveCleanupService->removeOverrideIfStale($oldOwnerId, Application::NODE_TYPE_CONTEXT, $contextId);
 				return $context;
 			}, $this->dbc);
 		} catch (\Exception $e) {
 			$this->logger->error('Failed to transfer context ownership: ' . $e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Failed to transfer context ownership: ' . $e->getMessage());
 		}
+
+		// Outside the transaction on purpose: the access check reads shares and team
+		// memberships, and a failure there must not take the completed transfer with it.
+		$this->archiveCleanupService->removeOverrideIfStale($oldOwnerId, Application::NODE_TYPE_CONTEXT, $contextId);
 
 		$this->auditLogService->log(Operation::ContextTransferred, 'Tables application with ID %s was transferred to user %s', [
 			'contextId' => $contextId,
