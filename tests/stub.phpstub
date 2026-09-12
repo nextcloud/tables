@@ -139,6 +139,7 @@ namespace Symfony\Component\Console\Input {
 		const VALUE_NONE = 1;
 		const VALUE_REQUIRED = 1;
 		const VALUE_OPTIONAL = 1;
+		const VALUE_NEGATABLE = 1;
 	}
 }
 
