@@ -191,8 +191,6 @@ export default {
 
 				this.icon = await this.getContextIcon(this.activeContext.iconName)
 
-				this.icon = await this.getContextIcon(this.activeContext.iconName)
-
 				if (this.context && this.context.pages) {
 					const pages = Object.values(this.context.pages)
 					const startPage = pages.find(p => p.page_type === 'startpage')
