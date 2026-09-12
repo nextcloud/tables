@@ -14,6 +14,8 @@ use OCP\IDBConnection;
 
 /** @template-extends RowCellMapperSuper<RowCellRelation, int|null, int|null> */
 class RowCellRelationMapper extends RowCellMapperSuper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_row_cells_relation';
 
 	public function __construct(IDBConnection $db) {
@@ -40,6 +42,18 @@ class RowCellRelationMapper extends RowCellMapperSuper {
 		return (int)$value;
 	}
 
+	/**
+	 * @param list<int|null> $values
+	 * @return list<int>|int|null
+	 */
+	public function formatAggregatedValues(Column $column, array $values): mixed {
+		$values = array_values(array_filter($values, static fn ($value) => $value !== null));
+		if (!(bool)($column->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false)) {
+			return $values[0] ?? null;
+		}
+		return $values;
+	}
+
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
 		$cell->setValue($data === null || $data === '' ? null : (int)$data);
 	}
@@ -63,18 +77,29 @@ class RowCellRelationMapper extends RowCellMapperSuper {
 			$rowId = (int)$row['row_id'];
 			if (isset($seenRows[$rowId])) {
 				$idsToDelete[] = (int)$row['id'];
+				if (count($idsToDelete) >= self::DB_CHUNK_SIZE) {
+					$this->deleteByIds($idsToDelete);
+					$idsToDelete = [];
+				}
 			} else {
 				$seenRows[$rowId] = true;
 			}
 		}
 		$result->closeCursor();
 
-		foreach (array_chunk($idsToDelete, 500) as $chunk) {
-			$deleteQb = $this->db->getQueryBuilder();
-			$deleteQb->delete($this->table)
-				->where($deleteQb->expr()->in('id', $deleteQb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)));
-			$deleteQb->executeStatement();
+		if ($idsToDelete !== []) {
+			$this->deleteByIds($idsToDelete);
 		}
+	}
+
+	/**
+	 * @param list<int> $ids
+	 */
+	private function deleteByIds(array $ids): void {
+		$deleteQb = $this->db->getQueryBuilder();
+		$deleteQb->delete($this->table)
+			->where($deleteQb->expr()->in('id', $deleteQb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+		$deleteQb->executeStatement();
 	}
 
 	/**

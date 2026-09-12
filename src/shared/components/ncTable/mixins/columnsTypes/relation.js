@@ -82,7 +82,7 @@ export default class RelationColumn extends AbstractColumn {
 	isFilterFound(cell, filter) {
 		const rawFilter = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 		const filterValue = String(rawFilter ?? '').toLowerCase()
-		const ids = this.normalizeIds(cell?.value ?? cell)
+		const ids = this.normalizeIds(cell?.value)
 		const labels = ids.map(id => (this.getLabel(id) || String(id)).toLowerCase())
 		const filterId = Number.parseInt(String(rawFilter), 10)
 		const filterIsNumericId = String(rawFilter) === String(filterId) && !Number.isNaN(filterId)

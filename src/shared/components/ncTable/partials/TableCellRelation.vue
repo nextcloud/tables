@@ -181,7 +181,6 @@ export default {
 			if (this.isMandatory && newValue.length === 0) {
 				showError(t('tables', 'This column is mandatory and cannot be empty.'))
 				this.cancelEdit()
-				this.localLoading = false
 				return
 			}
 

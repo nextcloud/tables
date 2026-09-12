@@ -5,10 +5,10 @@
 <template>
 	<div style="width: 100%">
 		<div class="row space-T">
-			<div class="form-col-4 title">
+			<div class="from-col-4 title">
 				{{ t('tables', 'Relation type') }}
 			</div>
-			<div class="form-col-4">
+			<div class="from-col-4">
 				<NcSelect v-model="customSettings.relationType"
 					:options="relationTypeOptions"
 					:reduce="(option) => option.id"
@@ -21,10 +21,10 @@
 		</div>
 
 		<div class="row space-T">
-			<div class="form-col-4 title">
+			<div class="from-col-4 title">
 				{{ t('tables', 'Target') }}
 			</div>
-			<div class="form-col-4">
+			<div class="from-col-4">
 				<NcSelect v-model="customSettings.targetId"
 					:options="availableTargets"
 					:reduce="(option) => option.id"
@@ -37,10 +37,10 @@
 		</div>
 
 		<div class="row space-T">
-			<div class="form-col-4 title">
+			<div class="from-col-4 title">
 				{{ t('tables', 'Label for relation selection') }}
 			</div>
-			<div class="form-col-4">
+			<div class="from-col-4">
 				<NcSelect v-model="customSettings.labelColumn"
 					:options="availableLabelColumns"
 					:reduce="(option) => option.id"
@@ -57,10 +57,10 @@
 		</div>
 
 		<div class="row space-T">
-			<div class="form-col-4 title">
+			<div class="from-col-4 title">
 				{{ t('tables', 'Select multiple items') }}
 			</div>
-			<div class="form-col-4 space-L-small" data-cy="relationMultipleSwitch">
+			<div class="from-col-4 space-L-small" data-cy="relationMultipleSwitch">
 				<NcCheckboxRadioSwitch v-model="customSettings.allowMultiple"
 					type="switch"
 					@update:model-value="updateCustomSettings" />

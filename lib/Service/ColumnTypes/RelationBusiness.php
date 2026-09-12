@@ -67,27 +67,17 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			return true;
 		}
 
-		try {
-			$this->normalizeToIds($value, $column, throwOnInvalid: true);
-			return true;
-		} catch (BadRequestError) {
-			return $this->normalizeToIds($value, $column, throwOnInvalid: false) !== [];
-		}
+		return $this->normalizeToIds($value, $column, throwOnInvalid: false) !== [];
 	}
 
 	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
-		$ids = ($value === null || $value === '' || $value === [])
-			? []
-			: $this->normalizeToIds($value, $column, throwOnInvalid: true);
-
-		if ($column->getMandatory() && $ids === []) {
-			throw new BadRequestError('Relation column is mandatory and cannot be empty');
-		}
-
-		if ($ids === []) {
+		if ($value === null || $value === '' || $value === []) {
+			// Emptiness for mandatory columns is enforced in RowService::validateMandatoryColumns()
+			// (including view-specific mandatory settings).
 			return;
 		}
 
+		$ids = $this->normalizeToIds($value, $column, throwOnInvalid: true);
 		$allowMultiple = (bool)($column->getCustomSettingsArray()[Column::RELATION_ALLOW_MULTIPLE] ?? false);
 
 		if (!$allowMultiple && count($ids) > 1) {
@@ -102,7 +92,10 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * - null / '' / [] → []
 	 * - single int/string id or label (legacy single-value clients)
 	 * - array of ints/strings (ids or labels)
-	 * - comma-separated string of labels/ids (import)
+	 * - JSON-encoded id / list of ids
+	 *
+	 * Comma-separated strings are only expanded when the full string is not a
+	 * valid label (labels may contain commas).
 	 *
 	 * @return list<int>
 	 * @throws BadRequestError
@@ -116,9 +109,11 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			$decoded = json_decode($value, true);
 			if (json_last_error() === JSON_ERROR_NONE) {
 				$value = $decoded;
-			} elseif (str_contains($value, ',')) {
-				$value = array_map(trim(...), explode(',', $value));
+			} elseif (ctype_digit($value)) {
+				// Keep numeric ids as ints so resolveRelationId does not depend on string equality
+				$value = [(int)$value];
 			} else {
+				// Keep as a single token first — labels may contain commas
 				$value = [$value];
 			}
 		}
@@ -135,14 +130,10 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 				continue;
 			}
 
-			$resolvedId = $this->resolveRelationId($item, $relationData);
-			if ($resolvedId === null) {
-				if ($throwOnInvalid) {
-					throw new BadRequestError('Relation value does not exist in the target table/view');
-				}
-				continue;
+			$resolvedIds = $this->resolveRelationIds($item, $relationData, $throwOnInvalid);
+			foreach ($resolvedIds as $resolvedId) {
+				$ids[] = $resolvedId;
 			}
-			$ids[] = $resolvedId;
 		}
 
 		return array_values(array_unique($ids, SORT_NUMERIC));
@@ -150,16 +141,55 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 	/**
 	 * @param array<int|string, array{id: int, label: string}> $relationData
+	 * @return list<int>
+	 * @throws BadRequestError
+	 */
+	private function resolveRelationIds(mixed $value, array $relationData, bool $throwOnInvalid): array {
+		$resolvedId = $this->resolveRelationId($value, $relationData);
+		if ($resolvedId !== null) {
+			return [$resolvedId];
+		}
+
+		// Only expand comma-separated input when the full string is not a label
+		if (is_string($value) && str_contains($value, ',')) {
+			$partIds = [];
+			foreach (array_map(trim(...), explode(',', $value)) as $part) {
+				if ($part === '') {
+					continue;
+				}
+				$partId = $this->resolveRelationId($part, $relationData);
+				if ($partId === null) {
+					if ($throwOnInvalid) {
+						throw new BadRequestError('Relation value does not exist in the target table/view');
+					}
+					continue;
+				}
+				$partIds[] = $partId;
+			}
+			return $partIds;
+		}
+
+		if ($throwOnInvalid) {
+			throw new BadRequestError('Relation value does not exist in the target table/view');
+		}
+		return [];
+	}
+
+	/**
+	 * @param array<int|string, array{id: int, label: string}> $relationData
 	 */
 	private function resolveRelationId(mixed $value, array $relationData): ?int {
-		// Match by label first (import / human-friendly input)
+		// Prefer numeric id match so stringified ints from clients resolve reliably
+		if (is_int($value) || (is_string($value) && ctype_digit($value))) {
+			$id = (int)$value;
+			if (isset($relationData[$id])) {
+				return $id;
+			}
+		}
+
 		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
 		if (!empty($matchingRelation)) {
 			return (int)reset($matchingRelation)['id'];
-		}
-
-		if (is_numeric($value) && isset($relationData[(int)$value])) {
-			return (int)$value;
 		}
 
 		return null;

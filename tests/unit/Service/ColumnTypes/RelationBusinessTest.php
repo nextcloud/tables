@@ -73,18 +73,31 @@ class RelationBusinessTest extends TestCase {
 	public function testValidateValueAllowsMultipleWhenEnabled(): void {
 		$column = $this->createMock(Column::class);
 		$column->method('getCustomSettingsArray')->willReturn([Column::RELATION_ALLOW_MULTIPLE => true]);
-		$column->method('getMandatory')->willReturn(false);
 		$this->business->validateValue([13, 14], $column, 'admin', 1, null);
 		$this->addToAssertionCount(1);
 	}
 
-	public function testValidateValueRejectsEmptyWhenMandatory(): void {
+	public function testValidateValueAllowsEmptyWhenMandatory(): void {
+		// Mandatory emptiness is enforced in RowService::validateMandatoryColumns()
 		$column = $this->createMock(Column::class);
 		$column->method('getCustomSettingsArray')->willReturn([]);
 		$column->method('getMandatory')->willReturn(true);
-		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('Relation column is mandatory and cannot be empty');
 		$this->business->validateValue([], $column, 'admin', 1, null);
+		$this->addToAssertionCount(1);
+	}
+
+	public function testParseValueKeepsLabelWithComma(): void {
+		$this->relationService = $this->createMock(RelationService::class);
+		$this->business = new RelationBusiness(
+			$this->createMock(LoggerInterface::class),
+			$this->relationService,
+		);
+		$this->relationService->method('getRelationData')->willReturn([
+			16 => ['id' => 16, 'label' => 'Smith, Jr.'],
+		]);
+		$column = $this->createMock(Column::class);
+		$result = json_decode($this->business->parseValue('Smith, Jr.', $column), true);
+		$this->assertSame([16], $result);
 	}
 
 	public function testCanBeParsedDisplayValueKeepsPartialMatches(): void {
@@ -99,5 +112,10 @@ class RelationBusinessTest extends TestCase {
 
 	public function testCanBeParsedStillRejectsPartialInvalid(): void {
 		$this->assertFalse($this->business->canBeParsed('Alice, Unknown', $this->column));
+	}
+
+	public function testParseValueNumericStringId(): void {
+		$result = json_decode($this->business->parseValue('13', $this->column), true);
+		$this->assertSame([13], $result);
 	}
 }
