@@ -44,6 +44,9 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options v-model:view-setting="localViewSetting" :rows="getSearchedAndFilteredAndSortedRows" :all-rows="rows" :columns="parsedColumns" :element-id="elementId"
+				:layout="layout"
+				:view-settings="viewSettings"
+				:can-switch-layout="canSwitchLayout"
 				:is-view="isView"
 				:selected-rows="localSelectedRows"
 				:show-options="parsedColumns.length !== 0" :config="config" @create-row="$emit('create-row')"
@@ -53,6 +56,8 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" v-model:view-setting="localViewSetting"
+				:layout="layout"
+				:view-settings="viewSettings"
 				:columns="parsedColumns" :rows="getSearchedAndFilteredAndSortedRows" :is-view="isView" :element-id="elementId"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
@@ -148,6 +153,18 @@ export default {
 		downloadTitle: {
 			type: String,
 			default: t('tables', 'Download'),
+		},
+		layout: {
+			type: String,
+			default: null,
+		},
+		canSwitchLayout: {
+			type: Boolean,
+			default: true,
+		},
+		viewSettings: {
+			type: Object,
+			default: null,
 		},
 		viewSetting: {
 			type: Object,
@@ -457,6 +474,16 @@ export default {
 	background-color: var(--color-main-background);
 	padding-top: 4px; // fix to show buttons completely
 	padding-bottom: 4px; // to make it nice with the padding-top
+}
+
+.custom-table.row {
+	width: var(--app-content-width, 100%);
+	min-width: 0;
+}
+
+.custom-table.row > * {
+	width: 100%;
+	min-width: 0;
 }
 </style>
 
