@@ -64,6 +64,16 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
+	 * Shape aggregated multi-cell values for the API response.
+	 *
+	 * @param list<mixed> $values
+	 * @return mixed
+	 */
+	public function formatAggregatedValues(Column $column, array $values): mixed {
+		return $values;
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function deleteAllForRow(int $rowId): void {
