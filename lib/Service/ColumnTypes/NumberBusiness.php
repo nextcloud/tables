@@ -18,7 +18,8 @@ class NumberBusiness extends SuperBusiness {
 	 * @return false|string
 	 */
 	public function parseValue($value, Column $column): string|false {
-		if ($value === null) {
+		// An emptied field arrives as '', which must stay empty rather than becoming 0
+		if ($value === null || $value === '') {
 			return '';
 		}
 		return json_encode(floatval($value));

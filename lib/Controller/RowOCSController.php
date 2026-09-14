@@ -147,6 +147,8 @@ class RowOCSController extends AOCSController {
 				return new DataResponse($this->federationService->updateRow($view, $rowId, $data));
 			}
 			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $data, $this->userId, $tableId)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (PermissionError $e) {
