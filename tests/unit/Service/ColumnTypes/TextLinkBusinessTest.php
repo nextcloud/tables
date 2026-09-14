@@ -83,6 +83,7 @@ class TextLinkBusinessTest extends TestCase {
 			'resourceUrl' => 'https://nextcloud.com'
 		]), $column));
 
+		// Client-supplied thumbnailUrl/icon/attributes must never be persisted. The preview is derived from the file id in the URL.
 		$column->setCustomSettings(json_encode([
 			'showPreview' => true,
 		]));
@@ -90,18 +91,12 @@ class TextLinkBusinessTest extends TestCase {
 			'title' => 'photo.jpg',
 			'value' => 'https://nextcloud.test/apps/files/f/123',
 			'providerId' => 'files',
-			'thumbnailUrl' => 'https://nextcloud.test/core/preview?fileId=123',
-			'icon' => 'icon-image',
-			'attributes' => [
-				'fileId' => '123',
-				'path' => '/Photos/photo.jpg',
-			],
 		])), $this->textLinkBusiness->parseValue(json_encode([
 			'title' => 'photo.jpg',
 			'resourceUrl' => 'https://nextcloud.test/apps/files/f/123',
 			'providerId' => 'files',
-			'thumbnailUrl' => 'https://nextcloud.test/core/preview?fileId=123',
-			'icon' => 'icon-image',
+			'thumbnailUrl' => 'https://example/img.png',
+			'icon' => 'https://example/icon.png',
 			'attributes' => [
 				'fileId' => '123',
 				'path' => '/Photos/photo.jpg',
