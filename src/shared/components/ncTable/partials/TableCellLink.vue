@@ -18,10 +18,11 @@
 				<img :src="imagePreviewSrc"
 					:alt="imagePreviewLabel"
 					class="cell-link__preview"
+					loading="lazy"
+					decoding="async"
 					@error="handlePreviewError">
 			</a>
-			<LinkWidget v-else :thumbnail-url="linkWidgetThumbnailUrl"
-				:icon-url="getValueObject.icon"
+			<LinkWidget v-else
 				:title="getValueObject.title"
 				:subline="getValueObject.subline"
 				:url="getValueObject.resourceUrl"
@@ -138,9 +139,6 @@ export default {
 		showImagePreview() {
 			return !!this.imagePreviewSrc && !this.imagePreviewFailed
 		},
-		linkWidgetThumbnailUrl() {
-			return this.imagePreviewFailed ? null : this.getValueObject.thumbnailUrl
-		},
 		imagePreviewSize() {
 			return normalizeImagePreviewSize(this.column?.customSettings?.imagePreviewSize)
 		},
@@ -154,19 +152,13 @@ export default {
 				return null
 			}
 
-			if (this.fileId) {
-				const previewParameters = new URLSearchParams({
-					fileId: String(this.fileId),
-					x: String(this.imagePreviewSize),
-					y: String(this.imagePreviewSize),
-					a: '1',
-				})
-				return generateUrl('/core/preview') + '?' + previewParameters.toString()
-			}
-			if (this.getValueObject?.thumbnailUrl) {
-				return this.getValueObject.thumbnailUrl
-			}
-			return null
+			const previewParameters = new URLSearchParams({
+				fileId: String(this.fileId),
+				x: String(this.imagePreviewSize),
+				y: String(this.imagePreviewSize),
+				a: '1',
+			})
+			return generateUrl('/core/preview') + '?' + previewParameters.toString()
 		},
 		imagePreviewLink() {
 			return this.getValueObject?.resourceUrl || this.getValueObject?.value
@@ -175,8 +167,8 @@ export default {
 			return this.getValueObject?.title || t('tables', 'Preview')
 		},
 		isFilesPreviewLink() {
-			// Show a preview whenever Files provides one (server sets thumbnailUrl only when a preview is available)
-			return this.getValueObject?.providerId === 'files' && !!this.getValueObject?.thumbnailUrl
+			// Derived at render time from the Files file id
+			return this.getValueObject?.providerId === 'files' && !!this.fileId
 		},
 		getValueObject() {
 			if (this.hasJsonStructure(this.value)) {
