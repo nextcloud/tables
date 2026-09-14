@@ -421,15 +421,7 @@ class RowService extends SuperService {
 		}
 
 		if (!empty($mandatoryColumns)) {
-			$existingRow = null;
-			if ($rowId !== null) {
-				try {
-					$existingRow = $this->getRowById($rowId);
-				} catch (NotFoundError|InternalError $e) {
-					$this->logger->debug('Could not load existing row for mandatory validation', ['rowId' => $rowId, 'exception' => $e]);
-				}
-			}
-			$this->validateMandatoryColumns($mandatoryColumns, $out, $columns, $existingRow);
+			$this->validateMandatoryColumns($mandatoryColumns, $out, $columns, $rowId !== null);
 		}
 
 		return $out;
@@ -439,11 +431,11 @@ class RowService extends SuperService {
 	 * @param array<int, bool> $mandatoryColumns
 	 * @param RowDataInput $data
 	 * @param Column[] $columns
-	 * @param Row2|null $existingRow
+	 * @param bool $isExistingRow Whether the data updates an existing row instead of creating one
 	 * @throws BadRequestError
 	 * @throws InternalError
 	 */
-	private function validateMandatoryColumns(array $mandatoryColumns, RowDataInput $data, array $columns, ?Row2 $existingRow = null): void {
+	private function validateMandatoryColumns(array $mandatoryColumns, RowDataInput $data, array $columns, bool $isExistingRow): void {
 		foreach ($mandatoryColumns as $columnId => $isMandatory) {
 			if (!$isMandatory) {
 				continue;
@@ -465,32 +457,27 @@ class RowService extends SuperService {
 				}
 			}
 
-			if (!$hasValue && $existingRow !== null) {
-				foreach ($existingRow->getData() as $existingEntry) {
-					if ($existingEntry['columnId'] === $columnId) {
-						$value = $existingEntry['value'];
-						$hasValue = true;
-						break;
-					}
+			if (!$hasValue) {
+				// Updates carry only the cells that actually change, so a column that is
+				// not part of the request keeps its stored value and must not be validated.
+				if ($isExistingRow) {
+					continue;
 				}
-			}
-
-			if ($hasValue) {
-				try {
-					$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
-					$isValid = $this->isValueValidForMandatoryColumn($value, $column, $columnBusiness);
-					if (!$isValid) {
-						throw new BadRequestError(
-							'Mandatory column "' . $column->getTitle() . '" cannot be empty or invalid.'
-						);
-					}
-				} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-					$this->logger->debug('Column type business class not found for mandatory validation', ['exception' => $e]);
-				}
-			} else {
 				throw new BadRequestError(
 					'Mandatory column "' . $column->getTitle() . '" cannot be empty.'
 				);
+			}
+
+			try {
+				$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
+				$isValid = $this->isValueValidForMandatoryColumn($value, $column, $columnBusiness);
+				if (!$isValid) {
+					throw new BadRequestError(
+						'Mandatory column "' . $column->getTitle() . '" cannot be empty or invalid.'
+					);
+				}
+			} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+				$this->logger->debug('Column type business class not found for mandatory validation', ['exception' => $e]);
 			}
 		}
 	}
