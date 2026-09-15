@@ -53,7 +53,8 @@
 						:disabled="!canShowImagePreviews"
 						:min="IMAGE_PREVIEW_SIZE_MIN"
 						:max="IMAGE_PREVIEW_SIZE_MAX"
-						:placeholder="t('tables', 'Enter a preview size between {min} and {max}', { min: IMAGE_PREVIEW_SIZE_MIN, max: IMAGE_PREVIEW_SIZE_MAX })">
+						:placeholder="t('tables', 'Enter a preview size between {min} and {max}', { min: IMAGE_PREVIEW_SIZE_MIN, max: IMAGE_PREVIEW_SIZE_MAX })"
+						@change="clampImagePreviewSize">
 				</div>
 				<div v-if="isImagePreviewSizeInvalid" class="fix-col-4">
 					<NcNoteCard type="warning">
@@ -76,7 +77,7 @@ import {
 	IMAGE_PREVIEW_SIZE_MAX,
 	IMAGE_PREVIEW_SIZE_MIN,
 } from '../../../../../constants.js'
-import { isImagePreviewSizeValid } from '../../../../../utils/imagePreviewSize.js'
+import { isImagePreviewSizeValid, normalizeImagePreviewSize } from '../../../../../utils/imagePreviewSize.js'
 
 export default {
 
@@ -178,8 +179,8 @@ export default {
 
 	async mounted() {
 		this.loading = true
-		await this.loadProviders()
-		if (!this.canShowImagePreviews && this.showPreview) {
+		const providersLoaded = await this.loadProviders()
+		if (providersLoaded && !this.canShowImagePreviews && this.showPreview) {
 			this.showPreview = false
 		}
 		this.loading = false
@@ -187,13 +188,16 @@ export default {
 
 	methods: {
 		t,
+		clampImagePreviewSize() {
+			this.imagePreviewSize = normalizeImagePreviewSize(this.imagePreviewSize)
+		},
 		async loadProviders() {
 			let res = null
 			try {
 				res = await axios.get(generateOcsUrl('/search/providers'))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load link providers.'))
-				return
+				return false
 			}
 			this.providers = [
 				{
@@ -214,6 +218,7 @@ export default {
 			this.providers.sort((a, b) => {
 				return b.active - a.active
 			})
+			return true
 		},
 		isActive(providerId) {
 			if (this.column?.id) {
