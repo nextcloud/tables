@@ -58,8 +58,10 @@ Have a good time and manage whatever you want.
 		<post-migration>
 			<step>OCA\Tables\Migration\NewDbStructureRepairStep</step>
 			<step>OCA\Tables\Migration\DbRowSleeveSequence</step>
-			<step>OCA\Tables\Migration\CacheSleeveCells</step>
 		</post-migration>
+		<live-migration>
+			<step>OCA\Tables\Migration\CacheSleeveCells</step>
+		</live-migration>
 	</repair-steps>
 	<commands>
 		<command>OCA\Tables\Command\ListTables</command>

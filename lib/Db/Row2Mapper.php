@@ -9,6 +9,8 @@ namespace OCA\Tables\Db;
 
 use DateTime;
 use DateTimeImmutable;
+use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Config\ConfigLexicon;
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\RowLoader\CachedRowLoader;
 use OCA\Tables\Db\RowLoader\NormalizedRowLoader;
@@ -21,6 +23,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\IAppConfig;
 use OCP\IDBConnection;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -43,6 +46,7 @@ class Row2Mapper {
 		protected ColumnMapper $columnMapper,
 		NormalizedRowLoader $normalizedRowLoader,
 		CachedRowLoader $cachedRowLoader,
+		private IAppConfig $appConfig,
 	) {
 		$this->rowLoaders = [
 			RowLoader\RowLoader::LOADER_NORMALIZED => $normalizedRowLoader,
@@ -182,7 +186,7 @@ class Row2Mapper {
 			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
 
 			// Get rows without SQL sorting
-			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds, RowLoader\RowLoader::LOADER_CACHED);
+			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds, $this->getRowLoader());
 
 			// Sort rows in PHP to preserve the order from getWantedRowIds
 			return $this->sortRowsByIds($rows, $wantedRowIdsArray);
@@ -190,6 +194,18 @@ class Row2Mapper {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+	}
+
+	/**
+	 * The cached_cells column is only fully populated once the live-migration
+	 * has run, until then the normalized loader has to be used.
+	 *
+	 * @return RowLoader\RowLoader::LOADER_*
+	 */
+	private function getRowLoader(): string {
+		return $this->appConfig->getValueBool(Application::APP_ID, ConfigLexicon::CACHING_SLEEVE_CELLS_COMPLETE)
+			? RowLoader\RowLoader::LOADER_CACHED
+			: RowLoader\RowLoader::LOADER_NORMALIZED;
 	}
 
 	/**

@@ -9,22 +9,29 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Migration;
 
+use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Config\ConfigLexicon;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Helper\ColumnsHelper;
-use OCP\IConfig;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\IAppConfig;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
 use Psr\Log\LoggerInterface;
 
 class CacheSleeveCells implements IRepairStep {
+	private const ROW_BATCH_SIZE = 1_000;
+
 	public function __construct(
 		private IDBConnection $db,
 		private ColumnMapper $columnMapper,
 		private ColumnsHelper $columnsHelper,
 		private RowSleeveMapper $rowSleeveMapper,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 		private LoggerInterface $logger,
 	) {
 	}
@@ -40,67 +47,81 @@ class CacheSleeveCells implements IRepairStep {
 	 * @inheritDoc
 	 */
 	public function run(IOutput $output) {
-		$cachingSleeveCellsComplete = $this->config->getAppValue('tables', 'cachingSleeveCellsComplete', 'false') === 'true';
-		if ($cachingSleeveCellsComplete) {
+		if ($this->appConfig->getValueBool(Application::APP_ID, ConfigLexicon::CACHING_SLEEVE_CELLS_COMPLETE)) {
 			return;
 		}
 
+		$pendingRowsQuery = $this->buildPendingRowIdsQuery();
 		foreach ($this->getTableIds() as $tableId) {
+			$pendingRowsQuery->setParameter('tableId', $tableId, IQueryBuilder::PARAM_INT);
 			$columns = $this->columnMapper->findAllByTable($tableId);
 
-			while ($rowIds = $this->getPendingRowIds($tableId)) {
+			while ($rowIds = $this->fetchPendingRowIds($pendingRowsQuery)) {
 				foreach ($rowIds as $rowId) {
-					$cachedCells = [];
-					foreach ($columns as $column) {
-						$cellMapper = $this->columnsHelper->getCellMapperFromType($column->getType());
-						$cells = $cellMapper->findManyByRowAndColumn($rowId, $column->getId());
-						foreach ($cells as $cell) {
-							if ($cellMapper->hasMultipleValues()) {
-								$cachedCells[$column->getId()][] = $cellMapper->toArray($cell);
-							} else {
-								$cachedCells[$column->getId()] = $cellMapper->toArray($cell);
-							}
-						}
-					}
-
-					$sleeve = $this->rowSleeveMapper->find($rowId);
-					$sleeve->setCachedCellsArray($cachedCells);
-					$this->rowSleeveMapper->update($sleeve);
+					$this->cacheCellsForRow($rowId, $columns);
 				}
 			}
 
 			$this->logger->info('Finished caching cells for table ' . $tableId);
 		}
 
-		$this->config->setAppValue('tables', 'cachingSleeveCellsComplete', 'true');
+		$this->appConfig->setValueBool(Application::APP_ID, ConfigLexicon::CACHING_SLEEVE_CELLS_COMPLETE, true);
+	}
+
+	/**
+	 * @param Column[] $columns
+	 */
+	private function cacheCellsForRow(int $rowId, array $columns): void {
+		try {
+			$sleeve = $this->rowSleeveMapper->find($rowId);
+		} catch (DoesNotExistException) {
+			// the row was deleted while the migration is running
+			return;
+		}
+
+		$cachedCells = [];
+		foreach ($columns as $column) {
+			$cellMapper = $this->columnsHelper->getCellMapperFromType($column->getType());
+			foreach ($cellMapper->findManyByRowAndColumn($rowId, $column->getId()) as $cell) {
+				if ($cellMapper->hasMultipleValues()) {
+					$cachedCells[$column->getId()][] = $cellMapper->toArray($cell);
+				} else {
+					$cachedCells[$column->getId()] = $cellMapper->toArray($cell);
+				}
+			}
+		}
+
+		$sleeve->setCachedCellsArray($cachedCells);
+		$this->rowSleeveMapper->update($sleeve);
 	}
 
 	/**
 	 * @return int[]
 	 */
-	public function getTableIds(): array {
+	private function getTableIds(): array {
 		return $this->db->getQueryBuilder()
 			->select('id')
 			->from('tables_tables')
 			->orderBy('id')
 			->executeQuery()
 			->fetchAll(\PDO::FETCH_COLUMN);
-
 	}
 
 	/**
 	 * @return int[]
 	 */
-	private function getPendingRowIds(int $tableId): array {
+	private function fetchPendingRowIds(IQueryBuilder $pendingRowsQuery): array {
+		return $pendingRowsQuery->executeQuery()->fetchAll(\PDO::FETCH_COLUMN);
+	}
+
+	private function buildPendingRowIdsQuery(): IQueryBuilder {
 		$qb = $this->db->getQueryBuilder();
 
 		return $qb->select('id')
 			->from('tables_row_sleeves')
 			->where($qb->expr()->isNull('cached_cells'))
-			->andWhere($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, \PDO::PARAM_INT)))
+			->andWhere($qb->expr()->eq('table_id', $qb->createParameter('tableId')))
 			->orderBy('id')
-			->setMaxResults(1000)
-			->executeQuery()
-			->fetchAll(\PDO::FETCH_COLUMN);
+			->setMaxResults(self::ROW_BATCH_SIZE);
 	}
 }

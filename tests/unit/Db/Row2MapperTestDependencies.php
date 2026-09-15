@@ -25,6 +25,7 @@ use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IAppConfig;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,6 +48,7 @@ trait Row2MapperTestDependencies {
 	protected CircleHelper|MockObject $circleHelper;
 	protected NormalizedRowLoader $normalizedRowLoader;
 	protected CachedRowLoader $cachedRowLoader;
+	protected IAppConfig|MockObject $appConfig;
 
 	protected static bool $testDataInitialized = false;
 	protected static int $testTableId;
@@ -85,6 +87,9 @@ trait Row2MapperTestDependencies {
 			$this->logger
 		);
 
+		$this->appConfig = $this->createMock(IAppConfig::class);
+		$this->appConfig->method('getValueBool')->willReturn(true);
+
 		$this->mapper = new Row2Mapper(
 			'test_user',
 			$this->connectionAdapter,
@@ -94,7 +99,8 @@ trait Row2MapperTestDependencies {
 			$this->columnsHelper,
 			$this->columnMapper,
 			$this->normalizedRowLoader,
-			$this->cachedRowLoader
+			$this->cachedRowLoader,
+			$this->appConfig
 		);
 
 		if (!self::$testDataInitialized) {
