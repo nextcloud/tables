@@ -78,11 +78,9 @@ import { useDataStore } from '../../store/data.js'
 import {
 	COLUMN_WIDTH_MAX,
 	COLUMN_WIDTH_MIN,
-	IMAGE_PREVIEW_SIZE_MAX,
-	IMAGE_PREVIEW_SIZE_MIN,
 } from '../../shared/constants.js'
 import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
-import { isImagePreviewSizeValid, normalizeImagePreviewSize } from '../../shared/utils/imagePreviewSize.js'
+import { normalizeImagePreviewSize } from '../../shared/utils/imagePreviewSize.js'
 
 export default {
 	name: 'EditColumn',
@@ -195,14 +193,6 @@ export default {
 				&& (this.editColumn.customSettings?.width < COLUMN_WIDTH_MIN || this.editColumn.customSettings?.width > COLUMN_WIDTH_MAX)) {
 				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
 				this.widthInvalidError = true
-				return
-			}
-
-			if (this.isTextLinkColumn(this.editColumn)
-				&& this.editColumn.customSettings?.showPreview
-				&& this.editColumn.customSettings?.imagePreviewSize !== undefined
-				&& !isImagePreviewSizeValid(this.editColumn.customSettings?.imagePreviewSize)) {
-				showError(t('tables', 'Cannot save column. Image preview size must be between {min} and {max}.', { min: IMAGE_PREVIEW_SIZE_MIN, max: IMAGE_PREVIEW_SIZE_MAX }))
 				return
 			}
 

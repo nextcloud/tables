@@ -133,11 +133,9 @@ import { mapActions } from 'pinia'
 import {
 	COLUMN_WIDTH_MAX,
 	COLUMN_WIDTH_MIN,
-	IMAGE_PREVIEW_SIZE_MAX,
-	IMAGE_PREVIEW_SIZE_MIN,
 } from '../../shared/constants.js'
 import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
-import { isImagePreviewSizeValid, normalizeImagePreviewSize } from '../../shared/utils/imagePreviewSize.js'
+import { normalizeImagePreviewSize } from '../../shared/utils/imagePreviewSize.js'
 
 export default {
 	name: 'CreateColumn',
@@ -329,11 +327,6 @@ export default {
 				&& (this.column.customSettings?.width < COLUMN_WIDTH_MIN || this.column.customSettings?.width > COLUMN_WIDTH_MAX)) {
 				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
 				this.widthInvalidError = true
-			} else if (this.combinedType === ColumnTypes.TextLink
-				&& this.column.customSettings?.showPreview
-				&& this.column.customSettings?.imagePreviewSize !== undefined
-				&& !isImagePreviewSizeValid(this.column.customSettings?.imagePreviewSize)) {
-				showError(t('tables', 'Cannot save column. Image preview size must be between {min} and {max}.', { min: IMAGE_PREVIEW_SIZE_MIN, max: IMAGE_PREVIEW_SIZE_MAX }))
 			} else if (this.column.type === null) {
 				this.titleMissingError = false
 				showInfo(t('tables', 'You need to select a type for the new column.'))
