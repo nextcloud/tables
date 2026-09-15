@@ -14,7 +14,6 @@ use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\RowCellDatetime;
 use OCA\Tables\Db\RowCellDatetimeMapper;
-use OCA\Tables\Db\RowCellMapperSuper;
 use OCA\Tables\Db\RowCellNumber;
 use OCA\Tables\Db\RowCellNumberMapper;
 use OCA\Tables\Db\RowCellSelection;
@@ -28,6 +27,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
@@ -35,7 +35,6 @@ use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
-use OCP\DB\Exception;
 use OCP\IL10N;
 use OCP\IUser;
 use OCP\UserMigration\IExportDestination;
@@ -70,6 +69,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 		protected TableMapper $tableMapper,
 		protected ColumnMapper $columnMapper,
 		protected RowSleeveMapper $rowSleeveMapper,
+		protected ColumnsHelper $columnsHelper,
 		protected ViewMapper $viewMapper,
 		protected ContextMapper $contextMapper,
 		protected ShareMapper $shareMapper,
@@ -342,33 +342,21 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	}
 
 	private function rebuildCachedCells(array $rowIdMap): void {
-		/** @var RowCellMapperSuper[] $cellMappers */
-		$cellMappers = [
-			$this->rowCellTextMapper,
-			$this->rowCellNumberMapper,
-			$this->rowCellDatetimeMapper,
-			$this->rowCellSelectionMapper,
-			$this->rowCellUsergroupMapper,
-		];
+		$columnsByTable = [];
 		foreach ($rowIdMap as $newRowId) {
-			$sleeve = $this->rowSleeveMapper->find($newRowId);
-			$cachedCells = [];
-			foreach ($cellMappers as $mapper) {
-				try {
-					$cells = $mapper->findAllForRow($newRowId);
-					foreach ($cells as $cell) {
-						$cachedCells[$cell->getColumnId()] = $mapper->toArray($cell);
-					}
-				} catch (Exception $e) {
-					$this->logger->error('Failed to load cells for row during cached_cells rebuild', [
-						'rowId' => $newRowId,
-						'exception' => $e->getMessage(),
-					]);
-				}
+			try {
+				$sleeve = $this->rowSleeveMapper->find($newRowId);
+				$tableId = $sleeve->getTableId();
+				$columnsByTable[$tableId] ??= $this->columnMapper->findAllByTable($tableId);
+				$cachedCells = $this->columnsHelper->getCachedCellsForRow($newRowId, $columnsByTable[$tableId]);
+				$sleeve->setCachedCellsArray($cachedCells);
+				$this->rowSleeveMapper->update($sleeve);
+			} catch (\Throwable $e) {
+				$this->logger->error('Failed to load cells for row during cached_cells rebuild', [
+					'rowId' => $newRowId,
+					'exception' => $e->getMessage(),
+				]);
 			}
-
-			$sleeve->setCachedCellsArray($cachedCells);
-			$this->rowSleeveMapper->update($sleeve);
 		}
 	}
 

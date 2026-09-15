@@ -746,6 +746,14 @@ class Row2Mapper {
 
 		// write all changed cells to its db-table
 		$cachedCells = $sleeve->getCachedCellsArray();
+		if ($cachedCells === []) {
+			// the row is not yet covered by the live-migration, so the cache has
+			// to be built completely instead of only holding the changed cells
+			$cachedCells = $this->columnsHelper->getCachedCellsForRow(
+				$sleeve->getId(),
+				$this->columnMapper->findAllByTable($sleeve->getTableId())
+			);
+		}
 		foreach ($changedCells as $cell) {
 			$cachedCells[$cell['columnId']] = $this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
 		}

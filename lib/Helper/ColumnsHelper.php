@@ -131,4 +131,25 @@ class ColumnsHelper {
 
 		return $this->cellMappers[$columnType] = $cellMapper;
 	}
+
+	/**
+	 * Collects all cells of a row in the format used for the cached_cells column
+	 *
+	 * @param Column[] $columns
+	 * @return array<int, mixed>
+	 */
+	public function getCachedCellsForRow(int $rowId, array $columns): array {
+		$cachedCells = [];
+		foreach ($columns as $column) {
+			$cellMapper = $this->getCellMapperFromType($column->getType());
+			foreach ($cellMapper->findManyByRowAndColumn($rowId, $column->getId()) as $cell) {
+				if ($cellMapper->hasMultipleValues()) {
+					$cachedCells[$column->getId()][] = $cellMapper->toArray($cell);
+				} else {
+					$cachedCells[$column->getId()] = $cellMapper->toArray($cell);
+				}
+			}
+		}
+		return $cachedCells;
+	}
 }

@@ -49,6 +49,7 @@ trait Row2MapperTestDependencies {
 	protected NormalizedRowLoader $normalizedRowLoader;
 	protected CachedRowLoader $cachedRowLoader;
 	protected IAppConfig|MockObject $appConfig;
+	protected bool $sleeveCellCachingComplete = true;
 
 	protected static bool $testDataInitialized = false;
 	protected static int $testTableId;
@@ -70,7 +71,13 @@ trait Row2MapperTestDependencies {
 		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->rowSleeveMapper = new RowSleeveMapper($this->connectionAdapter, $this->logger);
-		$this->columnsHelper = $this->createMock(ColumnsHelper::class);
+
+		// Partial mock so getCachedCellsForRow() keeps working with the real
+		// implementation on top of the mocked cell mapper resolution
+		$this->columnsHelper = $this->getMockBuilder(ColumnsHelper::class)
+			->setConstructorArgs([$this->userHelper, $this->circleHelper, $this->logger])
+			->onlyMethods(['getCellMapperFromType', 'resolveSearchValue'])
+			->getMock();
 
 		// Mock getCellMapperFromType to return real cell mappers
 		$this->setupCellMappers();
@@ -88,7 +95,8 @@ trait Row2MapperTestDependencies {
 		);
 
 		$this->appConfig = $this->createMock(IAppConfig::class);
-		$this->appConfig->method('getValueBool')->willReturn(true);
+		$this->appConfig->method('getValueBool')
+			->willReturnCallback(fn () => $this->sleeveCellCachingComplete);
 
 		$this->mapper = new Row2Mapper(
 			'test_user',
@@ -280,6 +288,12 @@ trait Row2MapperTestDependencies {
 
 		$this->columnMapper->method('find')
 			->willReturnCallback(fn ($id) => $columns[$id] ?? throw new DoesNotExistException('test'));
+
+		$this->columnMapper->method('findAllByTable')
+			->willReturnCallback(fn (int $tableId) => array_values(array_filter(
+				$columns,
+				fn (Column $column) => $column->getTableId() === $tableId
+			)));
 
 		$this->columnMapper->method('preloadColumns');
 		$this->columnMapper->method('getColumnTypes')->willReturn($columnTypes);

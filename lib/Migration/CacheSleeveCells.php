@@ -79,18 +79,7 @@ class CacheSleeveCells implements IRepairStep {
 			return;
 		}
 
-		$cachedCells = [];
-		foreach ($columns as $column) {
-			$cellMapper = $this->columnsHelper->getCellMapperFromType($column->getType());
-			foreach ($cellMapper->findManyByRowAndColumn($rowId, $column->getId()) as $cell) {
-				if ($cellMapper->hasMultipleValues()) {
-					$cachedCells[$column->getId()][] = $cellMapper->toArray($cell);
-				} else {
-					$cachedCells[$column->getId()] = $cellMapper->toArray($cell);
-				}
-			}
-		}
-
+		$cachedCells = $this->columnsHelper->getCachedCellsForRow($rowId, $columns);
 		$sleeve->setCachedCellsArray($cachedCells);
 		$this->rowSleeveMapper->update($sleeve);
 	}
