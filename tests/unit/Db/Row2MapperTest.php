@@ -11,6 +11,7 @@ namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\Column;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -211,6 +212,63 @@ class Row2MapperTest extends DatabaseTestCase {
 
 		$this->assertEquals($expectedNameOrder, $actualNameOrder, 'Should sort by existing columns only');
 		$this->assertEquals($expectedAgeOrder, $actualAgeOrder, 'Should sort by Age ASC, then Name ASC');
+	}
+
+	/**
+	 * Until the live-migration populated cached_cells for all rows, rows have to be
+	 * loaded via the normalized loader
+	 */
+	public function testFindAllFallsBackToNormalizedLoaderWhileMigrationIsPending(): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+		$this->sleeveCellCachingComplete = false;
+
+		// simulate rows that were not processed by the live-migration yet
+		$qb = $this->connection->getQueryBuilder();
+		$qb->update('tables_row_sleeves')
+			->set('cached_cells', $qb->createNamedParameter(null, IQueryBuilder::PARAM_NULL))
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter(self::$testTableId)))
+			->executeStatement();
+
+		$rows = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, null, null, null, null, 'test_user');
+
+		$this->assertCount(5, $rows, 'Should return all 5 rows');
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $columnMapping['name']), $rows);
+		$this->assertEquals(['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'], $actualNameOrder);
+	}
+
+	/**
+	 * Updating a row that was not processed by the live-migration yet has to build
+	 * the complete cached_cells instead of only caching the changed cells
+	 */
+	public function testUpdateRebuildsCompleteCacheWhileMigrationIsPending(): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+		$rowId = self::$testRowIds[0];
+
+		// simulate a row that was not processed by the live-migration yet
+		$qb = $this->connection->getQueryBuilder();
+		$qb->update('tables_row_sleeves')
+			->set('cached_cells', $qb->createNamedParameter(null, IQueryBuilder::PARAM_NULL))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($rowId)))
+			->executeStatement();
+
+		$columns = array_map(
+			fn (int $columnId) => $this->columnMapper->find($columnId),
+			self::$testColumnIds
+		);
+		$row = $this->mapper->find($rowId, $columns);
+		$row->markAsLoaded();
+		$row->insertOrUpdateCell(['columnId' => $columnMapping['name'], 'value' => 'Alice Updated']);
+
+		$this->mapper->update($row);
+
+		$cachedCells = $this->rowSleeveMapper->find($rowId)->getCachedCellsArray();
+
+		$this->assertSame('Alice Updated', $cachedCells[$columnMapping['name']]['value'] ?? null);
+		$this->assertArrayHasKey($columnMapping['age'], $cachedCells);
+		$this->assertArrayHasKey($columnMapping['skills'], $cachedCells);
 	}
 
 	/**
