@@ -1138,6 +1138,9 @@ export type components = {
             readonly customSettings: {
                 /** Format: int64 */
                 readonly width: number;
+                readonly showPreview?: boolean;
+                /** Format: int64 */
+                readonly imagePreviewSize?: number;
             } | null;
         };
         readonly Context: {
@@ -1243,6 +1246,9 @@ export type components = {
             readonly customSettings: {
                 /** Format: int64 */
                 readonly width: number;
+                readonly showPreview?: boolean;
+                /** Format: int64 */
+                readonly imagePreviewSize?: number;
             } | null;
         };
         readonly PublicRow: {

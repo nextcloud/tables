@@ -168,6 +168,8 @@ namespace OCA\Tables;
  *  },
  *  customSettings: ?array{
  *     width: int,
+ *     showPreview?: bool,
+ *     imagePreviewSize?: int,
  *  },
  * }
  *
@@ -209,6 +211,8 @@ namespace OCA\Tables;
  *   },
  *   customSettings: ?array{
  *      width: int,
+ *      showPreview?: bool,
+ *      imagePreviewSize?: int,
  *   },
  *  }
  *
