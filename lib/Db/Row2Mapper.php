@@ -697,24 +697,27 @@ class Row2Mapper {
 		if ($userId) {
 			$this->userId = $userId;
 		}
-		if ($row->getId()) {
-			// if row has an id from migration or import etc.
-			$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
-		} else {
-			// create a new row sleeve to get a new rowId
-			$rowSleeve = $this->createNewRowSleeve($row->getTableId());
-			$row->setId($rowSleeve->getId());
-		}
 
-		// write all cells to its db-table
-		$cachedCells = [];
-		foreach ($row->getData() as $cell) {
-			$cachedCells[$cell['columnId']] = $this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
-		}
-		$rowSleeve->setCachedCellsArray($cachedCells);
-		$this->rowSleeveMapper->update($rowSleeve);
+		return $this->atomic(function () use ($row): Row2 {
+			if ($row->getId()) {
+				// if row has an id from migration or import etc.
+				$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
+			} else {
+				// create a new row sleeve to get a new rowId
+				$rowSleeve = $this->createNewRowSleeve($row->getTableId());
+				$row->setId($rowSleeve->getId());
+			}
 
-		return $row;
+			// write all cells to its db-table
+			$cachedCells = [];
+			foreach ($row->getData() as $cell) {
+				$cachedCells[$cell['columnId']] = $this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
+			}
+			$rowSleeve->setCachedCellsArray($cachedCells);
+			$this->rowSleeveMapper->update($rowSleeve);
+
+			return $row;
+		}, $this->db);
 	}
 
 	/**
@@ -733,34 +736,36 @@ class Row2Mapper {
 			return $row;
 		}
 
-		// update meta data for sleeve
-		try {
-			$sleeve = $this->rowSleeveMapper->find($row->getId());
-			$this->updateMetaData($sleeve);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
+		return $this->atomic(function () use ($row, $changedCells): Row2 {
+			// update meta data for sleeve
+			try {
+				$sleeve = $this->rowSleeveMapper->findForUpdate($row->getId());
+				$this->updateMetaData($sleeve);
+			} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
 
-		$this->columnMapper->preloadColumns(array_column($changedCells, 'columnId'));
+			$this->columnMapper->preloadColumns(array_column($changedCells, 'columnId'));
 
-		// write all changed cells to its db-table
-		$cachedCells = $sleeve->getCachedCellsArray();
-		if ($cachedCells === []) {
-			// the row is not yet covered by the live-migration, so the cache has
-			// to be built completely instead of only holding the changed cells
-			$cachedCells = $this->columnsHelper->getCachedCellsForRow(
-				$sleeve->getId(),
-				$this->columnMapper->findAllByTable($sleeve->getTableId())
-			);
-		}
-		foreach ($changedCells as $cell) {
-			$cachedCells[$cell['columnId']] = $this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
-		}
-		$sleeve->setCachedCellsArray($cachedCells);
-		$this->rowSleeveMapper->update($sleeve);
+			// write all changed cells to its db-table
+			$cachedCells = $sleeve->getCachedCellsArray();
+			if ($cachedCells === []) {
+				// the row is not yet covered by the live-migration, so the cache has
+				// to be built completely instead of only holding the changed cells
+				$cachedCells = $this->columnsHelper->getCachedCellsForRow(
+					$sleeve->getId(),
+					$this->columnMapper->findAllByTable($sleeve->getTableId())
+				);
+			}
+			foreach ($changedCells as $cell) {
+				$cachedCells[$cell['columnId']] = $this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
+			}
+			$sleeve->setCachedCellsArray($cachedCells);
+			$this->rowSleeveMapper->update($sleeve);
 
-		return $row;
+			return $row;
+		}, $this->db);
 	}
 
 	/**

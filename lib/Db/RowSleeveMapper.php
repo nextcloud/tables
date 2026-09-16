@@ -42,6 +42,22 @@ class RowSleeveMapper extends QBMapper {
 	}
 
 	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 */
+	public function findForUpdate(int $id): RowSleeve {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		if ($this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
+			$qb->forUpdate();
+		}
+		return $this->findEntity($qb);
+	}
+
+	/**
 	 * @param int[] $ids
 	 * @return list<array<string, mixed>> Raw data from DB for the best performance
 	 * @throws Exception
