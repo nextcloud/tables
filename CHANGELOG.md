@@ -5,6 +5,32 @@
 
 # Changelog
 
+## 2.3.1
+
+### Added
+* [feat(federation): Federated table sharing](https://github.com/nextcloud/tables/pull/2786)
+* [feat: Reorder views](https://github.com/nextcloud/tables/pull/2813)
+* [feat: add is not empty filter support](https://github.com/nextcloud/tables/pull/2572)
+* [Add notification for async import finished event](https://github.com/nextcloud/tables/pull/2819)
+
+
+### Fixed
+* [fix: preserve view descriptions on scheme import](https://github.com/nextcloud/tables/pull/2886)
+* [fix: set default cell value using column's parseValue function](https://github.com/nextcloud/tables/pull/2914)
+* [Fix: Make case-insensitive search for the view filters](https://github.com/nextcloud/tables/pull/2816)
+* [fix: improve number input validation and update handling](https://github.com/nextcloud/tables/pull/2182)
+* [fix(rows): let file picker and smart picker open above row modals](https://github.com/nextcloud/tables/pull/2912)
+* [fix(rows): keep row counters fresh and reduce count queries](https://github.com/nextcloud/tables/pull/2781)
+* [Fix: Make case-insensitive search for the usergroup and multi selection columns](https://github.com/nextcloud/tables/pull/2446)
+* [Fix(embedded) : column order, sort, scrolls overlays, refresh, table …](https://github.com/nextcloud/tables/pull/2868)
+* [fix: Correctly handle selectionDefault initialization and normalizati…](https://github.com/nextcloud/tables/pull/2948)
+* [fix(relations): Fix relations loading in applications, references, analytics]( https://github.com/nextcloud/tables/pull/2923)
+* [fix: make delete table actions use destructive styling](https://github.com/nextcloud/tables/pull/2972)
+* [Fix: add contains-item filter support in views](https://github.com/nextcloud/tables/pull/2940)
+* [fix(federation): avoid empty body on signed requests](https://github.com/nextcloud/tables/pull/2993)
+* [fix(import): avoid crash when table or view is deleted before import job runs](https://github.com/nextcloud/tables/pull/2987)
+* [fix: don't validate unaffected columns of a row upon inline editing](https://github.com/nextcloud/tables/pull/3007)
+
 ## 2.3.0
 
 ### Added
