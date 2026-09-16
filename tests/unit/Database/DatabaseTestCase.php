@@ -338,12 +338,11 @@ abstract class DatabaseTestCase extends TestCase {
 	}
 
 	/**
-	 * Converts a test value to the format stored in the cell tables
+	 * Converts a test value to the format stored in cached_cells.
 	 *
-	 * Mirrors the conversion done by the cell mappers' applyDataToEntity(),
-	 * so cached_cells entries match what production writes via toArray().
+	 * Mirrors the array produced by the cell mappers' toArray() methods.
 	 */
-	private function convertValueToDbFormat(int $columnId, $value) {
+	private function convertCachedCellFormat(int $columnId, $value): array {
 		$qb = $this->connection->getQueryBuilder();
 		$result = $qb->select('type', 'subtype')
 			->from('tables_columns')
@@ -357,11 +356,21 @@ abstract class DatabaseTestCase extends TestCase {
 			throw new \InvalidArgumentException("Column with ID $columnId not found");
 		}
 
-		if ($column['type'] === 'selection' && $column['subtype'] !== 'check') {
-			return $this->convertSelectionValuesToIds($columnId, $value);
+		if ($column['type'] === 'usergroup') {
+			if (!is_array($value)) {
+				$value = [$value];
+			}
+			return array_values(array_map(static fn ($entry) => [
+				'value' => (string)($entry['id'] ?? ''),
+				'value_type' => (int)($entry['type'] ?? 0),
+			], $value));
 		}
 
-		return $value;
+		if ($column['type'] === 'selection' && $column['subtype'] !== 'check') {
+			return ['value' => $this->convertSelectionValuesToIds($columnId, $value)];
+		}
+
+		return ['value' => $value];
 	}
 
 	/**
@@ -400,7 +409,7 @@ abstract class DatabaseTestCase extends TestCase {
 			}
 
 			// Format the value as expected by CachedRowLoader (matches cell mapper toArray format)
-			$cachedCells[$columnId] = ['value' => $this->convertValueToDbFormat($columnId, $value)];
+			$cachedCells[$columnId] = $this->convertCachedCellFormat($columnId, $value);
 		}
 
 		$qb = $this->connection->getQueryBuilder();

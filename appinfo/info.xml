@@ -62,6 +62,9 @@ Have a good time and manage whatever you want.
 		<live-migration>
 			<step>OCA\Tables\Migration\CacheSleeveCells</step>
 		</live-migration>
+		<install>
+			<step>OCA\Tables\Migration\CacheSleeveCells</step>
+		</install>
 	</repair-steps>
 	<commands>
 		<command>OCA\Tables\Command\ListTables</command>
