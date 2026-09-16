@@ -222,6 +222,11 @@ class Row2Mapper {
 
 		$columns = $mappers = [];
 		foreach ($columnIds as $columnId) {
+			// meta columns are not stored in tables_columns, their values are
+			// taken from the row sleeve fields by the loaders
+			if ($columnId < 0) {
+				continue;
+			}
 			$columns[$columnId] = $this->columnMapper->find($columnId);
 			$mappers[$columnId] = $this->getCellMapper($columns[$columnId]);
 		}

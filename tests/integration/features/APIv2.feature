@@ -561,8 +561,8 @@ Feature: APIv2
       | t2    | table | read                |
     And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2" with permissions "read,create,update,delete,manage"
     When user "participant2-v2" transfers the Context "c1" to "participant3-v2"
-    Then the reported status is "403" 
-    
+    Then the reported status is "403"
+
   @api2 @contexts @contexts-ownership
   Scenario: Transfer an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
@@ -1462,6 +1462,50 @@ Feature: APIv2
       | weight    | 92                                                                        |
       | code      | wil02                                                                     |
     Then "view" "v1" has exactly these rows "r3,r2,r1" in exactly this order
+
+  @api2 @rows @views
+  Scenario: have a view with meta columns in the column settings
+    Given as user "participant1-v2"
+    And table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "statement" exists with following properties
+      | type          | text                |
+      | subtype       | line                |
+      | mandatory     | 1                   |
+      | description   | State your business |
+    And column "weight" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | description   | Importance of statement |
+    And user "participant1-v2" create view "Important Statements" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columnSettings "meta-id,statement,weight,meta-created-by" to view "v1"
+    Then the reported status is "200"
+    And using "view" "v1"
+    And user "participant1-v2" creates row "r1" with following values:
+      | statement | Be yourself; everyone else is already taken.          |
+      | weight    | 75                                                  |
+    And user "participant1-v2" creates row "r2" with following values:
+      | statement | A room without books is like a body without a soul. |
+      | weight    | 67                                                  |
+    Then "view" "v1" has exactly these rows "r1,r2" in exactly this order
+    And the user "participant1-v2" fetches the rows of view "v1" via the UI endpoint, it has exactly these rows "r1,r2"
+
+  @api2 @rows @views
+  Scenario: have a view with only meta columns in the column settings
+    Given as user "participant1-v2"
+    And table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "statement" exists with following properties
+      | type          | text                |
+      | subtype       | line                |
+      | mandatory     | 1                   |
+      | description   | State your business |
+    And user "participant1-v2" create view "IDs only" with emoji "🆔" for "t1" as "v1"
+    And user "participant1-v2" sets columnSettings "meta-id,meta-updated-at" to view "v1"
+    Then the reported status is "200"
+    And using "table" "t1"
+    And user "participant1-v2" creates row "r1" with following values:
+      | statement | Be yourself; everyone else is already taken. |
+    Then "view" "v1" has exactly these rows "r1" in exactly this order
+    And the user "participant1-v2" fetches the rows of view "v1" via the UI endpoint, it has exactly these rows "r1"
 
   @views
   Scenario: have a view with a multiple sort orders

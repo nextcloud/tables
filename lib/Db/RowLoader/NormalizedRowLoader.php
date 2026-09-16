@@ -51,6 +51,18 @@ class NormalizedRowLoader implements RowLoader {
 	 * @throws InternalError
 	 */
 	private function getRowsChunk(array $rowIds, array $columns, array $mappers): array {
+		try {
+			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
+		}
+
+		if (empty($columns)) {
+			// only meta columns were requested, there are no cells to load
+			return $this->parseResult(null, $sleeves, $columns, $mappers);
+		}
+
 		$qb = $this->db->getQueryBuilder();
 
 		$subqueries = [];
@@ -86,25 +98,18 @@ class NormalizedRowLoader implements RowLoader {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
 		}
 
-		try {
-			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
-		}
-
 		return $this->parseResult($result, $sleeves, $columns, $mappers);
 	}
 
 	/**
-	 * @param IResult $result
+	 * @param IResult|null $result
 	 * @param list<array<string, mixed>> $sleeves
 	 * @param array<int, Column> $columns Column per columnId
 	 * @param array<int, RowCellMapperSuper> $mappers Mapper per columnId
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function parseResult(IResult $result, array $sleeves, array $columns, array $mappers): array {
+	private function parseResult(?IResult $result, array $sleeves, array $columns, array $mappers): array {
 		$rows = [];
 		foreach ($sleeves as $sleeve) {
 			$id = (int)$sleeve['id'];
@@ -121,7 +126,7 @@ class NormalizedRowLoader implements RowLoader {
 		$keyToColumnId = [];
 		$keyToRowId = [];
 
-		while ($rowData = $result->fetch()) {
+		while ($result !== null && ($rowData = $result->fetch())) {
 			if (!isset($rowData['row_id'], $rows[$rowData['row_id']])) {
 				break;
 			}
