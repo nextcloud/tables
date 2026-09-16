@@ -22,7 +22,7 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 
 	public function formatRowData(Column $column, array $row) {
 		$value = $row['value'];
-		if ($value === '') {
+		if ($value === null || $value === '') {
 			return null;
 		}
 		$decimals = $column->getNumberDecimals() ?? 0;
@@ -36,6 +36,7 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
 		if (!is_numeric($data)) {
 			$cell->setValueWrapper(null);
+			return;
 		}
 		$cell->setValueWrapper((float)$data);
 	}
