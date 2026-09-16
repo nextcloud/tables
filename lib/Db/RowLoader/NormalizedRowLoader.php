@@ -56,7 +56,7 @@ class NormalizedRowLoader implements RowLoader {
 		$subqueries = [];
 		foreach ($this->columnsHelper->columns as $columnType) {
 			$qbValues = $this->db->getQueryBuilder();
-			$qbValues->select('row_id', 'column_id', 'last_edit_at', 'last_edit_by')
+			$qbValues->select('row_id', 'column_id')
 				->selectAlias($qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'value');
 
 			// This is not ideal but I cannot think of a good way to abstract this away into the mapper right now
@@ -76,11 +76,8 @@ class NormalizedRowLoader implements RowLoader {
 			$subqueries[] = $qbValues->getSQL();
 		}
 
-		$qb->select('row_id', 'column_id', 'created_by', 'created_at', 't1.last_edit_by', 't1.last_edit_at', 'value', 'table_id')
-			// Also should be more generic (see above)
-			->addSelect('value_type')
-			->from($qb->createFunction('(' . implode(' UNION ALL ', $subqueries) . ')'), 't1')
-			->innerJoin('t1', 'tables_row_sleeves', 'rs', 'rs.id = t1.row_id');
+		$qb->select('row_id', 'column_id', 'value', 'value_type')
+			->from($qb->createFunction('(' . implode(' UNION ALL ', $subqueries) . ')'), 't1');
 
 		try {
 			$result = $qb->executeQuery();
