@@ -74,7 +74,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="editTableModal"] #description-editor .tiptap.ProseMirror').type('Updated ToDo List description')
 		cy.get('[data-cy="editTableSaveBtn"]').should('be.enabled').click()
 
-		cy.wait(10).get('.toastify.toast-success').should('be.visible')
+		cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 		// cy.get('.app-navigation__list').contains('ToDo list').should('exist')
 		cy.contains('.text-editor__content p', 'Updated ToDo List description').should('be.visible')
 	})
@@ -109,7 +109,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="transferTableModal"] input[type="search"]').clear().type(targetUserTransfer.userId)
 		cy.contains('.vs__dropdown-menu li', targetUserTransfer.userId).click()
 		cy.get('[data-cy="transferTableButton"]').should('be.enabled').click()
-		cy.get('.toastify.toast-success').should('be.visible')
+		cy.get('[class*="toast_success"]').should('be.visible')
 		cy.get('.app-navigation__list').contains('test table').should('not.exist')
 		cy.login(targetUserTransfer)
 		cy.visit('apps/tables')

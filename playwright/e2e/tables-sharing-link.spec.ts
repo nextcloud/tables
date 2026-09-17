@@ -260,7 +260,7 @@ test.describe('Public link sharing', () => {
 		await expect(publicPage.locator('[data-cy="createRowModal"]')).toBeVisible()
 		await publicPage.locator('[data-cy="createRowModal"]').getByRole('textbox').first().fill('Form submission')
 		await publicPage.locator('[data-cy="createRowSaveButton"]').click()
-		await expect(publicPage.locator('.toastify.toast-success')).toBeVisible()
+		await expect(publicPage.locator('[class*="toast_success"]')).toBeVisible()
 		await publicContext.close()
 
 		await page.goto('/index.php/apps/tables')
