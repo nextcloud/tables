@@ -183,7 +183,7 @@ class ColumnMapper extends QBMapper {
 				->groupBy('table_id');
 
 			$result = $qb->executeQuery();
-			while ($row = $result->fetch()) {
+			while ($row = $result->fetchAssociative()) {
 				$counts[(int)$row['table_id']] = (int)$row['counter'];
 			}
 			$result->closeCursor();

@@ -164,7 +164,9 @@ class ViewMapper extends QBMapper {
 			$qb->select('v.*', 't.ownership')
 				->from($this->table, 'v')
 				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
-				->where($qb->expr()->in('v.table_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+				->where($qb->expr()->in('v.table_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
+				->addOrderBy('v.sidebar_order', 'ASC')
+				->addOrderBy('v.id', 'ASC');
 
 			$chunks[] = $this->findEntities($qb);
 		}
