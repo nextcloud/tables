@@ -117,7 +117,7 @@ test.describe('Manage a context', () => {
 		const updateResponse = page.waitForResponse(r => r.url().includes('/apps/tables/') && r.request().method() === 'PUT')
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 		await updateResponse
-		await expect(page.locator('.toastify.toast-success').first()).toBeVisible({ timeout: 10000 })
+		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible({ timeout: 10000 })
 
 		await loadContext(page, contextTitle)
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible({ timeout: 10000 })
@@ -171,7 +171,7 @@ test.describe('Manage a context', () => {
 		const updateDeleteResponse = page.waitForResponse(r => r.url().includes('/apps/tables/') && r.request().method() === 'PUT')
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 		await updateDeleteResponse
-		await expect(page.locator('.toastify.toast-success').first()).toBeVisible({ timeout: 10000 })
+		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible({ timeout: 10000 })
 
 		// verify that context was deleted from current user
 		const contextNavItem = page.locator('[data-cy="navigationContextItem"]').filter({ hasText: contextTitle }).first()

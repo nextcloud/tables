@@ -114,7 +114,7 @@ Cypress.Commands.add('deleteTable', (title) => {
 	cy.get('[data-cy="dataTableEditTableBtn"]').click()
 	cy.get('[data-cy="editTableModal"] [data-cy="editTableDeleteBtn"]').click()
 	cy.get('[data-cy="editTableModal"] [data-cy="editTableConfirmDeleteBtn"]').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('[data-cy="navigationTableItem"]').contains(title).should('not.exist')
 })
 
@@ -235,7 +235,7 @@ Cypress.Commands.add('createUsergroupColumn', (title, selectUsers, selectGroups,
 	})
 
 	cy.get('[data-cy="createColumnSaveBtn"]').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('[data-cy="ncTable"] table tr th').contains(title).should('exist')
 })
 
@@ -254,7 +254,7 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, isFirstC
 	)
 	cy.get('.modal-container button').contains('Save').click()
 
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -278,7 +278,7 @@ Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, is
 	})
 	cy.get('.modal-container button').contains('Save').click()
 
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -305,7 +305,7 @@ Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptio
 	})
 	cy.get('.modal-container button').contains('Save').click()
 
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -319,7 +319,7 @@ Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, is
 		cy.get('[data-cy="TextLineForm"] input').eq(1).type(maxLength)
 	}
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -334,7 +334,7 @@ Cypress.Commands.add('createDatetimeColumn', (title, setNow, isFirstColumn) => {
 	}
 
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -350,7 +350,7 @@ Cypress.Commands.add('createDatetimeDateColumn', (title, setNow, isFirstColumn) 
 	}
 
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -366,7 +366,7 @@ Cypress.Commands.add('createDatetimeTimeColumn', (title, setNow, isFirstColumn) 
 	}
 
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -395,7 +395,7 @@ Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, 
 		cy.get('[data-cy="NumberForm"] input').eq(5).clear().type(suffix)
 	}
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -409,7 +409,7 @@ Cypress.Commands.add('createNumberProgressColumn', (title, defaultValue, isFirst
 		cy.get('[data-cy="NumberProgressForm"] input').eq(0).clear().type(defaultValue)
 	}
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -425,7 +425,7 @@ Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, isFirstCol
 		}
 	}
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
@@ -440,7 +440,7 @@ Cypress.Commands.add('createSelectionCheckColumn', (title, defaultValue, isFirst
 		cy.get('[data-cy="selectionCheckFormDefaultSwitch"]').click()
 	}
 	cy.get('.modal-container button').contains('Save').click()
-	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 

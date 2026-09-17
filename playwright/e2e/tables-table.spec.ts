@@ -45,7 +45,7 @@ test.describe('Manage a table', () => {
 		await page.locator('[data-cy="editTableSaveBtn"]').click()
 
 		await page.waitForTimeout(10)
-		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
+		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
 		await expect(page.locator('.text-editor__content p').filter({ hasText: 'Updated ToDo List description' })).toBeVisible()
 	})
 
@@ -104,7 +104,7 @@ test.describe('Manage a table', () => {
 		await expect(page.locator('[data-cy="transferTableButton"]')).toBeEnabled()
 		await page.locator('[data-cy="transferTableButton"]').click()
 
-		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
+		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
 		await expect(page.locator('.app-navigation__list').filter({ hasText: 'test table' })).toBeHidden()
 
 		// login as other user
@@ -148,7 +148,7 @@ test.describe('Manage a table', () => {
 		const body = await updateResponse.json()
 		expect(body.ocs.data.columnOrder).toHaveLength(2)
 
-		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
+		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
 	})
 
 	test('Set default sort in Table settings modal', async ({ userPage: { page } }) => {
@@ -194,7 +194,7 @@ test.describe('Manage a table', () => {
 		expect(body.ocs.data.sort).toHaveLength(1)
 		expect(body.ocs.data.sort[0].mode).toBe('DESC')
 
-		await expect(page.locator('.toastify.toast-success').first()).toBeVisible()
+		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
 
 		await page.reload()
 		await expect(page.locator('h1').filter({ hasText: 'Default sort test table' })).toBeVisible()
