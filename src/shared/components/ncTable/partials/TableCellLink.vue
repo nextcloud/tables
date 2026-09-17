@@ -71,7 +71,7 @@
 <script>
 import { NcTextField, NcSelect } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
-import { generateOcsUrl, generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { translate as t } from '@nextcloud/l10n'
 import debounce from 'debounce'
 import generalHelper from '../../../mixins/generalHelper.js'
@@ -82,6 +82,7 @@ import { showError } from '@nextcloud/dialogs'
 import LinkWidget from './LinkWidget.vue'
 import { ALLOWED_PROTOCOLS } from '../../../constants.ts'
 import { normalizeImagePreviewSize } from '../../../utils/imagePreviewSize.js'
+import { buildPreviewUrl, findLocalFileId, isFileId } from '../../../utils/filePreview.js'
 
 export default {
 	name: 'TableCellLink',
@@ -128,13 +129,12 @@ export default {
 				return null
 			}
 
-			if (valueObject?.attributes?.fileId) {
-				return valueObject.attributes.fileId
+			// A picked file carries its id outright, which beats reading one out of a link.
+			if (isFileId(valueObject?.attributes?.fileId)) {
+				return String(valueObject.attributes.fileId)
 			}
 
-			const url = valueObject?.resourceUrl || valueObject?.value || ''
-			const match = url.match(/\/f\/(\d+)(?:[/?#]|$)/) || url.match(/[?&]fileid=(\d+)/) || url.match(/[?&]openfile=(\d+)/)
-			return match ? match[1] : null
+			return findLocalFileId(valueObject?.resourceUrl || valueObject?.value || '')
 		},
 		showImagePreview() {
 			return !!this.imagePreviewSrc && !this.imagePreviewFailed
@@ -152,13 +152,7 @@ export default {
 				return null
 			}
 
-			const previewParameters = new URLSearchParams({
-				fileId: String(this.fileId),
-				x: String(this.imagePreviewSize),
-				y: String(this.imagePreviewSize),
-				a: '1',
-			})
-			return generateUrl('/core/preview') + '?' + previewParameters.toString()
+			return buildPreviewUrl(this.fileId, this.imagePreviewSize)
 		},
 		imagePreviewLink() {
 			return this.getValueObject?.resourceUrl || this.getValueObject?.value
