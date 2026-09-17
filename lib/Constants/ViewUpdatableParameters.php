@@ -18,4 +18,6 @@ enum ViewUpdatableParameters: string {
 	case COLUMN_SETTINGS = 'columns';
 	case TECHNICAL_NAME = 'technicalName';
 	case SIDEBAR_ORDER = 'sidebarOrder';
+	case LAYOUT = 'layout';
+	case VIEW_SETTINGS = 'viewSettings';
 }
