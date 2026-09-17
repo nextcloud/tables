@@ -118,7 +118,7 @@ import {
 	TYPE_META_UPDATED_BY,
 } from '../../constants.ts'
 import { MetaColumns } from './mixins/metaColumns.js'
-import { MagicFields } from './mixins/magicFields.js'
+import { resolveMagicValues } from './mixins/magicFields.js'
 import { FilterIds, getFiltersForColumn } from './mixins/filter.js'
 
 export default {
@@ -344,7 +344,7 @@ export default {
 
 					// apply filters (if any)
 					filters.forEach(fil => {
-						this.addMagicFieldsValues(fil)
+						resolveMagicValues(fil)
 						if (filterStatus === null || filterStatus === true) {
 							filterStatus = column.isFilterFound(cell, fil)
 						}
@@ -430,18 +430,6 @@ export default {
 		setSearchString(str) {
 			this.localViewSetting.searchString = str !== '' ? str : null
 			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
-		},
-		addMagicFieldsValues(filter) {
-			if (FilterIds.ContainsItem === filter.operator.id) {
-				return
-			}
-
-			Object.values(MagicFields).forEach(field => {
-				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
-				if (filter.value !== newFilterValue) {
-					filter.magicValuesEnriched = newFilterValue
-				}
-			})
 		},
 	},
 }

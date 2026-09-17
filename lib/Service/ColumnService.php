@@ -54,6 +54,7 @@ class ColumnService extends SuperService {
 		private readonly IL10N $l,
 		private readonly UserHelper $userHelper,
 		private readonly ColumnDtoValidator $columnDtoValidator,
+		private readonly FormattingService $formattingService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -374,6 +375,10 @@ class ColumnService extends SuperService {
 			$this->columnDtoValidator->validate($columnDto);
 			$title = $this->normalizeTitle($columnDto->getTitle(), false);
 
+			$oldType = $item->getType();
+			$oldSubtype = $item->getSubtype();
+			$oldSelectionOptionIds = array_column($item->getSelectionOptionsArray(), 'id');
+
 			if ($title !== null) {
 				$item->setTitle($title);
 			}
@@ -428,6 +433,20 @@ class ColumnService extends SuperService {
 			$this->updateMetadata($item, $userId);
 			try {
 				$updatedColumn = $this->mapper->update($item);
+
+				$newType = $updatedColumn->getType();
+				$newSubtype = $updatedColumn->getSubtype();
+				if ($oldType !== $newType || $oldSubtype !== $newSubtype) {
+					$fullType = $newSubtype ? $newType . '-' . $newSubtype : $newType;
+					$this->formattingService->handleColumnTypeChange($updatedColumn->getId(), $fullType);
+				}
+				$dtoOptions = $columnDto->getSelectionOptions();
+				if ($dtoOptions !== null) {
+					$newOptionIds = array_column(json_decode($dtoOptions, true) ?? [], 'id');
+					foreach (array_diff($oldSelectionOptionIds, $newOptionIds) as $deletedId) {
+						$this->formattingService->handleSelectionOptionDeletion($updatedColumn->getId(), (int)$deletedId);
+					}
+				}
 
 				$this->activityManager->triggerEvent(
 					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
@@ -592,6 +611,8 @@ class ColumnService extends SuperService {
 			}
 		}
 
+		$this->formattingService->handleColumnDeletion($item->getId());
+
 		try {
 			$this->mapper->delete($item);
 		} catch (\OCP\DB\Exception $e) {
@@ -735,11 +756,11 @@ class ColumnService extends SuperService {
 	 * @param Table $table
 	 * @param array $column
 	 *
-	 * @return int
+	 * @return array{columnId: int, selectionOptionIdMap: array<int, int>}
 	 *
 	 * @throws InternalError
 	 */
-	public function importColumn(Table $table, array $column): int {
+	public function importColumn(Table $table, array $column): array {
 		$item = new Column();
 		if (isset($column['uuid'])) {
 			$uuid = (string)$column['uuid'];
@@ -795,7 +816,19 @@ class ColumnService extends SuperService {
 			$this->logger->error('importColumn insert error: ' . $e->getMessage());
 			throw new InternalError('importColumn insert error: ' . $e->getMessage());
 		}
-		return $newColumn->getId();
+
+		$oldOptions = $column['selectionOptions'] ?? [];
+		$newOptions = $newColumn->getSelectionOptionsArray();
+		$selectionOptionIdMap = [];
+		foreach ($oldOptions as $idx => $oldOpt) {
+			$oldId = $oldOpt['id'] ?? null;
+			$newId = $newOptions[$idx]['id'] ?? $oldId;
+			if ($oldId !== null) {
+				$selectionOptionIdMap[(int)$oldId] = (int)$newId;
+			}
+		}
+
+		return ['columnId' => $newColumn->getId(), 'selectionOptionIdMap' => $selectionOptionIdMap];
 	}
 
 	private function buildDefaultTechnicalName(int $columnId): string {
