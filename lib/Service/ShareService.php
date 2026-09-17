@@ -256,16 +256,13 @@ class ShareService extends SuperService {
 
 	/**
 	 * @param int[] $tableIds
-	 * @param string|null $userId
 	 * @return array<int, int>
 	 * @throws InternalError
 	 */
-	public function countSharesForTables(array $tableIds, ?string $userId = null): array {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
+	public function countSharesForTables(array $tableIds): array {
 		try {
 			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
-			$shares = $this->mapper->findAllSharesForNodes('table', $tableIds, $userId, $excluded);
+			$shares = $this->mapper->findAllSharesForNodes('table', $tableIds, $excluded);
 
 			$counts = array_fill_keys($tableIds, 0);
 			foreach ($shares as $share) {
@@ -282,16 +279,13 @@ class ShareService extends SuperService {
 
 	/**
 	 * @param int[] $viewIds
-	 * @param string|null $userId
 	 * @return array<int, int>
 	 * @throws InternalError
 	 */
-	public function countSharesForViews(array $viewIds, ?string $userId = null): array {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
+	public function countSharesForViews(array $viewIds): array {
 		try {
 			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
-			$shares = $this->mapper->findAllSharesForNodes('view', $viewIds, $userId, $excluded);
+			$shares = $this->mapper->findAllSharesForNodes('view', $viewIds, $excluded);
 
 			$counts = array_fill_keys($viewIds, 0);
 			foreach ($shares as $share) {
