@@ -12,11 +12,22 @@ namespace OCA\Tables\Tests\Unit\Db;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\RowCellDatetimeMapper;
+use OCA\Tables\Db\RowCellNumberMapper;
+use OCA\Tables\Db\RowCellSelectionMapper;
+use OCA\Tables\Db\RowCellTextMapper;
+use OCA\Tables\Db\RowCellUsergroupMapper;
+use OCA\Tables\Db\RowLoader\CachedRowLoader;
+use OCA\Tables\Db\RowLoader\NormalizedRowLoader;
 use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\ColumnsHelper;
+use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IAppConfig;
+use OCP\IUserManager;
+use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
@@ -35,6 +46,10 @@ trait Row2MapperTestDependencies {
 	protected ColumnsHelper|MockObject $columnsHelper;
 	protected LoggerInterface|MockObject $logger;
 	protected CircleHelper|MockObject $circleHelper;
+	protected NormalizedRowLoader $normalizedRowLoader;
+	protected CachedRowLoader $cachedRowLoader;
+	protected IAppConfig|MockObject $appConfig;
+	protected bool $sleeveCellCachingComplete = true;
 
 	protected static bool $testDataInitialized = false;
 	protected static int $testTableId;
@@ -56,7 +71,32 @@ trait Row2MapperTestDependencies {
 		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->rowSleeveMapper = new RowSleeveMapper($this->connectionAdapter, $this->logger);
-		$this->columnsHelper = new ColumnsHelper($this->userHelper, $this->circleHelper);
+
+		// Partial mock so getCachedCellsForRow() keeps working with the real
+		// implementation on top of the mocked cell mapper resolution
+		$this->columnsHelper = $this->getMockBuilder(ColumnsHelper::class)
+			->setConstructorArgs([$this->userHelper, $this->circleHelper, $this->logger])
+			->onlyMethods(['getCellMapperFromType', 'resolveSearchValue'])
+			->getMock();
+
+		// Mock getCellMapperFromType to return real cell mappers
+		$this->setupCellMappers();
+
+		// Use real loader instances since we have a real database
+		$this->normalizedRowLoader = new NormalizedRowLoader(
+			$this->connectionAdapter,
+			$this->rowSleeveMapper,
+			$this->columnsHelper,
+			$this->logger
+		);
+		$this->cachedRowLoader = new CachedRowLoader(
+			$this->rowSleeveMapper,
+			$this->logger
+		);
+
+		$this->appConfig = $this->createMock(IAppConfig::class);
+		$this->appConfig->method('getValueBool')
+			->willReturnCallback(fn () => $this->sleeveCellCachingComplete);
 
 		$this->mapper = new Row2Mapper(
 			'test_user',
@@ -65,13 +105,41 @@ trait Row2MapperTestDependencies {
 			$this->userHelper,
 			$this->rowSleeveMapper,
 			$this->columnsHelper,
-			$this->columnMapper
+			$this->columnMapper,
+			$this->normalizedRowLoader,
+			$this->cachedRowLoader,
+			$this->appConfig
 		);
 
 		if (!self::$testDataInitialized) {
 			$this->initializeTestData();
 			self::$testDataInitialized = true;
 		}
+	}
+
+	/**
+	 * Sets up real cell mappers by mocking getCellMapperFromType
+	 * This is needed because ColumnsHelper uses Server::get() which doesn't work in unit tests
+	 */
+	private function setupCellMappers(): void {
+		$userManager = $this->createMock(IUserManager::class);
+		$userSession = $this->createMock(IUserSession::class);
+
+		// Delegate resolveSearchValue to a real instance so magic values like
+		// '@selection-id-1' or '@checked' are resolved as in production
+		$realColumnsHelper = new ColumnsHelper($this->userHelper, $this->circleHelper, $this->logger);
+		$this->columnsHelper->method('resolveSearchValue')
+			->willReturnCallback(fn (string $placeholder, string $userId, ?Column $column = null) => $realColumnsHelper->resolveSearchValue($placeholder, $userId, $column));
+
+		$this->columnsHelper->method('getCellMapperFromType')
+			->willReturnCallback(fn ($columnType) => match ($columnType) {
+				Column::TYPE_TEXT => new RowCellTextMapper($this->connectionAdapter),
+				Column::TYPE_NUMBER => new RowCellNumberMapper($this->connectionAdapter),
+				Column::TYPE_DATETIME => new RowCellDatetimeMapper($this->connectionAdapter),
+				Column::TYPE_SELECTION => new RowCellSelectionMapper($this->connectionAdapter),
+				Column::TYPE_USERGROUP => new RowCellUsergroupMapper($this->connectionAdapter, $userManager, $this->circleHelper, $this->createMock(GroupHelper::class), $userSession),
+				default => throw new \InvalidArgumentException("Unknown column type: $columnType"),
+			});
 	}
 
 	/**
@@ -218,6 +286,12 @@ trait Row2MapperTestDependencies {
 
 		$this->columnMapper->method('find')
 			->willReturnCallback(fn ($id) => $columns[$id] ?? throw new DoesNotExistException('test'));
+
+		$this->columnMapper->method('findAllByTable')
+			->willReturnCallback(fn (int $tableId) => array_values(array_filter(
+				$columns,
+				fn (Column $column) => $column->getTableId() === $tableId
+			)));
 
 		$this->columnMapper->method('preloadColumns');
 		$this->columnMapper->method('getColumnTypes')->willReturn($columnTypes);
