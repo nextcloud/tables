@@ -126,7 +126,7 @@ class ColumnsHelper {
 			$cellMapper = Server::get($cellMapperClassName);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), previous: $e);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), previous: $e);
 		}
 
 		return $this->cellMappers[$columnType] = $cellMapper;

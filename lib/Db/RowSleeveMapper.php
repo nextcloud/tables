@@ -77,7 +77,7 @@ class RowSleeveMapper extends QBMapper {
 			->from($this->table, $sleeveAlias)
 			->where($qb->expr()->in($sleeveAlias . '.id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
 
-		return $qb->executeQuery()->fetchAll();
+		return $qb->executeQuery()->fetchAllAssociative();
 	}
 
 	/**

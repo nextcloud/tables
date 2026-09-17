@@ -22,8 +22,8 @@ use Psr\Log\LoggerInterface;
  */
 class CachedRowLoader implements RowLoader {
 	public function __construct(
-		private RowSleeveMapper $rowSleeveMapper,
-		private LoggerInterface $logger,
+		private readonly RowSleeveMapper $rowSleeveMapper,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
@@ -45,7 +45,7 @@ class CachedRowLoader implements RowLoader {
 			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
 		}
 
 		return $this->parseResult($sleeves, $columns, $mappers);

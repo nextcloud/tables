@@ -27,12 +27,12 @@ class CacheSleeveCells implements IRepairStep {
 	private const ROW_BATCH_SIZE = 1_000;
 
 	public function __construct(
-		private IDBConnection $db,
-		private ColumnMapper $columnMapper,
-		private ColumnsHelper $columnsHelper,
-		private RowSleeveMapper $rowSleeveMapper,
-		private IAppConfig $appConfig,
-		private LoggerInterface $logger,
+		private readonly IDBConnection $db,
+		private readonly ColumnMapper $columnMapper,
+		private readonly ColumnsHelper $columnsHelper,
+		private readonly RowSleeveMapper $rowSleeveMapper,
+		private readonly IAppConfig $appConfig,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
@@ -92,15 +92,14 @@ class CacheSleeveCells implements IRepairStep {
 			->select('id')
 			->from('tables_tables')
 			->orderBy('id')
-			->executeQuery()
-			->fetchAll(\PDO::FETCH_COLUMN);
+			->executeQuery()->fetchFirstColumn();
 	}
 
 	/**
 	 * @return int[]
 	 */
 	private function fetchPendingRowIds(IQueryBuilder $pendingRowsQuery): array {
-		return $pendingRowsQuery->executeQuery()->fetchAll(\PDO::FETCH_COLUMN);
+		return $pendingRowsQuery->executeQuery()->fetchFirstColumn();
 	}
 
 	private function buildPendingRowIdsQuery(): IQueryBuilder {

@@ -909,7 +909,7 @@ class Row2Mapper {
 			$cachedCell = $this->insertCell($rowId, $columnId, $value);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
 		}
 		return $cachedCell;
 	}

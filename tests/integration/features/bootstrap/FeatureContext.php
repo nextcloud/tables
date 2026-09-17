@@ -951,12 +951,10 @@ class FeatureContext implements Context {
 		$this->setCurrentUser($user);
 
 		$columns = explode(',', $columnList);
-		$columnSettings = array_map(function (string $columnAlias, int $index) {
-			return [
-				'columnId' => $this->resolveColumnId($columnAlias),
-				'order' => $index
-			];
-		}, $columns, array_keys($columns));
+		$columnSettings = array_map(fn (string $columnAlias, int $index) => [
+			'columnId' => $this->resolveColumnId($columnAlias),
+			'order' => $index
+		], $columns, array_keys($columns));
 
 		$this->sendUpdateViewRequest($viewAlias, ['columnSettings' => json_encode($columnSettings)]);
 

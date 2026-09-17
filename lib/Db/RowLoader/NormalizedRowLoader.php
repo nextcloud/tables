@@ -55,7 +55,7 @@ class NormalizedRowLoader implements RowLoader {
 			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
 		}
 
 		if (empty($columns)) {
@@ -95,7 +95,7 @@ class NormalizedRowLoader implements RowLoader {
 			$result = $qb->executeQuery();
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
 		}
 
 		return $this->parseResult($result, $sleeves, $columns, $mappers);
@@ -126,7 +126,7 @@ class NormalizedRowLoader implements RowLoader {
 		$keyToColumnId = [];
 		$keyToRowId = [];
 
-		while ($result !== null && ($rowData = $result->fetch())) {
+		while ($result !== null && ($rowData = $result->fetchAssociative())) {
 			if (!isset($rowData['row_id'], $rows[$rowData['row_id']])) {
 				break;
 			}

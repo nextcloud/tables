@@ -132,15 +132,13 @@ trait Row2MapperTestDependencies {
 			->willReturnCallback(fn (string $placeholder, string $userId, ?Column $column = null) => $realColumnsHelper->resolveSearchValue($placeholder, $userId, $column));
 
 		$this->columnsHelper->method('getCellMapperFromType')
-			->willReturnCallback(function ($columnType) use ($userManager, $userSession) {
-				return match ($columnType) {
-					Column::TYPE_TEXT => new RowCellTextMapper($this->connectionAdapter),
-					Column::TYPE_NUMBER => new RowCellNumberMapper($this->connectionAdapter),
-					Column::TYPE_DATETIME => new RowCellDatetimeMapper($this->connectionAdapter),
-					Column::TYPE_SELECTION => new RowCellSelectionMapper($this->connectionAdapter),
-					Column::TYPE_USERGROUP => new RowCellUsergroupMapper($this->connectionAdapter, $userManager, $this->circleHelper, $this->createMock(GroupHelper::class), $userSession),
-					default => throw new \InvalidArgumentException("Unknown column type: $columnType"),
-				};
+			->willReturnCallback(fn ($columnType) => match ($columnType) {
+				Column::TYPE_TEXT => new RowCellTextMapper($this->connectionAdapter),
+				Column::TYPE_NUMBER => new RowCellNumberMapper($this->connectionAdapter),
+				Column::TYPE_DATETIME => new RowCellDatetimeMapper($this->connectionAdapter),
+				Column::TYPE_SELECTION => new RowCellSelectionMapper($this->connectionAdapter),
+				Column::TYPE_USERGROUP => new RowCellUsergroupMapper($this->connectionAdapter, $userManager, $this->circleHelper, $this->createMock(GroupHelper::class), $userSession),
+				default => throw new \InvalidArgumentException("Unknown column type: $columnType"),
 			});
 	}
 
