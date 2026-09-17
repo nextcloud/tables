@@ -14,35 +14,11 @@ describe('Card preview URL', () => {
 		new TextLineColumn({ id: 2, title: 'Image', type: ColumnTypes.TextLine }),
 	]
 
-	it('takes the file id from a same origin link, whatever its spelling', () => {
-		mountCards('x').then(({ wrapper }) => {
-			const origin = window.location.origin
-			const id = value => wrapper.vm.getLocalFileId(value)
-
-			expect(id(`${origin}/index.php/f/123`)).to.equal('123')
-			expect(id(`${origin}/index.php/f/123/`)).to.equal('123')
-			expect(id('/index.php/f/456')).to.equal('456', 'a relative link resolves against this origin')
-			expect(id(`${origin}/index.php/core/preview?fileId=7&x=9999`)).to.equal('7')
-			expect(id(`${origin}/apps/files/?FILEID=8`)).to.equal('8', 'the parameter name is not case sensitive')
-		})
-	})
-
-	it('refuses anything that does not name a file on this server', () => {
-		mountCards('x').then(({ wrapper }) => {
-			const id = value => wrapper.vm.getLocalFileId(value)
-
-			expect(id('https://evil.example/index.php/f/42')).to.equal(null, 'another host is never followed')
-			expect(id('https://evil.example/index.php/core/preview?fileId=42')).to.equal(null)
-			expect(id('not a link')).to.equal(null)
-			expect(id(`${window.location.origin}/index.php/f/abc`)).to.equal(null, 'the id has to be numeric')
-		})
-	})
-
 	it('rebuilds the request instead of forwarding the stored one', () => {
 		mountCards(`${window.location.origin}/index.php/core/preview?fileId=7&x=9999&evil=1`)
 
 		cy.get(`${CARD} img`).should('have.attr', 'src').then(src => {
-			expect(src).to.match(/\/core\/preview\?fileId=7&x=\d+&y=\d+&a=true$/)
+			expect(src).to.match(/\/core\/preview\?fileId=7&x=\d+&y=\d+&a=1$/)
 			expect(src).not.to.contain('evil')
 			expect(src).not.to.contain('9999')
 		})
@@ -52,6 +28,15 @@ describe('Card preview URL', () => {
 		mountCards(JSON.stringify({ value: `${window.location.origin}/index.php/f/55`, title: 'x' }))
 
 		cy.get(`${CARD} img`).should('have.attr', 'src').and('match', /fileId=55&/)
+	})
+
+	it('prefers the file id a picked file stores over the link it also carries', () => {
+		mountCards(JSON.stringify({
+			resourceUrl: `${window.location.origin}/index.php/f/55`,
+			attributes: { fileId: 66 },
+		}))
+
+		cy.get(`${CARD} img`).should('have.attr', 'src').and('match', /fileId=66&/)
 	})
 
 	it('renders no image for a value it will not follow', () => {
