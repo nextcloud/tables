@@ -48,6 +48,7 @@ class TextLinkBusiness extends SuperBusiness {
 		$data = json_decode((string)$value, true);
 		if ($data !== null) {
 			if (isset($data['resourceUrl'])) {
+				// Only persist server-trusted fields
 				return json_encode(json_encode([
 					'title' => $data['title'] ?? $data['resourceUrl'],
 					'value' => $data['resourceUrl'],

@@ -130,8 +130,12 @@ import RelationForm from '../../shared/components/ncTable/partials/columnTypePar
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
-import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
+import {
+	COLUMN_WIDTH_MAX,
+	COLUMN_WIDTH_MIN,
+} from '../../shared/constants.js'
 import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
+import { normalizeImagePreviewSize } from '../../shared/utils/imagePreviewSize.js'
 
 export default {
 	name: 'CreateColumn',
@@ -382,6 +386,10 @@ export default {
 				data.textDefault = this.column.textDefault
 			} else if (this.combinedType === ColumnTypes.TextLink) {
 				data.textAllowedPattern = this.column.textAllowedPattern
+				data.customSettings.showPreview = !!this.column.customSettings?.showPreview
+				if (data.customSettings.showPreview || this.column.customSettings?.imagePreviewSize !== undefined) {
+					data.customSettings.imagePreviewSize = normalizeImagePreviewSize(this.column.customSettings?.imagePreviewSize)
+				}
 			} else if (this.column.type === 'selection') {
 				data.selectionDefault = typeof this.column.selectionDefault !== 'string' ? JSON.stringify(this.column.selectionDefault) : this.column.selectionDefault
 				if (this.column.subtype !== 'check') {

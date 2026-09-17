@@ -82,6 +82,28 @@ class TextLinkBusinessTest extends TestCase {
 		])), $this->textLinkBusiness->parseValue(json_encode([
 			'resourceUrl' => 'https://nextcloud.com'
 		]), $column));
+
+		// Client-supplied thumbnailUrl/icon/attributes must never be persisted. The preview is derived from the file id in the URL.
+		$column->setCustomSettings(json_encode([
+			'showPreview' => true,
+		]));
+		self::assertEquals(json_encode(json_encode([
+			'title' => 'photo.jpg',
+			'value' => 'https://nextcloud.test/apps/files/f/123',
+			'providerId' => 'files',
+		])), $this->textLinkBusiness->parseValue(json_encode([
+			'title' => 'photo.jpg',
+			'resourceUrl' => 'https://nextcloud.test/apps/files/f/123',
+			'providerId' => 'files',
+			'thumbnailUrl' => 'https://example/img.png',
+			'icon' => 'https://example/icon.png',
+			'attributes' => [
+				'fileId' => '123',
+				'path' => '/Photos/photo.jpg',
+			],
+		]), $column));
+
+		$column->setCustomSettings(null);
 		self::assertEquals(json_encode(json_encode([
 			'title' => 'Test link',
 			'value' => 'https://nextcloud.com',

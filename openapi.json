@@ -259,6 +259,13 @@
                             "width": {
                                 "type": "integer",
                                 "format": "int64"
+                            },
+                            "showPreview": {
+                                "type": "boolean"
+                            },
+                            "imagePreviewSize": {
+                                "type": "integer",
+                                "format": "int64"
                             }
                         }
                     }
@@ -608,6 +615,13 @@
                         ],
                         "properties": {
                             "width": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "showPreview": {
+                                "type": "boolean"
+                            },
+                            "imagePreviewSize": {
                                 "type": "integer",
                                 "format": "int64"
                             }

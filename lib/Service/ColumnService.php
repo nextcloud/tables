@@ -482,6 +482,29 @@ class ColumnService extends SuperService {
 				);
 			}
 		}
+
+		if (isset($settings['showPreview']) && !is_bool($settings['showPreview'])) {
+			$translatedMessage = $this->l->t('Show preview must be a boolean value.');
+			throw new BadRequestError(
+				$translatedMessage,
+				0,
+				null,
+				$translatedMessage
+			);
+		}
+
+		if (isset($settings['imagePreviewSize'])) {
+			$size = $settings['imagePreviewSize'];
+			if (!is_numeric($size) || $size < 32 || $size > 192) {
+				$translatedMessage = $this->l->t('Image preview size must be between %1$s and %2$s.', [32, 192]);
+				throw new BadRequestError(
+					$translatedMessage,
+					0,
+					null,
+					$translatedMessage
+				);
+			}
+		}
 	}
 
 	private function normalizeTitle(?string $title, bool $required): ?string {

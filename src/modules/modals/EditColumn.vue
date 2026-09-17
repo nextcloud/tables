@@ -75,8 +75,12 @@ import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandle
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../store/data.js'
-import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
+import {
+	COLUMN_WIDTH_MAX,
+	COLUMN_WIDTH_MIN,
+} from '../../shared/constants.js'
 import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
+import { normalizeImagePreviewSize } from '../../shared/utils/imagePreviewSize.js'
 
 export default {
 	name: 'EditColumn',
@@ -221,6 +225,10 @@ export default {
 
 			data.technicalName = this.normalizeTechnicalName(data.technicalName)
 			data.customSettings = { ...data.customSettings, width: data.customSettings.width }
+			if (this.isTextLinkColumn(this.column)
+				&& (data.customSettings.showPreview || data.customSettings.imagePreviewSize !== undefined)) {
+				data.customSettings.imagePreviewSize = normalizeImagePreviewSize(data.customSettings.imagePreviewSize)
+			}
 			const res = await this.updateColumn({
 				id: this.editColumn.id,
 				isView: this.isView,
@@ -237,6 +245,9 @@ export default {
 		},
 		isTechnicalNameValid() {
 			return isTechnicalNameValid(this.editColumn.technicalName)
+		},
+		isTextLinkColumn(column) {
+			return column?.type === ColumnTypes.TextLink || (column?.type === 'text' && column?.subtype === 'link')
 		},
 	},
 }
