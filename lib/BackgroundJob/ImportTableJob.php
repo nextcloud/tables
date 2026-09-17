@@ -28,8 +28,8 @@ class ImportTableJob extends QueuedJob {
 		private readonly ActivityManager $activityManager,
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
-		private NotificationHelper $notificationHelper,
-		private LoggerInterface $logger,
+		private readonly NotificationHelper $notificationHelper,
+		private readonly LoggerInterface $logger,
 	) {
 		parent::__construct($time);
 	}

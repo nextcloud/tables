@@ -1621,7 +1621,7 @@ class FeatureContext implements Context {
 	 */
 	private function normalizeExpectedCellValue(array $column, mixed $value): mixed {
 		if (($column['type'] ?? null) === 'selection' && ($column['subtype'] ?? null) === 'multi' && is_string($value)) {
-			$labels = array_map('trim', explode(',', $value));
+			$labels = array_map(trim(...), explode(',', $value));
 			$ids = [];
 			foreach ($column['selectionOptions'] ?? [] as $option) {
 				if (in_array($option['label'], $labels, true)) {
