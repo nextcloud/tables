@@ -145,6 +145,13 @@ class TableService extends SuperService {
 			} catch (InternalError|PermissionError $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}
+			foreach ($allTables as $table) {
+				// if the table is shared with me, there are no other shares
+				// will avoid showing the shared icon in the FE nav
+				if ($table->getIsShared()) {
+					$table->setHasShares(false);
+				}
+			}
 		}
 
 		return array_values($allTables);
@@ -207,8 +214,7 @@ class TableService extends SuperService {
 				$table->setOnSharePermissions(new Permissions(read: true));
 			}
 		} else {
-			$ownedTableIds = array_filter($tableIds, static fn (int $id) => $tablesById[$id]->getOwnership() === $userId);
-			$sharesCount = $this->shareService->countSharesForTables($ownedTableIds, $userId);
+			$sharesCount = $this->shareService->countSharesForTables($tableIds);
 			foreach ($tables as $table) {
 				$table->setHasShares(($sharesCount[$table->getId()] ?? 0) > 0);
 			}
@@ -224,14 +230,6 @@ class TableService extends SuperService {
 					$table->setIsShared(false);
 					$table->setOnSharePermissions(new Permissions());
 				}
-			}
-		}
-
-		// if the table is shared with me, there are no other shares
-		// will avoid showing the shared icon in the FE nav
-		foreach ($tables as $table) {
-			if ($table->getIsShared()) {
-				$table->setHasShares(false);
 			}
 		}
 

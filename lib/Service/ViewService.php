@@ -441,11 +441,6 @@ class ViewService extends SuperService {
 	 * @param int|null $tableRowsCount
 	 */
 	private function enhanceView(View $view, string $userId, ?int $tableRowsCount = null): void {
-		if ($view->isFederated()) {
-			$this->enhanceFederatedView($view, $userId);
-			return;
-		}
-
 		$this->enhanceViews([$view], $userId, [$view->getTableId() => $tableRowsCount]);
 	}
 
@@ -458,6 +453,16 @@ class ViewService extends SuperService {
 	 * @param array<int, int|null> $tableRowsCounts
 	 */
 	private function enhanceViews(array $views, string $userId, array $tableRowsCounts = []): void {
+		$localViews = [];
+		foreach ($views as $view) {
+			if ($view->isFederated()) {
+				$this->enhanceFederatedView($view, $userId);
+			} else {
+				$localViews[] = $view;
+			}
+		}
+		$views = $localViews;
+
 		if (empty($views)) {
 			return;
 		}
@@ -485,7 +490,7 @@ class ViewService extends SuperService {
 
 			if (!empty($ownedViewIds)) {
 				try {
-					$sharesCounts = $this->shareService->countSharesForViews($ownedViewIds, $userId);
+					$sharesCounts = $this->shareService->countSharesForViews($ownedViewIds);
 				} catch (InternalError $e) {
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
 				}
@@ -512,7 +517,7 @@ class ViewService extends SuperService {
 						$count = $this->rowService->getViewRowsCount($view, $userId);
 						$view->setRowsCount($count);
 						$rowsCountCache[$cacheKey] = $count;
-					} catch (InternalError|PermissionError $e) {
+					} catch (InternalError|PermissionError) {
 					}
 				}
 			}
@@ -608,9 +613,9 @@ class ViewService extends SuperService {
 					$view->setHasShares($sharesCount > 0);
 				} else {
 					try {
-						$counts = $this->shareService->countSharesForViews([$view->getId()], $userId);
+						$counts = $this->shareService->countSharesForViews([$view->getId()]);
 						$view->setHasShares(($counts[$view->getId()] ?? 0) > 0);
-					} catch (InternalError $e) {
+					} catch (InternalError) {
 					}
 				}
 			}
