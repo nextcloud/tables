@@ -119,10 +119,10 @@ import { PAGINATION_CHANGED, isSamePaginationTarget } from '../mixins/pagination
 import { NcRichText } from '@nextcloud/vue'
 import { ColumnTypes } from '../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
-import { generateUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 import { LAYOUT_GALLERY, LAYOUT_TABLE } from '../../../constants.ts'
 import { resolveLayout } from '../../../utils/viewSetting.js'
+import { buildPreviewUrl, findLocalFileId, isFileId } from '../../../utils/filePreview.js'
 
 // Share of the card image the title banner may cover before the text is ellipsized.
 // Cards start from a 220px minimum, so this still covers them at a doubled pixel ratio.
@@ -459,6 +459,10 @@ export default {
 			if (typeof rawValue === 'string') {
 				try {
 					const parsed = JSON.parse(rawValue)
+					// A picked file carries its id outright, which beats reading one out of a link.
+					if (isFileId(parsed?.attributes?.fileId)) {
+						return buildPreviewUrl(parsed.attributes.fileId, CARD_PREVIEW_SIZE)
+					}
 					candidates.push(parsed?.value, parsed?.resourceUrl, parsed?.thumbnailUrl)
 				} catch (err) {
 					// Keep raw string candidate
@@ -466,45 +470,13 @@ export default {
 			}
 
 			for (const candidate of candidates) {
-				if (typeof candidate !== 'string' || candidate.length === 0) {
-					continue
-				}
-				const fileId = this.getLocalFileId(candidate.replace(/\\\//g, '/'))
+				const fileId = findLocalFileId(candidate)
 				if (fileId !== null) {
-					return generateUrl(`/core/preview?fileId=${fileId}&x=${CARD_PREVIEW_SIZE}&y=${CARD_PREVIEW_SIZE}&a=true`)
+					return buildPreviewUrl(fileId, CARD_PREVIEW_SIZE)
 				}
 			}
 
 			return null
-		},
-		/**
-		 * The id of a file on this server that the given cell value names, or null.
-		 *
-		 * A cell is user supplied, so a foreign host is never followed: it would be fetched by
-		 * every viewer of the card. The id is read out of the link and the preview URL rebuilt
-		 * from it, so no attacker chosen path or query string reaches the request.
-		 *
-		 * @param {string} value the raw cell value
-		 * @return {string|null} the file id, or null when the value names no local file
-		 */
-		getLocalFileId(value) {
-			let url
-			try {
-				url = new URL(value, window.location.origin)
-			} catch (err) {
-				return null
-			}
-			if (url.origin !== window.location.origin) {
-				return null
-			}
-
-			for (const [key, param] of url.searchParams) {
-				if (key.toLowerCase() === 'fileid' && /^\d+$/.test(param)) {
-					return param
-				}
-			}
-
-			return url.pathname.match(/\/f\/(\d+)\/?$/)?.[1] ?? null
 		},
 		isRichColumn(column) {
 			return column?.type === ColumnTypes.TextRich
