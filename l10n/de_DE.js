@@ -733,7 +733,7 @@ OC.L10N.register(
     "Delete option" : "Option löschen",
     "Add option" : "Option hinzufügen",
     "You can set a default value by clicking on one of the radio buttons next to the label fields." : "Sie können einen Standardwert festlegen, indem Sie auf eines der Optionsfelder neben den Beschriftungsfeldern klicken.",
-    "Click here to unset default selection." : "Klicken Sie hier, um die Standardauswahl aufzuheben.",
+    "Click here to unset default selection." : "Hier klicken, um die Standardauswahl aufzuheben.",
     "You can set default values by marking the checkboxes next to the label fields." : "Sie können Standardwerte festlegen, indem Sie die Kontrollkästchen neben den Bezeichnungsfeldern markieren.",
     "Allowed pattern (regex)" : "Erlaubtes Muster (regex)",
     "Maximum text length" : "Maximale Textlänge",
