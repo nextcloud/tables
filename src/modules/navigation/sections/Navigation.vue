@@ -104,7 +104,8 @@ import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import NavigationContextItem from '../partials/NavigationContextItem.vue'
 import { useTablesStore } from '../../../store/store.js'
-import { emit, subscribe } from '@nextcloud/event-bus'
+import { emit } from '@nextcloud/event-bus'
+import { useEventBusSubscriptions } from '../../../shared/composables/useEventBusSubscriptions.js'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import ArchiveOutline from 'vue-material-design-icons/ArchiveOutline.vue'
 import { getCurrentUser } from '@nextcloud/auth'
@@ -127,6 +128,9 @@ export default {
 		NcButton,
 		NcCounterBubble,
 		NcEmptyContent,
+	},
+	setup() {
+		return { ...useEventBusSubscriptions() }
 	},
 	data() {
 		return {
@@ -192,7 +196,7 @@ export default {
 		},
 	},
 	created() {
-		subscribe('navigation-toggled', this.toggleNavigationByEventBus)
+		this.subscribeToEventBus('navigation-toggled', this.toggleNavigationByEventBus)
 	},
 	methods: {
 		...mapActions(useTablesStore, ['setAppNavCollapsed']),

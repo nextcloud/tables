@@ -60,7 +60,7 @@
 
 <script>
 
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { useEventBusSubscriptions } from '../../shared/composables/useEventBusSubscriptions.js'
 import CreateRow from './CreateRow.vue'
 import ImportScheme from './ImportScheme.vue'
 import ImportTableScheme from './ImportTableScheme.vue'
@@ -106,6 +106,9 @@ export default {
 		ImportContextScheme,
 	},
 
+	setup() {
+		return { ...useEventBusSubscriptions() }
+	},
 	data() {
 		return {
 			createColumnInfo: null,
@@ -135,81 +138,49 @@ export default {
 
 	mounted() {
 		// table
-		subscribe('tables:table:create', () => { this.showModalCreateTable = true })
-		subscribe('tables:table:delete', table => { this.tableToDelete = table })
-		subscribe('tables:table:edit', tableId => { this.editTable = tableId })
-		subscribe('tables:table:transfer', table => { this.tableToTransfer = table })
+		this.subscribeToEventBus('tables:table:create', () => { this.showModalCreateTable = true })
+		this.subscribeToEventBus('tables:table:delete', table => { this.tableToDelete = table })
+		this.subscribeToEventBus('tables:table:edit', tableId => { this.editTable = tableId })
+		this.subscribeToEventBus('tables:table:transfer', table => { this.tableToTransfer = table })
 
 		// views
-		subscribe('tables:view:reload', () => { this.reload(true) })
-		subscribe('tables:view:edit', view => { this.viewToEdit = { ...view, createView: false } })
-		subscribe('tables:view:create', tableInfos => {
+		this.subscribeToEventBus('tables:view:reload', () => { this.reload(true) })
+		this.subscribeToEventBus('tables:view:edit', view => { this.viewToEdit = { ...view, createView: false } })
+		this.subscribeToEventBus('tables:view:create', tableInfos => {
 			this.viewToEdit = {
 				view: { tableId: tableInfos.tableId, sort: [], filter: [] },
 				viewSetting: tableInfos.viewSetting,
 				createView: true,
 			}
 		})
-		subscribe('tables:view:delete', view => { this.viewToDelete = view })
+		this.subscribeToEventBus('tables:view:delete', view => { this.viewToDelete = view })
 
 		// columns
-		subscribe('tables:column:create', columnInfo => { this.createColumnInfo = columnInfo })
-		subscribe('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
-		subscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
+		this.subscribeToEventBus('tables:column:create', columnInfo => { this.createColumnInfo = columnInfo })
+		this.subscribeToEventBus('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
+		this.subscribeToEventBus('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
 
 		// rows
-		subscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
-		subscribe('tables:row:copy', rowInfo => { this.columnsForRow = { columns: rowInfo.columns, isView: rowInfo.isView, elementId: rowInfo.elementId, prefillData: rowInfo.row?.data } })
-		subscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
-		subscribe('tables:row:delete', tableInfo => {
+		this.subscribeToEventBus('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
+		this.subscribeToEventBus('tables:row:copy', rowInfo => { this.columnsForRow = { columns: rowInfo.columns, isView: rowInfo.isView, elementId: rowInfo.elementId, prefillData: rowInfo.row?.data } })
+		this.subscribeToEventBus('tables:row:edit', rowInfo => { this.editRow = rowInfo })
+		this.subscribeToEventBus('tables:row:delete', tableInfo => {
 			this.rowsToDelete = tableInfo
 		})
 
 		// misc
-		subscribe('tables:modal:import', element => { this.importToElement = element })
-		subscribe('tables:modal:scheme', title => { this.importSchemeTitle = title; this.showImportScheme = true })
-		subscribe('tables:modal:table-scheme-import', payload => { this.importSchemaToTable = payload.table })
+		this.subscribeToEventBus('tables:modal:import', element => { this.importToElement = element })
+		this.subscribeToEventBus('tables:modal:scheme', title => { this.importSchemeTitle = title; this.showImportScheme = true })
+		this.subscribeToEventBus('tables:modal:table-scheme-import', payload => { this.importSchemaToTable = payload.table })
 
 		// context
-		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
-		subscribe('tables:context:edit', contextId => { this.editContext = contextId })
-		subscribe('tables:context:import-scheme', contextId => { this.importContext = contextId })
-		subscribe('tables:context:transfer', context => { this.contextToTransfer = context })
-		subscribe('tables:context:delete', context => { this.contextToDelete = context })
+		this.subscribeToEventBus('tables:context:create', () => { this.showModalCreateContext = true })
+		this.subscribeToEventBus('tables:context:edit', contextId => { this.editContext = contextId })
+		this.subscribeToEventBus('tables:context:import-scheme', contextId => { this.importContext = contextId })
+		this.subscribeToEventBus('tables:context:transfer', context => { this.contextToTransfer = context })
+		this.subscribeToEventBus('tables:context:delete', context => { this.contextToDelete = context })
 
 	},
-	unmounted() {
-		unsubscribe('tables:view:reload', () => { this.reload(true) })
-		unsubscribe('tables:column:create', columnInfo => { this.createColumnInfo = columnInfo })
-		unsubscribe('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
-		unsubscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
-		unsubscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
-		unsubscribe('tables:row:copy', rowInfo => { this.columnsForRow = { columns: rowInfo.columns, isView: rowInfo.isView, elementId: rowInfo.elementId, prefillData: rowInfo.row?.data } })
-		unsubscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
-		unsubscribe('tables:row:delete', tableInfo => {
-			this.rowsToDelete = tableInfo
-		})
-		unsubscribe('tables:view:edit', view => { this.viewToEdit = { view, createView: false } })
-		unsubscribe('tables:view:create', tableInfos => {
-			this.viewToEdit = {
-				view: { tableId: tableInfos.tableId, sort: [], filter: [] },
-				viewSetting: tableInfos.viewSetting,
-				createView: true,
-			}
-		})
-		unsubscribe('tables:table:create', () => { this.showModalCreateTable = true })
-		unsubscribe('tables:modal:import', element => { this.importToElement = element })
-		unsubscribe('tables:modal:table-scheme-import', payload => { this.importSchemaToTable = payload.table })
-		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
-		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
-		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
-		unsubscribe('tables:context:create', () => { this.showModalCreateContext = true })
-		unsubscribe('tables:context:edit', contextId => { this.editContext = contextId })
-		unsubscribe('tables:context:import-scheme', contextId => { this.importContext = contextId })
-		unsubscribe('tables:context:transfer', context => { this.contextToTransfer = context })
-		unsubscribe('tables:context:delete', context => { this.contextToDelete = context })
-	},
-
 	methods: {
 		onSaveNewColumn(event) {
 			if (this.createColumnInfo?.onSave) {

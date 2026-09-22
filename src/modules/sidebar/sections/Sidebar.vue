@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { useEventBusSubscriptions } from '../../../shared/composables/useEventBusSubscriptions.js'
 import SidebarActivity from './SidebarActivity.vue'
 import SidebarSharing from './SidebarSharing.vue'
 import SidebarIntegration from './SidebarIntegration.vue'
@@ -100,7 +100,7 @@ export default {
 
 	mixins: [permissionsMixin, activityMixin],
 	setup() {
-		return { IconPersonAdd, IconPersonAddOutline }
+		return { IconPersonAdd, IconPersonAddOutline, ...useEventBusSubscriptions() }
 	},
 
 	data() {
@@ -129,14 +129,9 @@ export default {
 	},
 
 	mounted() {
-		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
-		subscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
-		subscribe('tables:sidebar:activity', data => this.handleToggleSidebar(data))
-	},
-	beforeUnmount() {
-		unsubscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
-		unsubscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
-		unsubscribe('tables:sidebar:activity', data => this.handleToggleSidebar(data))
+		this.subscribeToEventBus('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
+		this.subscribeToEventBus('tables:sidebar:integration', data => this.handleToggleSidebar(data))
+		this.subscribeToEventBus('tables:sidebar:activity', data => this.handleToggleSidebar(data))
 	},
 	methods: {
 		niceDateTime(value) {

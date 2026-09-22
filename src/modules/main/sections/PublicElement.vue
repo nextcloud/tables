@@ -72,7 +72,7 @@ import TableDescription from './TableDescription.vue'
 import ElementTitle from './ElementTitle.vue'
 import { NcActions, NcActionButton } from '@nextcloud/vue'
 import CreateRow from '../../modals/CreateRow.vue'
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { useEventBusSubscriptions } from '../../../shared/composables/useEventBusSubscriptions.js'
 import EditRow from '../../modals/EditRow.vue'
 import DeleteRows from '../../modals/DeleteRows.vue'
 import TrayArrowDown from 'vue-material-design-icons/TrayArrowDown.vue'
@@ -112,6 +112,10 @@ export default {
 		'download-csv',
 		'download-filtered-csv',
 	],
+	setup() {
+		return { ...useEventBusSubscriptions() }
+	},
+
 	data() {
 		return {
 			showCreateRow: false,
@@ -128,26 +132,19 @@ export default {
 	},
 
 	mounted() {
-		subscribe('tables:row:create', () => {
+		this.subscribeToEventBus('tables:row:create', () => {
 			this.showCreateRow = true
 		})
-		subscribe('tables:row:copy', rowInfo => {
+		this.subscribeToEventBus('tables:row:copy', rowInfo => {
 			this.prefillData = rowInfo.row?.data
 			this.showCreateRow = true
 		})
-		subscribe('tables:row:edit', rowInfo => {
+		this.subscribeToEventBus('tables:row:edit', rowInfo => {
 			this.editRow = rowInfo
 		})
-		subscribe('tables:row:delete', tableInfo => {
+		this.subscribeToEventBus('tables:row:delete', tableInfo => {
 			this.rowsToDelete = tableInfo
 		})
-	},
-
-	unmounted() {
-		unsubscribe('tables:row:create')
-		unsubscribe('tables:row:copy')
-		unsubscribe('tables:row:edit')
-		unsubscribe('tables:row:delete')
 	},
 
 	methods: {
