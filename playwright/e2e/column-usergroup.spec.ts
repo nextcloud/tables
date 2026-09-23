@@ -33,8 +33,8 @@ test.describe('Test column ' + columnTitle, () => {
 		await page.locator('[data-cy="createRowSaveButton"]').waitFor({ state: 'visible' })
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 
-		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: user.userId }).first()).toBeVisible()
-		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
+		await expect(page.locator('[data-cy="ncTable"] table tr td .usergroup-entry').filter({ hasText: user.userId }).first()).toBeVisible()
+		await expect(page.locator('[data-cy="ncTable"] table tr td .usergroup-entry').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
 	})
 
 	test('Create column and rows without default values', async ({ userPage: { page }, request }) => {
@@ -51,7 +51,7 @@ test.describe('Test column ' + columnTitle, () => {
 		await page.locator('.vs__dropdown-menu li').filter({ hasText: nonLocalUser.userId }).first().click()
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 
-		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
+		await expect(page.locator('[data-cy="ncTable"] table tr td .usergroup-entry').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
 	})
 
 	test('Create and edit rows', async ({ userPage: { page, user }, request }) => {
@@ -65,7 +65,7 @@ test.describe('Test column ' + columnTitle, () => {
 
 		await page.locator('button').filter({ hasText: 'Create row' }).click()
 		await page.locator('[data-cy="createRowSaveButton"]').click()
-		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: user.userId }).first()).toBeVisible()
+		await expect(page.locator('[data-cy="ncTable"] table tr td .usergroup-entry').filter({ hasText: user.userId }).first()).toBeVisible()
 
 		const firstRow = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').first()
 		await openRowActionMenu(page, firstRow)
@@ -85,7 +85,7 @@ test.describe('Test column ' + columnTitle, () => {
 
 		await saveEditRow(page)
 
-		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name', { hasText: user.userId })).toBeHidden()
-		await expect(page.locator('[data-cy="ncTable"] table tr td .user-bubble__name').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
+		await expect(page.locator('[data-cy="ncTable"] table tr td .usergroup-entry', { hasText: user.userId })).toBeHidden()
+		await expect(page.locator('[data-cy="ncTable"] table tr td .usergroup-entry').filter({ hasText: nonLocalUser.userId }).first()).toBeVisible()
 	})
 })
