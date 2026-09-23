@@ -7,7 +7,16 @@
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<div v-if="value" class="table-cell-usergroup">
 				<div v-for="item in value" :key="item.id" class="inline usergroup-entry">
-					<NcUserBubble :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="!isUser(item)" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
+					<span v-if="isUser(item)"
+						class="usergroup-user"
+						:class="{ 'usergroup-user--current': isCurrentUser(item) }"
+						@click="stopClickOnAvatarMenu">
+						<span class="usergroup-user__avatar">
+							<NcAvatar :user="item.id" :display-name="item.displayName ?? item.id" :size="column.showUserStatus ? 30 : 20" :hide-status="!column.showUserStatus" :disable-menu="isPublicShare" :disable-tooltip="true" />
+						</span>
+						{{ item.displayName ?? item.id }}
+					</span>
+					<NcUserBubble v-else :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="true" :display-name="item.displayName ?? item.id" :size="column.showUserStatus ? 34 : 20" />
 				</div>
 			</div>
 		</div>
@@ -45,7 +54,8 @@
 
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
-import { NcUserBubble, NcSelect } from '@nextcloud/vue'
+import { NcAvatar, NcSelect, NcUserBubble } from '@nextcloud/vue'
+import { useDataStore } from '../../../../store/data.js'
 import { USERGROUP_TYPE } from '../../../constants.ts'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import searchUserGroup from '../../../mixins/searchUserGroup.js'
@@ -58,8 +68,9 @@ export default {
 	name: 'TableCellUsergroup',
 
 	components: {
-		NcUserBubble,
+		NcAvatar,
 		NcSelect,
+		NcUserBubble,
 	},
 
 	mixins: [
@@ -97,6 +108,9 @@ export default {
 		isCurrentUser() {
 			return (item) => this.isUser(item) && item.id === currentUser?.uid
 		},
+		isPublicShare() {
+			return !!useDataStore().publicToken
+		},
 		isUser() {
 			return (item) => item.type === USERGROUP_TYPE.USER
 		},
@@ -131,6 +145,17 @@ export default {
 			this.startEditing()
 			// Stop the event from propagating to avoid immediate click outside
 			event.stopPropagation()
+		},
+
+		/**
+		 * Let a click on an avatar open its menu instead of starting to edit the cell
+		 *
+		 * @param {MouseEvent} event the click event
+		 */
+		stopClickOnAvatarMenu(event) {
+			if (event.target.closest('.avatardiv--with-menu')) {
+				event.stopPropagation()
+			}
 		},
 
 		getAvatarImage(item) {
@@ -215,6 +240,24 @@ export default {
 
 .usergroup-entry {
 	padding-inline-end: 10px;
+}
+
+.usergroup-user {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--default-grid-baseline);
+	padding: 2px 8px 2px 2px;
+	border-radius: var(--border-radius-pill);
+	background-color: var(--color-background-dark);
+
+	&--current {
+		background-color: var(--color-primary-element);
+		color: var(--color-primary-element-text);
+	}
+
+	&__avatar {
+		display: flex;
+	}
 }
 
 .edit-mode {

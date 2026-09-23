@@ -21,7 +21,7 @@ export default {
 			maxAutocompleteResults: 20,
 			suggestions: [],
 			recommendations: [],
-			currentUserId: getCurrentUser().uid,
+			currentUserId: getCurrentUser()?.uid ?? null,
 		}
 	},
 	computed: {
