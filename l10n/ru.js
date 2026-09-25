@@ -354,6 +354,7 @@ OC.L10N.register(
     "Create Row" : "Создать строку",
     "Go to first page" : "Перейти на первую страницу",
     "Go to previous page" : "Перейти к предыдущей странице",
+    "Page" : "Страница",
     "Page number" : "Номер страницы",
     "Go to next page" : "Перейти на следующую страницу",
     "Go to last page" : "Перейти на последнюю страницу",
