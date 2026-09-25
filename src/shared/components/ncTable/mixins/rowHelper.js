@@ -24,6 +24,8 @@ export default {
 				return this.isMultiSelectionValueValid(value, column)
 			case ColumnTypes.Usergroup:
 				return this.isUsergroupValueValid(value, column)
+			case ColumnTypes.Relation:
+				return this.isRelationValueValid(value, column)
 			default:
 				return this.isStandardValueValid(value, column)
 			}
@@ -87,6 +89,15 @@ export default {
 			// Handle null/undefined and any other edge cases
 			const hasDefaultValue = columnTypeDefault in column && column[columnTypeDefault] !== '[]' && column[columnTypeDefault] !== ''
 			return hasDefaultValue
+		},
+		isRelationValueValid(value) {
+			if (value instanceof Array) {
+				return value.length > 0
+			}
+			if (value === null || value === undefined || value === '') {
+				return false
+			}
+			return !Number.isNaN(parseInt(value))
 		},
 		isStandardValueValid(value, column) {
 			const columnTypeDefault = this.getColumnTypeDefault(column)
