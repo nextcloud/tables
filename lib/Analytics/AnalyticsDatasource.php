@@ -87,16 +87,9 @@ class AnalyticsDatasource implements IDatasource {
 		// get all tables and subsequent views
 		foreach ($tables as $table) {
 			$tableString = $tableString . $table->getId() . '-' . $table->getTitle() . '/';
-			// get all views per table
-			try {
-				$views = $this->viewService->findAll($this->tableService->find($table->getId()), $this->userId);
-				foreach ($views as $view) {
-					// concatenate the option-string. The format is tableId:viewId-title
-					$tableString = $tableString . $table->getId() . ':' . $view->getId() . '-' . $view->getTitle() . '/';
-				}
-			} catch (PermissionError) {
-				// this is a shared table without shared views;
-				continue;
+			foreach ($table->getViews() ?? [] as $view) {
+				// concatenate the option-string. The format is tableId:viewId-title
+				$tableString = $tableString . $table->getId() . ':' . $view->getId() . '-' . $view->getTitle() . '/';
 			}
 		}
 
