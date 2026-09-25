@@ -64,13 +64,18 @@
 
 		<!--advanced settings-->
 		<NcAppSettingsSection v-if="columns != null" id="advanced" :name="t('tables', 'Advanced settings')">
-			<div v-if="!showAdvanced" class="row">
+			<div class="row">
 				<div class="col-4">
-					<NcButton type="tertiary" :aria-label="t('tables', 'Show advanced settings')" @click="showAdvanced = true">
+					<NcButton
+						type="tertiary"
+						:aria-expanded="showAdvanced"
+						:aria-label="advancedToggleLabel"
+						@click="toggleAdvanced">
 						<template #icon>
-							<ChevronDown :size="20" />
+							<ChevronUp v-if="showAdvanced" :size="20" />
+							<ChevronDown v-else :size="20" />
 						</template>
-						{{ t('tables', 'Show advanced settings') }}
+						{{ advancedToggleLabel }}
 					</NcButton>
 				</div>
 			</div>
@@ -118,6 +123,8 @@
 <script>
 import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcNoteCard } from '@nextcloud/vue'
 import ChevronDown from 'vue-material-design-icons/ChevronDown.vue'
+import ChevronUp from 'vue-material-design-icons/ChevronUp.vue'
+import { useStorage } from '@vueuse/core'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
@@ -141,6 +148,7 @@ export default {
 		NcButton,
 		NcNoteCard,
 		ChevronDown,
+		ChevronUp,
 		NotificationsSettings,
 		FilterForm,
 		SelectedViewColumns,
@@ -174,7 +182,6 @@ export default {
 	data() {
 		return {
 			open: false,
-			showAdvanced: false,
 			title: '',
 			description: '',
 			icon: '',
@@ -193,7 +200,19 @@ export default {
 			generatedView: null,
 		}
 	},
+	created() {
+		this.showAdvancedStorage = useStorage('tables-view-advanced-settings', false)
+	},
 	computed: {
+		showAdvanced: {
+			get() { return this.showAdvancedStorage.value },
+			set(value) { this.showAdvancedStorage.value = value },
+		},
+		advancedToggleLabel() {
+			return this.showAdvanced
+				? t('tables', 'Hide advanced settings')
+				: t('tables', 'Show advanced settings')
+		},
 		mutableFilters: {
 			get() {
 				return this.mutableView.filter
@@ -278,6 +297,9 @@ export default {
 	methods: {
 		...mapActions(useTablesStore, ['insertNewView', 'updateView']),
 		...mapActions(useDataStore, ['getColumnsFromBE']),
+		toggleAdvanced() {
+			this.showAdvanced = !this.showAdvanced
+		},
 		setIcon(icon) {
 			this.icon = icon
 		},
