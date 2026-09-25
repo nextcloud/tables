@@ -136,6 +136,64 @@ function getTableActionLocator(page: Page, optionName: string) {
 	}
 }
 
+/**
+ * Reads the id of a navigation entry from the link it points to.
+ *
+ * @param page the page showing the navigation
+ * @param nodeType the kind of entry to look up
+ * @param title the title of the entry
+ * @return the id of the table or view
+ */
+export async function getNavigationNodeId(page: Page, nodeType: 'table' | 'view', title: string) {
+	await ensureNavigationOpen(page)
+
+	const entry = page
+		.locator(`[data-cy="navigation${nodeType === 'table' ? 'Table' : 'View'}Item"] a[title="${title}"]`)
+		.first()
+
+	await entry.waitFor({ state: 'visible', timeout: ACTION_TIMEOUT })
+	const id = (await entry.getAttribute('href'))?.match(new RegExp(`/${nodeType}/(\\d+)`))?.[1]
+	expect(id, `Could not read the id of ${nodeType} "${title}" from the navigation`).toBeTruthy()
+
+	return Number(id)
+}
+
+/**
+ * Holds the table listing back until the given request has been answered.
+ *
+ * The navigation loads tables, views shared with me and applications in parallel.
+ * Use this to pin down the order in which the table listing is applied to the store.
+ * Await the returned `answered` to make sure the awaited request really happened,
+ * otherwise the listing is let through after the timeout and nothing is pinned down.
+ *
+ * @param page the page to intercept the requests of
+ * @param until url fragment of the request that has to answer first
+ * @param timeout how long to wait for that request at most
+ * @return `answered` resolves once the awaited request has been answered
+ */
+export async function loadTableListingLast(page: Page, until: string, timeout = ACTION_TIMEOUT) {
+	let release = () => {}
+	const released = new Promise<void>((resolve) => {
+		release = resolve
+	})
+	const expired = new Promise<void>((resolve) => {
+		setTimeout(resolve, timeout)
+	})
+
+	page.on('response', (response) => {
+		if (response.url().includes(until)) {
+			release()
+		}
+	})
+
+	await page.route('**/apps/tables/table', async (route) => {
+		await Promise.race([released, expired])
+		await route.continue()
+	})
+
+	return { answered: released }
+}
+
 export async function ensureNavigationOpen(page: Page) {
 	const openButton = page.getByRole('button', { name: /open navigation/i }).first()
 	if (await openButton.isVisible().catch(() => false)) {
