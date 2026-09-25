@@ -219,6 +219,22 @@ class TableMapper extends QBMapper {
 		return $entity;
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	public function touch(int $id, ?string $userId = null, ?\DateTimeInterface $time = null): void {
+		$time ??= new \DateTime();
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->table)
+			->set('last_edit_at', $qb->createNamedParameter($time->format('Y-m-d H:i:s'), IQueryBuilder::PARAM_STR))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		if ($userId !== null && $userId !== '') {
+			$qb->set('last_edit_by', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR));
+		}
+		$qb->executeStatement();
+		unset($this->cache[(string)$id]);
+	}
+
 	public function getDbConnection() {
 		return $this->db;
 	}
