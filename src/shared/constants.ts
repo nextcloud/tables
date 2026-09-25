@@ -55,3 +55,10 @@ export const COLUMN_WIDTH_MAX = 1000
 export const IMAGE_PREVIEW_SIZE_MIN = 32
 export const IMAGE_PREVIEW_SIZE_MAX = 192
 export const IMAGE_PREVIEW_SIZE_DEFAULT = 64
+
+// from ViewLayout.php
+export const LAYOUT_TABLE = 'table'
+export const LAYOUT_TILES = 'tiles'
+export const LAYOUT_GALLERY = 'gallery'
+// The layouts that render rows as cards rather than as table rows.
+export const CARD_LAYOUTS = [LAYOUT_TILES, LAYOUT_GALLERY]
