@@ -28,6 +28,7 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method getEmoji(): string
  * @method setEmoji(string $emoji)
  * @method getArchived(): bool
+ * @method isArchived(): bool
  * @method setArchived(bool $archived)
  * @method getDescription(): string
  * @method setDescription(string $description)
