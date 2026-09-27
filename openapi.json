@@ -1008,6 +1008,8 @@
                     "columnSettings",
                     "sort",
                     "filter",
+                    "layout",
+                    "viewSettings",
                     "isShared",
                     "favorite",
                     "onSharePermissions",
@@ -1206,6 +1208,33 @@
                                         ]
                                     }
                                 }
+                            }
+                        }
+                    },
+                    "layout": {
+                        "type": "string",
+                        "enum": [
+                            "table",
+                            "tiles",
+                            "gallery"
+                        ]
+                    },
+                    "viewSettings": {
+                        "type": "object",
+                        "required": [
+                            "cardBackgroundSource",
+                            "cardTitleSource"
+                        ],
+                        "properties": {
+                            "cardBackgroundSource": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                            },
+                            "cardTitleSource": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
                             }
                         }
                     },
@@ -2080,6 +2109,17 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Technical name for the view"
+                                    },
+                                    "layout": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "enum": [
+                                            "table",
+                                            "tiles",
+                                            "gallery"
+                                        ],
+                                        "description": "Layout for the view"
                                     }
                                 }
                             }
@@ -2396,6 +2436,30 @@
                                                                 "DESC"
                                                             ]
                                                         }
+                                                    }
+                                                }
+                                            },
+                                            "layout": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "enum": [
+                                                    "table",
+                                                    "tiles",
+                                                    "gallery"
+                                                ]
+                                            },
+                                            "viewSettings": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "cardBackgroundSource": {
+                                                        "type": "integer",
+                                                        "format": "int64",
+                                                        "nullable": true
+                                                    },
+                                                    "cardTitleSource": {
+                                                        "type": "integer",
+                                                        "format": "int64",
+                                                        "nullable": true
                                                     }
                                                 }
                                             },
