@@ -374,14 +374,19 @@ class AnalyticsDatasource implements IDatasource {
 	}
 
 	private function formatRelationValue(Column $column, mixed $value): string {
-		if ($value === null || $value === '') {
+		$ids = $this->normalizeArrayValue($value);
+		if ($ids === []) {
 			return '';
 		}
 
 		$relationData = $this->relationService->getRelationData($column);
-		$valueId = (int)$value;
+		$labels = [];
+		foreach ($ids as $id) {
+			$valueId = (int)$id;
+			$labels[] = $relationData[$valueId]['label'] ?? (string)$id;
+		}
 
-		return $relationData[$valueId]['label'] ?? (string)$value;
+		return implode(', ', array_filter($labels, static fn (string $label): bool => $label !== ''));
 	}
 
 	private function parseDefaultValue(?string $value): mixed {

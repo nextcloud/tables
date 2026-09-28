@@ -188,6 +188,44 @@ final class AnalyticsDatasourceTest extends TestCase {
 		self::assertSame([['Order 1', 'Acme Corp', 1]], $result['data']);
 	}
 
+	public function testReadDataFormatsMultipleRelationValuesForAnalytics(): void {
+		$this->columnService
+			->expects($this->once())
+			->method('findAllByTable')
+			->with(123, 'user1')
+			->willReturn([
+				$this->createColumn(1, 'Name', 'text'),
+				$this->createColumn(2, 'Customer', 'relation'),
+			]);
+
+		$this->relationService
+			->expects($this->once())
+			->method('getRelationData')
+			->willReturn([
+				42 => ['id' => 42, 'label' => 'Acme Corp'],
+				43 => ['id' => 43, 'label' => 'Globex'],
+			]);
+
+		$row = new Row2();
+		$row->setData([
+			['columnId' => 1, 'value' => 'Order 1'],
+			['columnId' => 2, 'value' => [42, 43]],
+		]);
+
+		$this->rowService
+			->expects($this->once())
+			->method('findAllByTable')
+			->with(123, 'user1', null, null)
+			->willReturn([$row]);
+
+		$result = $this->datasource->readData([
+			'tableId' => '123',
+			'user_id' => 'user1',
+		]);
+
+		self::assertSame([['Order 1', 'Acme Corp, Globex', 1]], $result['data']);
+	}
+
 	public function testReadDataFormatsDefaultValuesForAnalytics(): void {
 		$numberColumn = $this->createColumn(1, 'Amount', 'number');
 		$numberColumn->setNumberDefault(10);

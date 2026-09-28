@@ -206,6 +206,12 @@ export const useDataStore = defineStore('data', {
 			data.usergroupDefault = JSON.stringify(data.usergroupDefault)
 			let res = null
 
+			const stateId = genStateKey(isView, elementId)
+			const previousColumn = stateId && this.columns[stateId]
+				? this.columns[stateId].find(c => c.id === id)
+				: null
+			const wasMultiple = !!previousColumn?.customSettings?.allowMultiple
+
 			try {
 				res = await axios.put(generateUrl('/apps/tables/api/1/columns/' + id), data)
 			} catch (e) {
@@ -213,11 +219,34 @@ export const useDataStore = defineStore('data', {
 				return false
 			}
 
-			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.columns[stateId]) {
 				const col = res.data
 				const index = this.columns[stateId].findIndex(c => c.id === col.id)
 				this.columns[stateId][index] = parseCol(col)
+
+				const isMultiple = !!col.customSettings?.allowMultiple
+				if (col.type === 'relation' && wasMultiple && !isMultiple) {
+					// Truncate local row values immediately so the table reflects the change
+					if (this.rows[stateId]) {
+						this.rows[stateId] = this.rows[stateId].map(row => ({
+							...row,
+							data: row.data.map(cell => {
+								if (cell.columnId !== col.id) {
+									return cell
+								}
+								const ids = Array.isArray(cell.value)
+									? cell.value
+									: (cell.value === null || cell.value === undefined || cell.value === '' ? [] : [cell.value])
+								return { ...cell, value: ids[0] ?? null }
+							}),
+						}))
+					}
+					// Reload from BE to stay in sync with truncated storage
+					await this.loadRowsFromBE({
+						tableId: isView ? undefined : elementId,
+						viewId: isView ? elementId : undefined,
+					})
+				}
 			}
 
 			return true

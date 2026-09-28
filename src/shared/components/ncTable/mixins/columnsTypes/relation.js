@@ -15,45 +15,43 @@ export default class RelationColumn extends AbstractColumn {
 		this.subtype = ''
 	}
 
+	get allowMultiple() {
+		return !!this.customSettings?.allowMultiple
+	}
+
 	/**
 	 * Format the value for display
 	 * @param {unknown} value The value to format
 	 * @return {string} The formatted value
 	 */
 	formatValue(value) {
-		if (value === null || value === undefined) {
+		const ids = this.normalizeIds(value)
+		if (ids.length === 0) {
 			return ''
 		}
-		// For single relations, return the value as is
-		return String(value)
+		return ids.map(id => this.getLabel(id) || String(id)).join(', ')
 	}
 
 	/**
 	 * Parse the value from input
 	 * @param {unknown} value The value to parse
-	 * @return {unknown} The parsed value
+	 * @return {number[]} The parsed value
 	 */
 	parseValue(value) {
-		if (value === null || value === undefined || value === '') {
-			return null
-		}
-		// For single relations, return the value as is
-		return value
+		return this.normalizeIds(value)
 	}
 
 	getValueString(valueObject) {
 		valueObject = valueObject || this.value || null
-		return this.getLabel(valueObject.value)
+		const ids = this.normalizeIds(valueObject?.value ?? valueObject)
+		return ids.map(id => this.getLabel(id) || String(id)).filter(Boolean).join(', ')
 	}
 
 	getLabel(rowId) {
-		// Try to get relation data from the store
 		try {
 			const dataStore = useDataStore()
-
 			const columnRelations = dataStore.getRelations(this.id)
 			const option = columnRelations[rowId]
-
 			return option ? option.label : ''
 		} catch (error) {
 			console.warn('Failed to get relation label:', error)
@@ -61,8 +59,18 @@ export default class RelationColumn extends AbstractColumn {
 		}
 	}
 
+	normalizeIds(value) {
+		if (value === null || value === undefined || value === '') {
+			return []
+		}
+		const list = Array.isArray(value) ? value : [value]
+		return list
+			.map(id => parseInt(id))
+			.filter(id => !Number.isNaN(id))
+	}
+
 	default() {
-		return null
+		return []
 	}
 
 	/**
@@ -72,15 +80,34 @@ export default class RelationColumn extends AbstractColumn {
 	 * @return {boolean} Whether the filter matches
 	 */
 	isFilterFound(cell, filter) {
-		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
-		const cellLabel = this.getLabel(cell.value)?.toLowerCase()
+		const rawFilter = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const filterValue = String(rawFilter ?? '').toLowerCase()
+		const ids = this.normalizeIds(cell?.value)
+		const labels = ids.map(id => (this.getLabel(id) || String(id)).toLowerCase())
+		const filterId = Number.parseInt(String(rawFilter), 10)
+		const filterIsNumericId = String(rawFilter) === String(filterId) && !Number.isNaN(filterId)
+		const hasId = filterIsNumericId && ids.includes(filterId)
+		const hasExactLabel = labels.includes(filterValue)
+		const hasPartialLabel = labels.some(label => label.includes(filterValue))
+		const allowMultiple = this.allowMultiple
+
 		const filterMethod = {
-			[FilterIds.Contains]() { return cellLabel?.includes(filterValue) },
-			[FilterIds.DoesNotContain]() { return !cellLabel?.includes(filterValue) },
-			[FilterIds.IsEqual]() { return cellLabel === filterValue },
-			[FilterIds.IsNotEqual]() { return cellLabel !== filterValue },
-			[FilterIds.IsEmpty]() { return !cellLabel },
-			[FilterIds.IsNotEmpty]() { return !!cellLabel },
+			[FilterIds.Contains]() { return hasId || hasPartialLabel },
+			[FilterIds.DoesNotContain]() { return !hasId && !hasPartialLabel },
+			[FilterIds.IsEqual]() {
+				if (filterIsNumericId) {
+					return allowMultiple ? ids.includes(filterId) : (ids.length === 1 && ids[0] === filterId)
+				}
+				return allowMultiple ? hasExactLabel : (labels.length === 1 && labels[0] === filterValue)
+			},
+			[FilterIds.IsNotEqual]() {
+				if (filterIsNumericId) {
+					return allowMultiple ? !ids.includes(filterId) : !(ids.length === 1 && ids[0] === filterId)
+				}
+				return allowMultiple ? !hasExactLabel : !(labels.length === 1 && labels[0] === filterValue)
+			},
+			[FilterIds.IsEmpty]() { return ids.length === 0 },
+			[FilterIds.IsNotEmpty]() { return ids.length > 0 },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

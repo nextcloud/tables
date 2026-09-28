@@ -199,11 +199,19 @@ export default {
 				// Ensure all columns have entries, even if missing from row data
 				this.columns.forEach(column => {
 					if (!(column.id in tmp)) {
-						// For usergroup columns, initialize as empty array
-						if (column.type === 'usergroup') {
+						// For usergroup/relation columns, initialize as empty array
+						if (column.type === 'usergroup' || column.type === 'relation') {
 							tmp[column.id] = []
 						} else {
 							tmp[column.id] = null
+						}
+					} else if (column.type === 'relation') {
+						// Normalize legacy single relation values to arrays
+						const value = tmp[column.id]
+						if (value === null || value === undefined || value === '') {
+							tmp[column.id] = []
+						} else if (!Array.isArray(value)) {
+							tmp[column.id] = [value]
 						}
 					}
 				})
