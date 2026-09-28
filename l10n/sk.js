@@ -169,7 +169,7 @@ OC.L10N.register(
     "Track your weight and other health measures." : "Sledujte svoju váhu a ďalšie zdravotné parametre.",
     "Date" : "Dátum",
     "Weight" : "Váha",
-    "Body fat" : "Tuk v tele",
+    "Body fat" : "Telesný tuk",
     "Feeling over all" : "Celkový pocit",
     "Comments" : "Komentáre",
     "feel sick" : "necítim sa dobre",

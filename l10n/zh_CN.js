@@ -445,6 +445,7 @@ OC.L10N.register(
     "Content" : "内容",
     "Select" : "选择",
     "Insert" : "插入",
+    "Import into Tables" : "导入至表格",
     "Checked" : "已检查",
     "Unchecked" : "未选中",
     "This year" : "今年",
