@@ -56,7 +56,7 @@
 <script>
 import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { useEventBusSubscriptions } from '../../../composables/useEventBusSubscriptions.js'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
@@ -106,6 +106,9 @@ export default {
 		'update-selected-rows',
 		'update:viewSetting',
 	],
+	setup() {
+		return { ...useEventBusSubscriptions() }
+	},
 	data() {
 		return {
 			selectedRows: [],
@@ -142,14 +145,9 @@ export default {
 	},
 
 	mounted() {
-		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
-		subscribe('tables:row:animate', this.enableRowAnimation)
-		subscribe('tables:pagination-changed', this.handlePaginationChanged)
-	},
-	beforeUnmount() {
-		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
-		unsubscribe('tables:row:animate', this.enableRowAnimation)
-		unsubscribe('tables:pagination-changed', this.handlePaginationChanged)
+		this.subscribeToEventBus('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
+		this.subscribeToEventBus('tables:row:animate', this.enableRowAnimation)
+		this.subscribeToEventBus('tables:pagination-changed', this.handlePaginationChanged)
 	},
 
 	methods: {

@@ -106,7 +106,7 @@ import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Cancel from 'vue-material-design-icons/Cancel.vue'
 import FileDocumentEditOutline from 'vue-material-design-icons/FileDocumentEditOutline.vue'
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { useEventBusSubscriptions } from '../../composables/useEventBusSubscriptions.js'
 import { parseCol } from './mixins/columnParser.js'
 import { AbstractColumn } from './mixins/columnClass.js'
 import { translate as t } from '@nextcloud/l10n'
@@ -223,6 +223,9 @@ export default {
 		'update:selectedRows',
 		'update:viewSetting',
 	],
+	setup() {
+		return { ...useEventBusSubscriptions() }
+	},
 	data() {
 		return {
 			localSelectedRows: [],
@@ -403,7 +406,7 @@ export default {
 		},
 	},
 	mounted() {
-		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
+		this.subscribeToEventBus('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
 
 		if (this.viewerAppAvailable) {
 			this.$refs.table.addEventListener('click', function(event) {
@@ -416,9 +419,6 @@ export default {
 				OCA.Viewer.open({ path: filePath, list: [{ filename: filePath }] })
 			})
 		}
-	},
-	beforeUnmount() {
-		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
 	},
 	methods: {
 		t,
