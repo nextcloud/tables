@@ -88,6 +88,7 @@
 				:columns="columns"
 				:element="table"
 				:is-view="false"
+				:context-search-string="contextSearchString"
 				:can-read-rows="canReadData(table)"
 				:can-create-rows="canCreateRowInElement(table)"
 				:can-edit-rows="canUpdateData(table)"
@@ -232,6 +233,10 @@ export default {
 		viewSetting: {
 			type: Object,
 			default: null,
+		},
+		contextSearchString: {
+			type: String,
+			default: '',
 		},
 		selectedRows: {
 			type: Array,

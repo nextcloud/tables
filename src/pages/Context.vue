@@ -17,20 +17,30 @@
 				<div class="row space-L context__description">
 					{{ activeContext.description }}
 				</div>
+				<div class="row space-L context__search">
+					<NcTextField
+						v-model="searchValue"
+						:label="t('tables', 'Search in application')"
+						:show-trailing-button="searchValue !== ''"
+						trailing-button-icon="close"
+						@trailing-button-click="clearSearch">
+						<Magnify :size="16" />
+					</NcTextField>
+				</div>
 			</div>
 
 			<div class="resources">
 				<div v-for="resource in contextResources" :key="resource.key">
 					<div v-if="!resource.isView" class="resource" data-cy="contextTableNode">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSettings[resource.key]" @create-column="createColumn(false, resource)"
+							:view-setting="viewSettings[resource.key]" :context-search-string="searchString" @create-column="createColumn(false, resource)"
 							@import-scheme="openImportSchemeModal(resource)"
 							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 					</div>
 					<div v-else-if="resource.isView" class="resource" data-cy="contextViewNode">
 						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSettings[resource.key]" @create-column="createColumn(true, resource)"
+							:view-setting="viewSettings[resource.key]" :context-search-string="searchString" @create-column="createColumn(true, resource)"
 							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
 					</div>
@@ -47,7 +57,9 @@
 <script>
 import MainModals from '../modules/modals/Modals.vue'
 import { mapState, mapActions, storeToRefs } from 'pinia'
-import { NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcIconSvgWrapper, NcTextField } from '@nextcloud/vue'
+import Magnify from 'vue-material-design-icons/Magnify.vue'
+import debounce from 'debounce'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
 import { emit } from '@nextcloud/event-bus'
@@ -64,6 +76,8 @@ export default {
 	components: {
 		MainModals,
 		NcIconSvgWrapper,
+		NcTextField,
+		Magnify,
 		ErrorMessage,
 		TableWrapper,
 		CustomView,
@@ -80,6 +94,8 @@ export default {
 		return {
 			loading: true,
 			icon: null,
+			searchValue: '',
+			searchString: '',
 			viewSettings: {},
 			context: null,
 			contextResources: [],
@@ -148,6 +164,10 @@ export default {
 			},
 			immediate: true,
 		},
+		// commit the search term debounced so the resources are not filtered on every keystroke
+		searchValue: debounce(function(value) {
+			this.searchString = value
+		}, 500),
 	},
 
 	async mounted() {
@@ -158,6 +178,10 @@ export default {
 	},
 
 	methods: {
+		clearSearch() {
+			this.searchValue = ''
+			this.searchString = ''
+		},
 		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		contextSignature() {
@@ -340,6 +364,12 @@ export default {
 		margin: calc(3 * var(--default-grid-baseline, 4px));
 		max-width: 790px;
 		margin-inline-start: 32px;
+	}
+
+	&__search {
+		max-width: 400px;
+		margin-inline-start: 32px;
+		margin-block-end: calc(3 * var(--default-grid-baseline, 4px));
 	}
 
 	&:deep(.icon-vue) {

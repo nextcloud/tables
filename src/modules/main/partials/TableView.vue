@@ -9,6 +9,7 @@
 		:columns="columns"
 		:element-id="element.id"
 		:is-view="isView"
+		:context-search-string="contextSearchString"
 		:download-title="element.title"
 		:can-read-rows="canReadRows"
 		:can-create-rows="canCreateRows"
@@ -66,6 +67,10 @@ export default {
 		viewSetting: {
 			type: Object,
 			default: null,
+		},
+		contextSearchString: {
+			type: String,
+			default: '',
 		},
 		isView: {
 			type: Boolean,
