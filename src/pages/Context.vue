@@ -21,14 +21,14 @@
 
 			<div class="resources">
 				<div v-for="resource in contextResources" :key="resource.key">
-					<div v-if="!resource.isView" class="resource">
+					<div v-if="!resource.isView" class="resource" data-cy="contextTableNode">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSettings[resource.key]" @create-column="createColumn(false, resource)"
 							@import-scheme="openImportSchemeModal(resource)"
 							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 					</div>
-					<div v-else-if="resource.isView" class="resource">
+					<div v-else-if="resource.isView" class="resource" data-cy="contextViewNode">
 						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSettings[resource.key]" @create-column="createColumn(true, resource)"
 							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"

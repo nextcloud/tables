@@ -118,7 +118,6 @@ Cypress.Commands.add('deleteTable', (title) => {
 	cy.get('[data-cy="navigationTableItem"]').contains(title).should('not.exist')
 })
 
-
 Cypress.Commands.add('deleteRow', (rowIndex) => {
 	cy.get('[data-cy="ncTable"] [data-cy="editRowBtn"]').eq(rowIndex).click()
 	cy.get('[data-cy="editRowDeleteButton"]').click({ force: true })
@@ -149,12 +148,16 @@ Cypress.Commands.add('openCreateColumnModal', (isFirstColumn) => {
 	}
 })
 
-Cypress.Commands.add('createContext', (title, showInNav = false) => {
+Cypress.Commands.add('createContext', (title, showInNav = false, resourceTitles = []) => {
 	cy.get('ul:nth-of-type(2) [data-cy="createContextIcon"]').click({ force: true })
 	cy.get('[data-cy="createContextModal"]').should('be.visible')
 	cy.get('[data-cy="createContextTitle"]').clear().type(title)
 	if (showInNav) {
 		cy.get('[data-cy="createContextShowInNavSwitch"]').click()
+	}
+	for (const resourceTitle of resourceTitles) {
+		cy.get('[data-cy="contextResourceForm"] input').first().clear().type(resourceTitle)
+		cy.contains('.vs__dropdown-menu li', resourceTitle).click()
 	}
 	cy.get('[data-cy="createContextSubmitBtn"]').click()
 
@@ -281,7 +284,6 @@ Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, is
 	cy.wait(10).get('[class*="toast_success"]').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
-
 
 Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptions, isFirstColumn) => {
 	cy.openCreateColumnModal(isFirstColumn)
