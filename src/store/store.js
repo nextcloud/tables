@@ -384,6 +384,9 @@ export const useTablesStore = defineStore('store', {
 					} else {
 						const shareId = previousReceiver.share_id
 						await this.updateDisplayMode({ shareId, displayMode, target: 'default' })
+						if (previousReceiver.receiver === getCurrentUser().uid && previousReceiver.receiver_type === 'user') {
+							await this.updateDisplayMode({ shareId, displayMode, target: 'self' })
+						}	
 					}
 				}
 			} catch (e) {
@@ -426,6 +429,8 @@ export const useTablesStore = defineStore('store', {
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
 				await this.shareContext({ id, previousReceivers, receivers, displayMode })
+				// reload so sharing / display_mode reflect the share change
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update application.'))
 				return false
