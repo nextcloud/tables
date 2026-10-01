@@ -17,7 +17,7 @@
 				<div class="row space-L context__description">
 					{{ activeContext.description }}
 				</div>
-				<div class="row space-L context__search">
+				<div class="row space-L context__search" data-cy="contextSearchInput">
 					<NcTextField
 						v-model="searchValue"
 						:label="t('tables', 'Search in application')"

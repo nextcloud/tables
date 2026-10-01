@@ -70,4 +70,27 @@ describe('Test view search inside an application', () => {
 		cy.get('[data-cy="contextViewNode"]:contains("' + viewOneTitle + '")')
 			.find('td').should('contain.text', 'banana row')
 	})
+
+	it('Application-wide search filters all resources at once', () => {
+		cy.loadContext(contextTitle)
+		cy.get('[data-cy="contextViewNode"]').should('have.length', 2)
+
+		cy.get('[data-cy="contextSearchInput"] input').type('apple', { force: true })
+		// wait for the search to be applied (debounced)
+		cy.wait(700)
+
+		// both views are filtered
+		cy.get('[data-cy="contextViewNode"]:contains("' + viewOneTitle + '")')
+			.find('td').should('contain.text', 'apple row')
+			.and('not.contain.text', 'banana row')
+		cy.get('[data-cy="contextViewNode"]:contains("' + viewTwoTitle + '")')
+			.find('td').should('contain.text', 'apple row')
+			.and('not.contain.text', 'banana row')
+
+		// clearing the search restores both views
+		cy.get('[data-cy="contextSearchInput"] input').clear({ force: true })
+		cy.wait(700)
+		cy.get('[data-cy="contextViewNode"]:contains("' + viewTwoTitle + '")')
+			.find('td').should('contain.text', 'banana row')
+	})
 })
