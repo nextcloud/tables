@@ -236,9 +236,16 @@ export default {
 		min-width: 100% !important;
 	}
 
-	:where(.name-parts) {
+	:deep(.vs__search) {
+		min-width: 0 !important;
+	}
+
+	:deep(.vs__selected .name-parts) {
 		display: block !important;
-		max-width: fit-content !important;
+		max-width: 100% !important;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 }
 

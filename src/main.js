@@ -7,6 +7,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router.js'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
+import './styles/select-selected-label.scss'
 
 const pinia = createPinia()
 
