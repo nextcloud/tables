@@ -100,6 +100,7 @@ class ContextController extends AOCSController {
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
 	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context
+	 * @param bool $cardViewEnabled Show the resources of the context as cards instead of stacked
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
@@ -108,7 +109,7 @@ class ContextController extends AOCSController {
 	 * 403: lacking permissions on a resource
 	 */
 	#[NoAdminRequired]
-	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
+	public function create(string $name, string $iconName, string $description = '', array $nodes = [], bool $cardViewEnabled = false): DataResponse {
 		try {
 			if (!$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
@@ -120,6 +121,7 @@ class ContextController extends AOCSController {
 				$this->sanitizeInputNodes($nodes),
 				$this->userId,
 				0,
+				$cardViewEnabled,
 			)->jsonSerialize());
 		} catch (Exception $e) {
 			return $this->handleError($e);
@@ -138,6 +140,7 @@ class ContextController extends AOCSController {
 	 * @param ?string $iconName provide this parameter to set a new icon
 	 * @param ?string $description provide this parameter to set a new description
 	 * @param ?array{id: int, type: int, permissions: int, order: int} $nodes provide this parameter to set a new list of nodes.
+	 * @param ?bool $cardViewEnabled provide this parameter to show (or stop showing) the resources as cards
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
@@ -149,7 +152,7 @@ class ContextController extends AOCSController {
 	 * @CanManageContext
 	 */
 	#[NoAdminRequired]
-	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
+	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?bool $cardViewEnabled = null): DataResponse {
 		try {
 			if ($iconName !== null && !$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
@@ -162,6 +165,7 @@ class ContextController extends AOCSController {
 				$iconName,
 				$description,
 				$nodes,
+				$cardViewEnabled,
 			)->jsonSerialize());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			return $this->handleError($e);
