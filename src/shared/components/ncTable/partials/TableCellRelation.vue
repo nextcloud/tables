@@ -19,7 +19,6 @@
 			tabindex="0"
 			@keydown.enter.stop="saveChanges"
 			@keydown.escape.stop="cancelEdit">
-			<span class="relation-select-hidden-label" aria-hidden="true">{{ relationLabel }}</span>
 			<NcSelect v-model="editValue"
 				:options="relationOptions"
 				:clearable="!column.mandatory"
@@ -170,17 +169,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-:deep(.relation-select) {
+.relation-select {
 	width: 100%;
-}
-
-.relation-select-hidden-label {
-	display: block;
-	visibility: hidden;
-	white-space: nowrap;
-	height: 0;
-	overflow: hidden;
-	pointer-events: none;
+	min-width: 0;
 }
 
 .cell-relation {
@@ -199,18 +190,6 @@ export default {
 :deep(.vs__dropdown-toggle) {
 	border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);
 	border-radius: var(--vs-border-radius);
-}
-
-:deep(.vs__selected) {
-	min-width: 0;
-	max-width: 100%;
-}
-
-:deep(.vs__selected .name-parts) {
-	display: flex !important;
-	align-items: center;
-	max-width: 100% !important;
-	min-width: 0;
 }
 
 .edit-mode {
