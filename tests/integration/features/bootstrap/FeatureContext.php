@@ -851,22 +851,26 @@ class FeatureContext implements Context {
 		);
 	}
 
+	private function resolveColumnId(string $columnAlias): int {
+		return match ($columnAlias) {
+			'meta-id' => -1,
+			'meta-created-by' => -2,
+			'meta-updated-by' => -3,
+			'meta-created-at' => -4,
+			'meta-updated-at' => -5,
+			default => is_numeric($columnAlias)
+				? (int)$columnAlias
+				: $this->collectionManager->getByAlias('column', $columnAlias)['id'],
+		};
+	}
+
 	#[When('following sort order is applied to view :viewName:')]
 	public function applySortToView(string $viewName, TableNode $sortOrder): void {
 		$sortData = [];
 		foreach ($sortOrder->getRows() as $row) {
 
-			$columnId = match ($row[0]) {
-				'meta-id' => -1,
-				'meta-created-by' => -2,
-				'meta-updated-by' => -3,
-				'meta-created-at' => -4,
-				'meta-updated-at' => -5,
-				default => $this->collectionManager->getByAlias('column', $row[0])['id'],
-			};
-
 			$sortData[] = [
-				'columnId' => $columnId,
+				'columnId' => $this->resolveColumnId($row[0]),
 				'mode' => $row[1]
 			];
 
@@ -947,21 +951,10 @@ class FeatureContext implements Context {
 		$this->setCurrentUser($user);
 
 		$columns = explode(',', $columnList);
-		$columnSettings = array_map(function (string $columnAlias, int $index) {
-			if (is_numeric($columnAlias)) {
-				return [
-					'columnId' => (int)$columnAlias,
-					'order' => $index
-				];
-			}
-
-			$col = $this->collectionManager->getByAlias('column', $columnAlias);
-
-			return [
-				'columnId' => $col['id'],
-				'order' => $index
-			];
-		}, $columns, array_keys($columns));
+		$columnSettings = array_map(fn (string $columnAlias, int $index) => [
+			'columnId' => $this->resolveColumnId($columnAlias),
+			'order' => $index
+		], $columns, array_keys($columns));
 
 		$this->sendUpdateViewRequest($viewAlias, ['columnSettings' => json_encode($columnSettings)]);
 
@@ -3191,6 +3184,34 @@ class FeatureContext implements Context {
 			}
 			return (int)$actualRow['id'];
 		}, $allRows);
+
+		Assert::assertSame($expectedIds, $actualRowIds);
+	}
+
+	/**
+	 * @Then the user :user fetches the rows of view :viewAlias via the UI endpoint, it has exactly these rows :rowAliasList
+	 */
+	public function viewHasExactlyThoseRowsViaUiEndpoint(string $user, string $viewAlias, string $rowAliasList): void {
+		$this->setCurrentUser($user);
+		$view = $this->collectionManager->getByAlias('view', $viewAlias);
+
+		$this->sendRequest(
+			'GET',
+			sprintf('/apps/tables/row/view/%d', $view['id']),
+		);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		$allRows = $this->getDataFromResponse($this->response);
+
+		$rowAliases = explode(',', $rowAliasList);
+		$expectedIds = array_map(function ($rowAlias): int {
+			$row = $this->collectionManager->getByAlias('row', $rowAlias);
+			return $row['id'];
+		}, $rowAliases);
+		sort($expectedIds);
+
+		$actualRowIds = array_map(static fn (array $row): int => (int)$row['id'], $allRows);
+		sort($actualRowIds);
 
 		Assert::assertSame($expectedIds, $actualRowIds);
 	}
