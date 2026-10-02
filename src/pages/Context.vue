@@ -21,16 +21,16 @@
 
 			<div class="resources">
 				<div v-for="resource in contextResources" :key="resource.key">
-					<div v-if="!resource.isView" class="resource">
+					<div v-if="!resource.isView" class="resource" data-cy="contextTableNode">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
+							:view-setting="viewSettings[resource.key]" @create-column="createColumn(false, resource)"
 							@import-scheme="openImportSchemeModal(resource)"
 							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 					</div>
-					<div v-else-if="resource.isView" class="resource">
+					<div v-else-if="resource.isView" class="resource" data-cy="contextViewNode">
 						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSetting" @create-column="createColumn(true, resource)"
+							:view-setting="viewSettings[resource.key]" @create-column="createColumn(true, resource)"
 							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
 					</div>
@@ -80,7 +80,7 @@ export default {
 		return {
 			loading: true,
 			icon: null,
-			viewSetting: {},
+			viewSettings: {},
 			context: null,
 			contextResources: [],
 			errorMessage: null,
@@ -175,6 +175,7 @@ export default {
 			this.isReloading = true
 			this.loading = true
 			this.contextResources = []
+			this.viewSettings = {}
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -223,6 +224,7 @@ export default {
 										})
 										table.key = (table.id).toString()
 										table.isView = false
+										this.viewSettings[table.key] = {}
 										this.contextResources.push(table)
 									}
 
@@ -242,6 +244,7 @@ export default {
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
+										this.viewSettings[view.key] = {}
 										this.contextResources.push(view)
 									}
 								}
