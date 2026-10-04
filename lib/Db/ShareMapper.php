@@ -350,35 +350,6 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
-	 * Count the shares matching the query's search and filters per initiator
-	 * (the sender), most shares first, in one grouped scan.
-	 *
-	 * @param int $limit at most this many initiators, ordered by count
-	 *                   descending, then sender ascending
-	 * @param list<string>|null $receiverTypes see findPageForShareReview()
-	 * @param list<string>|null $permissionColumns see findPageForShareReview()
-	 * @return array<string, int> sender to count, zero counts omitted
-	 * @throws Exception
-	 */
-	public function countByInitiatorForShareReview(ShareReviewQuery $query, int $limit, ?array $receiverTypes = null, ?array $permissionColumns = null): array {
-		$qb = $this->shareReviewQuery();
-		$qb->select('s.sender')
-			->selectAlias($qb->func()->count('s.id'), 'share_count')
-			->groupBy('s.sender')
-			->orderBy('share_count', 'DESC')
-			->addOrderBy('s.sender', 'ASC')
-			->setMaxResults($limit);
-		$this->applyShareReviewFilters($qb, $query, $receiverTypes, $permissionColumns);
-		$result = $qb->executeQuery();
-		$counts = [];
-		while (($row = $result->fetchAssociative()) !== false) {
-			$counts[(string)$row['sender']] = (int)$row['share_count'];
-		}
-		$result->closeCursor();
-		return $counts;
-	}
-
-	/**
 	 * Shares with the shared node joined per node type — a share points to a
 	 * table, a view or an application (context), each in its own table.
 	 */

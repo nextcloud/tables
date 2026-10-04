@@ -186,12 +186,6 @@ class ShareMapperShareReviewTest extends DatabaseTestCase {
 		$this->assertSame(2, $this->filteredCount(new ShareReviewQuery(modifiedSinceTimestamp: strtotime('2026-02-01 10:00:00'), modifiedBeforeTimestamp: strtotime('2026-05-01 10:00:00'))));
 	}
 
-	public function testCountByInitiatorOrdersByCountThenSenderAndHonoursTheLimit(): void {
-		$this->assertSame(['alice' => 3, 'bob' => 2], $this->shareMapper->countByInitiatorForShareReview(new ShareReviewQuery(), 5));
-		$this->assertSame(['alice' => 3], $this->shareMapper->countByInitiatorForShareReview(new ShareReviewQuery(), 1));
-		$this->assertSame(['bob' => 1], $this->shareMapper->countByInitiatorForShareReview(new ShareReviewQuery(recipientIds: ['carol']), 5));
-	}
-
 	public function testCountByTypeAppliesFilters(): void {
 		$byType = $this->shareMapper->countByTypeForShareReview(new ShareReviewQuery());
 		ksort($byType);
