@@ -190,7 +190,9 @@ class ShareMapperShareReviewTest extends DatabaseTestCase {
 		$byType = $this->shareMapper->countByTypeForShareReview(new ShareReviewQuery());
 		ksort($byType);
 		$this->assertSame(['circle' => 1, 'group' => 1, 'link' => 1, 'user' => 2], $byType);
-		$this->assertSame(['user' => 1, 'circle' => 1], array_intersect_key($this->shareMapper->countByTypeForShareReview(new ShareReviewQuery(initiatorIds: ['bob'])), ['user' => 1, 'circle' => 1]));
+		$byInitiator = array_intersect_key($this->shareMapper->countByTypeForShareReview(new ShareReviewQuery(initiatorIds: ['bob'])), ['user' => 1, 'circle' => 1]);
+		ksort($byInitiator);
+		$this->assertSame(['circle' => 1, 'user' => 1], $byInitiator);
 	}
 
 	public function testFindForShareReviewCarriesTheNodeName(): void {
