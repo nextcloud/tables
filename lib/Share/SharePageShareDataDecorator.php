@@ -237,6 +237,14 @@ class SharePageShareDataDecorator implements IShare {
 		return !empty($this->share->getPassword());
 	}
 
+	public function setPasswordHash(string $passwordHash): never {
+		throw new LogicException('Not implemented');
+	}
+
+	public function isPasswordHashed(): bool {
+		return true;
+	}
+
 	public function setToken($token): never {
 		throw new LogicException('Not implemented: read only object');
 	}
