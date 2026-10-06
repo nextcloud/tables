@@ -136,6 +136,9 @@ class Row2Mapper {
 		}
 
 		$this->addSortQueryForMultipleSleeveFinder($qb, 'sleeves', $sort);
+		// Tie-breaker: without a total order the database may return rows in a
+		// different order for every LIMIT/OFFSET, so pages overlap and skip rows.
+		$qb->addOrderBy('sleeves.id', 'ASC');
 
 		$qb->groupBy('sleeves.id');
 

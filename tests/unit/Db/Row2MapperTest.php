@@ -145,6 +145,45 @@ class Row2MapperTest extends DatabaseTestCase {
 	}
 
 	/**
+	 * Paging through a table without sort rules must return every row exactly once
+	 */
+	public function testFindAllPaginationWithoutSortReturnsEveryRowOnce(): void {
+		$all = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, null, null, null, null, 'test_user');
+		$this->assertCount(5, $all);
+		$allIds = array_map(fn ($row) => $row->getId(), $all);
+
+		$pagedIds = [];
+		foreach ([0, 2, 4] as $offset) {
+			$page = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, 2, $offset, null, null, 'test_user');
+			$pagedIds = array_merge($pagedIds, array_map(fn ($row) => $row->getId(), $page));
+		}
+
+		$this->assertSame($allIds, $pagedIds, 'Pages must continue the unpaginated order without overlaps or gaps');
+	}
+
+	/**
+	 * Rows with equal sort values must keep their order across pages
+	 */
+	public function testFindAllPaginationWithTiedSortValuesIsStable(): void {
+		// Charlie and Diana are both 25
+		$sort = $this->convertColumnNamesToIds([['columnId' => 'age', 'mode' => 'ASC']]);
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+		$nameColumnId = $columnMapping['name'];
+
+		$all = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, null, null, null, $sort, 'test_user');
+		$allNames = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $all);
+
+		$pagedNames = [];
+		for ($offset = 0; $offset < 5; $offset++) {
+			$page = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, 1, $offset, null, $sort, 'test_user');
+			$this->assertCount(1, $page);
+			$pagedNames[] = $this->getCellValue($page[0], $nameColumnId);
+		}
+
+		$this->assertSame($allNames, $pagedNames, 'Tied rows must not swap places between pages');
+	}
+
+	/**
 	 * Test for checking behavior with non-existent columnId
 	 */
 	public function testFindAllWithNonExistentColumnId(): void {
