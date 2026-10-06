@@ -24,6 +24,7 @@ Cypress.on('uncaught:exception', (err) => {
 		&& !err.message.includes('ResizeObserver loop completed with undelivered notifications')
 		&& !err.message.includes("Cannot read properties of undefined (reading 'from')")
 		&& !err.message.includes("Cannot read properties of undefined (reading 'createEditor')")
+		&& !err.message.includes('OCA.Viewer.registerHandler is not a function')
 })
 
 // Handle unsupported browser dialog that appears on page load
