@@ -7,13 +7,12 @@
 
 namespace OCA\Tables\Migration;
 
+use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\LegacyRowMapper;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
-use OCA\Tables\Errors\PermissionError;
-use OCA\Tables\Service\ColumnService;
-use OCA\Tables\Service\TableService;
 use OCP\DB\Exception;
 use OCP\IConfig;
 use OCP\Migration\IOutput;
@@ -25,8 +24,8 @@ class NewDbStructureRepairStep implements IRepairStep {
 
 	public function __construct(
 		protected LoggerInterface $logger,
-		protected TableService $tableService,
-		protected ColumnService $columnService,
+		protected TableMapper $tableMapper,
+		protected ColumnMapper $columnMapper,
 		protected LegacyRowMapper $legacyRowMapper,
 		protected Row2Mapper $rowMapper,
 		protected IConfig $config,
@@ -53,9 +52,9 @@ class NewDbStructureRepairStep implements IRepairStep {
 
 		$output->info('Look for tables');
 		try {
-			$tables = $this->tableService->findAll('', true, true, false);
+			$tables = $this->tableMapper->findAll();
 			$output->info('Found ' . count($tables) . ' table(s)');
-		} catch (InternalError) {
+		} catch (Exception) {
 			$output->warning('Error while fetching tables. Will aboard.');
 			return;
 		}
@@ -73,7 +72,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 			$output->info('-- Start transfer for table ' . $table->getId() . ' (' . $table->getTitle() . ') [' . $i . '/' . count($tables) . ']');
 			try {
 				$this->transferTable($table, $output);
-			} catch (InternalError|PermissionError|Exception|Throwable $e) {
+			} catch (InternalError|Exception|Throwable $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				$output->warning('Could not transfer data. Continue with next table. The logs will have more information about the error: ' . $e->getMessage());
 			}
@@ -82,12 +81,11 @@ class NewDbStructureRepairStep implements IRepairStep {
 	}
 
 	/**
-	 * @throws PermissionError
 	 * @throws InternalError
 	 * @throws Exception
 	 */
 	private function transferTable(Table $table, IOutput $output) {
-		$columns = $this->columnService->findAllByTable($table->getId(), '');
+		$columns = $this->columnMapper->findAllByTable($table->getId());
 		$output->info('---- Found ' . count($columns) . ' columns');
 
 		$legacyRows = $this->legacyRowMapper->findAllByTable($table->getId());
