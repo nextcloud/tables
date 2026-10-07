@@ -147,7 +147,7 @@ jobs:
           ./occ user:list
           ./occ app:enable --force ${{ env.APP_NAME }}
           ./occ config:system:set query_log_file --value "$PWD/query.log"
-          php -S localhost:8080 &
+          PHP_CLI_SERVER_WORKERS=3 php -S localhost:8080 &
 
       - name: Run behat
         working-directory: apps/${{ env.APP_NAME }}/tests/integration

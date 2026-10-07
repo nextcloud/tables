@@ -28,7 +28,7 @@ echo ''
 echo '#'
 echo '# Starting PHP webserver'
 echo '#'
-php -S localhost:8080 -t ${ROOT_DIR} &
+PHP_CLI_SERVER_WORKERS=3 php -S localhost:8080 -t ${ROOT_DIR} &
 PHPPID1=$!
 echo 'Running on process ID:'
 echo $PHPPID1
@@ -40,7 +40,13 @@ trap 'kill -TERM $PHPPID1; wait $PHPPID1' TERM
 PORT_FED=8180
 export PORT_FED
 
-php -S localhost:${PORT_FED} -t ${ROOT_DIR} &
+REMOTE_ROOT_DIR=$(realpath ${ROOT_DIR})/data/tables-federated-server
+REMOTE_OCC="env NEXTCLOUD_CONFIG_DIR=${REMOTE_ROOT_DIR}/config ${ROOT_DIR}/occ"
+rm -rf ${REMOTE_ROOT_DIR}
+mkdir -p ${REMOTE_ROOT_DIR}/config
+${REMOTE_OCC} maintenance:install --database=sqlite --admin-user=admin --admin-pass=admin --data-dir=${REMOTE_ROOT_DIR}/data || exit 1
+
+NEXTCLOUD_CONFIG_DIR=${REMOTE_ROOT_DIR}/config PHP_CLI_SERVER_WORKERS=3 php -S localhost:${PORT_FED} -t ${ROOT_DIR} &
 PHPPID2=$!
 echo 'Running on process ID:'
 echo $PHPPID2
@@ -60,6 +66,7 @@ echo '#'
 
 
 ${ROOT_DIR}/occ app:enable tables --force || exit 1
+${REMOTE_OCC} app:enable tables --force || exit 1
 
 ${ROOT_DIR}/occ app:list | grep tables
 
@@ -71,6 +78,10 @@ echo '#'
 ${ROOT_DIR}/occ config:system:set auth.bruteforce.protection.enabled --value false --type bool
 # Allow local remote urls otherwise we can not share
 ${ROOT_DIR}/occ config:system:set allow_local_remote_servers --value true --type bool
+${REMOTE_OCC} config:system:set allow_local_remote_servers --value true --type bool
+# Disable rate limiting because the federation tests exceed the limit for incoming shares
+${ROOT_DIR}/occ config:system:set ratelimit.protection.enabled --value false --type bool
+${REMOTE_OCC} config:system:set ratelimit.protection.enabled --value false --type bool
 # Temporarily opt-out of storing crypted passwords, as they have a bug and make our tests time out
 ${ROOT_DIR}/occ config:system:set auth.storeCryptedPassword --value false --type bool
 
