@@ -8,6 +8,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Service\NodeService;
 use OCA\Tables\Service\ShareService;
 use OCA\Text\Event\LoadEditor;
@@ -32,6 +33,7 @@ class PageController extends Controller {
 		protected IInitialState $initialState,
 		protected ShareService $shareService,
 		protected NodeService $nodeService,
+		protected ContextMapper $contextMapper,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -65,11 +67,18 @@ class PageController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
-	public function context(int $contextId): TemplateResponse {
-		$navId = Application::APP_ID . '_application_' . $contextId;
+	/**
+	 * Opens one application on its own, by id or by slug, with its menu as the navigation.
+	 */
+	public function context(string $contextId): TemplateResponse {
+		$id = is_numeric($contextId) ? (int)$contextId : $this->contextMapper->findIdBySlug($contextId);
+		if ($id === null) {
+			return $this->index();
+		}
+		$navId = Application::APP_ID . '_application_' . $id;
 		$this->navigationManager->setActiveEntry($navId);
 
-		$this->initialState->provideInitialState('contextId', $contextId);
+		$this->initialState->provideInitialState('contextId', $id);
 
 		return $this->index();
 	}

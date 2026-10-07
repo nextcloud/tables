@@ -4,7 +4,8 @@
 -->
 <template>
 	<NcContent app-name="tables">
-		<Navigation v-if="!isPublicShare" />
+		<ApplicationNavigation v-if="!isPublicShare && isStandaloneApplication" />
+		<Navigation v-else-if="!isPublicShare" />
 		<NcAppContent>
 			<div v-if="isLoadingSomething" class="icon-loading" />
 
@@ -18,6 +19,7 @@
 <script>
 import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
+import ApplicationNavigation from './modules/navigation/sections/ApplicationNavigation.vue'
 import PublicTableView from './pages/PublicTableView.vue'
 import { mapState, mapActions } from 'pinia'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
@@ -34,6 +36,7 @@ export default {
 		NcContent,
 		NcAppContent,
 		Navigation,
+		ApplicationNavigation,
 	},
 	props: {
 		tableId: {
@@ -46,12 +49,16 @@ export default {
 			loading: false,
 			defaultPageTitle: false,
 			shareToken: loadState('tables', 'shareToken', false),
+			standaloneContextId: loadState('tables', 'contextId', null),
 		}
 	},
 	computed: {
 		...mapState(useTablesStore, ['isLoadingSomething', 'activeView', 'activeTable', 'activeContext']),
 		isPublicShare() {
 			return !!this.shareToken
+		},
+		isStandaloneApplication() {
+			return this.standaloneContextId !== null
 		},
 	},
 	watch: {
@@ -84,17 +91,12 @@ export default {
 		routing(currentRoute) {
 			const url = generateUrl('/apps/tables/')
 
-			try {
-				if (loadState('tables', 'contextId', undefined)) {
-					// prepare route, when Context is opened from navigation bar
-					const contextId = loadState('tables', 'contextId', undefined)
-					const originalUrl = window.location.href
-					this.$router.replace('/application/' + contextId).catch(() => { })
-					// reverts turning /apps/tables/app/28 into /apps/tables/app/28#/application/28
-					history.replaceState({}, undefined, originalUrl)
-				}
-			} catch (e) {
-				// contextId is not always set, it is fine.
+			// an application opened on its own starts at its root; later route changes inside it must stay
+			if (this.standaloneContextId !== null && currentRoute.path === '/') {
+				const originalUrl = window.location.href
+				this.$router.replace('/application/' + this.standaloneContextId).catch(() => { })
+				// reverts turning /apps/tables/app/28 into /apps/tables/app/28#/application/28
+				history.replaceState({}, undefined, originalUrl)
 			}
 
 			if (currentRoute.name === 'tableRow' || currentRoute.name === 'viewRow') {

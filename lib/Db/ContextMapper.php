@@ -251,6 +251,23 @@ class ContextMapper extends QBMapper {
 	}
 
 	/**
+	 * The id of the context with this slug, or null when no context carries it.
+	 *
+	 * @throws Exception
+	 */
+	public function findIdBySlug(string $slug): ?int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('slug', $qb->createNamedParameter($slug, IQueryBuilder::PARAM_STR)))
+			->setMaxResults(1);
+		$result = $qb->executeQuery();
+		$id = $result->fetchOne();
+		$result->closeCursor();
+		return $id === false ? null : (int)$id;
+	}
+
+	/**
 	 * @return Context[]
 	 * @throws Exception
 	 */

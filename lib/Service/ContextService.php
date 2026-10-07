@@ -101,7 +101,8 @@ class ContextService {
 				$iconUrl = $this->urlGenerator->imagePath('core', 'places/default-app-icon.svg');
 			}
 
-			$contextUrl = $this->urlGenerator->linkToRoute('tables.page.context', ['contextId' => $context->getId()]);
+			// the slug makes the address readable; the id keeps working for applications without one
+			$contextUrl = $this->urlGenerator->linkToRoute('tables.page.context', ['contextId' => $context->getSlug() ?: $context->getId()]);
 
 			$this->navigationManager->add([
 				'id' => Application::APP_ID . '_application_' . $context->getId(),
