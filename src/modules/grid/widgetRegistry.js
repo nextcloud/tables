@@ -2,7 +2,6 @@
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-import { translate as t } from '@nextcloud/l10n'
 import HeaderWidget from './widgets/HeaderWidget.vue'
 import TextWidget from './widgets/TextWidget.vue'
 import DataWidget from './widgets/DataWidget.vue'
@@ -18,57 +17,41 @@ export const WIDGET_TYPE_TEXT = 'text'
 export const WIDGET_TYPE_DATA = 'data'
 
 /**
- * The widget types a grid view can hold. The content shape of each type is
- * what the add-widget dialog edits and what the widget component renders.
+ * The component that renders each widget type. Everything else about a type,
+ * its title, default size and the schema of its content, comes from the server
+ * (see GridWidgetTypes.php) so the form and the validation share one definition.
  */
-export const widgetTypes = {
-	[WIDGET_TYPE_HEADER]: {
-		displayName: () => t('tables', 'Header'),
-		component: HeaderWidget,
-		defaultSize: { gridWidth: GRID_COLUMNS, gridHeight: 2 },
-		showTitle: false,
-		defaultContent: () => ({
-			title: '',
-			subtitle: '',
-			backgroundColor: '',
-			textColor: '',
-			textAlign: 'left',
-		}),
-	},
-	[WIDGET_TYPE_TEXT]: {
-		displayName: () => t('tables', 'Description'),
-		component: TextWidget,
-		defaultSize: { gridWidth: 6, gridHeight: 2 },
-		showTitle: true,
-		defaultContent: () => ({
-			text: '',
-		}),
-	},
-	[WIDGET_TYPE_DATA]: {
-		displayName: () => t('tables', 'Table or view'),
-		component: DataWidget,
-		defaultSize: { gridWidth: GRID_COLUMNS, gridHeight: 5 },
-		showTitle: false,
-		defaultContent: () => ({
-			targetType: 'table',
-			targetId: null,
-		}),
-	},
+const widgetComponents = {
+	[WIDGET_TYPE_HEADER]: HeaderWidget,
+	[WIDGET_TYPE_TEXT]: TextWidget,
+	[WIDGET_TYPE_DATA]: DataWidget,
 }
 
 /**
  * @param {string} type widget type
- * @return {object|null}
+ * @return {object|null} the component that renders it
  */
-export function getWidgetType(type) {
-	return widgetTypes[type] ?? null
+export function getWidgetComponent(type) {
+	return widgetComponents[type] ?? null
 }
 
 /**
- * @return {Array<{id: string, label: string}>}
+ * @param {Array} widgetTypes the schemas loaded from the server
+ * @param {string} type widget type
+ * @return {object|null}
  */
-export function listWidgetTypes() {
-	return Object.entries(widgetTypes).map(([id, entry]) => ({ id, label: entry.displayName() }))
+export function findWidgetType(widgetTypes, type) {
+	return widgetTypes.find(widgetType => widgetType.type === type) ?? null
+}
+
+/**
+ * The content a new widget of this type starts with: every property at its default.
+ *
+ * @param {object} widgetType a schema from the server
+ * @return {object}
+ */
+export function defaultContent(widgetType) {
+	return Object.fromEntries(Object.entries(widgetType?.properties ?? {}).map(([name, property]) => [name, structuredClone(property.default ?? null)]))
 }
 
 /**

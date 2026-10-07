@@ -36,7 +36,9 @@
 import { NcActionButton, NcActions } from '@nextcloud/vue'
 import CogOutline from 'vue-material-design-icons/CogOutline.vue'
 import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
-import { getWidgetType } from './widgetRegistry.js'
+import { mapState } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
+import { findWidgetType, getWidgetComponent } from './widgetRegistry.js'
 
 /**
  * The card around one widget: its optional title, its edit actions and the type specific body.
@@ -61,14 +63,13 @@ export default {
 	},
 	emits: ['configure', 'remove'],
 	computed: {
-		widgetType() {
-			return getWidgetType(this.widget.type)
-		},
+		...mapState(useTablesStore, ['widgetTypes']),
 		widgetComponent() {
-			return this.widgetType?.component ?? null
+			return getWidgetComponent(this.widget.type)
 		},
 		typeLabel() {
-			return this.widgetType?.displayName() ?? this.widget.type
+			const widgetType = findWidgetType(this.widgetTypes, this.widget.type)
+			return widgetType ? t('tables', widgetType.title) : this.widget.type
 		},
 	},
 }

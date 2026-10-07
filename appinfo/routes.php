@@ -81,6 +81,7 @@ return [
 		['name' => 'view#show', 'url' => '/view/{id}', 'verb' => 'GET'],
 		['name' => 'view#create', 'url' => '/view', 'verb' => 'POST'],
 		['name' => 'view#createStandalone', 'url' => '/view/standalone', 'verb' => 'POST'],
+		['name' => 'view#widgetTypes', 'url' => '/grid/widget-types', 'verb' => 'GET'],
 		['name' => 'view#update', 'url' => '/view/{id}', 'verb' => 'PUT'],
 		['name' => 'view#destroy', 'url' => '/view/{id}', 'verb' => 'DELETE'],
 

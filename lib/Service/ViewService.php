@@ -301,6 +301,7 @@ class ViewService extends SuperService {
 
 				if ($parameter === ViewUpdatableParameters::GRID) {
 					$this->assertGridValid($value);
+					$value = $this->sanitizeGrid($value);
 				}
 
 				if ($value instanceof JsonSerializable || is_array($value)) {
@@ -766,8 +767,24 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * A grid holds widgets and where they sit. Colors inside widget content must be hex colors,
-	 * because they end up in inline styles.
+	 * The grid with every widget's content reduced to what its schema allows, defaults filled in.
+	 *
+	 * @param array{widgets?: list<array<string, mixed>>, layout?: list<array<string, mixed>>} $grid
+	 * @return array{widgets: list<array<string, mixed>>, layout: list<array<string, mixed>>}
+	 * @throws BadRequestError
+	 */
+	private function sanitizeGrid(array $grid): array {
+		$widgets = [];
+		foreach ($grid['widgets'] ?? [] as $widget) {
+			$widget['content'] = GridWidgetTypes::sanitizeContent($widget['type'], $widget['content'] ?? []);
+			$widgets[] = $widget;
+		}
+		return ['widgets' => $widgets, 'layout' => array_values($grid['layout'] ?? [])];
+	}
+
+	/**
+	 * A grid holds widgets and where they sit. Every widget's content must match the schema
+	 * of its type, see GridWidgetTypes.
 	 *
 	 * @throws BadRequestError
 	 */
@@ -781,12 +798,11 @@ class ViewService extends SuperService {
 			if (!is_array($widget) || !is_string($widget['id'] ?? null) || !is_string($widget['type'] ?? null)) {
 				throw new BadRequestError('Every widget needs a string id and type.');
 			}
-			foreach ($widget['content'] ?? [] as $contentKey => $contentValue) {
-				if (is_string($contentKey) && str_ends_with($contentKey, 'Color') && $contentValue !== '' && $contentValue !== null
-					&& (!is_string($contentValue) || !preg_match('/^#[0-9a-fA-F]{3,6}$/', $contentValue))) {
-					throw new BadRequestError('Widget colors must be hex colors, got "' . (is_scalar($contentValue) ? (string)$contentValue : gettype($contentValue)) . '" for ' . $contentKey . '.');
-				}
+			$content = $widget['content'] ?? [];
+			if (!is_array($content)) {
+				throw new BadRequestError('The content of widget ' . $widget['id'] . ' must be an object.');
 			}
+			GridWidgetTypes::sanitizeContent($widget['type'], $content);
 		}
 		foreach ($grid['layout'] ?? [] as $item) {
 			if (!is_array($item) || !is_string($item['widgetId'] ?? null)) {

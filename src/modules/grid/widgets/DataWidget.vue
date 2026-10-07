@@ -66,11 +66,18 @@ export default {
 	},
 	computed: {
 		...mapState(useTablesStore, ['tables', 'views']),
+		target() {
+			if (this.content.target) {
+				return this.content.target
+			}
+			// grids saved before the target became one property
+			return this.content.targetType ? { type: this.content.targetType, id: this.content.targetId } : null
+		},
 		isView() {
-			return this.content.targetType === 'view'
+			return this.target?.type === 'view'
 		},
 		targetId() {
-			return parseInt(this.content.targetId)
+			return parseInt(this.target?.id)
 		},
 		element() {
 			if (!this.targetId || this.loadFailed) {
@@ -88,11 +95,11 @@ export default {
 		},
 	},
 	watch: {
-		'content.targetType'() {
-			this.load()
-		},
-		'content.targetId'() {
-			this.load()
+		target: {
+			deep: true,
+			handler() {
+				this.load()
+			},
 		},
 	},
 	mounted() {

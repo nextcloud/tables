@@ -77,12 +77,12 @@ import ContentSaveOutline from 'vue-material-design-icons/ContentSaveOutline.vue
 import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import GridCanvas from './GridCanvas.vue'
 import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import { useTablesStore } from '../../store/store.js'
-import { cloneGrid, emptyGrid, getWidgetType, nextFreeRow } from './widgetRegistry.js'
+import { cloneGrid, emptyGrid, findWidgetType, nextFreeRow } from './widgetRegistry.js'
 
 /**
  * A grid view: its widgets on a grid, with an edit mode that saves the whole grid at once.
@@ -123,6 +123,7 @@ export default {
 		}
 	},
 	computed: {
+		...mapState(useTablesStore, ['widgetTypes']),
 		storedGrid() {
 			return this.view.grid?.layout ? this.view.grid : emptyGrid()
 		},
@@ -179,7 +180,8 @@ export default {
 				return
 			}
 			const id = 'w-' + payload.type + '-' + Date.now()
-			const size = getWidgetType(payload.type)?.defaultSize ?? { gridWidth: 6, gridHeight: 3 }
+			const widgetType = findWidgetType(this.widgetTypes, payload.type)
+			const size = { gridWidth: widgetType?.defaultWidth ?? 6, gridHeight: widgetType?.defaultHeight ?? 3 }
 			this.draftGrid = {
 				widgets: [...this.draftGrid.widgets, { id, type: payload.type, title: payload.title, showTitle: payload.showTitle, content: payload.content }],
 				layout: [...this.draftGrid.layout, {

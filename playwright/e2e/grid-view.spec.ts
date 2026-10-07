@@ -50,14 +50,14 @@ test.describe('Grid views inside an application', () => {
 		// Design it: a header and a description
 		await page.locator('[data-cy="grid-view-edit"]').click()
 		await page.locator('[data-cy="grid-view-add-widget"]').click()
-		await page.locator('[data-cy="addWidgetHeading"]').fill('Welcome, intake team')
+		await page.locator('[data-cy="widgetField-title"] input').fill('Welcome, intake team')
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 		await expect(page.locator('[data-cy="grid-item"]')).toHaveCount(1)
 
 		await page.locator('[data-cy="grid-view-add-widget"]').click()
 		await pickOption(page, '[data-cy="addWidgetType"] input', 'Description')
 		await page.locator('[data-cy="addWidgetTitle"]').fill('How this works')
-		await page.locator('[data-cy="addWidgetText"]').fill('Every new request lands in the welcome table.')
+		await page.locator('[data-cy="widgetField-text"] textarea').fill('Every new request lands in the welcome table.')
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 		await expect(page.locator('[data-cy="grid-item"]')).toHaveCount(2)
 

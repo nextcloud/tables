@@ -28,57 +28,7 @@
 				</NcCheckboxRadioSwitch>
 			</div>
 
-			<template v-if="type === 'header'">
-				<div class="row space-T">
-					<NcTextField v-model="content.title" :label="t('tables', 'Heading')" data-cy="addWidgetHeading" />
-				</div>
-				<div class="row space-T">
-					<NcTextField v-model="content.subtitle" :label="t('tables', 'Subheading')" />
-				</div>
-				<div class="row space-T">
-					<NcSelect v-model="textAlign"
-						:input-label="t('tables', 'Text alignment')"
-						:options="alignOptions"
-						:clearable="false"
-						label="label" />
-				</div>
-				<div class="row space-T color-row">
-					<label>
-						{{ t('tables', 'Background color') }}
-						<input v-model="content.backgroundColor" type="color" data-cy="addWidgetBackground">
-					</label>
-					<label>
-						{{ t('tables', 'Text color') }}
-						<input v-model="content.textColor" type="color">
-					</label>
-					<NcButton variant="tertiary" @click="content.backgroundColor = ''; content.textColor = ''">
-						{{ t('tables', 'Use theme colors') }}
-					</NcButton>
-				</div>
-			</template>
-
-			<template v-if="type === 'text'">
-				<div class="row space-T">
-					<NcTextArea v-model="content.text"
-						:label="t('tables', 'Text')"
-						:placeholder="t('tables', 'Leave an empty line between paragraphs')"
-						resize="vertical"
-						rows="6"
-						data-cy="addWidgetText" />
-				</div>
-			</template>
-
-			<template v-if="type === 'data'">
-				<div class="row space-T">
-					<NcSelect v-model="dataTarget"
-						:input-label="t('tables', 'Table or view')"
-						:options="dataOptions"
-						:clearable="false"
-						:searchable="true"
-						label="label"
-						data-cy="addWidgetData" />
-				</div>
-			</template>
+			<SchemaForm v-if="widgetType" v-model="content" :properties="widgetType.properties" />
 
 			<div class="row space-T">
 				<div class="fix-col-4 end">
@@ -92,13 +42,15 @@
 </template>
 
 <script>
-import { NcButton, NcCheckboxRadioSwitch, NcDialog, NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
+import { NcButton, NcCheckboxRadioSwitch, NcDialog, NcSelect, NcTextField } from '@nextcloud/vue'
 import { mapState } from 'pinia'
+import SchemaForm from '../grid/SchemaForm.vue'
 import { useTablesStore } from '../../store/store.js'
-import { getWidgetType, listWidgetTypes, WIDGET_TYPE_HEADER } from '../grid/widgetRegistry.js'
+import { defaultContent, findWidgetType } from '../grid/widgetRegistry.js'
 
 /**
- * Collects the type, title and content of a widget. The parent places it on the grid.
+ * Collects the type, title and content of a widget; the content form comes from
+ * the schema of the type. The parent places the widget on the grid.
  */
 export default {
 	name: 'AddWidget',
@@ -107,8 +59,8 @@ export default {
 		NcCheckboxRadioSwitch,
 		NcDialog,
 		NcSelect,
-		NcTextArea,
 		NcTextField,
+		SchemaForm,
 	},
 	props: {
 		showModal: {
@@ -130,65 +82,24 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(useTablesStore, ['tables', 'views']),
+		...mapState(useTablesStore, ['widgetTypes']),
 		typeOptions() {
-			return listWidgetTypes()
+			return this.widgetTypes.map(widgetType => ({ id: widgetType.type, label: t('tables', widgetType.title) }))
 		},
-		type() {
-			return this.selectedType?.id ?? null
-		},
-		alignOptions() {
-			return [
-				{ id: 'left', label: t('tables', 'Left') },
-				{ id: 'center', label: t('tables', 'Centered') },
-				{ id: 'right', label: t('tables', 'Right') },
-			]
-		},
-		textAlign: {
-			get() {
-				return this.alignOptions.find(option => option.id === this.content.textAlign) ?? this.alignOptions[0]
-			},
-			set(option) {
-				this.content.textAlign = option?.id ?? 'left'
-			},
-		},
-		dataOptions() {
-			const tables = this.tables.map(table => ({
-				id: 'table-' + table.id,
-				targetType: 'table',
-				targetId: table.id,
-				label: (table.emoji ? table.emoji + ' ' : '') + table.title,
-			}))
-			const views = this.views
-				.filter(view => view.type !== 'grid')
-				.map(view => ({
-					id: 'view-' + view.id,
-					targetType: 'view',
-					targetId: view.id,
-					label: (view.emoji ? view.emoji + ' ' : '') + view.title + ' (' + t('tables', 'view') + ')',
-				}))
-			return [...tables, ...views]
-		},
-		dataTarget: {
-			get() {
-				return this.dataOptions.find(option => option.targetType === this.content.targetType && option.targetId === this.content.targetId) ?? null
-			},
-			set(option) {
-				this.content.targetType = option?.targetType ?? 'table'
-				this.content.targetId = option?.targetId ?? null
-				if (option && this.title === '') {
-					this.title = option.label
-				}
-			},
+		widgetType() {
+			return findWidgetType(this.widgetTypes, this.selectedType?.id)
 		},
 		canSubmit() {
-			if (!this.type) {
+			if (!this.widgetType) {
 				return false
 			}
-			if (this.type === 'data') {
-				return !!this.content.targetId
-			}
-			return true
+			return Object.entries(this.widgetType.properties).every(([name, property]) => {
+				if (!property.required) {
+					return true
+				}
+				const value = this.content[name]
+				return property.type === 'target' ? !!value?.id : String(value ?? '').trim() !== ''
+			})
 		},
 	},
 	watch: {
@@ -198,9 +109,9 @@ export default {
 			}
 		},
 		selectedType(option, previous) {
-			if (option && previous && option.id !== previous.id) {
-				this.content = getWidgetType(option.id).defaultContent()
-				this.showTitle = getWidgetType(option.id).showTitle
+			if (option && previous && option.id !== previous.id && this.widgetType) {
+				this.content = defaultContent(this.widgetType)
+				this.showTitle = this.widgetType.showTitle
 			}
 		},
 	},
@@ -210,21 +121,21 @@ export default {
 				this.selectedType = this.typeOptions.find(option => option.id === this.editingWidget.type) ?? this.typeOptions[0]
 				this.title = this.editingWidget.title ?? ''
 				this.showTitle = !!this.editingWidget.showTitle
-				this.content = { ...getWidgetType(this.editingWidget.type)?.defaultContent(), ...JSON.parse(JSON.stringify(this.editingWidget.content ?? {})) }
+				this.content = { ...defaultContent(this.widgetType), ...JSON.parse(JSON.stringify(this.editingWidget.content ?? {})) }
 				return
 			}
-			this.selectedType = this.typeOptions.find(option => option.id === WIDGET_TYPE_HEADER) ?? this.typeOptions[0]
+			this.selectedType = this.typeOptions[0] ?? null
 			this.title = ''
-			this.showTitle = getWidgetType(this.selectedType.id).showTitle
-			this.content = getWidgetType(this.selectedType.id).defaultContent()
+			this.showTitle = this.widgetType?.showTitle ?? false
+			this.content = defaultContent(this.widgetType)
 		},
 		submit() {
 			if (!this.canSubmit) {
 				return
 			}
 			this.$emit('submit', {
-				type: this.type,
-				title: this.title.trim() || this.selectedType.label,
+				type: this.widgetType.type,
+				title: this.title.trim() || t('tables', this.widgetType.title),
 				showTitle: this.showTitle,
 				content: JSON.parse(JSON.stringify(this.content)),
 			})
@@ -238,21 +149,8 @@ export default {
 	padding-inline-end: 0 !important;
 
 	.row > :deep(.v-select),
-	.row > :deep(.input-field),
-	.row > :deep(.textarea) {
+	.row > :deep(.input-field) {
 		width: 100%;
-	}
-
-	.color-row {
-		display: flex;
-		align-items: center;
-		gap: calc(4 * var(--default-grid-baseline, 4px));
-
-		label {
-			display: inline-flex;
-			align-items: center;
-			gap: calc(2 * var(--default-grid-baseline, 4px));
-		}
 	}
 }
 </style>

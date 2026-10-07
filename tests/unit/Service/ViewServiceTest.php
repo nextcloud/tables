@@ -82,27 +82,32 @@ class ViewServiceTest extends TestCase {
 		$view = $this->storedView(null);
 		$this->expectUpdateOf($view);
 		$grid = [
-			'widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi', 'backgroundColor' => '#abc']]],
+			'widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi', 'backgroundColor' => '#abc', 'stray' => 'dropped']]],
 			'layout' => [['id' => 1, 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]],
 		];
 
 		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
 
-		$this->assertSame($grid, $updated->getGridArray());
+		$stored = $updated->getGridArray();
+		$this->assertSame($grid['layout'], $stored['layout']);
+		$this->assertSame('Hi', $stored['widgets'][0]['content']['title']);
+		$this->assertSame('#abc', $stored['widgets'][0]['content']['backgroundColor']);
+		$this->assertSame('left', $stored['widgets'][0]['content']['textAlign'], 'defaults are filled in');
+		$this->assertArrayNotHasKey('stray', $stored['widgets'][0]['content'], 'unknown properties are dropped');
 	}
 
 	public function testUpdateRejectsNonHexWidgetColors(): void {
 		$this->expectUpdateOf($this->storedView(null));
-		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['backgroundColor' => 'url(evil)']]], 'layout' => []];
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi', 'backgroundColor' => 'url(evil)']]], 'layout' => []];
 
 		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('hex colors');
+		$this->expectExceptionMessage('hex color');
 		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
 	}
 
 	public function testUpdateRejectsLayoutItemsWithoutPositions(): void {
 		$this->expectUpdateOf($this->storedView(null));
-		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text']], 'layout' => [['widgetId' => 'w-1', 'gridX' => 0]]];
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text', 'content' => ['text' => 'x']]], 'layout' => [['widgetId' => 'w-1', 'gridX' => 0]]];
 
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('gridY');
