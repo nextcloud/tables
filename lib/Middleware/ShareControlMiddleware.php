@@ -26,6 +26,7 @@ use OCP\Federation\ICloudIdManager;
 use OCP\IRequest;
 use OCP\ISession;
 use OCP\OCM\IOCMDiscoveryService;
+use OCP\Security\Signature\Model\Signatory;
 use OCP\Share\IManager as ShareManager;
 use ReflectionMethod;
 
@@ -135,7 +136,7 @@ class ShareControlMiddleware extends Middleware {
 		}
 
 		$cloudId = $this->cloudIdManager->resolveCloudId($this->share->getReceiver());
-		$expectedOrigin = parse_url($cloudId->getRemote(), PHP_URL_HOST);
+		$expectedOrigin = Signatory::extractIdentityFromUri($cloudId->getRemote());
 		if ($signedRequest->getOrigin() !== $expectedOrigin) {
 			throw new PermissionError('Unauthorized federation request origin');
 		}
