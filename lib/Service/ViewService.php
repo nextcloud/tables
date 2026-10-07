@@ -704,7 +704,7 @@ class ViewService extends SuperService {
 	 *
 	 * @throws InternalError
 	 */
-	public function importView(int $tableId, array $view, string $userId): View {
+	public function importView(?int $tableId, array $view, string $userId): View {
 		$item = new View();
 		$item->setUuid((isset($view['uuid']) && Uuid::isValid($view['uuid'])) ? $view['uuid'] : null);
 		$item->setTableId($tableId);

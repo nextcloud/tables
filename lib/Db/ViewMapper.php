@@ -273,12 +273,20 @@ class ViewMapper extends QBMapper {
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 */
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
 	public function findByUuid(string $uuid): ?View {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('v.*', 't.ownership')
 			->from($this->table, 'v')
-			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
 			->where($qb->expr()->eq('v.uuid', $qb->createNamedParameter($uuid)));
-		return $this->findEntity($qb);
+		try {
+			return $this->findEntity($qb);
+		} catch (DoesNotExistException) {
+			return null;
+		}
 	}
 }

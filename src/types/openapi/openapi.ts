@@ -7567,6 +7567,30 @@ export interface operations {
                         readonly addTables: readonly components["schemas"]["Table"][];
                         readonly modifyTables: readonly components["schemas"]["Table"][];
                     };
+                    /**
+                     * @description URL-friendly name of the context
+                     * @default null
+                     */
+                    readonly slug?: string | null;
+                    /**
+                     * @description Menu of the context, targets by uuid
+                     * @default []
+                     */
+                    readonly menuItems?: readonly {
+                        readonly label: string;
+                        readonly icon?: string | null;
+                        readonly targetType: string;
+                        readonly targetUuid?: string | null;
+                        readonly url?: string | null;
+                        readonly slug?: string | null;
+                    }[];
+                    /**
+                     * @description Views without a table that the menu points at
+                     * @default []
+                     */
+                    readonly gridViews?: readonly {
+                        readonly [key: string]: Record<string, never>;
+                    }[];
                 };
             };
         };

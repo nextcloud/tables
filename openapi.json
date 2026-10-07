@@ -13595,6 +13595,59 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "URL-friendly name of the context"
+                                    },
+                                    "menuItems": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "Menu of the context, targets by uuid",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "label",
+                                                "targetType"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "icon": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "targetType": {
+                                                    "type": "string"
+                                                },
+                                                "targetUuid": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "gridViews": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "Views without a table that the menu points at",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "object"
+                                            }
+                                        }
                                     }
                                 }
                             }

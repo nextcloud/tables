@@ -46,6 +46,7 @@ export default {
 	data() {
 		return {
 			grid: null,
+			resizeObserver: null,
 		}
 	},
 	watch: {
@@ -69,8 +70,14 @@ export default {
 			minRow: 1,
 		}, this.$refs.gridElement)
 		this.grid.on('change', (event, changedNodes) => this.onGridChange(changedNodes))
+		// 12 columns on a wide canvas, 6 on a medium one and a single column on a phone,
+		// driven by the canvas width so the grid restores when the window grows again
+		this.resizeObserver = new ResizeObserver(entries => this.applyColumns(entries[0]?.contentRect.width ?? 0))
+		this.resizeObserver.observe(this.$refs.gridElement)
 	},
 	beforeUnmount() {
+		this.resizeObserver?.disconnect()
+		this.resizeObserver = null
 		this.grid?.destroy(false)
 		this.grid = null
 	},
@@ -108,8 +115,24 @@ export default {
 				}
 			})
 		},
+		/**
+		 * @param {number} width current width of the canvas in pixels
+		 */
+		applyColumns(width) {
+			if (!this.grid || width === 0) {
+				return
+			}
+			const columns = width < 560 ? 1 : (width < 960 ? 6 : GRID_COLUMNS)
+			if (this.grid.getColumn() !== columns) {
+				this.grid.column(columns, 'moveScale')
+			}
+		},
 		onGridChange(changedNodes) {
 			if (!Array.isArray(changedNodes) || changedNodes.length === 0) {
+				return
+			}
+			// A reflow to fewer columns is only how the grid is shown on this screen, never the stored layout
+			if (this.grid.getColumn() !== GRID_COLUMNS) {
 				return
 			}
 			const positions = Object.fromEntries(changedNodes.map(node => [node.id, node]))

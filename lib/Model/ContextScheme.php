@@ -18,7 +18,28 @@ class ContextScheme implements JsonSerializable {
 		protected ?array $nodes = [],
 		protected ?array $pages = [],
 		protected ?array $tables = [],
+		protected ?string $slug = null,
+		protected array $menuItems = [],
+		protected array $gridViews = [],
 	) {
+	}
+
+	public function getSlug(): ?string {
+		return $this->slug;
+	}
+
+	/**
+	 * Menu items point at their target by uuid, so a scheme can be imported on another instance.
+	 */
+	public function getMenuItems(): array {
+		return $this->menuItems;
+	}
+
+	/**
+	 * Views without a table that the menu points at; they live outside the tables of the scheme.
+	 */
+	public function getGridViews(): array {
+		return $this->gridViews;
 	}
 
 	public function getName(): ?string {
@@ -53,6 +74,9 @@ class ContextScheme implements JsonSerializable {
 			'nodes' => $this->nodes,
 			'pages' => $this->pages,
 			'tables' => $this->tables,
+			'slug' => $this->slug,
+			'menuItems' => $this->menuItems,
+			'gridViews' => $this->gridViews,
 		];
 	}
 }
