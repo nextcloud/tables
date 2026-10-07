@@ -1152,6 +1152,8 @@ export type components = {
             readonly owner: string;
             /** Format: int64 */
             readonly ownerType: number;
+            readonly slug: string | null;
+            readonly menuItems: readonly components["schemas"]["MenuItem"][];
         };
         readonly ContextNavigation: {
             /** Format: int64 */
@@ -1185,6 +1187,21 @@ export type components = {
         readonly LinkShare: {
             readonly shareToken: string;
             readonly url: string;
+        };
+        readonly MenuItem: {
+            /** Format: int64 */
+            readonly id: number;
+            /** Format: int64 */
+            readonly contextId: number;
+            readonly label: string;
+            readonly icon: string | null;
+            readonly targetType: string;
+            /** Format: int64 */
+            readonly targetId: number | null;
+            readonly url: string | null;
+            readonly slug: string | null;
+            /** Format: int64 */
+            readonly order: number;
         };
         readonly NotifyConfig: {
             readonly "notify-assigned": boolean;
@@ -1416,6 +1433,16 @@ export type components = {
             readonly isFederated: boolean;
             /** Format: int64 */
             readonly sidebarOrder: number | null;
+            readonly type: string;
+            readonly grid: {
+                readonly widgets: readonly {
+                    readonly [key: string]: Record<string, never>;
+                }[];
+                readonly layout: readonly {
+                    readonly [key: string]: Record<string, never>;
+                }[];
+            };
+            readonly slug: string | null;
         };
     };
     responses: never;
@@ -6879,6 +6906,24 @@ export interface operations {
                         /** Format: int64 */
                         readonly permissions?: number;
                     }[];
+                    /**
+                     * @description URL-friendly name of the context
+                     * @default null
+                     */
+                    readonly slug?: string | null;
+                    /**
+                     * @description optional menu of the context, in order
+                     * @default null
+                     */
+                    readonly menuItems?: readonly {
+                        readonly label: string;
+                        readonly icon?: string | null;
+                        readonly targetType: string;
+                        /** Format: int64 */
+                        readonly targetId?: number | null;
+                        readonly url?: string | null;
+                        readonly slug?: string | null;
+                    }[] | null;
                 };
             };
         };
@@ -7069,6 +7114,24 @@ export interface operations {
                         /** Format: int64 */
                         readonly order: number;
                     } | null;
+                    /**
+                     * @description provide this parameter to set a new URL-friendly name
+                     * @default null
+                     */
+                    readonly slug?: string | null;
+                    /**
+                     * @description provide this parameter to replace the menu
+                     * @default null
+                     */
+                    readonly menuItems?: readonly {
+                        readonly label: string;
+                        readonly icon?: string | null;
+                        readonly targetType: string;
+                        /** Format: int64 */
+                        readonly targetId?: number | null;
+                        readonly url?: string | null;
+                        readonly slug?: string | null;
+                    }[] | null;
                 };
             };
         };

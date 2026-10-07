@@ -14,6 +14,8 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItem;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -61,6 +63,7 @@ class ContextService {
 		protected IURLGenerator $urlGenerator,
 		private TableMapper $tableMapper,
 		private ViewMapper $viewMapper,
+		private MenuItemMapper $menuItemMapper,
 	) {
 	}
 
@@ -132,15 +135,16 @@ class ContextService {
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
-	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType): Context {
+	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType, ?string $slug = null, ?array $menuItems = null): Context {
 		$context = new Context();
 		$context->setName(trim($name));
 		$context->setIcon(trim($iconName));
 		$context->setDescription(trim($description));
 		$context->setOwnerId($ownerId);
 		$context->setOwnerType($ownerType);
+		$context->setSlug($this->normalizeSlug($slug));
 
-		$this->atomic(function () use ($context, $nodes): void {
+		$this->atomic(function () use ($context, $nodes, $menuItems): void {
 			$this->contextMapper->insert($context);
 
 			if (!empty($nodes)) {
@@ -148,9 +152,58 @@ class ContextService {
 				$this->insertNodesFromArray($context, $nodes);
 			}
 			$this->insertPage($context);
+			$context->setMenuItems($this->replaceMenuItems($context->getId(), $menuItems ?? []));
 		}, $this->dbc);
 
 		return $context;
+	}
+
+	/**
+	 * Replace the menu of an application with the given items, in the given order.
+	 *
+	 * @psalm-param list<array{label: string, icon?: string|null, targetType: string, targetId?: int|null, url?: string|null, slug?: string|null}> $menuItems
+	 * @return list<array{id: int, contextId: int, label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, slug: string|null, order: int}>
+	 * @throws Exception
+	 */
+	protected function replaceMenuItems(int $contextId, array $menuItems): array {
+		$this->menuItemMapper->deleteAllByContextId($contextId);
+		$stored = [];
+		foreach (array_values($menuItems) as $position => $item) {
+			$menuItem = new MenuItem();
+			$menuItem->setContextId($contextId);
+			$menuItem->setLabel(trim($item['label']));
+			$menuItem->setIcon(isset($item['icon']) && $item['icon'] !== '' ? trim((string)$item['icon']) : null);
+			$menuItem->setTargetType($item['targetType']);
+			$menuItem->setTargetId($item['targetType'] === MenuItem::TARGET_URL ? null : ($item['targetId'] ?? null));
+			$menuItem->setUrl($item['targetType'] === MenuItem::TARGET_URL ? ($item['url'] ?? null) : null);
+			$menuItem->setSlug($this->normalizeSlug($item['slug'] ?? null) ?? $this->slugify($item['label']));
+			$menuItem->setOrder(($position + 1) * 10);
+			$stored[] = $this->menuItemMapper->insert($menuItem)->jsonSerialize();
+		}
+		return $stored;
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	protected function normalizeSlug(?string $slug): ?string {
+		if ($slug === null) {
+			return null;
+		}
+		$slug = trim($slug);
+		if ($slug === '') {
+			return null;
+		}
+		if (strlen($slug) > 64 || !preg_match('/^[a-z0-9][a-z0-9-]*$/', $slug)) {
+			throw new InvalidArgumentException('A slug may only contain lowercase letters, numbers and hyphens, and must start with a letter or number.');
+		}
+		return $slug;
+	}
+
+	protected function slugify(string $label): string {
+		$slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $label) ?? '', '-'));
+		$slug = preg_replace('/^[^a-z0-9]+/', '', $slug) ?? '';
+		return substr($slug === '' ? 'item' : $slug, 0, 64);
 	}
 
 	/**
@@ -159,11 +212,17 @@ class ContextService {
 	 * @throws DoesNotExistException
 	 * @throws PermissionError|MultipleObjectsReturnedException
 	 */
-	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
+	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?string $slug = null, ?array $menuItems = null): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		if ($name !== null) {
 			$context->setName(trim($name));
+		}
+		if ($slug !== null) {
+			$context->setSlug($this->normalizeSlug($slug));
+		}
+		if ($menuItems !== null) {
+			$context->setMenuItems($this->replaceMenuItems($contextId, $menuItems));
 		}
 		if ($iconName !== null) {
 			$context->setIcon(trim($iconName));
@@ -316,6 +375,7 @@ class ContextService {
 
 		$this->atomic(function () use ($context): void {
 			$this->shareService->deleteAllForContext($context);
+			$this->menuItemMapper->deleteAllByContextId($context->getId());
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
 			foreach ($pageIds as $pageId) {
@@ -689,7 +749,7 @@ class ContextService {
 					$view = $viewService->find($node['node_id']);
 					$node['node_uuid'] = $view->getUuid();
 					$node['node_title'] = $view->getTitle();
-					if (isset($tables[$view->getTableId()])) {
+					if ($view->getTableId() === null || isset($tables[$view->getTableId()])) {
 						continue;
 					}
 					$tables[$view->getTableId()] = $tableService->getScheme($view->getTableId(), $userId)->jsonSerialize();

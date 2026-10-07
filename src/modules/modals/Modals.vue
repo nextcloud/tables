@@ -35,6 +35,12 @@
 			:view-setting="viewToEdit?.viewSetting"
 			@close="viewToEdit = null" />
 		<DeleteView :show-modal="viewToDelete !== null" :view="viewToDelete" @cancel="viewToDelete = null" />
+		<GridViewSettings
+			:show-modal="gridView !== null"
+			:view="gridView?.view ?? null"
+			:context-id="gridView?.contextId ?? null"
+			@created="payload => emitGridViewCreated(payload)"
+			@close="gridView = null" />
 
 		<Import
 			:show-modal="importToElement !== null"
@@ -60,6 +66,7 @@
 
 <script>
 
+import { emit } from '@nextcloud/event-bus'
 import { useEventBusSubscriptions } from '../../shared/composables/useEventBusSubscriptions.js'
 import CreateRow from './CreateRow.vue'
 import ImportScheme from './ImportScheme.vue'
@@ -76,6 +83,7 @@ import CreateTable from './CreateTable.vue'
 import DeleteView from './DeleteView.vue'
 import EditTable from './EditTable.vue'
 import EditContext from './EditContext.vue'
+import GridViewSettings from './GridViewSettings.vue'
 import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
 import TransferContext from './TransferContext.vue'
@@ -85,6 +93,7 @@ import ImportContextScheme from './ImportContextScheme.vue';
 export default {
 	components: {
 		EditTable,
+		GridViewSettings,
 		DeleteView,
 		CreateTable,
 		Import,
@@ -118,6 +127,7 @@ export default {
 			editRow: null,
 			rowsToDelete: null,
 			viewToEdit: null,
+			gridView: null,
 			showModalCreateTable: false,
 			showModalCreateContext: false,
 			importToElement: null,
@@ -145,7 +155,14 @@ export default {
 
 		// views
 		this.subscribeToEventBus('tables:view:reload', () => { this.reload(true) })
-		this.subscribeToEventBus('tables:view:edit', view => { this.viewToEdit = { ...view, createView: false } })
+		this.subscribeToEventBus('tables:view:edit', view => {
+			if (view?.view?.type === 'grid') {
+				this.gridView = { view: view.view, contextId: null }
+				return
+			}
+			this.viewToEdit = { ...view, createView: false }
+		})
+		this.subscribeToEventBus('tables:view:create-grid', payload => { this.gridView = { view: null, contextId: payload?.contextId ?? null } })
 		this.subscribeToEventBus('tables:view:create', tableInfos => {
 			this.viewToEdit = {
 				view: { tableId: tableInfos.tableId, sort: [], filter: [] },
@@ -182,6 +199,9 @@ export default {
 
 	},
 	methods: {
+		emitGridViewCreated(payload) {
+			emit('tables:view:grid-created', payload)
+		},
 		onSaveNewColumn(event) {
 			if (this.createColumnInfo?.onSave) {
 				this.createColumnInfo.onSave(event)

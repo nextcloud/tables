@@ -147,6 +147,10 @@ class ViewService extends SuperService {
 		}
 
 		$sharedViews = $this->shareService->findViewsSharedWithMe($userId);
+		// views without a table are not listed under any table, so the user's own ones are listed here
+		foreach ($this->mapper->findAllStandaloneOwnedBy($userId) as $standaloneView) {
+			$sharedViews[$standaloneView->getId()] ??= $standaloneView;
+		}
 		$contexts = $this->contextService->findAll($userId);
 		foreach ($contexts as $context) {
 			$nodes = $context->getNodes();
@@ -181,17 +185,28 @@ class ViewService extends SuperService {
 	public function create(
 		string $title,
 		?string $emoji,
-		Table $table,
+		?Table $table,
 		?string $userId = null,
 		?string $technicalName = null,
 		?string $uuid = null,
+		string $type = View::TYPE_TABLE,
+		?string $slug = null,
+		string $description = '',
 	): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
+		$this->assertTypeValid($type);
+		if ($table === null && $type === View::TYPE_TABLE) {
+			throw new BadRequestError('A table view needs a table.');
+		}
+
 		// security
-		if (!$this->permissionsService->canManageTable($table, $userId)) {
+		if ($table !== null && !$this->permissionsService->canManageTable($table, $userId)) {
 			throw new PermissionError('PermissionError: can not create view');
+		}
+		if ($table === null && $userId === '') {
+			throw new PermissionError('PermissionError: a view without a table needs an owner');
 		}
 
 		$time = new DateTime();
@@ -201,8 +216,13 @@ class ViewService extends SuperService {
 		if ($emoji) {
 			$item->setEmoji($emoji);
 		}
-		$item->setDescription('');
-		$item->setTableId($table->getId());
+		$item->setDescription($description);
+		$item->setTableId($table?->getId());
+		$item->setType($type);
+		if ($slug !== null && $slug !== '') {
+			$this->assertSlugValid($slug);
+			$item->setSlug($slug);
+		}
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
@@ -213,8 +233,8 @@ class ViewService extends SuperService {
 		}
 		// ownership is not stored with the record, but it might be necessary upon
 		// further interaction with the view in the running process, as the instance
-		// is cached now. The ownership is always inherited from the table.
-		$item->setOwnership($table->getOwnership());
+		// is cached now. The ownership is inherited from the table, or it is the creator's.
+		$item->setOwnership($table?->getOwnership() ?? $userId);
 		try {
 			$newItem = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {
@@ -268,7 +288,22 @@ class ViewService extends SuperService {
 					$this->assertTechnicalNameValid($value);
 				}
 
-				if ($value instanceof JsonSerializable) {
+				if ($parameter === ViewUpdatableParameters::TYPE) {
+					$this->assertTypeValid($value);
+					if ($value === View::TYPE_TABLE && $view->getTableId() === null) {
+						throw new BadRequestError('A view without a table cannot become a table view.');
+					}
+				}
+
+				if ($parameter === ViewUpdatableParameters::SLUG && $value !== '') {
+					$this->assertSlugValid($value);
+				}
+
+				if ($parameter === ViewUpdatableParameters::GRID) {
+					$this->assertGridValid($value);
+				}
+
+				if ($value instanceof JsonSerializable || is_array($value)) {
 					$insertableValue = json_encode($value);
 				}
 
@@ -427,6 +462,10 @@ class ViewService extends SuperService {
 
 		$this->setIsSharedState($view, $userId);
 
+		if ($view->getTableId() === null) {
+			return;
+		}
+
 		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
 			return;
 		}
@@ -496,6 +535,9 @@ class ViewService extends SuperService {
 					$view->setIsShared(true);
 					$canManageTable = false;
 					try {
+						if ($view->getTableId() === null) {
+							throw new NotFoundError('The view has no table');
+						}
 						try {
 							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
 						} catch (NotFoundError) {
@@ -682,6 +724,16 @@ class ViewService extends SuperService {
 		$item->setColumns(json_encode($view['columnSettings']));
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
+		$type = $view['type'] ?? View::TYPE_TABLE;
+		$this->assertTypeValid($type);
+		$item->setType($type);
+		if (isset($view['grid']) && is_array($view['grid'])) {
+			$item->setGridArray($view['grid']);
+		}
+		if (isset($view['slug']) && $view['slug'] !== '') {
+			$this->assertSlugValid($view['slug']);
+			$item->setSlug($view['slug']);
+		}
 		try {
 			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
@@ -704,6 +756,62 @@ class ViewService extends SuperService {
 	/**
 	 * @throws BadRequestError
 	 */
+	/**
+	 * @throws BadRequestError
+	 */
+	private function assertTypeValid(string $type): void {
+		if (!in_array($type, View::TYPES, true)) {
+			throw new BadRequestError('Unknown view type "' . $type . '", expected one of: ' . implode(', ', View::TYPES));
+		}
+	}
+
+	/**
+	 * A grid holds widgets and where they sit. Colors inside widget content must be hex colors,
+	 * because they end up in inline styles.
+	 *
+	 * @throws BadRequestError
+	 */
+	private function assertGridValid(array $grid): void {
+		foreach (['widgets', 'layout'] as $key) {
+			if (isset($grid[$key]) && !is_array($grid[$key])) {
+				throw new BadRequestError('The grid property "' . $key . '" must be a list.');
+			}
+		}
+		foreach ($grid['widgets'] ?? [] as $widget) {
+			if (!is_array($widget) || !is_string($widget['id'] ?? null) || !is_string($widget['type'] ?? null)) {
+				throw new BadRequestError('Every widget needs a string id and type.');
+			}
+			foreach ($widget['content'] ?? [] as $contentKey => $contentValue) {
+				if (is_string($contentKey) && str_ends_with($contentKey, 'Color') && $contentValue !== '' && $contentValue !== null
+					&& (!is_string($contentValue) || !preg_match('/^#[0-9a-fA-F]{3,6}$/', $contentValue))) {
+					throw new BadRequestError('Widget colors must be hex colors, got "' . (is_scalar($contentValue) ? (string)$contentValue : gettype($contentValue)) . '" for ' . $contentKey . '.');
+				}
+			}
+		}
+		foreach ($grid['layout'] ?? [] as $item) {
+			if (!is_array($item) || !is_string($item['widgetId'] ?? null)) {
+				throw new BadRequestError('Every layout item needs the id of its widget.');
+			}
+			foreach (['gridX', 'gridY', 'gridWidth', 'gridHeight'] as $position) {
+				if (!is_int($item[$position] ?? null) || $item[$position] < 0) {
+					throw new BadRequestError('The layout position "' . $position . '" must be a non-negative integer.');
+				}
+			}
+		}
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function assertSlugValid(string $slug): void {
+		if (strlen($slug) > 64) {
+			throw new BadRequestError('A slug must not exceed 64 characters.');
+		}
+		if (!preg_match('/^[a-z0-9][a-z0-9-]*$/', $slug)) {
+			throw new BadRequestError('A slug may only contain lowercase letters, numbers and hyphens, and must start with a letter or number.');
+		}
+	}
+
 	private function assertTechnicalNameValid(string $technicalName): void {
 		if (strlen($technicalName) > 200) {
 			throw new BadRequestError('Technical name must not exceed 200 characters.');

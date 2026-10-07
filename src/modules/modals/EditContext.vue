@@ -32,9 +32,22 @@
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
+					{{ t('tables', 'Slug') }}
+				</div>
+				<input v-model="slug" type="text" data-cy="editContextSlug"
+					:placeholder="t('tables', 'Optional, e.g. intake. Lowercase letters, numbers and hyphens.')">
+			</div>
+			<div class="col-4 row space-T">
+				<div class="col-4">
 					{{ t('tables', 'Resources') }}
 				</div>
 				<NcContextResource v-model:resources="resources" v-model:receivers="receivers" />
+			</div>
+			<div class="col-4 row space-T">
+				<div class="col-4">
+					{{ t('tables', 'Menu') }}
+				</div>
+				<MenuItemsEditor v-model:items="menuItems" />
 			</div>
 			<div class="row space-T">
 				<NcActionCheckbox :model-value="showInNavigationDefault" @change="changeDisplayMode">
@@ -74,6 +87,8 @@ import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
+import MenuItemsEditor from '../../shared/components/ncContextResource/MenuItemsEditor.vue'
+import { toMenuItemPayload, toEditableMenuItems } from '../../shared/utils/menuItems.js'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE, NAV_ENTRY_MODE } from '../../shared/constants.ts'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
@@ -90,6 +105,7 @@ export default {
 		NcIconPicker,
 		NcIconSvgWrapper,
 		NcContextResource,
+		MenuItemsEditor,
 		NcActionCheckbox,
 	},
 	mixins: [svgHelper, permissionBitmask, permissionsMixin],
@@ -114,6 +130,8 @@ export default {
 				svg: null,
 			},
 			description: '',
+			slug: '',
+			menuItems: [],
 			errorTitle: false,
 			resources: [],
 			receivers: [],
@@ -144,6 +162,8 @@ export default {
 				this.title = context.name
 				this.setIcon(this.localContext.iconName)
 				this.description = context.description
+				this.slug = context.slug ?? ''
+				this.menuItems = toEditableMenuItems(context.menuItems)
 				this.resources = context ? this.getContextResources(context) : []
 				this.receivers = context ? this.getContextReceivers(context) : []
 				this.showInNavigationDefault = this.getNavDisplay(context)
@@ -177,6 +197,8 @@ export default {
 					iconName: this.icon.name,
 					description: this.description,
 					nodes: dataResources,
+					slug: this.slug.trim(),
+					menuItems: this.menuItems.map(toMenuItemPayload),
 				}
 				const context = this.getContext(this.contextId)
 				// adding share to oneself to have navigation display control
@@ -202,6 +224,8 @@ export default {
 			this.errorTitle = false
 			this.icon.name = 'equalizer'
 			this.description = ''
+			this.slug = context?.slug ?? ''
+			this.menuItems = toEditableMenuItems(context?.menuItems)
 			this.resources = context ? this.getContextResources(context) : []
 			this.receivers = context ? this.getContextReceivers(context) : []
 			this.prepareDeleteContext = false

@@ -21,6 +21,8 @@ use JsonSerializable;
  * @method setOwnerId(string $value): void
  * @method getOwnerType(): int
  * @method setOwnerType(int $value): void
+ * @method getSlug(): ?string
+ * @method setSlug(?string $value): void
  *
  * @method getSharing(): array
  * @method setSharing(array $value): void
@@ -28,6 +30,8 @@ use JsonSerializable;
  * @method setNodes(array $value): void
  * @method getPages(): array
  * @method setPages(array $value): void
+ * @method getMenuItems(): array
+ * @method setMenuItems(array $value): void
  */
 class Context extends EntitySuper implements JsonSerializable {
 	protected ?string $name = null;
@@ -35,13 +39,15 @@ class Context extends EntitySuper implements JsonSerializable {
 	protected ?string $description = null;
 	protected ?string $ownerId = null;
 	protected ?int $ownerType = null;
+	protected ?string $slug = null;
 
 	// virtual properties
 	protected ?array $sharing = null;
 	protected ?array $nodes = null;
 	protected ?array $pages = null;
+	protected ?array $menuItems = null;
 
-	protected const VIRTUAL_PROPERTIES = ['sharing', 'nodes', 'pages'];
+	protected const VIRTUAL_PROPERTIES = ['sharing', 'nodes', 'pages', 'menuItems'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -56,7 +62,9 @@ class Context extends EntitySuper implements JsonSerializable {
 			'iconName' => $this->getIcon(),
 			'description' => $this->getDescription(),
 			'owner' => $this->getOwnerId(),
-			'ownerType' => $this->getOwnerType()
+			'ownerType' => $this->getOwnerType(),
+			'slug' => $this->getSlug(),
+			'menuItems' => array_values($this->menuItems ?? []),
 		];
 
 		// extended data

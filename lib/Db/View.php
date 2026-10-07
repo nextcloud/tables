@@ -30,8 +30,14 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setTitle(string $title)
  * @method getTechnicalName(): string
  * @method setTechnicalName(?string $technicalName)
- * @method getTableId(): int
- * @method setTableId(int $tableId)
+ * @method getTableId(): ?int
+ * @method setTableId(?int $tableId)
+ * @method getType(): string
+ * @method setType(string $type)
+ * @method getGrid(): ?string
+ * @method setGrid(?string $grid)
+ * @method getSlug(): ?string
+ * @method setSlug(?string $slug)
  * @method getColumns(): string
  * @method setColumns(string $columns)
  * @method getColumnSettings(): string
@@ -74,6 +80,10 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setSidebarOrder(?int $sidebarOrder)
  */
 class View extends EntitySuper implements JsonSerializable {
+	public const TYPE_TABLE = 'table';
+	public const TYPE_GRID = 'grid';
+	public const TYPES = [self::TYPE_TABLE, self::TYPE_GRID];
+
 	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?string $technicalName = null;
@@ -88,6 +98,9 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+	protected ?string $type = null;
+	protected ?string $grid = null; // json
+	protected ?string $slug = null;
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -212,6 +225,34 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
+	/**
+	 * The grid layout of a grid view: its widgets and where they sit.
+	 *
+	 * @return array{widgets: list<array<string, mixed>>, layout: list<array<string, mixed>>}
+	 */
+	public function getGridArray(): array {
+		$grid = $this->getArray($this->getGrid());
+		return [
+			'widgets' => array_values(is_array($grid['widgets'] ?? null) ? $grid['widgets'] : []),
+			'layout' => array_values(is_array($grid['layout'] ?? null) ? $grid['layout'] : []),
+		];
+	}
+
+	public function setGridArray(array $array): void {
+		$this->setGrid(\json_encode($array));
+	}
+
+	public function getTypeOrDefault(): string {
+		return in_array($this->type, self::TYPES, true) ? $this->type : self::TYPE_TABLE;
+	}
+
+	/**
+	 * A view inherits its ownership from its table; a view without a table is owned by its creator.
+	 */
+	public function getOwnership(): ?string {
+		return $this->ownership ?? $this->createdBy;
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -228,7 +269,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'technicalName' => $this->technicalName,
 			'description' => $this->description,
 			'emoji' => $this->emoji,
-			'ownership' => $this->ownership ?: '',
+			'ownership' => $this->getOwnership() ?: '',
 			'createdBy' => $this->createdBy ?: '',
 			'createdAt' => $this->createdAt ?: '',
 			'lastEditBy' => $this->lastEditBy ?: '',
@@ -244,6 +285,9 @@ class View extends EntitySuper implements JsonSerializable {
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'isFederated' => $this->isFederated(),
 			'sidebarOrder' => $this->sidebarOrder,
+			'type' => $this->getTypeOrDefault(),
+			'grid' => $this->getGridArray(),
+			'slug' => $this->slug,
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

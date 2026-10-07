@@ -37,4 +37,31 @@ class ViewUpdateInputTest extends TestCase {
 		$this->assertArrayHasKey(ViewUpdatableParameters::DESCRIPTION->value, $updates);
 		$this->assertSame('', $updates[ViewUpdatableParameters::DESCRIPTION->value]);
 	}
+
+	public function testUpdateDetailIncludesTypeGridAndSlug(): void {
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'header']], 'layout' => [['id' => 1, 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]]];
+		$input = ViewUpdateInput::fromInputArray(['type' => 'grid', 'grid' => json_encode($grid), 'slug' => 'home']);
+		$updates = [];
+
+		foreach ($input->updateDetail() as $parameter => $value) {
+			$updates[$parameter->value] = $value;
+		}
+
+		$this->assertSame('grid', $updates[ViewUpdatableParameters::TYPE->value]);
+		$this->assertSame($grid, $updates[ViewUpdatableParameters::GRID->value]);
+		$this->assertSame('home', $updates[ViewUpdatableParameters::SLUG->value]);
+	}
+
+	public function testUpdateDetailSkipsGridWhenAbsent(): void {
+		$input = ViewUpdateInput::fromInputArray(['title' => 'Only a title']);
+		$updates = [];
+
+		foreach ($input->updateDetail() as $parameter => $value) {
+			$updates[$parameter->value] = $value;
+		}
+
+		$this->assertArrayNotHasKey(ViewUpdatableParameters::GRID->value, $updates);
+		$this->assertArrayNotHasKey(ViewUpdatableParameters::TYPE->value, $updates);
+		$this->assertArrayNotHasKey(ViewUpdatableParameters::SLUG->value, $updates);
+	}
 }

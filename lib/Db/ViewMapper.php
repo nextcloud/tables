@@ -89,6 +89,36 @@ class ViewMapper extends QBMapper {
 		return $result;
 	}
 
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function findBySlug(string $slug): View {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->where($qb->expr()->eq('v.slug', $qb->createNamedParameter($slug, IQueryBuilder::PARAM_STR)));
+		return $this->findEntity($qb);
+	}
+
+	/**
+	 * Views that live without a table and belong to the given user.
+	 *
+	 * @return View[]
+	 * @throws Exception
+	 */
+	public function findAllStandaloneOwnedBy(string $userId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->isNull('table_id'))
+			->andWhere($qb->expr()->eq('created_by', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
+			->orderBy('id', 'ASC');
+		return $this->findEntities($qb);
+	}
+
 	public function findByExternalIdAndToken(int $externalId, string $shareToken): ?View {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -134,7 +164,7 @@ class ViewMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('v.*', 't.ownership')
 			->from($this->table, 'v')
-			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id');
+			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id');
 
 		if ($tableId !== null) {
 			$qb->where($qb->expr()->eq('v.table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));

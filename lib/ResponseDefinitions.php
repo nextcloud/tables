@@ -45,6 +45,9 @@ namespace OCA\Tables;
  *  rowsCount: int,
  *  isFederated: bool,
  *  sidebarOrder: int|null,
+ *  type: string,
+ *  grid: array{widgets: list<array<string, mixed>>, layout: list<array<string, mixed>>},
+ *  slug: string|null,
  * }
  *
  * @psalm-type TablesTable = array{
@@ -226,6 +229,18 @@ namespace OCA\Tables;
  *  errors_count: int,
  * }
  *
+ * @psalm-type TablesMenuItem = array{
+ *   id: int,
+ *   contextId: int,
+ *   label: string,
+ *   icon: string|null,
+ *   targetType: string,
+ *   targetId: int|null,
+ *   url: string|null,
+ *   slug: string|null,
+ *   order: int,
+ * }
+ *
  * @psalm-type TablesContext = array{
  *   id: int,
  *   name: string,
@@ -233,6 +248,8 @@ namespace OCA\Tables;
  *   description: string,
  *   owner: string,
  *   ownerType: int,
+ *   slug: string|null,
+ *   menuItems: list<TablesMenuItem>,
  * }
  *
  * @psalm-type TablesContextNavigation = array{

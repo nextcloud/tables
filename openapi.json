@@ -279,7 +279,9 @@
                     "iconName",
                     "description",
                     "owner",
-                    "ownerType"
+                    "ownerType",
+                    "slug",
+                    "menuItems"
                 ],
                 "properties": {
                     "id": {
@@ -301,6 +303,16 @@
                     "ownerType": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "menuItems": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MenuItem"
+                        }
                     }
                 }
             },
@@ -405,6 +417,57 @@
                     },
                     "url": {
                         "type": "string"
+                    }
+                }
+            },
+            "MenuItem": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "contextId",
+                    "label",
+                    "icon",
+                    "targetType",
+                    "targetId",
+                    "url",
+                    "slug",
+                    "order"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "contextId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "targetType": {
+                        "type": "string"
+                    },
+                    "targetId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "slug": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "order": {
+                        "type": "integer",
+                        "format": "int64"
                     }
                 }
             },
@@ -1014,7 +1077,10 @@
                     "hasShares",
                     "rowsCount",
                     "isFederated",
-                    "sidebarOrder"
+                    "sidebarOrder",
+                    "type",
+                    "grid",
+                    "slug"
                 ],
                 "properties": {
                     "id": {
@@ -1256,6 +1322,40 @@
                     "sidebarOrder": {
                         "type": "integer",
                         "format": "int64",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "grid": {
+                        "type": "object",
+                        "required": [
+                            "widgets",
+                            "layout"
+                        ],
+                        "properties": {
+                            "widgets": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "object"
+                                    }
+                                }
+                            },
+                            "layout": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "slug": {
+                        "type": "string",
                         "nullable": true
                     }
                 }
@@ -11946,6 +12046,50 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "URL-friendly name of the context"
+                                    },
+                                    "menuItems": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "optional menu of the context, in order",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "label",
+                                                "targetType"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "icon": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "targetType": {
+                                                    "type": "string"
+                                                },
+                                                "targetId": {
+                                                    "type": "integer",
+                                                    "format": "int64",
+                                                    "nullable": true
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -12376,6 +12520,50 @@
                                             "order": {
                                                 "type": "integer",
                                                 "format": "int64"
+                                            }
+                                        }
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "provide this parameter to set a new URL-friendly name"
+                                    },
+                                    "menuItems": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "provide this parameter to replace the menu",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "label",
+                                                "targetType"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "icon": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "targetType": {
+                                                    "type": "string"
+                                                },
+                                                "targetId": {
+                                                    "type": "integer",
+                                                    "format": "int64",
+                                                    "nullable": true
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
                                             }
                                         }
                                     }

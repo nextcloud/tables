@@ -60,6 +60,14 @@ class ViewController extends Controller {
 		return $this->handleError(fn () => $this->service->create($title, $emoji, $this->getTable($tableId, true)));
 	}
 
+	/**
+	 * Create a view that is not bound to a table, such as a grid view.
+	 */
+	#[NoAdminRequired]
+	public function createStandalone(string $title, ?string $emoji = null, string $type = 'grid', ?string $slug = null, string $description = ''): DataResponse {
+		return $this->handleError(fn () => $this->service->create($title, $emoji, null, $this->userId, null, null, $type, $slug, $description));
+	}
+
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function update(int $id, array $data): DataResponse {

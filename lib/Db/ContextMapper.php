@@ -27,6 +27,7 @@ class ContextMapper extends QBMapper {
 		IDBConnection $db,
 		protected UserHelper $userHelper,
 		protected GroupHelper $groupHelper,
+		protected MenuItemMapper $menuItemMapper,
 	) {
 		parent::__construct($db, $this->table, Context::class);
 	}
@@ -84,6 +85,7 @@ class ContextMapper extends QBMapper {
 			'description' => $rows[0]['description'],
 			'owner_id' => $rows[0]['owner_id'],
 			'owner_type' => $rows[0]['owner_type'],
+			'slug' => $rows[0]['slug'] ?? null,
 		];
 
 		$formatted['sharing'] = array_reduce($rows, function (array $carry, array $item) use ($userId) {
@@ -140,6 +142,11 @@ class ContextMapper extends QBMapper {
 
 			return $carry;
 		}, []);
+
+		$formatted['menu_items'] = array_map(
+			static fn (MenuItem $menuItem): array => $menuItem->jsonSerialize(),
+			$this->menuItemMapper->findByContextId((int)$rows[0]['id']),
+		);
 
 		return $this->mapRowToEntity($formatted);
 	}

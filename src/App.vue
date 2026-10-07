@@ -119,6 +119,9 @@ export default {
 						|| document.querySelector(`header .header-left .app-menu a[href="${url}"]`)
 					this.switchActiveMenuEntry(targetElement)
 				}
+			} else if (currentRoute.path === '/applications') {
+				this.setActiveContextId(null)
+				this.setPageTitle(t('tables', 'Applications'))
 			} else if (currentRoute.path.startsWith('/application/')) {
 				const contextId = parseInt(currentRoute.params.contextId)
 				this.setActiveContextId(contextId)

@@ -31,20 +31,84 @@
 								{{ t('tables', 'Save') }}
 							</NcButton>
 						</template>
-						<NcButton v-else variant="secondary" data-cy="context-layout-edit" @click="draftLayout = { ...layout }">
-							<template #icon>
-								<PencilOutline :size="20" />
-							</template>
-							{{ t('tables', 'Edit layout') }}
-						</NcButton>
+						<template v-else>
+							<NcButton v-if="ownsContext(activeContext)" variant="secondary" data-cy="context-add-grid-view" @click="addGridView">
+								<template #icon>
+									<ViewDashboardOutline :size="20" />
+								</template>
+								{{ t('tables', 'Add grid view') }}
+							</NcButton>
+							<NcButton v-if="ownsContext(activeContext)" variant="secondary" data-cy="context-edit-application" @click="editApplication">
+								<template #icon>
+									<PlaylistEdit :size="20" />
+								</template>
+								{{ t('tables', 'Edit application') }}
+							</NcButton>
+							<NcButton v-if="!selectedMenuItem" variant="secondary" data-cy="context-layout-edit" @click="draftLayout = { ...layout }">
+								<template #icon>
+									<PencilOutline :size="20" />
+								</template>
+								{{ t('tables', 'Edit layout') }}
+							</NcButton>
+						</template>
 					</div>
 				</div>
 				<div class="row space-L context__description">
 					{{ activeContext.description }}
 				</div>
+				<nav v-if="menuItems.length > 0" class="context__menu" :aria-label="t('tables', 'Application menu')" data-cy="context-menu">
+					<router-link :to="'/application/' + activeContext.id"
+						class="context__menu-item"
+						:class="{ 'context__menu-item--active': !selectedMenuItem }"
+						data-cy="context-menu-overview">
+						{{ t('tables', 'Overview') }}
+					</router-link>
+					<template v-for="item in menuItems" :key="item.id">
+						<a v-if="item.targetType === 'url'"
+							:href="item.url"
+							class="context__menu-item"
+							target="_blank"
+							rel="noopener noreferrer"
+							data-cy="context-menu-item">
+							{{ item.label }}
+							<OpenInNew :size="16" />
+						</a>
+						<router-link v-else
+							:to="menuItemRoute(item, activeContext.id)"
+							class="context__menu-item"
+							:class="{ 'context__menu-item--active': selectedMenuItem && selectedMenuItem.id === item.id }"
+							data-cy="context-menu-item">
+							{{ item.label }}
+						</router-link>
+					</template>
+				</nav>
 			</div>
 
-			<div class="context__grid" :class="{ 'context__grid--editing': isEditingLayout }">
+			<div v-if="selectedMenuItem" class="context__menu-target" data-cy="context-menu-target">
+				<div v-if="menuTargetLoading" class="icon-loading" />
+				<NcEmptyContent v-else-if="!menuResource"
+					:name="t('tables', 'This menu item points at nothing')"
+					:description="t('tables', 'The view or table it opened no longer exists, or you have no access to it.')" />
+				<GridView v-else-if="menuResource.isView && menuResource.type === 'grid'"
+					:view="menuResource"
+					:can-edit="canManageElement(menuResource)"
+					:show-title="true" />
+				<div v-else-if="menuResource.isView" class="resource">
+					<CustomView :view="menuResource" :columns="getColumns(true, menuResource.id)" :rows="getRows(true, menuResource.id)"
+						:view-setting="viewSetting" @create-column="createColumn(true, menuResource)"
+						@import="openImportModal(menuResource, true)" @download-csv="downloadCSV(menuResource, true)"
+						@download-filtered-csv="rows => downloadFilteredCSV(rows, menuResource, true)" />
+				</div>
+				<div v-else class="resource">
+					<TableWrapper :table="menuResource" :columns="getColumns(false, menuResource.id)" :rows="getRows(false, menuResource.id)"
+						:view-setting="viewSetting" @create-column="createColumn(false, menuResource)"
+						@import-scheme="openImportSchemeModal(menuResource)"
+						@import="openImportModal(menuResource, false)" @download-csv="downloadCSV(menuResource, false)"
+						@download-filtered-csv="rows => downloadFilteredCSV(rows, menuResource, false)" />
+				</div>
+			</div>
+
+			<div v-if="!selectedMenuItem" class="context__grid" :class="{ 'context__grid--editing': isEditingLayout }">
 				<section v-for="resource in contextResources"
 					:key="resource.key"
 					class="context__grid-item"
@@ -91,7 +155,14 @@
 <script>
 import MainModals from '../modules/modals/Modals.vue'
 import { mapState, mapActions, storeToRefs } from 'pinia'
-import { NcActionRadio, NcActions, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcActionRadio, NcActions, NcButton, NcEmptyContent, NcIconSvgWrapper } from '@nextcloud/vue'
+import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
+import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
+import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
+import GridView from '../modules/grid/GridView.vue'
+import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
+import { useEventBusSubscriptions } from '../shared/composables/useEventBusSubscriptions.js'
+import { menuItemRoute } from '../shared/utils/menuItems.js'
 import ContentSaveOutline from 'vue-material-design-icons/ContentSaveOutline.vue'
 import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
 import Restore from 'vue-material-design-icons/Restore.vue'
@@ -115,7 +186,12 @@ export default {
 		NcActionRadio,
 		NcActions,
 		NcButton,
+		NcEmptyContent,
 		NcIconSvgWrapper,
+		OpenInNew,
+		PlaylistEdit,
+		ViewDashboardOutline,
+		GridView,
 		ContentSaveOutline,
 		PencilOutline,
 		Restore,
@@ -125,12 +201,12 @@ export default {
 		CustomView,
 	},
 
-	mixins: [exportTableMixin, svgHelper],
+	mixins: [exportTableMixin, svgHelper, permissionsMixin],
 
 	setup() {
 		const store = useDataStore()
 		const { getColumns, getRows } = storeToRefs(store)
-		return { getColumns, getRows }
+		return { getColumns, getRows, ...useEventBusSubscriptions() }
 	},
 
 	data() {
@@ -145,6 +221,8 @@ export default {
 			isReloading: false,
 			layout: {},
 			draftLayout: null,
+			menuResource: null,
+			menuTargetLoading: false,
 		}
 	},
 
@@ -152,6 +230,16 @@ export default {
 		...mapState(useTablesStore, ['tables', 'contexts', 'activeContextId', 'views', 'activeContext']),
 		isEditingLayout() {
 			return this.draftLayout !== null
+		},
+		menuItems() {
+			return [...(this.activeContext?.menuItems ?? [])].sort((a, b) => a.order - b.order)
+		},
+		selectedMenuItem() {
+			const slug = this.$route.params.itemSlug
+			if (!slug) {
+				return null
+			}
+			return this.menuItems.find(item => item.slug === slug) ?? null
 		},
 		activeLayout() {
 			return this.draftLayout ?? this.layout
@@ -203,6 +291,12 @@ export default {
 	},
 
 	watch: {
+		selectedMenuItem: {
+			immediate: true,
+			handler() {
+				this.loadMenuTarget()
+			},
+		},
 
 		activeContext: {
 			handler() {
@@ -230,13 +324,79 @@ export default {
 		emit('toggle-navigation', {
 			open: false,
 		})
+		this.subscribeToEventBus('tables:view:grid-created', this.onGridViewCreated)
 		await this.reload()
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView']),
+		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView', 'updateContextMenuItems']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		getGridCellStyle,
+		menuItemRoute,
+		editApplication() {
+			emit('tables:context:edit', this.activeContext.id)
+		},
+		addGridView() {
+			emit('tables:view:create-grid', { contextId: this.activeContext.id })
+		},
+		/**
+		 * A grid view created from this application gets a menu item right away.
+		 *
+		 * @param {{view: object, contextId: number|null}} payload the created view and the application it was created from
+		 */
+		async onGridViewCreated({ view, contextId }) {
+			if (!view || contextId !== this.activeContext?.id) {
+				return
+			}
+			const menuItems = [
+				...this.menuItems.map(item => ({ label: item.label, icon: item.icon, targetType: item.targetType, targetId: item.targetId, url: item.url, slug: item.slug })),
+				{ label: view.title, icon: null, targetType: 'view', targetId: view.id, url: null, slug: view.slug || null },
+			]
+			const context = await this.updateContextMenuItems({ id: this.activeContext.id, menuItems })
+			const added = context?.menuItems?.find(item => item.targetType === 'view' && item.targetId === view.id)
+			if (added) {
+				await this.$router.push(menuItemRoute(added, this.activeContext.id)).catch(err => err)
+			}
+		},
+		/**
+		 * Loads the view or table the selected menu item opens.
+		 */
+		async loadMenuTarget() {
+			const item = this.selectedMenuItem
+			this.menuResource = null
+			if (!item || item.targetType === 'url') {
+				return
+			}
+			this.menuTargetLoading = true
+			try {
+				if (item.targetType === 'view') {
+					await this.loadContextView({ id: item.targetId })
+					const view = this.views.find(view => view.id === item.targetId)
+					if (view) {
+						if (view.type !== 'grid') {
+							await this.loadColumnsFromBE({ view })
+							await this.loadRowsFromBE({ viewId: view.id, tableId: view.tableId })
+							await this.loadRelationsFromBE({ viewId: view.id })
+						}
+						this.menuResource = { ...view, isView: true, key: 'view-' + view.id }
+					}
+				} else {
+					await this.loadContextTable({ id: item.targetId })
+					const table = this.tables.find(table => table.id === item.targetId)
+					if (table) {
+						await this.loadColumnsFromBE({ view: null, tableId: table.id })
+						await this.loadRowsFromBE({ viewId: null, tableId: table.id })
+						await this.loadRelationsFromBE({ tableId: table.id })
+						this.menuResource = { ...table, isView: false, key: String(table.id) }
+					}
+				}
+			} catch (error) {
+				console.error('The menu target could not be loaded', error)
+				this.menuResource = null
+			} finally {
+				this.menuTargetLoading = false
+			}
+		},
 		getResourceSpan(resource) {
 			return this.activeLayout[resource.key] ?? GRID_COLUMNS
 		},
@@ -439,6 +599,44 @@ export default {
 		gap: calc(2 * var(--default-grid-baseline, 4px));
 		margin-inline-start: auto;
 		padding-inline-end: calc(4 * var(--default-grid-baseline, 4px));
+	}
+
+	&__menu {
+		display: flex;
+		flex-wrap: wrap;
+		gap: calc(2 * var(--default-grid-baseline, 4px));
+		padding: 0 calc(4 * var(--default-grid-baseline, 4px)) calc(2 * var(--default-grid-baseline, 4px));
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	&__menu-item {
+		display: inline-flex;
+		align-items: center;
+		gap: calc(1 * var(--default-grid-baseline, 4px));
+		padding: calc(2 * var(--default-grid-baseline, 4px)) calc(3 * var(--default-grid-baseline, 4px));
+		border-radius: var(--border-radius-element, var(--border-radius-pill));
+		color: inherit;
+		text-decoration: none;
+		font-weight: bold;
+
+		&:hover,
+		&:focus-visible {
+			background-color: var(--color-background-hover);
+		}
+
+		&--active {
+			background-color: var(--color-primary-element-light);
+			color: var(--color-primary-element-light-text);
+		}
+	}
+
+	&__menu-target {
+		width: 100%;
+		padding: calc(2 * var(--default-grid-baseline, 4px)) 0;
+
+		.resource {
+			overflow-x: auto;
+		}
 	}
 
 	&__description {

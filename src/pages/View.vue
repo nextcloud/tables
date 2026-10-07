@@ -8,6 +8,10 @@
 			<div class="icon-loading" />
 		</div>
 
+		<div v-else-if="activeView && activeView.type === 'grid'" class="main-view-view__grid">
+			<GridView :view="activeView" :can-edit="canManageElement(activeView)" />
+		</div>
+
 		<div v-else-if="activeView">
 			<MainWrapper :element="activeView" :is-view="true" />
 		</div>
@@ -22,6 +26,8 @@
 import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../store/store.js'
 import MainWrapper from '../modules/main/sections/MainWrapper.vue'
+import GridView from '../modules/grid/GridView.vue'
+import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import MainModals from '../modules/modals/Modals.vue'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
@@ -30,9 +36,12 @@ export default {
 
 	components: {
 		MainWrapper,
+		GridView,
 		MainModals,
 		ErrorMessage,
 	},
+
+	mixins: [permissionsMixin],
 
 	data() {
 		return {
@@ -80,6 +89,10 @@ export default {
 .main-view-view {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
+
+	&__grid {
+		width: var(--app-content-width, 100%);
+	}
 }
 
 :deep(h1) {

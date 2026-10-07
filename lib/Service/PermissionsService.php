@@ -456,7 +456,7 @@ class PermissionsService {
 				// We need to take possibly inherited permissions into account
 				try {
 					$view = $this->viewMapper->find($elementId);
-					if (!$view->isFederated()) {
+					if (!$view->isFederated() && $view->getTableId() !== null) {
 						$table = $this->tableMapper->find($view->getTableId());
 					}
 				} catch (DoesNotExistException $e) {
@@ -701,6 +701,10 @@ class PermissionsService {
 		}
 
 		$shareNodeId = $nodeType === 'view' ? $element->getTableId() : $element->getId();
+		if ($shareNodeId === null) {
+			// a view without a table has nothing to inherit from
+			return false;
+		}
 		// Views inherit manage permissions from their parent table, while contexts
 		// must resolve against context shares to avoid cross-type ID collisions.
 		$shareNodeType = $nodeType === 'context' ? 'context' : 'table';

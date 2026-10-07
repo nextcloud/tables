@@ -11,6 +11,7 @@ namespace OCA\Tables\Controller;
 use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
+use OCA\Tables\Db\MenuItem;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -100,6 +101,8 @@ class ContextController extends AOCSController {
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
 	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context
+	 * @param ?string $slug URL-friendly name of the context
+	 * @psalm-param ?list<array{label: string, icon?: string|null, targetType: string, targetId?: int|null, url?: string|null, slug?: string|null}> $menuItems optional menu of the context, in order
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
@@ -108,7 +111,7 @@ class ContextController extends AOCSController {
 	 * 403: lacking permissions on a resource
 	 */
 	#[NoAdminRequired]
-	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
+	public function create(string $name, string $iconName, string $description = '', array $nodes = [], ?string $slug = null, ?array $menuItems = null): DataResponse {
 		try {
 			if (!$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
@@ -120,6 +123,8 @@ class ContextController extends AOCSController {
 				$this->sanitizeInputNodes($nodes),
 				$this->userId,
 				0,
+				$slug,
+				$menuItems !== null ? $this->sanitizeInputMenuItems($menuItems) : null,
 			)->jsonSerialize());
 		} catch (Exception $e) {
 			return $this->handleError($e);
@@ -138,6 +143,8 @@ class ContextController extends AOCSController {
 	 * @param ?string $iconName provide this parameter to set a new icon
 	 * @param ?string $description provide this parameter to set a new description
 	 * @param ?array{id: int, type: int, permissions: int, order: int} $nodes provide this parameter to set a new list of nodes.
+	 * @param ?string $slug provide this parameter to set a new URL-friendly name
+	 * @psalm-param ?list<array{label: string, icon?: string|null, targetType: string, targetId?: int|null, url?: string|null, slug?: string|null}> $menuItems provide this parameter to replace the menu
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
@@ -149,7 +156,7 @@ class ContextController extends AOCSController {
 	 * @CanManageContext
 	 */
 	#[NoAdminRequired]
-	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
+	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?string $slug = null, ?array $menuItems = null): DataResponse {
 		try {
 			if ($iconName !== null && !$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
@@ -162,6 +169,8 @@ class ContextController extends AOCSController {
 				$iconName,
 				$description,
 				$nodes,
+				$slug,
+				$menuItems !== null ? $this->sanitizeInputMenuItems($menuItems) : null,
 			)->jsonSerialize());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			return $this->handleError($e);
@@ -170,6 +179,35 @@ class ContextController extends AOCSController {
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
+	}
+
+	/**
+	 * @psalm-return list<array{label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, slug: string|null}>
+	 * @throws InvalidArgumentException
+	 */
+	protected function sanitizeInputMenuItems(array $menuItems): array {
+		$sanitized = [];
+		foreach ($menuItems as $item) {
+			if (!is_array($item) || !isset($item['label']) || trim((string)$item['label']) === '') {
+				throw new InvalidArgumentException('A menu item needs a label');
+			}
+			$targetType = (string)($item['targetType'] ?? MenuItem::TARGET_URL);
+			if (!in_array($targetType, MenuItem::TARGET_TYPES, true)) {
+				throw new InvalidArgumentException('Unexpected menu item target type');
+			}
+			if ($targetType !== MenuItem::TARGET_URL && !is_numeric($item['targetId'] ?? null)) {
+				throw new InvalidArgumentException('A menu item pointing at a ' . $targetType . ' needs its id');
+			}
+			$sanitized[] = [
+				'label' => (string)$item['label'],
+				'icon' => isset($item['icon']) ? (string)$item['icon'] : null,
+				'targetType' => $targetType,
+				'targetId' => $targetType === MenuItem::TARGET_URL ? null : (int)$item['targetId'],
+				'url' => $targetType === MenuItem::TARGET_URL ? (string)($item['url'] ?? '') : null,
+				'slug' => isset($item['slug']) ? (string)$item['slug'] : null,
+			];
+		}
+		return $sanitized;
 	}
 
 	/**

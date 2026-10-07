@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -66,6 +67,7 @@ final class ContextServiceTest extends TestCase {
 			$urlGenerator,
 			$this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
+			$this->createMock(MenuItemMapper::class),
 		);
 	}
 
