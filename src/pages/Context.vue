@@ -595,10 +595,17 @@ export default {
 
 	&__edit-actions {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: calc(2 * var(--default-grid-baseline, 4px));
 		margin-inline-start: auto;
 		padding-inline-end: calc(4 * var(--default-grid-baseline, 4px));
+	}
+
+	// on a narrow screen the actions drop below the title instead of pushing it off screen
+	.row.first-row {
+		flex-wrap: wrap;
+		row-gap: calc(2 * var(--default-grid-baseline, 4px));
 	}
 
 	&__menu {

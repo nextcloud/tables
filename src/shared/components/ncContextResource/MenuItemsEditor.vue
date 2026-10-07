@@ -168,26 +168,33 @@ export default {
 
 <style lang="scss" scoped>
 .menu-items-editor {
+	// the dialog's labels float left, so the editor must start on its own line
+	clear: both;
+	width: 100%;
+	min-width: 0;
+
 	&__list {
 		margin-bottom: calc(2 * var(--default-grid-baseline, 4px));
 	}
 
 	&__item {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: flex-end;
 		gap: calc(2 * var(--default-grid-baseline, 4px));
-		padding: calc(1 * var(--default-grid-baseline, 4px)) 0;
+		padding: calc(2 * var(--default-grid-baseline, 4px)) 0;
+		border-bottom: 1px solid var(--color-border);
 		list-style: none;
 
 		:deep(.input-field) {
-			flex: 1;
-			min-width: 120px;
+			flex: 1 1 160px;
+			min-width: 0;
 		}
 	}
 
 	&__target {
-		flex: 1;
-		min-width: 160px;
+		flex: 1 1 200px;
+		min-width: 0;
 	}
 
 	&__empty {

@@ -48,7 +48,7 @@ export const widgetTypes = {
 		displayName: () => t('tables', 'Table or view'),
 		component: DataWidget,
 		defaultSize: { gridWidth: GRID_COLUMNS, gridHeight: 5 },
-		showTitle: true,
+		showTitle: false,
 		defaultContent: () => ({
 			targetType: 'table',
 			targetId: null,

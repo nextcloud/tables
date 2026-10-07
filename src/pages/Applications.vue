@@ -89,13 +89,15 @@ export default {
 
 	&__header {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
 		gap: calc(4 * var(--default-grid-baseline, 4px));
 		margin-bottom: calc(4 * var(--default-grid-baseline, 4px));
 
 		h1 {
-			margin: 0;
+			// leave room for the navigation toggle that floats over the top left corner of the content
+			margin: 0 0 0 var(--default-clickable-area, 44px);
 			font-size: 24px;
 			font-weight: bold;
 		}

@@ -92,6 +92,8 @@ export default {
 
 	&__grid {
 		width: var(--app-content-width, 100%);
+		// leave room for the navigation toggle that floats over the top left corner of the content
+		padding-inline-start: var(--default-clickable-area, 44px);
 	}
 }
 

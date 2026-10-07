@@ -158,7 +158,11 @@ export const useTablesStore = defineStore('store', {
 						views = views.concat(table.views)
 					}
 				})
-				this.setViews(views)
+				// shared views and views without a table are loaded separately and must survive this reload
+				const loadedIds = new Set(views.map(view => view.id))
+				const loadedTableIds = new Set(res.data.map(table => table.id))
+				const keptViews = this.views.filter(view => !loadedIds.has(view.id) && !loadedTableIds.has(view.tableId))
+				this.setViews([...views, ...keptViews])
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
