@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Helper\CircleHelper;
@@ -70,5 +71,26 @@ class PermissionsServiceTest extends TestCase {
 		$permissionsService = $this->getPermissionServiceWithUserId($userId, true);
 
 		self::assertEquals($userId, $permissionsService->preCheckUserId($userId));
+	}
+
+	private function tablelessView(string $createdBy): View {
+		$view = new View();
+		$view->setId(6);
+		$view->setTableId(null);
+		$view->setCreatedBy($createdBy);
+		$view->setType(View::TYPE_GRID);
+		return $view;
+	}
+
+	public function testTheCreatorManagesAViewWithoutTable(): void {
+		$permissionsService = $this->getPermissionServiceWithUserId('alice');
+
+		$this->assertTrue($permissionsService->canManageView($this->tablelessView('alice'), 'alice'));
+	}
+
+	public function testOthersDoNotInheritAnythingOnAViewWithoutTable(): void {
+		$permissionsService = $this->getPermissionServiceWithUserId('bob');
+
+		$this->assertFalse($permissionsService->canManageView($this->tablelessView('alice'), 'bob'));
 	}
 }
