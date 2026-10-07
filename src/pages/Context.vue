@@ -13,14 +13,58 @@
 						<NcIconSvgWrapper :svg="icon" :size="32" style="display: inline-block;" />&nbsp; {{
 							activeContext.name }}
 					</h1>
+					<div class="context__edit-actions">
+						<template v-if="isEditingLayout">
+							<NcButton v-if="hasCustomLayout" variant="tertiary" data-cy="context-layout-reset" @click="draftLayout = {}">
+								<template #icon>
+									<Restore :size="20" />
+								</template>
+								{{ t('tables', 'Reset layout') }}
+							</NcButton>
+							<NcButton variant="tertiary" data-cy="context-layout-cancel" @click="draftLayout = null">
+								{{ t('tables', 'Cancel') }}
+							</NcButton>
+							<NcButton variant="primary" data-cy="context-layout-save" @click="saveLayout">
+								<template #icon>
+									<ContentSaveOutline :size="20" />
+								</template>
+								{{ t('tables', 'Save') }}
+							</NcButton>
+						</template>
+						<NcButton v-else variant="secondary" data-cy="context-layout-edit" @click="draftLayout = { ...layout }">
+							<template #icon>
+								<PencilOutline :size="20" />
+							</template>
+							{{ t('tables', 'Edit layout') }}
+						</NcButton>
+					</div>
 				</div>
 				<div class="row space-L context__description">
 					{{ activeContext.description }}
 				</div>
 			</div>
 
-			<div class="resources">
-				<div v-for="resource in contextResources" :key="resource.key">
+			<div class="context__grid" :class="{ 'context__grid--editing': isEditingLayout }">
+				<section v-for="resource in contextResources"
+					:key="resource.key"
+					class="context__grid-item"
+					:style="getGridCellStyle(getResourceSpan(resource))"
+					data-cy="context-grid-item">
+					<div v-if="isEditingLayout" class="context__grid-item-toolbar">
+						<NcActions :menu-name="t('tables', 'Width')" :aria-label="t('tables', 'Width of {title}', { title: resource.title })">
+							<template #icon>
+								<TableColumnWidth :size="20" />
+							</template>
+							<NcActionRadio v-for="option in widthOptions"
+								:key="option.span"
+								:name="'context-width-' + resource.key"
+								:value="option.span"
+								:model-value="getResourceSpan(resource)"
+								@update:model-value="span => setResourceSpan(resource, span)">
+								{{ option.label }}
+							</NcActionRadio>
+						</NcActions>
+					</div>
 					<div v-if="!resource.isView" class="resource">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
@@ -34,7 +78,7 @@
 							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
 							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
 					</div>
-				</div>
+				</section>
 			</div>
 		</div>
 
@@ -47,7 +91,11 @@
 <script>
 import MainModals from '../modules/modals/Modals.vue'
 import { mapState, mapActions, storeToRefs } from 'pinia'
-import { NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcActionRadio, NcActions, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import ContentSaveOutline from 'vue-material-design-icons/ContentSaveOutline.vue'
+import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
+import Restore from 'vue-material-design-icons/Restore.vue'
+import TableColumnWidth from 'vue-material-design-icons/TableColumnWidth.vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
 import { emit } from '@nextcloud/event-bus'
@@ -59,17 +107,26 @@ import { useDataStore } from '../store/data.js'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
 import { showError } from '@nextcloud/dialogs'
+import { GRID_COLUMNS, getGridCellStyle, loadContextLayout, saveContextLayout } from '../shared/utils/contextLayout.js'
 
 export default {
 	components: {
 		MainModals,
+		NcActionRadio,
+		NcActions,
+		NcButton,
 		NcIconSvgWrapper,
+		ContentSaveOutline,
+		PencilOutline,
+		Restore,
+		TableColumnWidth,
 		ErrorMessage,
 		TableWrapper,
 		CustomView,
 	},
 
 	mixins: [exportTableMixin, svgHelper],
+
 	setup() {
 		const store = useDataStore()
 		const { getColumns, getRows } = storeToRefs(store)
@@ -86,11 +143,30 @@ export default {
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
+			layout: {},
+			draftLayout: null,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['tables', 'contexts', 'activeContextId', 'views', 'activeContext']),
+		isEditingLayout() {
+			return this.draftLayout !== null
+		},
+		activeLayout() {
+			return this.draftLayout ?? this.layout
+		},
+		hasCustomLayout() {
+			return Object.keys(this.activeLayout).length > 0
+		},
+		widthOptions() {
+			return [
+				{ span: 12, label: t('tables', 'Full width') },
+				{ span: 8, label: t('tables', 'Two thirds') },
+				{ span: 6, label: t('tables', 'Half') },
+				{ span: 4, label: t('tables', 'One third') },
+			]
+		},
 		rows() {
 			const rows = {}
 			if (this.context && this.context.nodes) {
@@ -160,6 +236,28 @@ export default {
 	methods: {
 		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
+		getGridCellStyle,
+		getResourceSpan(resource) {
+			return this.activeLayout[resource.key] ?? GRID_COLUMNS
+		},
+		setResourceSpan(resource, span) {
+			const draftLayout = { ...this.activeLayout }
+			if (span === GRID_COLUMNS) {
+				delete draftLayout[resource.key]
+			} else {
+				draftLayout[resource.key] = span
+			}
+			this.draftLayout = draftLayout
+		},
+		saveLayout() {
+			if (this.draftLayout === null) {
+				return
+			}
+			// The layout is the user's own arrangement and saves once, when editing ends
+			this.layout = this.draftLayout
+			this.draftLayout = null
+			saveContextLayout(this.activeContextId, this.layout)
+		},
 		contextSignature() {
 			const ctx = this.activeContext
 			return ctx ? `${ctx.id}:${Object.keys(ctx.nodes || {}).sort().join(',')}` : null
@@ -175,6 +273,8 @@ export default {
 			this.isReloading = true
 			this.loading = true
 			this.contextResources = []
+			this.layout = loadContextLayout(this.activeContextId)
+			this.draftLayout = null
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -333,6 +433,14 @@ export default {
 		display: inline-flex;
 	}
 
+	&__edit-actions {
+		display: flex;
+		align-items: center;
+		gap: calc(2 * var(--default-grid-baseline, 4px));
+		margin-inline-start: auto;
+		padding-inline-end: calc(4 * var(--default-grid-baseline, 4px));
+	}
+
 	&__description {
 		margin: calc(3 * var(--default-grid-baseline, 4px));
 		max-width: 790px;
@@ -346,18 +454,88 @@ export default {
 }
 
 .main-context-view {
-	width: max-content;
-	min-width: var(--app-content-width, 100%);
+	width: 100%;
+}
+
+// 12-column application grid, collapsing to 6 columns and then to one on smaller screens
+.context__grid {
+	display: grid;
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	gap: calc(4 * var(--default-grid-baseline, 4px));
+	padding: calc(4 * var(--default-grid-baseline, 4px));
+}
+
+.context__grid-item {
+	grid-column: span var(--context-grid-span, 12);
+	min-width: 0;
+	overflow-x: auto;
+	background-color: var(--color-main-background);
+	border: 1px solid var(--color-border);
+	border-radius: var(--border-radius-large);
+	box-shadow: 0 2px 4px var(--color-box-shadow);
+}
+
+.context__grid--editing .context__grid-item {
+	outline: 2px dashed var(--color-border-dark);
+	outline-offset: 2px;
+}
+
+.context__grid-item-toolbar {
+	display: flex;
+	justify-content: flex-end;
+	padding: calc(2 * var(--default-grid-baseline, 4px));
+	border-bottom: 1px solid var(--color-border);
+}
+
+@media (max-width: 900px) {
+	.context__grid {
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+	}
+
+	.context__grid-item {
+		grid-column: span var(--context-grid-span-medium, 6);
+	}
+}
+
+@media (max-width: 600px) {
+	.context__grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.context__grid-item {
+		grid-column: 1 / -1;
+	}
 }
 
 .resource {
-	margin: 40px 0;
-	width: max-content;
-	min-width: var(--app-content-width, 100%);
+	// The title and option rows stick to the page width on a table page; inside a grid cell they flow with the card
+	&:deep(.row.first-row),
+	&:deep(.row.space-T),
+	&:deep(.options.row),
+	&:deep(.options .sticky) {
+		position: static;
+		width: auto;
+	}
 
 	&:deep(.row.first-row) {
 		margin-inline-start: 0;
-		padding-inline-start: 20px;
+		padding-inline-start: calc(4 * var(--default-grid-baseline, 4px));
+	}
+
+	// Table look shared with OpenRegister: muted header band and horizontal row lines only
+	&:deep(table thead) {
+		top: 0;
+	}
+
+	&:deep(table thead tr th) {
+		background-color: var(--color-background-dark);
+		font-weight: 500;
+	}
+
+	&:deep(table tbody td) {
+		border: none;
+		border-bottom: 1px solid var(--color-border);
+		padding-block: calc(3 * var(--default-grid-baseline, 4px));
 	}
 }
 
