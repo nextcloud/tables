@@ -6,6 +6,63 @@
 
 Part of the [buildiq parity project](README.md). Measured on OpenRegister at 1dc6a466 and the Tables fork at `feat/application-shell`.
 
+## Types Tables is missing
+
+- **json**: an opaque dictionary or blob, validated against an optional schema fragment, never queried.
+- **file**: a Files node id per cell, multi-valued for attachments; Files owns access, versions and sharing.
+- **array**: a list of scalars with a subtype, one cell per value.
+- **tag**: a Nextcloud system tag per cell, multi-valued.
+- **format** on text columns: not a type but the concept Tables lacks, with a server-side validator registry.
+
+Relation exists and is extended. User, group and team exist as the usergroup type. Everything else maps onto an existing type.
+
+## Nextcloud server entities as types
+
+The rule: Tables cannot and must not depend on another app. So a column type may point at anything the Nextcloud server itself provides through `OCP` interfaces, and at nothing that lives in a separate app. Tables already honours this: its usergroup type uses `OCA\Circles` for teams through an optional check, and it implements reference and search providers from `OCP\Collaboration` and `OCP\Search`.
+
+| Entity | Where it lives | Tables today | Plan |
+|---|---|---|---|
+| user | server, `OCP\IUserManager` | usergroup type, `usergroupSelectUsers` | exists |
+| group | server, `OCP\IGroupManager` | usergroup type, `usergroupSelectGroups` | exists |
+| team | bundled Circles app, optional | usergroup type, `usergroupSelectTeams` | exists |
+| file or folder | server, `OCP\Files` | nothing; text link at best | new type **file** |
+| system tag | server, `OCP\SystemTag` | nothing | new type **tag**, S to M; gives the tags tab and facet for free |
+| share | server, `OCP\Share` | Tables shares its own nodes | not a cell type; the sharing tab reads Tables shares |
+| comment | server, `OCP\Comments` | nothing | not a cell type; a notes tab on a row can use comments on the row, M, later |
+| activity | server, `OCP\Activity` | Tables emits activity | the activity tab reads it; the audit trail is Tables' own |
+| calendar event | server dav app, `OCP\Calendar\IManager` | nothing | possible as a link type storing calendar and event uid; see question Q8 |
+| contact | server dav app, `OCP\Contacts\IManager` | nothing | possible as a link type storing addressbook and contact uid; see question Q8 |
+| task | dav app, VTODO through `OCP\Calendar` | nothing | same route as calendar event; not before the release |
+| notification | server, `OCP\Notification` | Tables sends some | not a type |
+
+Calendar events and contacts are the border case. The interfaces are in `OCP` and the dav app ships with every server, so a type is allowed. But reading and writing events through `OCP\Calendar` is thinner than the Calendar app's own API, and buildiq's calendar widget reads through the Calendar app. The plan keeps them out of the data layer cluster and asks Q8.
+
+## Integrations we do not carry over
+
+OpenRegister and nextcloud-vue integrate with other Nextcloud apps through providers and leaves. A leaf is another Conduction app that registers its own tabs and widgets on an object. Tables takes none of that as a dependency. The list, with what happens to each.
+
+| Integration | Depends on | In Tables |
+|---|---|---|
+| files, version history | server | yes, through the file type and Files |
+| tags | server | yes, through the tag type |
+| shares | server and Tables shares | yes, the sharing tab |
+| activity | server | yes, the activity tab |
+| audit trail | OpenRegister's own | yes, Tables' own row audit |
+| notes, tasks on an object | OpenRegister's own | no; a notes tab may come later on `OCP\Comments` |
+| calendar, contacts | dav app | later, question Q8 |
+| deck | Deck app | no |
+| talk | Talk app | no |
+| collectives | Collectives app | no |
+| forms, polls | Forms and Polls apps | no; the form page type covers intake forms |
+| maps, photos | Maps and Photos apps | no; the map widget renders geo columns itself |
+| cospend, openproject, bookmarks, analytics | separate apps | no |
+| email, contactmoment, time tracker, field inspection | Mail app and Conduction apps | no |
+| xwiki, BRP, KvK, OpenCorporates | external services | no |
+| flow, message dispatch | OpenRegister flows | no, out of scope with automation |
+| leaves | other Conduction apps | no; a leaf app can consume the Tables API, Tables does not load leaves |
+
+What a Conduction app loses by this: a buildiq app that showed Deck cards or Talk conversations on a detail page will not have those tabs on Tables. That is the price of a Tables that installs anywhere. The widget slot system stays open, so an app that ships its own code can still add a tab; Tables will not ship it.
+
 ## How each side models a value
 
 OpenRegister follows JSON Schema. A property has a `type` from eight values and an optional `format` that narrows it. Validation runs server-side through Opis JSON Schema, with custom resolvers for the formats that are not in the standard.

@@ -54,6 +54,14 @@ Why it matters: the sessions start in the week of 7 December and need invitation
 
 Who answers: Nextcloud GmbH. Needed before: 15 November 2026.
 
+### Q8. Calendar events and contacts as column types?
+
+Both are reachable through `OCP\Calendar\IManager` and `OCP\Contacts\IManager`, which ship with every server, so a type is allowed under the no-dependency rule. The interfaces are thinner than the Calendar and Contacts apps' own APIs. Do we add link types for them before the release, or leave them to a later version?
+
+Why it matters: the people and calendar widgets in buildiq read through the apps. Without a type they stay presentational.
+
+Who answers: Ruben with Nextcloud GmbH. Needed before: sprint 3.
+
 ## Decisions
 
 ### D1. The Tables API speaks objects, the frontend speaks Tables
