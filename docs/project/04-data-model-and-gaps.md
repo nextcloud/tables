@@ -33,7 +33,7 @@ Validation on write covers mandatory, text length, number range, unique text, li
 |---|---|---|
 | Register as a container of schemas | Application (context) groups tables and views, carries permissions per node, exports and imports as one scheme, and since this fork has a slug, a menu and grid pages | Has, under another name |
 | Schema as JSON Schema with typed properties | Table with typed columns; the scheme format is Tables' own | Partial, needs a JSON Schema mapping |
-| Object and array properties | No nested values; only selection-multi and usergroup-multi hold lists | Lacks |
+| Object and array properties | No nested values; only selection-multi and usergroup-multi hold lists | Lacks; decision D2 makes them column types, see [types and formats](10-types-and-formats.md) |
 | `$ref` relations between schemas | Relation column: one target, one row, one label; no multi, no inverse, no cascade | Partial |
 | File properties on objects | Text-link column with the Files provider and a preview; a link only, no storage, upload or access control | Partial |
 | Uuid-based object access | Rows have integer ids only; no route takes a uuid | Lacks for rows |

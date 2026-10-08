@@ -18,6 +18,8 @@ Ship date 16 February 2027, code freeze 15 January 2027.
 | [Project plan](06-project-plan.md) | milestones, seven sprints, owners, dependencies, deferral order |
 | [Risks](07-risks.md) | ten risks with triggers and responses |
 | [Testing and acceptance](08-testing-and-acceptance.md) | what every change carries, the acceptance paths, the benchmarks, the release checklist |
+| [Questions and decisions](09-questions-and-decisions.md) | what still needs an answer and from whom, and what was decided, when and why |
+| [Types and formats](10-types-and-formats.md) | OpenRegister property types and formats against Tables column types, and the four new types |
 
 The [research note](../research/functionality-research-tables-openregister.md) of 6 October is the starting point these documents answer.
 

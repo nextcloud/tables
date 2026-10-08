@@ -33,9 +33,11 @@ A page in the shell renders through three calls at most: the application (with m
 
 The shell is the existing standalone route `/apps/tables/app/{slug}`. The Tables UI stays the configuration surface and keeps the tab bar for switching pages while designing.
 
-## The data adapter
+## The Tables API speaks objects
 
-Frontend components that render lists, forms and details talk to one adapter module instead of to endpoints. The adapter has the methods the nc-vue components call today against OpenRegister, implemented against Tables: list, get, create, update, delete, schema, aggregate, relations, files, audit. The [component list](03-component-list.md) names the methods and their callers. The adapter is the seam that lets presentational components move between nc-vue and Tables later without rewrites.
+Decision D1: the translation between Tables storage and the object shape the components expect happens on the server. A second rows API lists rows of a table or view with search, filter, sort, paging, field selection and `format=object`, returning `{results, total, page, pages}` with rows as flat objects keyed by technical name and a metadata block. A schema endpoint returns a table as JSON Schema. The frontend store that the nc-vue components call is pointed at these endpoints with URL and parameter changes only. What remains in the browser is configuration, not a shape mapper. The [component list](03-component-list.md) names the methods and their callers; the [types and formats](10-types-and-formats.md) document names the mapping rules.
+
+Nested data is column types, decision D2: relation for objects, array for lists of scalars, json for opaque blobs, file for Files nodes. See [questions and decisions](09-questions-and-decisions.md) for the rules that keep this honest.
 
 ## Manifest exchange
 

@@ -33,7 +33,7 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 
 | Milestone | Sprint | Outcome | Deferrable past the freeze |
 |---|---|---|---|
-| M1 data foundation | 1 to 2 | row uuids and routes, server-side list API, the frontend adapter and server-side paging, JSON Schema export and flat import, formats, benchmark baseline | no |
+| M1 data foundation | 1 to 2 | cell indexes, row uuids, rows v2 listing with object format, column `format` and the formats registry, json, file and array column types, JSON Schema export and import, aggregation endpoint, benchmark baseline | no |
 | M2 pages and widgets | 3 to 4 | detail, form and settings page types, aggregation API and widgets, presentational widget set, relations with inverse, file attachments, row audit, advisory locks | parts: audit, locks |
 | M3 designer | 5 | visibility rules with server-side gating, actions and sidebar editors, index page configuration, menu sections and nesting, application settings and preferences, templates | parts: actions editor, templates |
 | M4 manifest exchange | 6 | export and import of an application as a manifest with its schemes; a buildiq manifest imports | no |
@@ -41,25 +41,29 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 
 ## Sprint plan
 
-### Sprint 1, 12 to 25 October
+### Sprint 1, 12 to 25 October, the data layer cluster
+
+Decision D5: both developers work the types and the API extensions together, because they share the mapper, import and export, the column editor and the OpenAPI document. The keep widgets move to sprint 2.
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | row uuids with backfill, lookup by uuid, OCS routes by uuid; user migration and federation updated | M |
-| Robert | OCS rows endpoint with filter, sort, search and pagination, validated against visible columns, returning a total | M |
-| Remko | the data adapter module with `list`, `get`, `create`, `update`, `remove`, `getSchema`, `listFields`, `listSources`; the existing data widget switched to it | M |
-| Remko | copy of the keep widgets: label, image, link, links, quicklinks, tile, divider, video, menu, container, banner, with their forms as server schemas | M |
-| Ruben | specification of the JSON Schema mapping (types, formats, enum, required, `$ref`) and of the formats registry | S |
-| Thijn | acceptance specs for paths 1 and 4 drafted; the 100k row benchmark table built | S |
+| Robert | indexes on the cell tables, `(column_id, row_id)` and `(column_id, value)`; row uuids with backfill and routes by uuid | M |
+| Robert | rows v2 listing for tables and views: search, filter with the twelve operators, sort, page and limit with total, fields, `format=object`; object format accepted on create and update | L |
+| Robert | `format` on columns, the formats registry with the first twelve validators, pattern enforcement; JSON Schema export and flat import | M |
+| Remko | the json and file column types end to end: migration, mapper, cell editor, renderer, filter UI, import and export, OpenAPI | L |
+| Remko | the store pointed at the Tables rows v2 and schema endpoints: URL and parameter changes, the data widget on it | S |
+| Ruben | specification of the JSON Schema mapping, the formats list and the request syntax of rows v2; the answer to Q2 and Q6 | S |
+| Thijn | acceptance specs for paths 1 and 4 drafted; the 100k row benchmark table built; benchmark round 0 on the new endpoint | M |
 
 ### Sprint 2, 26 October to 8 November
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | JSON Schema export of a table and application; flat JSON Schema import through the scheme import | M |
-| Robert | formats registry with validators (email, uri, uuid, date, postal code, BSN), regex enforcement; aggregation endpoint: value, grouped, timeseries | M |
+| Robert | aggregation endpoint: value, grouped, timeseries; distinct values of a column; `extend` for relation cells | M |
+| Robert | the array column type; search decision Q3 settled by the benchmark | M |
+| Remko | copy of the keep widgets: label, image, link, links, quicklinks, tile, divider, video, menu, container, banner, with their forms as server schemas | M |
 | Remko | server-side paging, filtering and search in the Tables data table behind a threshold; application pages use server mode | L |
-| Remko | aggregation widgets: stat, delta, gauge, stats block, chart, stacked bar, workspace filter, on the adapter | M |
+| Remko | aggregation widgets: stat, delta, gauge, stats block, chart, stacked bar, workspace filter | M |
 | Ruben | design of the detail page and the form page (layout, sidebar tabs, actions) | S |
 | Thijn | benchmark round 1 and the review of M1 | S |
 
@@ -68,7 +72,7 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 | Owner | Item | Size |
 |---|---|---|
 | Robert | multi-valued relations with inverse lookups and lookups by target uuid; relation endpoint in both directions | L |
-| Robert | file attachment column: file ids, Files decides access, upload, cleanup on row delete; attachment endpoints | L |
+| Robert | relation delete rule (Q4) and file cell delete rule (Q5) implemented; inverse relation endpoint | M |
 | Remko | detail page type: header, widget grid with data and metadata widgets, sidebar with files, relations and activity tabs | L |
 | Remko | form page type: standalone form from a table's columns, multi-step, per-field validation, public submit | M |
 | Ruben | manifest field mapping specification (buildiq v2 to Tables rows and back) | S |
@@ -118,11 +122,10 @@ Bug fixing from the acceptance runs, the upgrade test from the previous Tables r
 
 ## Dependencies between items
 
-- The adapter (sprint 1) before every adapt component.
-- The rows endpoint (sprint 1) before server-side paging (sprint 2) and the index page work.
+- Rows v2 (sprint 1) before every adapt component, server-side paging (sprint 2) and the index page work.
 - Row uuids (sprint 1) before relations by uuid, manifest export and packaging.
 - The aggregation endpoint (sprint 2) before the aggregation widgets (sprint 2) and the dashboard parity.
-- Relations and attachments (sprint 3) before the related widget and the detail sidebar (sprint 4).
+- The file type (sprint 1) and relations (sprint 3) before the related widget and the detail sidebar (sprint 4).
 - Settings and permission fields (sprint 4) before the designer editors (sprint 5).
 - Manifest export (sprint 5) before packaging (sprint 7).
 
