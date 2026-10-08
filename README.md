@@ -12,6 +12,8 @@ With this app you are able to create your own tables with individual columns. Yo
 
 ## Documentation
 
+User and administration docs are in the [docs](docs/README.md) folder.
+
 ### General information
 https://github.com/nextcloud/tables/wiki
 
