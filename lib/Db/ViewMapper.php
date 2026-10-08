@@ -90,20 +90,6 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
-	 */
-	public function findBySlug(string $slug): View {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('v.*', 't.ownership')
-			->from($this->table, 'v')
-			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
-			->where($qb->expr()->eq('v.slug', $qb->createNamedParameter($slug, IQueryBuilder::PARAM_STR)));
-		return $this->findEntity($qb);
-	}
-
-	/**
 	 * Views that live without a table and belong to the given user.
 	 *
 	 * @return View[]

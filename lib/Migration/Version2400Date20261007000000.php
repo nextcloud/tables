@@ -17,8 +17,8 @@ use OCP\Migration\SimpleMigrationStep;
 use Override;
 
 /**
- * Views get a type (table, grid), a grid layout and a slug, and may exist
- * without a table. Applications (contexts) get a slug and a menu.
+ * Views get a type (table, grid) and a grid layout, and may exist without
+ * a table. Applications (contexts) get a technical name and a menu.
  */
 class Version2400Date20261007000000 extends SimpleMigrationStep {
 	#[Override]
@@ -41,24 +41,17 @@ class Version2400Date20261007000000 extends SimpleMigrationStep {
 					'default' => null,
 				]);
 			}
-			if (!$table->hasColumn('slug')) {
-				$table->addColumn('slug', Types::STRING, [
-					'notnull' => false,
-					'default' => null,
-					'length' => 64,
-				]);
-			}
 			// A grid view does not need a table
 			$table->getColumn('table_id')->setNotnull(false);
 		}
 
 		if ($schema->hasTable('tables_contexts_context')) {
 			$table = $schema->getTable('tables_contexts_context');
-			if (!$table->hasColumn('slug')) {
-				$table->addColumn('slug', Types::STRING, [
+			if (!$table->hasColumn('technical_name')) {
+				$table->addColumn('technical_name', Types::STRING, [
 					'notnull' => false,
 					'default' => null,
-					'length' => 64,
+					'length' => 200,
 				]);
 			}
 		}
@@ -72,7 +65,7 @@ class Version2400Date20261007000000 extends SimpleMigrationStep {
 			$table->addColumn('target_type', Types::STRING, ['notnull' => true, 'length' => 16]);
 			$table->addColumn('target_id', Types::INTEGER, ['notnull' => false]);
 			$table->addColumn('url', Types::STRING, ['notnull' => false, 'length' => 2000]);
-			$table->addColumn('slug', Types::STRING, ['notnull' => false, 'length' => 64]);
+			$table->addColumn('technical_name', Types::STRING, ['notnull' => false, 'length' => 200]);
 			$table->addColumn('order', Types::INTEGER, ['notnull' => true, 'default' => 0]);
 			$table->setPrimaryKey(['id']);
 			$table->addIndex(['context_id'], 'tables_ctx_menu_ctx_idx');

@@ -17,7 +17,7 @@ export function toEditableMenuItems(menuItems) {
 		targetType: item.targetType ?? 'url',
 		targetId: item.targetId ?? null,
 		url: item.url ?? '',
-		slug: item.slug ?? null,
+		technicalName: item.technicalName ?? null,
 	}))
 }
 
@@ -34,7 +34,7 @@ export function toMenuItemPayload(item) {
 		targetType: item.targetType,
 		targetId: item.targetType === 'url' ? null : item.targetId,
 		url: item.targetType === 'url' ? item.url : null,
-		slug: item.slug || null,
+		technicalName: item.technicalName || null,
 	}
 }
 
@@ -49,5 +49,5 @@ export function menuItemRoute(item, contextId) {
 	if (item.targetType === 'url') {
 		return null
 	}
-	return '/application/' + contextId + '/menu/' + item.slug
+	return '/application/' + contextId + '/menu/' + item.technicalName
 }

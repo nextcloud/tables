@@ -333,7 +333,7 @@ export default {
 			return this.standaloneContextId !== null
 		},
 		applicationUrl() {
-			return window.location.origin + generateUrl('/apps/tables/app/' + (this.activeContext?.slug || this.activeContext?.id))
+			return window.location.origin + generateUrl('/apps/tables/app/' + (this.activeContext?.technicalName || this.activeContext?.id))
 		},
 		pageCards() {
 			return this.menuItems.map(item => {
@@ -353,11 +353,11 @@ export default {
 			})
 		},
 		selectedMenuItem() {
-			const slug = this.$route.params.itemSlug
-			if (!slug) {
+			const technicalName = this.$route.params.itemName
+			if (!technicalName) {
 				return null
 			}
-			return this.menuItems.find(item => item.slug === slug) ?? null
+			return this.menuItems.find(item => item.technicalName === technicalName) ?? null
 		},
 		activeLayout() {
 			return this.draftLayout ?? this.layout
@@ -467,7 +467,7 @@ export default {
 		 * Only once: the overview stays reachable from the menu afterwards.
 		 */
 		openFirstPageWhenStandalone() {
-			if (!this.isStandalone || this.openedFirstPage || this.$route.params.itemSlug || this.menuItems.length === 0) {
+			if (!this.isStandalone || this.openedFirstPage || this.$route.params.itemName || this.menuItems.length === 0) {
 				return
 			}
 			const first = this.menuItems.find(item => item.targetType !== 'url')
@@ -494,15 +494,15 @@ export default {
 		/**
 		 * A grid view created from this application gets a menu item right away.
 		 *
-		 * @param {{view: object, contextId: number|null}} payload the created view and the application it was created from
+		 * @param {{view: object, contextId: number|null, technicalName?: string|null}} payload the created view, the application it was created from and the name typed for it
 		 */
-		async onGridViewCreated({ view, contextId }) {
+		async onGridViewCreated({ view, contextId, technicalName = null }) {
 			if (!view || contextId !== this.activeContext?.id) {
 				return
 			}
 			const menuItems = [
-				...this.menuItems.map(item => ({ label: item.label, icon: item.icon, targetType: item.targetType, targetId: item.targetId, url: item.url, slug: item.slug })),
-				{ label: view.title, icon: null, targetType: 'view', targetId: view.id, url: null, slug: view.slug || null },
+				...this.menuItems.map(item => ({ label: item.label, icon: item.icon, targetType: item.targetType, targetId: item.targetId, url: item.url, technicalName: item.technicalName })),
+				{ label: view.title, icon: null, targetType: 'view', targetId: view.id, url: null, technicalName },
 			]
 			const context = await this.updateContextMenuItems({ id: this.activeContext.id, menuItems })
 			const added = context?.menuItems?.find(item => item.targetType === 'view' && item.targetId === view.id)

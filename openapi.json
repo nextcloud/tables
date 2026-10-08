@@ -280,7 +280,7 @@
                     "description",
                     "owner",
                     "ownerType",
-                    "slug",
+                    "technicalName",
                     "menuItems"
                 ],
                 "properties": {
@@ -304,7 +304,7 @@
                         "type": "integer",
                         "format": "int64"
                     },
-                    "slug": {
+                    "technicalName": {
                         "type": "string",
                         "nullable": true
                     },
@@ -430,7 +430,7 @@
                     "targetType",
                     "targetId",
                     "url",
-                    "slug",
+                    "technicalName",
                     "order"
                 ],
                 "properties": {
@@ -461,7 +461,7 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "slug": {
+                    "technicalName": {
                         "type": "string",
                         "nullable": true
                     },
@@ -1079,8 +1079,7 @@
                     "isFederated",
                     "sidebarOrder",
                     "type",
-                    "grid",
-                    "slug"
+                    "grid"
                 ],
                 "properties": {
                     "id": {
@@ -1353,10 +1352,6 @@
                                 }
                             }
                         }
-                    },
-                    "slug": {
-                        "type": "string",
-                        "nullable": true
                     }
                 }
             }
@@ -12047,11 +12042,11 @@
                                             }
                                         }
                                     },
-                                    "slug": {
+                                    "technicalName": {
                                         "type": "string",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "URL-friendly name of the context"
+                                        "description": "technical name of the context"
                                     },
                                     "menuItems": {
                                         "type": "array",
@@ -12084,7 +12079,7 @@
                                                     "type": "string",
                                                     "nullable": true
                                                 },
-                                                "slug": {
+                                                "technicalName": {
                                                     "type": "string",
                                                     "nullable": true
                                                 }
@@ -12523,11 +12518,11 @@
                                             }
                                         }
                                     },
-                                    "slug": {
+                                    "technicalName": {
                                         "type": "string",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "provide this parameter to set a new URL-friendly name"
+                                        "description": "provide this parameter to set a new technical name"
                                     },
                                     "menuItems": {
                                         "type": "array",
@@ -12560,7 +12555,7 @@
                                                     "type": "string",
                                                     "nullable": true
                                                 },
-                                                "slug": {
+                                                "technicalName": {
                                                     "type": "string",
                                                     "nullable": true
                                                 }
@@ -13596,11 +13591,11 @@
                                             }
                                         }
                                     },
-                                    "slug": {
+                                    "technicalName": {
                                         "type": "string",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "URL-friendly name of the context"
+                                        "description": "technical name of the context"
                                     },
                                     "menuItems": {
                                         "type": "array",
@@ -13631,7 +13626,7 @@
                                                     "type": "string",
                                                     "nullable": true
                                                 },
-                                                "slug": {
+                                                "technicalName": {
                                                     "type": "string",
                                                     "nullable": true
                                                 }

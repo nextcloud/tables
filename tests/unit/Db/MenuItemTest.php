@@ -25,7 +25,7 @@ class MenuItemTest extends TestCase {
 			'targetType' => MenuItem::TARGET_URL,
 			'targetId' => null,
 			'url' => null,
-			'slug' => null,
+			'technicalName' => null,
 			'order' => 0,
 		], $item->jsonSerialize());
 	}
@@ -38,7 +38,7 @@ class MenuItemTest extends TestCase {
 		$item->setIcon('home');
 		$item->setTargetType(MenuItem::TARGET_VIEW);
 		$item->setTargetId(6);
-		$item->setSlug('home');
+		$item->setTechnicalName('home');
 		$item->setOrder(20);
 
 		$json = $item->jsonSerialize();
@@ -47,7 +47,7 @@ class MenuItemTest extends TestCase {
 		$this->assertSame('Intake home', $json['label']);
 		$this->assertSame('view', $json['targetType']);
 		$this->assertSame(6, $json['targetId']);
-		$this->assertSame('home', $json['slug']);
+		$this->assertSame('home', $json['technicalName']);
 		$this->assertSame(20, $json['order']);
 	}
 

@@ -47,7 +47,6 @@ namespace OCA\Tables;
  *  sidebarOrder: int|null,
  *  type: string,
  *  grid: array{widgets: list<array<string, mixed>>, layout: list<array<string, mixed>>},
- *  slug: string|null,
  * }
  *
  * @psalm-type TablesTable = array{
@@ -237,7 +236,7 @@ namespace OCA\Tables;
  *   targetType: string,
  *   targetId: int|null,
  *   url: string|null,
- *   slug: string|null,
+ *   technicalName: string|null,
  *   order: int,
  * }
  *
@@ -248,7 +247,7 @@ namespace OCA\Tables;
  *   description: string,
  *   owner: string,
  *   ownerType: int,
- *   slug: string|null,
+ *   technicalName: string|null,
  *   menuItems: list<TablesMenuItem>,
  * }
  *

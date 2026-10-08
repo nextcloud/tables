@@ -1152,7 +1152,7 @@ export type components = {
             readonly owner: string;
             /** Format: int64 */
             readonly ownerType: number;
-            readonly slug: string | null;
+            readonly technicalName: string | null;
             readonly menuItems: readonly components["schemas"]["MenuItem"][];
         };
         readonly ContextNavigation: {
@@ -1199,7 +1199,7 @@ export type components = {
             /** Format: int64 */
             readonly targetId: number | null;
             readonly url: string | null;
-            readonly slug: string | null;
+            readonly technicalName: string | null;
             /** Format: int64 */
             readonly order: number;
         };
@@ -1442,7 +1442,6 @@ export type components = {
                     readonly [key: string]: Record<string, never>;
                 }[];
             };
-            readonly slug: string | null;
         };
     };
     responses: never;
@@ -6907,10 +6906,10 @@ export interface operations {
                         readonly permissions?: number;
                     }[];
                     /**
-                     * @description URL-friendly name of the context
+                     * @description technical name of the context
                      * @default null
                      */
-                    readonly slug?: string | null;
+                    readonly technicalName?: string | null;
                     /**
                      * @description optional menu of the context, in order
                      * @default null
@@ -6922,7 +6921,7 @@ export interface operations {
                         /** Format: int64 */
                         readonly targetId?: number | null;
                         readonly url?: string | null;
-                        readonly slug?: string | null;
+                        readonly technicalName?: string | null;
                     }[] | null;
                 };
             };
@@ -7115,10 +7114,10 @@ export interface operations {
                         readonly order: number;
                     } | null;
                     /**
-                     * @description provide this parameter to set a new URL-friendly name
+                     * @description provide this parameter to set a new technical name
                      * @default null
                      */
-                    readonly slug?: string | null;
+                    readonly technicalName?: string | null;
                     /**
                      * @description provide this parameter to replace the menu
                      * @default null
@@ -7130,7 +7129,7 @@ export interface operations {
                         /** Format: int64 */
                         readonly targetId?: number | null;
                         readonly url?: string | null;
-                        readonly slug?: string | null;
+                        readonly technicalName?: string | null;
                     }[] | null;
                 };
             };
@@ -7568,10 +7567,10 @@ export interface operations {
                         readonly modifyTables: readonly components["schemas"]["Table"][];
                     };
                     /**
-                     * @description URL-friendly name of the context
+                     * @description technical name of the context
                      * @default null
                      */
-                    readonly slug?: string | null;
+                    readonly technicalName?: string | null;
                     /**
                      * @description Menu of the context, targets by uuid
                      * @default []
@@ -7582,7 +7581,7 @@ export interface operations {
                         readonly targetType: string;
                         readonly targetUuid?: string | null;
                         readonly url?: string | null;
-                        readonly slug?: string | null;
+                        readonly technicalName?: string | null;
                     }[];
                     /**
                      * @description Views without a table that the menu points at

@@ -36,8 +36,6 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setType(string $type)
  * @method getGrid(): ?string
  * @method setGrid(?string $grid)
- * @method getSlug(): ?string
- * @method setSlug(?string $slug)
  * @method getColumns(): string
  * @method setColumns(string $columns)
  * @method getColumnSettings(): string
@@ -100,7 +98,6 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $filter = null; // json
 	protected ?string $type = null;
 	protected ?string $grid = null; // json
-	protected ?string $slug = null;
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -287,7 +284,6 @@ class View extends EntitySuper implements JsonSerializable {
 			'sidebarOrder' => $this->sidebarOrder,
 			'type' => $this->getTypeOrDefault(),
 			'grid' => $this->getGridArray(),
-			'slug' => $this->slug,
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

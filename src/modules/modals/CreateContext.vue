@@ -38,9 +38,9 @@
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
-					{{ t('tables', 'Slug') }}
+					{{ t('tables', 'Technical name') }}
 				</div>
-				<input v-model="slug" type="text" data-cy="createContextSlug"
+				<input v-model="technicalName" type="text" data-cy="createContextTechnicalName"
 					:placeholder="t('tables', 'Optional, e.g. intake. Lowercase letters, numbers and hyphens.')">
 			</div>
 			<div class="col-4 row space-T">
@@ -122,7 +122,7 @@ export default {
 			customTitleChosen: false,
 			errorTitle: false,
 			description: '',
-			slug: '',
+			technicalName: '',
 			menuItems: [],
 			resources: [],
 			receivers: [],
@@ -187,7 +187,7 @@ export default {
 				iconName: this.icon.name,
 				description: this.description,
 				nodes: dataResources,
-				slug: this.slug.trim() || null,
+				technicalName: this.technicalName.trim() || null,
 				menuItems: this.menuItems.map(toMenuItemPayload),
 			}
 			// adding share to oneself to have navigation display control
@@ -212,7 +212,7 @@ export default {
 		},
 		reset() {
 			this.title = ''
-			this.slug = ''
+			this.technicalName = ''
 			this.menuItems = []
 			this.errorTitle = false
 			this.setIcon(this.randomIcon())

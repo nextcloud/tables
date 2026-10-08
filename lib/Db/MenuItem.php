@@ -27,8 +27,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setTargetId(?int $targetId): void
  * @method getUrl(): ?string
  * @method setUrl(?string $url): void
- * @method getSlug(): ?string
- * @method setSlug(?string $slug): void
+ * @method getTechnicalName(): ?string
+ * @method setTechnicalName(?string $technicalName): void
  * @method getOrder(): int
  * @method setOrder(int $order): void
  */
@@ -44,7 +44,7 @@ class MenuItem extends Entity implements JsonSerializable {
 	protected ?string $targetType = null;
 	protected ?int $targetId = null;
 	protected ?string $url = null;
-	protected ?string $slug = null;
+	protected ?string $technicalName = null;
 	protected ?int $order = null;
 
 	public function __construct() {
@@ -55,7 +55,7 @@ class MenuItem extends Entity implements JsonSerializable {
 	}
 
 	/**
-	 * @return array{id: int, contextId: int, label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, slug: string|null, order: int}
+	 * @return array{id: int, contextId: int, label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, technicalName: string|null, order: int}
 	 */
 	public function jsonSerialize(): array {
 		return [
@@ -66,7 +66,7 @@ class MenuItem extends Entity implements JsonSerializable {
 			'targetType' => $this->getTargetType() ?? self::TARGET_URL,
 			'targetId' => $this->getTargetId(),
 			'url' => $this->getUrl(),
-			'slug' => $this->getSlug(),
+			'technicalName' => $this->getTechnicalName(),
 			'order' => $this->getOrder() ?? 0,
 		];
 	}

@@ -139,21 +139,21 @@ class ViewServiceTest extends TestCase {
 		$this->service->update(6, ViewUpdateInput::fromInputArray(['type' => 'table']), 'alice', true);
 	}
 
-	public function testUpdateRejectsAMalformedSlug(): void {
+	public function testUpdateRejectsAMalformedTechnicalName(): void {
 		$this->expectUpdateOf($this->storedView());
 
 		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('slug');
-		$this->service->update(6, ViewUpdateInput::fromInputArray(['slug' => 'Not A Slug']), 'alice', true);
+		$this->expectExceptionMessage('Technical name');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['technicalName' => 'Not A Name']), 'alice', true);
 	}
 
-	public function testUpdateStoresAValidSlugAndType(): void {
+	public function testUpdateStoresAValidTechnicalNameAndType(): void {
 		$view = $this->storedView();
 		$this->expectUpdateOf($view);
 
-		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['slug' => 'intake-2', 'type' => 'grid']), 'alice', true);
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['technicalName' => 'intake_2', 'type' => 'grid']), 'alice', true);
 
-		$this->assertSame('intake-2', $updated->getSlug());
+		$this->assertSame('intake_2', $updated->getTechnicalName());
 		$this->assertSame('grid', $updated->getType());
 	}
 
@@ -175,14 +175,13 @@ class ViewServiceTest extends TestCase {
 		});
 		$this->mapper->method('update')->willReturnArgument(0);
 
-		$created = $this->service->create('Home', '🧩', null, 'alice', null, null, View::TYPE_GRID, 'home', 'Start here');
+		$created = $this->service->create('Home', '🧩', null, 'alice', 'home', null, View::TYPE_GRID, 'Start here');
 
 		$this->assertNull($created->getTableId());
 		$this->assertSame('alice', $created->getOwnership());
 		$this->assertSame('grid', $created->getType());
-		$this->assertSame('home', $created->getSlug());
 		$this->assertSame('Start here', $created->getDescription());
-		$this->assertSame('view_6', $created->getTechnicalName());
+		$this->assertSame('home', $created->getTechnicalName());
 	}
 
 	public function testCreateWithATableStillChecksTheTablePermission(): void {

@@ -38,10 +38,10 @@
 			</div>
 			<div class="row space-T">
 				<div class="col-4">
-					{{ t('tables', 'Slug') }}
+					{{ t('tables', 'Technical name') }}
 				</div>
-				<input v-model="slug" type="text" data-cy="gridViewSlug"
-					:class="{ missing: errorSlug }"
+				<input v-model="technicalName" type="text" data-cy="gridViewTechnicalName"
+					:class="{ missing: errorTechnicalName }"
 					:placeholder="t('tables', 'Optional, e.g. home. Lowercase letters, numbers and hyphens.')">
 			</div>
 			<div class="row space-T">
@@ -61,10 +61,10 @@ import { showError } from '@nextcloud/dialogs'
 import { mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 
-const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*$/
+const TECHNICAL_NAME_PATTERN = /^[a-z][a-z0-9_]*$/
 
 /**
- * Creates a grid view, or edits the title, description and slug of one.
+ * Creates a grid view, or edits the title, description and technicalName of one.
  */
 export default {
 	name: 'GridViewSettings',
@@ -93,10 +93,10 @@ export default {
 		return {
 			title: '',
 			description: '',
-			slug: '',
+			technicalName: '',
 			icon: '',
 			errorTitle: false,
-			errorSlug: false,
+			errorTechnicalName: false,
 			saving: false,
 		}
 	},
@@ -112,10 +112,10 @@ export default {
 		reset() {
 			this.title = this.view?.title ?? ''
 			this.description = this.view?.description ?? ''
-			this.slug = this.view?.slug ?? ''
+			this.technicalName = this.view?.technicalName ?? ''
 			this.icon = this.view?.emoji || '🧩'
 			this.errorTitle = false
-			this.errorSlug = false
+			this.errorTechnicalName = false
 			this.saving = false
 		},
 		actionCancel() {
@@ -123,20 +123,20 @@ export default {
 		},
 		async submit() {
 			this.errorTitle = this.title.trim() === ''
-			this.errorSlug = this.slug !== '' && !SLUG_PATTERN.test(this.slug)
+			this.errorTechnicalName = this.technicalName !== '' && !TECHNICAL_NAME_PATTERN.test(this.technicalName)
 			if (this.errorTitle) {
 				showError(t('tables', 'Cannot save the view. Title is missing.'))
 				return
 			}
-			if (this.errorSlug) {
-				showError(t('tables', 'A slug may only contain lowercase letters, numbers and hyphens.'))
+			if (this.errorTechnicalName) {
+				showError(t('tables', 'A technical name must start with a lowercase letter and contain only lowercase letters, numbers and underscores.'))
 				return
 			}
 			this.saving = true
 			if (this.view) {
 				const success = await this.updateView({
 					id: this.view.id,
-					data: { data: { title: this.title.trim(), description: this.description, emoji: this.icon, slug: this.slug } },
+					data: { data: { title: this.title.trim(), description: this.description, emoji: this.icon, ...(this.technicalName ? { technicalName: this.technicalName } : {}) } },
 				})
 				this.saving = false
 				if (success) {
@@ -145,11 +145,11 @@ export default {
 				return
 			}
 			const created = await this.insertStandaloneView({
-				data: { title: this.title.trim(), description: this.description, emoji: this.icon, type: 'grid', slug: this.slug || null },
+				data: { title: this.title.trim(), description: this.description, emoji: this.icon, type: 'grid', technicalName: this.technicalName || null },
 			})
 			this.saving = false
 			if (created) {
-				this.$emit('created', { view: created, contextId: this.contextId })
+				this.$emit('created', { view: created, contextId: this.contextId, technicalName: this.technicalName || null })
 				this.$emit('close')
 				if (!this.contextId) {
 					await this.$router.push('/view/' + created.id).catch(err => err)

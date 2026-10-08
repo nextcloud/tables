@@ -101,8 +101,8 @@ class ContextService {
 				$iconUrl = $this->urlGenerator->imagePath('core', 'places/default-app-icon.svg');
 			}
 
-			// the slug makes the address readable; the id keeps working for applications without one
-			$contextUrl = $this->urlGenerator->linkToRoute('tables.page.context', ['contextId' => $context->getSlug() ?: $context->getId()]);
+			// the technical name makes the address readable; the id keeps working for applications without one
+			$contextUrl = $this->urlGenerator->linkToRoute('tables.page.context', ['contextId' => $context->getTechnicalName() ?: $context->getId()]);
 
 			$this->navigationManager->add([
 				'id' => Application::APP_ID . '_application_' . $context->getId(),
@@ -137,14 +137,14 @@ class ContextService {
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
-	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType, ?string $slug = null, ?array $menuItems = null): Context {
+	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType, ?string $technicalName = null, ?array $menuItems = null): Context {
 		$context = new Context();
 		$context->setName(trim($name));
 		$context->setIcon(trim($iconName));
 		$context->setDescription(trim($description));
 		$context->setOwnerId($ownerId);
 		$context->setOwnerType($ownerType);
-		$context->setSlug($this->normalizeSlug($slug));
+		$context->setTechnicalName($this->normalizeTechnicalName($technicalName));
 
 		$this->atomic(function () use ($context, $nodes, $menuItems): void {
 			$this->contextMapper->insert($context);
@@ -163,8 +163,8 @@ class ContextService {
 	/**
 	 * Replace the menu of an application with the given items, in the given order.
 	 *
-	 * @psalm-param list<array{label: string, icon?: string|null, targetType: string, targetId?: int|null, url?: string|null, slug?: string|null}> $menuItems
-	 * @return list<array{id: int, contextId: int, label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, slug: string|null, order: int}>
+	 * @psalm-param list<array{label: string, icon?: string|null, targetType: string, targetId?: int|null, url?: string|null, technicalName?: string|null}> $menuItems
+	 * @return list<array{id: int, contextId: int, label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, technicalName: string|null, order: int}>
 	 * @throws Exception
 	 */
 	protected function replaceMenuItems(int $contextId, array $menuItems): array {
@@ -178,7 +178,7 @@ class ContextService {
 			$menuItem->setTargetType($item['targetType']);
 			$menuItem->setTargetId($item['targetType'] === MenuItem::TARGET_URL ? null : ($item['targetId'] ?? null));
 			$menuItem->setUrl($item['targetType'] === MenuItem::TARGET_URL ? ($item['url'] ?? null) : null);
-			$menuItem->setSlug($this->normalizeSlug($item['slug'] ?? null) ?? $this->slugify($item['label']));
+			$menuItem->setTechnicalName($this->normalizeTechnicalName($item['technicalName'] ?? null) ?? $this->technicalNameFromLabel($item['label']));
 			$menuItem->setOrder(($position + 1) * 10);
 			$stored[] = $this->menuItemMapper->insert($menuItem)->jsonSerialize();
 		}
@@ -188,24 +188,24 @@ class ContextService {
 	/**
 	 * @throws InvalidArgumentException
 	 */
-	protected function normalizeSlug(?string $slug): ?string {
-		if ($slug === null) {
+	protected function normalizeTechnicalName(?string $technicalName): ?string {
+		if ($technicalName === null) {
 			return null;
 		}
-		$slug = trim($slug);
-		if ($slug === '') {
+		$technicalName = trim($technicalName);
+		if ($technicalName === '') {
 			return null;
 		}
-		if (strlen($slug) > 64 || !preg_match('/^[a-z0-9][a-z0-9-]*$/', $slug)) {
-			throw new InvalidArgumentException('A slug may only contain lowercase letters, numbers and hyphens, and must start with a letter or number.');
+		if (strlen($technicalName) > 200 || !preg_match('/^[a-z][a-z0-9_]*$/', $technicalName)) {
+			throw new InvalidArgumentException('A technical name must start with a lowercase letter and contain only lowercase letters, numbers and underscores.');
 		}
-		return $slug;
+		return $technicalName;
 	}
 
-	protected function slugify(string $label): string {
-		$slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $label) ?? '', '-'));
-		$slug = preg_replace('/^[^a-z0-9]+/', '', $slug) ?? '';
-		return substr($slug === '' ? 'item' : $slug, 0, 64);
+	protected function technicalNameFromLabel(string $label): string {
+		$name = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '_', $label) ?? '', '_'));
+		$name = preg_replace('/^[^a-z]+/', '', $name) ?? '';
+		return substr($name === '' ? 'item' : $name, 0, 200);
 	}
 
 	/**
@@ -214,14 +214,14 @@ class ContextService {
 	 * @throws DoesNotExistException
 	 * @throws PermissionError|MultipleObjectsReturnedException
 	 */
-	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?string $slug = null, ?array $menuItems = null): Context {
+	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?string $technicalName = null, ?array $menuItems = null): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		if ($name !== null) {
 			$context->setName(trim($name));
 		}
-		if ($slug !== null) {
-			$context->setSlug($this->normalizeSlug($slug));
+		if ($technicalName !== null) {
+			$context->setTechnicalName($this->normalizeTechnicalName($technicalName));
 		}
 		if ($menuItems !== null) {
 			$context->setMenuItems($this->replaceMenuItems($contextId, $menuItems));
@@ -770,7 +770,7 @@ class ContextService {
 			array_values($nodes),
 			$context->getPages(),
 			array_values($tables),
-			$context->getSlug(),
+			$context->getTechnicalName(),
 			$menuItems,
 			$gridViews,
 		);
@@ -791,7 +791,7 @@ class ContextService {
 				'targetType' => $item['targetType'],
 				'targetUuid' => null,
 				'url' => $item['url'],
-				'slug' => $item['slug'],
+				'technicalName' => $item['technicalName'],
 			];
 			try {
 				if ($item['targetType'] === MenuItem::TARGET_TABLE && $item['targetId'] !== null) {
@@ -839,7 +839,7 @@ class ContextService {
 			'emoji' => $view->getEmoji(),
 			'description' => $view->getDescription(),
 			'type' => $view->getTypeOrDefault(),
-			'slug' => $view->getSlug(),
+			'technicalName' => $view->getTechnicalName(),
 			'createdAt' => $view->getCreatedAt(),
 			'lastEditAt' => $view->getLastEditAt(),
 			'grid' => $grid,
@@ -875,7 +875,7 @@ class ContextService {
 				'emoji' => $viewData['emoji'] ?? null,
 				'description' => $viewData['description'] ?? '',
 				'type' => View::TYPE_GRID,
-				'slug' => $viewData['slug'] ?? null,
+				'technicalName' => $viewData['technicalName'] ?? null,
 				'createdAt' => $viewData['createdAt'] ?? (new \DateTime())->format('Y-m-d H:i:s'),
 				'lastEditAt' => $viewData['lastEditAt'] ?? (new \DateTime())->format('Y-m-d H:i:s'),
 				'columnSettings' => [],
@@ -910,7 +910,7 @@ class ContextService {
 	 * Menu items of a scheme with their uuid targets turned into local ids; items whose target is missing are dropped.
 	 *
 	 * @param list<array<string, mixed>> $menuItems
-	 * @return list<array{label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, slug: string|null}>
+	 * @return list<array{label: string, icon: string|null, targetType: string, targetId: int|null, url: string|null, technicalName: string|null}>
 	 */
 	private function resolveMenuItems(array $menuItems): array {
 		$resolved = [];
@@ -933,7 +933,7 @@ class ContextService {
 				'targetType' => $targetType,
 				'targetId' => $targetId,
 				'url' => $targetType === MenuItem::TARGET_URL ? (string)($item['url'] ?? '') : null,
-				'slug' => isset($item['slug']) ? (string)$item['slug'] : null,
+				'technicalName' => isset($item['technicalName']) ? (string)$item['technicalName'] : null,
 			];
 		}
 		return $resolved;
@@ -1029,7 +1029,7 @@ class ContextService {
 	 * @throws NotFoundExceptionInterface
 	 * @throws PermissionError
 	 */
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?string $slug = null, array $menuItems = [], array $gridViews = []): Context {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?string $technicalName = null, array $menuItems = [], array $gridViews = []): Context {
 		// Validate the structure of the columns and views arrays
 		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
 			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
@@ -1093,6 +1093,6 @@ class ContextService {
 
 		$this->importGridViews($gridViews, $userId);
 
-		return $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes, $slug, $this->resolveMenuItems($menuItems));
+		return $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes, $technicalName, $this->resolveMenuItems($menuItems));
 	}
 }

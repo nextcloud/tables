@@ -35,15 +35,15 @@ class ContextControllerMenuItemsTest extends TestCase {
 
 	public function testSanitizeCastsAndNormalisesEveryItem(): void {
 		$sanitized = $this->controller->sanitize([
-			['label' => 'Intake home', 'targetType' => 'view', 'targetId' => '6', 'slug' => 'home', 'url' => 'ignored'],
+			['label' => 'Intake home', 'targetType' => 'view', 'targetId' => '6', 'technicalName' => 'home', 'url' => 'ignored'],
 			['label' => 'Docs', 'targetType' => 'url', 'url' => 'https://example.org', 'targetId' => '99', 'icon' => 'book'],
 			['label' => 'Welcome', 'targetType' => 'table', 'targetId' => 4],
 		]);
 
 		$this->assertSame([
-			['label' => 'Intake home', 'icon' => null, 'targetType' => 'view', 'targetId' => 6, 'url' => null, 'slug' => 'home'],
-			['label' => 'Docs', 'icon' => 'book', 'targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org', 'slug' => null],
-			['label' => 'Welcome', 'icon' => null, 'targetType' => 'table', 'targetId' => 4, 'url' => null, 'slug' => null],
+			['label' => 'Intake home', 'icon' => null, 'targetType' => 'view', 'targetId' => 6, 'url' => null, 'technicalName' => 'home'],
+			['label' => 'Docs', 'icon' => 'book', 'targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org', 'technicalName' => null],
+			['label' => 'Welcome', 'icon' => null, 'targetType' => 'table', 'targetId' => 4, 'url' => null, 'technicalName' => null],
 		], $sanitized);
 	}
 

@@ -85,7 +85,7 @@ class ContextMapper extends QBMapper {
 			'description' => $rows[0]['description'],
 			'owner_id' => $rows[0]['owner_id'],
 			'owner_type' => $rows[0]['owner_type'],
-			'slug' => $rows[0]['slug'] ?? null,
+			'technicalName' => $rows[0]['technical_name'] ?? null,
 		];
 
 		$formatted['sharing'] = array_reduce($rows, function (array $carry, array $item) use ($userId) {
@@ -251,17 +251,17 @@ class ContextMapper extends QBMapper {
 	}
 
 	/**
-	 * The id of the context with this slug among the contexts the user owns or was given,
-	 * or null when there is none. Slugs are not unique across users, so the lookup is scoped.
+	 * The id of the context with this technical name among the contexts the user owns or was given,
+	 * or null when there is none. Technical names are not unique across users, so the lookup is scoped.
 	 *
 	 * @throws Exception
 	 */
-	public function findIdBySlug(string $slug, string $userId): ?int {
+	public function findIdByTechnicalName(string $technicalName, string $userId): ?int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('c.id')
 			->from($this->table, 'c');
 		$this->applyOwnedOrSharedQuery($qb, $userId);
-		$qb->andWhere($qb->expr()->eq('c.slug', $qb->createNamedParameter($slug, IQueryBuilder::PARAM_STR)))
+		$qb->andWhere($qb->expr()->eq('c.technical_name', $qb->createNamedParameter($technicalName, IQueryBuilder::PARAM_STR)))
 			->orderBy('c.id', 'ASC')
 			->setMaxResults(1);
 		$result = $qb->executeQuery();

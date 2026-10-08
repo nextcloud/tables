@@ -18,14 +18,14 @@ class ContextScheme implements JsonSerializable {
 		protected ?array $nodes = [],
 		protected ?array $pages = [],
 		protected ?array $tables = [],
-		protected ?string $slug = null,
+		protected ?string $technicalName = null,
 		protected array $menuItems = [],
 		protected array $gridViews = [],
 	) {
 	}
 
-	public function getSlug(): ?string {
-		return $this->slug;
+	public function getTechnicalName(): ?string {
+		return $this->technicalName;
 	}
 
 	/**
@@ -74,7 +74,7 @@ class ContextScheme implements JsonSerializable {
 			'nodes' => $this->nodes,
 			'pages' => $this->pages,
 			'tables' => $this->tables,
-			'slug' => $this->slug,
+			'technicalName' => $this->technicalName,
 			'menuItems' => $this->menuItems,
 			'gridViews' => $this->gridViews,
 		];

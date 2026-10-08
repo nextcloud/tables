@@ -35,8 +35,8 @@
 						</p>
 						<p class="application-card__meta">
 							{{ n('tables', '%n menu item', '%n menu items', (context.menuItems ?? []).length) }}
-							<template v-if="context.slug">
-								· /{{ context.slug }}
+							<template v-if="context.technicalName">
+								· /{{ context.technicalName }}
 							</template>
 						</p>
 					</div>

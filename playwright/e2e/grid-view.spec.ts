@@ -27,12 +27,12 @@ test.describe('Grid views inside an application', () => {
 		await createContext(page, contextTitle)
 		await loadContext(page, contextTitle)
 
-		// The slug through the application dialog, an external menu item through the inline menu editor
+		// The technical name through the application dialog, an external menu item through the inline menu editor
 		await page.locator('[data-cy="context-edit-application"]').click()
 		await expect(page.locator('[data-cy="editContextModal"]').first()).toBeVisible()
-		await page.locator('[data-cy="editContextSlug"]').fill('grid-demo')
+		await page.locator('[data-cy="editContextTechnicalName"]').fill('grid_demo')
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
-		await expect(page.locator('[data-cy="context-address"]')).toContainText('/apps/tables/app/grid-demo')
+		await expect(page.locator('[data-cy="context-address"]')).toContainText('/apps/tables/app/grid_demo')
 
 		await page.locator('[data-cy="context-menu-edit"]').click()
 		await page.locator('[data-cy="menuItemAdd"]').click()
@@ -46,7 +46,7 @@ test.describe('Grid views inside an application', () => {
 		await page.locator('[data-cy="context-add-grid-view"]').click()
 		await page.locator('[data-cy="gridViewTitle"]').fill('Intake home')
 		await page.locator('[data-cy="gridViewDescription"]').fill('Start here every morning')
-		await page.locator('[data-cy="gridViewSlug"]').fill('home')
+		await page.locator('[data-cy="gridViewTechnicalName"]').fill('home')
 		await page.locator('[data-cy="gridViewSubmit"]').click()
 		await expect(page).toHaveURL(/\/menu\/home$/)
 		await expect(page.locator('[data-cy="grid-view-title"]')).toHaveText(/Intake home/)
@@ -103,25 +103,25 @@ test.describe('Grid views inside an application', () => {
 
 	test('An application opened on its own shows its menu and its first page', async ({ userPage: { page } }) => {
 		const contextTitle = 'standalone demo application'
-		// slugs are scoped per user, but a unique one keeps reruns on a shared instance honest
-		const slug = 'standalone-demo-' + Date.now()
+		// technical names are scoped per user, but a unique one keeps reruns on a shared instance honest
+		const technicalName = 'standalone_demo_' + Date.now()
 		await page.goto('/index.php/apps/tables')
 		await createContext(page, contextTitle)
 		await loadContext(page, contextTitle)
 		await page.locator('[data-cy="context-edit-application"]').click()
-		await page.locator('[data-cy="editContextSlug"]').fill(slug)
+		await page.locator('[data-cy="editContextTechnicalName"]').fill(technicalName)
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
-		await expect(page.locator('[data-cy="context-address"]')).toContainText('/apps/tables/app/' + slug)
+		await expect(page.locator('[data-cy="context-address"]')).toContainText('/apps/tables/app/' + technicalName)
 
 		await page.locator('[data-cy="context-add-page"]').click()
 		await page.locator('[data-cy="gridViewTitle"]').fill('Front page')
 		await page.locator('[data-cy="gridViewSubmit"]').click()
-		await expect(page).toHaveURL(/\/menu\/front-page$/)
+		await expect(page).toHaveURL(/\/menu\/front_page$/)
 
-		await page.goto('/index.php/apps/tables/app/' + slug)
+		await page.goto('/index.php/apps/tables/app/' + technicalName)
 		await expect(page.locator('[data-cy="application-nav-header"]')).toContainText(contextTitle)
 		await expect(page.locator('[data-cy="application-nav-item"]').filter({ hasText: 'Front page' })).toBeVisible()
-		await expect(page).toHaveURL(/\/menu\/front-page$/)
+		await expect(page).toHaveURL(/\/menu\/front_page$/)
 		await expect(page.locator('[data-cy="grid-view-title"]')).toHaveText(/Front page/)
 		await expect(page.locator('[data-cy="navigationCreateTableIcon"]')).toHaveCount(0)
 	})

@@ -30,7 +30,7 @@ export default createRouter({
 			name: 'context',
 		},
 		{
-			path: '/application/:contextId/menu/:itemSlug',
+			path: '/application/:contextId/menu/:itemName',
 			component: Context,
 			name: 'contextMenuItem',
 		},

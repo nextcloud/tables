@@ -32,9 +32,9 @@
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
-					{{ t('tables', 'Slug') }}
+					{{ t('tables', 'Technical name') }}
 				</div>
-				<input v-model="slug" type="text" data-cy="editContextSlug"
+				<input v-model="technicalName" type="text" data-cy="editContextTechnicalName"
 					:placeholder="t('tables', 'Optional, e.g. intake. Lowercase letters, numbers and hyphens.')">
 			</div>
 			<div class="col-4 row space-T">
@@ -121,7 +121,7 @@ export default {
 				svg: null,
 			},
 			description: '',
-			slug: '',
+			technicalName: '',
 			errorTitle: false,
 			resources: [],
 			receivers: [],
@@ -152,7 +152,7 @@ export default {
 				this.title = context.name
 				this.setIcon(this.localContext.iconName)
 				this.description = context.description
-				this.slug = context.slug ?? ''
+				this.technicalName = context.technicalName ?? ''
 				this.resources = context ? this.getContextResources(context) : []
 				this.receivers = context ? this.getContextReceivers(context) : []
 				this.showInNavigationDefault = this.getNavDisplay(context)
@@ -186,7 +186,7 @@ export default {
 					iconName: this.icon.name,
 					description: this.description,
 					nodes: dataResources,
-					slug: this.slug.trim(),
+					technicalName: this.technicalName.trim(),
 				}
 				const context = this.getContext(this.contextId)
 				// adding share to oneself to have navigation display control
@@ -212,7 +212,7 @@ export default {
 			this.errorTitle = false
 			this.icon.name = 'equalizer'
 			this.description = ''
-			this.slug = context?.slug ?? ''
+			this.technicalName = context?.technicalName ?? ''
 			this.resources = context ? this.getContextResources(context) : []
 			this.receivers = context ? this.getContextReceivers(context) : []
 			this.prepareDeleteContext = false

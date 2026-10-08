@@ -73,8 +73,8 @@ class ViewController extends Controller {
 	 * Create a view that is not bound to a table, such as a grid view.
 	 */
 	#[NoAdminRequired]
-	public function createStandalone(string $title, ?string $emoji = null, string $type = 'grid', ?string $slug = null, string $description = ''): DataResponse {
-		return $this->handleError(fn () => $this->service->create($title, $emoji, null, $this->userId, null, null, $type, $slug, $description));
+	public function createStandalone(string $title, ?string $emoji = null, string $type = 'grid', ?string $technicalName = null, string $description = ''): DataResponse {
+		return $this->handleError(fn () => $this->service->create($title, $emoji, null, $this->userId, $technicalName, null, $type, $description));
 	}
 
 	#[NoAdminRequired]

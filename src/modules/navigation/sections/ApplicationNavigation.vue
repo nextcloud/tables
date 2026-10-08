@@ -31,7 +31,7 @@
 				<NcAppNavigationItem v-if="hasResources"
 					:name="t('tables', 'Overview')"
 					:to="'/application/' + context.id"
-					:class="{ active: !$route.params.itemSlug }"
+					:class="{ active: !$route.params.itemName }"
 					data-cy="application-nav-overview">
 					<template #icon>
 						<ViewGridOutline :size="20" />
@@ -101,7 +101,7 @@ export default {
 	methods: {
 		menuItemRoute,
 		isActive(item) {
-			return item.targetType !== 'url' && this.$route.params.itemSlug === item.slug
+			return item.targetType !== 'url' && this.$route.params.itemName === item.technicalName
 		},
 	},
 }

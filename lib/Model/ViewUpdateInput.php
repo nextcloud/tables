@@ -33,7 +33,6 @@ class ViewUpdateInput {
 		protected readonly ?int $sidebarOrder = null,
 		protected readonly ?string $type = null,
 		protected readonly ?array $grid = null,
-		protected readonly ?string $slug = null,
 	) {
 	}
 
@@ -68,9 +67,6 @@ class ViewUpdateInput {
 		if ($this->grid !== null) {
 			yield ViewUpdatableParameters::GRID => $this->grid;
 		}
-		if ($this->slug !== null) {
-			yield ViewUpdatableParameters::SLUG => $this->slug;
-		}
 	}
 
 	/**
@@ -85,8 +81,7 @@ class ViewUpdateInput {
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'contains-item'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float|list<array{id: int, label: string, uuid?: string}>}>>,
 	 *     sidebarOrder?: int,
 	 *     type?: string,
-	 *     grid?: array{widgets?: list<array<string, mixed>>, layout?: list<array<string, mixed>>},
-	 *     slug?: string
+	 *     grid?: array{widgets?: list<array<string, mixed>>, layout?: list<array<string, mixed>>}
 	 * } $data
 	 * @param array $columnsMap
 	 */
@@ -117,7 +112,6 @@ class ViewUpdateInput {
 			sidebarOrder: (array_key_exists('sidebarOrder', $data) && $data['sidebarOrder'] !== null) ? (int)$data['sidebarOrder'] : null,
 			type: isset($data['type']) ? (string)$data['type'] : null,
 			grid: (isset($data['grid']) && is_array($data['grid'])) ? $data['grid'] : null,
-			slug: array_key_exists('slug', $data) && $data['slug'] !== null ? (string)$data['slug'] : null,
 		);
 	}
 

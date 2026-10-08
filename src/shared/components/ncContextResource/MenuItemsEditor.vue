@@ -140,7 +140,7 @@ export default {
 				targetType: 'url',
 				targetId: null,
 				url: '',
-				slug: null,
+				technicalName: null,
 			}])
 		},
 		remove(index) {

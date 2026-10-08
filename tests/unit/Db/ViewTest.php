@@ -59,17 +59,17 @@ class ViewTest extends TestCase {
 		$this->assertSame('table-owner', $view->getOwnership());
 	}
 
-	public function testJsonSerializeCarriesTypeGridAndSlug(): void {
+	public function testJsonSerializeCarriesTypeGridAndTechnicalName(): void {
 		$view = new View();
 		$view->setType(View::TYPE_GRID);
-		$view->setSlug('home');
+		$view->setTechnicalName('home');
 		$view->setCreatedBy('alice');
 		$view->setGridArray(['widgets' => [], 'layout' => []]);
 
 		$json = $view->jsonSerialize();
 
 		$this->assertSame('grid', $json['type']);
-		$this->assertSame('home', $json['slug']);
+		$this->assertSame('home', $json['technicalName']);
 		$this->assertSame(['widgets' => [], 'layout' => []], $json['grid']);
 		$this->assertSame(-1, $json['tableId']);
 		$this->assertSame('alice', $json['ownership']);

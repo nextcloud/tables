@@ -190,7 +190,6 @@ class ViewService extends SuperService {
 		?string $technicalName = null,
 		?string $uuid = null,
 		string $type = View::TYPE_TABLE,
-		?string $slug = null,
 		string $description = '',
 	): View {
 		/** @var string $userId */
@@ -219,10 +218,6 @@ class ViewService extends SuperService {
 		$item->setDescription($description);
 		$item->setTableId($table?->getId());
 		$item->setType($type);
-		if ($slug !== null && $slug !== '') {
-			$this->assertSlugValid($slug);
-			$item->setSlug($slug);
-		}
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
@@ -293,10 +288,6 @@ class ViewService extends SuperService {
 					if ($value === View::TYPE_TABLE && $view->getTableId() === null) {
 						throw new BadRequestError('A view without a table cannot become a table view.');
 					}
-				}
-
-				if ($parameter === ViewUpdatableParameters::SLUG && $value !== '') {
-					$this->assertSlugValid($value);
 				}
 
 				if ($parameter === ViewUpdatableParameters::GRID) {
@@ -731,10 +722,6 @@ class ViewService extends SuperService {
 		if (isset($view['grid']) && is_array($view['grid'])) {
 			$item->setGridArray($view['grid']);
 		}
-		if (isset($view['slug']) && $view['slug'] !== '') {
-			$this->assertSlugValid($view['slug']);
-			$item->setSlug($view['slug']);
-		}
 		try {
 			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
@@ -819,14 +806,6 @@ class ViewService extends SuperService {
 	/**
 	 * @throws BadRequestError
 	 */
-	private function assertSlugValid(string $slug): void {
-		if (strlen($slug) > 64) {
-			throw new BadRequestError('A slug must not exceed 64 characters.');
-		}
-		if (!preg_match('/^[a-z0-9][a-z0-9-]*$/', $slug)) {
-			throw new BadRequestError('A slug may only contain lowercase letters, numbers and hyphens, and must start with a letter or number.');
-		}
-	}
 
 	private function assertTechnicalNameValid(string $technicalName): void {
 		if (strlen($technicalName) > 200) {

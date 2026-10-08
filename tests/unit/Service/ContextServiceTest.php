@@ -99,7 +99,7 @@ final class ContextServiceTest extends TestCase {
 		});
 	}
 
-	public function testUpdateReplacesTheMenuInOrderAndSlugifiesLabels(): void {
+	public function testUpdateReplacesTheMenuInOrderAndDerivesTechnicalNamesFromLabels(): void {
 		$context = $this->contextWithMenu(7, []);
 		$this->contextMapper->method('findById')->with(7, 'user-1')->willReturn($context);
 		$this->contextMapper->method('update')->willReturnArgument(0);
@@ -107,14 +107,14 @@ final class ContextServiceTest extends TestCase {
 		$this->expectMenuReplacement(7, $inserted);
 
 		$updated = $this->service->update(7, 'user-1', null, null, null, null, 'intake', [
-			['label' => 'Intake home', 'targetType' => 'view', 'targetId' => 6, 'slug' => 'home'],
+			['label' => 'Intake home', 'targetType' => 'view', 'targetId' => 6, 'technicalName' => 'home'],
 			['label' => 'Welcome table!', 'targetType' => 'table', 'targetId' => 4],
 			['label' => 'Docs', 'targetType' => 'url', 'url' => 'https://docs.nextcloud.com', 'targetId' => 99],
 		]);
 
-		$this->assertSame('intake', $updated->getSlug());
+		$this->assertSame('intake', $updated->getTechnicalName());
 		$this->assertSame([10, 20, 30], array_map(static fn (MenuItem $item) => $item->getOrder(), $inserted));
-		$this->assertSame(['home', 'welcome-table', 'docs'], array_map(static fn (MenuItem $item) => $item->getSlug(), $inserted));
+		$this->assertSame(['home', 'welcome_table', 'docs'], array_map(static fn (MenuItem $item) => $item->getTechnicalName(), $inserted));
 		$this->assertSame([6, 4, null], array_map(static fn (MenuItem $item) => $item->getTargetId(), $inserted));
 		$this->assertSame([null, null, 'https://docs.nextcloud.com'], array_map(static fn (MenuItem $item) => $item->getUrl(), $inserted));
 		$this->assertCount(3, $updated->getMenuItems());
@@ -133,25 +133,25 @@ final class ContextServiceTest extends TestCase {
 		$this->assertSame('Keep me', $updated->getMenuItems()[0]['label']);
 	}
 
-	public function testUpdateRejectsAMalformedSlug(): void {
+	public function testUpdateRejectsAMalformedTechnicalName(): void {
 		$this->contextMapper->method('findById')->willReturn($this->contextWithMenu(7, []));
 
 		$this->expectException(\InvalidArgumentException::class);
-		$this->service->update(7, 'user-1', null, null, null, null, 'Not A Slug');
+		$this->service->update(7, 'user-1', null, null, null, null, 'Not A Name');
 	}
 
-	public function testUpdateClearsTheSlugWhenItIsBlank(): void {
+	public function testUpdateClearsTheTechnicalNameWhenItIsBlank(): void {
 		$context = $this->contextWithMenu(7, []);
-		$context->setSlug('old');
+		$context->setTechnicalName('old');
 		$this->contextMapper->method('findById')->willReturn($context);
 		$this->contextMapper->method('update')->willReturnArgument(0);
 
 		$updated = $this->service->update(7, 'user-1', null, null, null, null, '  ');
 
-		$this->assertNull($updated->getSlug());
+		$this->assertNull($updated->getTechnicalName());
 	}
 
-	public function testCreateStoresSlugAndMenuItems(): void {
+	public function testCreateStoresTechnicalNameAndMenuItems(): void {
 		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
 			$context->setId(8);
 			return $context;
@@ -164,10 +164,10 @@ final class ContextServiceTest extends TestCase {
 			['label' => 'Docs', 'targetType' => 'url', 'url' => 'https://example.org'],
 		]);
 
-		$this->assertSame('intake', $created->getSlug());
+		$this->assertSame('intake', $created->getTechnicalName());
 		$this->assertSame('desc', $created->getDescription());
 		$this->assertCount(1, $created->getMenuItems());
-		$this->assertSame('docs', $inserted[0]->getSlug());
+		$this->assertSame('docs', $inserted[0]->getTechnicalName());
 	}
 
 	public function testDeleteRemovesTheMenuItems(): void {
@@ -198,15 +198,15 @@ final class ContextServiceTest extends TestCase {
 		$gridView->setUuid('view-uuid');
 		$gridView->setTitle('Intake home');
 		$gridView->setType(View::TYPE_GRID);
-		$gridView->setSlug('home');
+		$gridView->setTechnicalName('home');
 		$gridView->setGridArray(['widgets' => [['id' => 'w-1', 'type' => 'data', 'content' => ['targetType' => 'table', 'targetId' => 4]]], 'layout' => []]);
 		$this->tableMapper->method('find')->with(4)->willReturn($table);
 		$this->viewMapper->method('find')->with(6)->willReturn($gridView);
 
 		$context = $this->contextWithMenu(7, [
-			['label' => 'Intake home', 'icon' => null, 'targetType' => 'view', 'targetId' => 6, 'url' => null, 'slug' => 'home'],
-			['label' => 'Welcome', 'icon' => null, 'targetType' => 'table', 'targetId' => 4, 'url' => null, 'slug' => 'welcome'],
-			['label' => 'Docs', 'icon' => null, 'targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org', 'slug' => 'docs'],
+			['label' => 'Intake home', 'icon' => null, 'targetType' => 'view', 'targetId' => 6, 'url' => null, 'technicalName' => 'home'],
+			['label' => 'Welcome', 'icon' => null, 'targetType' => 'table', 'targetId' => 4, 'url' => null, 'technicalName' => 'welcome'],
+			['label' => 'Docs', 'icon' => null, 'targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org', 'technicalName' => 'docs'],
 		]);
 
 		[$menuItems, $gridViews] = $this->callPrivate('exportMenuItems', [$context]);
@@ -221,8 +221,8 @@ final class ContextServiceTest extends TestCase {
 	public function testExportSkipsMenuItemsWhoseTargetIsGone(): void {
 		$this->tableMapper->method('find')->willThrowException(new \OCP\AppFramework\Db\DoesNotExistException('gone'));
 		$context = $this->contextWithMenu(7, [
-			['label' => 'Gone', 'icon' => null, 'targetType' => 'table', 'targetId' => 99, 'url' => null, 'slug' => 'gone'],
-			['label' => 'Docs', 'icon' => null, 'targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org', 'slug' => 'docs'],
+			['label' => 'Gone', 'icon' => null, 'targetType' => 'table', 'targetId' => 99, 'url' => null, 'technicalName' => 'gone'],
+			['label' => 'Docs', 'icon' => null, 'targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org', 'technicalName' => 'docs'],
 		]);
 
 		[$menuItems] = $this->callPrivate('exportMenuItems', [$context]);
@@ -244,7 +244,7 @@ final class ContextServiceTest extends TestCase {
 		$this->viewMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): ?View => $uuid === 'view-uuid' ? $view : null);
 
 		$resolved = $this->callPrivate('resolveMenuItems', [[
-			['label' => 'Intake home', 'targetType' => 'view', 'targetUuid' => 'view-uuid', 'slug' => 'home'],
+			['label' => 'Intake home', 'targetType' => 'view', 'targetUuid' => 'view-uuid', 'technicalName' => 'home'],
 			['label' => 'Welcome', 'targetType' => 'table', 'targetUuid' => 'table-uuid'],
 			['label' => 'Missing', 'targetType' => 'table', 'targetUuid' => 'nope'],
 			['label' => 'Weird', 'targetType' => 'kanban', 'targetUuid' => 'x'],
