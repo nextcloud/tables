@@ -121,7 +121,7 @@ Three APIs exist today, which is the problem proposal P16 addresses:
 | `api/2`, OCS | 36 | tables, columns, contexts, favourites, config, scheme export and import, ownership transfer, widget types, standalone views | yes | no rows endpoint |
 | internal, `/apps/tables/...` | 48 | views, rows, shares, tables, import, search, navigation, the app shell | no | yes, for the frontend only |
 
-The internal routes are the ones Tables' own frontend calls for views, rows and shares, while it already calls `api/2` for applications and tables. So the primary consumer of Tables uses an API that has no OpenAPI description and no declared schemas, and every capability exists twice or three times. Proposal P16: the frontend moves to `api/2` and the internal routes retire in 2.0.
+The internal routes are the ones Tables' own frontend calls for views, rows and shares, while it already calls `api/2` for applications and tables. So the primary consumer of Tables uses an API that has no OpenAPI description and no declared schemas, and every capability exists twice or three times. Proposal P16: the frontend moves to `api/2` and the internal routes retire in 2.0. The [API index](13-api-index.md) lists every route by capability and where it lands.
 
 The rule this project follows, proposal P12: neither version changes shape. Rows arrive on `api/2` as new endpoints with the object format, next to the existing `api/2` tables and contexts routes. `api/1` rows stay for Analytics, Forms and the connectors. A client that wants the old cell shape on `api/2` asks for `format=cells`. The [rows API](12-rows-api.md) document holds both shapes.
 

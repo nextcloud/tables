@@ -110,7 +110,7 @@ Ruben. Columns and views already have `technicalName`; applications and menu ite
 
 ### P16. One API: the frontend consumes `api/2`
 
-Ruben. Tables has three APIs: `api/1` and `api/2` over OCS and 48 internal routes that only the frontend uses and that no OpenAPI document describes. Every new capability lands on `api/2` only, the frontend store (P13) is pointed at `api/2`, and the internal routes retire in 2.0 once nothing calls them. The OpenAPI document then describes the whole surface, with a named schema for every response, and the JSON Schema endpoint per table describes the data. `api/1` stays frozen for its outside consumers.
+Ruben. Sought as a design decision at the kick-off, see the [API index](13-api-index.md) for every route and its target. Tables has three APIs: `api/1` and `api/2` over OCS and 48 internal routes that only the frontend uses and that no OpenAPI document describes. Every new capability lands on `api/2` only, the frontend store (P13) is pointed at `api/2`, and the internal routes retire in 2.0 once nothing calls them. The OpenAPI document then describes the whole surface, with a named schema for every response, and the JSON Schema endpoint per table describes the data. `api/1` stays frozen for its outside consumers.
 
 Why: an API the primary consumer does not use is not tested by use, and a frontend on undocumented routes cannot be replaced by another client.
 
