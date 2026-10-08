@@ -49,6 +49,23 @@ namespace OCA\Tables;
  *  grid: array{widgets: list<array<string, mixed>>, layout: list<array<string, mixed>>},
  * }
  *
+ * @psalm-type TablesGridWidgetProperty = array{
+ *  type: string,
+ *  title: string,
+ *  default: mixed,
+ *  options?: list<array{value: string, label: string}>,
+ *  required?: bool,
+ * }
+ *
+ * @psalm-type TablesGridWidgetType = array{
+ *  type: string,
+ *  title: string,
+ *  defaultWidth: int,
+ *  defaultHeight: int,
+ *  configuration: array<string, TablesGridWidgetProperty>,
+ *  properties: array<string, TablesGridWidgetProperty>,
+ * }
+ *
  * @psalm-type TablesTable = array{
  * 	id: int,
  *  uuid: string,
