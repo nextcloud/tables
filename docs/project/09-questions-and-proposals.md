@@ -96,6 +96,18 @@ Ruben. Both are added through the server's `OCP\\Calendar` and `OCP\\Contacts` i
 
 Ruben. A table, view, column, share or API call that works today works unchanged after this project. New fields are nullable and default to today's behaviour. The v1 and v2 APIs keep their shapes; new capabilities arrive as new parameters and new endpoints.
 
+### P13. A frontend store with a cache
+
+Components call the Tables API directly, which puts caching on the backend alone. Before that becomes a performance problem, the Tables frontend gets one store: a per-source cache of collections and items, request coalescing so two widgets asking for the same page share one call, invalidation on row create, update and delete, and an optional subscription to row events later. The nc-vue object store already has this shape and is the model. On the roadmap in sprint 2, next to server-side paging.
+
+### P14. Context becomes application in code and API
+
+Ruben. The user interface already says application; the code, the database and the API say context. The 2.0 release renames code and API to application, adds `api/2/applications` routes and keeps `api/2/contexts` as aliases for one release.
+
+### P15. One identifier: the technical name
+
+Ruben. Columns and views already have `technicalName`. Tables and applications get the same field with the same pattern. The fork's separate `slug` is dropped before the upstream pull request. Row input by technical name is an existing pattern, `dataByAlias`, and the object format on `api/2` builds on it.
+
 ### P6. Parity scope and data layer
 
 Ruben. Parity is the application runtime, the designer and packaging. Flows, automation and the AI companion are out. The data layer is Tables rows. See [goals and scope](01-goals-and-scope.md).

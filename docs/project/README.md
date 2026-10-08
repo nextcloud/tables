@@ -35,7 +35,9 @@ Tables already holds the structural half of an application builder: tables, colu
 - Row identity: a uuid per row and routes by uuid.
 - Column formats: a `format` field, a server-side validator registry, pattern enforcement.
 - Six column types: json, file, array, tag, calendar item and contact. Relation extended with filter, sort, inverse lookup and inline resolve.
-- Slugs on tables and a default CRUD API per application and table.
+- Technical names on tables and applications and a default CRUD API per application and table.
+- A frontend store with a cache.
+- The rename of context to application in code and API.
 - Search beyond `LIKE`.
 - JSON Schema export and import of a table and of an application.
 - Aggregations: value, grouped and timeseries.

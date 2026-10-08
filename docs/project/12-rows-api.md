@@ -45,7 +45,7 @@ Proposal P12 follows from that: v1 and the existing v2 routes keep their shapes.
 ]
 ```
 
-`dataByAlias` is only filled for columns that have a technical name. Selection values are the magic string `@selection-id-{id}`. Relation values are target row ids. Usergroup values are `{id, type, displayName}` objects.
+`dataByAlias` is only filled for columns that have a technical name. That alias is already the pattern this plan builds on: the object format on `api/2` is `dataByAlias` flattened, and spreading `technicalName` to tables and applications (P15) is the technical debt that stands between today's API and a default CRUD route per application and table. Selection values are the magic string `@selection-id-{id}`. Relation values are target row ids. Usergroup values are `{id, type, displayName}` objects.
 
 ## Today: a single row
 
@@ -58,7 +58,7 @@ Everything below is an addition. No existing route changes its parameters or its
 ```
 GET    /api/2/tables/{tableId}/rows
 GET    /api/2/views/{viewId}/rows
-GET    /api/2/apps/{applicationSlug}/{tableSlug}
+GET    /api/2/apps/{applicationTechnicalName}/{tableTechnicalName}
 GET    /api/2/rows/{uuid}
 POST   /api/2/tables/{tableId}/rows
 PUT    /api/2/rows/{uuid}
@@ -121,7 +121,7 @@ Index response:
 }
 ```
 
-Properties are keyed by technical name; a column without one gets a slug of its title and the schema endpoint says which. Selection values are the option label, with the option id available through the schema's `enum`. Dates are ISO 8601 with offset. Relation cells are ids unless extended. The metadata block carries the integer row id so v1 and v2 can be joined.
+Properties are keyed by technical name; a column without one gets a technical name derived from its title on first use, stored on the column, and the schema endpoint says which. Selection values are the option label, with the option id available through the schema's `enum`. Dates are ISO 8601 with offset. Relation cells are ids unless extended. The metadata block carries the integer row id so v1 and v2 can be joined.
 
 Single row: `GET /api/2/rows/{uuid}` returns one object of the same shape. Create and update accept the same object shape keyed by technical name and return the stored object, so a client never needs a second read.
 

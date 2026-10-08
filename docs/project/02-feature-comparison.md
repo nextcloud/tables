@@ -8,7 +8,7 @@ Part of the [buildiq parity project](README.md). Measured on buildiq 0.7.15 with
 
 buildiq has three layers: an application runtime that renders a whole app from one JSON manifest, a designer that edits that manifest and the data model in place, and packaging that turns an application into a real Nextcloud app. Flows, automation, the AI companion and connectors are out of scope for this project and are left out below.
 
-Status words: **has** means Tables does it today, **partial** means a smaller version exists, **lacks** means nothing exists, **built** means the fork added it on the open pull requests.
+Status words: **has** means Tables does it today, **partial** means a smaller version exists, **lacks** means nothing exists, **built** means the fork added it on the open pull requests; it is not in Tables and counts as proposed until merged upstream.
 
 ## 1 The manifest
 

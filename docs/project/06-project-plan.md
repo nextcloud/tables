@@ -46,7 +46,7 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 | Owner | Item | Size |
 |---|---|---|
 | Ruben | merge fork pull requests #2, #3 and #4 into `feat/grid-page`, rename the migration to the current target version and date, open the upstream pull request on nextcloud/tables with the AI disclosure, in Ruben's own words | S |
-| Remko | split the widget shape into `configuration` and `content` before the upstream pull request, with the migration of existing grid JSON; address upstream review during sprint 1 as it comes | S |
+| Remko | before the upstream pull request: split the widget shape into `configuration` and `content` with a migration of existing grid JSON, and replace the fork's `slug` on views and applications by `technicalName` (P15); address upstream review during sprint 1 as it comes | M |
 
 ### Sprint 1, 12 to 25 October, the data layer cluster
 
@@ -54,7 +54,7 @@ Proposal P5: both developers work the types and the API extensions together, bec
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | indexes on the cell tables, `(column_id, row_id)` and `(column_id, value)`; row uuids with backfill and routes by uuid; slugs on tables and the default CRUD routes `/api/2/apps/{application}/{table}` | M |
+| Robert | indexes on the cell tables, `(column_id, row_id)` and `(column_id, value)`; row uuids with backfill and routes by uuid; `technicalName` on tables and applications and the default CRUD routes `/api/2/apps/{application}/{table}` (P15) | M |
 | Robert | rows v2 listing for tables and views: search, filter with the twelve operators, sort, page and limit with total, fields, `format=object`; object format accepted on create and update | L |
 | Robert | `format` on columns, the formats registry with the first twelve validators, pattern enforcement; JSON Schema export and flat import | M |
 | Remko | the json and file column types end to end: migration, mapper, cell editor, renderer, filter UI, import and export, OpenAPI | L |
@@ -69,7 +69,7 @@ Proposal P5: both developers work the types and the API extensions together, bec
 | Robert | aggregation endpoint: value, grouped, timeseries; distinct values of a column; `extend` for relation cells | M |
 | Robert | the tag column type; search improved past `LIKE`: a per-table search index over text cells, proposal P9 | L |
 | Remko | copy of the keep widgets: label, image, link, links, quicklinks, tile, divider, video, menu, container, banner, with their forms as server schemas | M |
-| Remko | server-side paging, filtering and search in the Tables data table behind a threshold; application pages use server mode | L |
+| Remko | the Tables frontend store (P13): per-source cache, request coalescing, invalidation on row changes; server-side paging, filtering and search in the data table behind a threshold | L |
 | Remko | aggregation widgets: stat, delta, gauge, stats block, chart, stacked bar, workspace filter | M |
 | Ruben | design of the detail page and the form page (layout, sidebar tabs, actions) | S |
 | Thijn | benchmark round 1 and the review of M1 | S |
@@ -141,6 +141,10 @@ From December, every sprint review is followed by a user review: an online sessi
 How a session runs: Ruben demonstrates one acceptance path from [testing and acceptance](08-testing-and-acceptance.md) live, then two or three participants try the same path on a shared test instance while the others watch, then open discussion. Thijn records findings as issues with the participant's words and the screen they were on. Findings are triaged within a week and the participants hear back what happened to each one.
 
 Who is invited: organisations that depend on Tables for their own applications, Schleswig-Holstein first because of the weight of its Tables use, plus the Conduction municipalities that will run the first packaged apps, plus anyone Nextcloud GmbH names. Six to ten participants per session. Question Q7 asks Nextcloud GmbH whether a user panel exists we can draw from; until that answer, we build our own list.
+
+## The 2.0 rename
+
+Proposal P14, context to application, is its own item because it touches every layer. It runs in sprint 4 for Robert, after the data layer has settled and before the manifest and packaging work name the entity in files: migration renaming the tables, classes and services renamed, `api/2/applications` routes added, `api/2/contexts` kept as aliases, OpenAPI regenerated, frontend store and strings aligned. Size L. If sprint 4 is full it moves to the stabilisation weeks, not past the release.
 
 ## Dependencies between items
 

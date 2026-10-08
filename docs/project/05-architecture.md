@@ -16,9 +16,9 @@ Part of the [buildiq parity project](README.md).
 
 ## The application model
 
-Three columns because the fork is ahead of Tables: what nextcloud/tables has, what the fork's open pull requests add, and what this project adds.
+Three columns because the fork is ahead of Tables: what nextcloud/tables has, what the fork's open pull requests add, and what this project adds. Nothing in the last two columns is in Tables; all of it is a proposal until it is merged upstream.
 
-| Entity | Table | In nextcloud/tables | On the fork | This project adds |
+| Entity | Table | In nextcloud/tables | On the fork (proposed) | This project adds (proposed) |
 |---|---|---|---|---|
 | Application | `tables_contexts_context` | name, icon, description, owner, sharing, nodes, pages | slug, menu items | version, `configuration` JSON (landing page, theme, runtime options), permission fields |
 | Menu item | `tables_contexts_menu_item` | nothing; the start page lists node tiles | label, icon, target (view, table, url), slug, order | section, parent (one level), permission (group), count source |
@@ -30,6 +30,69 @@ Three columns because the fork is ahead of Tables: what nextcloud/tables has, wh
 Two naming notes. Tables has no configuration field on an application today: its `api/2/config` routes return the notification settings of a table or view and set app or user config keys, which is a different thing. The application and page field is therefore named `configuration` here, and the plan avoids `config` for it. For widgets the fork currently puts every property, title and show title included, in `content`; the split into `configuration` and `content` is a change to the fork's widget shape before it goes upstream, so it is listed under the pre-sprint work.
 
 Pages of type detail and form are views without a table of their own, like grid views. Their configuration names the table they work on.
+
+## Examples
+
+An application, as the proposed `api/2` would return it:
+
+```json
+{
+  "id": 2,
+  "technicalName": "intake",
+  "name": "Intake",
+  "icon": "inbox",
+  "description": "Intake of requests for the service desk",
+  "version": "1.2.0",
+  "configuration": { "landingPage": "home", "theme": "default" },
+  "menu": [
+    { "id": 11, "technicalName": "home", "label": "Intake home", "icon": "home", "target": { "type": "view", "id": 6 }, "order": 0 },
+    { "id": 12, "technicalName": "requests", "label": "Requests", "icon": "table", "target": { "type": "table", "id": 4 }, "order": 1, "permission": { "groups": ["servicedesk"] } },
+    { "id": 13, "technicalName": "docs", "label": "Documentation", "icon": "book", "target": { "type": "url", "url": "https://docs.example.org" }, "order": 2 }
+  ],
+  "owner": "admin",
+  "sharing": []
+}
+```
+
+A page, a view of type grid, with one widget in the proposed split shape:
+
+```json
+{
+  "id": 6,
+  "uuid": "7c0e…",
+  "technicalName": "home",
+  "title": "Intake home",
+  "type": "grid",
+  "tableId": null,
+  "configuration": { "dataSource": null, "actions": [], "sidebar": null },
+  "grid": {
+    "widgets": [
+      {
+        "id": "w1",
+        "type": "header",
+        "layout": { "x": 0, "y": 0, "w": 12, "h": 2 },
+        "configuration": { "title": "Welcome", "showTitle": false, "visibleWhen": null, "style": { "backgroundColor": "#1f6feb" } },
+        "content": { "title": "Welcome to intake", "subtitle": "Register a request in three steps", "textAlign": "left" }
+      },
+      {
+        "id": "w2",
+        "type": "data",
+        "layout": { "x": 0, "y": 2, "w": 12, "h": 6 },
+        "configuration": { "title": "Open requests", "showTitle": true, "source": { "type": "view", "id": 9 }, "limit": 10 },
+        "content": {}
+      }
+    ]
+  }
+}
+```
+
+## Naming debt to clear in 2.0
+
+Two names are inconsistent today, and the upstream pull request is the moment to fix them, proposals P14 and P15.
+
+**Context versus application.** The code, the database tables and the eleven `contexts` routes say context. The user interface says application in 39 strings and context in 1. A 2.0 release renames the code and the API to application: `tables_contexts_*` tables and classes become `tables_applications_*`, `api/2/applications` routes are added, and the `api/2/contexts` routes stay for one release as aliases so Analytics, Forms and connectors keep working.
+
+**Technical name versus slug.** Upstream columns and views already carry a `technicalName`, validated as `^[a-z][a-z0-9_]*$`, and the row API already returns `dataByAlias` keyed by it. The fork added a separate `slug` on views and applications. That is two identifiers for one job. The proposal: one identifier, `technicalName`, on columns, views, tables and applications alike, with the existing pattern, and no `slug` field. The fork drops `slug` before the upstream pull request. Spreading an identifier that already exists to two more entities is debt removal, not a feature.
 
 ## Request paths
 
