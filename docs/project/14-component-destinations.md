@@ -23,7 +23,7 @@ Weeks are ISO weeks and follow the [project plan](06-project-plan.md): sprint 1 
 
 ## Screenshots
 
-Every component should have a screenshot, the way the docs show one for a component with a styleguide example. Today the styleguide renders 62 components, and 45 of those are in this list. We captured them from the live styleguide and they are on the filterable page. The other 145 components have a docs page with props but no rendered example, so they have nothing to screenshot yet. The fix is one styleguide example per component in nextcloud-vue, written when the component is copied or proposed. Thijn checks the screenshot exists before a component counts as landed.
+Every component should have a screenshot, the way the docs show one for a component with a styleguide example. Today the styleguide lists 62 components, and 45 of those are in this list. We captured 44 of them from the live styleguide and they are on the filterable page. CnIndexPage has a styleguide entry whose example never mounts, so it has no screenshot until that example is fixed. The other 145 components have a docs page with props but no rendered example, so they have nothing to screenshot yet. The fix is one styleguide example per component in nextcloud-vue, written when the component is copied or proposed. Thijn checks the screenshot exists before a component counts as landed.
 
 ## The list
 
@@ -182,7 +182,7 @@ Every component should have a screenshot, the way the docs show one for a compon
 | CnWidgetGrid | layout and shell | adapt | tables | 46 | needs an example |
 | CnDetailPage | page type | rewrite | tables | 46 | captured |
 | CnFormPage | page type | adapt | tables | 46 | needs an example |
-| CnIndexPage | page type | rewrite | tables | 46 | captured |
+| CnIndexPage | page type | rewrite | tables | 46 | example does not render |
 | CnLogsPage | page type | rewrite | tables | 46 | needs an example |
 | CnAuditTrailCard | layout and shell | adapt | tables | 48 | needs an example |
 | CnCardGrid | layout and shell | adapt | tables | 48 | captured |

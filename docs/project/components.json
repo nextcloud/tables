@@ -1845,7 +1845,7 @@
   "week": "46",
   "starts": "9 Nov",
   "docs": "https://nextcloud-vue.conduction.nl/docs/components/cn-index-page/",
-  "screenshot": "captured"
+  "screenshot": "example does not render"
  },
  {
   "name": "CnLogsPage",
