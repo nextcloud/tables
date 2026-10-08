@@ -4,11 +4,11 @@
 -->
 # API index
 
-Part of the [buildiq parity project](README.md). Every route of the Tables fork at branch `refactor/upstream-shape`, read from `appinfo/routes.php`, grouped by capability and split into the three APIs that exist today. The last column is the design decision this project seeks: where the capability lives on `api/2` once proposal P16 is accepted.
+Part of the [buildiq parity project](README.md). This is every route of the Tables fork at branch `refactor/upstream-shape`, read from `appinfo/routes.php`. Routes are grouped by capability and split into the three APIs that exist today. The last column is the design decision this project seeks: where the capability lives on `api/2` once proposal P16 is accepted.
 
-Counts: internal 48, `api/1` 40, `api/2` 36 (the CORS preflight route left out). Only `api/1` and `api/2` appear in `openapi.json`.
+The counts are 48 internal, 40 on `api/1` and 36 on `api/2`, with the CORS preflight route left out. Only `api/1` and `api/2` appear in `openapi.json`.
 
-Reading the table: a capability that only has internal routes is one the frontend uses and no other client can; one that has `api/1` and internal routes exists twice; one with all three exists three times.
+How to read the table. A capability with only internal routes is one the frontend uses and no other client can. One with `api/1` and internal routes exists twice. One with all three exists three times.
 
 | Capability | Internal | `api/1` | `api/2` | Target on `api/2` |
 |---|---|---|---|---|
@@ -32,7 +32,7 @@ Reading the table: a capability that only has internal routes is one the fronten
 
 ## The decision this asks for
 
-Proposal P16 as a design decision for the kick-off: **`api/2` is the only API Tables adds to from now on, and the only one its frontend calls.** Concretely:
+We ask the kick-off to make proposal P16 a design decision: **`api/2` is the only API Tables adds to from now on, and the only one its frontend calls.** In practice:
 
 1. No new internal route. A capability the frontend needs is an `api/2` route with Nextcloud attributes, a rate limit where it mutates, a named response type and an OpenAPI entry.
 2. The frontend store (P13) calls `api/2` for everything. Sprint 2 adds the `api/2` routes that only internal ones offer today: views by table, shares, import with preview and upload, search, navigation.
@@ -40,4 +40,4 @@ Proposal P16 as a design decision for the kick-off: **`api/2` is the only API Ta
 4. The internal routes are removed in 2.0, together with the context to application rename, once nothing calls them. Page routes (`/`, `/app/{technicalName}`, `/view/{id}`, the public share page) stay, because they serve HTML, not data.
 5. `openapi.json` then describes the whole data surface, and `GET /api/2/tables/{id}/schema` describes the data itself in JSON Schema.
 
-Why decide it now: every sprint that adds a capability on two APIs doubles the work and the drift. The widget types and the standalone view already exist twice on the fork, one week in.
+Why decide it now: every sprint that adds a capability on two APIs doubles the work and the drift. The widget types and the standalone view already exist twice on the fork, one week in. Until the decision is taken, add nothing to the internal routes; put it on `api/2` and update this index.

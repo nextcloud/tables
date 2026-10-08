@@ -4,11 +4,11 @@
 -->
 # The rows API, today and proposed
 
-Part of the [buildiq parity project](README.md). Shapes are taken from the controllers and `ResponseDefinitions.php` on the fork; every Tables response sits inside the OCS envelope `{"ocs": {"meta": {...}, "data": ...}}`, which is left out below.
+Part of the [buildiq parity project](README.md). The shapes come from the controllers and `ResponseDefinitions.php` on the fork. Every Tables response sits inside the OCS envelope `{"ocs": {"meta": {...}, "data": ...}}`, which we leave out below.
 
 ## Who depends on the API today
 
-The v1 API has been public and documented since Tables 0.6 and has consumers outside Tables:
+The v1 API has been public and documented since Tables 0.6. It has consumers outside Tables:
 
 - Nextcloud Analytics reads tables as a data source.
 - Nextcloud Forms links a form to a table and writes submissions as rows.
@@ -16,13 +16,13 @@ The v1 API has been public and documented since Tables 0.6 and has consumers out
 - Conduction's integriq calls it from its own code.
 - Tables' own frontend uses the internal routes, not the OCS API.
 
-The fork already added two `api/2` routes in this spirit on pull request #7: `GET /api/2/views/widget-types` and `POST /api/2/views` for a view without a table, both in the OpenAPI document.
+The fork already added two `api/2` routes in this spirit on pull request #7: `GET /api/2/views/widget-types`, and `POST /api/2/views` for a view without a table. Both are in the OpenAPI document.
 
-Proposal P12 follows from that: v1 and the existing v2 routes keep their shapes. New capability arrives as new parameters with defaults and as new endpoints, never as a changed response.
+Proposal P12 follows from that. The v1 routes and the existing v2 routes keep their shapes. New capability arrives as new parameters with defaults and as new endpoints, never as a changed response.
 
 ## Today: the row index
 
-`GET /ocs/v2.php/apps/tables/api/1/tables/{tableId}/rows?limit=&offset=`, also `/api/1/views/{viewId}/rows`. There is no rows endpoint under `api/2`. Parameters: `limit` and `offset` only. Response: a bare list, no total, no paging metadata.
+The index is `GET /ocs/v2.php/apps/tables/api/1/tables/{tableId}/rows?limit=&offset=`, and the same under `/api/1/views/{viewId}/rows`. There is no rows endpoint under `api/2`. The only parameters are `limit` and `offset`. The response is a bare list, with no total and no paging metadata.
 
 ```json
 [
@@ -47,15 +47,15 @@ Proposal P12 follows from that: v1 and the existing v2 routes keep their shapes.
 ]
 ```
 
-`dataByAlias` is only filled for columns that have a technical name. That alias is already the pattern this plan builds on: the object format on `api/2` is `dataByAlias` flattened, and spreading `technicalName` to tables and applications (P15) is the technical debt that stands between today's API and a default CRUD route per application and table. Selection values are the magic string `@selection-id-{id}`. Relation values are target row ids. Usergroup values are `{id, type, displayName}` objects.
+`dataByAlias` is only filled for columns that have a technical name. That alias is the pattern this plan builds on. The object format on `api/2` is `dataByAlias` flattened, and spreading `technicalName` to tables (P15) is the debt between today's API and a default CRUD route per application and table. Selection values are the magic string `@selection-id-{id}`. Relation values are target row ids. Usergroup values are `{id, type, displayName}` objects.
 
 ## Today: a single row
 
-`GET /ocs/v2.php/apps/tables/api/1/rows/{rowId}`. Same shape as one element above. Create is `POST /api/1/tables/{tableId}/rows` with `{"data": {"5": "Jansen", "6": "jansen@example.org"}}` keyed by column id; update is `PUT /api/1/rows/{rowId}` with the same body; delete is `DELETE /api/1/rows/{rowId}`.
+A single row is `GET /ocs/v2.php/apps/tables/api/1/rows/{rowId}`, in the same shape as one element above. Create is `POST /api/1/tables/{tableId}/rows` with `{"data": {"5": "Jansen", "6": "jansen@example.org"}}`, keyed by column id. Update is `PUT /api/1/rows/{rowId}` with the same body. Delete is `DELETE /api/1/rows/{rowId}`.
 
 ## Proposed: non-breaking additions to `api/2`
 
-Everything below is an addition. No existing route changes its parameters or its response. The two resources the components need are the **table endpoint**, the rows of one table or view as a collection, and the **item endpoint**, one row by uuid. Same OCS envelope. Routes by id and, once tables carry slugs, by slug under the application:
+Everything below is an addition. No existing route changes its parameters or its response. The components need two resources. The **table endpoint** lists the rows of one table or view as a collection. The **item endpoint** returns one row by uuid. Both sit in the OCS envelope. Routes exist by id and, once tables carry a technical name, by technical name under the application:
 
 ```
 GET    /api/2/tables/{tableId}/rows
@@ -77,7 +77,7 @@ Collection and item, side by side:
 | | Table endpoint | Item endpoint |
 |---|---|---|
 | read | `GET /api/2/tables/{id}/rows` | `GET /api/2/rows/{uuid}` |
-| by slug | `GET /api/2/apps/{application}/{table}` | `GET /api/2/apps/{application}/{table}/{uuid}` |
+| by technical name | `GET /api/2/apps/{application}/{table}` | `GET /api/2/apps/{application}/{table}/{uuid}` |
 | create | `POST /api/2/tables/{id}/rows` | |
 | update | | `PUT /api/2/rows/{uuid}`, `PATCH` for partial |
 | delete | `DELETE /api/2/tables/{id}/rows?ids=` for bulk | `DELETE /api/2/rows/{uuid}` |
@@ -123,15 +123,15 @@ Index response:
 }
 ```
 
-Properties are keyed by technical name; a column without one gets a technical name derived from its title on first use, stored on the column, and the schema endpoint says which. Selection values are the option label, with the option id available through the schema's `enum`. Dates are ISO 8601 with offset. Relation cells are ids unless extended. The metadata block carries the integer row id so v1 and v2 can be joined.
+Properties are keyed by technical name. A column without one gets a name derived from its title on first use, stored on the column, and the schema endpoint says which. Selection values are the option label, with the option id available through the schema's `enum`. Dates are ISO 8601 with offset. Relation cells are ids unless extended. The metadata block carries the integer row id, so v1 and v2 can be joined.
 
-Single row: `GET /api/2/rows/{uuid}` returns one object of the same shape. Create and update accept the same object shape keyed by technical name and return the stored object, so a client never needs a second read.
+A single row, `GET /api/2/rows/{uuid}`, returns one object of the same shape. Create and update accept that same object keyed by technical name and return the stored object, so a client never needs a second read.
 
-Errors keep Nextcloud's OCS status codes; the body carries `{"message": "..."}` plus, for validation, `{"errors": {"email": "is not a valid email address"}}` per property, which the form components render inline.
+Errors keep Nextcloud's OCS status codes. The body carries `{"message": "..."}` and, for validation, `{"errors": {"email": "is not a valid email address"}}` per property, which the form components render inline.
 
 ## Proposed: applications as manifests on `api/2`
 
-`api/2` already exports and imports a context scheme: `GET /contexts/{id}/scheme/export`, `POST /contexts/{id}/scheme/import` and `POST /contexts/{id}/scheme/preview-changes`, and the fork's version of that scheme already carries the slug, the menu items and the grid views with their widgets. The manifest is that scheme grown to the whole application, not a second format:
+`api/2` already exports and imports a context scheme, through `GET /contexts/{id}/scheme/export`, `POST /contexts/{id}/scheme/import` and `POST /contexts/{id}/scheme/preview-changes`. The fork's version of that scheme already carries the technical name, the menu items and the grid views with their widgets. The manifest is that scheme grown to the whole application, not a second format:
 
 | Scheme today | Manifest adds |
 |---|---|
@@ -152,10 +152,10 @@ GET    /api/2/contexts/{id}/manifest/export?data=1   manifest plus rows as a ZIP
 POST   /api/2/contexts/manifest/import               the ZIP back in
 ```
 
-The existing scheme routes stay and keep returning today's shape. `preview-changes` is reused as the dry run the designer shows before an import. A buildiq v2 manifest imports through the same `POST`, with a `source=buildiq` parameter that switches on the field mapping; what has no home in Tables is listed in the preview and skipped. The packager in sprint 7 reads the manifest from the first route and writes it into the generated app; the generated app's repair step posts it back through the import route on install. So import and export, templates, the round trip between two instances and packaging all run through one format and six routes.
+The existing scheme routes stay and keep returning today's shape. We reuse `preview-changes` as the dry run the designer shows before an import. A buildiq v2 manifest imports through the same `POST` with a `source=buildiq` parameter that switches on the field mapping. What has no home in Tables shows up in the preview and is skipped. The packager in sprint 7 reads the manifest from the first route and writes it into the generated app. On install, the generated app's repair step posts it back through the import route. So import and export, templates, the round trip between two instances and packaging all run through one format and six routes.
 
 ## OpenAPI
 
-Tables generates `openapi.json` (OpenAPI 3.0.3, currently 32 OCS paths) from the controller annotations with `composer run openapi`, and the TypeScript types from it. Every new route above regenerates into it. There is no served documentation page; Nextcloud has none for any app. A Redoc or Swagger UI page under the Tables settings is a small addition and is on the kick-off agenda as a question, not in the plan.
+Tables generates `openapi.json`, OpenAPI 3.0.3 with 55 paths today, from the controller annotations with `composer run openapi`, and the TypeScript types from it. Every new route above regenerates into it. There is no served documentation page, and Nextcloud has none for any app. A Redoc or Swagger UI page under the Tables settings is a small addition. It is a question on the kick-off agenda, not an item in the plan.
 
-Alignment with OpenAPI conventions on the new routes: plural nouns, filter and sort as query parameters, a paging envelope with `total`, consistent error bodies, uuids as identifiers, and every response shape declared as a named type in `ResponseDefinitions.php`. The v1 routes are not changed to match; they are documented as they are.
+On the new routes we follow OpenAPI conventions: plural nouns, filter and sort as query parameters, a paging envelope with `total`, consistent error bodies, uuids as identifiers, and every response shape declared as a named type in `ResponseDefinitions.php`. The v1 routes stay as they are and are documented as they are. When you add a route, start from the parameter table above and the collection and item table, and regenerate the document before you push.

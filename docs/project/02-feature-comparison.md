@@ -6,18 +6,18 @@
 
 Part of the [buildiq parity project](README.md). Measured on buildiq 0.7.15 with nextcloud-vue 2.57.1 and on the Tables fork at `feat/application-shell`.
 
-buildiq has three layers: an application runtime that renders a whole app from one JSON manifest, a designer that edits that manifest and the data model in place, and packaging that turns an application into a real Nextcloud app. Flows, automation, the AI companion and connectors are out of scope for this project and are left out below.
+buildiq has three layers. The runtime renders a whole app from one JSON manifest. The designer edits that manifest and the data model in place. Packaging turns an application into a real Nextcloud app. Flows, automation, the AI companion and connectors are out of scope, so they are left out below.
 
-Status words: **has** means Tables does it today, **partial** means a smaller version exists, **lacks** means nothing exists, **built** means the fork added it on the open pull requests; it is not in Tables and counts as proposed until merged upstream.
+Status words: **has** means Tables does it today, **partial** means a smaller version exists, **lacks** means nothing exists. **Built** means the fork added it on the open pull requests. Built is not in Tables, and counts as proposed until it is merged upstream.
 
 ## 1 The manifest
 
-buildiq describes an application in a manifest validated against a JSON Schema (`app-manifest-v2.schema.json`). Tables describes an application as rows: a context, its menu items, its pages and its views.
+buildiq describes an application in a manifest, validated against a JSON Schema (`app-manifest-v2.schema.json`). Tables describes an application as entities: an application, its menu items, its pages and its views.
 
 | Manifest key | What it does in buildiq | Tables fork | Status |
 |---|---|---|---|
 | `version` | content version, cache busting, migrations | none on applications | lacks |
-| `menu` | left navigation: sections, nesting, icons, permission, counts, dynamic sources | menu items table: label, icon, target (view, table, link), slug, order; one level | built, partial |
+| `menu` | left navigation: sections, nesting, icons, permission, counts, dynamic sources | menu items table: label, icon, target (view, table, link), technical name, order; one level | built, partial |
 | `pages` | typed pages with route, title, permission, widgets, actions, sidebar | views of type table or grid, linked through menu items | built, partial |
 | `dependencies` | hard and soft app dependencies with a guard screen | none | lacks |
 | `setup` | first-run wizard with config fields, choices and server actions | none | lacks |
@@ -28,7 +28,7 @@ buildiq describes an application in a manifest validated against a JSON Schema (
 | `schedules`, `observability`, `store`, `deepLinks`, `mcp` | scheduled actions, health and metrics, store plane, search deep links, tool hints | none | out of scope for 16 February |
 | `pageTemplates`, `pageInstances`, `sets` | declare an index and detail page once and stamp them per entity | none | lacks |
 
-Proposal this project takes: Tables keeps rows as the source of truth and gains an export of an application as a manifest, plus an import of a manifest into rows. That keeps every piece editable in the Tables UI and gives buildiq compatible apps a file format. See [architecture](05-architecture.md).
+We keep Tables entities as the source of truth and add a manifest export and import on top. That keeps every piece editable in the Tables UI and gives buildiq apps a file format. See [architecture](05-architecture.md).
 
 ## 2 Page types
 
@@ -48,7 +48,7 @@ Proposal this project takes: Tables keeps rows as the source of truth and gains 
 
 ## 3 Widgets
 
-buildiq registers about 41 widget types. The fork has 3. The table groups them by what they need.
+buildiq registers about 41 widget types. The fork has three. The table groups them by what they need.
 
 | Group | buildiq widgets | Fork | Status |
 |---|---|---|---|
@@ -61,14 +61,14 @@ buildiq registers about 41 widget types. The fork has 3. The table groups them b
 | Forms | form-renderer, interaction-form | none | lacks |
 | Out of scope | flow-runs, tasks, spend-analytics, kb-search, integration | none | out of scope |
 
-Widget configuration already follows the buildiq shape on the fork: one `content` object per widget, validated against a server-side schema that also drives the form. New widget types are a schema and a renderer each.
+On the fork a widget already carries a `configuration` and a `content` object, each validated against a server-side schema that also drives its form. A new widget type is a schema and a renderer, nothing more.
 
 ## 4 Menu, actions, sidebar, settings, onboarding and permissions
 
 | Concern | buildiq | Tables fork | Status |
 |---|---|---|---|
-| Menu | sections, two levels, counts, permission, `visibleIf`, dynamic sources, pinned and open state | one level, label, icon, target, slug, order; inline editor | built, partial |
-| Published app entry | top-bar entry with icon for a published application | top-bar entry through the existing navigation display mode, slug address | built |
+| Menu | sections, two levels, counts, permission, `visibleIf`, dynamic sources, pinned and open state | one level, label, icon, target, technical name, order; inline editor | built, partial |
+| Published app entry | top-bar entry with icon for a published application | top-bar entry through the existing navigation display mode, address by technical name | built |
 | Page and row actions | declarative actions: object-op, open-form, open-page, navigate, export, api-call, refresh, toggle; bulk actions | Tables' fixed row actions and export | partial |
 | Sidebar | index sidebar (search, columns, facets), detail sidebar tabs | Tables sidebar: sharing, activity, integration | partial |
 | Settings | settings pages, admin settings dialog, generic settings endpoint | none for applications | lacks |
@@ -100,17 +100,17 @@ Widget configuration already follows the buildiq shape on the fork: one `content
 
 ## 6 Packaging
 
-buildiq has three delivery modes. Virtual: the manifest is served and rendered under the buildiq app. Hybrid: an installed app plus deltas. Export: an async job builds a Nextcloud app from a template with the manifest, the register definition, seed data and a portable repository layout, optionally pushed to GitHub.
+buildiq has three delivery modes. Virtual serves the manifest and renders it under the buildiq app. Hybrid is an installed app plus deltas. Export builds a Nextcloud app from a template, with the manifest, the register definition, seed data and a repository layout, and can push it to GitHub.
 
 | Capability | buildiq | Tables fork | Status |
 |---|---|---|---|
-| Serve an application at its own address with its own navigation entry | `/apps/buildiq/builder/{slug}` | `/apps/tables/app/{slug}` | built |
+| Serve an application at its own address with its own navigation entry | `/apps/buildiq/builder/{slug}` | `/apps/tables/app/{technicalName}` | built |
 | Export the application definition | manifest plus register JSON plus seed data | context scheme with menu items and grid views; table schemes with data | partial |
 | Generate an installable app | ZIP from a template, deterministic, with CI config | none | lacks |
 | Push to GitHub | through the OpenRegister credential broker | none | lacks, needs a credential source without OpenRegister |
 | Generated app runtime | needs OpenRegister installed: it imports its register on repair and calls the OpenRegister API from the browser | target: the generated app needs Tables, imports its scheme on repair and calls the Tables API | to design |
 
-Two facts about buildiq's export matter for the plan. The template it builds from still pins Vue 2 and an old library version while buildiq writes manifests for the current library, so exported apps need repair work regardless of this project. And the exported `info.xml` declares no OpenRegister dependency although the app cannot run without it. The Tables generator should declare its dependency on Tables explicitly.
+Two facts about buildiq's export matter here. Its template still pins Vue 2 and an old library version, while buildiq writes manifests for the current library. Exported apps therefore need repair work regardless of this project. And the exported `info.xml` declares no OpenRegister dependency, although the app cannot run without it. Our generator declares its dependency on Tables.
 
 ## 7 What the runtime takes from OpenRegister
 
@@ -134,14 +134,14 @@ The buildiq inventory lists every OpenRegister endpoint the three layers call. G
 | Registers and schema authoring | registers and schemas endpoints | tables, columns, applications | has, different shape |
 | Credential broker | `/api/credentials` | none | packaging only; GitHub token in app config |
 
-The full list with the exact endpoints and the consuming components is in the [component list](03-component-list.md) and the [data model mapping](04-data-model-and-gaps.md).
+The exact endpoints and their consuming components are in the [component list](03-component-list.md) and the [data model mapping](04-data-model-and-gaps.md).
 
 ## 8 Reading the comparison
 
 Three conclusions shape the plan.
 
-Tables already holds the structural half: tables, columns, views, applications, shares, schemes, import and export, and since October the menu, the grid, the widget schemas and the app shell. What it lacks is query power on the API (filter, sort, search, pagination, facets, aggregations), row identity (uuids), row-level extras (files, audit, locks, inverse relations) and the manifest-level concerns (settings, setup, walkthrough, visibility rules, versions).
+Tables already holds the structural half. Tables, columns, views, applications, shares, schemes, import and export are there, and since the fork so are the menu, the grid, the widget schemas and the app shell. What it lacks is query power on the API, row identity, row-level extras and the manifest-level concerns. Query power means filter, sort, search, pagination, facets and aggregations. Row-level extras are files, audit, locks and inverse relations. Manifest-level concerns are settings, setup, walkthrough, visibility rules and versions.
 
-The designer gap is smaller than it looks. buildiq's in-place editing (ADR-041) is the part users touch; the three-pane designer is a developer tool. The fork already edits pages, menu and widgets in place. The missing editors are rules, actions, sidebar and index page config.
+The designer gap is smaller than it looks. buildiq's editing in place (ADR-041) is the part users touch. The three-pane designer is a developer tool. The fork already edits pages, menu and widgets in place. What is missing are the editors for rules, actions, sidebar and index page configuration.
 
-Packaging is the one layer with no equivalent at all, and it depends on everything else being stable. It is the last milestone before the freeze and the first candidate to move behind 15 January if the data layer slips.
+Packaging has no equivalent at all, and it depends on everything else being stable. So it is the last milestone before the freeze, and the first to move behind 15 January if the data layer slips. Use the gap list in the [data model](04-data-model-and-gaps.md) to size what you pick up.

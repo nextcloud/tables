@@ -4,11 +4,11 @@
 -->
 # Kick-off agenda
 
-Part of the [buildiq parity project](README.md). For the first meeting between Conduction and Nextcloud GmbH about this plan. Ninety minutes. Outcomes wanted: answers to the open questions marked here, agreement on the integration direction, and a date for the first sprint review.
+Part of the [buildiq parity project](README.md). This is the agenda for the first meeting between Conduction and Nextcloud GmbH about the plan. Ninety minutes. We want three things out of it: answers to the open questions marked here, agreement on the integration direction, and a date for the first sprint review.
 
 ## 1. The integration direction, 30 minutes
 
-The one architectural proposal that shapes everything else. Today Tables reaches teams by calling Circles classes directly, behind an enabled check:
+This is the one architectural choice that shapes everything else. Today Tables reaches teams by calling Circles classes directly, behind an enabled check:
 
 ```mermaid
 flowchart LR
@@ -16,7 +16,7 @@ flowchart LR
     T -.->|"isEnabledForUser('circles')"| A[App manager]
 ```
 
-That works because Circles is bundled, and it is the pattern this project must not repeat for Deck, Talk, Collectives, Forms, Polls, Maps, Photos, Mail or anything else. The alternative is the Flow model: the hosting app publishes extension points, the integrating app registers into them, and the hosting app depends on nothing.
+That works because Circles is bundled. It is also the pattern this project must not repeat for Deck, Talk, Collectives, Forms, Polls, Maps, Photos, Mail or anything else. The alternative is the Flow model. The hosting app publishes extension points, the integrating app registers into them, and the hosting app depends on nothing.
 
 ```mermaid
 flowchart LR
@@ -56,16 +56,16 @@ sequenceDiagram
     App-->>UI: card summary
 ```
 
-Outcome wanted: yes or no on the registries, and the answer to question Q2.
+We leave this point with a yes or no on the registries, and the answer to question Q2.
 
 ## 2. The rows API and identifiers, 15 minutes
 
 - The second rows API: search, filter, sort, paging with total, fields, `format=object`. Parameter names follow Tables conventions. Is `api/2` the right home?
-- One identifier: `technicalName`, which columns and views already have, spread to tables and applications, so a default CRUD API exists per application and table: `/api/2/apps/{application}/{table}`. The fork's `slug` goes.
+- One identifier. Columns and views already have `technicalName`. We spread it to tables and applications, so a default CRUD API exists per application and table: `/api/2/apps/{application}/{table}`. The fork's `slug` is gone.
 - The 2.0 rename of context to application in code and API, with `contexts` routes kept as aliases for one release (P14).
-- **Decision wanted:** three APIs today, `api/1`, `api/2` and 48 internal routes without OpenAPI that the frontend uses for views, rows and shares. Proposal P16: from now on only `api/2` grows, the frontend moves to it, internal routes retire in 2.0, `api/1` is frozen. The [API index](13-api-index.md) lists every route and its target. Does Nextcloud GmbH agree, and in which release?
-- The v1 API has outside consumers (Analytics, Forms, automation connectors), so it stays frozen and new capability lands on `api/2`. See the [rows API](12-rows-api.md).
-- Everything regenerates into `openapi.json`. Does Nextcloud want a served documentation page for it, or stays the file the documentation?
+- **Decision wanted.** Tables has three APIs today: `api/1`, `api/2` and 48 internal routes without OpenAPI that the frontend uses for views, rows and shares. Proposal P16: from now on only `api/2` grows, the frontend moves to it, the internal routes retire in 2.0 and `api/1` is frozen. The [API index](13-api-index.md) lists every route and its target. Does Nextcloud GmbH agree, and in which release?
+- The v1 API has outside consumers, Analytics, Forms and the automation connectors, so it stays frozen and new capability lands on `api/2`. See the [rows API](12-rows-api.md).
+- Everything regenerates into `openapi.json`. Does Nextcloud want a served documentation page for it, or does the file stay the documentation?
 
 ## 3. Types and formats, 15 minutes
 
@@ -75,14 +75,16 @@ Outcome wanted: yes or no on the registries, and the answer to question Q2.
 
 ## 4. May an application assume Tables, 10 minutes
 
-Question Q1. A generated application declares Tables as a dependency. Acceptable?
+Question Q1. A generated application declares Tables as a dependency and refuses to enable without it. Is that acceptable?
 
 ## 5. User reviews, 10 minutes
 
-Question Q7. Monthly online sessions from December with organisations that build on Tables. Does Nextcloud have contacts to invite? Is Conduction hosting acceptable?
+Question Q7. We want monthly online sessions from December with organisations that build on Tables. Does Nextcloud have contacts to invite? May Conduction host?
 
 ## 6. Working agreement, 10 minutes
 
 - Sprint reviews every two weeks, who attends from Nextcloud.
 - Upstream review turnaround on the fork's pull requests, starting with the grid and app shell pull request.
 - Where the project documents live after the kick-off: this folder in nextcloud/tables, or a wiki.
+
+Before the meeting, read [questions and proposals](09-questions-and-proposals.md) and the [API index](13-api-index.md). After it, Ruben writes the answers into the questions document with a date, and the agreed proposals become decisions there.

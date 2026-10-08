@@ -4,7 +4,7 @@
 -->
 # Component list
 
-Part of the [buildiq parity project](README.md). Measured on `@conduction/nextcloud-vue` at commit b03e0f8c by walking the import graph from the application shell, the page types, the widget registry, the designer dialogs and the form system, with flows, automation, the AI companion and the app pickers for other Nextcloud apps as stop points. Reliance numbers come from the generated reliance score on the docs site.
+Part of the [buildiq parity project](README.md). We measured `@conduction/nextcloud-vue` at commit b03e0f8c by walking the import graph from the application shell, the page types, the widget registry, the designer dialogs and the form system. Flows, automation, the AI companion and the pickers for other Nextcloud apps were the stop points. Reliance numbers come from the reliance score on the docs site.
 
 ## Summary
 
@@ -17,7 +17,7 @@ Part of the [buildiq parity project](README.md). Measured on `@conduction/nextcl
 | rewrite | 10 | built around the OpenRegister object model; rebuilt on Tables |
 | drop | 12 | an OpenRegister-only concept or out of scope |
 
-One finding changes the numbers more than any code: most "heavy" scores come from one import chain. The integration registry statically imports all 28 built-in integrations, including every picker for other apps. Cutting that chain to the seven core integrations (audit trail, files, notes, shares, tags, tasks, version history) removes 23 to 27 out-of-scope entries from the reliance path of every layout component. The scorer also counts comments and UI text, so 15 components are "light" without making any call; they are marked keep.
+One finding changes the numbers more than any code. Most "heavy" scores come from one import chain. The integration registry imports all 28 built-in integrations, including every picker for other apps. Cut that chain to the seven core integrations and 23 to 27 out-of-scope entries disappear from the reliance path of every layout component. Those seven are audit trail, files, notes, shares, tags, tasks and version history. The scorer also counts comments and UI text, so 15 components are "light" without making any call. We mark those keep.
 
 ## Page types
 
@@ -66,7 +66,7 @@ One finding changes the numbers more than any code: most "heavy" scores come fro
 | Detail | CnObjectMetadataWidget, CnObjectGeoWidget, CnAuditTrailWidget, CnStagesWidget, CnInteractionFormWidget, CnWidgetFormRenderer, CnTabsWidget, CnIntegrationWidget | adapt (stages keeps only the field write) |
 | Out of scope | CnTasksWidget, CnKbSearchWidget, CnObjectPresenceWidget, CnWidgetRefItem, CnSpendAnalyticsWidget | drop |
 
-Widget forms: 23 keep as is, 11 adapt because they use the register and schema picker or infer fields from the first row, 1 drops with its widget. The picker itself, CnRegisterSchemaSelect, is rewritten as a table and view picker. Form helpers CnFilterRowsEditor, CnFieldPicker, CnMenuItemEditor and CnTextTableEditor keep.
+Widget forms: 23 keep as is, 11 adapt and 1 drops with its widget. The 11 adapt because they use the register and schema picker, or infer fields from the first row. The picker itself, CnRegisterSchemaSelect, becomes a table and view picker. The form helpers CnFilterRowsEditor, CnFieldPicker, CnMenuItemEditor and CnTextTableEditor keep.
 
 ## Dialogs, fields and primitives
 
@@ -100,7 +100,7 @@ Widget forms: 23 keep as is, 11 adapt because they use the register and schema p
 
 ## The data adapter contract
 
-Every adapt and rewrite verdict above resolves to one of these methods. This is the interface the Tables adapter implements in the frontend, against Tables endpoints that exist or that the [data model plan](04-data-model-and-gaps.md) adds.
+Every adapt and rewrite verdict above resolves to one of these methods. With proposal P1 the Tables API answers them directly, in the object shape, so the frontend store needs URL and parameter changes rather than a shape mapper. The endpoints either exist or the [data model plan](04-data-model-and-gaps.md) adds them.
 
 | Method | Tables endpoint | Callers (examples) |
 |---|---|---|
@@ -122,11 +122,13 @@ Every adapt and rewrite verdict above resolves to one of these methods. This is 
 | `saveSchema`, `deleteSchema`, `createSource`, `updateSource` | Tables table and column endpoints | the data model editor (designer only) |
 | `subscribe`, `unsubscribe` | optional, later | detail, index, sidebar |
 
-Optional sub-resources the sidebar tabs would need: notes, tasks, tags and shares per row. Tags map to Nextcloud system tags; shares map to Tables shares; notes and tasks are not planned before 16 February.
+The sidebar tabs would also want notes, tasks, tags and shares per row. Tags map to Nextcloud system tags and shares to Tables shares. Notes and tasks are not planned before 16 February.
 
 ## What the list means for the plan
 
 - The 132 keep components are a copy job with tests, no design.
-- The 75 adapt components wait on the adapter; most need one method each. The adapter is therefore the first frontend deliverable.
+- The 75 adapt components wait on the rows API and the store that calls it. Most need one method each. That is why the rows API is the first deliverable.
 - The 10 rewrite components are the detail page family (detail page, sidebar, data widget, related widget, related collections), the index page data layer, the logs page, and the data model editor and picker. They are planned as their own milestone.
 - The 12 drop components cost nothing.
+
+If you pick up a component, find it in the tables above, read its verdict, and check which method it needs against the [rows API](12-rows-api.md).

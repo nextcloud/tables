@@ -6,11 +6,11 @@
 
 Part of the [buildiq parity project](README.md). Measured on the fork at branch `feat/application-shell`.
 
-buildiq stores its data in OpenRegister: registers hold schemas, schemas are JSON Schema documents, objects are JSON documents validated against a schema. After the move, Tables is the data layer. This page maps every OpenRegister concept buildiq uses onto Tables, names the Tables piece, and ranks each gap by effort.
+buildiq stores its data in OpenRegister. Registers hold schemas, a schema is a JSON Schema document, and an object is a JSON document validated against one. After the move, Tables is the data layer. This page maps every OpenRegister concept buildiq uses onto Tables, names the Tables piece, and sizes each gap.
 
 ## How Tables stores data today
 
-Tables uses an entity, attribute, value model. A table is a row in `tables_tables`. A column is a row in `tables_columns`. A data row is a sleeve in `tables_row_sleeves` with only ids and timestamps. Every cell value lives in one table per storage type: `tables_row_cells_text`, `_number`, `_selection`, `_datetime`, `_usergroup` and `_relation`. `Row2Mapper` assembles a row from the sleeve and the cell tables.
+Tables uses an entity, attribute, value model. A table is a row in `tables_tables` and a column is a row in `tables_columns`. A data row is a sleeve in `tables_row_sleeves`, holding only ids and timestamps. Every cell value lives in one table per storage type: `tables_row_cells_text`, `_number`, `_selection`, `_datetime`, `_usergroup` and `_relation`. `Row2Mapper` assembles a row from the sleeve and the cell tables.
 
 Fifteen column types exist, grouped by storage type:
 
@@ -23,15 +23,15 @@ Fifteen column types exist, grouped by storage type:
 | usergroup | users, groups, teams; single or multiple |
 | relation | one row of one target table or view, shown by one label column |
 
-Tables, columns, views and selection options carry a uuid. Rows do not. Columns and views carry a technical name, so a row can be read as `dataByAlias` keyed by that name.
+Tables, columns, views and selection options carry a uuid. Rows do not. Columns and views carry a technical name, so a row can be read as `dataByAlias` keyed by it.
 
-Validation on write covers mandatory, text length, number range, unique text, link protocol and provider, relation target existence, and parsing of selection and date values. A regex pattern per text column is stored but not enforced.
+On write, Tables checks mandatory, text length, number range, unique text, link protocol and provider, and that a relation target exists. It also parses selection and date values. A regex pattern per text column is stored and not enforced.
 
 ## Concept by concept
 
 | OpenRegister concept buildiq uses | Tables today | Verdict |
 |---|---|---|
-| Register as a container of schemas | Application (context) groups tables and views, carries permissions per node, exports and imports as one scheme, and since this fork has a slug, a menu and grid pages | Has, under another name |
+| Register as a container of schemas | Application (context) groups tables and views, carries permissions per node, exports and imports as one scheme, and since this fork has a technical name, a menu and grid pages | Has, under another name |
 | Schema as JSON Schema with typed properties | Table with typed columns; the scheme format is Tables' own | Partial, needs a JSON Schema mapping |
 | Object and array properties | No nested values; only selection-multi and usergroup-multi hold lists | Lacks; proposal P2 makes them column types, see [types and formats](10-types-and-formats.md) |
 | `$ref` relations between schemas | Relation column: one target, one row, one label; no multi, no inverse, no cascade | Partial |
@@ -52,7 +52,7 @@ Validation on write covers mandatory, text length, number range, unique text, li
 
 ## Gaps ranked by effort
 
-Effort is a relative size for one developer, including tests: S under a week, M one to two weeks, L two to four weeks, XL more than a month or a design proposal first.
+Effort is a relative size for one developer, tests included. S is under a week, M one to two weeks, L two to four weeks. XL is more than a month, or needs a proposal first.
 
 ### S
 
@@ -87,8 +87,8 @@ Effort is a relative size for one developer, including tests: S under a week, M 
 
 ## One cross-cutting item
 
-The Tables frontend loads every row of a table or view and filters, sorts and searches in the browser. Server-side query work (items 5, 6, 12 and 13) only pays off once the row views page, filter and search on the server. That switch is a frontend task of size M to L and belongs in the plan before the query items.
+The Tables frontend loads every row of a table or view and filters, sorts and searches in the browser. Server-side query work, items 5, 6, 12 and 13, only pays off once the row views page, filter and search on the server. That switch is a frontend task of size M to L. It belongs in the plan before the query items, and it is in sprint 2.
 
 ## What buildiq does not need from OpenRegister
 
-Out of scope by proposal: flows and automation, the AI companion, and everything only they consume (flow runs, actions, chat threads). The parity target is the application runtime, the designer and the packaging.
+Flows and automation, the AI companion, and everything only they consume stay out. That covers flow runs, actions and chat threads. The parity target is the application runtime, the designer and packaging. When you size a feature, take the gap number from the list above into the sprint plan, and update the size here if the work proves it wrong.

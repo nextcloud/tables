@@ -4,7 +4,7 @@
 -->
 # Types and formats
 
-Part of the [buildiq parity project](README.md). Measured on OpenRegister at 1dc6a466 and the Tables fork at `feat/application-shell`.
+Part of the [buildiq parity project](README.md). We measured OpenRegister at 1dc6a466 and the Tables fork at `feat/application-shell`.
 
 ## Types Tables is missing
 
@@ -16,13 +16,13 @@ Part of the [buildiq parity project](README.md). Measured on OpenRegister at 1dc
 - **contact**: an address book and contact uid per cell, through `OCP\Contacts`.
 - **geo**: a point or GeoJSON shape, for the map widget and page; stored as json with format `geojson`, so it needs no own storage.
 
-Relation exists and is extended. User, group and team exist as the usergroup type. Boolean, integer, rich text, link, progress and rating map onto existing types and subtypes. Money, percentage and duration are formats on number and text, not types. A formula or computed column is not needed for parity; aggregations cover what the widgets ask. Nothing else is missing.
+Relation exists and gets extended. User, group and team exist as the usergroup type. Boolean, integer, rich text, link, progress and rating map onto existing types and subtypes. Money, percentage and duration are formats on number and text, not types. A formula column is not needed for parity, because aggregations cover what the widgets ask. Nothing else is missing.
 
 Legend in the tables below: ✅ Tables has it, ◐ a smaller version exists, ❌ missing.
 
 ## Nextcloud server entities as types
 
-The rule: Tables cannot and must not depend on another app. So a column type may point at anything the Nextcloud server itself provides through `OCP` interfaces, and at nothing that lives in a separate app. Tables already honours this: its usergroup type uses `OCA\Circles` for teams through an optional check, and it implements reference and search providers from `OCP\Collaboration` and `OCP\Search`.
+The rule is that Tables cannot and must not depend on another app. So a column type may point at anything the Nextcloud server provides through `OCP` interfaces, and at nothing that lives in a separate app. Tables already honours this in part. Its usergroup type uses `OCA\Circles` for teams behind an optional check, and it implements reference and search providers from `OCP\Collaboration` and `OCP\Search`.
 
 | Entity | Where it lives | Tables today | Plan |
 |---|---|---|---|
@@ -39,11 +39,11 @@ The rule: Tables cannot and must not depend on another app. So a column type may
 | task | dav app, VTODO through `OCP\Calendar` | nothing | same route as calendar event; not before the release |
 | notification | server, `OCP\Notification` | Tables sends some | not a type |
 
-Calendar events and contacts are the border case. The interfaces are in `OCP` and the dav app ships with every server, so a type is allowed. But reading and writing events through `OCP\Calendar` is thinner than the Calendar app's own API, and buildiq's calendar widget reads through the Calendar app. The plan keeps them out of the data layer cluster and asks Q8.
+Calendar items and contacts go through `OCP\Calendar\IManager` and `OCP\Contacts\IManager`. Those interfaces are in the server and the dav app ships with every server, so the types are allowed, proposal P11. They are thinner than the Calendar and Contacts apps' own APIs. A cell stores the uid, the server resolves it to a title and a date or a name, and editing happens in the owning app. That is enough for the people and calendar widgets.
 
 ## Integrations we do not carry over
 
-OpenRegister and nextcloud-vue integrate with other Nextcloud apps through providers and leaves. A leaf is another Conduction app that registers its own tabs and widgets on an object. Tables takes none of that as a dependency. The list, with what happens to each.
+OpenRegister and nextcloud-vue integrate with other Nextcloud apps through providers and leaves. A leaf is another Conduction app that registers its own tabs and widgets on an object. Tables takes none of that as a dependency. Here is the list, with what happens to each.
 
 | Integration | Depends on | In Tables |
 |---|---|---|
@@ -65,15 +65,15 @@ OpenRegister and nextcloud-vue integrate with other Nextcloud apps through provi
 | flow, message dispatch | OpenRegister flows | no, out of scope with automation |
 | leaves | other Conduction apps | no; a leaf app can consume the Tables API, Tables does not load leaves |
 
-What a Conduction app loses by this: a buildiq app that showed Deck cards or Talk conversations on a detail page will not have those tabs on Tables. That is the price of a Tables that installs anywhere. The widget slot system stays open, so an app that ships its own code can still add a tab; Tables will not ship it.
+What a Conduction app loses by this: a buildiq app that showed Deck cards or Talk conversations on a detail page will not have those tabs on Tables. That is the price of a Tables that installs anywhere. The widget slot stays open, so an app that ships its own code can still add a tab. Tables will not ship it.
 
 ## How each side models a value
 
-OpenRegister follows JSON Schema. A property has a `type` from eight values and an optional `format` that narrows it. Validation runs server-side through Opis JSON Schema, with custom resolvers for the formats that are not in the standard.
+OpenRegister follows JSON Schema. A property has a `type` from eight values and an optional `format` that narrows it. Validation runs on the server through Opis JSON Schema, with custom resolvers for the formats outside the standard.
 
-Tables has a `type` from six values and a `subtype` that changes storage, editor and rendering. There is no `format` concept. Validation on write covers mandatory, text length, number range, unique text, link protocol, relation target existence and parsing. A regex per text column is stored as `textAllowedPattern` and not enforced on the server. Every column also has a free `customSettings` JSON field.
+Tables has a `type` from six values and a `subtype` that changes storage, editor and rendering. There is no `format`. On write it checks mandatory, text length, number range, unique text, link protocol, relation target existence and parsing. A regex per text column is stored as `textAllowedPattern` and not enforced on the server. Every column also has a free `customSettings` JSON field.
 
-So Tables does not support `format` the way we do. It needs the concept, a place to store it, a server-side validator per format, and a mapping to JSON Schema in both directions.
+So Tables does not support `format` the way we do. It needs the concept, a place to store it, a validator per format on the server, and a mapping to JSON Schema in both directions.
 
 ## Types
 
@@ -93,11 +93,11 @@ So Tables does not support `format` the way we do. It needs the concept, a place
 | selection with options | ✅ selection | map; `enum` in JSON Schema |
 | datetime, date, time | ✅ datetime, subtypes date and time | map |
 
-New column types: json, file, array, tag, calendar item and contact. Relation exists and is extended, not rebuilt: today it stores several target ids per cell with `targetId`, `relationType` and `labelColumn` in the column settings and validates that the target exists, but it cannot filter, sort, resolve inline, answer an inverse lookup or survive import and export. Boolean and integer need no new storage, only a mapping rule.
+New column types: json, file, array, tag, calendar item and contact. Relation exists and gets extended, not rebuilt. Today it stores several target ids per cell, with `targetId`, `relationType` and `labelColumn` in the column settings, and it checks that the target exists. It cannot filter, sort, resolve inline, answer an inverse lookup, or survive import and export. Boolean and integer need no new storage, only a mapping rule.
 
 ## Formats
 
-OpenRegister's schema editor offers these formats, and the backend registers resolvers for the ones marked with a validator.
+OpenRegister's schema editor offers these formats. The backend registers resolvers for the ones marked with a validator.
 
 | Format | OpenRegister validator | Tables today | Plan |
 |---|---|---|---|
@@ -118,15 +118,15 @@ OpenRegister's schema editor offers these formats, and the backend registers res
 | binary, csv, pdf, ods, json | used as file content types | ❌ | file type with an accepted content type list |
 | pattern (regex on the property) | standard | ◐ stored as `textAllowedPattern`, not enforced | folded into format, see the proposal |
 
-Formats buildiq apps use that OpenRegister does not name as formats, and that the formats registry should carry from day one: postal code, phone, iban, kvk, rsin and percentage. They are validators of a few lines each.
+buildiq apps also use formats that OpenRegister never named: postal code, phone, iban, kvk, rsin and percentage. The registry carries them from day one. Each is a validator of a few lines.
 
 ## Proposal: format on columns
 
-A column gets a `format`. It narrows a type the way JSON Schema does: a text column with format `email` only accepts email addresses, a number with format `percentage` stays between 0 and 100, a json column with format `geojson` must parse as GeoJSON. The current `textAllowedPattern` becomes the format `pattern` with the regex as its argument, so nothing existing breaks and existing patterns are finally enforced. For the person configuring a column it is one dropdown instead of writing a regex, with the common cases ready: email, phone, url, uuid, postal code, bsn, iban, kvk, rsin, color, percentage, money, duration.
+A column gets a `format`. It narrows a type the way JSON Schema does. A text column with format `email` only accepts email addresses. A number with format `percentage` stays between 0 and 100. A json column with format `geojson` must parse as GeoJSON. The current `textAllowedPattern` becomes the format `pattern` with the regex as its argument. Nothing existing breaks, and existing patterns are enforced at last. For the person configuring a column it is one dropdown instead of a regex, with the common cases ready: email, phone, url, uuid, postal code, bsn, iban, kvk, rsin, color, percentage, money, duration.
 
-Backwards compatibility, proposal P12: a column without a format behaves exactly as today. The import of an old scheme sets no format. The API accepts rows for a formatted column as before, and only rejects values that fail the format, which is the same behaviour an enforced pattern would have had.
+Backwards compatibility, proposal P12. A column without a format behaves exactly as today. Importing an old scheme sets no format. The API accepts rows for a formatted column as before and only rejects values that fail the format, which is what an enforced pattern would have done.
 
-Storage: a `format` column on `tables_columns` with a migration, nullable, plus a `formatOptions` json for the argument such as the regex or the currency. A dedicated column rather than a key in `customSettings`, because the export, the filter UI and the JSON Schema mapping all read it.
+Storage is a nullable `format` column on `tables_columns`, added by a migration, plus a `formatOptions` json for the argument, such as the regex or the currency. A dedicated column rather than a key in `customSettings`, because the export, the filter UI and the JSON Schema mapping all read it.
 
 ## What this means for the build
 
@@ -135,4 +135,4 @@ Storage: a `format` column on `tables_columns` with a migration, nullable, plus 
 3. Map both ways in the JSON Schema export and import: `type` and `subtype` and `format` to JSON Schema `type` and `format`, with `enum` for selection, `$ref` for relation, `items` for array.
 4. Build the new storage types: json first, then file and tag, then array, then calendar item and contact. Extend relation with filter, sort, inverse and resolve.
 
-Sizes: the registry with the first twelve formats is S to M. Each storage type is M, because a column type touches about twenty-nine files from migration to OpenAPI.
+Sizes: the registry with the first twelve formats is S to M. Each storage type is M, because a column type touches about twenty-nine files from migration to OpenAPI. If you add a type, start from the usergroup type and follow its twenty-nine files; if you add a format, start from the registry and add one class and one test.

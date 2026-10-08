@@ -4,7 +4,7 @@
 -->
 # Risks
 
-Part of the [buildiq parity project](README.md). Each risk names the trigger that tells us it is happening and the response.
+Part of the [buildiq parity project](README.md). Each risk names the trigger that tells us it is happening, and what we do then.
 
 | # | Risk | Likelihood | Impact | Trigger | Response |
 |---|---|---|---|---|---|
@@ -19,4 +19,6 @@ Part of the [buildiq parity project](README.md). Each risk names the trigger tha
 | 9 | Scope creep from buildiq features that look small (notes, presence, saved view trees) | high | low | a PR adds an entity not in the component list | the component list is the scope; additions need a proposal in the sprint review |
 | 10 | Holidays in sprint 6 (21 December to 3 January) | certain | low | none needed | sprint 6 is planned at 8 working days and carries only closing work |
 
-Two of these already have evidence. Risk 1 is the concern the research note raised, and the Tables UI today loads every row into the browser, which hides the cost. Risk 3 is why the frontend paging switch is scheduled in sprint 2, before the API gains filters, so the suite proves the rendering path first.
+Two of these already have evidence. Risk 1 is the concern the research note raised. The Tables UI today loads every row into the browser, which hides the cost. Risk 3 is why the frontend paging switch sits in sprint 2, before the API gains filters. The suite then proves the rendering path first.
+
+When you see a trigger fire, say so at the next stand-up and name the risk number. Thijn adds the measurement to the benchmark table. The response column is the plan until the review decides otherwise.

@@ -16,7 +16,7 @@ Part of the [buildiq parity project](README.md).
 | 18 January to 12 February 2027 | stabilisation: bugs, upgrade tests, documentation, upstream slices |
 | 16 February 2027 | release |
 
-Seven two-week sprints before the freeze, 70 working days in total. Sprint 6 has eight working days because of the holidays. A sprint review with Nextcloud GmbH closes every sprint.
+Seven two-week sprints run before the freeze, 70 working days in all. Sprint 6 has eight working days because of the holidays. Every sprint ends with a review together with Nextcloud GmbH.
 
 ## Team
 
@@ -27,7 +27,7 @@ Seven two-week sprints before the freeze, 70 working days in total. Sprint 6 has
 | Ruben | product owner, design, specifications, code | half time |
 | Thijn | testing: acceptance specs, benchmarks, personas | half time |
 
-Rule of thumb for the sizing below: one developer, one sprint, roughly two medium items or one large item plus its tests.
+Rule of thumb for the sizes below: one developer does about two medium items, or one large item with its tests, in one sprint.
 
 ## Milestones
 
@@ -50,7 +50,7 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 
 ### Sprint 1, 12 to 25 October, the data layer cluster
 
-Proposal P5: both developers work the types and the API extensions together, because they share the mapper, import and export, the column editor and the OpenAPI document. The keep widgets move to sprint 2.
+Proposal P5: Robert and Remko work the types and the API extensions together, because they share the mapper, import and export, the column editor and the OpenAPI document. The keep widgets move to sprint 2.
 
 | Owner | Item | Size |
 |---|---|---|
@@ -101,7 +101,7 @@ Proposal P5: both developers work the types and the API extensions together, bec
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | manifest routes on `api/2`, grown from the context scheme export and import: identity and version, pages with widgets, menu, settings, visibility, columns with format and relations by slug; preview-changes as dry run; optional rows as data | L |
+| Robert | manifest routes on `api/2`, grown from the context scheme export and import: identity and version, pages with widgets, menu, settings, visibility, columns with format and relations by technical name; preview-changes as dry run; optional rows as data | L |
 | Remko | designer: visibility rules editor, actions editor, sidebar editor, index page configuration dialog, menu sections and one level of nesting | L |
 | Remko | application templates: save an application as a template, create from template | M |
 | Ruben | packaging specification: template, repair step, dependency on Tables, CI configuration | S |
@@ -126,11 +126,11 @@ Proposal P5: both developers work the types and the API extensions together, bec
 
 ### After the freeze, 18 January to 12 February
 
-Bug fixing from the acceptance runs, the upgrade test from the previous Tables release, documentation with refreshed screenshots, the changelog, and upstream pull requests sliced per feature for nextcloud/tables. No new features.
+We fix bugs from the acceptance runs, run the upgrade test from the previous Tables release, refresh the documentation and its screenshots, write the changelog, and slice the upstream pull requests per feature for nextcloud/tables. No new features.
 
 ## User reviews
 
-From December, every sprint review is followed by a user review: an online session of about an hour where we show the working software to people who build on Tables today and collect what they say. Proposal P7.
+From December every sprint review is followed by a user review. That is an online session of about an hour, where we show the working software to people who build on Tables today and listen to what they say. Proposal P7.
 
 | Date | Session | Shows |
 |---|---|---|
@@ -139,15 +139,15 @@ From December, every sprint review is followed by a user review: an online sessi
 | week of 25 January 2027 | user review 3 | the release candidate, a packaged application, the upgrade path |
 | week of 8 February 2027 | user review 4 | fixes from review 3, go or no go for 16 February |
 
-How a session runs: Ruben demonstrates one acceptance path from [testing and acceptance](08-testing-and-acceptance.md) live, then two or three participants try the same path on a shared test instance while the others watch, then open discussion. Thijn records findings as issues with the participant's words and the screen they were on. Findings are triaged within a week and the participants hear back what happened to each one.
+How a session runs. Ruben demonstrates one acceptance path from [testing and acceptance](08-testing-and-acceptance.md) live. Two or three participants then try the same path on a shared test instance while the others watch. Open discussion closes it. Thijn records findings as issues, in the participant's words and with the screen they were on. We triage within a week, and every participant hears what happened to their finding.
 
-Who is invited: organisations that depend on Tables for their own applications, Schleswig-Holstein first because of the weight of its Tables use, plus the Conduction municipalities that will run the first packaged apps, plus anyone Nextcloud GmbH names. Six to ten participants per session. Question Q7 asks Nextcloud GmbH whether a user panel exists we can draw from; until that answer, we build our own list.
+Who is invited. Organisations that depend on Tables for their own applications, Schleswig-Holstein first because of the weight of its Tables use. The Conduction municipalities that will run the first packaged apps. Anyone Nextcloud GmbH names. Six to ten participants per session. Question Q7 asks Nextcloud GmbH whether a user panel exists we can draw from. Until that answer, we build our own list.
 
 ## The 2.0 rename and the internal routes
 
-With P16 the internal routes go in the same release as the rename, once the frontend store calls `api/2` for everything: sprint 4 removes what nothing calls any more and the OpenAPI document becomes the description of the whole app.
+With P16 the internal routes go in the same release as the rename, once the frontend store calls `api/2` for everything. Sprint 4 removes what nothing calls any more. From then on the OpenAPI document describes the whole app.
 
-Proposal P14, context to application, is its own item because it touches every layer. It runs in sprint 4 for Robert, after the data layer has settled and before the manifest and packaging work name the entity in files: migration renaming the tables, classes and services renamed, `api/2/applications` routes added, `api/2/contexts` kept as aliases, OpenAPI regenerated, frontend store and strings aligned. Size L. If sprint 4 is full it moves to the stabilisation weeks, not past the release.
+Proposal P14, context to application, is its own item because it touches every layer. Robert takes it in sprint 4, after the data layer has settled and before the manifest and packaging work write the entity name into files. It covers a migration that renames the tables, renamed classes and services, new `api/2/applications` routes with `api/2/contexts` kept as aliases, a regenerated OpenAPI document, and the frontend store and strings aligned. Size L. If sprint 4 is full it moves to the stabilisation weeks, never past the release.
 
 ## Dependencies between items
 
@@ -160,8 +160,10 @@ Proposal P14, context to application, is its own item because it touches every l
 
 ## Deferral order
 
-If sprint 4 ends with M2 incomplete, items leave the freeze in this order: packaging as a whole, application templates, the actions editor, locks, audit, the settings page type. The data foundation and the manifest exchange stay, because the release is not useful without them.
+If sprint 4 ends with M2 incomplete, items leave the freeze in this order: packaging as a whole, application templates, the actions editor, locks, audit, the settings page type. The data foundation and the manifest exchange stay. Without them the release is not useful.
 
 ## How work flows
 
-One change, one pull request, one feature, on the fork with base `feat/application-shell` until that chain merges, then base `main`. Every pull request carries unit tests, a Playwright spec where a user path changes, the generated OpenAPI document, and a reviewed screenshot. Nextcloud GmbH gets the sprint review and chooses which slices go upstream and in which order.
+One change, one pull request, one feature. The base is `feat/application-shell` until that chain merges, then `main`. Every pull request carries unit tests, a Playwright spec where a user path changes, the generated OpenAPI document and a reviewed screenshot. Nextcloud GmbH gets the sprint review and chooses which slices go upstream, and in which order.
+
+If you own an item above, open its pull request against the base named here and write what you verified in the body. If an item is going to miss its sprint, say so at the review, not after it.

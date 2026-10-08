@@ -4,7 +4,7 @@
 -->
 # buildiq parity on Nextcloud Tables
 
-A project plan for bringing the application builder that buildiq offers on OpenRegister to Nextcloud Tables, without OpenRegister. Written for Conduction and Nextcloud GmbH.
+We want to build applications in Nextcloud Tables the way buildiq builds them on OpenRegister today, without OpenRegister. This is the plan. It is written for Conduction and Nextcloud GmbH together.
 
 Ship date 16 February 2027, code freeze 15 January 2027.
 
@@ -24,11 +24,11 @@ Ship date 16 February 2027, code freeze 15 January 2027.
 | [API index](13-api-index.md) | every route split into internal, `api/1` and `api/2`, and the decision to build on `api/2` only |
 | [Kick-off agenda](11-meeting-agenda.md) | the first meeting with Nextcloud GmbH: integration direction, rows API and slugs, types, dependencies, user reviews |
 
-The [research note](../research/functionality-research-tables-openregister.md) is the starting point these documents answer.
+Our colleague's [research note](../research/functionality-research-tables-openregister.md) asked the questions. These documents answer them.
 
 ## In one paragraph
 
-Tables already holds the structural half of an application builder: tables, columns, views, applications with menus, shares, schemes, import and export. The Conduction fork adds the other half of the foundation on three open pull requests, a widget grid on views, server-side widget schemas, menu items on applications and a standalone app shell. None of that is in Nextcloud Tables yet. It goes upstream as one pull request before sprint 1, and every item below builds on top of it. Two developers full time, a half-time owner and a half-time tester deliver the rest in seven sprints, with packaging as the last milestone and the first to move behind the freeze if the data layer slips.
+Tables already has the bones of an application builder. Tables, columns, views, applications with menus, shares, schemes, import and export all exist. On the fork we added the rest of the foundation: a widget grid on views, widget schemas on the server, menu items on applications and a standalone app shell. None of that is in Nextcloud Tables yet. We send it upstream as one pull request before sprint 1, and everything below builds on it. Two developers, a half-time owner and a half-time tester then deliver the rest in seven sprints. Packaging comes last. If the data layer slips, packaging is the first thing to move behind the freeze.
 
 ## What is still missing
 
@@ -50,3 +50,7 @@ Tables already holds the structural half of an application builder: tables, colu
 - Application settings and preferences, group permissions on menu items, pages and widgets.
 - A manifest format with export and import, including a buildiq v2 import.
 - A packager that generates an installable Nextcloud app from an application.
+
+## Where to start
+
+Read [goals and scope](01-goals-and-scope.md) first, then the [project plan](06-project-plan.md). Before the kick-off, read the [agenda](11-meeting-agenda.md) and the [questions and proposals](09-questions-and-proposals.md) it draws on. Everything else is reference for the people building it.

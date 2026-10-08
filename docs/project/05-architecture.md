@@ -8,15 +8,15 @@ Part of the [buildiq parity project](README.md).
 
 ## Principles
 
-1. **Applications are Tables entities; their data are tables and rows.** An application, its menu items, its pages and their widgets are entities in Tables' own schema, `tables_contexts_*` and `tables_views`, with their own mappers, services and API routes. The data an application works on are ordinary tables, columns and rows. Neither side is stored as the other: an application is not a row in a user table, and a user's data is never hidden inside an application record. The manifest is a file format for exchange, not the storage.
-2. **Tables runs on itself.** Tables depends on the Nextcloud server and on nothing else. No OpenRegister, no nextcloud-vue runtime dependency, no other app's classes, bundled or not. Anything from outside the server reaches Tables through `OCP` interfaces or through extension points Tables publishes and other apps register into. A schema is a table, a property is a column, an object is a row.
+1. **Applications are Tables entities. Their data are tables and rows.** An application, its menu items, its pages and their widgets live in Tables' own schema, `tables_contexts_*` and `tables_views`, with their own mappers, services and routes. The data an application works on are ordinary tables, columns and rows. Neither side is stored inside the other. The manifest is a file format for exchange, not the storage.
+2. **Tables runs on itself.** Tables depends on the Nextcloud server and on nothing else. No OpenRegister, no nextcloud-vue at runtime, no other app's classes, bundled or not. Anything from outside the server reaches Tables through `OCP` interfaces, or through extension points that Tables publishes and other apps register into. A schema is a table, a property is a column, an object is a row.
 3. **Server-side definitions.** Widget types, page types, formats and validators are defined once on the server and served to the frontend, as the widget schemas already are. The form and the validation share one definition.
 4. **Nothing hidden.** Every value a page shows comes from a Tables API a user could call. No private endpoints for the runtime.
-5. **Upstream shape.** Code is written so nextcloud/tables can take it: Nextcloud attributes on controllers, psalm clean, generated OpenAPI, unit tests per class, Playwright for every user path.
+5. **Upstream shape.** We write code so nextcloud/tables can take it: Nextcloud attributes on controllers, psalm clean, generated OpenAPI, unit tests per class, Playwright for every user path.
 
 ## The application model
 
-Three columns because the fork is ahead of Tables: what nextcloud/tables has, what the fork's open pull requests add, and what this project adds. Nothing in the last two columns is in Tables; all of it is a proposal until it is merged upstream.
+The table has three columns because the fork is ahead of Tables. The first says what nextcloud/tables has. The second says what the fork's open pull requests add. The third says what this project adds. Nothing in the last two columns is in Tables. All of it is a proposal until it is merged upstream.
 
 | Entity | Table | In nextcloud/tables | On the fork (proposed) | This project adds (proposed) |
 |---|---|---|---|---|
@@ -27,7 +27,7 @@ Three columns because the fork is ahead of Tables: what nextcloud/tables has, wh
 | Widget type | `GridWidgetTypes` on the server | nothing | title, size, a configuration schema and a content schema, served on `api/2/views/widget-types` | a category and a data need flag |
 | Data | tables, columns, rows | fifteen column types, shares, views with filter and sort, uuid and technical name on views | | uuids on rows, relations with inverse, the new column types, formats, audit, locks |
 
-Two naming notes. Tables has no configuration field on an application today: its `api/2/config` routes return the notification settings of a table or view and set app or user config keys, which is a different thing. The application and page field is therefore named `configuration` here, and the plan avoids `config` for it. Widgets carry `configuration` and `content` as separate objects with separate schemas since fork pull request #7; grids saved before that read as the new shape until saved again.
+Two naming notes. Tables has no configuration field on an application today. Its `api/2/config` routes return the notification settings of a table or view and set app or user config keys, which is something else. So the application and page field is named `configuration` here, and we avoid `config` for it. Widgets carry `configuration` and `content` as separate objects with separate schemas since fork pull request #7. Grids saved before that read as the new shape until saved again.
 
 Pages of type detail and form are views without a table of their own, like grid views. Their configuration names the table they work on.
 
@@ -87,31 +87,31 @@ A page, a view of type grid, with two widgets as the fork stores them since pull
 }
 ```
 
-What this project adds to the page is a `configuration` object of its own (data source, actions, sidebar) and, to each widget's configuration, style and visibility rules.
+This project gives the page a `configuration` object of its own, for the data source, actions and sidebar. Each widget's configuration gains style and visibility rules.
 
 ## Naming debt to clear in 2.0
 
-Two names are inconsistent today, and the upstream pull request is the moment to fix them, proposals P14 and P15.
+Two names are inconsistent today. The upstream pull request is the moment to fix them, proposals P14 and P15.
 
-**Context versus application.** The code, the database tables and the eleven `contexts` routes say context. The user interface says application in 39 strings and context in 1. A 2.0 release renames the code and the API to application: `tables_contexts_*` tables and classes become `tables_applications_*`, `api/2/applications` routes are added, and the `api/2/contexts` routes stay for one release as aliases so Analytics, Forms and connectors keep working.
+**Context versus application.** The code, the database tables and the eleven `contexts` routes say context. The user interface says application in 39 strings and context in one. In 2.0 we rename the code and the API to application. The `tables_contexts_*` tables and classes become `tables_applications_*`, `api/2/applications` routes arrive, and the `api/2/contexts` routes stay for one release as aliases. That keeps Analytics, Forms and the connectors working.
 
-**Technical name versus slug.** Upstream columns and views already carry a `technicalName`, validated as `^[a-z][a-z0-9_]*$`, and the row API already returns `dataByAlias` keyed by it. The fork had added a separate `slug` on views and applications; pull request #7 removed it and gave applications and menu items `technicalName` with the same pattern. What remains: the same field on tables, so the default CRUD route per application and table exists. Spreading an identifier that already exists to one more entity is debt removal, not a feature.
+**Technical name versus slug.** Upstream columns and views already carry a `technicalName`, validated as `^[a-z][a-z0-9_]*$`, and the row API already returns `dataByAlias` keyed by it. The fork had added a separate `slug` on views and applications. Pull request #7 removed it and gave applications and menu items `technicalName` with the same pattern. What remains is the same field on tables, so a default CRUD route per application and table can exist. That is debt removal, not a feature.
 
 ## Request paths
 
-A page in the shell renders through three calls at most: the application (with menu and pages), the page definition, and the data of its widgets. Data calls go to the row API with filter, sort, search and pagination on the query string, validated against the columns the caller may see. Aggregates go to one aggregation endpoint per table or view. Nothing is loaded that the page does not show.
+A page in the shell renders through three calls at most. The first loads the application with its menu and pages. The second loads the page definition. The third loads the data of its widgets. Data calls go to the rows API with filter, sort, search and pagination on the query string, validated against the columns the caller may see. Aggregates go to one aggregation endpoint per table or view. Nothing is loaded that the page does not show.
 
-The shell is the fork's standalone route `/apps/tables/app/{technicalName}`. The Tables UI stays the configuration surface and keeps the tab bar for switching pages while designing.
+The shell is the fork's standalone route `/apps/tables/app/{technicalName}`. The Tables UI stays the place where you configure, and keeps the tab bar for switching pages while designing.
 
 ## The Tables API speaks objects
 
-Proposal P1: the translation between Tables storage and the object shape the components expect happens on the server. A second rows API lists rows of a table or view with search, filter, sort, paging, field selection and `format=object`, returning `{results, total, page, pages}` with rows as flat objects keyed by technical name and a metadata block. A schema endpoint returns a table as JSON Schema. The frontend store that the nc-vue components call is pointed at these endpoints with URL and parameter changes only. What remains in the browser is configuration, not a shape mapper. The [component list](03-component-list.md) names the methods and their callers; the [types and formats](10-types-and-formats.md) document names the mapping rules.
+Proposal P1: the server translates between Tables storage and the object shape the components expect. A second rows API lists the rows of a table or view with search, filter, sort, paging, field selection and `format=object`. It returns `{results, total, page, pages}` with rows as flat objects keyed by technical name, plus a metadata block. A schema endpoint returns a table as JSON Schema. We point the frontend store at these endpoints with URL and parameter changes only. What remains in the browser is configuration, not a shape mapper. The [component list](03-component-list.md) names the methods and their callers. The [types and formats](10-types-and-formats.md) document names the mapping rules.
 
-Nested data is column types, proposal P2: relation for objects, array for lists of scalars, json for opaque blobs, file for Files nodes. See [questions and proposals](09-questions-and-proposals.md) for the rules that keep this honest.
+Nested data is column types, proposal P2. Relation holds objects, array holds lists of scalars, json holds opaque blobs, file holds Files nodes. The [questions and proposals](09-questions-and-proposals.md) carry the rules that keep this honest.
 
 ## API consumers and versions
 
-Other apps depend on the Tables API, so it is a contract, not an implementation detail. Known consumers: Nextcloud Analytics reads tables as a data source, Nextcloud Forms writes submissions into tables, automation connectors such as the n8n node call it, and Conduction's integriq calls it. Tables' own frontend uses internal routes and is not a consumer of the OCS API.
+Other apps depend on the Tables API, so it is a contract, not an implementation detail. Nextcloud Analytics reads tables as a data source. Nextcloud Forms writes submissions into tables. Automation connectors such as the n8n node call it, and so does Conduction's integriq. Tables' own frontend uses internal routes instead.
 
 Three APIs exist today, which is the problem proposal P16 addresses:
 
@@ -121,17 +121,17 @@ Three APIs exist today, which is the problem proposal P16 addresses:
 | `api/2`, OCS | 36 | tables, columns, contexts, favourites, config, scheme export and import, ownership transfer, widget types, standalone views | yes | no rows endpoint |
 | internal, `/apps/tables/...` | 48 | views, rows, shares, tables, import, search, navigation, the app shell | no | yes, for the frontend only |
 
-The internal routes are the ones Tables' own frontend calls for views, rows and shares, while it already calls `api/2` for applications and tables. So the primary consumer of Tables uses an API that has no OpenAPI description and no declared schemas, and every capability exists twice or three times. Proposal P16: the frontend moves to `api/2` and the internal routes retire in 2.0. The [API index](13-api-index.md) lists every route by capability and where it lands.
+The internal routes are what Tables' own frontend calls for views, rows and shares, while it already calls `api/2` for applications and tables. So the primary consumer of Tables runs on an API with no OpenAPI description and no declared schemas, and most capabilities exist twice or three times. Proposal P16 moves the frontend to `api/2` and retires the internal routes in 2.0. The [API index](13-api-index.md) lists every route by capability and where it lands.
 
-The rule this project follows, proposal P12: neither version changes shape. Rows arrive on `api/2` as new endpoints with the object format, next to the existing `api/2` tables and contexts routes. `api/1` rows stay for Analytics, Forms and the connectors. A client that wants the old cell shape on `api/2` asks for `format=cells`. The [rows API](12-rows-api.md) document holds both shapes.
+Proposal P12 is the rule: neither version changes shape. Rows arrive on `api/2` as new endpoints with the object format, next to the existing tables and contexts routes. The `api/1` rows stay for Analytics, Forms and the connectors. A client that wants the old cell shape on `api/2` asks for `format=cells`. The [rows API](12-rows-api.md) document holds both shapes.
 
 ## Manifest exchange
 
-The manifest is the existing `api/2` context scheme grown to the whole application: identity and version, the tables and views with their columns, pages with their widgets, menu, settings, visibility rules and optional row data. Export, import, preview and a ZIP form with data are additions to `api/2`; the current scheme routes keep their shape. Templates, the round trip between instances, the buildiq v2 import and the packager all use the same six routes. The [rows API](12-rows-api.md) lists them and the [data model](04-data-model-and-gaps.md) names what buildiq fields have no home.
+The manifest is the existing `api/2` context scheme grown to the whole application. It carries identity and version, the tables and views with their columns, pages with their widgets, menu, settings, visibility rules and optional row data. Export, import, preview and a ZIP form with data are additions to `api/2`. The current scheme routes keep their shape. Templates, the round trip between instances, the buildiq v2 import and the packager all use the same six routes. The [rows API](12-rows-api.md) lists them, and the [data model](04-data-model-and-gaps.md) names which buildiq fields have no home.
 
 ## Packaging
 
-The packager generates a Nextcloud app from a template: `appinfo/info.xml` with a dependency on Tables, a repair step that imports the application manifest and schemes through the Tables API, a frontend that mounts the Tables shell for one application, and the CI configuration from the app template. The output is a deterministic ZIP. GitHub push is deferred; the ZIP is the deliverable.
+The packager generates a Nextcloud app from a template. The app gets an `appinfo/info.xml` with a dependency on Tables, a repair step that imports the manifest and schemes through the Tables API, a frontend that mounts the Tables shell for one application, and the CI configuration from the app template. The output is a deterministic ZIP. GitHub push waits; the ZIP is the deliverable.
 
 ## Permissions
 
@@ -143,4 +143,8 @@ Three layers, all existing Tables mechanisms:
 
 ## What stays in nc-vue
 
-Components that are tier none in the reliance score and purely presentational can be shared later; this project copies what it needs into Tables and keeps the adapter shape so the copies can be replaced by the library versions when Tables adopts it. No `@conduction/nextcloud-vue` dependency is added before 16 February.
+Components with no reliance that are purely presentational can be shared later. For now we copy what we need into Tables. Because the copies keep the same shape, the library versions can replace them when Tables adopts nextcloud-vue. We add no `@conduction/nextcloud-vue` dependency before 16 February.
+
+## Before you design something new
+
+Check it against the five principles above. If it needs a dependency outside the server, it needs an extension point instead. If it adds a route, it goes on `api/2`. If it stores data, it is a table or a column, not a blob.
