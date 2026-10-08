@@ -4,11 +4,11 @@
 -->
 # Feature comparison: buildiq against the Tables fork
 
-Part of the [buildiq parity project](README.md). Measured on buildiq 0.7.15 with nextcloud-vue 2.57.1 and on the Tables fork at `feat/application-shell`, 8 October 2026.
+Part of the [buildiq parity project](README.md). Measured on buildiq 0.7.15 with nextcloud-vue 2.57.1 and on the Tables fork at `feat/application-shell`.
 
 buildiq has three layers: an application runtime that renders a whole app from one JSON manifest, a designer that edits that manifest and the data model in place, and packaging that turns an application into a real Nextcloud app. Flows, automation, the AI companion and connectors are out of scope for this project and are left out below.
 
-Status words: **has** means Tables does it today, **partial** means a smaller version exists, **lacks** means nothing exists, **built** means the fork added it in October 2026.
+Status words: **has** means Tables does it today, **partial** means a smaller version exists, **lacks** means nothing exists, **built** means the fork added it on the open pull requests.
 
 ## 1 The manifest
 

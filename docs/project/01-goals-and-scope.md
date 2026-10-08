@@ -18,7 +18,7 @@ Tables is the data app Nextcloud users already have. buildiq proved the applicat
 
 ## In scope
 
-Three buildiq layers, as decided on 8 October 2026:
+Three buildiq layers, as decided:
 
 1. **Application runtime.** Applications with a menu, pages of type table, grid, detail, form and settings, widgets with server-validated configuration, actions, visibility rules, a standalone shell at its own address and a top-bar entry.
 2. **Designer.** In-place editing of pages, menu, widgets, actions, sidebar and visibility; the data model edited with Tables' own table and column editors; application templates.
@@ -28,7 +28,7 @@ Plus the data layer work the three layers need. Tables is the data layer: a sche
 
 ## Out of scope
 
-Decided on 8 October 2026:
+Decided:
 
 - Flows, automation, rule sets, decision tables, agents, the AI companion and connectors. They stay in OpenRegister and buildiq.
 - OpenRegister features buildiq does not use, and OpenRegister features only the excluded layers use (flow runs, tasks, chat threads).

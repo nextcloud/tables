@@ -4,7 +4,7 @@
 -->
 # Types and formats
 
-Part of the [buildiq parity project](README.md). Measured on OpenRegister at 1dc6a466 and the Tables fork on 8 October 2026.
+Part of the [buildiq parity project](README.md). Measured on OpenRegister at 1dc6a466 and the Tables fork at `feat/application-shell`.
 
 ## How each side models a value
 

@@ -4,7 +4,7 @@
 -->
 # Data model mapping and gaps
 
-Part of the [buildiq parity project](README.md). Measured on the fork at branch `feat/application-shell` on 8 October 2026.
+Part of the [buildiq parity project](README.md). Measured on the fork at branch `feat/application-shell`.
 
 buildiq stores its data in OpenRegister: registers hold schemas, schemas are JSON Schema documents, objects are JSON documents validated against a schema. After the move, Tables is the data layer. This page maps every OpenRegister concept buildiq uses onto Tables, names the Tables piece, and ranks each gap by effort.
 

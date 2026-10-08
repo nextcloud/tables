@@ -4,7 +4,7 @@
 -->
 # Questions and decisions
 
-Part of the [buildiq parity project](README.md). Open questions wait for an answer from Conduction and Nextcloud GmbH together. Decisions record what was chosen, when, and why, so nobody reopens them by accident. Add to both lists as the work raises them.
+Part of the [buildiq parity project](README.md). Open questions wait for an answer from Conduction and Nextcloud GmbH together. Decisions record what was chosen and why, so nobody reopens them by accident. Add to both lists as the work raises them.
 
 ## Open questions
 
@@ -58,40 +58,40 @@ Who answers: Nextcloud GmbH. Needed before: 15 November 2026.
 
 ### D1. The Tables API speaks objects, the frontend speaks Tables
 
-8 October 2026. The translation from cell arrays to objects and from columns to JSON Schema happens on the server, in a second rows API and a schema endpoint, not in a browser adapter and not in each component. The frontend store is pointed at Tables with URL and parameter changes only.
+The translation from cell arrays to objects and from columns to JSON Schema happens on the server, in a second rows API and a schema endpoint, not in a browser adapter and not in each component. The frontend store is pointed at Tables with URL and parameter changes only.
 
 Why: fifty files send `_search`, and the shape gap is bigger than the parameter gap. A server-side object format serves every client, is a feature Tables wants anyway, and moves work to the lane where the engine already lives.
 
 ### D2. Nested attributes are column types, not a document
 
-8 October 2026. An object attribute is a relation cell to a row in another table. An array is one cell per value in the typed table, the usergroup pattern. A json blob is a new opaque cell type. A file is a new cell type that stores a Files node id.
+An object attribute is a relation cell to a row in another table. An array is one cell per value in the typed table, the usergroup pattern. A json blob is a new opaque cell type. A file is a new cell type that stores a Files node id.
 
 Why: the EAV layout gives typed filters, sorts and aggregations cheaper than a JSON document does. The nested property gap moves from one XL item to three M items.
 
 ### D3. A json column is never queried
 
-8 October 2026. The json cell type is for display data, imports and configuration. It does not appear in filter, sort, facet, aggregate or search. An optional JSON Schema fragment validates it on write.
+The json cell type is for display data, imports and configuration. It does not appear in filter, sort, facet, aggregate or search. An optional JSON Schema fragment validates it on write.
 
 Why: without this rule the json type becomes the escape hatch that makes every later query impossible.
 
 ### D4. Files owns file storage
 
-8 October 2026. A file cell holds a Files node id and nothing else. Access, versions, previews, sharing and trash are Files' job. Tables asks Files whether the user may read the node.
+A file cell holds a Files node id and nothing else. Access, versions, previews, sharing and trash are Files' job. Tables asks Files whether the user may read the node.
 
 Why: OpenRegister's own file tree and access code is where the file problems came from.
 
 ### D5. Types and API extensions are one cluster in sprint 1
 
-8 October 2026, Ruben. The new column types and the API extensions are built together in the first two weeks with both developers on them, because they share the mapper, the import and export code and the OpenAPI document. The keep widgets move to sprint 2.
+Ruben. The new column types and the API extensions are built together in the first two weeks with both developers on them, because they share the mapper, the import and export code and the OpenAPI document. The keep widgets move to sprint 2.
 
 Why: one pass through the twenty-nine files a column type touches, instead of four passes.
 
 ### D7. User reviews from December
 
-8 October 2026, Ruben. From December every sprint review is followed by an online user review with organisations that depend on Tables for their applications, Schleswig-Holstein among the first. Four sessions before the release, see the [project plan](06-project-plan.md).
+Ruben. From December every sprint review is followed by an online user review with organisations that depend on Tables for their applications, Schleswig-Holstein among the first. Four sessions before the release, see the [project plan](06-project-plan.md).
 
 Why: these organisations carry the risk of a change in Tables; they should see it before it ships, not after.
 
 ### D6. Parity scope and data layer
 
-8 October 2026, Ruben. Parity is the application runtime, the designer and packaging. Flows, automation and the AI companion are out. The data layer is Tables rows. See [goals and scope](01-goals-and-scope.md).
+Ruben. Parity is the application runtime, the designer and packaging. Flows, automation and the AI companion are out. The data layer is Tables rows. See [goals and scope](01-goals-and-scope.md).

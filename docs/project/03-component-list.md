@@ -4,7 +4,7 @@
 -->
 # Component list
 
-Part of the [buildiq parity project](README.md). Measured on `@conduction/nextcloud-vue` at commit b03e0f8c (8 October 2026) by walking the import graph from the application shell, the page types, the widget registry, the designer dialogs and the form system, with flows, automation, the AI companion and the app pickers for other Nextcloud apps as stop points. Reliance numbers come from the generated reliance score on the docs site.
+Part of the [buildiq parity project](README.md). Measured on `@conduction/nextcloud-vue` at commit b03e0f8c by walking the import graph from the application shell, the page types, the widget registry, the designer dialogs and the form system, with flows, automation, the AI companion and the app pickers for other Nextcloud apps as stop points. Reliance numbers come from the generated reliance score on the docs site.
 
 ## Summary
 

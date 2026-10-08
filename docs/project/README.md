@@ -4,7 +4,7 @@
 -->
 # buildiq parity on Nextcloud Tables
 
-A project plan for bringing the application builder that buildiq offers on OpenRegister to Nextcloud Tables, without OpenRegister. Written on 8 October 2026 for Conduction and Nextcloud GmbH.
+A project plan for bringing the application builder that buildiq offers on OpenRegister to Nextcloud Tables, without OpenRegister. Written for Conduction and Nextcloud GmbH.
 
 Ship date 16 February 2027, code freeze 15 January 2027.
 
@@ -21,11 +21,11 @@ Ship date 16 February 2027, code freeze 15 January 2027.
 | [Questions and decisions](09-questions-and-decisions.md) | what still needs an answer and from whom, and what was decided, when and why |
 | [Types and formats](10-types-and-formats.md) | OpenRegister property types and formats against Tables column types, and the four new types |
 
-The [research note](../research/functionality-research-tables-openregister.md) of 6 October is the starting point these documents answer.
+The [research note](../research/functionality-research-tables-openregister.md) is the starting point these documents answer.
 
 ## In one paragraph
 
-Tables already holds the structural half of an application builder: tables, columns, views, applications with menus, shares, schemes, import and export. The Conduction fork adds the other half of the foundation on three open pull requests, a widget grid on views, server-side widget schemas, menu items on applications and a standalone app shell. None of that is in Nextcloud Tables yet. It goes upstream as one pull request on 9 October 2026, and every item below builds on top of it. Two developers full time, a half-time owner and a half-time tester deliver the rest in seven sprints, with packaging as the last milestone and the first to move behind the freeze if the data layer slips.
+Tables already holds the structural half of an application builder: tables, columns, views, applications with menus, shares, schemes, import and export. The Conduction fork adds the other half of the foundation on three open pull requests, a widget grid on views, server-side widget schemas, menu items on applications and a standalone app shell. None of that is in Nextcloud Tables yet. It goes upstream as one pull request before sprint 1, and every item below builds on top of it. Two developers full time, a half-time owner and a half-time tester deliver the rest in seven sprints, with packaging as the last milestone and the first to move behind the freeze if the data layer slips.
 
 ## What is still missing
 

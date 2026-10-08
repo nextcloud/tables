@@ -10,8 +10,7 @@ Part of the [buildiq parity project](README.md).
 
 | Date | Event |
 |---|---|
-| 8 October 2026 | plan written; grid views, widget schemas, application menus and the app shell built on fork pull requests #2, #3 and #4 |
-| 9 October 2026 | the fork chain merged and opened as one pull request on nextcloud/tables; everything below builds on it |
+| before sprint 1 | the fork chain merged and opened as one pull request on nextcloud/tables; everything below builds on it |
 | 12 October 2026 | sprint 1 starts |
 | 15 January 2027 | code freeze: every feature that ships is merged on the fork and green |
 | 18 January to 12 February 2027 | stabilisation: bugs, upgrade tests, documentation, upstream slices |
@@ -42,7 +41,7 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 
 ## Sprint plan
 
-### Before sprint 1, 9 October
+### Before sprint 1
 
 | Owner | Item | Size |
 |---|---|---|
