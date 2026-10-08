@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Model;
 
+use InvalidArgumentException;
 use JsonSerializable;
 
 class ContextScheme implements JsonSerializable {
@@ -22,6 +23,38 @@ class ContextScheme implements JsonSerializable {
 		protected array $menuItems = [],
 		protected array $gridViews = [],
 	) {
+	}
+
+	/**
+	 * Builds the scheme from an import request and refuses what the import could not handle.
+	 *
+	 * @param array<string, mixed> $data
+	 * @throws InvalidArgumentException
+	 */
+	public static function createFromInputArray(array $data): self {
+		$tables = $data['tables'] ?? null;
+		if (!is_array($tables) || !isset($tables['addTables'], $tables['modifyTables']) || !is_array($tables['addTables']) || !is_array($tables['modifyTables'])) {
+			throw new InvalidArgumentException('Invalid tables structure provided: expected addTables and modifyTables lists.');
+		}
+		foreach (['nodes', 'menuItems', 'gridViews'] as $list) {
+			if (isset($data[$list]) && !is_array($data[$list])) {
+				throw new InvalidArgumentException('The scheme property "' . $list . '" must be a list.');
+			}
+		}
+		if (!is_string($data['name'] ?? null) || trim($data['name']) === '') {
+			throw new InvalidArgumentException('A scheme needs a name.');
+		}
+		return new self(
+			name: $data['name'],
+			icon: isset($data['icon']) ? (string)$data['icon'] : null,
+			description: isset($data['description']) ? (string)$data['description'] : null,
+			nodes: array_values($data['nodes'] ?? []),
+			pages: [],
+			tables: $tables,
+			technicalName: isset($data['technicalName']) && $data['technicalName'] !== '' ? (string)$data['technicalName'] : null,
+			menuItems: array_values($data['menuItems'] ?? []),
+			gridViews: array_values($data['gridViews'] ?? []),
+		);
 	}
 
 	public function getTechnicalName(): ?string {

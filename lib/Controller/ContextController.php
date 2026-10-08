@@ -17,6 +17,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -407,8 +408,13 @@ class ContextController extends AOCSController {
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, ?string $technicalName = null, array $menuItems = [], array $gridViews = []): DataResponse {
 		try {
+			$scheme = ContextScheme::createFromInputArray(['name' => $name, 'icon' => $iconName, 'description' => $description, 'nodes' => $nodes, 'tables' => $tables, 'technicalName' => $technicalName, 'menuItems' => $menuItems, 'gridViews' => $gridViews]);
+		} catch (\InvalidArgumentException $e) {
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		}
+		try {
 			$this->db->beginTransaction();
-			$context = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId, $technicalName, $menuItems, $gridViews);
+			$context = $this->contextService->importScheme($contextId, $scheme, $this->userId);
 			$this->db->commit();
 			return new DataResponse($context->jsonSerialize());
 		} catch (\InvalidArgumentException $e) {

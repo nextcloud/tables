@@ -1009,32 +1009,19 @@ class ContextService {
 	}
 
 	/**
-	 * @param int $contextId
-	 * @param string $name
-	 * @param string $iconName
-	 * @param string $description
-	 * @param array $nodes
-	 * @param array $tables
-	 * @param string $userId
-	 *
-	 * @return Context
+	 * Imports a scheme into an existing context: creates or modifies its tables, resolves the
+	 * nodes and menu targets by uuid, imports the grid views and updates the context itself.
 	 *
 	 * @throws BadRequestError
-	 * @throws ContainerExceptionInterface
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
-	 * @throws NotFoundError
-	 * @throws NotFoundExceptionInterface
 	 * @throws PermissionError
 	 */
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?string $technicalName = null, array $menuItems = [], array $gridViews = []): Context {
-		// Validate the structure of the columns and views arrays
-		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
-			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
-			throw new BadRequestError('Invalid tables structure provided.');
-		}
+	public function importScheme(int $contextId, ContextScheme $scheme, string $userId): Context {
+		$tables = $scheme->getTables() ?? ['addTables' => [], 'modifyTables' => []];
+		$nodes = $scheme->getNodes() ?? [];
 
 		$tableService = \OCP\Server::get(TableService::class);
 		$viewService = \OCP\Server::get(ViewService::class);
@@ -1091,8 +1078,8 @@ class ContextService {
 			}
 		}
 
-		$this->importGridViews($gridViews, $userId);
+		$this->importGridViews($scheme->getGridViews(), $userId);
 
-		return $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes, $technicalName, $this->resolveMenuItems($menuItems));
+		return $this->update($contextId, $userId, $scheme->getName(), $scheme->getIcon() ?? '', $scheme->getDescription() ?? '', $resolvedNodes, $scheme->getTechnicalName(), $this->resolveMenuItems($scheme->getMenuItems()));
 	}
 }

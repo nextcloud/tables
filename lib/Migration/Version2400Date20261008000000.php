@@ -20,7 +20,7 @@ use Override;
  * Views get a type (table, grid) and a grid layout, and may exist without
  * a table. Applications (contexts) get a technical name and a menu.
  */
-class Version2400Date20261007000000 extends SimpleMigrationStep {
+class Version2400Date20261008000000 extends SimpleMigrationStep {
 	#[Override]
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
