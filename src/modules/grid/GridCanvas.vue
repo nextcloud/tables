@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { markRaw } from 'vue'
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import { GRID_CELL_HEIGHT, GRID_COLUMNS } from './widgetRegistry.js'
@@ -51,7 +52,11 @@ export default {
 	},
 	watch: {
 		editable(editable) {
-			this.grid?.setStatic(!editable)
+			if (editable) {
+				this.grid?.enable()
+			} else {
+				this.grid?.disable()
+			}
 		},
 		layout: {
 			handler(layout, previousLayout) {
@@ -60,19 +65,22 @@ export default {
 		},
 	},
 	mounted() {
-		this.grid = GridStack.init({
+		// markRaw: a reactive proxy around the instance makes GridStack compare its own proxied `this`
+		// with the raw instance its nodes point at, and every drop is then silently ignored
+		this.grid = markRaw(GridStack.init({
 			column: GRID_COLUMNS,
 			cellHeight: GRID_CELL_HEIGHT,
 			margin: 8,
 			float: true,
 			animate: true,
-			staticGrid: !this.editable,
+			disableDrag: !this.editable,
+			disableResize: !this.editable,
 			minRow: 1,
-		}, this.$refs.gridElement)
+		}, this.$refs.gridElement))
 		this.grid.on('change', (event, changedNodes) => this.onGridChange(changedNodes))
 		// 12 columns on a wide canvas, 6 on a medium one and a single column on a phone,
 		// driven by the canvas width so the grid restores when the window grows again
-		this.resizeObserver = new ResizeObserver(entries => this.applyColumns(entries[0]?.contentRect.width ?? 0))
+		this.resizeObserver = markRaw(new ResizeObserver(entries => this.applyColumns(entries[0]?.contentRect.width ?? 0)))
 		this.resizeObserver.observe(this.$refs.gridElement)
 	},
 	beforeUnmount() {
