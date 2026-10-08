@@ -28,7 +28,7 @@ buildiq describes an application in a manifest validated against a JSON Schema (
 | `schedules`, `observability`, `store`, `deepLinks`, `mcp` | scheduled actions, health and metrics, store plane, search deep links, tool hints | none | out of scope for 16 February |
 | `pageTemplates`, `pageInstances`, `sets` | declare an index and detail page once and stamp them per entity | none | lacks |
 
-Decision this project takes: Tables keeps rows as the source of truth and gains an export of an application as a manifest, plus an import of a manifest into rows. That keeps every piece editable in the Tables UI and gives buildiq compatible apps a file format. See [architecture](05-architecture.md).
+Proposal this project takes: Tables keeps rows as the source of truth and gains an export of an application as a manifest, plus an import of a manifest into rows. That keeps every piece editable in the Tables UI and gives buildiq compatible apps a file format. See [architecture](05-architecture.md).
 
 ## 2 Page types
 
