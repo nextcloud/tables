@@ -7,6 +7,7 @@
 		<ElementTitle v-model:view-setting="localViewSetting" :active-element="table" />
 		<TableDescription :description="table.description" :read-only="true" />
 		<DataTable v-model:view-setting="localViewSetting" :show-options="false" :table="table" :columns="columns" :rows="rows"
+			:context-search-string="contextSearchString"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
 			@import-scheme="$emit('import-scheme')"
@@ -50,6 +51,10 @@ export default {
 		viewSetting: {
 			type: Object,
 			default: null,
+		},
+		contextSearchString: {
+			type: String,
+			default: '',
 		},
 	},
 
