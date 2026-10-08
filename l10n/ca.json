@@ -131,6 +131,7 @@
     "Operator" : "Operador",
     "Delete filter" : "Suprimeix el filtre",
     "Ascending" : "Ascendent",
+    "Descending" : "Descendent",
     "Updated table \"{emoji}{table}\"." : "S'ha actualitzat la taula \"{emoji}{table}\".",
     "Cannot update table. Title is missing." : "No es pot actualitzar la taula. Falta el títol.",
     "Views" : "Vistes",
