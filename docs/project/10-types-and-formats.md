@@ -23,8 +23,8 @@ So Tables does not support `format` the way we do. It needs the concept, a place
 | integer | number with decimals 0 | map; export as integer when decimals is 0 |
 | boolean | selection-check | map |
 | array of scalars | selection-multi and usergroup hold lists; no general array | new type **array** with a scalar subtype, one cell per value |
-| array of objects | nothing | relation, multi-valued, to a child table |
-| object | nothing | relation, single-valued, to a child table |
+| array of objects | relation, multi-valued, exists | reuse; add filter, sort, inverse lookup, inline resolve, import and export remapping |
+| object | relation, single-valued, exists | reuse; same additions |
 | dictionary | nothing | **json** type, opaque |
 | file | nothing | new type **file**, one cell per Files node id |
 | user and group | usergroup | map |
@@ -32,7 +32,7 @@ So Tables does not support `format` the way we do. It needs the concept, a place
 | selection with options | selection | map; `enum` in JSON Schema |
 | datetime, date, time | datetime, subtypes date and time | map |
 
-Four new column types: array, json, file, and a date-time with timezone if the benchmark shows the current datetime cell loses it. Boolean and integer need no new storage, only a mapping rule.
+Three new column types: array, json and file. Relation exists and is extended, not rebuilt: today it stores several target ids per cell with `targetId`, `relationType` and `labelColumn` in the column settings and validates that the target exists, but it cannot filter, sort, resolve inline, answer an inverse lookup or survive import and export. Boolean and integer need no new storage, only a mapping rule.
 
 ## Formats
 
@@ -64,6 +64,6 @@ Formats buildiq apps use that OpenRegister does not name as formats, and that th
 1. Add `format` to a column, stored in a new column or in `customSettings`, see question Q6. Expose it in the column editor as a dropdown filtered by type.
 2. Add a server-side formats registry: one class per format, a `validate(value): ?string` method, registered by type. Run it in the column type's `validateValue`, next to the existing checks. Enforce `textAllowedPattern` there as well.
 3. Map both ways in the JSON Schema export and import: `type` and `subtype` and `format` to JSON Schema `type` and `format`, with `enum` for selection, `$ref` for relation, `items` for array.
-4. Build the three new storage types: json first, then file, then array.
+4. Build the three new storage types: json first, then file, then array. Extend relation with filter, sort, inverse and resolve.
 
 Sizes: the registry with the first twelve formats is S to M. Each storage type is M, because a column type touches about twenty-nine files from migration to OpenAPI.
