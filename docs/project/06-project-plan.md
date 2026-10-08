@@ -128,6 +128,21 @@ Decision D5: both developers work the types and the API extensions together, bec
 
 Bug fixing from the acceptance runs, the upgrade test from the previous Tables release, documentation with refreshed screenshots, the changelog, and upstream pull requests sliced per feature for nextcloud/tables. No new features.
 
+## User reviews
+
+From December, every sprint review is followed by a user review: an online session of about an hour where we show the working software to people who build on Tables today and collect what they say. Decision D7.
+
+| Date | Session | Shows |
+|---|---|---|
+| week of 7 December 2026 | user review 1 | detail and form pages, data widgets, the designer so far |
+| week of 4 January 2027 | user review 2 | visibility rules, actions, sidebar, templates, manifest export and import |
+| week of 25 January 2027 | user review 3 | the release candidate, a packaged application, the upgrade path |
+| week of 8 February 2027 | user review 4 | fixes from review 3, go or no go for 16 February |
+
+How a session runs: Ruben demonstrates one acceptance path from [testing and acceptance](08-testing-and-acceptance.md) live, then two or three participants try the same path on a shared test instance while the others watch, then open discussion. Thijn records findings as issues with the participant's words and the screen they were on. Findings are triaged within a week and the participants hear back what happened to each one.
+
+Who is invited: organisations that depend on Tables for their own applications, Schleswig-Holstein first because of the weight of its Tables use, plus the Conduction municipalities that will run the first packaged apps, plus anyone Nextcloud GmbH names. Six to ten participants per session. Question Q7 asks Nextcloud GmbH whether a user panel exists we can draw from; until that answer, we build our own list.
+
 ## Dependencies between items
 
 - Rows v2 (sprint 1) before every adapt component, server-side paging (sprint 2) and the index page work.

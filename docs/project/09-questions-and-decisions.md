@@ -46,6 +46,14 @@ Either a new `format` column on `tables_columns`, or a key in the existing `cust
 
 Who answers: Robert. Needed before: sprint 1.
 
+### Q7. Does Nextcloud have a user panel for Tables, and may we run review sessions?
+
+We are not aware of a standing user research panel at Nextcloud; the community forum and GitHub discussions are open channels, not a panel. Does Nextcloud GmbH have customer contacts who build on Tables and would join an online review session once a month from December? And is it acceptable that Conduction hosts those sessions and invites its own customers alongside?
+
+Why it matters: the sessions start in the week of 7 December and need invitations in November.
+
+Who answers: Nextcloud GmbH. Needed before: 15 November 2026.
+
 ## Decisions
 
 ### D1. The Tables API speaks objects, the frontend speaks Tables
@@ -77,6 +85,12 @@ Why: OpenRegister's own file tree and access code is where the file problems cam
 8 October 2026, Ruben. The new column types and the API extensions are built together in the first two weeks with both developers on them, because they share the mapper, the import and export code and the OpenAPI document. The keep widgets move to sprint 2.
 
 Why: one pass through the twenty-nine files a column type touches, instead of four passes.
+
+### D7. User reviews from December
+
+8 October 2026, Ruben. From December every sprint review is followed by an online user review with organisations that depend on Tables for their applications, Schleswig-Holstein among the first. Four sessions before the release, see the [project plan](06-project-plan.md).
+
+Why: these organisations carry the risk of a change in Tables; they should see it before it ships, not after.
 
 ### D6. Parity scope and data layer
 
