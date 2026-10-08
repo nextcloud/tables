@@ -17,18 +17,18 @@ Reading the table: a capability that only has internal routes is one the fronten
 | columns | none | `GET /api/1/tables/{tableId}/columns`<br>`GET /api/1/views/{viewId}/columns`<br>`POST /api/1/columns`<br>`POST /api/1/tables/{tableId}/columns`<br>`PUT /api/1/columns/{columnId}`<br>`GET /api/1/columns/{columnId}`<br>`DELETE /api/1/columns/{columnId}` | `GET /api/2/columns/{nodeType}/{nodeId}`<br>`GET /api/2/columns/{id}`<br>`POST /api/2/columns/number`<br>`POST /api/2/columns/text`<br>`POST /api/2/columns/selection`<br>`POST /api/2/columns/datetime`<br>`POST /api/2/columns/usergroup` | exists on `api/2`; delete and update per type to check |
 | rows | `GET /row/table/{tableId}`<br>`GET /row/{id}`<br>`GET /row/view/{viewId}`<br>`PUT /row/{id}/column/{columnId}`<br>`PUT /row/{id}`<br>`DELETE /row/{id}` | `GET /api/1/tables/{tableId}/rows/simple`<br>`GET /api/1/tables/{tableId}/rows`<br>`GET /api/1/views/{viewId}/rows`<br>`POST /api/1/views/{viewId}/rows`<br>`POST /api/1/tables/{tableId}/rows`<br>`GET /api/1/rows/{rowId}`<br>`DELETE /api/1/views/{viewId}/rows/{rowId}`<br>`PUT /api/1/rows/{rowId}`<br>`DELETE /api/1/rows/{rowId}` | none | the new rows API, see [rows API](12-rows-api.md) |
 | shares | `GET /share/table/{tableId}`<br>`GET /share/view/{viewId}`<br>`GET /share/policy`<br>`GET /share/{id}`<br>`POST /share`<br>`PUT /share/{id}/permission`<br>`PUT /share/{id}/permissions`<br>`PUT /share/{id}/display-mode`<br>`DELETE /share/{id}` | `GET /api/1/shares/{shareId}`<br>`GET /api/1/views/{viewId}/shares`<br>`GET /api/1/tables/{tableId}/shares`<br>`POST /api/1/shares`<br>`DELETE /api/1/shares/{shareId}`<br>`PUT /api/1/shares/{shareId}`<br>`PUT /api/1/shares/{shareId}/display-mode`<br>`POST /api/1/tables/{tableId}/shares` | none | `/api/2/shares` with node type and id |
-| applications | none | — | `GET /api/2/contexts`<br>`GET /api/2/contexts/{contextId}`<br>`POST /api/2/contexts`<br>`PUT /api/2/contexts/{contextId}`<br>`DELETE /api/2/contexts/{contextId}`<br>`PUT /api/2/contexts/{contextId}/pages/{pageId}` | exists on `api/2`; renamed to `applications` in 2.0 (P14) |
+| applications | none | none | `GET /api/2/contexts`<br>`GET /api/2/contexts/{contextId}`<br>`POST /api/2/contexts`<br>`PUT /api/2/contexts/{contextId}`<br>`DELETE /api/2/contexts/{contextId}`<br>`PUT /api/2/contexts/{contextId}/pages/{pageId}` | exists on `api/2`; renamed to `applications` in 2.0 (P14) |
 | scheme exchange | none | `GET /api/1/tables/{tableId}/scheme` | `GET /api/2/tables/scheme/{id}`<br>`POST /api/2/tables/scheme`<br>`POST /api/2/tables/{id}/scheme/preview-changes`<br>`POST /api/2/tables/{id}/scheme/import`<br>`GET /api/2/contexts/{contextId}/scheme/export`<br>`POST /api/2/contexts/{contextId}/scheme/preview-changes`<br>`POST /api/2/contexts/{contextId}/scheme/import` | exists; grows into the manifest routes |
-| ownership | none | — | `PUT /api/2/tables/{id}/transfer`<br>`PUT /api/2/contexts/{contextId}/transfer` | exists on `api/2` |
+| ownership | none | none | `PUT /api/2/tables/{id}/transfer`<br>`PUT /api/2/contexts/{contextId}/transfer` | exists on `api/2` |
 | import | `POST /import-preview/table/{tableId}`<br>`POST /v2/import/table/{tableId}`<br>`POST /v2/import/view/{viewId}`<br>`POST /import-preview/view/{viewId}`<br>`POST /importupload-preview/table/{tableId}`<br>`POST /importupload-preview/view/{viewId}`<br>`POST /v2/importupload/table/{tableId}`<br>`POST /v2/importupload/view/{viewId}`<br>`POST /importupload/table/{tableId}`<br>`POST /importupload/view/{viewId}`<br>`POST /import/table/{tableId}`<br>`POST /import/view/{viewId}` | `POST /api/1/import/table/{tableId}`<br>`POST /api/1/import/views/{viewId}` | none | `/api/2/import/{nodeType}/{id}` with preview and upload |
-| favourites | none | — | `POST /api/2/favorites/{nodeType}/{nodeId}`<br>`DELETE /api/2/favorites/{nodeType}/{nodeId}` | exists on `api/2` |
-| config | none | — | `GET /api/2/config/table/{id}`<br>`GET /api/2/config/view/{id}`<br>`POST /api/2/config/{key}` | exists on `api/2` |
-| search | `GET /search/all` | none | — | `/api/2/search` |
-| navigation | `GET /navigation` | none | — | folded into `GET /api/2/init` or `/api/2/navigation` |
-| public share | `POST /s/{token}/authenticate` | none | — | `/api/2/public/{token}/...`, exists in part |
-| app shell | `GET /`<br>`GET /app/{contextId}` | none | — | page routes, not an API; stay |
-| grid widgets | `GET /grid/widget-types` | none | — | exists on `api/2/views/widget-types`; internal twin retires |
-| init | none | — | `GET /api/2/init` | exists on `api/2` |
+| favourites | none | none | `POST /api/2/favorites/{nodeType}/{nodeId}`<br>`DELETE /api/2/favorites/{nodeType}/{nodeId}` | exists on `api/2` |
+| config | none | none | `GET /api/2/config/table/{id}`<br>`GET /api/2/config/view/{id}`<br>`POST /api/2/config/{key}` | exists on `api/2` |
+| search | `GET /search/all` | none | none | `/api/2/search` |
+| navigation | `GET /navigation` | none | none | folded into `GET /api/2/init` or `/api/2/navigation` |
+| public share | `POST /s/{token}/authenticate` | none | none | `/api/2/public/{token}/...`, exists in part |
+| app shell | `GET /`<br>`GET /app/{contextId}` | none | none | page routes, not an API; stay |
+| grid widgets | `GET /grid/widget-types` | none | none | exists on `api/2/views/widget-types`; internal twin retires |
+| init | none | none | `GET /api/2/init` | exists on `api/2` |
 
 ## The decision this asks for
 
