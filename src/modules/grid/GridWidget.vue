@@ -3,10 +3,10 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<section class="grid-widget" :aria-label="widget.title || typeLabel" data-cy="grid-widget">
-		<header v-if="widget.showTitle || editable" class="grid-widget__header">
+	<section class="grid-widget" :aria-label="widget.configuration.title || typeLabel" data-cy="grid-widget">
+		<header v-if="widget.configuration.showTitle || editable" class="grid-widget__header">
 			<h3 class="grid-widget__title">
-				{{ widget.showTitle ? widget.title : typeLabel }}
+				{{ widget.configuration.showTitle ? widget.configuration.title : typeLabel }}
 			</h3>
 			<NcActions v-if="editable" :aria-label="t('tables', 'Widget actions')" :force-menu="true">
 				<NcActionButton :close-after-click="true" @click="$emit('configure', widget)">

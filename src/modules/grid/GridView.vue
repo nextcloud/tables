@@ -173,7 +173,7 @@ export default {
 				this.draftGrid = {
 					...this.draftGrid,
 					widgets: this.draftGrid.widgets.map(widget => widget.id === this.widgetBeingConfigured.id
-						? { ...widget, title: payload.title, showTitle: payload.showTitle, content: payload.content }
+						? { ...widget, configuration: payload.configuration, content: payload.content }
 						: widget),
 				}
 				this.closeAddWidget()
@@ -183,7 +183,7 @@ export default {
 			const widgetType = findWidgetType(this.widgetTypes, payload.type)
 			const size = { gridWidth: widgetType?.defaultWidth ?? 6, gridHeight: widgetType?.defaultHeight ?? 3 }
 			this.draftGrid = {
-				widgets: [...this.draftGrid.widgets, { id, type: payload.type, title: payload.title, showTitle: payload.showTitle, content: payload.content }],
+				widgets: [...this.draftGrid.widgets, { id, type: payload.type, configuration: payload.configuration, content: payload.content }],
 				layout: [...this.draftGrid.layout, {
 					id: this.draftGrid.layout.length + 1,
 					widgetId: id,

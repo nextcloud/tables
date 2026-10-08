@@ -45,6 +45,16 @@ export function findWidgetType(widgetTypes, type) {
 }
 
 /**
+ * The configuration a new widget of this type starts with: every property at its default.
+ *
+ * @param {object} widgetType a schema from the server
+ * @return {object}
+ */
+export function defaultConfiguration(widgetType) {
+	return Object.fromEntries(Object.entries(widgetType?.configuration ?? {}).map(([name, property]) => [name, structuredClone(property.default ?? null)]))
+}
+
+/**
  * The content a new widget of this type starts with: every property at its default.
  *
  * @param {object} widgetType a schema from the server

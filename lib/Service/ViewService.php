@@ -763,15 +763,14 @@ class ViewService extends SuperService {
 	private function sanitizeGrid(array $grid): array {
 		$widgets = [];
 		foreach ($grid['widgets'] ?? [] as $widget) {
-			$widget['content'] = GridWidgetTypes::sanitizeContent($widget['type'], $widget['content'] ?? []);
-			$widgets[] = $widget;
+			$widgets[] = GridWidgetTypes::sanitizeWidget($widget);
 		}
 		return ['widgets' => $widgets, 'layout' => array_values($grid['layout'] ?? [])];
 	}
 
 	/**
-	 * A grid holds widgets and where they sit. Every widget's content must match the schema
-	 * of its type, see GridWidgetTypes.
+	 * A grid holds widgets and where they sit. Every widget's configuration and content must
+	 * match the schemas of its type, see GridWidgetTypes.
 	 *
 	 * @throws BadRequestError
 	 */
@@ -782,14 +781,10 @@ class ViewService extends SuperService {
 			}
 		}
 		foreach ($grid['widgets'] ?? [] as $widget) {
-			if (!is_array($widget) || !is_string($widget['id'] ?? null) || !is_string($widget['type'] ?? null)) {
+			if (!is_array($widget)) {
 				throw new BadRequestError('Every widget needs a string id and type.');
 			}
-			$content = $widget['content'] ?? [];
-			if (!is_array($content)) {
-				throw new BadRequestError('The content of widget ' . $widget['id'] . ' must be an object.');
-			}
-			GridWidgetTypes::sanitizeContent($widget['type'], $content);
+			GridWidgetTypes::sanitizeWidget($widget);
 		}
 		foreach ($grid['layout'] ?? [] as $item) {
 			if (!is_array($item) || !is_string($item['widgetId'] ?? null)) {

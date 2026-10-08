@@ -229,10 +229,38 @@ class View extends EntitySuper implements JsonSerializable {
 	 */
 	public function getGridArray(): array {
 		$grid = $this->getArray($this->getGrid());
+		$widgets = [];
+		foreach (is_array($grid['widgets'] ?? null) ? $grid['widgets'] : [] as $widget) {
+			if (is_array($widget)) {
+				$widgets[] = self::upgradeWidgetShape($widget);
+			}
+		}
 		return [
-			'widgets' => array_values(is_array($grid['widgets'] ?? null) ? $grid['widgets'] : []),
+			'widgets' => $widgets,
 			'layout' => array_values(is_array($grid['layout'] ?? null) ? $grid['layout'] : []),
 		];
+	}
+
+	/**
+	 * Grids saved before widgets had a configuration carried title and showTitle on
+	 * the widget itself. They read as the current shape until the view is saved again.
+	 *
+	 * @param array<string, mixed> $widget
+	 * @return array<string, mixed>
+	 */
+	private static function upgradeWidgetShape(array $widget): array {
+		$configuration = is_array($widget['configuration'] ?? null) ? $widget['configuration'] : [];
+		foreach (['title', 'showTitle'] as $legacy) {
+			if (array_key_exists($legacy, $widget)) {
+				if (!array_key_exists($legacy, $configuration)) {
+					$configuration[$legacy] = $widget[$legacy];
+				}
+				unset($widget[$legacy]);
+			}
+		}
+		$widget['configuration'] = $configuration;
+		$widget['content'] = is_array($widget['content'] ?? null) ? $widget['content'] : [];
+		return $widget;
 	}
 
 	public function setGridArray(array $array): void {

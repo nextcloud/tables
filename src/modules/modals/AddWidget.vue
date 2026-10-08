@@ -46,11 +46,11 @@ import { NcButton, NcCheckboxRadioSwitch, NcDialog, NcSelect, NcTextField } from
 import { mapState } from 'pinia'
 import SchemaForm from '../grid/SchemaForm.vue'
 import { useTablesStore } from '../../store/store.js'
-import { defaultContent, findWidgetType } from '../grid/widgetRegistry.js'
+import { defaultConfiguration, defaultContent, findWidgetType } from '../grid/widgetRegistry.js'
 
 /**
- * Collects the type, title and content of a widget; the content form comes from
- * the schema of the type. The parent places the widget on the grid.
+ * Collects the type, configuration and content of a widget; the content form comes
+ * from the schema of the type. The parent places the widget on the grid.
  */
 export default {
 	name: 'AddWidget',
@@ -111,7 +111,7 @@ export default {
 		selectedType(option, previous) {
 			if (option && previous && option.id !== previous.id && this.widgetType) {
 				this.content = defaultContent(this.widgetType)
-				this.showTitle = this.widgetType.showTitle
+				this.showTitle = defaultConfiguration(this.widgetType).showTitle ?? false
 			}
 		},
 	},
@@ -119,14 +119,14 @@ export default {
 		reset() {
 			if (this.editingWidget) {
 				this.selectedType = this.typeOptions.find(option => option.id === this.editingWidget.type) ?? this.typeOptions[0]
-				this.title = this.editingWidget.title ?? ''
-				this.showTitle = !!this.editingWidget.showTitle
+				this.title = this.editingWidget.configuration?.title ?? ''
+				this.showTitle = !!this.editingWidget.configuration?.showTitle
 				this.content = { ...defaultContent(this.widgetType), ...JSON.parse(JSON.stringify(this.editingWidget.content ?? {})) }
 				return
 			}
 			this.selectedType = this.typeOptions[0] ?? null
 			this.title = ''
-			this.showTitle = this.widgetType?.showTitle ?? false
+			this.showTitle = defaultConfiguration(this.widgetType).showTitle ?? false
 			this.content = defaultContent(this.widgetType)
 		},
 		submit() {
@@ -135,8 +135,7 @@ export default {
 			}
 			this.$emit('submit', {
 				type: this.widgetType.type,
-				title: this.title.trim() || t('tables', this.widgetType.title),
-				showTitle: this.showTitle,
+				configuration: { title: this.title.trim() || t('tables', this.widgetType.title), showTitle: this.showTitle },
 				content: JSON.parse(JSON.stringify(this.content)),
 			})
 		},

@@ -30,13 +30,20 @@ class ViewTest extends TestCase {
 
 	public function testGridArrayRoundTrips(): void {
 		$grid = [
-			'widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi']]],
+			'widgets' => [['id' => 'w-1', 'type' => 'header', 'configuration' => ['title' => 'Hi', 'showTitle' => false], 'content' => ['title' => 'Hi']]],
 			'layout' => [['id' => 1, 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]],
 		];
 		$view = new View();
 		$view->setGridArray($grid);
 
 		$this->assertSame($grid, $view->getGridArray());
+	}
+
+	public function testGridArrayUpgradesWidgetsSavedBeforeTheConfiguration(): void {
+		$view = new View();
+		$view->setGrid(json_encode(['widgets' => [['id' => 'w-1', 'type' => 'text', 'title' => 'How', 'showTitle' => true, 'content' => ['text' => 'x']]], 'layout' => []]));
+
+		$this->assertSame([['id' => 'w-1', 'type' => 'text', 'content' => ['text' => 'x'], 'configuration' => ['title' => 'How', 'showTitle' => true]]], $view->getGridArray()['widgets']);
 	}
 
 	public function testTypeFallsBackToTable(): void {

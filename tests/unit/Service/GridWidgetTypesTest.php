@@ -30,6 +30,36 @@ class GridWidgetTypesTest extends TestCase {
 		}
 	}
 
+	public function testEveryTypeHasATitleAndShowTitleConfiguration(): void {
+		foreach (GridWidgetTypes::all() as $definition) {
+			$this->assertSame('string', $definition['configuration']['title']['type']);
+			$this->assertSame('boolean', $definition['configuration']['showTitle']['type']);
+		}
+	}
+
+	public function testSanitizeWidgetSplitsConfigurationFromContent(): void {
+		$widget = GridWidgetTypes::sanitizeWidget(['id' => 'w-1', 'type' => 'text', 'configuration' => ['title' => 'How', 'showTitle' => 1, 'stray' => 'x'], 'content' => ['text' => 'it works']]);
+
+		$this->assertSame(['id' => 'w-1', 'type' => 'text', 'configuration' => ['title' => 'How', 'showTitle' => true], 'content' => ['text' => 'it works']], $widget);
+	}
+
+	public function testSanitizeWidgetUpgradesTitleAndShowTitleFromTheOldShape(): void {
+		$widget = GridWidgetTypes::sanitizeWidget(['id' => 'w-1', 'type' => 'header', 'title' => 'Old', 'showTitle' => true, 'content' => ['title' => 'Hi']]);
+
+		$this->assertSame(['title' => 'Old', 'showTitle' => true], $widget['configuration']);
+		$this->assertArrayNotHasKey('title', array_diff_key($widget, ['configuration' => 1, 'content' => 1, 'id' => 1, 'type' => 1]));
+	}
+
+	public function testSanitizeWidgetFillsTheConfigurationDefaultsOfTheType(): void {
+		$this->assertFalse(GridWidgetTypes::sanitizeWidget(['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi']])['configuration']['showTitle']);
+		$this->assertTrue(GridWidgetTypes::sanitizeWidget(['id' => 'w-2', 'type' => 'text'])['configuration']['showTitle']);
+	}
+
+	public function testSanitizeWidgetRejectsAWidgetWithoutIdOrType(): void {
+		$this->expectException(BadRequestError::class);
+		GridWidgetTypes::sanitizeWidget(['type' => 'text']);
+	}
+
 	public function testUnknownTypeIsRejected(): void {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('Unknown widget type');

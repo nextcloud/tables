@@ -94,6 +94,7 @@ class ViewServiceTest extends TestCase {
 		$this->assertSame('#abc', $stored['widgets'][0]['content']['backgroundColor']);
 		$this->assertSame('left', $stored['widgets'][0]['content']['textAlign'], 'defaults are filled in');
 		$this->assertArrayNotHasKey('stray', $stored['widgets'][0]['content'], 'unknown properties are dropped');
+		$this->assertSame(['title' => '', 'showTitle' => false], $stored['widgets'][0]['configuration'], 'the configuration is filled from the type');
 	}
 
 	public function testUpdateRejectsNonHexWidgetColors(): void {
