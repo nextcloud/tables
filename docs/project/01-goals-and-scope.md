@@ -30,7 +30,7 @@ Plus the data layer work the three layers need. Tables is the data layer: a sche
 
 Decided:
 
-- Flows, automation, rule sets, decision tables, agents, the AI companion and connectors. They stay in OpenRegister and buildiq.
+- Flows, automation, rule sets, proposal tables, agents, the AI companion and connectors. They stay in OpenRegister and buildiq.
 - OpenRegister features buildiq does not use, and OpenRegister features only the excluded layers use (flow runs, tasks, chat threads).
 - Layered customisation of already installed fleet apps (admin and user deltas).
 - The store plane, scheduled actions, observability metrics, MCP hints.
@@ -38,7 +38,7 @@ Decided:
 
 ## Deferred past 15 January
 
-Allowed by decision: larger and more complex features move behind the freeze rather than ship unfinished. Candidates, in the order they would be picked up afterwards:
+Allowed by proposal: larger and more complex features move behind the freeze rather than ship unfinished. Candidates, in the order they would be picked up afterwards:
 
 1. Nested object and array properties in a table.
 2. Versions of rows with restore and diff.

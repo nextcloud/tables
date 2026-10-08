@@ -8,7 +8,7 @@ Part of the [buildiq parity project](README.md). For the first meeting between C
 
 ## 1. The integration direction, 30 minutes
 
-The one architectural decision that shapes everything else. Today Tables reaches teams by calling Circles classes directly, behind an enabled check:
+The one architectural proposal that shapes everything else. Today Tables reaches teams by calling Circles classes directly, behind an enabled check:
 
 ```mermaid
 flowchart LR
@@ -62,13 +62,14 @@ Outcome wanted: yes or no on the registries, and the answer to question Q2.
 
 - The second rows API: search, filter, sort, paging with total, fields, `format=object`. Parameter names follow Tables conventions. Is `api/2` the right home?
 - Slugs on tables, so a default CRUD API exists per application and table: `/api/2/apps/{application}/{table}`. Views and applications already carry slugs on the fork; tables do not.
+- The v1 API has outside consumers (Analytics, Forms, automation connectors), so it stays frozen and new capability lands on `api/2`. See the [rows API](12-rows-api.md).
 - Everything regenerates into `openapi.json`. Does Nextcloud want a served documentation page for it, or stays the file the documentation?
 
 ## 3. Types and formats, 15 minutes
 
 - The new column types: json, file, array, tag, calendar item, contact. See [types and formats](10-types-and-formats.md).
 - `format` on columns, folding in the current regex pattern.
-- Backwards compatibility rule D12.
+- Backwards compatibility rule P12.
 
 ## 4. May an application assume Tables, 10 minutes
 

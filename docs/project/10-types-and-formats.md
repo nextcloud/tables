@@ -124,7 +124,7 @@ Formats buildiq apps use that OpenRegister does not name as formats, and that th
 
 A column gets a `format`. It narrows a type the way JSON Schema does: a text column with format `email` only accepts email addresses, a number with format `percentage` stays between 0 and 100, a json column with format `geojson` must parse as GeoJSON. The current `textAllowedPattern` becomes the format `pattern` with the regex as its argument, so nothing existing breaks and existing patterns are finally enforced. For the person configuring a column it is one dropdown instead of writing a regex, with the common cases ready: email, phone, url, uuid, postal code, bsn, iban, kvk, rsin, color, percentage, money, duration.
 
-Backwards compatibility, decision D12: a column without a format behaves exactly as today. The import of an old scheme sets no format. The API accepts rows for a formatted column as before, and only rejects values that fail the format, which is the same behaviour an enforced pattern would have had.
+Backwards compatibility, proposal P12: a column without a format behaves exactly as today. The import of an old scheme sets no format. The API accepts rows for a formatted column as before, and only rejects values that fail the format, which is the same behaviour an enforced pattern would have had.
 
 Storage: a `format` column on `tables_columns` with a migration, nullable, plus a `formatOptions` json for the argument such as the regex or the currency. A dedicated column rather than a key in `customSettings`, because the export, the filter UI and the JSON Schema mapping all read it.
 

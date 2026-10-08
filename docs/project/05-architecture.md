@@ -35,9 +35,9 @@ The shell is the existing standalone route `/apps/tables/app/{slug}`. The Tables
 
 ## The Tables API speaks objects
 
-Decision D1: the translation between Tables storage and the object shape the components expect happens on the server. A second rows API lists rows of a table or view with search, filter, sort, paging, field selection and `format=object`, returning `{results, total, page, pages}` with rows as flat objects keyed by technical name and a metadata block. A schema endpoint returns a table as JSON Schema. The frontend store that the nc-vue components call is pointed at these endpoints with URL and parameter changes only. What remains in the browser is configuration, not a shape mapper. The [component list](03-component-list.md) names the methods and their callers; the [types and formats](10-types-and-formats.md) document names the mapping rules.
+Proposal P1: the translation between Tables storage and the object shape the components expect happens on the server. A second rows API lists rows of a table or view with search, filter, sort, paging, field selection and `format=object`, returning `{results, total, page, pages}` with rows as flat objects keyed by technical name and a metadata block. A schema endpoint returns a table as JSON Schema. The frontend store that the nc-vue components call is pointed at these endpoints with URL and parameter changes only. What remains in the browser is configuration, not a shape mapper. The [component list](03-component-list.md) names the methods and their callers; the [types and formats](10-types-and-formats.md) document names the mapping rules.
 
-Nested data is column types, decision D2: relation for objects, array for lists of scalars, json for opaque blobs, file for Files nodes. See [questions and decisions](09-questions-and-decisions.md) for the rules that keep this honest.
+Nested data is column types, proposal P2: relation for objects, array for lists of scalars, json for opaque blobs, file for Files nodes. See [questions and proposals](09-questions-and-proposals.md) for the rules that keep this honest.
 
 ## Manifest exchange
 

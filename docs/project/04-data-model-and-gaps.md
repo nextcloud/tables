@@ -33,7 +33,7 @@ Validation on write covers mandatory, text length, number range, unique text, li
 |---|---|---|
 | Register as a container of schemas | Application (context) groups tables and views, carries permissions per node, exports and imports as one scheme, and since this fork has a slug, a menu and grid pages | Has, under another name |
 | Schema as JSON Schema with typed properties | Table with typed columns; the scheme format is Tables' own | Partial, needs a JSON Schema mapping |
-| Object and array properties | No nested values; only selection-multi and usergroup-multi hold lists | Lacks; decision D2 makes them column types, see [types and formats](10-types-and-formats.md) |
+| Object and array properties | No nested values; only selection-multi and usergroup-multi hold lists | Lacks; proposal P2 makes them column types, see [types and formats](10-types-and-formats.md) |
 | `$ref` relations between schemas | Relation column: one target, one row, one label; no multi, no inverse, no cascade | Partial |
 | File properties on objects | Text-link column with the Files provider and a preview; a link only, no storage, upload or access control | Partial |
 | Uuid-based object access | Rows have integer ids only; no route takes a uuid | Lacks for rows |
@@ -52,7 +52,7 @@ Validation on write covers mandatory, text length, number range, unique text, li
 
 ## Gaps ranked by effort
 
-Effort is a relative size for one developer, including tests: S under a week, M one to two weeks, L two to four weeks, XL more than a month or a design decision first.
+Effort is a relative size for one developer, including tests: S under a week, M one to two weeks, L two to four weeks, XL more than a month or a design proposal first.
 
 ### S
 
@@ -83,7 +83,7 @@ Effort is a relative size for one developer, including tests: S under a week, M 
 
 ### XL
 
-19. **Nested object and array properties.** These do not fit scalar cells. Either a JSON cell type, which loses typed filtering and sorting unless JSON path queries are added for all three databases, or child tables with automatic relations. Both touch the mapper, the API, import and export, the editors and analytics. This needs a decision before any code.
+19. **Nested object and array properties.** These do not fit scalar cells. Either a JSON cell type, which loses typed filtering and sorting unless JSON path queries are added for all three databases, or child tables with automatic relations. Both touch the mapper, the API, import and export, the editors and analytics. This needs a proposal before any code.
 
 ## One cross-cutting item
 
@@ -91,4 +91,4 @@ The Tables frontend loads every row of a table or view and filters, sorts and se
 
 ## What buildiq does not need from OpenRegister
 
-Out of scope by decision: flows and automation, the AI companion, and everything only they consume (flow runs, actions, chat threads). The parity target is the application runtime, the designer and the packaging.
+Out of scope by proposal: flows and automation, the AI companion, and everything only they consume (flow runs, actions, chat threads). The parity target is the application runtime, the designer and the packaging.

@@ -50,7 +50,7 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 
 ### Sprint 1, 12 to 25 October, the data layer cluster
 
-Decision D5: both developers work the types and the API extensions together, because they share the mapper, import and export, the column editor and the OpenAPI document. The keep widgets move to sprint 2.
+Proposal P5: both developers work the types and the API extensions together, because they share the mapper, import and export, the column editor and the OpenAPI document. The keep widgets move to sprint 2.
 
 | Owner | Item | Size |
 |---|---|---|
@@ -67,7 +67,7 @@ Decision D5: both developers work the types and the API extensions together, bec
 | Owner | Item | Size |
 |---|---|---|
 | Robert | aggregation endpoint: value, grouped, timeseries; distinct values of a column; `extend` for relation cells | M |
-| Robert | the tag column type; search improved past `LIKE`: a per-table search index over text cells, decision D9 | L |
+| Robert | the tag column type; search improved past `LIKE`: a per-table search index over text cells, proposal P9 | L |
 | Remko | copy of the keep widgets: label, image, link, links, quicklinks, tile, divider, video, menu, container, banner, with their forms as server schemas | M |
 | Remko | server-side paging, filtering and search in the Tables data table behind a threshold; application pages use server mode | L |
 | Remko | aggregation widgets: stat, delta, gauge, stats block, chart, stacked bar, workspace filter | M |
@@ -79,7 +79,7 @@ Decision D5: both developers work the types and the API extensions together, bec
 | Owner | Item | Size |
 |---|---|---|
 | Robert | relation extended: filter, sort, inverse lookups, inline resolve, import and export remapping | L |
-| Robert | the array column type; delete behaviour as property configuration on relation and file columns, decision D10 | M |
+| Robert | the array column type; delete behaviour as property configuration on relation and file columns, proposal P10 | M |
 | Remko | detail page type: header, widget grid with data and metadata widgets, sidebar with files, relations and activity tabs | L |
 | Remko | form page type: standalone form from a table's columns, multi-step, per-field validation, public submit | M |
 | Ruben | manifest field mapping specification (buildiq v2 to Tables rows and back) | S |
@@ -93,7 +93,7 @@ Decision D5: both developers work the types and the API extensions together, bec
 | Robert | application settings and preferences endpoints (per application, per user); group permission fields on menu items, pages and widgets with server-side filtering when the application is served | M |
 | Remko | data list widgets: object table, card grid, map; related widget and related collections on the relation endpoint | L |
 | Remko | audit and lock state on the detail page; settings page type | M |
-| Ruben | review of M2 with Nextcloud GmbH; decision on what is deferred | S |
+| Ruben | review of M2 with Nextcloud GmbH; proposal on what is deferred | S |
 | Thijn | benchmark round 2; persona round on the application paths | M |
 
 ### Sprint 5, 7 to 20 December
@@ -129,7 +129,7 @@ Bug fixing from the acceptance runs, the upgrade test from the previous Tables r
 
 ## User reviews
 
-From December, every sprint review is followed by a user review: an online session of about an hour where we show the working software to people who build on Tables today and collect what they say. Decision D7.
+From December, every sprint review is followed by a user review: an online session of about an hour where we show the working software to people who build on Tables today and collect what they say. Proposal P7.
 
 | Date | Session | Shows |
 |---|---|---|

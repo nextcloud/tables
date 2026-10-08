@@ -2,9 +2,9 @@
   - SPDX-FileCopyrightText: 2026 Conduction B.V.
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-# Questions and decisions
+# Questions and proposals
 
-Part of the [buildiq parity project](README.md). Open questions wait for an answer from Conduction and Nextcloud GmbH together. Decisions record what was chosen and why, so nobody reopens them by accident. Add to both lists as the work raises them.
+Part of the [buildiq parity project](README.md). Open questions wait for an answer from Conduction and Nextcloud GmbH together. Nothing below is decided yet. Proposals record what Conduction puts forward and why. A proposal becomes a proposal when Conduction and Nextcloud GmbH agree in a sprint review or the kick-off; the agreed ones get a date here. Add to both lists as the work raises them.
 
 ## Open questions
 
@@ -38,64 +38,64 @@ Why it matters: the sessions start in the week of 7 December and need invitation
 
 Who answers: Nextcloud GmbH. Needed before: 15 November 2026.
 
-## Decisions
+## Proposals
 
-### D1. The Tables API speaks objects, the frontend speaks Tables
+### P1. The Tables API speaks objects, the frontend speaks Tables
 
 The translation from cell arrays to objects and from columns to JSON Schema happens on the server, in a second rows API and a schema endpoint, not in a browser adapter and not in each component. The frontend store is pointed at Tables with URL and parameter changes only.
 
 Why: fifty files send `_search`, and the shape gap is bigger than the parameter gap. A server-side object format serves every client, is a feature Tables wants anyway, and moves work to the lane where the engine already lives.
 
-### D2. Nested attributes are column types, not a document
+### P2. Nested attributes are column types, not a document
 
 An object attribute is a relation cell to a row in another table. An array is one cell per value in the typed table, the usergroup pattern. A json blob is a new opaque cell type. A file is a new cell type that stores a Files node id.
 
 Why: the EAV layout gives typed filters, sorts and aggregations cheaper than a JSON document does. The nested property gap moves from one XL item to three M items.
 
-### D3. A json column is never queried
+### P3. A json column is never queried
 
 The json cell type is for display data, imports and configuration. It does not appear in filter, sort, facet, aggregate or search. An optional JSON Schema fragment validates it on write.
 
 Why: without this rule the json type becomes the escape hatch that makes every later query impossible.
 
-### D4. Files owns file storage
+### P4. Files owns file storage
 
 A file cell holds a Files node id and nothing else. Access, versions, previews, sharing and trash are Files' job. Tables asks Files whether the user may read the node.
 
 Why: OpenRegister's own file tree and access code is where the file problems came from.
 
-### D5. Types and API extensions are one cluster in sprint 1
+### P5. Types and API extensions are one cluster in sprint 1
 
 Ruben. The new column types and the API extensions are built together in the first two weeks with both developers on them, because they share the mapper, the import and export code and the OpenAPI document. The keep widgets move to sprint 2.
 
 Why: one pass through the twenty-nine files a column type touches, instead of four passes.
 
-### D7. User reviews from December
+### P7. User reviews from December
 
 Ruben. From December every sprint review is followed by an online user review with organisations that depend on Tables for their applications, Schleswig-Holstein among the first. Four sessions before the release, see the [project plan](06-project-plan.md).
 
 Why: these organisations carry the risk of a change in Tables; they should see it before it ships, not after.
 
-### D8. Everything goes upstream
+### P8. Everything goes upstream
 
 Ruben. There is no fork-only feature. Every endpoint, type and designer surface is built to land in nextcloud/tables, with Tables conventions, regenerated OpenAPI and upstream review. The fork is a staging area, not a product.
 
-### D9. Search is improved, not accepted
+### P9. Search is improved, not accepted
 
 Ruben. `LIKE` over text cells is the first version so the endpoint ships in sprint 1; a real search follows in the plan rather than waiting on a benchmark verdict.
 
-### D10. Delete behaviour is property configuration
+### P10. Delete behaviour is property configuration
 
 Ruben. What happens to a relation target or a file when a row goes is a setting on the column, like mandatory or default, not a global rule. The column editor offers unlink, trash or delete where the type allows it.
 
-### D11. Calendar items and contacts are column types
+### P11. Calendar items and contacts are column types
 
 Ruben. Both are added through the server's `OCP\\Calendar` and `OCP\\Contacts` interfaces, which ship with every server. The cell stores a uid; the owning app edits the item.
 
-### D12. Everything is backwards compatible
+### P12. Everything is backwards compatible
 
 Ruben. A table, view, column, share or API call that works today works unchanged after this project. New fields are nullable and default to today's behaviour. The v1 and v2 APIs keep their shapes; new capabilities arrive as new parameters and new endpoints.
 
-### D6. Parity scope and data layer
+### P6. Parity scope and data layer
 
 Ruben. Parity is the application runtime, the designer and packaging. Flows, automation and the AI companion are out. The data layer is Tables rows. See [goals and scope](01-goals-and-scope.md).

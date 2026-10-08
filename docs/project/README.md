@@ -18,8 +18,9 @@ Ship date 16 February 2027, code freeze 15 January 2027.
 | [Project plan](06-project-plan.md) | milestones, seven sprints, owners, dependencies, deferral order |
 | [Risks](07-risks.md) | ten risks with triggers and responses |
 | [Testing and acceptance](08-testing-and-acceptance.md) | what every change carries, the acceptance paths, the benchmarks, the release checklist |
-| [Questions and decisions](09-questions-and-decisions.md) | what still needs an answer and from whom, and what was decided, when and why |
+| [Questions and proposals](09-questions-and-proposals.md) | what still needs an answer and from whom, and what Conduction proposes and why |
 | [Types and formats](10-types-and-formats.md) | OpenRegister property types and formats against Tables column types, the missing types, the format proposal |
+| [Rows API](12-rows-api.md) | who depends on the API today, the current index and single row responses, the proposed object format |
 | [Kick-off agenda](11-meeting-agenda.md) | the first meeting with Nextcloud GmbH: integration direction, rows API and slugs, types, dependencies, user reviews |
 
 The [research note](../research/functionality-research-tables-openregister.md) is the starting point these documents answer.
