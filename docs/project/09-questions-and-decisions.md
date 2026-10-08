@@ -16,35 +16,19 @@ Why it matters: if the answer is no, every widget needs a "Tables missing" state
 
 Who answers: Nextcloud GmbH. Needed before: sprint 5, when packaging is specified.
 
-### Q2. Does the object-shaped rows API go to upstream Tables or stay in the fork?
-
-The listing endpoint with search, filter, sort, paging and `format=object` is useful to Tables on its own. If it goes upstream, the request syntax must follow Tables conventions and the OpenAPI document must be regenerated. If it stays in the fork, we are free but carry it.
-
-Who answers: Nextcloud GmbH. Needed before: sprint 1 ends, because the parameter names are set then.
-
-### Q3. Which search is good enough?
-
-`LIKE` over text cells, or an index. The benchmark on 100k rows decides. If `LIKE` is too slow, the options are a per-table search index in Tables or Nextcloud's unified search provider extended with filters.
-
-Who answers: Robert, with the benchmark. Needed before: sprint 2.
-
 ### Q4. Does a relation delete cascade?
 
 A nested object becomes a row in a child table and a relation cell. When the parent goes, does the child go? Per relation setting, or one rule for all?
 
 Who answers: Ruben. Needed before: sprint 3.
 
-### Q5. Row delete and file cells
+### Q2. Which direction do integrations run?
 
-A file cell points at a Files node. When the row goes: unlink only, move the file to trash, or delete? A per-column setting is proposed.
+Tables reaches teams by calling Circles classes directly behind an enabled check. Nextcloud's architecture prefers the other direction: the hosting app publishes extension points and the integrating app registers into them, the way Flow works. Does Tables publish extension points for column types, row tabs and widgets, so Deck, Talk, Collectives, Forms, Polls, Maps, Photos and the rest can register themselves, and does Tables itself stop calling other apps' classes?
 
-Who answers: Ruben. Needed before: sprint 3.
+Why it matters: it decides the shape of every integration in this plan and what Tables may contain. See the [meeting agenda](11-meeting-agenda.md).
 
-### Q6. How is `format` stored on a column?
-
-Either a new `format` column on `tables_columns`, or a key in the existing `customSettings` JSON. A dedicated column is queryable and explicit. `customSettings` needs no migration.
-
-Who answers: Robert. Needed before: sprint 1.
+Who answers: Nextcloud GmbH with Conduction, in the kick-off meeting. Needed before: sprint 2.
 
 ### Q7. Does Nextcloud have a user panel for Tables, and may we run review sessions?
 
@@ -53,14 +37,6 @@ We are not aware of a standing user research panel at Nextcloud; the community f
 Why it matters: the sessions start in the week of 7 December and need invitations in November.
 
 Who answers: Nextcloud GmbH. Needed before: 15 November 2026.
-
-### Q8. Calendar events and contacts as column types?
-
-Both are reachable through `OCP\Calendar\IManager` and `OCP\Contacts\IManager`, which ship with every server, so a type is allowed under the no-dependency rule. The interfaces are thinner than the Calendar and Contacts apps' own APIs. Do we add link types for them before the release, or leave them to a later version?
-
-Why it matters: the people and calendar widgets in buildiq read through the apps. Without a type they stay presentational.
-
-Who answers: Ruben with Nextcloud GmbH. Needed before: sprint 3.
 
 ## Decisions
 
@@ -99,6 +75,26 @@ Why: one pass through the twenty-nine files a column type touches, instead of fo
 Ruben. From December every sprint review is followed by an online user review with organisations that depend on Tables for their applications, Schleswig-Holstein among the first. Four sessions before the release, see the [project plan](06-project-plan.md).
 
 Why: these organisations carry the risk of a change in Tables; they should see it before it ships, not after.
+
+### D8. Everything goes upstream
+
+Ruben. There is no fork-only feature. Every endpoint, type and designer surface is built to land in nextcloud/tables, with Tables conventions, regenerated OpenAPI and upstream review. The fork is a staging area, not a product.
+
+### D9. Search is improved, not accepted
+
+Ruben. `LIKE` over text cells is the first version so the endpoint ships in sprint 1; a real search follows in the plan rather than waiting on a benchmark verdict.
+
+### D10. Delete behaviour is property configuration
+
+Ruben. What happens to a relation target or a file when a row goes is a setting on the column, like mandatory or default, not a global rule. The column editor offers unlink, trash or delete where the type allows it.
+
+### D11. Calendar items and contacts are column types
+
+Ruben. Both are added through the server's `OCP\\Calendar` and `OCP\\Contacts` interfaces, which ship with every server. The cell stores a uid; the owning app edits the item.
+
+### D12. Everything is backwards compatible
+
+Ruben. A table, view, column, share or API call that works today works unchanged after this project. New fields are nullable and default to today's behaviour. The v1 and v2 APIs keep their shapes; new capabilities arrive as new parameters and new endpoints.
 
 ### D6. Parity scope and data layer
 

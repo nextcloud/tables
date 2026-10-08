@@ -12,9 +12,13 @@ Part of the [buildiq parity project](README.md). Measured on OpenRegister at 1dc
 - **file**: a Files node id per cell, multi-valued for attachments; Files owns access, versions and sharing.
 - **array**: a list of scalars with a subtype, one cell per value.
 - **tag**: a Nextcloud system tag per cell, multi-valued.
-- **format** on text columns: not a type but the concept Tables lacks, with a server-side validator registry.
+- **calendar item**: a calendar and event uid per cell, through `OCP\Calendar`.
+- **contact**: an address book and contact uid per cell, through `OCP\Contacts`.
+- **geo**: a point or GeoJSON shape, for the map widget and page; stored as json with format `geojson`, so it needs no own storage.
 
-Relation exists and is extended. User, group and team exist as the usergroup type. Everything else maps onto an existing type.
+Relation exists and is extended. User, group and team exist as the usergroup type. Boolean, integer, rich text, link, progress and rating map onto existing types and subtypes. Money, percentage and duration are formats on number and text, not types. A formula or computed column is not needed for parity; aggregations cover what the widgets ask. Nothing else is missing.
+
+Legend in the tables below: ✅ Tables has it, ◐ a smaller version exists, ❌ missing.
 
 ## Nextcloud server entities as types
 
@@ -22,9 +26,9 @@ The rule: Tables cannot and must not depend on another app. So a column type may
 
 | Entity | Where it lives | Tables today | Plan |
 |---|---|---|---|
-| user | server, `OCP\IUserManager` | usergroup type, `usergroupSelectUsers` | exists |
-| group | server, `OCP\IGroupManager` | usergroup type, `usergroupSelectGroups` | exists |
-| team | bundled Circles app, optional | usergroup type, `usergroupSelectTeams` | exists |
+| user | server, `OCP\IUserManager` | ✅ usergroup type, `usergroupSelectUsers` | exists |
+| group | server, `OCP\IGroupManager` | ✅ usergroup type, `usergroupSelectGroups` | exists |
+| team | bundled Circles app, optional | ✅ usergroup type, `usergroupSelectTeams`, see the note below | exists |
 | file or folder | server, `OCP\Files` | nothing; text link at best | new type **file** |
 | system tag | server, `OCP\SystemTag` | nothing | new type **tag**, S to M; gives the tags tab and facet for free |
 | share | server, `OCP\Share` | Tables shares its own nodes | not a cell type; the sharing tab reads Tables shares |
@@ -75,21 +79,21 @@ So Tables does not support `format` the way we do. It needs the concept, a place
 
 | OpenRegister type | Tables today | Plan |
 |---|---|---|
-| string | text, subtypes line, link, long, rich | map; formats narrow it |
-| number | number | map |
-| integer | number with decimals 0 | map; export as integer when decimals is 0 |
-| boolean | selection-check | map |
-| array of scalars | selection-multi and usergroup hold lists; no general array | new type **array** with a scalar subtype, one cell per value |
-| array of objects | relation, multi-valued, exists | reuse; add filter, sort, inverse lookup, inline resolve, import and export remapping |
-| object | relation, single-valued, exists | reuse; same additions |
-| dictionary | nothing | **json** type, opaque |
-| file | nothing | new type **file**, one cell per Files node id |
-| user and group | usergroup | map |
-| relation (`$ref`) | relation | map; add inverse lookup and inline extend |
-| selection with options | selection | map; `enum` in JSON Schema |
-| datetime, date, time | datetime, subtypes date and time | map |
+| string | ✅ text, subtypes line, link, long, rich | map; formats narrow it |
+| number | ✅ number | map |
+| integer | ◐ number with decimals 0 | map; export as integer when decimals is 0 |
+| boolean | ✅ selection-check | map |
+| array of scalars | ◐ selection-multi and usergroup hold lists; no general array | new type **array** with a scalar subtype, one cell per value |
+| array of objects | ✅ relation, multi-valued | reuse; add filter, sort, inverse lookup, inline resolve, import and export remapping |
+| object | ✅ relation, single-valued | reuse; same additions |
+| dictionary | ❌ | **json** type, opaque |
+| file | ❌ | new type **file**, one cell per Files node id |
+| user and group | ✅ usergroup | map |
+| relation (`$ref`) | ✅ relation | map; add inverse lookup and inline extend |
+| selection with options | ✅ selection | map; `enum` in JSON Schema |
+| datetime, date, time | ✅ datetime, subtypes date and time | map |
 
-Three new column types: array, json and file. Relation exists and is extended, not rebuilt: today it stores several target ids per cell with `targetId`, `relationType` and `labelColumn` in the column settings and validates that the target exists, but it cannot filter, sort, resolve inline, answer an inverse lookup or survive import and export. Boolean and integer need no new storage, only a mapping rule.
+New column types: json, file, array, tag, calendar item and contact. Relation exists and is extended, not rebuilt: today it stores several target ids per cell with `targetId`, `relationType` and `labelColumn` in the column settings and validates that the target exists, but it cannot filter, sort, resolve inline, answer an inverse lookup or survive import and export. Boolean and integer need no new storage, only a mapping rule.
 
 ## Formats
 
@@ -97,30 +101,38 @@ OpenRegister's schema editor offers these formats, and the backend registers res
 
 | Format | OpenRegister validator | Tables today | Plan |
 |---|---|---|---|
-| text, markdown, html | none, rendering only | text long and text rich | map to subtypes |
-| date-time, date, time | date-time has a resolver | datetime subtypes | map |
-| duration | standard | nothing | validator, S |
-| email, idn-email | standard | nothing | validator, S |
-| hostname, idn-hostname, ipv4, ipv6 | standard | nothing | validator, S, low priority |
-| uri, uri-reference, iri, iri-reference, url, uri-template | standard | text link checks protocol | validator, S |
-| uuid | resolver | nothing | validator, S |
-| regex | standard | nothing | validator, S |
-| json-pointer, relative-json-pointer | standard | nothing | skip unless a widget needs it |
-| color and six colour variants | resolver, hex default, rgba, oklch | nothing | validator, S; the grid widgets already validate hex |
-| bsn | resolver | nothing | validator, S |
-| semver | resolver | nothing | validator, S |
-| cron | resolver | nothing | skip, schedules are out of scope |
-| user | resolver against the user manager | usergroup type | map |
-| binary, csv, pdf, ods, json | used as file content types | nothing | file type with an accepted content type list |
-| pattern (regex on the property) | standard | stored, not enforced | enforce on the server, S |
+| text, markdown, html | none, rendering only | ✅ text long and text rich | map to subtypes |
+| date-time, date, time | date-time has a resolver | ✅ datetime subtypes | map |
+| duration | standard | ❌ | validator, S |
+| email, idn-email | standard | ❌ | validator, S |
+| hostname, idn-hostname, ipv4, ipv6 | standard | ❌ | validator, S, low priority |
+| uri, uri-reference, iri, iri-reference, url, uri-template | standard | ◐ text link checks protocol | validator, S |
+| uuid | resolver | ❌ | validator, S |
+| regex | standard | ❌ | validator, S |
+| json-pointer, relative-json-pointer | standard | ❌ | skip unless a widget needs it |
+| color and six colour variants | resolver, hex default, rgba, oklch | ❌ | validator, S; the grid widgets already validate hex |
+| bsn | resolver | ❌ | validator, S |
+| semver | resolver | ❌ | validator, S |
+| cron | resolver | ❌ | skip, schedules are out of scope |
+| user | resolver against the user manager | ✅ usergroup type | map |
+| binary, csv, pdf, ods, json | used as file content types | ❌ | file type with an accepted content type list |
+| pattern (regex on the property) | standard | ◐ stored as `textAllowedPattern`, not enforced | folded into format, see the proposal |
 
 Formats buildiq apps use that OpenRegister does not name as formats, and that the formats registry should carry from day one: postal code, phone, iban, kvk, rsin and percentage. They are validators of a few lines each.
 
+## Proposal: format on columns
+
+A column gets a `format`. It narrows a type the way JSON Schema does: a text column with format `email` only accepts email addresses, a number with format `percentage` stays between 0 and 100, a json column with format `geojson` must parse as GeoJSON. The current `textAllowedPattern` becomes the format `pattern` with the regex as its argument, so nothing existing breaks and existing patterns are finally enforced. For the person configuring a column it is one dropdown instead of writing a regex, with the common cases ready: email, phone, url, uuid, postal code, bsn, iban, kvk, rsin, color, percentage, money, duration.
+
+Backwards compatibility, decision D12: a column without a format behaves exactly as today. The import of an old scheme sets no format. The API accepts rows for a formatted column as before, and only rejects values that fail the format, which is the same behaviour an enforced pattern would have had.
+
+Storage: a `format` column on `tables_columns` with a migration, nullable, plus a `formatOptions` json for the argument such as the regex or the currency. A dedicated column rather than a key in `customSettings`, because the export, the filter UI and the JSON Schema mapping all read it.
+
 ## What this means for the build
 
-1. Add `format` to a column, stored in a new column or in `customSettings`, see question Q6. Expose it in the column editor as a dropdown filtered by type.
-2. Add a server-side formats registry: one class per format, a `validate(value): ?string` method, registered by type. Run it in the column type's `validateValue`, next to the existing checks. Enforce `textAllowedPattern` there as well.
+1. Add `format` and `formatOptions` to a column with a migration. Expose format in the column editor as a dropdown filtered by type.
+2. Add a server-side formats registry: one class per format, a `validate(value, options): ?string` method, registered by type. Run it in the column type's `validateValue`, next to the existing checks. Migrate `textAllowedPattern` into format `pattern`.
 3. Map both ways in the JSON Schema export and import: `type` and `subtype` and `format` to JSON Schema `type` and `format`, with `enum` for selection, `$ref` for relation, `items` for array.
-4. Build the three new storage types: json first, then file, then array. Extend relation with filter, sort, inverse and resolve.
+4. Build the new storage types: json first, then file and tag, then array, then calendar item and contact. Extend relation with filter, sort, inverse and resolve.
 
 Sizes: the registry with the first twelve formats is S to M. Each storage type is M, because a column type touches about twenty-nine files from migration to OpenAPI.

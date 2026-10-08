@@ -54,7 +54,7 @@ Decision D5: both developers work the types and the API extensions together, bec
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | indexes on the cell tables, `(column_id, row_id)` and `(column_id, value)`; row uuids with backfill and routes by uuid | M |
+| Robert | indexes on the cell tables, `(column_id, row_id)` and `(column_id, value)`; row uuids with backfill and routes by uuid; slugs on tables and the default CRUD routes `/api/2/apps/{application}/{table}` | M |
 | Robert | rows v2 listing for tables and views: search, filter with the twelve operators, sort, page and limit with total, fields, `format=object`; object format accepted on create and update | L |
 | Robert | `format` on columns, the formats registry with the first twelve validators, pattern enforcement; JSON Schema export and flat import | M |
 | Remko | the json and file column types end to end: migration, mapper, cell editor, renderer, filter UI, import and export, OpenAPI | L |
@@ -67,7 +67,7 @@ Decision D5: both developers work the types and the API extensions together, bec
 | Owner | Item | Size |
 |---|---|---|
 | Robert | aggregation endpoint: value, grouped, timeseries; distinct values of a column; `extend` for relation cells | M |
-| Robert | the array column type; search decision Q3 settled by the benchmark | M |
+| Robert | the tag column type; search improved past `LIKE`: a per-table search index over text cells, decision D9 | L |
 | Remko | copy of the keep widgets: label, image, link, links, quicklinks, tile, divider, video, menu, container, banner, with their forms as server schemas | M |
 | Remko | server-side paging, filtering and search in the Tables data table behind a threshold; application pages use server mode | L |
 | Remko | aggregation widgets: stat, delta, gauge, stats block, chart, stacked bar, workspace filter | M |
@@ -78,8 +78,8 @@ Decision D5: both developers work the types and the API extensions together, bec
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | multi-valued relations with inverse lookups and lookups by target uuid; relation endpoint in both directions | L |
-| Robert | relation delete rule (Q4) and file cell delete rule (Q5) implemented; inverse relation endpoint | M |
+| Robert | relation extended: filter, sort, inverse lookups, inline resolve, import and export remapping | L |
+| Robert | the array column type; delete behaviour as property configuration on relation and file columns, decision D10 | M |
 | Remko | detail page type: header, widget grid with data and metadata widgets, sidebar with files, relations and activity tabs | L |
 | Remko | form page type: standalone form from a table's columns, multi-step, per-field validation, public submit | M |
 | Ruben | manifest field mapping specification (buildiq v2 to Tables rows and back) | S |
@@ -89,7 +89,7 @@ Decision D5: both developers work the types and the API extensions together, bec
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | row audit trail stored from the existing row events, with a read endpoint; advisory locks | M |
+| Robert | row audit trail stored from the existing row events, with a read endpoint; advisory locks; calendar item and contact column types through `OCP\\Calendar` and `OCP\\Contacts` | L |
 | Robert | application settings and preferences endpoints (per application, per user); group permission fields on menu items, pages and widgets with server-side filtering when the application is served | M |
 | Remko | data list widgets: object table, card grid, map; related widget and related collections on the relation endpoint | L |
 | Remko | audit and lock state on the detail page; settings page type | M |

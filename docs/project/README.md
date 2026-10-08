@@ -19,7 +19,8 @@ Ship date 16 February 2027, code freeze 15 January 2027.
 | [Risks](07-risks.md) | ten risks with triggers and responses |
 | [Testing and acceptance](08-testing-and-acceptance.md) | what every change carries, the acceptance paths, the benchmarks, the release checklist |
 | [Questions and decisions](09-questions-and-decisions.md) | what still needs an answer and from whom, and what was decided, when and why |
-| [Types and formats](10-types-and-formats.md) | OpenRegister property types and formats against Tables column types, and the four new types |
+| [Types and formats](10-types-and-formats.md) | OpenRegister property types and formats against Tables column types, the missing types, the format proposal |
+| [Kick-off agenda](11-meeting-agenda.md) | the first meeting with Nextcloud GmbH: integration direction, rows API and slugs, types, dependencies, user reviews |
 
 The [research note](../research/functionality-research-tables-openregister.md) is the starting point these documents answer.
 
@@ -32,7 +33,9 @@ Tables already holds the structural half of an application builder: tables, colu
 - Query power on the rows API: search, filter, sort, paging with a total, field selection, an object-shaped response.
 - Row identity: a uuid per row and routes by uuid.
 - Column formats: a `format` field, a server-side validator registry, pattern enforcement.
-- Three column types: json, file and array. Relation extended with filter, sort, inverse lookup and inline resolve.
+- Six column types: json, file, array, tag, calendar item and contact. Relation extended with filter, sort, inverse lookup and inline resolve.
+- Slugs on tables and a default CRUD API per application and table.
+- Search beyond `LIKE`.
 - JSON Schema export and import of a table and of an application.
 - Aggregations: value, grouped and timeseries.
 - Row extras: audit trail, advisory locks, facets.
