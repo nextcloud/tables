@@ -135,9 +135,9 @@ Errors keep Nextcloud's OCS status codes. The body carries `{"message": "..."}` 
 
 | Scheme today | Manifest adds |
 |---|---|
-| name, description, icon, slug | version, author, licence, required Tables version |
+| name, description, icon, technical name | version, author, licence, required Tables version |
 | nodes: the tables and views the application uses | pages with their type, grid and widgets; menu sections and nesting |
-| tables with columns and their settings | column `format`, relations by target slug, the new types |
+| tables with columns and their settings | column `format`, relations by target technical name, the new types |
 | menu items, grid views | visibility rules, actions, sidebar configuration, settings, walkthrough and setup text |
 | | optional data: rows per table, for templates and demo content |
 
