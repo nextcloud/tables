@@ -8,24 +8,28 @@ Part of the [buildiq parity project](README.md).
 
 ## Principles
 
-1. **Rows are the source of truth.** An application, its menu, its pages and its widgets are rows in Tables, editable in the Tables UI. The manifest is a file format for exchange, not the storage.
-2. **Tables is the data layer.** A schema is a table, a property is a column, an object is a row. No OpenRegister at runtime.
-3. **Server-side definitions.** Widget types, page types and validators are defined once on the server and served to the frontend, as the widget schemas already are. The form and the validation share one definition.
+1. **Applications are Tables entities; their data are tables and rows.** An application, its menu items, its pages and their widgets are entities in Tables' own schema, `tables_contexts_*` and `tables_views`, with their own mappers, services and API routes. The data an application works on are ordinary tables, columns and rows. Neither side is stored as the other: an application is not a row in a user table, and a user's data is never hidden inside an application record. The manifest is a file format for exchange, not the storage.
+2. **Tables runs on itself.** Tables depends on the Nextcloud server and on nothing else. No OpenRegister, no nextcloud-vue runtime dependency, no other app's classes, bundled or not. Anything from outside the server reaches Tables through `OCP` interfaces or through extension points Tables publishes and other apps register into. A schema is a table, a property is a column, an object is a row.
+3. **Server-side definitions.** Widget types, page types, formats and validators are defined once on the server and served to the frontend, as the widget schemas already are. The form and the validation share one definition.
 4. **Nothing hidden.** Every value a page shows comes from a Tables API a user could call. No private endpoints for the runtime.
 5. **Upstream shape.** Code is written so nextcloud/tables can take it: Nextcloud attributes on controllers, psalm clean, generated OpenAPI, unit tests per class, Playwright for every user path.
 
 ## The application model
 
-| Entity | Table | What it holds today | What it gains |
-|---|---|---|---|
-| Application | `tables_contexts_context` | name, icon, description, owner, slug | version, settings JSON, runtime options (landing page, theme) |
-| Menu item | `tables_contexts_menu_item` | label, icon, target (view, table, url), slug, order | section, parent (one level of nesting), permission (group), count source |
-| Page | `tables_views` with `type` | table and grid views, grid JSON, slug | types detail, form and settings; page config JSON; actions JSON; sidebar JSON; permission |
-| Widget | inside the page's grid JSON | id, type, title, show title, content, position | visibility rules |
-| Widget type | `GridWidgetTypes` on the server | title, size, content schema | a category and a data need flag, so the add dialog can group and hide what the page cannot feed |
-| Data | tables, columns, rows | fifteen column types, shares, views | uuids on rows, relations with inverse, files, audit, locks, formats |
+Three columns because the fork is ahead of Tables: what nextcloud/tables has, what the fork's open pull requests add, and what this project adds.
 
-Pages of type detail and form are views without a table of their own, like grid views. Their config names the table they work on.
+| Entity | Table | In nextcloud/tables | On the fork | This project adds |
+|---|---|---|---|---|
+| Application | `tables_contexts_context` | name, icon, description, owner, sharing, nodes, pages | slug, menu items | version, `configuration` JSON (landing page, theme, runtime options), permission fields |
+| Menu item | `tables_contexts_menu_item` | nothing; the start page lists node tiles | label, icon, target (view, table, url), slug, order | section, parent (one level), permission (group), count source |
+| Page | `tables_views` with `type` | views are table views only; a context has one start page in `tables_contexts_page` with ordered node tiles | view `type` table or grid, grid JSON, slug, views without a table | types detail, form and settings; page `configuration` JSON; actions JSON; sidebar JSON; permission |
+| Widget | inside the page's grid JSON | nothing | type, layout (position and size), content with every property including title and show title | split into `configuration` (title, show title, style, data source, visibility rules) and `content` (what the widget shows) |
+| Widget type | `GridWidgetTypes` on the server | nothing | title, default show title, size, content schema | a category, a data need flag, and a configuration schema next to the content schema |
+| Data | tables, columns, rows | fifteen column types, shares, views with filter and sort, uuid and technical name on views | | uuids on rows, relations with inverse, the new column types, formats, audit, locks |
+
+Two naming notes. Tables has no configuration field on an application today: its `api/2/config` routes return the notification settings of a table or view and set app or user config keys, which is a different thing. The application and page field is therefore named `configuration` here, and the plan avoids `config` for it. For widgets the fork currently puts every property, title and show title included, in `content`; the split into `configuration` and `content` is a change to the fork's widget shape before it goes upstream, so it is listed under the pre-sprint work.
+
+Pages of type detail and form are views without a table of their own, like grid views. Their configuration names the table they work on.
 
 ## Request paths
 
