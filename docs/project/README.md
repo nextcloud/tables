@@ -25,4 +25,20 @@ The [research note](../research/functionality-research-tables-openregister.md) o
 
 ## In one paragraph
 
-Tables already holds the structural half of an application builder: tables, columns, views, applications with menus, shares, schemes, import and export, and since October a widget grid with server-side widget schemas and a standalone app shell. What is missing is query power on the API, row identity, row-level extras such as files and audit, the detail and form page types, the remaining designer editors, a manifest format, and a packager. Two developers full time, a half-time owner and a half-time tester deliver that in seven sprints, with packaging as the last milestone and the first to move behind the freeze if the data layer slips.
+Tables already holds the structural half of an application builder: tables, columns, views, applications with menus, shares, schemes, import and export. The Conduction fork adds the other half of the foundation on three open pull requests, a widget grid on views, server-side widget schemas, menu items on applications and a standalone app shell. None of that is in Nextcloud Tables yet. It goes upstream as one pull request on 9 October 2026, and every item below builds on top of it. Two developers full time, a half-time owner and a half-time tester deliver the rest in seven sprints, with packaging as the last milestone and the first to move behind the freeze if the data layer slips.
+
+## What is still missing
+
+- Query power on the rows API: search, filter, sort, paging with a total, field selection, an object-shaped response.
+- Row identity: a uuid per row and routes by uuid.
+- Column formats: a `format` field, a server-side validator registry, pattern enforcement.
+- Three column types: json, file and array. Relation extended with filter, sort, inverse lookup and inline resolve.
+- JSON Schema export and import of a table and of an application.
+- Aggregations: value, grouped and timeseries.
+- Row extras: audit trail, advisory locks, facets.
+- Page types: detail, form, settings, logs as a read-only index.
+- The remaining widgets: data lists, aggregations, detail widgets, related objects.
+- Designer editors: visibility rules, actions, sidebar, index configuration, menu sections, templates.
+- Application settings and preferences, group permissions on menu items, pages and widgets.
+- A manifest format with export and import, including a buildiq v2 import.
+- A packager that generates an installable Nextcloud app from an application.

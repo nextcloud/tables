@@ -10,7 +10,8 @@ Part of the [buildiq parity project](README.md).
 
 | Date | Event |
 |---|---|
-| 8 October 2026 | plan written; research and the October fork work (grid views, applications, menus, widget schemas, app shell) done |
+| 8 October 2026 | plan written; grid views, widget schemas, application menus and the app shell built on fork pull requests #2, #3 and #4 |
+| 9 October 2026 | the fork chain merged and opened as one pull request on nextcloud/tables; everything below builds on it |
 | 12 October 2026 | sprint 1 starts |
 | 15 January 2027 | code freeze: every feature that ships is merged on the fork and green |
 | 18 January to 12 February 2027 | stabilisation: bugs, upgrade tests, documentation, upstream slices |
@@ -40,6 +41,13 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 | M5 packaging | 7 | generate an installable Nextcloud app from an application; release candidate | yes, as a whole |
 
 ## Sprint plan
+
+### Before sprint 1, 9 October
+
+| Owner | Item | Size |
+|---|---|---|
+| Ruben | merge fork pull requests #2, #3 and #4 into `feat/grid-page`, rename the migration to the current target version and date, open the upstream pull request on nextcloud/tables with the AI disclosure, in Ruben's own words | S |
+| Remko | address upstream review on the grid and app shell during sprint 1 as it comes | S |
 
 ### Sprint 1, 12 to 25 October, the data layer cluster
 
