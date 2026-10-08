@@ -54,7 +54,7 @@ The rule this project follows, proposal P12: neither version changes shape. Rows
 
 ## Manifest exchange
 
-Export produces one JSON document per application: identity, menu, pages with their config and widgets, and the schemes of the tables it uses, with every target referenced by uuid. Import creates or updates the rows. The document follows buildiq's manifest v2 where the concepts match (menu, pages, widgets, settings, visibility) and adds a `tables` section for the data model. A buildiq manifest with only those concepts imports into Tables; the reverse export opens in buildiq's validator. Exact field mapping is a design task in sprint 3.
+The manifest is the existing `api/2` context scheme grown to the whole application: identity and version, the tables and views with their columns, pages with their widgets, menu, settings, visibility rules and optional row data. Export, import, preview and a ZIP form with data are additions to `api/2`; the current scheme routes keep their shape. Templates, the round trip between instances, the buildiq v2 import and the packager all use the same six routes. The [rows API](12-rows-api.md) lists them and the [data model](04-data-model-and-gaps.md) names what buildiq fields have no home.
 
 ## Packaging
 

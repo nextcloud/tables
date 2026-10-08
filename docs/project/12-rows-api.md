@@ -51,9 +51,9 @@ Proposal P12 follows from that: v1 and the existing v2 routes keep their shapes.
 
 `GET /ocs/v2.php/apps/tables/api/1/rows/{rowId}`. Same shape as one element above. Create is `POST /api/1/tables/{tableId}/rows` with `{"data": {"5": "Jansen", "6": "jansen@example.org"}}` keyed by column id; update is `PUT /api/1/rows/{rowId}` with the same body; delete is `DELETE /api/1/rows/{rowId}`.
 
-## Proposed: the object format on `api/2`
+## Proposed: non-breaking additions to `api/2`
 
-New endpoints, new parameters, same OCS envelope. Routes by id and, once tables carry slugs, by slug under the application:
+Everything below is an addition. No existing route changes its parameters or its response. The two resources the components need are the **table endpoint**, the rows of one table or view as a collection, and the **item endpoint**, one row by uuid. Same OCS envelope. Routes by id and, once tables carry slugs, by slug under the application:
 
 ```
 GET    /api/2/tables/{tableId}/rows
@@ -65,7 +65,21 @@ PUT    /api/2/rows/{uuid}
 DELETE /api/2/rows/{uuid}
 GET    /api/2/tables/{tableId}/schema
 GET    /api/2/tables/{tableId}/aggregate
+GET    /api/2/rows/{uuid}/relations?direction=used
+GET    /api/2/rows/{uuid}/audit
+GET    /api/2/columns/{id}/distinct
 ```
+
+Collection and item, side by side:
+
+| | Table endpoint | Item endpoint |
+|---|---|---|
+| read | `GET /api/2/tables/{id}/rows` | `GET /api/2/rows/{uuid}` |
+| by slug | `GET /api/2/apps/{application}/{table}` | `GET /api/2/apps/{application}/{table}/{uuid}` |
+| create | `POST /api/2/tables/{id}/rows` | |
+| update | | `PUT /api/2/rows/{uuid}`, `PATCH` for partial |
+| delete | `DELETE /api/2/tables/{id}/rows?ids=` for bulk | `DELETE /api/2/rows/{uuid}` |
+| response | `{results, total, page, pages, limit}` | one object |
 
 Index parameters:
 
@@ -112,6 +126,31 @@ Properties are keyed by technical name; a column without one gets a slug of its 
 Single row: `GET /api/2/rows/{uuid}` returns one object of the same shape. Create and update accept the same object shape keyed by technical name and return the stored object, so a client never needs a second read.
 
 Errors keep Nextcloud's OCS status codes; the body carries `{"message": "..."}` plus, for validation, `{"errors": {"email": "is not a valid email address"}}` per property, which the form components render inline.
+
+## Proposed: applications as manifests on `api/2`
+
+`api/2` already exports and imports a context scheme: `GET /contexts/{id}/scheme/export`, `POST /contexts/{id}/scheme/import` and `POST /contexts/{id}/scheme/preview-changes`, and the fork's version of that scheme already carries the slug, the menu items and the grid views with their widgets. The manifest is that scheme grown to the whole application, not a second format:
+
+| Scheme today | Manifest adds |
+|---|---|
+| name, description, icon, slug | version, author, licence, required Tables version |
+| nodes: the tables and views the application uses | pages with their type, grid and widgets; menu sections and nesting |
+| tables with columns and their settings | column `format`, relations by target slug, the new types |
+| menu items, grid views | visibility rules, actions, sidebar configuration, settings, walkthrough and setup text |
+| | optional data: rows per table, for templates and demo content |
+
+Routes, all additions:
+
+```
+GET    /api/2/contexts/{id}/manifest                 the application as a manifest
+POST   /api/2/contexts/manifest                      create an application from a manifest
+POST   /api/2/contexts/{id}/manifest                 update an application from a manifest
+POST   /api/2/contexts/{id}/manifest/preview-changes what an import would change
+GET    /api/2/contexts/{id}/manifest/export?data=1   manifest plus rows as a ZIP
+POST   /api/2/contexts/manifest/import               the ZIP back in
+```
+
+The existing scheme routes stay and keep returning today's shape. `preview-changes` is reused as the dry run the designer shows before an import. A buildiq v2 manifest imports through the same `POST`, with a `source=buildiq` parameter that switches on the field mapping; what has no home in Tables is listed in the preview and skipped. The packager in sprint 7 reads the manifest from the first route and writes it into the generated app; the generated app's repair step posts it back through the import route on install. So import and export, templates, the round trip between two instances and packaging all run through one format and six routes.
 
 ## OpenAPI
 

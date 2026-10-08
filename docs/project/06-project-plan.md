@@ -100,7 +100,7 @@ Proposal P5: both developers work the types and the API extensions together, bec
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | manifest export: identity, menu, pages, widgets, settings, visibility, schemes by uuid; manifest import creating or updating rows | L |
+| Robert | manifest routes on `api/2`, grown from the context scheme export and import: identity and version, pages with widgets, menu, settings, visibility, columns with format and relations by slug; preview-changes as dry run; optional rows as data | L |
 | Remko | designer: visibility rules editor, actions editor, sidebar editor, index page configuration dialog, menu sections and one level of nesting | L |
 | Remko | application templates: save an application as a template, create from template | M |
 | Ruben | packaging specification: template, repair step, dependency on Tables, CI configuration | S |
@@ -110,7 +110,7 @@ Proposal P5: both developers work the types and the API extensions together, bec
 
 | Owner | Item | Size |
 |---|---|---|
-| Robert | manifest import of a buildiq v2 manifest with the supported concepts; round trip tests | M |
+| Robert | manifest ZIP export and import with data; import of a buildiq v2 manifest through `source=buildiq`; round trip tests between two instances | M |
 | Remko | closing work on M2 and M3 items; screenshot pass of every surface at desktop and phone width | M |
 | Thijn | round trip test between two instances | S |
 
