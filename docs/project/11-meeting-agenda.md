@@ -58,7 +58,7 @@ sequenceDiagram
 
 Outcome wanted: yes or no on the registries, and the answer to question Q2.
 
-## 2. The rows API and slugs, 15 minutes
+## 2. The rows API and identifiers, 15 minutes
 
 - The second rows API: search, filter, sort, paging with total, fields, `format=object`. Parameter names follow Tables conventions. Is `api/2` the right home?
 - One identifier: `technicalName`, which columns and views already have, spread to tables and applications, so a default CRUD API exists per application and table: `/api/2/apps/{application}/{table}`. The fork's `slug` goes.

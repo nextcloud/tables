@@ -98,7 +98,7 @@ Two names are inconsistent today, and the upstream pull request is the moment to
 
 A page in the shell renders through three calls at most: the application (with menu and pages), the page definition, and the data of its widgets. Data calls go to the row API with filter, sort, search and pagination on the query string, validated against the columns the caller may see. Aggregates go to one aggregation endpoint per table or view. Nothing is loaded that the page does not show.
 
-The shell is the existing standalone route `/apps/tables/app/{slug}`. The Tables UI stays the configuration surface and keeps the tab bar for switching pages while designing.
+The shell is the fork's standalone route `/apps/tables/app/{slug}`, which becomes `/apps/tables/app/{technicalName}` under P15. The Tables UI stays the configuration surface and keeps the tab bar for switching pages while designing.
 
 ## The Tables API speaks objects
 
