@@ -38,6 +38,7 @@ Tables already holds the structural half of an application builder: tables, colu
 - Technical names on tables and applications and a default CRUD API per application and table.
 - A frontend store with a cache.
 - The rename of context to application in code and API.
+- One API: the frontend on `api/2`, the 48 internal routes retired.
 - Search beyond `LIKE`.
 - JSON Schema export and import of a table and of an application.
 - Aggregations: value, grouped and timeseries.

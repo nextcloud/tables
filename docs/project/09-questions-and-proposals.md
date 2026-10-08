@@ -108,6 +108,12 @@ Ruben. The user interface already says application; the code, the database and t
 
 Ruben. Columns and views already have `technicalName`; applications and menu items got it on fork pull request #7, which also dropped the fork's `slug`. Tables get the same field with the same pattern. Row input by technical name is an existing pattern, `dataByAlias`, and the object format on `api/2` builds on it.
 
+### P16. One API: the frontend consumes `api/2`
+
+Ruben. Tables has three APIs: `api/1` and `api/2` over OCS and 48 internal routes that only the frontend uses and that no OpenAPI document describes. Every new capability lands on `api/2` only, the frontend store (P13) is pointed at `api/2`, and the internal routes retire in 2.0 once nothing calls them. The OpenAPI document then describes the whole surface, with a named schema for every response, and the JSON Schema endpoint per table describes the data. `api/1` stays frozen for its outside consumers.
+
+Why: an API the primary consumer does not use is not tested by use, and a frontend on undocumented routes cannot be replaced by another client.
+
 ### P6. Parity scope and data layer
 
 Ruben. Parity is the application runtime, the designer and packaging. Flows, automation and the AI companion are out. The data layer is Tables rows. See [goals and scope](01-goals-and-scope.md).

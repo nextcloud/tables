@@ -113,12 +113,15 @@ Nested data is column types, proposal P2: relation for objects, array for lists 
 
 Other apps depend on the Tables API, so it is a contract, not an implementation detail. Known consumers: Nextcloud Analytics reads tables as a data source, Nextcloud Forms writes submissions into tables, automation connectors such as the n8n node call it, and Conduction's integriq calls it. Tables' own frontend uses internal routes and is not a consumer of the OCS API.
 
-Two API versions exist today, both under `/ocs/v2.php/apps/tables`:
+Three APIs exist today, which is the problem proposal P16 addresses:
 
-| Version | Routes | Covers | Rows |
-|---|---|---|---|
-| `api/1` | 40 | tables, views, columns, rows, shares, import | yes, `limit` and `offset` only, cell-array shape |
-| `api/2` | 34 | tables, columns, contexts, favourites, config, scheme export and import, ownership transfer | no rows endpoint |
+| API | Routes | Covers | In OpenAPI | Rows |
+|---|---|---|---|---|
+| `api/1`, OCS | 40 | tables, views, columns, rows, shares, import | yes | yes, `limit` and `offset` only, cell-array shape |
+| `api/2`, OCS | 36 | tables, columns, contexts, favourites, config, scheme export and import, ownership transfer, widget types, standalone views | yes | no rows endpoint |
+| internal, `/apps/tables/...` | 48 | views, rows, shares, tables, import, search, navigation, the app shell | no | yes, for the frontend only |
+
+The internal routes are the ones Tables' own frontend calls for views, rows and shares, while it already calls `api/2` for applications and tables. So the primary consumer of Tables uses an API that has no OpenAPI description and no declared schemas, and every capability exists twice or three times. Proposal P16: the frontend moves to `api/2` and the internal routes retire in 2.0.
 
 The rule this project follows, proposal P12: neither version changes shape. Rows arrive on `api/2` as new endpoints with the object format, next to the existing `api/2` tables and contexts routes. `api/1` rows stay for Analytics, Forms and the connectors. A client that wants the old cell shape on `api/2` asks for `format=cells`. The [rows API](12-rows-api.md) document holds both shapes.
 

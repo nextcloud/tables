@@ -63,6 +63,7 @@ Outcome wanted: yes or no on the registries, and the answer to question Q2.
 - The second rows API: search, filter, sort, paging with total, fields, `format=object`. Parameter names follow Tables conventions. Is `api/2` the right home?
 - One identifier: `technicalName`, which columns and views already have, spread to tables and applications, so a default CRUD API exists per application and table: `/api/2/apps/{application}/{table}`. The fork's `slug` goes.
 - The 2.0 rename of context to application in code and API, with `contexts` routes kept as aliases for one release (P14).
+- Three APIs today: `api/1`, `api/2` and 48 internal routes without OpenAPI that the frontend uses for views, rows and shares. Proposal P16: the frontend moves to `api/2`, internal routes retire in 2.0. Does Nextcloud GmbH agree, and in which release?
 - The v1 API has outside consumers (Analytics, Forms, automation connectors), so it stays frozen and new capability lands on `api/2`. See the [rows API](12-rows-api.md).
 - Everything regenerates into `openapi.json`. Does Nextcloud want a served documentation page for it, or stays the file the documentation?
 

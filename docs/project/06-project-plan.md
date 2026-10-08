@@ -67,9 +67,10 @@ Proposal P5: both developers work the types and the API extensions together, bec
 | Owner | Item | Size |
 |---|---|---|
 | Robert | aggregation endpoint: value, grouped, timeseries; distinct values of a column; `extend` for relation cells | M |
+| Robert | `api/2` routes for what only internal routes offer today: views by table, shares, import preview, search, navigation (P16) | M |
 | Robert | the tag column type; search improved past `LIKE`: a per-table search index over text cells, proposal P9 | L |
 | Remko | copy of the keep widgets: label, image, link, links, quicklinks, tile, divider, video, menu, container, banner, with their forms as server schemas | M |
-| Remko | the Tables frontend store (P13): per-source cache, request coalescing, invalidation on row changes; server-side paging, filtering and search in the data table behind a threshold | L |
+| Remko | the Tables frontend store (P13) on `api/2` only (P16): per-source cache, request coalescing, invalidation on row changes; server-side paging, filtering and search in the data table behind a threshold | L |
 | Remko | aggregation widgets: stat, delta, gauge, stats block, chart, stacked bar, workspace filter | M |
 | Ruben | design of the detail page and the form page (layout, sidebar tabs, actions) | S |
 | Thijn | benchmark round 1 and the review of M1 | S |
@@ -142,7 +143,9 @@ How a session runs: Ruben demonstrates one acceptance path from [testing and acc
 
 Who is invited: organisations that depend on Tables for their own applications, Schleswig-Holstein first because of the weight of its Tables use, plus the Conduction municipalities that will run the first packaged apps, plus anyone Nextcloud GmbH names. Six to ten participants per session. Question Q7 asks Nextcloud GmbH whether a user panel exists we can draw from; until that answer, we build our own list.
 
-## The 2.0 rename
+## The 2.0 rename and the internal routes
+
+With P16 the internal routes go in the same release as the rename, once the frontend store calls `api/2` for everything: sprint 4 removes what nothing calls any more and the OpenAPI document becomes the description of the whole app.
 
 Proposal P14, context to application, is its own item because it touches every layer. It runs in sprint 4 for Robert, after the data layer has settled and before the manifest and packaging work name the entity in files: migration renaming the tables, classes and services renamed, `api/2/applications` routes added, `api/2/contexts` kept as aliases, OpenAPI regenerated, frontend store and strings aligned. Size L. If sprint 4 is full it moves to the stabilisation weeks, not past the release.
 
