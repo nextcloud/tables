@@ -20,14 +20,14 @@ Three columns because the fork is ahead of Tables: what nextcloud/tables has, wh
 
 | Entity | Table | In nextcloud/tables | On the fork (proposed) | This project adds (proposed) |
 |---|---|---|---|---|
-| Application | `tables_contexts_context` | name, icon, description, owner, sharing, nodes, pages | slug, menu items | version, `configuration` JSON (landing page, theme, runtime options), permission fields |
-| Menu item | `tables_contexts_menu_item` | nothing; the start page lists node tiles | label, icon, target (view, table, url), slug, order | section, parent (one level), permission (group), count source |
-| Page | `tables_views` with `type` | views are table views only; a context has one start page in `tables_contexts_page` with ordered node tiles | view `type` table or grid, grid JSON, slug, views without a table | types detail, form and settings; page `configuration` JSON; actions JSON; sidebar JSON; permission |
-| Widget | inside the page's grid JSON | nothing | type, layout (position and size), content with every property including title and show title | split into `configuration` (title, show title, style, data source, visibility rules) and `content` (what the widget shows) |
-| Widget type | `GridWidgetTypes` on the server | nothing | title, default show title, size, content schema | a category, a data need flag, and a configuration schema next to the content schema |
+| Application | `tables_contexts_context` | name, icon, description, owner, sharing, nodes, pages | technical name, menu items | version, `configuration` JSON (landing page, theme, runtime options), permission fields |
+| Menu item | `tables_contexts_menu_item` | nothing; the start page lists node tiles | label, icon, target (view, table, url), technical name, order | section, parent (one level), permission (group), count source |
+| Page | `tables_views` with `type` | views are table views only; a context has one start page in `tables_contexts_page` with ordered node tiles | view `type` table or grid, grid JSON, views without a table | types detail, form and settings; page `configuration` JSON; actions JSON; sidebar JSON; permission |
+| Widget | inside the page's grid JSON | nothing | `{id, type, configuration, content}`; configuration holds title and show title; position and size in the grid's layout list | configuration grows with style, data source and visibility rules |
+| Widget type | `GridWidgetTypes` on the server | nothing | title, size, a configuration schema and a content schema, served on `api/2/views/widget-types` | a category and a data need flag |
 | Data | tables, columns, rows | fifteen column types, shares, views with filter and sort, uuid and technical name on views | | uuids on rows, relations with inverse, the new column types, formats, audit, locks |
 
-Two naming notes. Tables has no configuration field on an application today: its `api/2/config` routes return the notification settings of a table or view and set app or user config keys, which is a different thing. The application and page field is therefore named `configuration` here, and the plan avoids `config` for it. For widgets the fork currently puts every property, title and show title included, in `content`; the split into `configuration` and `content` is a change to the fork's widget shape before it goes upstream, so it is listed under the pre-sprint work.
+Two naming notes. Tables has no configuration field on an application today: its `api/2/config` routes return the notification settings of a table or view and set app or user config keys, which is a different thing. The application and page field is therefore named `configuration` here, and the plan avoids `config` for it. Widgets carry `configuration` and `content` as separate objects with separate schemas since fork pull request #7; grids saved before that read as the new shape until saved again.
 
 Pages of type detail and form are views without a table of their own, like grid views. Their configuration names the table they work on.
 
@@ -54,7 +54,7 @@ An application, as the proposed `api/2` would return it:
 }
 ```
 
-A page, a view of type grid, with one widget in the proposed split shape:
+A page, a view of type grid, with two widgets as the fork stores them since pull request #7. Position and size live in the layout list, keyed by widget id:
 
 ```json
 {
@@ -64,27 +64,30 @@ A page, a view of type grid, with one widget in the proposed split shape:
   "title": "Intake home",
   "type": "grid",
   "tableId": null,
-  "configuration": { "dataSource": null, "actions": [], "sidebar": null },
   "grid": {
     "widgets": [
       {
-        "id": "w1",
+        "id": "w-header-1",
         "type": "header",
-        "layout": { "x": 0, "y": 0, "w": 12, "h": 2 },
-        "configuration": { "title": "Welcome", "showTitle": false, "visibleWhen": null, "style": { "backgroundColor": "#1f6feb" } },
-        "content": { "title": "Welcome to intake", "subtitle": "Register a request in three steps", "textAlign": "left" }
+        "configuration": { "title": "Welcome", "showTitle": false },
+        "content": { "title": "Welcome to intake", "subtitle": "Register a request in three steps", "textAlign": "left", "backgroundColor": "#1f6feb", "textColor": "" }
       },
       {
-        "id": "w2",
+        "id": "w-data-2",
         "type": "data",
-        "layout": { "x": 0, "y": 2, "w": 12, "h": 6 },
-        "configuration": { "title": "Open requests", "showTitle": true, "source": { "type": "view", "id": 9 }, "limit": 10 },
-        "content": {}
+        "configuration": { "title": "Open requests", "showTitle": true },
+        "content": { "target": { "type": "view", "id": 9 } }
       }
+    ],
+    "layout": [
+      { "id": 1, "widgetId": "w-header-1", "gridX": 0, "gridY": 0, "gridWidth": 12, "gridHeight": 2 },
+      { "id": 2, "widgetId": "w-data-2", "gridX": 0, "gridY": 2, "gridWidth": 12, "gridHeight": 6 }
     ]
   }
 }
 ```
+
+What this project adds to the page is a `configuration` object of its own (data source, actions, sidebar) and, to each widget's configuration, style and visibility rules.
 
 ## Naming debt to clear in 2.0
 
@@ -92,13 +95,13 @@ Two names are inconsistent today, and the upstream pull request is the moment to
 
 **Context versus application.** The code, the database tables and the eleven `contexts` routes say context. The user interface says application in 39 strings and context in 1. A 2.0 release renames the code and the API to application: `tables_contexts_*` tables and classes become `tables_applications_*`, `api/2/applications` routes are added, and the `api/2/contexts` routes stay for one release as aliases so Analytics, Forms and connectors keep working.
 
-**Technical name versus slug.** Upstream columns and views already carry a `technicalName`, validated as `^[a-z][a-z0-9_]*$`, and the row API already returns `dataByAlias` keyed by it. The fork added a separate `slug` on views and applications. That is two identifiers for one job. The proposal: one identifier, `technicalName`, on columns, views, tables and applications alike, with the existing pattern, and no `slug` field. The fork drops `slug` before the upstream pull request. Spreading an identifier that already exists to two more entities is debt removal, not a feature.
+**Technical name versus slug.** Upstream columns and views already carry a `technicalName`, validated as `^[a-z][a-z0-9_]*$`, and the row API already returns `dataByAlias` keyed by it. The fork had added a separate `slug` on views and applications; pull request #7 removed it and gave applications and menu items `technicalName` with the same pattern. What remains: the same field on tables, so the default CRUD route per application and table exists. Spreading an identifier that already exists to one more entity is debt removal, not a feature.
 
 ## Request paths
 
 A page in the shell renders through three calls at most: the application (with menu and pages), the page definition, and the data of its widgets. Data calls go to the row API with filter, sort, search and pagination on the query string, validated against the columns the caller may see. Aggregates go to one aggregation endpoint per table or view. Nothing is loaded that the page does not show.
 
-The shell is the fork's standalone route `/apps/tables/app/{slug}`, which becomes `/apps/tables/app/{technicalName}` under P15. The Tables UI stays the configuration surface and keeps the tab bar for switching pages while designing.
+The shell is the fork's standalone route `/apps/tables/app/{technicalName}`. The Tables UI stays the configuration surface and keeps the tab bar for switching pages while designing.
 
 ## The Tables API speaks objects
 

@@ -16,6 +16,8 @@ The v1 API has been public and documented since Tables 0.6 and has consumers out
 - Conduction's integriq calls it from its own code.
 - Tables' own frontend uses the internal routes, not the OCS API.
 
+The fork already added two `api/2` routes in this spirit on pull request #7: `GET /api/2/views/widget-types` and `POST /api/2/views` for a view without a table, both in the OpenAPI document.
+
 Proposal P12 follows from that: v1 and the existing v2 routes keep their shapes. New capability arrives as new parameters with defaults and as new endpoints, never as a changed response.
 
 ## Today: the row index

@@ -46,7 +46,7 @@ Rule of thumb for the sizing below: one developer, one sprint, roughly two mediu
 | Owner | Item | Size |
 |---|---|---|
 | Ruben | merge fork pull requests #2, #3 and #4 into `feat/grid-page`, rename the migration to the current target version and date, open the upstream pull request on nextcloud/tables with the AI disclosure, in Ruben's own words | S |
-| Remko | before the upstream pull request: split the widget shape into `configuration` and `content` with a migration of existing grid JSON, and replace the fork's `slug` on views and applications by `technicalName` (P15); address upstream review during sprint 1 as it comes | M |
+| Remko | done on fork pull request #7: widget `configuration` and `content`, `technicalName` instead of `slug`, OCS routes for widget types and standalone views, the scheme import value object; left: review and merge #7, then address upstream review during sprint 1 as it comes | S |
 
 ### Sprint 1, 12 to 25 October, the data layer cluster
 

@@ -106,7 +106,7 @@ Ruben. The user interface already says application; the code, the database and t
 
 ### P15. One identifier: the technical name
 
-Ruben. Columns and views already have `technicalName`. Tables and applications get the same field with the same pattern. The fork's separate `slug` is dropped before the upstream pull request. Row input by technical name is an existing pattern, `dataByAlias`, and the object format on `api/2` builds on it.
+Ruben. Columns and views already have `technicalName`; applications and menu items got it on fork pull request #7, which also dropped the fork's `slug`. Tables get the same field with the same pattern. Row input by technical name is an existing pattern, `dataByAlias`, and the object format on `api/2` builds on it.
 
 ### P6. Parity scope and data layer
 
