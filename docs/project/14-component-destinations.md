@@ -4,7 +4,7 @@
 -->
 # Component destinations
 
-Part of the [buildiq parity project](README.md). Every component from the [component list](03-component-list.md) with two decisions: where it goes, and in which week we bring it there. The same data sits in [components.json](components.json), and the filterable page built from it is linked from the pull request.
+Part of the [buildiq parity project](README.md). Every component from the [component list](03-component-list.md) with two decisions: where it goes, and in which week we bring it there. The same data sits in [components.json](components.json), and the [filterable page](https://claude.ai/artifact/MffacrpvJtVvApPzaGGGfJ) is built from it, screenshots included.
 
 ## The two destinations
 
