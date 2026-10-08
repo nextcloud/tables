@@ -79,6 +79,7 @@ import { useDataStore } from '../store/data.js'
 import { createPinia, setActivePinia } from 'pinia'
 import LinkReferenceWidget from './LinkReferenceWidget.vue'
 import ContentReferenceWidget from './ContentReferenceWidget.vue'
+import { LAYOUT_TABLE } from '../shared/constants.ts'
 
 const pinia = createPinia()
 setActivePinia(pinia)
@@ -113,6 +114,8 @@ export default {
 				title: '',
 				type: '',
 				id: '',
+				layout: LAYOUT_TABLE,
+				viewSettings: null,
 				columns: [],
 				rows: [],
 			},
@@ -154,8 +157,11 @@ export default {
 			if (this.renderMode === 'content') {
 				this.previewLoading = true
 
-				await this.loadColumnsForContentPreview()
-				await this.loadRowsForContentPreview()
+				await Promise.all([
+					this.loadColumnsForContentPreview(),
+					this.loadRowsForContentPreview(),
+					this.loadLayoutForContentPreview(),
+				])
 
 				this.previewLoading = false
 			} else {
@@ -203,6 +209,22 @@ export default {
 				this.richObject.rows = res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch rows for content preview.'))
+			}
+		},
+
+		async loadLayoutForContentPreview() {
+			if (this.value === null || this.value.type !== 'view') {
+				this.richObject.layout = LAYOUT_TABLE
+				this.richObject.viewSettings = null
+				return
+			}
+
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/api/1/views/' + this.value.value))
+				this.richObject.layout = res.data?.layout ?? LAYOUT_TABLE
+				this.richObject.viewSettings = res.data?.viewSettings ?? null
+			} catch (e) {
+				displayError(e, t('tables', 'Could not fetch the layout for content preview.'))
 			}
 		},
 	},

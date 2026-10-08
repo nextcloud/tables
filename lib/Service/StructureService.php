@@ -8,9 +8,11 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
 class StructureService {
@@ -213,6 +215,22 @@ class StructureService {
 					unset($views[$i]['columnSettings'][$j]['columnId']);
 				}
 			}
+			if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+				foreach (ViewSettings::SOURCE_KEYS as $sourceKey) {
+					$sourceId = $view['viewSettings'][$sourceKey] ?? null;
+					if ($sourceId === null) {
+						continue;
+					}
+
+					// The scheme travels to another instance, where a column id of this one addresses
+					// something else entirely. A source that has no uuid to carry it is therefore
+					// dropped rather than exported as a bare number.
+					unset($views[$i]['viewSettings'][$sourceKey]);
+					if (isset($columnsMap[$sourceId])) {
+						$views[$i]['viewSettings'][$sourceKey . 'Uuid'] = $columnsMap[$sourceId]['uuid'];
+					}
+				}
+			}
 			foreach ($view['sort'] as $j => $col) {
 				if (isset($columnsMap[$col['columnId']])) {
 					$views[$i]['sort'][$j]['columnUuid'] = $columnsMap[$col['columnId']]['uuid'];
@@ -287,32 +305,34 @@ class StructureService {
 			$viewB = $viewB->jsonSerialize();
 		}
 
-		$jsonViewA = json_encode(
-			[
-				'title' => $viewA['title'],
-				'technicalName' => $viewA['technicalName'],
-				'description' => $viewA['description'],
-				'emoji' => $viewA['emoji'],
-				'columns' => $viewA['columns'],
-				'columnSettings' => $viewA['columnSettings'],
-				'sort' => $viewA['sort'],
-				'filter' => $viewA['filter'],
-			]
-		);
-		$jsonViewB = json_encode(
-			[
-				'title' => $viewB['title'],
-				'technicalName' => $viewB['technicalName'],
-				'description' => $viewB['description'],
-				'emoji' => $viewB['emoji'],
-				'columns' => $viewB['columns'],
-				'columnSettings' => $viewB['columnSettings'],
-				'sort' => $viewB['sort'],
-				'filter' => $viewB['filter'],
-			]
-		);
+		return $this->comparableView($viewA) !== $this->comparableView($viewB);
+	}
 
-		return $jsonViewA !== $jsonViewB;
+	/**
+	 * The comparable form of a view.
+	 *
+	 * A scheme written before the layout existed, or by hand, carries neither key. Both
+	 * sides are normalised so such a view does not read as modified on every import,
+	 * which would cost a write, an activity entry and a federation notification each.
+	 */
+	private function comparableView(array $view): array {
+		$viewSettings = is_array($view['viewSettings'] ?? null) ? $view['viewSettings'] : [];
+
+		return [
+			'title' => $view['title'],
+			'technicalName' => $view['technicalName'],
+			'description' => $view['description'],
+			'emoji' => $view['emoji'],
+			'columns' => $view['columns'],
+			'columnSettings' => $view['columnSettings'],
+			'sort' => $view['sort'],
+			'filter' => $view['filter'],
+			'layout' => ViewLayout::normalize($view['layout'] ?? null)->value,
+			'viewSettings' => [
+				'cardBackgroundSource' => $viewSettings['cardBackgroundSource'] ?? null,
+				'cardTitleSource' => $viewSettings['cardTitleSource'] ?? null,
+			],
+		];
 	}
 
 	protected function resolveColumnOrderChanges(array $currentSchema, array $updateSchema): void {
