@@ -39,6 +39,19 @@ Proposal P1: the translation between Tables storage and the object shape the com
 
 Nested data is column types, proposal P2: relation for objects, array for lists of scalars, json for opaque blobs, file for Files nodes. See [questions and proposals](09-questions-and-proposals.md) for the rules that keep this honest.
 
+## API consumers and versions
+
+Other apps depend on the Tables API, so it is a contract, not an implementation detail. Known consumers: Nextcloud Analytics reads tables as a data source, Nextcloud Forms writes submissions into tables, automation connectors such as the n8n node call it, and Conduction's integriq calls it. Tables' own frontend uses internal routes and is not a consumer of the OCS API.
+
+Two API versions exist today, both under `/ocs/v2.php/apps/tables`:
+
+| Version | Routes | Covers | Rows |
+|---|---|---|---|
+| `api/1` | 40 | tables, views, columns, rows, shares, import | yes, `limit` and `offset` only, cell-array shape |
+| `api/2` | 34 | tables, columns, contexts, favourites, config, scheme export and import, ownership transfer | no rows endpoint |
+
+The rule this project follows, proposal P12: neither version changes shape. Rows arrive on `api/2` as new endpoints with the object format, next to the existing `api/2` tables and contexts routes. `api/1` rows stay for Analytics, Forms and the connectors. A client that wants the old cell shape on `api/2` asks for `format=cells`. The [rows API](12-rows-api.md) document holds both shapes.
+
 ## Manifest exchange
 
 Export produces one JSON document per application: identity, menu, pages with their config and widgets, and the schemes of the tables it uses, with every target referenced by uuid. Import creates or updates the rows. The document follows buildiq's manifest v2 where the concepts match (menu, pages, widgets, settings, visibility) and adds a `tables` section for the data model. A buildiq manifest with only those concepts imports into Tables; the reverse export opens in buildiq's validator. Exact field mapping is a design task in sprint 3.
