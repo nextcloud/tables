@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { type Page } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
 import {
 	createContext,
@@ -15,30 +14,13 @@ import {
 	openCreateColumnModal,
 	openCreateRowModal,
 	fillInValueTextLine,
+	selectFromVueDropdown,
 } from '../support/commands'
 
 const sourceTableTitle = 'Test relation source'
 const targetTableTitle = 'Test relation target'
 const sourceColumnTitle = 'Name'
 const relationColumnTitle = 'Refers to'
-
-async function selectFromVueDropdown(page: Page, label: string, value: string) {
-	const input = page.locator(`[aria-label="${label}"] input, [aria-label="${label}"]`).first()
-	await input.click()
-	await input.clear()
-	await input.fill(value)
-
-	// NcSelect options may not expose a clean accessible name, so try several selectors
-	const optionByRole = page.getByRole('option', { name: new RegExp(value, 'i') }).first()
-	if (await optionByRole.isVisible({ timeout: 3000 }).catch(() => false)) {
-		await optionByRole.click()
-		return
-	}
-
-	const optionByText = page.locator('ul.vs__dropdown-menu li').filter({ hasText: new RegExp(value, 'i') }).first()
-	await optionByText.waitFor({ state: 'visible', timeout: 5000 })
-	await optionByText.click()
-}
 
 test.describe('Test column relation', () => {
 	test.setTimeout(60000)
@@ -64,7 +46,7 @@ test.describe('Test column relation', () => {
 		await page.locator('[data-cy="columnTypeFormInput"]').clear()
 		await page.locator('[data-cy="columnTypeFormInput"]').fill(relationColumnTitle)
 		await page.locator('.columnTypeSelection .vs__open-indicator').click()
-		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').filter({ hasText: 'Relation' }).click()
+		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').getByText('Relation', { exact: true }).click()
 
 		// configure the relation to point at the source table and use 'Name' as label
 		const targetColumnsResponse = page.waitForResponse(
@@ -120,7 +102,7 @@ test.describe('Test column relation', () => {
 		await page.locator('[data-cy="columnTypeFormInput"]').clear()
 		await page.locator('[data-cy="columnTypeFormInput"]').fill(relationColumnTitle)
 		await page.locator('.columnTypeSelection .vs__open-indicator').click()
-		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').filter({ hasText: 'Relation' }).click()
+		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').getByText('Relation', { exact: true }).click()
 
 		const targetColumnsResponse = page.waitForResponse(
 			r => r.url().includes('/apps/tables/api/1/tables/')

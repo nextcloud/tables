@@ -60,7 +60,8 @@ export default {
 		relationOptions() {
 			const dataStore = useDataStore()
 			const columnRelations = dataStore.getRelations(this.column?.id)
-			return Object.values(columnRelations)
+			return Object.values(columnRelations.values || {})
+				.map(relation => ({ id: relation.id, label: relation.value }))
 		},
 		localValue: {
 			get() {

@@ -18,6 +18,7 @@ import TextLongColumn from './columnsTypes/textLong.js'
 import TextRichColumn from './columnsTypes/textRich.js'
 import UsergroupColumn from './columnsTypes/usergroup.js'
 import RelationColumn from './columnsTypes/relation.js'
+import RelationLookupColumn from './columnsTypes/relationLookup.js'
 
 export function parseCol(col) {
 	const columnType = col.type + (col.subtype === '' ? '' : '-' + col.subtype)
@@ -37,6 +38,7 @@ export function parseCol(col) {
 	case ColumnTypes.DatetimeTime: return new DatetimeTimeColumn(col)
 	case ColumnTypes.Usergroup: return new UsergroupColumn(col)
 	case ColumnTypes.Relation: return new RelationColumn(col)
+	case ColumnTypes.RelationLookup: return new RelationLookupColumn(col)
 	default: throw Error(columnType + ' is not a valid column type!')
 	}
 }

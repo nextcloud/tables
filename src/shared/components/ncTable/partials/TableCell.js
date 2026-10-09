@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+import { defineAsyncComponent } from 'vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
 
 import TableCellHtml from './TableCellHtml.vue'
@@ -33,6 +34,9 @@ const COMPONENT_BY_COLUMN_TYPE = {
 	[ColumnTypes.DatetimeTime]: TableCellDateTime,
 	[ColumnTypes.Usergroup]: TableCellUsergroup,
 	[ColumnTypes.Relation]: TableCellRelation,
+	// Loaded asynchronously to break the circular dependency with
+	// TableCellRelationLookup, which resolves cells via getTableCellComponent.
+	[ColumnTypes.RelationLookup]: defineAsyncComponent(() => import('./TableCellRelationLookup.vue')),
 }
 
 export function getTableCellComponent(column) {
