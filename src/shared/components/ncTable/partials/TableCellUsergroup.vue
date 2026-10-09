@@ -7,7 +7,30 @@
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<div v-if="value" class="table-cell-usergroup">
 				<div v-for="item in value" :key="item.id" class="inline usergroup-entry">
-					<NcUserBubble :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="!isUser(item)" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
+					<NcPopover v-if="isUser(item)"
+						v-model:shown="hoverCardOpen[item.id]"
+						:triggers="['hover', 'focus']"
+						:popover-triggers="['hover']"
+						:delay="{ show: 400, hide: 300 }"
+						popover-base-class="usergroup-profile-popover"
+						popup-role="dialog"
+						no-focus-trap>
+						<template #trigger="{ attrs }">
+							<span v-bind="attrs"
+								class="usergroup-profile-trigger"
+								role="button"
+								tabindex="0"
+								:aria-label="t('tables', 'Show profile of {name}', { name: item.displayName ?? item.id })"
+								data-cy="usergroupProfileTrigger">
+								<NcUserBubble :user="item.id" :display-name="item.displayName ?? item.id" :show-user-status="column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
+							</span>
+						</template>
+						<NcProfileHoverCard :user="item.id"
+							:open="hoverCardOpen[item.id] ?? false"
+							:actions="contactsMenuActions[item.id] ?? null"
+							:actions-loading="contactsMenuLoading[item.id] ?? false" />
+					</NcPopover>
+					<NcUserBubble v-else :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="true" :display-name="item.displayName ?? item.id" :size="column.showUserStatus ? 34 : 20" />
 				</div>
 			</div>
 		</div>
@@ -45,7 +68,9 @@
 
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
-import { NcUserBubble, NcSelect } from '@nextcloud/vue'
+import axios from '@nextcloud/axios'
+import { generateUrl } from '@nextcloud/router'
+import { getEnabledContactsMenuActions, NcPopover, NcProfileHoverCard, NcSelect, NcUserBubble } from '@nextcloud/vue'
 import { USERGROUP_TYPE } from '../../../constants.ts'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import searchUserGroup from '../../../mixins/searchUserGroup.js'
@@ -58,8 +83,10 @@ export default {
 	name: 'TableCellUsergroup',
 
 	components: {
-		NcUserBubble,
+		NcPopover,
+		NcProfileHoverCard,
 		NcSelect,
+		NcUserBubble,
 	},
 
 	mixins: [
@@ -90,6 +117,9 @@ export default {
 			selectGroups: this.column?.usergroupSelectGroups ?? false,
 			selectCircles: false,
 			isInitialEditClick: false,
+			hoverCardOpen: {},
+			contactsMenuActions: {},
+			contactsMenuLoading: {},
 		}
 	},
 
@@ -103,6 +133,14 @@ export default {
 	},
 
 	watch: {
+		hoverCardOpen: {
+			deep: true,
+			handler(openStates) {
+				Object.entries(openStates)
+					.filter(([userId, isOpen]) => isOpen && !(userId in this.contactsMenuActions) && !this.contactsMenuLoading[userId])
+					.forEach(([userId]) => this.loadContactsMenuActions(userId))
+			},
+		},
 		isEditing(isEditing) {
 			if (isEditing) {
 				this.editValue = this.value ? [...this.value] : []
@@ -131,6 +169,42 @@ export default {
 			this.startEditing()
 			// Stop the event from propagating to avoid immediate click outside
 			event.stopPropagation()
+		},
+
+		/**
+		 * Load the contacts menu entries of a user, the same source the avatar's hover card uses,
+		 * so the card in the cell offers the same actions (profile page, mail, Talk, ...)
+		 *
+		 * @param {string} userId the user to load the entries for
+		 */
+		async loadContactsMenuActions(userId) {
+			this.contactsMenuLoading[userId] = true
+			try {
+				const response = await axios.post(generateUrl('contactsmenu/findOne'), { shareType: 0, shareWith: userId })
+				const entry = response.data
+				const serverActions = entry.topAction ? [entry.topAction, ...entry.actions] : entry.actions ?? []
+				const actions = serverActions.map((action) => ({
+					id: action.id,
+					appId: action.appId,
+					text: action.title,
+					href: action.hyperlink,
+					icon: action.icon,
+				}))
+				getEnabledContactsMenuActions(entry).forEach((action) => {
+					actions.push({
+						id: action.id,
+						text: action.displayName(entry),
+						iconSvg: action.iconSvg(entry),
+						onClick: () => action.callback(entry),
+					})
+				})
+				this.contactsMenuActions[userId] = actions
+			} catch (e) {
+				console.error('Could not load contacts menu actions', e)
+				this.contactsMenuActions[userId] = null
+			} finally {
+				this.contactsMenuLoading[userId] = false
+			}
 		},
 
 		getAvatarImage(item) {
