@@ -9,7 +9,7 @@
 		data-cy="createRowModal"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
-			<div v-for="column in nonMetaColumns" :key="column.getValueColumnId()" :data-cy="column.title">
+			<div v-for="column in nonMetaColumns" :key="column.id" :data-cy="column.title">
 				<ColumnFormComponent
 					v-model:value="row[column.getValueColumnId()]"
 					:column="column" />

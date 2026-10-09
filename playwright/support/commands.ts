@@ -1151,3 +1151,21 @@ export async function fillInValueSelectionCheck(
 		)
 		.click()
 }
+
+export async function selectFromVueDropdown(page: Page, label: string, value: string) {
+	const input = page.locator(`[aria-label="${label}"] input, [aria-label="${label}"]`).first()
+	await input.click()
+	await input.clear()
+	await input.fill(value)
+
+	// NcSelect options may not expose a clean accessible name, so try several selectors
+	const optionByRole = page.getByRole('option', { name: new RegExp(value, 'i') }).first()
+	if (await optionByRole.isVisible({ timeout: 3000 }).catch(() => false)) {
+		await optionByRole.click()
+		return
+	}
+
+	const optionByText = page.locator('ul.vs__dropdown-menu li').filter({ hasText: new RegExp(value, 'i') }).first()
+	await optionByText.waitFor({ state: 'visible', timeout: 5000 })
+	await optionByText.click()
+}

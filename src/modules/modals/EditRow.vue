@@ -35,7 +35,7 @@
 			</div>
 
 			<div v-if="activeTabId === 'edit' && localRow" class="row">
-				<div v-for="column in nonMetaColumns" :key="column.getValueColumnId()">
+				<div v-for="column in nonMetaColumns" :key="column.id">
 					<ColumnFormComponent
 						v-model:value="localRow[column.getValueColumnId()]"
 						:column="column" />
