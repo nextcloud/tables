@@ -164,8 +164,8 @@ final class AnalyticsDatasourceTest extends TestCase {
 			->expects($this->once())
 			->method('getRelationData')
 			->willReturn([
-				42 => ['id' => 42, 'label' => 'Acme Corp'],
-				43 => ['id' => 43, 'label' => 'Globex'],
+				42 => ['id' => 42, 'value' => 'Acme Corp'],
+				43 => ['id' => 43, 'value' => 'Globex'],
 			]);
 
 		$row = new Row2();

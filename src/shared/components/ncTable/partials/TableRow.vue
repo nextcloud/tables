@@ -69,7 +69,7 @@ import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import Pencil from 'vue-material-design-icons/PencilOutline.vue'
 import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { getTableCellComponent } from './TableCell.js'
-import { getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
+import { ColumnTypes, getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,

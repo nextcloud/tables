@@ -15,7 +15,7 @@
 					:loading="loadingRelationColumns"
 					:aria-label-combobox="t('tables', 'Select relation column')"
 					required
-					@input="onRelationColumnChange" />
+					@update:model-value="onRelationColumnChange" />
 			</div>
 		</div>
 
@@ -30,7 +30,7 @@
 					:loading="loadingTargetColumns"
 					:aria-label-combobox="t('tables', 'Select target column')"
 					required
-					@input="onTargetColumnChange" />
+					@update:model-value="onTargetColumnChange" />
 			</div>
 		</div>
 	</div>

@@ -42,21 +42,7 @@ export default class RelationLookupColumn extends AbstractColumn {
 	 * @return {number} The relation column id to read the cell value from
 	 */
 	getValueColumnId() {
-		return this.customSettings.relationColumnId
-	}
-
-	/**
-	 * Get the value for form input.
-	 * For relation lookup, extracts the value from the relation column id.
-	 *
-	 * @param {*} value The raw value
-	 * @return {*} The value for form input
-	 */
-	getValueForForm(value) {
-		if (this.customSettings?.relationColumnId) {
-			return value?.[this.customSettings.relationColumnId] ?? null
-		}
-		return value
+		return this.customSettings?.relationColumnId
 	}
 
 	getValueString(valueObject) {

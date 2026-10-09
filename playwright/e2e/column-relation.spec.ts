@@ -64,7 +64,7 @@ test.describe('Test column relation', () => {
 		await page.locator('[data-cy="columnTypeFormInput"]').clear()
 		await page.locator('[data-cy="columnTypeFormInput"]').fill(relationColumnTitle)
 		await page.locator('.columnTypeSelection .vs__open-indicator').click()
-		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').filter({ hasText: 'Relation' }).click()
+		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').getByText('Relation', { exact: true }).click()
 
 		// configure the relation to point at the source table and use 'Name' as label
 		const targetColumnsResponse = page.waitForResponse(
@@ -120,7 +120,7 @@ test.describe('Test column relation', () => {
 		await page.locator('[data-cy="columnTypeFormInput"]').clear()
 		await page.locator('[data-cy="columnTypeFormInput"]').fill(relationColumnTitle)
 		await page.locator('.columnTypeSelection .vs__open-indicator').click()
-		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').filter({ hasText: 'Relation' }).click()
+		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').getByText('Relation', { exact: true }).click()
 
 		const targetColumnsResponse = page.waitForResponse(
 			r => r.url().includes('/apps/tables/api/1/tables/')

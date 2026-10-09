@@ -4,8 +4,9 @@
 -->
 <template>
 	<div>
-		<TableCell
+		<component :is="getTableCellComponent(targetColumn)"
 			v-if="targetColumn"
+			:key="relatedRow?.id"
 			:column="targetColumn"
 			:row-id="rowId"
 			:value="targetValue"
@@ -15,14 +16,10 @@
 
 <script>
 import { useDataStore } from '../../../../store/data.js'
+import { getTableCellComponent } from './TableCell.js'
 
 export default {
 	name: 'TableCellRelationLookup',
-	components: {
-		// Loaded asynchronously to break the circular dependency with TableCell,
-		// which itself resolves TableCellRelationLookup for relation lookup columns.
-		TableCell: () => import('./TableCell.vue'),
-	},
 	props: {
 		column: {
 			type: Object,
@@ -35,11 +32,6 @@ export default {
 		value: {
 			required: true,
 		},
-	},
-	data() {
-		return {
-			loading: false,
-		}
 	},
 	computed: {
 		targetColumn() {
@@ -55,7 +47,7 @@ export default {
 			const relationData = dataStore.getRelations(this.column.id)
 			return relationData?.values || null
 		},
-		targetValue() {
+		relatedRow() {
 			if (!this.column?.customSettings?.targetColumnId) {
 				return null
 			}
@@ -70,13 +62,18 @@ export default {
 			}
 
 			// Get the related row data for the current value (which is the relation ID)
-			const relatedRow = this.relationValues[value]
-			if (!relatedRow) {
+			return this.relationValues[value] ?? null
+		},
+		targetValue() {
+			if (!this.relatedRow || !this.targetColumn) {
 				return null
 			}
 
-			return relatedRow.value
+			return this.targetColumn.parseValue(this.relatedRow.value)
 		},
+	},
+	methods: {
+		getTableCellComponent,
 	},
 }
 </script>

@@ -56,6 +56,8 @@ import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
 import { NODE_TYPE_VIEW } from '../shared/constants.ts'
+import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
+import { AbstractColumn } from '../shared/components/ncTable/mixins/columnClass.js'
 
 export default {
 
@@ -152,7 +154,8 @@ export default {
 			if (storeColumns && storeColumns.length > 0) {
 				return storeColumns
 			}
-			return this.richObject?.columns || []
+			return (this.richObject?.columns || [])
+				.map(col => (col instanceof AbstractColumn || col.id < 0) ? col : parseCol(col))
 		},
 	},
 
