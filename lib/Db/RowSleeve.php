@@ -46,14 +46,14 @@ class RowSleeve extends Entity implements JsonSerializable {
 		if ($this->cachedCells === null) {
 			return [];
 		}
-		return json_decode($this->cachedCells, true) ?: [];
+		return json_decode($this->cachedCells, true, flags: JSON_THROW_ON_ERROR) ?: [];
 	}
 
 	/**
 	 * @param array<int, mixed> $cachedCells Indexed by column ID
 	 */
 	public function setCachedCellsArray(array $cachedCells): void {
-		$this->setCachedCells(json_encode($cachedCells));
+		$this->setCachedCells(json_encode($cachedCells, JSON_THROW_ON_ERROR));
 	}
 
 	public function jsonSerialize(): array {

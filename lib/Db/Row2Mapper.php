@@ -929,11 +929,19 @@ class Row2Mapper {
 	}
 
 	/**
+	 * @param bool $purgeCachedCells also remove the column's data from the
+	 *                               cached_cells of all row sleeves (can be skipped if the sleeves are
+	 *                               deleted anyway, e.g. when deleting the whole table)
 	 * @throws InternalError
 	 */
-	public function deleteDataForColumn(Column $column): void {
+	public function deleteDataForColumn(Column $column, bool $purgeCachedCells = true): void {
 		try {
-			$this->getCellMapper($column)->deleteAllForColumn($column->getId());
+			$this->atomic(function () use ($column, $purgeCachedCells): void {
+				$this->getCellMapper($column)->deleteAllForColumn($column->getId());
+				if ($purgeCachedCells) {
+					$this->rowSleeveMapper->removeCachedCellsForColumn($column->getTableId(), $column->getId());
+				}
+			}, $this->db);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -948,7 +956,7 @@ class Row2Mapper {
 	public function deleteAllForTable(int $tableId, array $columns): void {
 		foreach ($columns as $column) {
 			try {
-				$this->deleteDataForColumn($column);
+				$this->deleteDataForColumn($column, purgeCachedCells: false);
 			} catch (InternalError $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}

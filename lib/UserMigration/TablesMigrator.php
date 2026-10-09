@@ -354,8 +354,9 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 			} catch (\Throwable $e) {
 				$this->logger->error('Failed to load cells for row during cached_cells rebuild', [
 					'rowId' => $newRowId,
-					'exception' => $e->getMessage(),
+					'exception' => $e,
 				]);
+				throw $e;
 			}
 		}
 	}

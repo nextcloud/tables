@@ -110,6 +110,30 @@ class RowSleeveMapper extends QBMapper {
 	}
 
 	/**
+	 * Removes the cells of a single column from the cached_cells of all rows in a table
+	 *
+	 * @param int $tableId
+	 * @param int $columnId
+	 * @throws Exception
+	 */
+	public function removeCachedCellsForColumn(int $tableId, int $columnId): void {
+		$qb = $this->db->getQueryBuilder();
+		if ($this->db->getDatabaseProvider() === IDBConnection::PLATFORM_POSTGRES) {
+			$expression = '(cached_cells::jsonb - :columnKey)::text';
+			$qb->setParameter('columnKey', (string)$columnId, IQueryBuilder::PARAM_STR);
+		} else { // mysql / mariadb / sqlite
+			$expression = 'JSON_REMOVE(cached_cells, :columnKey)';
+			$qb->setParameter('columnKey', '$."' . $columnId . '"', IQueryBuilder::PARAM_STR);
+		}
+
+		$qb->update($this->table)
+			->set('cached_cells', $qb->createFunction($expression))
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->like('cached_cells', $qb->createNamedParameter('%"' . $columnId . '":%')));
+		$qb->executeStatement();
+	}
+
+	/**
 	 * @param int $tableId
 	 * @return int Effected rows
 	 * @throws Exception
