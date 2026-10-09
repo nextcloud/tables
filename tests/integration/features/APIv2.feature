@@ -937,6 +937,134 @@ Feature: APIv2
   When user "participant4-v2" attempts to fetch all shares of table t1
   Then the reported status is 404
 
+  @api2 @sharing @tables
+  Scenario: A table manager sees all shares of a table, including indirect ones
+    Given group "table-managers" exists
+    And user "participant2-v2" is member of group "table-managers"
+    And table "Managed table" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" shares "table" "t1" with "group" "table-managers"
+    And user "participant1-v2" sets permission "manage" to 1
+    And user "participant1-v2" shares "table" "t1" with "user" "participant3-v2"
+    # participant2-v2 manages the table indirectly through the group share
+    And user "participant2-v2" has the following permissions against "table" "t1"
+      | manage  | 1 |
+    # all shares are found, also the ones sent by the owner
+    When user "participant2-v2" fetches table info for table "t1"
+    Then user "participant2-v2" sees the following table attributes on table "t1"
+      | isShared  | 1 |
+      | hasShares | 1 |
+    When user "participant2-v2" attempts to fetch all shares of table t1
+    Then the reported status is "200"
+    And the response contains 2 shares
+    # a share created by the co-manager is still counted for the owner
+    When user "participant2-v2" shares "table" "t1" with "user" "participant4-v2"
+    Then the reported status is "200"
+    When user "participant1-v2" fetches table info for table "t1"
+    Then user "participant1-v2" sees the following table attributes on table "t1"
+      | hasShares | 1 |
+    When user "participant1-v2" attempts to fetch all shares of table t1
+    Then the reported status is "200"
+    And the response contains 3 shares
+
+  @api2 @tables @views
+  Scenario: Table response contains counters and embedded views
+    Given table "Stats table" with emoji "📊" exists for user "participant1-v2" as "t1" via v2
+    And column "one" exists with following properties
+      | type      | text    |
+      | subtype   | line    |
+      | mandatory | 0       |
+    And column "two" exists with following properties
+      | type      | number  |
+      | mandatory | 0       |
+    And using table "t1"
+    And user "participant1-v2" creates row "r1" with following values:
+      | one | A |
+      | two | 1 |
+    And user "participant1-v2" creates row "r2" with following values:
+      | one | B |
+      | two | 2 |
+    And user "participant1-v2" create view "Filtered" with emoji "🔎" for "t1" as "v1"
+    And user "participant1-v2" sets filter to view "v1"
+      | column | operator | value |
+      | one    | is-equal | A     |
+    And user "participant1-v2" create view "All rows" with emoji "📋" for "t1" as "v2"
+    And user "participant1-v2" shares view "v2" with "participant3-v2"
+    When user "participant1-v2" fetches table info for table "t1"
+    Then user "participant1-v2" sees the following table attributes on table "t1"
+      | columnsCount     | 2                           |
+      | rowsCount        | 2                           |
+      | isShared         | 0                           |
+      | hasShares        | 0                           |
+      | ownerDisplayName | participant1-v2-displayname |
+    # views are embedded in sidebar order, each with its own rows count
+    And user "participant1-v2" sees the following views of table "t1"
+      | alias | rowsCount | hasShares | isShared |
+      | v1    | 1         | 0         | 0        |
+      | v2    | 2         | 1         | 0        |
+
+  @api2 @sharing @views
+  Scenario: Views of a table can only be listed by owners and managers
+    Given table "View listing" with emoji "📋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" create view "v2" with emoji "🦉" for "t1" as "v2"
+    And user "participant1-v2" shares "table" "t1" with "user" "participant2-v2"
+    And user "participant1-v2" shares "table" "t1" with "user" "participant3-v2"
+    And user "participant1-v2" sets permission "manage" to 1
+    When user "participant1-v2" attempts to fetch views of table "t1"
+    Then the reported status is "200"
+    And the response contains 2 views
+    When user "participant3-v2" attempts to fetch views of table "t1"
+    Then the reported status is "200"
+    And the response contains 2 views
+    When user "participant2-v2" attempts to fetch views of table "t1"
+    Then the reported status is "403"
+    When user "participant4-v2" attempts to fetch views of table "t1"
+    Then the reported status is "404"
+    # the same rule applies to the views embedded in the table response:
+    # they are only loaded for the owner and managers
+    When user "participant3-v2" fetches table info for table "t1"
+    Then user "participant3-v2" sees the following views of table "t1"
+      | alias |
+      | v1    |
+      | v2    |
+    When user "participant2-v2" fetches table info for table "t1"
+    Then user "participant2-v2" sees the following table attributes on table "t1"
+      | isShared  | 1 |
+      | hasShares | 1 |
+    And user "participant2-v2" sees the following views of table "t1"
+      | alias |
+
+  @api2 @sharing @views
+  Scenario: A shared view hides its filter details for sharees without table manage permission
+    Given table "Filtered shared view" with emoji "🔎" exists for user "participant1-v2" as "t1" via v2
+    And column "state" exists with following properties
+      | type      | text    |
+      | subtype   | line    |
+      | mandatory | 0       |
+    And using table "t1"
+    And user "participant1-v2" creates row "r1" with following values:
+      | state | open      |
+    And user "participant1-v2" creates row "r2" with following values:
+      | state | completed |
+    And user "participant1-v2" create view "Open items" with emoji "🔔" for "t1" as "v1"
+    And user "participant1-v2" sets filter to view "v1"
+      | column | operator | value |
+      | state  | is-equal | open  |
+    And user "participant1-v2" shares view "v1" with "participant2-v2"
+    # the owner sees the real filter and the share count
+    When user "participant1-v2" fetches view info for view "v1"
+    Then user "participant1-v2" sees the following view attributes on view "v1"
+      | isShared  | 0 |
+      | hasShares | 1 |
+      | rowsCount | 1 |
+    # the sharee gets the rows count, but the filter details are hidden
+    When user "participant2-v2" fetches view info for view "v1"
+    Then user "participant2-v2" sees the following view attributes on view "v1"
+      | isShared  | 1  |
+      | hasShares | 0  |
+      | rowsCount | 1  |
+      | filter    | [] |
+
   @api2 @sharing @views
   Scenario: Create a shared view and check its permissions
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
