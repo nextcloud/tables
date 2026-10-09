@@ -95,6 +95,7 @@ class FeatureContext implements Context {
 	 * @AfterScenario
 	 */
 	public function cleanupUsers() {
+		$this->usingServer('LOCAL');
 		$this->importColumnData = null;
 		$this->collectionManager->cleanUp();
 		foreach ($this->createdUsers as $user) {
@@ -3334,5 +3335,60 @@ class FeatureContext implements Context {
 			$columnId = $this->collectionManager->getByAlias('column', $alias)['id'];
 			Assert::assertEquals($columnId, $dataByAlias[$alias]['columnId'], "columnId mismatch for alias '$alias'");
 		}
+	}
+
+	/**
+	 * @Given acting on server :server
+	 */
+	public function usingServer(string $server): void {
+		$this->baseUrl = getenv($server === 'REMOTE' ? 'TEST_REMOTE_URL' : 'TEST_SERVER_URL');
+		$this->cookieJars = [];
+	}
+
+	/**
+	 * @Then user :user has federated :nodeType :title as :nodeAlias
+	 */
+	public function userHasFederatedNode(string $user, string $nodeType, string $title, string $nodeAlias): void {
+		$federatedNodes = $this->findFederatedNodes($user, $nodeType, $title);
+		Assert::assertCount(1, $federatedNodes);
+		$this->collectionManager->register($federatedNodes[0], $nodeType, $federatedNodes[0]['id'], $nodeAlias);
+	}
+
+	/**
+	 * @Then user :user has no federated :nodeType :title
+	 */
+	public function userHasNoFederatedNode(string $user, string $nodeType, string $title): void {
+		Assert::assertCount(0, $this->findFederatedNodes($user, $nodeType, $title));
+	}
+
+	/**
+	 * @Then user :user sees the following rows in :nodeType :nodeAlias
+	 */
+	public function userSeesFollowingRowsInNode(string $user, string $nodeType, string $nodeAlias, TableNode $expectedValues): void {
+		$this->setCurrentUser($user);
+		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+		$this->sendRequest('GET', sprintf('/apps/tables/row/%s/%d', $nodeType, $node['id']));
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$rows = $this->getDataFromResponse($this->response);
+		$actualValues = array_map(static fn (array $row): string => (string)$row['data'][0]['value'], $rows);
+		Assert::assertEqualsCanonicalizing($expectedValues->getRow(0), $actualValues);
+	}
+
+	private function findFederatedNodes(string $user, string $nodeType, string $title): array {
+		$this->setCurrentUser($user);
+		if ($nodeType === 'view') {
+			$this->sendRequest('GET', '/apps/tables/view');
+			$nodes = $this->getDataFromResponse($this->response);
+		} else {
+			$this->sendOcsRequest('GET', '/apps/tables/api/2/tables');
+			$nodes = $this->getDataFromResponse($this->response)['ocs']['data'];
+		}
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		return array_values(array_filter(
+			$nodes,
+			static fn (array $node): bool => $node['isFederated'] && $node['title'] === $title,
+		));
 	}
 }
