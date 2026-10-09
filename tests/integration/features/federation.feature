@@ -55,6 +55,32 @@ Feature: Federation
       | from owner |
 
   @federation
+  Scenario: A federated view keeps its federated attributes when enhanced
+    Given acting on server "LOCAL"
+    And user "federation-owner" create view "Federated view" with emoji "🌍" for "t1" as "v1"
+    And user "federation-owner" sets columnSettings "statement" to view "v1"
+    And user "federation-owner" shares "view" "v1" with "remote" "federation-receiver@http://localhost:8180"
+    And user "federation-owner" sets permission "create" to 1
+    And acting on server "REMOTE"
+    And user "federation-receiver" has federated view "Federated view" as "federated-v1"
+    When user "federation-receiver" fetches the views shared with them
+    Then view "federated-v1" in the shared views list has the following attributes
+      | title              | Federated view                                                          |
+      | isFederated        | 1                                                                       |
+      | isShared           | 1                                                                       |
+      | hasShares          | 0                                                                       |
+      | rowsCount          | 0                                                                       |
+      | onSharePermissions | {"read":true,"create":true,"update":true,"delete":false,"manage":false} |
+    When user "federation-receiver" fetches view info for view "federated-v1"
+    Then user "federation-receiver" sees the following view attributes on view "federated-v1"
+      | title              | Federated view                                                          |
+      | isFederated        | 1                                                                       |
+      | isShared           | 1                                                                       |
+      | hasShares          | 0                                                                       |
+      | rowsCount          | 0                                                                       |
+      | onSharePermissions | {"read":true,"create":true,"update":true,"delete":false,"manage":false} |
+
+  @federation
   Scenario: Receiver creates a row in a federated view after the owner grants the permission
     Given acting on server "LOCAL"
     And user "federation-owner" create view "Federated view" with emoji "🌍" for "t1" as "v1"
