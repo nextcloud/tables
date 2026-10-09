@@ -41,25 +41,15 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 	}
 
 	getObjects(values) {
-		// values is an array of option-ids as string
-		const objects = []
-		values?.forEach(id => {
-			const optionsObject = this.getOptionObject(parseInt(id))
-			// skip options that not exists anymore
-			if (optionsObject) {
-				objects.push(optionsObject)
-			}
-		})
-		return objects
+		return (values || [])
+			.map(rawId => parseInt(rawId))
+			.filter(id => !Number.isNaN(id))
+			.map(id => this.getOptionObject(id))
 	}
 
 	getOptionObject(id) {
-		const i = this.selectionOptions?.findIndex(obj => {
-			return obj.id === id
-		})
-		if (i !== undefined) {
-			return this.selectionOptions[i] || null
-		}
+		if (id === null || id === undefined) return null
+		return this.selectionOptions?.find(obj => obj.id === id) || { id, label: String(id), deleted: true }
 	}
 
 	isSearchStringFound(cell, searchString) {
