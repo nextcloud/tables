@@ -69,6 +69,74 @@ final class ContextServiceTest extends TestCase {
 		);
 	}
 
+	public function testCreateStoresCardViewEnabled(): void {
+		$this->contextMapper
+			->expects($this->once())
+			->method('insert')
+			->willReturnArgument(0);
+
+		$context = $this->service->create('My app', 'star', 'Some description', [], 'user-1', 0, true);
+
+		self::assertTrue($context->getCardViewEnabled());
+		self::assertTrue($context->jsonSerialize()['cardViewEnabled']);
+	}
+
+	public function testCreateDisablesCardViewByDefault(): void {
+		$this->contextMapper
+			->expects($this->once())
+			->method('insert')
+			->willReturnArgument(0);
+
+		$context = $this->service->create('My app', 'star', 'Some description', [], 'user-1', 0);
+
+		self::assertFalse($context->getCardViewEnabled());
+		self::assertFalse($context->jsonSerialize()['cardViewEnabled']);
+	}
+
+	public function testUpdateSetsCardViewEnabledWhenProvided(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setCardViewEnabled(false);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('findById')
+			->with(7, 'user-1')
+			->willReturn($context);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('update')
+			->with($context)
+			->willReturnArgument(0);
+
+		$updatedContext = $this->service->update(7, 'user-1', null, null, null, null, true);
+
+		self::assertTrue($updatedContext->getCardViewEnabled());
+	}
+
+	public function testUpdateKeepsCardViewEnabledWhenNotProvided(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setCardViewEnabled(true);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('findById')
+			->with(7, 'user-1')
+			->willReturn($context);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('update')
+			->with($context)
+			->willReturnArgument(0);
+
+		$updatedContext = $this->service->update(7, 'user-1', 'Renamed', null, null, null);
+
+		self::assertTrue($updatedContext->getCardViewEnabled());
+	}
+
 	public function testUpdateReordersStartPageContentsFromSubmittedNodes(): void {
 		$context = new Context();
 		$context->id = 7;

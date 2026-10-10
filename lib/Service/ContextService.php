@@ -132,13 +132,14 @@ class ContextService {
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
-	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType): Context {
+	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType, bool $cardViewEnabled = false): Context {
 		$context = new Context();
 		$context->setName(trim($name));
 		$context->setIcon(trim($iconName));
 		$context->setDescription(trim($description));
 		$context->setOwnerId($ownerId);
 		$context->setOwnerType($ownerType);
+		$context->setCardViewEnabled($cardViewEnabled);
 
 		$this->atomic(function () use ($context, $nodes): void {
 			$this->contextMapper->insert($context);
@@ -159,7 +160,7 @@ class ContextService {
 	 * @throws DoesNotExistException
 	 * @throws PermissionError|MultipleObjectsReturnedException
 	 */
-	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
+	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?bool $cardViewEnabled = null): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		if ($name !== null) {
@@ -170,6 +171,9 @@ class ContextService {
 		}
 		if ($description !== null) {
 			$context->setDescription(trim($description));
+		}
+		if ($cardViewEnabled !== null) {
+			$context->setCardViewEnabled($cardViewEnabled);
 		}
 
 		$hasUpdatedNodeInformation = false;

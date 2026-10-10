@@ -14,27 +14,60 @@
 							activeContext.name }}
 					</h1>
 				</div>
-				<div class="row space-L context__description">
+				<div v-if="activeContext.description?.trim()" class="row space-L context__description">
 					{{ activeContext.description }}
 				</div>
 			</div>
 
 			<div class="resources">
-				<div v-for="resource in contextResources" :key="resource.key">
-					<div v-if="!resource.isView" class="resource">
-						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
-							@import-scheme="openImportSchemeModal(resource)"
-							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
-							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
-					</div>
-					<div v-else-if="resource.isView" class="resource">
-						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
-							:view-setting="viewSetting" @create-column="createColumn(true, resource)"
-							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
-							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
+				<ContextResourceCards v-if="layoutMode === 'cards' && contextResources.length > 1"
+					:resources="contextResources"
+					:active-index="activeResourceIndex"
+					@update:active-index="index => activeResourceIndex = index" />
+
+				<!-- Cards mode: one resource visible at a time, all overlaid in
+				     the same grid cell so switching never changes the
+				     container's height (prevents the scroll jump). -->
+				<div v-if="layoutMode === 'cards'" class="resources__stack">
+					<div v-for="(resource, index) in contextResources"
+						:key="resource.key"
+						class="resources__stack-item"
+						:class="{ 'resources__stack-item--active': index === activeResourceIndex }">
+						<div v-if="!resource.isView" class="resource resource--card-mode">
+							<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
+								:view-setting="viewSetting" @create-column="createColumn(false, resource)"
+								@import-scheme="openImportSchemeModal(resource)"
+								@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
+								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
+						</div>
+						<div v-else-if="resource.isView" class="resource resource--card-mode">
+							<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
+								:view-setting="viewSetting" @create-column="createColumn(true, resource)"
+								@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
+								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
+						</div>
 					</div>
 				</div>
+
+				<!-- Stacked mode: every resource shown normally, one after
+				     the other, exactly like before this feature existed. -->
+				<template v-else>
+					<div v-for="resource in contextResources" :key="resource.key">
+						<div v-if="!resource.isView" class="resource">
+							<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
+								:view-setting="viewSetting" @create-column="createColumn(false, resource)"
+								@import-scheme="openImportSchemeModal(resource)"
+								@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
+								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
+						</div>
+						<div v-else-if="resource.isView" class="resource">
+							<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
+								:view-setting="viewSetting" @create-column="createColumn(true, resource)"
+								@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
+								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
+						</div>
+					</div>
+				</template>
 			</div>
 		</div>
 
@@ -50,6 +83,7 @@ import { mapState, mapActions, storeToRefs } from 'pinia'
 import { NcIconSvgWrapper } from '@nextcloud/vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
+import ContextResourceCards from '../modules/main/sections/ContextResourceCards.vue'
 import { emit } from '@nextcloud/event-bus'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMixin.js'
@@ -67,6 +101,7 @@ export default {
 		ErrorMessage,
 		TableWrapper,
 		CustomView,
+		ContextResourceCards,
 	},
 
 	mixins: [exportTableMixin, svgHelper],
@@ -86,11 +121,22 @@ export default {
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
+			activeResourceIndex: 0,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['tables', 'contexts', 'activeContextId', 'views', 'activeContext']),
+		// 'cards' (a card picker on top, one resource shown at a time) only
+		// when the application was created/edited with the card-view option
+		// enabled AND there's more than one resource; otherwise everything is
+		// just stacked one below the other, same as before this feature.
+		layoutMode() {
+			if (!this.activeContext?.cardViewEnabled) {
+				return 'stacked'
+			}
+			return this.contextResources.length > 1 ? 'cards' : 'stacked'
+		},
 		rows() {
 			const rows = {}
 			if (this.context && this.context.nodes) {
@@ -148,6 +194,13 @@ export default {
 			},
 			immediate: true,
 		},
+		contextResources() {
+			// Keep the active card in range (e.g. after switching to a context
+			// with fewer resources, or once resources finish loading).
+			if (this.activeResourceIndex >= this.contextResources.length) {
+				this.activeResourceIndex = 0
+			}
+		},
 	},
 
 	async mounted() {
@@ -175,6 +228,7 @@ export default {
 			this.isReloading = true
 			this.loading = true
 			this.contextResources = []
+			this.activeResourceIndex = 0
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -350,6 +404,22 @@ export default {
 	min-width: var(--app-content-width, 100%);
 }
 
+.resources__stack {
+	display: grid;
+	overflow-anchor: none;
+
+	&-item {
+		grid-area: 1 / 1;
+		visibility: hidden;
+		pointer-events: none;
+
+		&--active {
+			visibility: visible;
+			pointer-events: auto;
+		}
+	}
+}
+
 .resource {
 	margin: 40px 0;
 	width: max-content;
@@ -358,6 +428,14 @@ export default {
 	&:deep(.row.first-row) {
 		margin-inline-start: 0;
 		padding-inline-start: 20px;
+	}
+
+	// In card mode the picker above already shows the title, so avoid
+	// rendering the description a second time inside the opened resource.
+	&--card-mode {
+		&:deep(.element-description) {
+			display: none;
+		}
 	}
 }
 

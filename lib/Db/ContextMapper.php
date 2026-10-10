@@ -84,6 +84,7 @@ class ContextMapper extends QBMapper {
 			'description' => $rows[0]['description'],
 			'owner_id' => $rows[0]['owner_id'],
 			'owner_type' => $rows[0]['owner_type'],
+			'card_view_enabled' => $rows[0]['card_view_enabled'] ?? null,
 		];
 
 		$formatted['sharing'] = array_reduce($rows, function (array $carry, array $item) use ($userId) {
@@ -103,7 +104,9 @@ class ContextMapper extends QBMapper {
 				'display_mode_default' => (int)$item['display_mode_default'],
 			];
 			if ($userId !== null) {
-				$item['display_mode'] ??= $item['display_mode_default'];
+				if ($item['display_mode'] === null) {
+					$item['display_mode'] = $item['display_mode_default'];
+				}
 				$carry[$item['share_id']]['display_mode'] = (int)$item['display_mode'];
 			}
 			return $carry;
@@ -128,7 +131,9 @@ class ContextMapper extends QBMapper {
 				// empty Context
 				return $carry;
 			}
-			$carry[$item['page_id']] ??= ['content' => []];
+			if (!isset($carry[$item['page_id']])) {
+				$carry[$item['page_id']] = ['content' => []];
+			}
 			$carry[$item['page_id']]['id'] = (int)$item['page_id'];
 			$carry[$item['page_id']]['page_type'] = $item['page_type'];
 			if ($item['node_rel_id'] !== null) {

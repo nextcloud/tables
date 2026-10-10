@@ -233,6 +233,7 @@ namespace OCA\Tables;
  *   description: string,
  *   owner: string,
  *   ownerType: int,
+ *   cardViewEnabled: bool,
  * }
  *
  * @psalm-type TablesContextNavigation = array{
