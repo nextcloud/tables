@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div :class="{ empty: localValue === '' }">
+	<div :class="{ empty: localValue === '' }" data-cy="elementSearchInput">
 		<NcTextField
 			v-model="localValue"
 			:label="t('tables', 'Search')"
