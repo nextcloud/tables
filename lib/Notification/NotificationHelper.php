@@ -53,12 +53,12 @@ class NotificationHelper {
 			switch ($objectType) {
 				case ActivityManager::TABLES_OBJECT_TABLE:
 					if ($object instanceof Table) {
-						$this->sendTableNotification($object, $subject, $author);
+						$this->sendTableNotification($object, $subject, $additionalParams, $author);
 					}
 					break;
 				case ActivityManager::TABLES_OBJECT_VIEW:
 					if ($object instanceof View) {
-						$this->sendViewNotification($object, $subject, $author);
+						$this->sendViewNotification($object, $subject, $additionalParams, $author);
 					}
 					break;
 				case ActivityManager::TABLES_OBJECT_ROW:
@@ -82,7 +82,10 @@ class NotificationHelper {
 		}
 	}
 
-	private function sendTableNotification(Table $object, string $subject, ?string $author): void {
+	/**
+	 * @param array<string, mixed> $additionalParams
+	 */
+	private function sendTableNotification(Table $object, string $subject, array $additionalParams, ?string $author): void {
 		$subjectParams = [
 			'author' => $author,
 			'objectType' => ActivityManager::TABLES_OBJECT_TABLE,
@@ -95,7 +98,7 @@ class NotificationHelper {
 		if ($subject === ActivityManager::SUBJECT_IMPORT_FINISHED || $subject === ActivityManager::SUBJECT_IMPORT_FAILED) {
 			$notification = $this->generateNotification(
 				subject: $subject,
-				subjectParams: $subjectParams,
+				subjectParams: array_merge($subjectParams, $additionalParams),
 				objectType: ActivityManager::TABLES_OBJECT_TABLE,
 				objectId: (string)$object->getId(),
 				receiver: $author,
@@ -115,7 +118,10 @@ class NotificationHelper {
 		);
 	}
 
-	private function sendViewNotification(View $object, string $subject, ?string $author): void {
+	/**
+	 * @param array<string, mixed> $additionalParams
+	 */
+	private function sendViewNotification(View $object, string $subject, array $additionalParams, ?string $author): void {
 		$subjectParams = [
 			'author' => $author,
 			'objectType' => ActivityManager::TABLES_OBJECT_VIEW,
@@ -134,7 +140,7 @@ class NotificationHelper {
 
 			$notification = $this->generateNotification(
 				subject: $subject,
-				subjectParams: $subjectParams,
+				subjectParams: array_merge($subjectParams, $additionalParams),
 				objectType: ActivityManager::TABLES_OBJECT_VIEW,
 				objectId: (string)$object->getId(),
 				receiver: $author,

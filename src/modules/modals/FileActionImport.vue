@@ -8,6 +8,9 @@
 		size="normal"
 		@closing="closeImportDialog">
 		<div class="modal__content">
+			<p v-if="errorMessage" role="alert" class="import-error">
+				{{ errorMessage }}
+			</p>
 			<RowFormWrapper
 				class="row"
 				:title="t('tables', 'Import as new table')"
@@ -95,6 +98,7 @@
 		:name="t('tables', 'Import successful')"
 		size="small">
 		<template #actions>
+			<ImportProblemsFileButton :problems-file="importResults.result?.problemsFile" />
 			<NcButton :aria-label="t('tables', 'Close')" @click="closeResultsDialog()">
 				{{ t('tables', 'Close') }}
 			</NcButton>
@@ -121,6 +125,7 @@ import axios from '@nextcloud/axios'
 import { translate as t } from '@nextcloud/l10n'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import ImportResults from './ImportResults.vue'
+import ImportProblemsFileButton from './ImportProblemsFileButton.vue'
 
 export default {
 	name: 'FileActionImport',
@@ -129,6 +134,7 @@ export default {
 		NcButton,
 		NcDialog,
 		ImportResults,
+		ImportProblemsFileButton,
 		NcLoadingIcon,
 		NcSelect,
 		NcCheckboxRadioSwitch,
@@ -153,6 +159,7 @@ export default {
 
 			loadingTables: false,
 			importingFile: false,
+			errorMessage: '',
 
 			newTable: {
 				emoji: '🔧',
@@ -206,32 +213,38 @@ export default {
 			this.showResultsDialog = false
 		},
 		async importFile() {
-			this.importingFile = true
-
-			if (this.importAsNew) {
-				this.importResults = await importToNewTable(this.newTable.title, this.newTable.emoji, this.file)
-
-				if (!this.importResults) {
-					showError(t('tables', 'Could not create table'))
-				} else if (this.importResults.async) {
-					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
-				}
-			} else {
-				if (!this.selectedTable) {
-					showError(t('tables', 'You must select an existing table'))
-					return
-				}
-
-				this.importResults = await importToExistingTable(this.selectedTable.value, this.file, this.createMissingColumns)
-
-				if (!this.importResults) {
-					showError(t('tables', 'Could not import data to table'))
-				} else if (this.importResults.async) {
-					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
-				}
+			if (!this.importAsNew && !this.selectedTable) {
+				showError(t('tables', 'You must select an existing table'))
+				return
 			}
+			this.importingFile = true
+			this.errorMessage = ''
 
-			this.importingFile = false
+			try {
+				if (this.importAsNew) {
+					this.importResults = await importToNewTable(this.newTable.title, this.newTable.emoji, this.file)
+
+					if (!this.importResults) {
+						this.errorMessage = t('tables', 'Could not create table')
+					}
+				} else {
+					this.importResults = await importToExistingTable(this.selectedTable.value, this.file, this.createMissingColumns)
+
+					if (!this.importResults) {
+						this.errorMessage = t('tables', 'Could not import data to table')
+					}
+				}
+
+				if (this.importResults?.async) {
+					showInfo(t('tables', 'File import started, this might take a while. You will be notified once it finished.'))
+				}
+			} catch (error) {
+				this.errorMessage = typeof error.response?.data?.message === 'string'
+					? error.response.data.message
+					: t('tables', 'Could not import data due to unknown errors.')
+			} finally {
+				this.importingFile = false
+			}
 		},
 		closeImportDialog() {
 			this.$emit('close')
@@ -254,13 +267,16 @@ async function importToExistingTable(tableId, file, createMissingColumns) {
 }
 
 async function insertTable(title, emoji) {
-	const res = await axios.post(generateUrl('/apps/tables/table'), {
-		title,
-		emoji,
-		template: 'custom',
-	})
-
-	return res.data
+	try {
+		const res = await axios.post(generateUrl('/apps/tables/table'), {
+			title,
+			emoji,
+			template: 'custom',
+		})
+		return res.data
+	} catch {
+		return null
+	}
 }
 
 async function updateTable(tableId, path, createMissingColumns) {
@@ -276,6 +292,10 @@ async function updateTable(tableId, path, createMissingColumns) {
 <style scoped lang="scss">
 .modal__content {
 	margin: 20px;
+}
+
+.import-error {
+	color: var(--color-error-text);
 }
 
 .row {

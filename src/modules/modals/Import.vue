@@ -9,7 +9,7 @@
 		@closing="actionCancel">
 		<div class="modal__content">
 			<!-- Starting -->
-			<div v-if="!loading && !importInitialized && preview === null && !waitForReload">
+			<div v-if="!loading && !importFailed && !importInitialized && preview === null && !waitForReload">
 				<div class="row space-T">
 					{{ t('tables', 'Add data to the table from a file') }}
 				</div>
@@ -67,7 +67,7 @@
 			</div>
 
 			<!-- show preview -->
-			<div v-if="!loading && preview !== null && !importInitialized && !waitForReload">
+			<div v-if="!loading && !importFailed && preview !== null && !importInitialized && !waitForReload">
 				<ImportPreview :preview-data="preview" :element="element" :create-missing-columns="createMissingColumns" @update:columns="onUpdateColumnsConfig" />
 
 				<div class="row">
@@ -80,11 +80,12 @@
 			</div>
 
 			<!-- show results -->
-			<div v-if="!loading && importInitialized && result !== null && !waitForReload">
+			<div v-if="!loading && !importFailed && importInitialized && result !== null && !waitForReload">
 				<ImportResults :results="result" />
 
 				<div class="row">
 					<div class="fix-col-4 space-T end">
+						<ImportProblemsFileButton :problems-file="result.problemsFile" class="problems-file-button" />
 						<NcButton :aria-label="t('tables', 'Done')" type="primary" @click="actionCloseAndReload">
 							{{ t('tables', 'Done') }}
 						</NcButton>
@@ -94,16 +95,22 @@
 
 			<!-- show loading -->
 			<div v-if="loading && !waitForReload">
-				<div v-if="!importFailed">
-					<NcEmptyContent :name="t('tables', 'Importing data from ') + importFileName"
-						:description="t('tables', 'This might take a while...')">
-						<template #icon>
-							<NcIconTimerSand />
-						</template>
-					</NcEmptyContent>
-				</div>
-				<div v-else>
-					<NcEmptyContent :name="t('tables', 'Failed')" :description="errorMessage" />
+				<NcEmptyContent :name="t('tables', 'Importing data from ') + importFileName"
+					:description="t('tables', 'This might take a while...')">
+					<template #icon>
+						<NcIconTimerSand />
+					</template>
+				</NcEmptyContent>
+			</div>
+
+			<div v-if="!loading && importFailed && !waitForReload">
+				<NcEmptyContent :name="t('tables', 'Failed')" :description="errorMessage" />
+				<div class="row">
+					<div class="fix-col-4 space-T end">
+						<NcButton :aria-label="t('tables', 'Done')" type="primary" @click="actionCloseAndReload">
+							{{ t('tables', 'Done') }}
+						</NcButton>
+					</div>
 				</div>
 			</div>
 
@@ -129,6 +136,7 @@ import { mapState, mapActions } from 'pinia'
 import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
 import ImportResults from './ImportResults.vue'
 import ImportPreview from './ImportPreview.vue'
+import ImportProblemsFileButton from './ImportProblemsFileButton.vue'
 import { translate as t } from '@nextcloud/l10n'
 import { useDataStore } from '../../store/data.js'
 
@@ -144,6 +152,7 @@ export default {
 		NcButton,
 		ImportResults,
 		ImportPreview,
+		ImportProblemsFileButton,
 		NcCheckboxRadioSwitch,
 		RowFormWrapper,
 		NcEmptyContent,
@@ -303,9 +312,7 @@ export default {
 					this.importFailed = true
 				}
 			} catch (e) {
-				this.errorMessage = t('tables', 'Could not import data due to unknown errors.')
-				console.error(e)
-				this.importFailed = true
+				this.handleResponse(e.response, e)
 				return false
 			}
 		},
@@ -330,9 +337,7 @@ export default {
 					this.importFailed = true
 				}
 			} catch (e) {
-				this.errorMessage = t('tables', 'Could not import data due to unknown errors.')
-				console.error(e)
-				this.importFailed = true
+				this.handleResponse(e.response, e)
 				return false
 			}
 		},
@@ -398,8 +403,7 @@ export default {
 						this.result = res.data.result
 					}
 				} else {
-					console.debug('error while importing', res)
-					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
+					this.handleResponse(res, null)
 				}
 			} catch (e) {
 				this.handleResponse(e.response, e)
@@ -430,8 +434,7 @@ export default {
 						this.result = res.data.result
 					}
 				} else {
-					console.debug('error while importing', res)
-					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
+					this.handleResponse(res, null)
 				}
 			} catch (e) {
 				this.handleResponse(e.response, e)
@@ -448,6 +451,7 @@ export default {
 			this.createMissingColumns = true
 			this.result = null
 			this.importInitialized = false
+			this.importFailed = false
 			this.preview = null
 			this.loading = false
 		},
@@ -482,7 +486,11 @@ export default {
 			this.columnsConfig = event
 		},
 		handleResponse(res, e) {
-			if (res?.status === 401) {
+			this.loading = false
+			this.importFailed = true
+			if ([400, 403, 404, 500].includes(res?.status) && typeof res?.data?.message === 'string') {
+				this.errorMessage = res.data.message
+			} else if (res?.status === 401) {
 				console.debug('error while importing', e || res)
 				this.errorMessage = t('tables', 'Could not import, not authorized. Are you logged in?')
 			} else if (res?.status === 403) {
@@ -493,7 +501,7 @@ export default {
 				this.errorMessage = t('tables', 'Could not import, needed resources were not found.')
 			} else {
 				console.debug('error while importing', e || res)
-				this.errorMessage = t('tables', e?.response?.data?.message || 'Could not import data due to unknown errors.')
+				this.errorMessage = t('tables', 'Could not import data due to unknown errors.')
 			}
 		},
 	},
@@ -520,6 +528,10 @@ export default {
 
 	.information :deep(.row.space-T) {
 		padding-top: calc(var(--default-grid-baseline) * 2);
+	}
+
+	.problems-file-button {
+		margin-inline-end: auto;
 	}
 
 	.import-filename {

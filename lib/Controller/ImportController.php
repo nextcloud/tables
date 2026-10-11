@@ -7,13 +7,17 @@
 
 namespace OCA\Tables\Controller;
 
+use Closure;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ImportProblem;
+use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ImportService;
 use OCA\Tables\UploadException;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\Files\NotPermittedException;
@@ -22,6 +26,9 @@ use OCP\IRequest;
 use OCP\Util;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type TablesImportV2Response from ResponseDefinitions
+ */
 class ImportController extends Controller {
 	public const MIME_TYPES = [
 		'text/csv',
@@ -33,16 +40,36 @@ class ImportController extends Controller {
 		'application/vnd.oasis.opendocument.spreadsheet',
 	];
 
-	use Errors;
-
 	public function __construct(
 		IRequest $request,
 		protected LoggerInterface $logger,
-		private ImportService $service,
-		private string $userId,
-		private IL10N $l10n,
+		private readonly ImportService $service,
+		private readonly string $userId,
+		private readonly IL10N $l10n,
 	) {
 		parent::__construct(Application::APP_ID, $request);
+	}
+
+	/**
+	 * @template T of array<array-key, mixed>|null|object|scalar
+	 * @param Closure(): T $callback
+	 * @return DataResponse<Http::STATUS_OK, T, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 */
+	protected function handleError(Closure $callback): DataResponse {
+		try {
+			return new DataResponse($callback());
+		} catch (\Throwable $e) {
+			$this->logger->error('Import request failed', ['exception' => $e]);
+			$code = ImportProblem::codeForException($e);
+			$status = match ($code) {
+				ImportProblem::CODE_RESOURCE_NOT_FOUND => Http::STATUS_NOT_FOUND,
+				ImportProblem::CODE_PERMISSION_DENIED => Http::STATUS_FORBIDDEN,
+				ImportProblem::CODE_FILE_READ_FAILED => Http::STATUS_BAD_REQUEST,
+				default => Http::STATUS_INTERNAL_SERVER_ERROR,
+			};
+			$message = ImportProblem::describeCode($this->l10n, $code);
+			return new DataResponse(['message' => $message], $status);
+		}
 	}
 
 	#[NoAdminRequired]
@@ -63,9 +90,29 @@ class ImportController extends Controller {
 			fn () => $this->service->import($tableId, null, $path, $createMissingColumns, $columnsConfig));
 	}
 
+	/**
+	 * Import data into a table from a file in the user's storage
+	 *
+	 * Small files are imported synchronously and the result is returned
+	 * in `result`. Larger files are queued as a background job and
+	 * `async` is set to true; the import stats are then published via
+	 * an activity entry once the job finished.
+	 *
+	 * @param int $tableId Table ID
+	 * @param string $path Path to a file in the user's storage
+	 * @param bool $createMissingColumns Create missing columns
+	 * @param list<array<string, mixed>> $columnsConfig Column configuration for the import
+	 * @return DataResponse<Http::STATUS_OK, TablesImportV2Response, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Import finished or queued
+	 * 400: Invalid request
+	 * 403: No permissions
+	 * 404: Not found
+	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function importV2InTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($tableId, $path, $createMissingColumns, $columnsConfig) {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
@@ -74,7 +121,7 @@ class ImportController extends Controller {
 				return ['async' => true];
 			}
 			$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_USER_FILE, $path, $tableId, null, $createMissingColumns, $columnsConfig);
-			return ['async' => false, 'result' => $result];
+			return ['async' => false, 'result' => $result->jsonSerialize()];
 		});
 	}
 
@@ -96,9 +143,29 @@ class ImportController extends Controller {
 			fn () => $this->service->import(null, $viewId, $path, $createMissingColumns, $columnsConfig));
 	}
 
+	/**
+	 * Import data into a view from a file in the user's storage
+	 *
+	 * Small files are imported synchronously and the result is returned
+	 * in `result`. Larger files are queued as a background job and
+	 * `async` is set to true; the import stats are then published via
+	 * an activity entry once the job finished.
+	 *
+	 * @param int $viewId View ID
+	 * @param string $path Path to a file in the user's storage
+	 * @param bool $createMissingColumns Create missing columns
+	 * @param list<array<string, mixed>> $columnsConfig Column configuration for the import
+	 * @return DataResponse<Http::STATUS_OK, TablesImportV2Response, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Import finished or queued
+	 * 400: Invalid request
+	 * 403: No permissions
+	 * 404: Not found
+	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function importV2InView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($viewId, $path, $createMissingColumns, $columnsConfig) {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
@@ -107,7 +174,7 @@ class ImportController extends Controller {
 				return ['async' => true];
 			}
 			$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_USER_FILE, $path, null, $viewId, $createMissingColumns, $columnsConfig);
-			return ['async' => false, 'result' => $result];
+			return ['async' => false, 'result' => $result->jsonSerialize()];
 		});
 	}
 
@@ -119,8 +186,7 @@ class ImportController extends Controller {
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(fn () => $this->service->previewImport($tableId, null, $file['tmp_name']));
 		} catch (UploadException|NotPermittedException $e) {
-			$this->logger->error('Upload error', ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->handleUploadError($e);
 		}
 	}
 
@@ -137,8 +203,7 @@ class ImportController extends Controller {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				fn () => $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray));
 		} catch (UploadException|NotPermittedException $e) {
-			$this->logger->error('Upload error', ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->handleUploadError($e);
 		}
 	}
 
@@ -150,8 +215,7 @@ class ImportController extends Controller {
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(fn () => $this->service->previewImport(null, $viewId, $file['tmp_name']));
 		} catch (UploadException|NotPermittedException $e) {
-			$this->logger->error('Upload error', ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->handleUploadError($e);
 		}
 	}
 
@@ -165,15 +229,14 @@ class ImportController extends Controller {
 			return $this->handleError(function () use ($tableId, $file, $createMissingColumns, $columnsConfigArray) {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				if ($this->service->shouldImportAsync($file['tmp_name'])) {
-					$this->service->scheduleImport($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
+					$this->service->scheduleImport($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray, $file['name'] ?? null);
 					return ['async' => true];
 				}
-				$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_UPLOADED_FILE, $file['tmp_name'], $tableId, null, $createMissingColumns, $columnsConfigArray);
-				return ['async' => false, 'result' => $result];
+				$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_UPLOADED_FILE, $file['tmp_name'], $tableId, null, $createMissingColumns, $columnsConfigArray, $file['name'] ?? null);
+				return ['async' => false, 'result' => $result->jsonSerialize()];
 			});
 		} catch (UploadException|NotPermittedException $e) {
-			$this->logger->error('Upload error', ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->handleUploadError($e);
 		}
 	}
 
@@ -187,8 +250,7 @@ class ImportController extends Controller {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				fn () => $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray));
 		} catch (UploadException|NotPermittedException $e) {
-			$this->logger->error('Upload error', ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->handleUploadError($e);
 		}
 	}
 
@@ -202,16 +264,26 @@ class ImportController extends Controller {
 			return $this->handleError(function () use ($viewId, $file, $createMissingColumns, $columnsConfigArray) {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				if ($this->service->shouldImportAsync($file['tmp_name'])) {
-					$this->service->scheduleImport(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
+					$this->service->scheduleImport(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray, $file['name'] ?? null);
 					return ['async' => true];
 				}
-				$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_UPLOADED_FILE, $file['tmp_name'], null, $viewId, $createMissingColumns, $columnsConfigArray);
-				return ['async' => false, 'result' => $result];
+				$result = $this->service->importV2($this->userId, ImportService::IMPORT_TYPE_UPLOADED_FILE, $file['tmp_name'], null, $viewId, $createMissingColumns, $columnsConfigArray, $file['name'] ?? null);
+				return ['async' => false, 'result' => $result->jsonSerialize()];
 			});
 		} catch (UploadException|NotPermittedException $e) {
-			$this->logger->error('Upload error', ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->handleUploadError($e);
 		}
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 */
+	private function handleUploadError(UploadException|NotPermittedException $exception): DataResponse {
+		$this->logger->error('Upload error', ['exception' => $exception]);
+		$message = $exception instanceof UploadException
+			? $exception->getMessage()
+			: ImportProblem::describeCode($this->l10n, ImportProblem::CODE_PERMISSION_DENIED);
+		return new DataResponse(['message' => $message], Http::STATUS_BAD_REQUEST);
 	}
 
 	/**
