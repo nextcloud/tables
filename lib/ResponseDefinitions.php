@@ -226,6 +226,31 @@ namespace OCA\Tables;
  *  errors_count: int,
  * }
  *
+ * @psalm-type TablesImportProblem = array{
+ *  code: string,
+ *  row: ?int,
+ *  column: ?string,
+ *  value: ?string,
+ *  description: ?string,
+ * }
+ *
+ * @psalm-type TablesImportStats = array{
+ *  foundColumnsCount: int,
+ *  matchingColumnsCount: int,
+ *  createdColumnsCount: int,
+ *  insertedRowsCount: int,
+ *  updatedRowsCount: int,
+ *  errorsParsingCount: int,
+ *  errorsCount: int,
+ *  problems: list<TablesImportProblem>,
+ *  problemsFile: ?array{id: int, name: string, path: string},
+ * }
+ *
+ * @psalm-type TablesImportV2Response = array{
+ *  async: bool,
+ *  result?: TablesImportStats,
+ * }
+ *
  * @psalm-type TablesContext = array{
  *   id: int,
  *   name: string,

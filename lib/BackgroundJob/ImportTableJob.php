@@ -64,6 +64,8 @@ class ImportTableJob extends QueuedJob {
 
 		$oldUser = $this->userSession->getUser();
 		$importSuccess = false;
+		$importStats = null;
+		$importErrorMessage = null;
 
 		try {
 			$user = $this->userManager->get($userId);
@@ -80,28 +82,35 @@ class ImportTableJob extends QueuedJob {
 					$tableId,
 					$viewId,
 					$argument['create_missing_columns'],
-					$argument['columns_config']
+					$argument['columns_config'],
+					$argument['import_file_name'] ?? null
 				);
 			$importSuccess = true;
 		} catch (\Exception $e) {
+			$importErrorMessage = $e->getMessage();
 			$this->logger->error('Import failed: ' . $e->getMessage(), ['exception' => $e]);
 		} finally {
 			$this->userSession->setUser($oldUser);
 		}
 
 		if ($importSuccess) {
+			$notifySubject = ActivityManager::SUBJECT_IMPORT_FINISHED;
+			$notifyParams = [
+				'importStats' => $importStats->withoutProblems(),
+				'importProblemsFile' => $this->importService->getStoredProblemsFile(),
+			];
+		} else {
 			$this->activityManager->triggerEvent(
 				objectType: ActivityManager::TABLES_OBJECT_TABLE,
 				object: $table,
-				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
+				subject: ActivityManager::SUBJECT_IMPORT_FAILED,
 				additionalParams: [
-					'importStats' => $importStats,
+					'errorMessage' => $importErrorMessage,
 				],
 				author: $userId
 			);
-			$notifySubject = ActivityManager::SUBJECT_IMPORT_FINISHED;
-		} else {
 			$notifySubject = ActivityManager::SUBJECT_IMPORT_FAILED;
+			$notifyParams = ['errorMessage' => $importErrorMessage];
 		}
 
 		if ($view !== null) {
@@ -109,6 +118,7 @@ class ImportTableJob extends QueuedJob {
 				objectType: ActivityManager::TABLES_OBJECT_VIEW,
 				object: $view,
 				subject: $notifySubject,
+				additionalParams: $notifyParams,
 				author: $userId
 			);
 		} else {
@@ -116,6 +126,7 @@ class ImportTableJob extends QueuedJob {
 				objectType: ActivityManager::TABLES_OBJECT_TABLE,
 				object: $table,
 				subject: $notifySubject,
+				additionalParams: $notifyParams,
 				author: $userId
 			);
 		}
