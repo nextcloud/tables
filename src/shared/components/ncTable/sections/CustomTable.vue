@@ -56,14 +56,15 @@
 		<div v-else
 			ref="cardLayout"
 			class="card-layout"
-			:class="[`card-layout--${currentLayout}`, { 'card-layout--no-image': !hasCardBackground }]"
-			:style="{ '--card-title-lines': cardTitleLines }">
+			:class="`card-layout--${currentLayout}`"
+			:style="{ '--card-title-lines': cardTitleLines, '--card-title-lines-full': cardTitleLinesFull }">
 			<!-- The card is a plain container: a button role would make its list and any rich
 				text link presentational, so neither would reach assistive technology. The title
 				below is the real control; clicking the card is a convenience on top. -->
 			<div v-for="card in cards"
 				:key="card.id"
 				class="layout-card"
+				:class="{ 'layout-card--no-image': !card.previewUrl }"
 				:data-cy="`${currentLayout}LayoutCard`"
 				@click="activateCard(card.id, $event)">
 				<div class="layout-card__image-wrapper">
@@ -204,6 +205,7 @@ export default {
 			pageNumber: 1,
 			rowsPerPage: 100,
 			cardTitleLines: 2,
+			cardTitleLinesFull: 2,
 			pendingTitleMeasure: null,
 			rowAnimation: false,
 			pinnedColumnId: null,
@@ -372,6 +374,8 @@ export default {
 			const available = Math.min(imageHeight, Math.max(imageHeight * share, keepMinimum)) - padding
 			const lines = Math.floor(available / lineHeight)
 			this.cardTitleLines = Math.min(MAX_TITLE_LINES, Math.max(1, lines))
+			// A card without an image gives its title the whole box.
+			this.cardTitleLinesFull = Math.max(1, Math.floor((imageHeight - padding) / lineHeight))
 		},
 
 		measureColumnWidths() {
@@ -494,8 +498,8 @@ export default {
 			return this.columns.find(column => column.id === preferredColumnId) ?? this.columns[1] ?? this.columns[0] ?? null
 		},
 		getBackgroundColumn() {
-			// No fallback: a card without a configured background shows no image, which is what
-			// hasCardBackground reports to the styling.
+			// No fallback: a card without a configured background shows no image, and its title
+			// then fills the card.
 			const preferredColumnId = this.viewSettings?.cardBackgroundSource
 			return this.columns.find(column => column.id === preferredColumnId) ?? null
 		},
@@ -645,15 +649,16 @@ export default {
 	overflow: hidden;
 }
 
-.card-layout--no-image .layout-card__title-banner {
+/* Without an image the title fills the box instead of sitting in a banner at its foot. */
+.layout-card--no-image .layout-card__title-banner {
+	top: 0;
 	background: transparent;
 	color: var(--color-main-text);
 	text-shadow: none;
 }
 
-.card-layout--tiles.card-layout--no-image .layout-card__title-banner {
-	top: 0;
-	bottom: auto;
+.layout-card--no-image .layout-card__title-text {
+	-webkit-line-clamp: var(--card-title-lines-full, 2);
 }
 
 .layout-card__open {

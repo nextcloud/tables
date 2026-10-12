@@ -134,11 +134,20 @@
 		<div v-if="canManageTable(view)" class="row sticky">
 			<div class="fix-col-4 space-T end">
 				<div style="padding-right: var(--default-grid-baseline);">
-					<NcButton v-if="!localLoading && !createView" type="secondary" :aria-label="createNewViewText" @click="createNewView()">
+					<NcButton v-if="!localLoading && !createView"
+						type="secondary"
+						:aria-label="createNewViewText"
+						:disabled="isTitleMissing"
+						@click="createNewView()">
 						{{ createNewViewText }}
 					</NcButton>
 				</div>
-				<NcButton v-if="!localLoading" type="primary" :aria-label="saveText" data-cy="modifyViewBtn" @click="saveView()">
+				<NcButton v-if="!localLoading"
+					type="primary"
+					:aria-label="saveText"
+					:disabled="isTitleMissing"
+					data-cy="modifyViewBtn"
+					@click="saveView()">
 					{{ saveText }}
 				</NcButton>
 			</div>
@@ -245,6 +254,10 @@ export default {
 			set(filters) {
 				this.mutableView.filter = filters
 			},
+		},
+		// The server trims the title before it checks it, so a blank title is missing too.
+		isTitleMissing() {
+			return this.title.trim() === ''
 		},
 		showTechnicalNameWarning() {
 			return !this.createView && this.technicalName !== this.originalTechnicalName
@@ -398,11 +411,12 @@ export default {
 			}
 		},
 		async saveView() {
-			if (this.title === '') {
+			if (this.isTitleMissing) {
 				let titleErrorText = this.createView ? t('tables', 'Cannot create view.') : t('tables', 'Cannot update view.')
 				titleErrorText += ' ' + t('tables', 'Title is missing.')
 				showError(titleErrorText)
 				this.errorTitle = true
+				return
 			}
 
 			if (!this.isTechnicalNameValid()) {
@@ -425,9 +439,10 @@ export default {
 			}
 		},
 		async createNewView() {
-			if (this.title === '') {
+			if (this.isTitleMissing) {
 				showError(t('tables', 'Cannot create view.') + ' ' + t('tables', 'Title is missing.'))
 				this.errorTitle = true
+				return
 			}
 
 			if (this.technicalName === this.originalTechnicalName) {
