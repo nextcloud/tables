@@ -158,7 +158,7 @@ class ActivityManager {
 			$objectTitle = $object->getTitle();
 			$table = $object;
 		} elseif ($object instanceof View) {
-			if ($object->getTableId() === null) {
+			if ($object->isStandalone()) {
 				// activities are attached to a table, a view without one has no stream
 				return null;
 			}

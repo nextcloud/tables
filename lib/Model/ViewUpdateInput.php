@@ -13,6 +13,7 @@ use Generator;
 use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ViewUpdatableParameters;
+use OCA\Tables\Db\View;
 use OCA\Tables\Service\ValueObject\Emoji;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -77,7 +78,7 @@ class ViewUpdateInput {
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'contains-item'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float|list<array{id: int, label: string, uuid?: string}>}>>,
 	 *     sidebarOrder?: int,
-	 *     type?: string
+	 *     type?: 'table'|'grid'
 	 * } $data
 	 * @param array $columnsMap
 	 */
@@ -106,7 +107,7 @@ class ViewUpdateInput {
 			filterSet: isset($data['filter']) ? FilterSet::createFromInputArray($data['filter'], $columnsMap) : null,
 			sortRuleSet: isset($data['sort']) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
 			sidebarOrder: (array_key_exists('sidebarOrder', $data) && $data['sidebarOrder'] !== null) ? (int)$data['sidebarOrder'] : null,
-			type: self::optionalString($data, 'type'),
+			type: self::optionalType($data),
 		);
 	}
 
@@ -121,6 +122,17 @@ class ViewUpdateInput {
 			throw new InvalidArgumentException('The view property "' . $key . '" must be a string.');
 		}
 		return $data[$key];
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	private static function optionalType(array $data): ?string {
+		$type = self::optionalString($data, 'type');
+		if ($type !== null && !in_array($type, View::TYPES, true)) {
+			throw new InvalidArgumentException('Unknown view type "' . $type . '", expected one of: ' . implode(', ', View::TYPES) . '.');
+		}
+		return $type;
 	}
 
 	protected static function transformJsonToArrayInPayload(array $input, array $keys): array {

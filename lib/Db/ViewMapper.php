@@ -90,7 +90,8 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
-	 * Views that live without a table and belong to the given user.
+	 * Views that live without a table and belong to the given user. Federated views have no
+	 * table either, so they are left out by their external id.
 	 *
 	 * @return View[]
 	 * @throws Exception
@@ -100,6 +101,7 @@ class ViewMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->isNull('table_id'))
+			->andWhere($qb->expr()->isNull('external_id'))
 			->andWhere($qb->expr()->eq('created_by', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
 			->orderBy('id', 'ASC');
 		return $this->findEntities($qb);

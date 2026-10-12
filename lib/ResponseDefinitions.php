@@ -45,7 +45,7 @@ namespace OCA\Tables;
  *  rowsCount: int,
  *  isFederated: bool,
  *  sidebarOrder: int|null,
- *  type: string,
+ *  type: 'table'|'grid',
  * }
  *
  * @psalm-type TablesTable = array{

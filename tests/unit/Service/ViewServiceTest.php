@@ -92,14 +92,6 @@ class ViewServiceTest extends TestCase {
 		$this->assertSame([['columnId' => 3, 'mode' => 'ASC']], $updated->getSortArray());
 	}
 
-	public function testUpdateRejectsAnUnknownType(): void {
-		$this->expectUpdateOf($this->storedView());
-
-		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('Unknown view type');
-		$this->service->update(6, ViewUpdateInput::fromInputArray(['type' => 'kanban']), 'alice', true);
-	}
-
 	public function testUpdateRefusesToTurnATablelessViewIntoATableView(): void {
 		$this->expectUpdateOf($this->storedView(null));
 

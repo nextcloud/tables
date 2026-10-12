@@ -285,7 +285,7 @@ class ViewService extends SuperService {
 				}
 
 				if ($parameter === ViewUpdatableParameters::TYPE) {
-					$this->assertTypeValid($value);
+					// the value is validated by ViewUpdateInput; this rule needs the stored view
 					if ($value === View::TYPE_TABLE && $view->getTableId() === null) {
 						throw new BadRequestError('A view without a table cannot become a table view.');
 					}
@@ -450,7 +450,7 @@ class ViewService extends SuperService {
 
 		$this->setIsSharedState($view, $userId);
 
-		if ($view->getTableId() === null) {
+		if ($view->isStandalone()) {
 			return;
 		}
 
@@ -523,7 +523,7 @@ class ViewService extends SuperService {
 					$view->setIsShared(true);
 					$canManageTable = false;
 					try {
-						if ($view->getTableId() === null) {
+						if ($view->isStandalone()) {
 							throw new NotFoundError('The view has no table');
 						}
 						try {

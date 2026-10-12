@@ -17,7 +17,8 @@ use OCP\Migration\SimpleMigrationStep;
 use Override;
 
 /**
- * Views get a type (table, grid) and may exist without a table.
+ * Views get a type (table, grid). table_id is already nullable for federated views
+ * (Version2203Date20260821000000), so a view without a table needs no schema change.
  */
 class Version2400Date20261012000000 extends SimpleMigrationStep {
 	#[Override]
@@ -34,8 +35,6 @@ class Version2400Date20261012000000 extends SimpleMigrationStep {
 					'length' => 16,
 				]);
 			}
-			// A grid view does not need a table
-			$table->getColumn('table_id')->setNotnull(false);
 		}
 
 		return $schema;
