@@ -13,11 +13,13 @@
 namespace OCA\Tables;
 
 /**
+ * @psalm-type TablesGridWidgetValue = string|bool|int|array{type: 'table'|'view', id: int}|null
+ *
  * @psalm-type TablesGridWidget = array{
  *  id: string,
  *  type: string,
- *  configuration: array<string, mixed>,
- *  content: array<string, mixed>,
+ *  configuration: array<string, TablesGridWidgetValue>,
+ *  content: array<string, TablesGridWidgetValue>,
  * }
  *
  * @psalm-type TablesGridLayoutItem = array{

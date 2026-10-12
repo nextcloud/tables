@@ -383,16 +383,51 @@
                     "configuration": {
                         "type": "object",
                         "additionalProperties": {
-                            "type": "object"
+                            "$ref": "#/components/schemas/GridWidgetValue"
                         }
                     },
                     "content": {
                         "type": "object",
                         "additionalProperties": {
-                            "type": "object"
+                            "$ref": "#/components/schemas/GridWidgetValue"
                         }
                     }
                 }
+            },
+            "GridWidgetValue": {
+                "nullable": true,
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "id"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "table",
+                                    "view"
+                                ]
+                            },
+                            "id": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                ]
             },
             "ImportState": {
                 "type": "object",

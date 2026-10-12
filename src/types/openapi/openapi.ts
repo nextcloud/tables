@@ -1178,12 +1178,18 @@ export type components = {
             readonly id: string;
             readonly type: string;
             readonly configuration: {
-                readonly [key: string]: Record<string, never>;
+                readonly [key: string]: components["schemas"]["GridWidgetValue"];
             };
             readonly content: {
-                readonly [key: string]: Record<string, never>;
+                readonly [key: string]: components["schemas"]["GridWidgetValue"];
             };
         };
+        readonly GridWidgetValue: (string | boolean | number | {
+            /** @enum {string} */
+            readonly type: "table" | "view";
+            /** Format: int64 */
+            readonly id: number;
+        }) | null;
         readonly ImportState: {
             /** Format: int64 */
             readonly found_columns_count: number;

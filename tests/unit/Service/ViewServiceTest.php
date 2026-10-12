@@ -11,6 +11,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
@@ -61,7 +62,7 @@ class ViewServiceTest extends TestCase {
 			$l10n,
 			$this->createMock(FederationService::class),
 			$this->activityManager,
-			new GridWidgetTypes($l10n, $this->mapper),
+			new GridWidgetTypes($l10n, $this->mapper, $this->createMock(TableMapper::class), $this->permissionsService),
 		);
 	}
 
@@ -99,6 +100,31 @@ class ViewServiceTest extends TestCase {
 		$this->assertSame('left', $stored['widgets'][0]['content']['textAlign'], 'defaults are filled in');
 		$this->assertArrayNotHasKey('stray', $stored['widgets'][0]['content'], 'unknown properties are dropped');
 		$this->assertSame(['title' => '', 'showTitle' => false], $stored['widgets'][0]['configuration'], 'the configuration is filled from the type');
+	}
+
+	public function testUpdateRefusesAGridOnATableView(): void {
+		$this->expectUpdateOf($this->storedView(4));
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('Only a grid view holds a grid');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode(['widgets' => [], 'layout' => []])]), 'alice', true);
+	}
+
+	public function testUpdateAcceptsTheGridTypeAndAGridInOneRequest(): void {
+		$this->expectUpdateOf($this->storedView(4));
+
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['type' => 'grid', 'grid' => json_encode(['widgets' => [], 'layout' => []])]), 'alice', true);
+
+		$this->assertSame(['widgets' => [], 'layout' => []], $updated->getGridArray());
+	}
+
+	public function testUpdateRefusesAGridThatCannotBeEncodedInsteadOfWipingIt(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text', 'content' => ['text' => "\xFF"]]], 'layout' => []];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('"grid" cannot be stored');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => $grid]), 'alice', true);
 	}
 
 	public function testUpdateWritesEveryParameterToItsOwnColumn(): void {

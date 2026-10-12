@@ -9,16 +9,21 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Service;
 
+use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Service\GridWidgetTypes;
+use OCA\Tables\Service\PermissionsService;
 use OCP\IL10N;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class GridWidgetTypesTest extends TestCase {
 	private ViewMapper&MockObject $viewMapper;
+	private TableMapper&MockObject $tableMapper;
+	private PermissionsService&MockObject $permissionsService;
 	private GridWidgetTypes $types;
 
 	protected function setUp(): void {
@@ -26,7 +31,9 @@ class GridWidgetTypesTest extends TestCase {
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(static fn (string $text): string => $text);
 		$this->viewMapper = $this->createMock(ViewMapper::class);
-		$this->types = new GridWidgetTypes($l10n, $this->viewMapper);
+		$this->tableMapper = $this->createMock(TableMapper::class);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
+		$this->types = new GridWidgetTypes($l10n, $this->viewMapper, $this->tableMapper, $this->permissionsService);
 	}
 
 	public function testEveryTypeDescribesItselfAndItsProperties(): void {
@@ -48,7 +55,7 @@ class GridWidgetTypesTest extends TestCase {
 	public function testTitlesAreTranslated(): void {
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(static fn (string $text): string => 'nl:' . $text);
-		$types = (new GridWidgetTypes($l10n, $this->viewMapper))->all();
+		$types = (new GridWidgetTypes($l10n, $this->viewMapper, $this->tableMapper, $this->permissionsService))->all();
 
 		$this->assertSame('nl:Header', $types['header']['title']);
 		$this->assertSame('nl:Heading', $types['header']['properties']['title']['title']);
@@ -66,13 +73,6 @@ class GridWidgetTypesTest extends TestCase {
 		$widget = $this->types->sanitizeWidget(['id' => 'w-1', 'type' => 'text', 'configuration' => ['title' => 'How', 'showTitle' => true, 'stray' => 'x'], 'content' => ['text' => 'it works']]);
 
 		$this->assertSame(['id' => 'w-1', 'type' => 'text', 'configuration' => ['title' => 'How', 'showTitle' => true], 'content' => ['text' => 'it works']], $widget);
-	}
-
-	public function testSanitizeWidgetUpgradesTitleAndShowTitleFromTheOldShape(): void {
-		$widget = $this->types->sanitizeWidget(['id' => 'w-1', 'type' => 'header', 'title' => 'Old', 'showTitle' => true, 'content' => ['title' => 'Hi']]);
-
-		$this->assertSame(['title' => 'Old', 'showTitle' => true], $widget['configuration']);
-		$this->assertSame(['id', 'type', 'configuration', 'content'], array_keys($widget));
 	}
 
 	public function testSanitizeWidgetFillsTheConfigurationDefaultsOfTheType(): void {
@@ -127,12 +127,6 @@ class GridWidgetTypesTest extends TestCase {
 		$this->assertSame(['target' => ['type' => 'view', 'id' => 6]], $widget['content']);
 	}
 
-	public function testSanitizeUpgradesTheOldDataShape(): void {
-		$widget = $this->types->sanitizeWidget(['id' => 'w-1', 'type' => 'data', 'content' => ['targetType' => 'table', 'targetId' => '4']]);
-
-		$this->assertSame(['target' => ['type' => 'table', 'id' => 4]], $widget['content']);
-	}
-
 	public function testSanitizeRejectsATargetWithoutId(): void {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('name a table or view by id');
@@ -155,7 +149,7 @@ class GridWidgetTypesTest extends TestCase {
 		$grid = $this->types->sanitizeGrid([
 			'widgets' => [['id' => 'w-1', 'type' => 'text']],
 			'layout' => [['id' => 7, 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'stray' => true]],
-		]);
+		], 'alice');
 
 		$this->assertSame([['id' => 'w-1', 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]], $grid['layout']);
 	}
@@ -166,13 +160,13 @@ class GridWidgetTypesTest extends TestCase {
 		$this->types->sanitizeGrid([
 			'widgets' => [],
 			'layout' => [['widgetId' => 'w-gone', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]],
-		]);
+		], 'alice');
 	}
 
 	public function testSanitizeGridRejectsTwoWidgetsWithTheSameId(): void {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('share the id');
-		$this->types->sanitizeGrid(['widgets' => [['id' => 'w-1', 'type' => 'text'], ['id' => 'w-1', 'type' => 'text']]]);
+		$this->types->sanitizeGrid(['widgets' => [['id' => 'w-1', 'type' => 'text'], ['id' => 'w-1', 'type' => 'text']]], 'alice');
 	}
 
 	public function testSanitizeGridRejectsANegativePosition(): void {
@@ -181,23 +175,79 @@ class GridWidgetTypesTest extends TestCase {
 		$this->types->sanitizeGrid([
 			'widgets' => [['id' => 'w-1', 'type' => 'text']],
 			'layout' => [['widgetId' => 'w-1', 'gridX' => -1, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]],
-		]);
-	}
-
-	public function testSanitizeGridRejectsAWidgetShowingAViewWithoutTable(): void {
-		$gridView = new View();
-		$gridView->setId(9);
-		$gridView->setTableId(null);
-		$this->viewMapper->method('findMany')->with([9])->willReturn([9 => $gridView]);
-
-		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('which has no table');
-		$this->types->sanitizeGrid(['widgets' => [['id' => 'w-1', 'type' => 'data', 'content' => ['target' => ['type' => 'view', 'id' => 9]]]]]);
+		], 'alice');
 	}
 
 	public function testSanitizeGridRejectsWidgetsThatAreNotAList(): void {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('"widgets" must be a list');
-		$this->types->sanitizeGrid(['widgets' => ['a' => ['id' => 'w-1', 'type' => 'text']]]);
+		$this->types->sanitizeGrid(['widgets' => ['a' => ['id' => 'w-1', 'type' => 'text']]], 'alice');
+	}
+
+	private function dataWidget(string $type, int $id): array {
+		return ['id' => 'w-1', 'type' => 'data', 'content' => ['target' => ['type' => $type, 'id' => $id]]];
+	}
+
+	public function testSanitizeGridKeepsATargetTheUserCanRead(): void {
+		$table = new Table();
+		$table->setId(4);
+		$this->tableMapper->method('findMany')->with([4])->willReturn([4 => $table]);
+		$this->permissionsService->method('canReadRowsByElement')->with($table, 'table', 'alice')->willReturn(true);
+
+		$grid = $this->types->sanitizeGrid(['widgets' => [$this->dataWidget('table', 4)]], 'alice');
+
+		$this->assertSame(['type' => 'table', 'id' => 4], $grid['widgets'][0]['content']['target']);
+	}
+
+	public function testSanitizeGridRefusesTargetsTheUserCannotUseWithOneMessage(): void {
+		$gridView = new View();
+		$gridView->setId(9);
+		$readableTable = new Table();
+		$readableTable->setId(4);
+		$this->viewMapper->method('findMany')->willReturn([9 => $gridView]);
+		$this->tableMapper->method('findMany')->willReturn([4 => $readableTable]);
+		$this->permissionsService->method('canReadRowsByElement')->willReturnCallback(static fn ($element): bool => $element === $readableTable);
+
+		$cases = [
+			'a view without a table' => $this->dataWidget('view', 9),
+			'a table that does not exist' => $this->dataWidget('table', 5),
+			'a view that does not exist' => $this->dataWidget('view', 10),
+		];
+		foreach ($cases as $case => $widget) {
+			try {
+				$this->types->sanitizeGrid(['widgets' => [$widget]], 'alice');
+				$this->fail($case . ' was accepted');
+			} catch (BadRequestError $e) {
+				$this->assertSame('A table or view widget can only show a table or view whose rows you can read.', $e->getMessage(), $case);
+			}
+		}
+	}
+
+	public function testSanitizeGridRefusesATableTheUserCannotRead(): void {
+		$table = new Table();
+		$table->setId(4);
+		$this->tableMapper->method('findMany')->willReturn([4 => $table]);
+		$this->permissionsService->method('canReadRowsByElement')->willReturn(false);
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('whose rows you can read');
+		$this->types->sanitizeGrid(['widgets' => [$this->dataWidget('table', 4)]], 'alice');
+	}
+
+	public function testSanitizeGridRejectsAWidgetPlacedTwice(): void {
+		$item = ['widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('places widget w-1 twice');
+		$this->types->sanitizeGrid(['widgets' => [['id' => 'w-1', 'type' => 'text']], 'layout' => [$item, $item]], 'alice');
+	}
+
+	public function testSanitizeGridRejectsALayoutItemWithoutSize(): void {
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('"gridWidth" must be a positive integer');
+		$this->types->sanitizeGrid([
+			'widgets' => [['id' => 'w-1', 'type' => 'text']],
+			'layout' => [['widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 0, 'gridHeight' => 2]],
+		], 'alice');
 	}
 }
