@@ -13,13 +13,16 @@
 			<template v-if="view.emoji">
 				{{ view.emoji }}
 			</template>
+			<template v-else-if="view.type === 'grid'">
+				<ViewDashboardOutline :size="20" />
+			</template>
 			<template v-else>
 				<Table :size="20" />
 			</template>
 		</template>
 		<template #counter>
 			<IconCloudOutline v-if="view.isFederated" :size="20" decorative style="margin-right: 8px;" />
-			<NcCounterBubble v-else-if="canReadData(view)" :count="view.rowsCount" />
+			<NcCounterBubble v-else-if="view.type !== 'grid' && canReadData(view)" :count="view.rowsCount" />
 			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
 			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view) && showShareSender" class="margin-left">
 				<NcAvatar :user="view.ownership" :show-user-status="false" />
@@ -37,7 +40,7 @@
 			</NcActionButton>
 
 			<!-- DUPLICATE -->
-			<NcActionButton v-if="canManageTable(view)"
+			<NcActionButton v-if="view.type !== 'grid' && canManageTable(view)"
 				:close-after-click="true"
 				@click="cloneView">
 				<template #icon>
@@ -55,7 +58,7 @@
 			</NcActionButton>
 
 			<!-- IMPORT -->
-			<NcActionButton v-if="canCreateRowInElement(view)"
+			<NcActionButton v-if="view.type !== 'grid' && canCreateRowInElement(view)"
 				:close-after-click="true"
 				@click="actionShowImport(view)">
 				{{ t('tables', 'Import') }}
@@ -117,6 +120,7 @@
 </template>
 <script>
 import { NcAppNavigationItem, NcActionButton, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
+import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
 import '@nextcloud/dialogs/style.css'
 import { getCurrentUser } from '@nextcloud/auth'
 import { mapState, mapActions } from 'pinia'
@@ -140,6 +144,7 @@ export default {
 	name: 'NavigationViewItem',
 
 	components: {
+		ViewDashboardOutline,
 		IconCloudOutline,
 		ActivityIcon,
 		PlaylistEdit,

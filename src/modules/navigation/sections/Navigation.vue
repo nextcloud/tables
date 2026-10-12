@@ -148,12 +148,12 @@ export default {
 			const sharedTableIds = this.getFilteredTables.map(table => table.id)
 
 			return this.views.filter(view => {
-				return !view.isShared && view.ownership === getCurrentUser().uid && sharedTableIds.includes(view.tableId)
+				return view.type !== 'grid' && !view.isShared && view.ownership === getCurrentUser().uid && sharedTableIds.includes(view.tableId)
 			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
 		getSharedViews() {
 			return this.views.filter(view => {
-				return view.isShared && view.ownership !== getCurrentUser().uid
+				return view.type !== 'grid' && view.isShared && view.ownership !== getCurrentUser().uid
 			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
 		getFavoriteTables() {
