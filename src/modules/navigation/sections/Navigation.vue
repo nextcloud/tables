@@ -59,6 +59,18 @@
 				</NcAppNavigationItem>
 			</ul>
 			<ul v-if="!isLoadingSomething">
+				<NcAppNavigationCaption :name="t('tables', 'Grid views')">
+					<template #actions>
+						<NcActionButton :aria-label="t('tables', 'Create grid view')" icon="icon-add"
+							data-cy="navigationCreateGridViewIcon" @click.prevent="createGridView" />
+					</template>
+				</NcAppNavigationCaption>
+
+				<template v-for="view in getGridViews" :key="'grid-view-' + view.id">
+					<NavigationViewItem :view="view" />
+				</template>
+			</ul>
+			<ul v-if="!isLoadingSomething">
 				<NcAppNavigationCaption :name="t('tables', 'Applications')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create application')" icon="icon-add" data-cy="createContextIcon"
@@ -156,6 +168,12 @@ export default {
 				return view.type !== 'grid' && view.isShared && view.ownership !== getCurrentUser().uid
 			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
+		// Grid views are pages, not data, so they get their own list instead of sitting among the tables
+		getGridViews() {
+			return this.views
+				.filter(view => view.type === 'grid' && view.title.toLowerCase().includes(this.filterString.toLowerCase()))
+				.sort((a, b) => a.title.localeCompare(b.title))
+		},
 		getFavoriteTables() {
 			return this.getAllNodes.filter(node => !node.tableId && node.favorite)
 		},
@@ -205,6 +223,9 @@ export default {
 		},
 		createContext() {
 			emit('tables:context:create')
+		},
+		createGridView() {
+			emit('tables:view:create-grid')
 		},
 		closeNav() {
 			if (window.innerWidth < 960) {

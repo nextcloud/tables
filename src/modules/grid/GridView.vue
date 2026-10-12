@@ -3,10 +3,10 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="grid-view" data-cy="grid-view">
+	<div class="grid-view" data-cy="gridView">
 		<div class="grid-view__header">
 			<div class="grid-view__heading">
-				<h1 v-if="showTitle" class="grid-view__title" data-cy="grid-view-title">
+				<h1 v-if="showTitle" class="grid-view__title" data-cy="gridViewHeading">
 					{{ view.emoji }} {{ view.title }}
 				</h1>
 				<p v-if="showTitle && view.description" class="grid-view__description">
@@ -15,23 +15,23 @@
 			</div>
 			<div v-if="canEdit" class="grid-view__actions">
 				<template v-if="isEditing">
-					<NcButton variant="secondary" data-cy="grid-view-add-widget" @click="openAddWidget">
+					<NcButton variant="secondary" data-cy="gridViewAddWidget" @click="openAddWidget">
 						<template #icon>
 							<Plus :size="20" />
 						</template>
 						{{ t('tables', 'Add widget') }}
 					</NcButton>
-					<NcButton variant="tertiary" data-cy="grid-view-cancel" @click="cancelEditing">
+					<NcButton variant="tertiary" data-cy="gridViewCancel" @click="cancelEditing">
 						{{ t('tables', 'Cancel') }}
 					</NcButton>
-					<NcButton variant="primary" :disabled="saving" data-cy="grid-view-save" @click="save">
+					<NcButton variant="primary" :disabled="saving" data-cy="gridViewSave" @click="save">
 						<template #icon>
 							<ContentSaveOutline :size="20" />
 						</template>
 						{{ t('tables', 'Save') }}
 					</NcButton>
 				</template>
-				<NcButton v-else variant="secondary" data-cy="grid-view-edit" @click="startEditing">
+				<NcButton v-else variant="secondary" data-cy="gridViewEdit" @click="startEditing">
 					<template #icon>
 						<PencilOutline :size="20" />
 					</template>
@@ -55,10 +55,12 @@
 		</NcEmptyContent>
 
 		<GridCanvas :layout="activeGrid.layout" :editable="isEditing" @layout-change="onLayoutChange">
-			<template #widget="{ item }">
+			<template #widget="{ item, narrow }">
 				<GridWidget v-if="widgetsById[item.widgetId]"
 					:widget="widgetsById[item.widgetId]"
+					:layout-item="item"
 					:editable="isEditing"
+					:arrangeable="!narrow"
 					@configure="configureWidget"
 					@remove="removeWidget"
 					@move="moveWidget" />
@@ -74,17 +76,19 @@
 
 <script>
 import { NcButton, NcEmptyContent } from '@nextcloud/vue'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showConfirmation, showSuccess } from '@nextcloud/dialogs'
 import ContentSaveOutline from 'vue-material-design-icons/ContentSaveOutline.vue'
 import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
+import { getCurrentInstance } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { mapActions, mapState } from 'pinia'
 import GridCanvas from './GridCanvas.vue'
 import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, emptyGrid, findWidgetType, nextFreeRow } from './widgetRegistry.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, emptyGrid, findWidgetType, nextFreeRow } from './gridLayout.js'
 
 /**
  * A grid view: its widgets on a grid, with an edit mode that saves the whole grid at once.
@@ -116,6 +120,13 @@ export default {
 			default: true,
 		},
 	},
+	setup() {
+		// Leaving the page, or switching to another view, asks first while the grid has unsaved changes
+		const instance = getCurrentInstance()
+		const confirmLeave = () => instance.proxy.confirmDiscard()
+		onBeforeRouteLeave(confirmLeave)
+		onBeforeRouteUpdate(confirmLeave)
+	},
 	data() {
 		return {
 			draftGrid: null,
@@ -135,6 +146,9 @@ export default {
 		isEditing() {
 			return this.draftGrid !== null
 		},
+		hasUnsavedChanges() {
+			return this.isEditing && JSON.stringify(this.draftGrid) !== JSON.stringify(cloneGrid(this.storedGrid))
+		},
 		widgetsById() {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.id, widget]))
 		},
@@ -144,32 +158,96 @@ export default {
 			this.draftGrid = null
 		},
 	},
+	mounted() {
+		window.addEventListener('beforeunload', this.warnBeforeUnload)
+	},
+	beforeUnmount() {
+		window.removeEventListener('beforeunload', this.warnBeforeUnload)
+	},
 	methods: {
 		...mapActions(useTablesStore, ['updateView']),
+		/**
+		 * Asks whether unsaved changes may be discarded.
+		 *
+		 * @return {Promise<boolean>} true when there is nothing to lose or the user agrees
+		 */
+		async confirmDiscard() {
+			if (!this.hasUnsavedChanges) {
+				return true
+			}
+			try {
+				return await showConfirmation({
+					name: t('tables', 'Discard unsaved changes?'),
+					text: t('tables', 'This page has changes that are not saved yet.'),
+					labelConfirm: t('tables', 'Discard changes'),
+					labelReject: t('tables', 'Keep editing'),
+				})
+			} catch {
+				// Closing the dialog keeps the changes
+				return false
+			}
+		},
+		/**
+		 * Lets the browser warn before the tab closes or reloads with unsaved changes.
+		 *
+		 * @param {BeforeUnloadEvent} event the unload event
+		 */
+		warnBeforeUnload(event) {
+			if (this.hasUnsavedChanges) {
+				event.preventDefault()
+			}
+		},
+		/**
+		 * Starts editing on a copy of the stored grid.
+		 */
 		startEditing() {
 			this.draftGrid = cloneGrid(this.storedGrid)
 		},
+		/**
+		 * Leaves edit mode and drops the draft.
+		 */
 		cancelEditing() {
 			this.draftGrid = null
 		},
+		/**
+		 * Takes over the layout after a drag or resize.
+		 *
+		 * @param {Array} layout the new layout
+		 */
 		onLayoutChange(layout) {
 			if (!this.isEditing) {
 				return
 			}
 			this.draftGrid = { ...this.draftGrid, layout }
 		},
+		/**
+		 * Opens the dialog for a new widget.
+		 */
 		openAddWidget() {
 			this.widgetBeingConfigured = null
 			this.addWidgetOpen = true
 		},
+		/**
+		 * Closes the widget dialog.
+		 */
 		closeAddWidget() {
 			this.addWidgetOpen = false
 			this.widgetBeingConfigured = null
 		},
+		/**
+		 * Opens the dialog for a widget on the grid.
+		 *
+		 * @param {object} widget the widget to configure
+		 */
 		configureWidget(widget) {
 			this.widgetBeingConfigured = widget
 			this.addWidgetOpen = true
 		},
+		/**
+		 * Updates the configured widget, or places a new one below the others.
+		 *
+		 * @param {{type: string, configuration: object, content: object}} payload the widget from the dialog
+		 */
 		onWidgetSubmit(payload) {
 			if (this.widgetBeingConfigured) {
 				this.draftGrid = {
@@ -221,12 +299,20 @@ export default {
 				}),
 			}
 		},
+		/**
+		 * Removes a widget and its place on the grid.
+		 *
+		 * @param {object} widget the widget to remove
+		 */
 		removeWidget(widget) {
 			this.draftGrid = {
 				widgets: this.draftGrid.widgets.filter(item => item.id !== widget.id),
 				layout: this.draftGrid.layout.filter(item => item.widgetId !== widget.id),
 			}
 		},
+		/**
+		 * Saves the whole grid at once.
+		 */
 		async save() {
 			if (!this.isEditing) {
 				return
@@ -238,11 +324,10 @@ export default {
 				data: { data: { grid: JSON.stringify(grid) } },
 			})
 			this.saving = false
+			// A failed save is already reported by the store
 			if (success) {
 				this.draftGrid = null
 				showSuccess(t('tables', 'Page saved'))
-			} else {
-				showError(t('tables', 'The page could not be saved'))
 			}
 		},
 	},
@@ -252,14 +337,14 @@ export default {
 <style lang="scss" scoped>
 .grid-view {
 	width: 100%;
-	padding: calc(4 * var(--default-grid-baseline, 4px));
+	padding: calc(4 * var(--default-grid-baseline));
 
 	&__header {
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
-		gap: calc(4 * var(--default-grid-baseline, 4px));
-		margin-bottom: calc(4 * var(--default-grid-baseline, 4px));
+		gap: calc(4 * var(--default-grid-baseline));
+		margin-bottom: calc(4 * var(--default-grid-baseline));
 	}
 
 	&__title {
@@ -267,14 +352,14 @@ export default {
 	}
 
 	&__description {
-		margin: calc(1 * var(--default-grid-baseline, 4px)) 0 0;
+		margin: var(--default-grid-baseline) 0 0;
 		color: var(--color-text-maxcontrast);
 	}
 
 	&__actions {
 		display: flex;
 		align-items: center;
-		gap: calc(2 * var(--default-grid-baseline, 4px));
+		gap: calc(2 * var(--default-grid-baseline));
 		flex-shrink: 0;
 	}
 

@@ -38,8 +38,6 @@
 		<GridViewSettings
 			:show-modal="gridView !== null"
 			:view="gridView?.view ?? null"
-			:context-id="gridView?.contextId ?? null"
-			@created="payload => emitGridViewCreated(payload)"
 			@close="gridView = null" />
 
 		<Import
@@ -66,7 +64,6 @@
 
 <script>
 
-import { emit } from '@nextcloud/event-bus'
 import { useEventBusSubscriptions } from '../../shared/composables/useEventBusSubscriptions.js'
 import CreateRow from './CreateRow.vue'
 import ImportScheme from './ImportScheme.vue'
@@ -157,12 +154,12 @@ export default {
 		this.subscribeToEventBus('tables:view:reload', () => { this.reload(true) })
 		this.subscribeToEventBus('tables:view:edit', view => {
 			if (view?.view?.type === 'grid') {
-				this.gridView = { view: view.view, contextId: null }
+				this.gridView = { view: view.view }
 				return
 			}
 			this.viewToEdit = { ...view, createView: false }
 		})
-		this.subscribeToEventBus('tables:view:create-grid', payload => { this.gridView = { view: null, contextId: payload?.contextId ?? null } })
+		this.subscribeToEventBus('tables:view:create-grid', () => { this.gridView = { view: null } })
 		this.subscribeToEventBus('tables:view:create', tableInfos => {
 			this.viewToEdit = {
 				view: { tableId: tableInfos.tableId, sort: [], filter: [] },
@@ -199,9 +196,6 @@ export default {
 
 	},
 	methods: {
-		emitGridViewCreated(payload) {
-			emit('tables:view:grid-created', payload)
-		},
 		onSaveNewColumn(event) {
 			if (this.createColumnInfo?.onSave) {
 				this.createColumnInfo.onSave(event)

@@ -162,10 +162,10 @@ export const useTablesStore = defineStore('store', {
 						views = views.concat(table.views)
 					}
 				})
-				// shared views and views without a table are loaded separately and must survive this reload
+				// Shared views and grid views are loaded separately and must survive this reload;
+				// a view of a table that is gone or no longer shared is dropped as before
 				const loadedIds = new Set(views.map(view => view.id))
-				const loadedTableIds = new Set(res.data.map(table => table.id))
-				const keptViews = this.views.filter(view => !loadedIds.has(view.id) && !loadedTableIds.has(view.tableId))
+				const keptViews = this.views.filter(view => !loadedIds.has(view.id) && (view.isShared || view.type === 'grid'))
 				this.setViews([...views, ...keptViews])
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
