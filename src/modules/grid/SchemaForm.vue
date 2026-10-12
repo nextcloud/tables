@@ -22,9 +22,12 @@
 				class="schema-form__input"
 				:model-value="String(value(name) ?? '')"
 				:label="label(property)"
+				:error="invalidIntegers.includes(name)"
+				:helper-text="invalidIntegers.includes(name) ? t('tables', 'Enter a whole number') : ''"
 				type="number"
-				@update:model-value="text => set(name, text === '' ? null : parseInt(text))" />
+				@update:model-value="text => setInteger(name, text)" />
 			<NcCheckboxRadioSwitch v-else-if="property.type === 'boolean'"
+				type="switch"
 				:model-value="!!value(name)"
 				@update:model-value="checked => set(name, checked)">
 				{{ label(property) }}
@@ -53,7 +56,7 @@
 					@update:model-value="color => set(name, color ?? '')">
 					<NcButton variant="secondary">
 						<template #icon>
-							<span class="schema-form__swatch" :style="{ backgroundColor: colorValue(name) ?? 'var(--color-primary-element-light)' }" />
+							<span class="schema-form__swatch" :style="{ backgroundColor: colorValue(name) ?? 'transparent' }" />
 						</template>
 						{{ label(property) }}
 					</NcButton>
@@ -95,6 +98,11 @@ export default {
 		},
 	},
 	emits: ['update:modelValue'],
+	data() {
+		return {
+			invalidIntegers: [],
+		}
+	},
 	computed: {
 		...mapState(useTablesStore, ['tables', 'views']),
 		targetOptions() {
@@ -110,7 +118,7 @@ export default {
 					id: 'view-' + view.id,
 					targetType: 'view',
 					targetId: view.id,
-					label: (view.emoji ? view.emoji + ' ' : '') + view.title + ' (' + t('tables', 'view') + ')',
+					label: t('tables', '{title} (view)', { title: (view.emoji ? view.emoji + ' ' : '') + view.title }),
 				}))
 			return [...tables, ...views]
 		},
@@ -121,6 +129,21 @@ export default {
 		},
 		set(name, value) {
 			this.$emit('update:modelValue', { ...this.modelValue, [name]: value })
+		},
+		/**
+		 * Stores a whole number, or nothing for an empty field. Anything else is marked
+		 * invalid instead of being rounded.
+		 *
+		 * @param {string} name property name
+		 * @param {string} text what was typed
+		 */
+		setInteger(name, text) {
+			const number = Number(text)
+			const isValid = text === '' || Number.isInteger(number)
+			this.invalidIntegers = isValid ? this.invalidIntegers.filter(invalid => invalid !== name) : [...new Set([...this.invalidIntegers, name])]
+			if (isValid) {
+				this.set(name, text === '' ? null : number)
+			}
 		},
 		label(property) {
 			return property.title
@@ -148,7 +171,7 @@ export default {
 <style lang="scss" scoped>
 .schema-form {
 	&__field {
-		margin-top: calc(2 * var(--default-grid-baseline, 4px));
+		margin-top: calc(2 * var(--default-grid-baseline));
 	}
 
 	&__input {
@@ -158,13 +181,13 @@ export default {
 	&__color {
 		display: flex;
 		align-items: center;
-		gap: calc(3 * var(--default-grid-baseline, 4px));
+		gap: calc(3 * var(--default-grid-baseline));
 	}
 
 	&__swatch {
 		display: inline-block;
-		width: calc(5 * var(--default-grid-baseline, 4px));
-		height: calc(5 * var(--default-grid-baseline, 4px));
+		width: calc(5 * var(--default-grid-baseline));
+		height: calc(5 * var(--default-grid-baseline));
 		border: 1px solid var(--color-border-dark);
 		border-radius: var(--border-radius);
 	}
