@@ -10,14 +10,15 @@
 		@closing="$emit('close')">
 		<div class="modal__content">
 			<div class="row space-T">
-				<NcSelect v-model="selectedType"
+				<NcSelect :model-value="selectedType"
 					class="add-widget__input"
 					:input-label="t('tables', 'Widget type')"
 					:options="typeOptions"
 					:clearable="false"
 					:disabled="editingWidget !== null"
 					label="label"
-					data-cy="addWidgetType" />
+					data-cy="addWidgetType"
+					@update:model-value="selectType" />
 			</div>
 
 			<div class="row space-T">
@@ -29,25 +30,25 @@
 				</NcCheckboxRadioSwitch>
 			</div>
 
-			<SchemaForm v-if="widgetType" v-model="content" :properties="widgetType.properties" />
-
-			<div class="row space-T">
-				<div class="fix-col-4 end">
-					<NcButton variant="primary" :disabled="!canSubmit" data-cy="addWidgetSubmit" @click="submit">
-						{{ editingWidget ? t('tables', 'Save widget') : t('tables', 'Add widget') }}
-					</NcButton>
-				</div>
-			</div>
+			<SchemaForm v-if="widgetType"
+				v-model="content"
+				:properties="widgetType.properties"
+				@validity="isValid => formIsValid = isValid" />
 		</div>
+		<template #actions>
+			<NcButton variant="primary" :disabled="!canSubmit" data-cy="addWidgetSubmit" @click="submit">
+				{{ editingWidget ? t('tables', 'Save widget') : t('tables', 'Add widget') }}
+			</NcButton>
+		</template>
 	</NcDialog>
 </template>
 
 <script>
 import { NcButton, NcCheckboxRadioSwitch, NcDialog, NcSelect, NcTextField } from '@nextcloud/vue'
-import { mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import SchemaForm from '../grid/SchemaForm.vue'
 import { useTablesStore } from '../../store/store.js'
-import { defaultConfiguration, defaultContent, findWidgetType } from '../grid/widgetRegistry.js'
+import { defaultConfiguration, defaultContent, findWidgetType } from '../grid/gridLayout.js'
 
 /**
  * Collects the type, configuration and content of a widget; the content form comes
@@ -80,6 +81,7 @@ export default {
 			title: '',
 			showTitle: false,
 			content: {},
+			formIsValid: true,
 		}
 	},
 	computed: {
@@ -91,7 +93,7 @@ export default {
 			return findWidgetType(this.widgetTypes, this.selectedType?.id)
 		},
 		canSubmit() {
-			if (!this.widgetType) {
+			if (!this.widgetType || !this.formIsValid) {
 				return false
 			}
 			return Object.entries(this.widgetType.properties).every(([name, property]) => {
@@ -109,34 +111,50 @@ export default {
 				this.reset()
 			}
 		},
-		selectedType(option, previous) {
-			if (option && previous && option.id !== previous.id && this.widgetType) {
-				this.content = defaultContent(this.widgetType)
-				this.showTitle = defaultConfiguration(this.widgetType).showTitle ?? false
-			}
-		},
 	},
 	methods: {
-		reset() {
+		...mapActions(useTablesStore, ['loadWidgetTypes']),
+		/**
+		 * Fills the form for a new widget, or with the widget being configured. A widget of a type
+		 * the server does not know keeps no type here, so it can never be saved as another one.
+		 */
+		async reset() {
+			// Awaited only when the types are missing, so the common case fills the form before it renders
+			if (this.widgetTypes.length === 0) {
+				await this.loadWidgetTypes()
+			}
 			if (this.editingWidget) {
-				this.selectedType = this.typeOptions.find(option => option.id === this.editingWidget.type) ?? this.typeOptions[0]
+				this.selectedType = this.typeOptions.find(option => option.id === this.editingWidget.type) ?? null
 				this.title = this.editingWidget.configuration?.title ?? ''
 				this.showTitle = !!this.editingWidget.configuration?.showTitle
 				this.content = { ...defaultContent(this.widgetType), ...JSON.parse(JSON.stringify(this.editingWidget.content ?? {})) }
 				return
 			}
-			this.selectedType = this.typeOptions[0] ?? null
 			this.title = ''
+			this.selectType(this.typeOptions[0] ?? null)
+		},
+		/**
+		 * A type the user picks starts from the defaults of that type. Only this resets the form,
+		 * so loading a widget to configure keeps its content.
+		 *
+		 * @param {object|null} option the picked type
+		 */
+		selectType(option) {
+			this.selectedType = option
 			this.showTitle = defaultConfiguration(this.widgetType).showTitle ?? false
 			this.content = defaultContent(this.widgetType)
 		},
+		/**
+		 * Hands the widget to the parent, which places it on the grid.
+		 */
 		submit() {
 			if (!this.canSubmit) {
 				return
 			}
 			this.$emit('submit', {
 				type: this.widgetType.type,
-				configuration: { title: this.title.trim() || this.widgetType.title, showTitle: this.showTitle },
+				// An empty title stays empty; the card shows the type name in the viewer's language instead
+				configuration: { title: this.title.trim(), showTitle: this.showTitle },
 				content: JSON.parse(JSON.stringify(this.content)),
 			})
 		},

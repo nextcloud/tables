@@ -4,9 +4,17 @@
 -->
 <template>
 	<div class="data-widget">
-		<NcLoadingIcon v-if="loading" :size="32" class="data-widget__loading" />
-		<p v-else-if="!element" class="data-widget__empty">
-			{{ t('tables', 'Pick a table or view in the widget settings') }}
+		<p v-if="widgetBroken" class="data-widget__empty" data-cy="dataWidgetBroken">
+			{{ t('tables', 'This table or view no longer exists') }}
+		</p>
+		<template v-else-if="!target">
+			<p v-if="editable" class="data-widget__empty">
+				{{ t('tables', 'Pick a table or view in the widget settings') }}
+			</p>
+		</template>
+		<NcLoadingIcon v-else-if="loading" :size="32" class="data-widget__loading" />
+		<p v-else-if="!element" class="data-widget__empty" data-cy="dataWidgetLoadFailed">
+			{{ t('tables', 'This table or view could not be loaded') }}
 		</p>
 		<template v-else>
 			<CustomView v-if="isView"
@@ -48,10 +56,19 @@ export default {
 		TableWrapper,
 		CustomView,
 	},
+	inject: {
+		// Set when the server marked the stored target as gone
+		widgetBroken: { default: false },
+	},
 	props: {
 		content: {
 			type: Object,
 			required: true,
+		},
+		// The prompt to pick a target only shows while the page is edited
+		editable: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	setup() {
@@ -69,17 +86,13 @@ export default {
 	computed: {
 		...mapState(useTablesStore, ['tables', 'views']),
 		target() {
-			if (this.content.target) {
-				return this.content.target
-			}
-			// grids saved before the target became one property
-			return this.content.targetType ? { type: this.content.targetType, id: this.content.targetId } : null
+			return this.content.target ?? null
 		},
 		isView() {
 			return this.target?.type === 'view'
 		},
 		targetId() {
-			return parseInt(this.target?.id)
+			return this.target?.id ?? null
 		},
 		element() {
 			if (!this.targetId || this.loadFailed) {
@@ -104,15 +117,25 @@ export default {
 			},
 		},
 	},
+	created() {
+		// Counts the loads, so a load that a newer one overtook leaves the state alone
+		this.loadRequest = 0
+	},
 	mounted() {
 		this.load()
 	},
 	methods: {
 		...mapActions(useTablesStore, ['loadContextTable', 'loadContextView']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
+		/**
+		 * Loads the table or view with its columns, rows and relations. A target the server
+		 * marked as gone is not requested.
+		 */
 		async load() {
+			const request = ++this.loadRequest
 			this.loadFailed = false
-			if (!this.targetId) {
+			if (!this.targetId || this.widgetBroken) {
+				this.loading = false
 				return
 			}
 			this.loading = true
@@ -131,16 +154,26 @@ export default {
 					await this.loadRowsFromBE({ viewId: null, tableId: this.targetId })
 					await this.loadRelationsFromBE({ tableId: this.targetId })
 				}
-			} catch (error) {
-				console.error('The widget could not load its data', error)
-				this.loadFailed = true
+			} catch {
+				// The store already reported the error
+				if (request === this.loadRequest) {
+					this.loadFailed = true
+				}
 			} finally {
-				this.loading = false
+				if (request === this.loadRequest) {
+					this.loading = false
+				}
 			}
 		},
+		/**
+		 * Asks the app to open the create column dialog for the shown table or view.
+		 */
 		createColumn() {
 			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
+		/**
+		 * Asks the app to open the import dialog for the shown table or view.
+		 */
 		openImportModal() {
 			emit('tables:modal:import', { element: this.element, isView: this.isView })
 		},
@@ -154,11 +187,11 @@ export default {
 	overflow: auto;
 
 	&__loading {
-		margin: calc(4 * var(--default-grid-baseline, 4px)) auto;
+		margin: calc(4 * var(--default-grid-baseline)) auto;
 	}
 
 	&__empty {
-		padding: calc(3 * var(--default-grid-baseline, 4px));
+		padding: calc(3 * var(--default-grid-baseline));
 		color: var(--color-text-maxcontrast);
 	}
 
