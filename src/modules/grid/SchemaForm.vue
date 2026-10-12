@@ -4,16 +4,16 @@
 -->
 <template>
 	<div class="schema-form">
-		<div v-for="(property, name) in properties" :key="name" class="schema-form__field" :data-cy="'widgetField-' + name">
+		<div v-for="(property, name) in properties" :key="name" class="schema-form__field" :data-cy="fieldDataCy(name)">
 			<NcTextField v-if="property.type === 'string'"
 				class="schema-form__input"
 				:model-value="value(name)"
-				:label="label(property)"
+				:label="property.title"
 				@update:model-value="text => set(name, text)" />
 			<NcTextArea v-else-if="property.type === 'text'"
 				class="schema-form__input"
 				:model-value="value(name)"
-				:label="label(property)"
+				:label="property.title"
 				:placeholder="t('tables', 'Leave an empty line between paragraphs')"
 				resize="vertical"
 				rows="6"
@@ -21,7 +21,7 @@
 			<NcTextField v-else-if="property.type === 'integer'"
 				class="schema-form__input"
 				:model-value="String(value(name) ?? '')"
-				:label="label(property)"
+				:label="property.title"
 				:error="invalidIntegers.includes(name)"
 				:helper-text="invalidIntegers.includes(name) ? t('tables', 'Enter a whole number') : ''"
 				type="number"
@@ -30,12 +30,12 @@
 				type="switch"
 				:model-value="!!value(name)"
 				@update:model-value="checked => set(name, checked)">
-				{{ label(property) }}
+				{{ property.title }}
 			</NcCheckboxRadioSwitch>
 			<NcSelect v-else-if="property.type === 'enum'"
 				class="schema-form__input"
 				:model-value="enumOption(property, value(name))"
-				:input-label="label(property)"
+				:input-label="property.title"
 				:options="property.options"
 				:clearable="false"
 				label="label"
@@ -43,7 +43,7 @@
 			<NcSelect v-else-if="property.type === 'target'"
 				class="schema-form__input"
 				:model-value="targetOption(value(name))"
-				:input-label="label(property)"
+				:input-label="property.title"
 				:options="targetOptions"
 				:clearable="false"
 				:searchable="true"
@@ -58,7 +58,7 @@
 						<template #icon>
 							<span class="schema-form__swatch" :style="{ backgroundColor: colorValue(name) ?? 'transparent' }" />
 						</template>
-						{{ label(property) }}
+						{{ property.title }}
 					</NcButton>
 				</NcColorPicker>
 				<span class="schema-form__hint">{{ colorValue(name) ?? t('tables', 'Theme color') }}</span>
@@ -97,7 +97,7 @@ export default {
 			required: true,
 		},
 	},
-	emits: ['update:modelValue'],
+	emits: ['update:modelValue', 'validity'],
 	data() {
 		return {
 			invalidIntegers: [],
@@ -105,6 +105,9 @@ export default {
 	},
 	computed: {
 		...mapState(useTablesStore, ['tables', 'views']),
+		isValid() {
+			return this.invalidIntegers.length === 0
+		},
 		targetOptions() {
 			const tables = this.tables.map(table => ({
 				id: 'table-' + table.id,
@@ -118,15 +121,42 @@ export default {
 					id: 'view-' + view.id,
 					targetType: 'view',
 					targetId: view.id,
-					label: t('tables', '{title} (view)', { title: (view.emoji ? view.emoji + ' ' : '') + view.title }),
+					label: t('tables', '{title} (view)', { title: (view.emoji ? view.emoji + ' ' : '') + view.title }, undefined, { escape: false }),
 				}))
 			return [...tables, ...views]
 		},
 	},
+	watch: {
+		properties() {
+			// Another widget type has other fields, so earlier invalid input no longer applies
+			this.invalidIntegers = []
+		},
+		isValid: {
+			immediate: true,
+			handler(isValid) {
+				this.$emit('validity', isValid)
+			},
+		},
+	},
 	methods: {
+		/**
+		 * @param {string} name property name
+		 * @return {string} the data-cy of the field, in camelCase
+		 */
+		fieldDataCy(name) {
+			return 'widgetField' + name.charAt(0).toUpperCase() + name.slice(1)
+		},
+		/**
+		 * @param {string} name property name
+		 * @return {string|number|boolean|object|null} the current value of the property
+		 */
 		value(name) {
 			return this.modelValue[name]
 		},
+		/**
+		 * @param {string} name property name
+		 * @param {string|number|boolean|object|null} value the new value of the property
+		 */
 		set(name, value) {
 			this.$emit('update:modelValue', { ...this.modelValue, [name]: value })
 		},
@@ -145,9 +175,6 @@ export default {
 				this.set(name, text === '' ? null : number)
 			}
 		},
-		label(property) {
-			return property.title
-		},
 		/**
 		 * @param {string} name property name
 		 * @return {string|undefined} the stored color, or undefined for the theme color
@@ -155,9 +182,18 @@ export default {
 		colorValue(name) {
 			return isHexColor(this.value(name)) ? this.value(name) : undefined
 		},
+		/**
+		 * @param {object} property the enum property
+		 * @param {string} value the stored value
+		 * @return {object|null} the option of the value, else the option of the default
+		 */
 		enumOption(property, value) {
 			return property.options.find(option => option.value === value) ?? property.options.find(option => option.value === property.default) ?? null
 		},
+		/**
+		 * @param {{type: string, id: number}|null} target the stored target
+		 * @return {object|null} the option of the target, or null when it is not in the lists
+		 */
 		targetOption(target) {
 			if (!target) {
 				return null
@@ -188,7 +224,7 @@ export default {
 		display: inline-block;
 		width: calc(5 * var(--default-grid-baseline));
 		height: calc(5 * var(--default-grid-baseline));
-		border: 1px solid var(--color-border-dark);
+		border: 1px solid var(--color-border-maxcontrast);
 		border-radius: var(--border-radius);
 	}
 

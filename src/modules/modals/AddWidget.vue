@@ -30,7 +30,10 @@
 				</NcCheckboxRadioSwitch>
 			</div>
 
-			<SchemaForm v-if="widgetType" v-model="content" :properties="widgetType.properties" />
+			<SchemaForm v-if="widgetType"
+				v-model="content"
+				:properties="widgetType.properties"
+				@validity="isValid => formIsValid = isValid" />
 		</div>
 		<template #actions>
 			<NcButton variant="primary" :disabled="!canSubmit" data-cy="addWidgetSubmit" @click="submit">
@@ -78,6 +81,7 @@ export default {
 			title: '',
 			showTitle: false,
 			content: {},
+			formIsValid: true,
 		}
 	},
 	computed: {
@@ -89,7 +93,7 @@ export default {
 			return findWidgetType(this.widgetTypes, this.selectedType?.id)
 		},
 		canSubmit() {
-			if (!this.widgetType) {
+			if (!this.widgetType || !this.formIsValid) {
 				return false
 			}
 			return Object.entries(this.widgetType.properties).every(([name, property]) => {
@@ -115,7 +119,10 @@ export default {
 		 * the server does not know keeps no type here, so it can never be saved as another one.
 		 */
 		async reset() {
-			await this.loadWidgetTypes()
+			// Awaited only when the types are missing, so the common case fills the form before it renders
+			if (this.widgetTypes.length === 0) {
+				await this.loadWidgetTypes()
+			}
 			if (this.editingWidget) {
 				this.selectedType = this.typeOptions.find(option => option.id === this.editingWidget.type) ?? null
 				this.title = this.editingWidget.configuration?.title ?? ''
@@ -137,6 +144,9 @@ export default {
 			this.showTitle = defaultConfiguration(this.widgetType).showTitle ?? false
 			this.content = defaultContent(this.widgetType)
 		},
+		/**
+		 * Hands the widget to the parent, which places it on the grid.
+		 */
 		submit() {
 			if (!this.canSubmit) {
 				return
