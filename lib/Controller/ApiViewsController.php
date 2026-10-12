@@ -9,13 +9,18 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Controller;
 
+use InvalidArgumentException;
+use OCA\Tables\Db\View;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\GridWidgetTypes;
+use OCA\Tables\Service\ValueObject\Emoji;
+use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
@@ -49,31 +54,38 @@ class ApiViewsController extends AOCSController {
 	 * 200: Widget types returned
 	 */
 	#[NoAdminRequired]
+	#[ApiRoute(verb: 'GET', url: '/api/2/views/widget-types')]
 	public function widgetTypes(): DataResponse {
 		return new DataResponse(array_values($this->gridWidgetTypes->all()));
 	}
 
 	/**
-	 * [api v2] Create a view without a table, such as a grid view
+	 * [api v2] Create a grid view, a view without a table
 	 *
 	 * The view belongs to the user who creates it and can be placed in an application menu.
+	 * It is named by its id, so it takes no technical name.
 	 *
 	 * @param string $title Title of the view
 	 * @param string|null $emoji Emoji shown with the title
-	 * @param string $type Type of the view, `grid` for a page of widgets
-	 * @param string|null $technicalName Technical name, lowercase letters, numbers and underscores
 	 * @param string $description Description shown on the page
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: View created
-	 * 400: Invalid type or technical name
+	 * 400: Invalid title or emoji
 	 * 403: No permissions
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
-	public function create(string $title, ?string $emoji = null, string $type = 'grid', ?string $technicalName = null, string $description = ''): DataResponse {
+	#[ApiRoute(verb: 'POST', url: '/api/2/views')]
+	public function create(string $title, ?string $emoji = null, string $description = ''): DataResponse {
 		try {
-			return new DataResponse($this->viewService->create($title, $emoji, null, $this->userId, $technicalName, null, $type, $description)->jsonSerialize());
+			$validTitle = (string)new Title($title);
+			$validEmoji = $emoji === null || $emoji === '' ? null : (string)new Emoji($emoji);
+		} catch (InvalidArgumentException $e) {
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		}
+		try {
+			return new DataResponse($this->viewService->create($validTitle, $validEmoji, null, $this->userId, null, null, View::TYPE_GRID, $description)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (BadRequestError $e) {

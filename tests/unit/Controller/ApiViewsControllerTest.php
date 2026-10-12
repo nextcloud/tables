@@ -56,19 +56,38 @@ final class ApiViewsControllerTest extends TestCase {
 		$view->setCreatedBy('alice');
 		$this->viewService->expects($this->once())
 			->method('create')
-			->with('Home', '🧩', null, 'alice', 'home', null, View::TYPE_GRID, 'Start here')
+			->with('Home', '🧩', null, 'alice', null, null, View::TYPE_GRID, 'Start here')
 			->willReturn($view);
 
-		$response = $this->controller->create('Home', '🧩', 'grid', 'home', 'Start here');
+		$response = $this->controller->create(' Home ', '🧩', 'Start here');
 
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 		$this->assertSame(6, $response->getData()['id']);
 	}
 
-	public function testCreateTurnsABadRequestInto400(): void {
-		$this->viewService->method('create')->willThrowException(new BadRequestError('Technical name must start with a lowercase letter'));
+	public static function invalidInput(): array {
+		return [
+			'empty title' => ['   ', null],
+			'title over 200 bytes' => [str_repeat('a', 201), null],
+			'emoji that is not one emoji' => ['Home', 'not an emoji'],
+		];
+	}
 
-		$response = $this->controller->create('Home', null, 'grid', 'Not Valid');
+	/**
+	 * @dataProvider invalidInput
+	 */
+	public function testCreateRefusesInvalidInputWith400(string $title, ?string $emoji): void {
+		$this->viewService->expects($this->never())->method('create');
+
+		$response = $this->controller->create($title, $emoji);
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+	}
+
+	public function testCreateTurnsABadRequestInto400(): void {
+		$this->viewService->method('create')->willThrowException(new BadRequestError('rejected by the service'));
+
+		$response = $this->controller->create('Home');
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
 	}

@@ -69,7 +69,7 @@ namespace OCA\Tables;
  * }
  *
  * @psalm-type TablesGridWidgetProperty = array{
- *  type: string,
+ *  type: 'string'|'text'|'color'|'boolean'|'integer'|'enum'|'target',
  *  title: string,
  *  default: TablesGridWidgetValue,
  *  options?: list<array{value: string, label: string}>,
@@ -77,7 +77,7 @@ namespace OCA\Tables;
  * }
  *
  * @psalm-type TablesGridWidgetType = array{
- *  type: string,
+ *  type: 'header'|'text'|'data',
  *  title: string,
  *  defaultWidth: int,
  *  defaultHeight: int,
