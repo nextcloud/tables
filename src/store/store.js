@@ -27,6 +27,7 @@ export const useTablesStore = defineStore('store', {
 		activeRowId: null,
 		activeElementIsView: false,
 		activeContextId: null,
+		widgetTypes: [],
 		appNavCollapsed: false,
 	}),
 
@@ -213,6 +214,15 @@ export const useTablesStore = defineStore('store', {
 			table.views.push(res.data)
 
 			return res.data.id
+		},
+
+		async loadWidgetTypes() {
+			try {
+				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/views/widget-types'))
+				this.widgetTypes = res.data.ocs.data
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load widget types.'))
+			}
 		},
 
 		async updateView({ id, data }) {
