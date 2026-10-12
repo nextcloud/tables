@@ -1202,6 +1202,8 @@ export type components = {
             readonly technicalName: string | null;
             /** Format: int64 */
             readonly order: number;
+            /** Format: int64 */
+            readonly parentId: number | null;
             readonly broken: boolean;
         };
         readonly NotifyConfig: {
@@ -6898,7 +6900,7 @@ export interface operations {
                         readonly permissions?: number;
                     }[];
                     /**
-                     * @description optional menu of the context, in order; the views and tables it opens become nodes of the context
+                     * @description optional menu of the context, in order; parentIndex is the position of the parent item, for one level of nesting; the views and tables it opens become nodes of the context
                      * @default null
                      */
                     readonly menuItems?: readonly {
@@ -6910,6 +6912,8 @@ export interface operations {
                         readonly targetId?: number;
                         readonly url?: string;
                         readonly technicalName?: string;
+                        /** Format: int64 */
+                        readonly parentIndex?: number;
                     }[] | null;
                 };
             };
@@ -7102,7 +7106,7 @@ export interface operations {
                         readonly order: number;
                     } | null;
                     /**
-                     * @description provide this parameter to replace the menu; the views and tables it opens become nodes of the context
+                     * @description provide this parameter to replace the menu; parentIndex is the position of the parent item, for one level of nesting; the views and tables it opens become nodes of the context
                      * @default null
                      */
                     readonly menuItems?: readonly {
@@ -7114,6 +7118,8 @@ export interface operations {
                         readonly targetId?: number;
                         readonly url?: string;
                         readonly technicalName?: string;
+                        /** Format: int64 */
+                        readonly parentIndex?: number;
                     }[] | null;
                 };
             };

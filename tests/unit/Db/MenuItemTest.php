@@ -27,6 +27,7 @@ class MenuItemTest extends TestCase {
 			'url' => null,
 			'technicalName' => null,
 			'order' => 0,
+			'parentId' => null,
 			'broken' => false,
 		], $item->jsonSerialize());
 	}

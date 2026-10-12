@@ -236,6 +236,7 @@ namespace OCA\Tables;
  *   url: string|null,
  *   technicalName: string|null,
  *   order: int,
+ *   parentId: int|null,
  *   broken: bool,
  * }
  *
