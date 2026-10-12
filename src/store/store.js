@@ -11,7 +11,7 @@ import displayError from '../shared/utils/displayError.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 import { getCurrentUser } from '@nextcloud/auth'
 
-// the one request for the widget types while it runs, so widgets that mount together share it
+// The one request for the widget types while it runs, so widgets that mount together share it
 let widgetTypesRequest = null
 
 export const useTablesStore = defineStore('store', {

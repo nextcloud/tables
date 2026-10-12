@@ -13,7 +13,7 @@ import {
 	defaultConfiguration,
 	defaultContent,
 	nextFreeRow,
-} from '../../src/modules/grid/widgetRegistry.js'
+} from '../../src/modules/grid/gridLayout.js'
 import { isHexColor } from '../../src/shared/utils/gridColors.js'
 
 const headerType = {
@@ -29,7 +29,7 @@ const headerType = {
 	},
 }
 
-describe('grid widget registry', () => {
+describe('grid layout', () => {
 	it('starts a widget with every configuration and content property at its default', () => {
 		expect(defaultConfiguration(headerType)).to.deep.equal({ title: '', showTitle: false })
 		expect(defaultContent(headerType)).to.deep.equal({ title: '', textAlign: 'left', target: null })

@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="header-widget" :style="style">
-		<component :is="'h' + widgetHeadingLevel" class="header-widget__title">
+		<component :is="'h' + widgetHeadingLevel" v-if="content.title || editable" class="header-widget__title">
 			{{ content.title || t('tables', 'Untitled header') }}
 		</component>
 		<p v-if="content.subtitle" class="header-widget__subtitle">
@@ -16,7 +16,7 @@
 <script>
 import { isHexColor } from '../../../shared/utils/gridColors.js'
 
-// stored values say left and right; rendered as start and end so they follow the reading direction
+// Stored values say left and right; rendered as start and end so they follow the reading direction
 const TEXT_ALIGN = { left: 'start', center: 'center', right: 'end' }
 
 export default {
@@ -28,6 +28,11 @@ export default {
 		content: {
 			type: Object,
 			required: true,
+		},
+		// Placeholders that prompt for content only show while the page is edited
+		editable: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	computed: {
@@ -62,8 +67,7 @@ export default {
 	}
 
 	&__subtitle {
-		margin: calc(1 * var(--default-grid-baseline)) 0 0;
-		opacity: 0.85;
+		margin: var(--default-grid-baseline) 0 0;
 	}
 }
 </style>

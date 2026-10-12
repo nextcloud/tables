@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="grid-canvas">
-		<p v-if="editable && isNarrow" class="grid-canvas__hint" data-cy="grid-narrow-hint">
+		<p v-if="editable && isNarrow" class="grid-canvas__hint" data-cy="gridNarrowHint">
 			{{ t('tables', 'Widen the window to arrange the widgets. On a narrow screen the page is only shown.') }}
 		</p>
 		<div ref="gridElement" class="grid-stack grid-canvas__stack" :class="{ 'grid-canvas__stack--editing': isArranging }">
@@ -17,7 +17,7 @@
 				:gs-w="item.gridWidth"
 				:gs-h="item.gridHeight"
 				:gs-min-w="minWidth"
-				data-cy="grid-item">
+				data-cy="gridItem">
 				<div class="grid-stack-item-content">
 					<slot name="widget" :item="item" :narrow="isNarrow" />
 				</div>
@@ -27,10 +27,9 @@
 </template>
 
 <script>
-import { markRaw } from 'vue'
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
-import { GRID_CELL_HEIGHT, GRID_COLUMNS, GRID_MIN_WIDTH, applyNodePositions, columnsForWidth } from './widgetRegistry.js'
+import { GRID_CELL_HEIGHT, GRID_COLUMNS, GRID_MARGIN, GRID_MIN_WIDTH, applyNodePositions, columnsForWidth } from './gridLayout.js'
 
 /**
  * Places widgets on a 12 column grid. In edit mode the widgets can be dragged and resized;
@@ -54,9 +53,6 @@ export default {
 	emits: ['layout-change'],
 	data() {
 		return {
-			grid: null,
-			resizeObserver: null,
-			minWidth: GRID_MIN_WIDTH,
 			columns: GRID_COLUMNS,
 		}
 	},
@@ -76,29 +72,31 @@ export default {
 				this.grid?.disable()
 			}
 		},
-		layout: {
-			handler(layout, previousLayout) {
-				this.syncGridItems(layout, previousLayout ?? [])
-			},
+		layout(layout, previousLayout) {
+			this.syncGridItems(layout, previousLayout ?? [])
 		},
 	},
+	created() {
+		// Not declared in data(): GridStack and the observer must stay plain objects, a reactive
+		// proxy around GridStack makes it ignore every drop
+		this.grid = null
+		this.resizeObserver = null
+		this.minWidth = GRID_MIN_WIDTH
+	},
 	mounted() {
-		// markRaw: a reactive proxy around the instance makes GridStack compare its own proxied `this`
-		// with the raw instance its nodes point at, and every drop is then silently ignored
-		this.grid = markRaw(GridStack.init({
+		this.grid = GridStack.init({
 			column: GRID_COLUMNS,
 			cellHeight: GRID_CELL_HEIGHT,
-			margin: 8,
+			margin: GRID_MARGIN,
 			float: true,
 			animate: true,
 			disableDrag: !this.isArranging,
 			disableResize: !this.isArranging,
 			minRow: 1,
-		}, this.$refs.gridElement))
+		}, this.$refs.gridElement)
 		this.grid.on('change', (event, changedNodes) => this.onGridChange(changedNodes))
-		// 12 columns on a wide canvas, 6 on a medium one and a single column on a phone,
-		// driven by the canvas width so the grid restores when the window grows again
-		this.resizeObserver = markRaw(new ResizeObserver(entries => this.applyColumns(entries[0]?.contentRect.width ?? 0)))
+		// The column count follows the canvas width, so the grid restores when the window grows again
+		this.resizeObserver = new ResizeObserver(entries => this.applyColumns(entries[0]?.contentRect.width ?? 0))
 		this.resizeObserver.observe(this.$refs.gridElement)
 	},
 	beforeUnmount() {
@@ -119,18 +117,16 @@ export default {
 			if (!this.grid) {
 				return
 			}
-			const currentIds = new Set(layout.map(item => item.widgetId))
 			const previousIds = new Set(previousLayout.map(item => item.widgetId))
-
 			const positions = Object.fromEntries(layout.map(item => [item.widgetId, item]))
-			// on a narrower canvas the grid shows a reflow of the stored layout, so positions only sync at full width
+			// On a narrower canvas the grid shows a reflow of the stored layout, so positions only sync at full width
 			const isFullWidth = this.grid.getColumn() === GRID_COLUMNS
 			for (const node of [...this.grid.engine.nodes]) {
 				const item = positions[node.id]
 				if (!item) {
 					this.grid.removeWidget(node.el, false, false)
 				} else if (isFullWidth && (node.x !== item.gridX || node.y !== item.gridY || node.w !== item.gridWidth || node.h !== item.gridHeight)) {
-					// a move from the widget menu rather than a drag
+					// A move from the widget menu rather than a drag
 					this.grid.update(node.el, { x: item.gridX, y: item.gridY, w: item.gridWidth, h: item.gridHeight })
 				}
 			}
@@ -149,6 +145,8 @@ export default {
 			})
 		},
 		/**
+		 * Shows the number of columns that fits the canvas width.
+		 *
 		 * @param {number} width current width of the canvas in pixels
 		 */
 		applyColumns(width) {
@@ -161,12 +159,14 @@ export default {
 			}
 			this.columns = columns
 		},
+		/**
+		 * Emits the layout after a drag or resize. A reflow to fewer columns is only how the grid is
+		 * shown on this screen, never the stored layout, so it is not emitted.
+		 *
+		 * @param {Array} changedNodes the GridStack nodes that moved
+		 */
 		onGridChange(changedNodes) {
-			if (!Array.isArray(changedNodes) || changedNodes.length === 0) {
-				return
-			}
-			// A reflow to fewer columns is only how the grid is shown on this screen, never the stored layout
-			if (this.grid.getColumn() !== GRID_COLUMNS) {
+			if (!Array.isArray(changedNodes) || changedNodes.length === 0 || this.grid.getColumn() !== GRID_COLUMNS) {
 				return
 			}
 			this.$emit('layout-change', applyNodePositions(this.layout, changedNodes))
@@ -197,7 +197,7 @@ export default {
 }
 
 .grid-canvas__stack--editing .grid-stack-item-content {
-	outline: 2px dashed var(--color-border-dark);
+	outline: 2px dashed var(--color-border-maxcontrast);
 	outline-offset: -2px;
 	cursor: move;
 }
