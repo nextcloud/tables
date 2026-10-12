@@ -233,6 +233,7 @@ namespace OCA\Tables;
  *   description: string,
  *   owner: string,
  *   ownerType: int,
+ *   archived: bool,
  * }
  *
  * @psalm-type TablesContextNavigation = array{

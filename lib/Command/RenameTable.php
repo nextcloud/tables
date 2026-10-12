@@ -56,7 +56,7 @@ class RenameTable extends Command {
 				'archived',
 				'a',
 				InputOption::VALUE_NONE,
-				'Archived'
+				'Archive the table; the archived state is kept unchanged when omitted'
 			)
 		;
 	}
@@ -70,7 +70,9 @@ class RenameTable extends Command {
 		$id = $input->getArgument('ID');
 		$title = $input->getArgument('title');
 		$emoji = $input->getOption('emoji');
-		$archived = $input->getOption('archived');
+		// VALUE_NONE yields false when absent; map that to null so an omitted
+		// flag leaves the archived state unchanged instead of unarchiving
+		$archived = $input->getOption('archived') ? true : null;
 		$description = $input->getOption('description');
 
 		try {
