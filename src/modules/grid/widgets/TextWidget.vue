@@ -35,10 +35,10 @@ export default {
 
 <style lang="scss" scoped>
 .text-widget {
-	padding: calc(3 * var(--default-grid-baseline, 4px)) calc(4 * var(--default-grid-baseline, 4px));
+	padding: calc(3 * var(--default-grid-baseline)) calc(4 * var(--default-grid-baseline));
 
 	&__paragraph {
-		margin: 0 0 calc(2 * var(--default-grid-baseline, 4px));
+		margin: 0 0 calc(2 * var(--default-grid-baseline));
 		white-space: pre-wrap;
 	}
 

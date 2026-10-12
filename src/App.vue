@@ -67,7 +67,6 @@ export default {
 				store.getAllContexts(),
 				store.loadViewsSharedWithMeFromBE(),
 				store.loadTemplatesFromBE(),
-				store.loadWidgetTypes(),
 			])
 		} else {
 			store.setLoading({ key: 'tables', value: false })

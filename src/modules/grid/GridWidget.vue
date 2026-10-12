@@ -4,7 +4,7 @@
 -->
 <template>
 	<section class="grid-widget" :aria-label="widget.configuration.title || typeLabel" data-cy="grid-widget">
-		<header v-if="widget.configuration.showTitle || editable" class="grid-widget__header">
+		<header v-if="hasHeading" class="grid-widget__header">
 			<h2 class="grid-widget__title">
 				{{ widget.configuration.showTitle ? widget.configuration.title : typeLabel }}
 			</h2>
@@ -21,8 +21,8 @@
 					</template>
 					{{ t('tables', 'Remove widget') }}
 				</NcActionButton>
-				<NcActionSeparator />
-				<NcActionButton v-for="step in layoutSteps"
+				<NcActionSeparator v-if="arrangeable" />
+				<NcActionButton v-for="step in arrangeable ? layoutSteps : []"
 					:key="step.key"
 					:data-cy="'widget-' + step.key"
 					@click="$emit('move', widget, step.change)">
@@ -34,7 +34,7 @@
 			</NcActions>
 		</header>
 		<div class="grid-widget__body">
-			<component :is="widgetComponent" v-if="widgetComponent" :content="widget.content" :editable="editable" />
+			<component :is="widgetComponent" v-if="widgetComponent" :content="widget.content" />
 			<p v-else class="grid-widget__unknown">
 				{{ t('tables', 'Unknown widget type "{type}"', { type: widget.type }) }}
 			</p>
@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { NcActionButton, NcActions, NcActionSeparator } from '@nextcloud/vue'
 import ArrowCollapseHorizontal from 'vue-material-design-icons/ArrowCollapseHorizontal.vue'
 import ArrowCollapseVertical from 'vue-material-design-icons/ArrowCollapseVertical.vue'
@@ -54,7 +55,7 @@ import ArrowRight from 'vue-material-design-icons/ArrowRight.vue'
 import ArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import CogOutline from 'vue-material-design-icons/CogOutline.vue'
 import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
-import { mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import { findWidgetType, getWidgetComponent } from './widgetRegistry.js'
 
@@ -71,6 +72,10 @@ export default {
 		CogOutline,
 		TrashCanOutline,
 	},
+	provide() {
+		// a widget that renders its own heading sits one level below the card's heading
+		return { widgetHeadingLevel: computed(() => this.hasHeading ? 3 : 2) }
+	},
 	props: {
 		widget: {
 			type: Object,
@@ -80,10 +85,18 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		// false on a narrowed grid, which is only shown and never arranged
+		arrangeable: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	emits: ['configure', 'remove', 'move'],
 	computed: {
 		...mapState(useTablesStore, ['widgetTypes']),
+		hasHeading() {
+			return this.widget.configuration.showTitle || this.editable
+		},
 		widgetComponent() {
 			return getWidgetComponent(this.widget.type)
 		},
@@ -103,6 +116,13 @@ export default {
 			]
 		},
 	},
+	created() {
+		// the type titles come from the server, loaded the first time a grid shows a widget
+		this.loadWidgetTypes()
+	},
+	methods: {
+		...mapActions(useTablesStore, ['loadWidgetTypes']),
+	},
 }
 </script>
 
@@ -117,8 +137,8 @@ export default {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: calc(2 * var(--default-grid-baseline, 4px));
-		padding: calc(2 * var(--default-grid-baseline, 4px)) calc(3 * var(--default-grid-baseline, 4px));
+		gap: calc(2 * var(--default-grid-baseline));
+		padding: calc(2 * var(--default-grid-baseline)) calc(3 * var(--default-grid-baseline));
 		border-bottom: 1px solid var(--color-border);
 	}
 
@@ -138,7 +158,7 @@ export default {
 	}
 
 	&__unknown {
-		padding: calc(3 * var(--default-grid-baseline, 4px));
+		padding: calc(3 * var(--default-grid-baseline));
 		color: var(--color-text-maxcontrast);
 	}
 }

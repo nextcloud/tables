@@ -4,9 +4,9 @@
 -->
 <template>
 	<div class="header-widget" :style="style">
-		<h2 class="header-widget__title">
+		<component :is="'h' + widgetHeadingLevel" class="header-widget__title">
 			{{ content.title || t('tables', 'Untitled header') }}
-		</h2>
+		</component>
 		<p v-if="content.subtitle" class="header-widget__subtitle">
 			{{ content.subtitle }}
 		</p>
@@ -21,6 +21,9 @@ const TEXT_ALIGN = { left: 'start', center: 'center', right: 'end' }
 
 export default {
 	name: 'HeaderWidget',
+	inject: {
+		widgetHeadingLevel: { default: 2 },
+	},
 	props: {
 		content: {
 			type: Object,
@@ -50,7 +53,7 @@ export default {
 	flex-direction: column;
 	justify-content: center;
 	height: 100%;
-	padding: calc(4 * var(--default-grid-baseline, 4px)) calc(5 * var(--default-grid-baseline, 4px));
+	padding: calc(4 * var(--default-grid-baseline)) calc(5 * var(--default-grid-baseline));
 	background-color: var(--color-primary-element-light);
 	color: var(--color-primary-element-light-text);
 
@@ -59,7 +62,7 @@ export default {
 	}
 
 	&__subtitle {
-		margin: calc(1 * var(--default-grid-baseline, 4px)) 0 0;
+		margin: calc(1 * var(--default-grid-baseline)) 0 0;
 		opacity: 0.85;
 	}
 }

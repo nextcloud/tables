@@ -14,6 +14,12 @@ export const GRID_MIN_WIDTH = 2
 /** Height of one grid row in pixels. */
 export const GRID_CELL_HEIGHT = 80
 
+/** Below this canvas width in pixels the grid shows one column. */
+export const GRID_BREAKPOINT_SINGLE = 560
+
+/** Below this canvas width in pixels the grid shows six columns. */
+export const GRID_BREAKPOINT_MEDIUM = 960
+
 export const WIDGET_TYPE_HEADER = 'header'
 export const WIDGET_TYPE_TEXT = 'text'
 export const WIDGET_TYPE_DATA = 'data'
@@ -26,6 +32,17 @@ export const WIDGET_TYPE_DATA = 'data'
 const widgetComponents = {
 	[WIDGET_TYPE_HEADER]: HeaderWidget,
 	[WIDGET_TYPE_TEXT]: TextWidget,
+}
+
+/**
+ * Deep copy of plain data. A JSON round-trip also copies reactive proxies, which
+ * structuredClone refuses.
+ *
+ * @param {object|Array|string|number|boolean|null|undefined} value plain data
+ * @return {object|Array|string|number|boolean|null}
+ */
+function copy(value) {
+	return JSON.parse(JSON.stringify(value ?? null))
 }
 
 /**
@@ -52,7 +69,7 @@ export function findWidgetType(widgetTypes, type) {
  * @return {object}
  */
 export function defaultConfiguration(widgetType) {
-	return Object.fromEntries(Object.entries(widgetType?.configuration ?? {}).map(([name, property]) => [name, structuredClone(property.default ?? null)]))
+	return Object.fromEntries(Object.entries(widgetType?.configuration ?? {}).map(([name, property]) => [name, copy(property.default)]))
 }
 
 /**
@@ -62,7 +79,7 @@ export function defaultConfiguration(widgetType) {
  * @return {object}
  */
 export function defaultContent(widgetType) {
-	return Object.fromEntries(Object.entries(widgetType?.properties ?? {}).map(([name, property]) => [name, structuredClone(property.default ?? null)]))
+	return Object.fromEntries(Object.entries(widgetType?.properties ?? {}).map(([name, property]) => [name, copy(property.default)]))
 }
 
 /**
@@ -82,8 +99,8 @@ export function emptyGrid() {
  */
 export function cloneGrid(grid) {
 	return {
-		widgets: JSON.parse(JSON.stringify(grid?.widgets ?? [])),
-		layout: JSON.parse(JSON.stringify(grid?.layout ?? [])),
+		widgets: copy(grid?.widgets ?? []),
+		layout: copy(grid?.layout ?? []),
 	}
 }
 
@@ -95,4 +112,33 @@ export function cloneGrid(grid) {
  */
 export function nextFreeRow(layout) {
 	return layout.reduce((max, item) => Math.max(max, (item.gridY ?? 0) + (item.gridHeight ?? 1)), 0)
+}
+
+/**
+ * How many columns the grid shows on a canvas of this width: 12 on a wide one, 6 on a
+ * medium one and one on a phone.
+ *
+ * @param {number} width width of the canvas in pixels
+ * @return {number}
+ */
+export function columnsForWidth(width) {
+	if (width < GRID_BREAKPOINT_SINGLE) {
+		return 1
+	}
+	return width < GRID_BREAKPOINT_MEDIUM ? 6 : GRID_COLUMNS
+}
+
+/**
+ * The layout with the positions of the gridstack nodes that changed applied to it.
+ *
+ * @param {Array} layout layout items
+ * @param {Array<{id: string, x: number, y: number, w: number, h: number}>} nodes the changed nodes
+ * @return {Array}
+ */
+export function applyNodePositions(layout, nodes) {
+	const positions = Object.fromEntries(nodes.map(node => [node.id, node]))
+	return layout.map(item => {
+		const node = positions[item.widgetId]
+		return node ? { ...item, gridX: node.x, gridY: node.y, gridWidth: node.w, gridHeight: node.h } : item
+	})
 }

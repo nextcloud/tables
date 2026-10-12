@@ -3,19 +3,24 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div ref="gridElement" class="grid-stack grid-canvas" :class="{ 'grid-canvas--editing': editable }">
-		<div v-for="item in layout"
-			:key="item.widgetId"
-			class="grid-stack-item"
-			:gs-id="item.widgetId"
-			:gs-x="item.gridX"
-			:gs-y="item.gridY"
-			:gs-w="item.gridWidth"
-			:gs-h="item.gridHeight"
-			:gs-min-w="minWidth"
-			data-cy="grid-item">
-			<div class="grid-stack-item-content">
-				<slot name="widget" :item="item" />
+	<div class="grid-canvas">
+		<p v-if="editable && isNarrow" class="grid-canvas__hint" data-cy="grid-narrow-hint">
+			{{ t('tables', 'Widen the window to arrange the widgets. On a narrow screen the page is only shown.') }}
+		</p>
+		<div ref="gridElement" class="grid-stack grid-canvas__stack" :class="{ 'grid-canvas__stack--editing': isArranging }">
+			<div v-for="item in layout"
+				:key="item.widgetId"
+				class="grid-stack-item"
+				:gs-id="item.widgetId"
+				:gs-x="item.gridX"
+				:gs-y="item.gridY"
+				:gs-w="item.gridWidth"
+				:gs-h="item.gridHeight"
+				:gs-min-w="minWidth"
+				data-cy="grid-item">
+				<div class="grid-stack-item-content">
+					<slot name="widget" :item="item" :narrow="isNarrow" />
+				</div>
 			</div>
 		</div>
 	</div>
@@ -25,11 +30,14 @@
 import { markRaw } from 'vue'
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
-import { GRID_CELL_HEIGHT, GRID_COLUMNS, GRID_MIN_WIDTH } from './widgetRegistry.js'
+import { GRID_CELL_HEIGHT, GRID_COLUMNS, GRID_MIN_WIDTH, applyNodePositions, columnsForWidth } from './widgetRegistry.js'
 
 /**
  * Places widgets on a 12 column grid. In edit mode the widgets can be dragged and resized;
  * every change is emitted as a full layout, the parent decides when to persist it.
+ *
+ * On a narrower canvas the grid shows a reflow of the layout. That reflow is never stored,
+ * so widgets can only be arranged at full width; the widget slot gets narrow to know it.
  */
 export default {
 	name: 'GridCanvas',
@@ -49,11 +57,20 @@ export default {
 			grid: null,
 			resizeObserver: null,
 			minWidth: GRID_MIN_WIDTH,
+			columns: GRID_COLUMNS,
 		}
 	},
+	computed: {
+		isNarrow() {
+			return this.columns !== GRID_COLUMNS
+		},
+		isArranging() {
+			return this.editable && !this.isNarrow
+		},
+	},
 	watch: {
-		editable(editable) {
-			if (editable) {
+		isArranging(isArranging) {
+			if (isArranging) {
 				this.grid?.enable()
 			} else {
 				this.grid?.disable()
@@ -74,8 +91,8 @@ export default {
 			margin: 8,
 			float: true,
 			animate: true,
-			disableDrag: !this.editable,
-			disableResize: !this.editable,
+			disableDrag: !this.isArranging,
+			disableResize: !this.isArranging,
 			minRow: 1,
 		}, this.$refs.gridElement))
 		this.grid.on('change', (event, changedNodes) => this.onGridChange(changedNodes))
@@ -138,10 +155,11 @@ export default {
 			if (!this.grid || width === 0) {
 				return
 			}
-			const columns = width < 560 ? 1 : (width < 960 ? 6 : GRID_COLUMNS)
+			const columns = columnsForWidth(width)
 			if (this.grid.getColumn() !== columns) {
 				this.grid.column(columns, 'moveScale')
 			}
+			this.columns = columns
 		},
 		onGridChange(changedNodes) {
 			if (!Array.isArray(changedNodes) || changedNodes.length === 0) {
@@ -151,21 +169,7 @@ export default {
 			if (this.grid.getColumn() !== GRID_COLUMNS) {
 				return
 			}
-			const positions = Object.fromEntries(changedNodes.map(node => [node.id, node]))
-			const updated = this.layout.map(item => {
-				const node = positions[item.widgetId]
-				if (!node) {
-					return item
-				}
-				return {
-					...item,
-					gridX: node.x,
-					gridY: node.y,
-					gridWidth: node.w,
-					gridHeight: node.h,
-				}
-			})
-			this.$emit('layout-change', updated)
+			this.$emit('layout-change', applyNodePositions(this.layout, changedNodes))
 		},
 	},
 }
@@ -173,7 +177,14 @@ export default {
 
 <style lang="scss" scoped>
 .grid-canvas {
-	min-height: 160px;
+	&__hint {
+		margin: 0 0 calc(2 * var(--default-grid-baseline));
+		color: var(--color-text-maxcontrast);
+	}
+
+	&__stack {
+		min-height: 160px;
+	}
 }
 
 .grid-stack-item-content {
@@ -185,7 +196,7 @@ export default {
 	border-radius: var(--border-radius-large);
 }
 
-.grid-canvas--editing .grid-stack-item-content {
+.grid-canvas__stack--editing .grid-stack-item-content {
 	outline: 2px dashed var(--color-border-dark);
 	outline-offset: -2px;
 	cursor: move;
