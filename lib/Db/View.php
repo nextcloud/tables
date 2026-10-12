@@ -229,7 +229,7 @@ class View extends EntitySuper implements JsonSerializable {
 	 */
 	public function getGridArray(): array {
 		$grid = $this->getArray($this->getGrid());
-		$list = static fn (mixed $items): array => array_values(array_filter(is_array($items) ? $items : [], 'is_array'));
+		$list = static fn (mixed $items): array => array_values(array_filter(is_array($items) ? $items : [], is_array(...)));
 		return ['widgets' => $list($grid['widgets'] ?? null), 'layout' => $list($grid['layout'] ?? null)];
 	}
 
