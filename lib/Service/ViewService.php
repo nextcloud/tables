@@ -308,7 +308,7 @@ class ViewService extends SuperService {
 					if ($view->getTypeOrDefault() !== View::TYPE_GRID) {
 						throw new BadRequestError('Only a grid view holds a grid.');
 					}
-					$value = $this->gridWidgetTypes->sanitizeGrid($value, $userId);
+					$value = $this->gridWidgetTypes->sanitizeGrid($value, $userId, $view->getGridArray());
 				}
 
 				if ($value instanceof JsonSerializable || is_array($value)) {

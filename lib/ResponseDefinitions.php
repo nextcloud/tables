@@ -20,6 +20,7 @@ namespace OCA\Tables;
  *  type: string,
  *  configuration: array<string, TablesGridWidgetValue>,
  *  content: array<string, TablesGridWidgetValue>,
+ *  broken?: bool,
  * }
  *
  * @psalm-type TablesGridLayoutItem = array{

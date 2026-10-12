@@ -391,6 +391,9 @@
                         "additionalProperties": {
                             "$ref": "#/components/schemas/GridWidgetValue"
                         }
+                    },
+                    "broken": {
+                        "type": "boolean"
                     }
                 }
             },

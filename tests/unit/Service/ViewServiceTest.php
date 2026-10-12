@@ -235,6 +235,22 @@ class ViewServiceTest extends TestCase {
 		$this->service->update(6, ViewUpdateInput::fromInputArray(['technicalName' => 'home']), 'alice', true);
 	}
 
+	public function testImportOfATableViewDoesNotTakeOverAGrid(): void {
+		$this->mapper->method('insert')->willReturnCallback(static function (View $view): View {
+			$view->setId(9);
+			return $view;
+		});
+		$this->mapper->method('update')->willReturnArgument(0);
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text', 'content' => ['text' => 'x']]], 'layout' => []];
+
+		$imported = $this->service->importView(4, [
+			'title' => 'Open', 'emoji' => null, 'description' => '', 'type' => View::TYPE_TABLE, 'grid' => $grid,
+			'createdAt' => '2026-10-12 10:00:00', 'lastEditAt' => '2026-10-12 10:00:00', 'columnSettings' => [], 'sort' => [], 'filter' => [],
+		], 'alice');
+
+		$this->assertNull($imported->getGrid());
+	}
+
 	public function testImportWithoutTableIgnoresTheSourceTechnicalName(): void {
 		$this->mapper->method('insert')->willReturnCallback(static function (View $view): View {
 			$view->setId(9);

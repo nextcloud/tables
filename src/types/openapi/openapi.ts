@@ -1183,6 +1183,7 @@ export type components = {
             readonly content: {
                 readonly [key: string]: components["schemas"]["GridWidgetValue"];
             };
+            readonly broken?: boolean;
         };
         readonly GridWidgetValue: (string | boolean | number | {
             /** @enum {string} */

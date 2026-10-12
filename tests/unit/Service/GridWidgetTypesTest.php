@@ -206,7 +206,8 @@ class GridWidgetTypesTest extends TestCase {
 		$readableTable->setId(4);
 		$this->viewMapper->method('findMany')->willReturn([9 => $gridView]);
 		$this->tableMapper->method('findMany')->willReturn([4 => $readableTable]);
-		$this->permissionsService->method('canReadRowsByElement')->willReturnCallback(static fn ($element): bool => $element === $readableTable);
+		// the owner can read their own grid view, so only the "has a table" check may refuse it
+		$this->permissionsService->method('canReadRowsByElement')->willReturnCallback(static fn ($element): bool => $element === $readableTable || $element === $gridView);
 
 		$cases = [
 			'a view without a table' => $this->dataWidget('view', 9),
@@ -232,6 +233,51 @@ class GridWidgetTypesTest extends TestCase {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('whose rows you can read');
 		$this->types->sanitizeGrid(['widgets' => [$this->dataWidget('table', 4)]], 'alice');
+	}
+
+	public function testSanitizeGridKeepsAnUnchangedTargetTheSaverCannotRead(): void {
+		$table = new Table();
+		$table->setId(4);
+		$this->tableMapper->method('findMany')->willReturn([4 => $table]);
+		$this->permissionsService->expects($this->never())->method('canReadRowsByElement');
+		$widget = $this->dataWidget('table', 4);
+
+		$grid = $this->types->sanitizeGrid(['widgets' => [$widget]], 'bob', ['widgets' => [$widget]]);
+
+		$this->assertSame(['type' => 'table', 'id' => 4], $grid['widgets'][0]['content']['target']);
+		$this->assertArrayNotHasKey('broken', $grid['widgets'][0]);
+	}
+
+	public function testSanitizeGridMarksAnUnchangedTargetThatNoLongerExistsAsBroken(): void {
+		$this->tableMapper->method('findMany')->willReturn([]);
+		$widget = $this->dataWidget('table', 4);
+
+		$grid = $this->types->sanitizeGrid(['widgets' => [$widget]], 'alice', ['widgets' => [$widget]]);
+
+		$this->assertTrue($grid['widgets'][0]['broken']);
+		$this->assertSame(['type' => 'table', 'id' => 4], $grid['widgets'][0]['content']['target'], 'the reference is kept');
+	}
+
+	public function testSanitizeGridClearsTheBrokenMarkWhenTheTargetIsValidAgain(): void {
+		$table = new Table();
+		$table->setId(4);
+		$this->tableMapper->method('findMany')->willReturn([4 => $table]);
+		$widget = $this->dataWidget('table', 4) + ['broken' => true];
+
+		$grid = $this->types->sanitizeGrid(['widgets' => [$widget]], 'alice', ['widgets' => [$widget]]);
+
+		$this->assertArrayNotHasKey('broken', $grid['widgets'][0]);
+	}
+
+	public function testSanitizeGridChecksAChangedTargetAgainstTheSaver(): void {
+		$table = new Table();
+		$table->setId(5);
+		$this->tableMapper->method('findMany')->willReturn([5 => $table]);
+		$this->permissionsService->method('canReadRowsByElement')->willReturn(false);
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('whose rows you can read');
+		$this->types->sanitizeGrid(['widgets' => [$this->dataWidget('table', 5)]], 'bob', ['widgets' => [$this->dataWidget('table', 4)]]);
 	}
 
 	public function testSanitizeGridRejectsAWidgetPlacedTwice(): void {

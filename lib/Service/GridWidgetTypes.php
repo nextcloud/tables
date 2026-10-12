@@ -117,13 +117,14 @@ class GridWidgetTypes {
 
 	/**
 	 * Validates a grid for the user who stores it and returns it with every widget reduced
-	 * to what its schemas allow.
+	 * to what its schemas allow. The grid stored so far tells which targets are unchanged.
 	 *
+	 * @param array<array-key, mixed> $storedGrid
 	 * @return array{widgets: list<TablesGridWidget>, layout: list<TablesGridLayoutItem>}
 	 * @throws BadRequestError
 	 * @throws Exception
 	 */
-	public function sanitizeGrid(mixed $grid, string $userId): array {
+	public function sanitizeGrid(mixed $grid, string $userId, array $storedGrid = []): array {
 		if (!is_array($grid)) {
 			throw new BadRequestError('The grid must be an object.');
 		}
@@ -144,7 +145,7 @@ class GridWidgetTypes {
 			}
 			$widgets[$sanitized['id']] = $sanitized;
 		}
-		$this->assertTargetsAreReadable($widgets, $userId);
+		$widgets = $this->checkTargets($widgets, $userId, $this->storedTargets($storedGrid));
 
 		$layout = [];
 		foreach ($grid['layout'] ?? [] as $item) {
@@ -219,14 +220,18 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * A data widget shows rows, so its table or view must exist, hold rows and be readable for
-	 * the user. Every unusable target gets the same error, so it reveals nothing about others' views.
+	 * A data widget shows rows, so a new or changed target must exist, hold rows and be readable
+	 * for the user; every unusable one gets the same error, so it reveals nothing about others'
+	 * views. A target that was stored before is kept as it is, so a save does not depend on the
+	 * saver's access to widgets they did not touch, and is marked broken once it no longer exists.
 	 *
 	 * @param array<string, TablesGridWidget> $widgets
+	 * @param array<string, array{type: 'table'|'view', id: int}> $storedTargets
+	 * @return array<string, TablesGridWidget>
 	 * @throws BadRequestError
 	 * @throws Exception
 	 */
-	private function assertTargetsAreReadable(array $widgets, string $userId): void {
+	private function checkTargets(array $widgets, string $userId, array $storedTargets): array {
 		$targetIds = ['table' => [], 'view' => []];
 		foreach ($widgets as $widget) {
 			$target = $widget['content']['target'] ?? null;
@@ -238,17 +243,41 @@ class GridWidgetTypes {
 			'table' => $targetIds['table'] === [] ? [] : $this->tableMapper->findMany($targetIds['table']),
 			'view' => $targetIds['view'] === [] ? [] : $this->viewMapper->findMany($targetIds['view']),
 		];
-		foreach ($targetIds as $type => $ids) {
-			foreach ($ids as $id) {
-				$element = $elements[$type][$id] ?? null;
-				$isUsable = $element !== null
-					&& !($element instanceof View && $element->isStandalone())
-					&& $this->permissionsService->canReadRowsByElement($element, $type, $userId);
-				if (!$isUsable) {
-					throw new BadRequestError('A table or view widget can only show a table or view whose rows you can read.');
+		foreach ($widgets as $widgetId => $widget) {
+			$target = $widget['content']['target'] ?? null;
+			if (!is_array($target)) {
+				continue;
+			}
+			$element = $elements[$target['type']][$target['id']] ?? null;
+			$exists = $element !== null && !($element instanceof View && $element->isStandalone());
+			if (($storedTargets[$widgetId] ?? null) === $target) {
+				// an unchanged target is kept; one that no longer exists is marked until the widget is saved valid again
+				if (!$exists) {
+					$widgets[$widgetId]['broken'] = true;
 				}
+				continue;
+			}
+			if (!$exists || !$this->permissionsService->canReadRowsByElement($element, $target['type'], $userId)) {
+				throw new BadRequestError('A table or view widget can only show a table or view whose rows you can read.');
 			}
 		}
+		return $widgets;
+	}
+
+	/**
+	 * The target of every widget in the stored grid, by widget id.
+	 *
+	 * @return array<string, array{type: 'table'|'view', id: int}>
+	 */
+	private function storedTargets(array $storedGrid): array {
+		$targets = [];
+		foreach (is_array($storedGrid['widgets'] ?? null) ? $storedGrid['widgets'] : [] as $widget) {
+			$target = is_array($widget) ? ($widget['content']['target'] ?? null) : null;
+			if (is_string($widget['id'] ?? null) && is_array($target) && in_array($target['type'] ?? null, ['table', 'view'], true) && is_int($target['id'] ?? null)) {
+				$targets[$widget['id']] = ['type' => $target['type'], 'id' => $target['id']];
+			}
+		}
+		return $targets;
 	}
 
 	/**
