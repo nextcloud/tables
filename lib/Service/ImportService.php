@@ -38,6 +38,7 @@ use OCP\DB\Exception;
 use OCP\Files\AppData\IAppDataFactory;
 use OCP\Files\Folder;
 use OCP\Files\IAppData;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
@@ -114,6 +115,7 @@ class ImportService extends SuperService {
 		private readonly IFactory $l10nFactory,
 		private readonly ActivityManager $activityManager,
 		IAppDataFactory $appDataFactory,
+		private readonly IFilenameValidator $filenameValidator,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->appData = $appDataFactory->get(Application::APP_ID);
@@ -460,19 +462,16 @@ class ImportService extends SuperService {
 			throw new InternalError($error);
 		}
 
-		$storedUserFilePath = null;
-		// uploaded file: copy it into the user's storage so the background job
-		// can read it later and the import report lands next to it
+		$importFileName = null;
+		// uploaded file: copy it into app data so the background job
+		// can read it later without adding it to the user's files
 		if (\file_exists($path)) {
-			$importsFolder = $this->getImportsFolder($this->userId);
-			if ($importsFolder === null) {
-				throw new InternalError('Could not access the imports folder of the user.');
+			if ($originalFileName === null || !$this->filenameValidator->isFilenameValid($originalFileName)) {
+				$originalFileName = 'import-' . bin2hex(random_bytes(8));
 			}
-			$fileName = $originalFileName !== null && $originalFileName !== ''
-				? basename($originalFileName)
-				: 'import-' . date('Y-m-d_H-i-s');
-			$storedUserFilePath = '/' . self::IMPORTS_FOLDER . '/' . $importsFolder->getNonExistingName($fileName);
-			$importsFolder->newFile(basename($storedUserFilePath))->putContent(\file_get_contents($path));
+			$extension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+			$importFileName = 'import-' . bin2hex(random_bytes(16)) . ($extension !== '' ? '.' . $extension : '');
+			$this->getImportAppDataDir()->newFile($importFileName)->putContent(\file_get_contents($path));
 		}
 
 		$this->jobList->add(
@@ -481,8 +480,9 @@ class ImportService extends SuperService {
 				'user_id' => $this->userId,
 				'table_id' => $this->tableId,
 				'view_id' => $this->viewId,
-				'user_file_path' => $storedUserFilePath ?? $path,
-				'import_file_name' => null,
+				'user_file_path' => $importFileName === null ? $path : null,
+				'import_file_name' => $importFileName,
+				'original_file_name' => $originalFileName,
 				'create_missing_columns' => $createMissingColumns,
 				'columns_config' => $columnsConfig,
 			]
@@ -655,7 +655,11 @@ class ImportService extends SuperService {
 		$baseName = $sourcePath !== null ? (pathinfo($sourcePath, PATHINFO_FILENAME) ?: 'import') : 'import';
 
 		try {
-			$problemsFileName = $importsFolder->getNonExistingName($baseName . '.import-problems-' . date('Ymd-His') . '.csv');
+			$problemsFileName = $baseName . '.import-problems-' . date('Ymd-His') . '.csv';
+			if (!$this->filenameValidator->isFilenameValid($problemsFileName)) {
+				$problemsFileName = 'import-problems-' . bin2hex(random_bytes(8)) . '.csv';
+			}
+			$problemsFileName = $importsFolder->getNonExistingName($problemsFileName);
 			$problemsFile = $importsFolder->newFile($problemsFileName);
 			$this->problemsFileStream->rewind();
 			$problemsFile->putContent($this->problemsFileStream->fread($this->problemsFileStream->getSize()));
@@ -679,7 +683,7 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * Get (and lazily create) the folder used for staged import files and
+	 * Get (and lazily create) the folder used for generated import
 	 * issue reports in the user's storage.
 	 */
 	private function getImportsFolder(string $userId): ?Folder {

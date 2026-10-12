@@ -41,6 +41,9 @@ class TablesProvider implements IProvider {
 		$subjectIdentifier = $event->getSubject();
 		$subjectParams = $event->getSubjectParameters();
 		$ownActivity = ($event->getAuthor() === $this->userId);
+		if (!$ownActivity && in_array($subjectIdentifier, [ActivityManager::SUBJECT_IMPORT_FINISHED, ActivityManager::SUBJECT_IMPORT_FAILED], true)) {
+			unset($subjectParams['importStats'], $subjectParams['importProblemsFile'], $subjectParams['errorMessage']);
+		}
 
 		/**
 		 * Map stored parameter objects to rich string types
