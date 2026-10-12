@@ -165,9 +165,15 @@ export default {
 				}
 			}
 		},
+		/**
+		 * Asks the app to open the create column dialog for the shown table or view.
+		 */
 		createColumn() {
 			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
+		/**
+		 * Asks the app to open the import dialog for the shown table or view.
+		 */
 		openImportModal() {
 			emit('tables:modal:import', { element: this.element, isView: this.isView })
 		},
