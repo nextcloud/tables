@@ -81,7 +81,7 @@ import ContentSaveOutline from 'vue-material-design-icons/ContentSaveOutline.vue
 import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
-import { getCurrentInstance } from 'vue'
+import { computed, ref } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { mapActions, mapState } from 'pinia'
 import GridCanvas from './GridCanvas.vue'
@@ -120,16 +120,42 @@ export default {
 			default: true,
 		},
 	},
-	setup() {
+	setup(props) {
+		// The draft lives here, so the route guards and the component share one implementation
+		const draftGrid = ref(null)
+		const storedGrid = computed(() => props.view.grid?.layout ? props.view.grid : emptyGrid())
+		const hasUnsavedChanges = computed(() => draftGrid.value !== null && JSON.stringify(draftGrid.value) !== JSON.stringify(cloneGrid(storedGrid.value)))
+
+		/**
+		 * Asks whether unsaved changes may be discarded.
+		 *
+		 * @return {Promise<boolean>} true when there is nothing to lose or the user agrees
+		 */
+		const confirmDiscard = async () => {
+			if (!hasUnsavedChanges.value) {
+				return true
+			}
+			try {
+				return await showConfirmation({
+					name: t('tables', 'Discard unsaved changes?'),
+					text: t('tables', 'This page has changes that are not saved yet.'),
+					labelConfirm: t('tables', 'Discard changes'),
+					labelReject: t('tables', 'Keep editing'),
+				})
+			} catch {
+				// Closing the dialog keeps the changes
+				return false
+			}
+		}
+
 		// Leaving the page, or switching to another view, asks first while the grid has unsaved changes
-		const instance = getCurrentInstance()
-		const confirmLeave = () => instance.proxy.confirmDiscard()
-		onBeforeRouteLeave(confirmLeave)
-		onBeforeRouteUpdate(confirmLeave)
+		onBeforeRouteLeave(confirmDiscard)
+		onBeforeRouteUpdate(confirmDiscard)
+
+		return { draftGrid, storedGrid, hasUnsavedChanges, confirmDiscard }
 	},
 	data() {
 		return {
-			draftGrid: null,
 			saving: false,
 			addWidgetOpen: false,
 			widgetBeingConfigured: null,
@@ -137,17 +163,11 @@ export default {
 	},
 	computed: {
 		...mapState(useTablesStore, ['widgetTypes']),
-		storedGrid() {
-			return this.view.grid?.layout ? this.view.grid : emptyGrid()
-		},
 		activeGrid() {
 			return this.draftGrid ?? this.storedGrid
 		},
 		isEditing() {
 			return this.draftGrid !== null
-		},
-		hasUnsavedChanges() {
-			return this.isEditing && JSON.stringify(this.draftGrid) !== JSON.stringify(cloneGrid(this.storedGrid))
 		},
 		widgetsById() {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.id, widget]))
@@ -166,27 +186,6 @@ export default {
 	},
 	methods: {
 		...mapActions(useTablesStore, ['updateView']),
-		/**
-		 * Asks whether unsaved changes may be discarded.
-		 *
-		 * @return {Promise<boolean>} true when there is nothing to lose or the user agrees
-		 */
-		async confirmDiscard() {
-			if (!this.hasUnsavedChanges) {
-				return true
-			}
-			try {
-				return await showConfirmation({
-					name: t('tables', 'Discard unsaved changes?'),
-					text: t('tables', 'This page has changes that are not saved yet.'),
-					labelConfirm: t('tables', 'Discard changes'),
-					labelReject: t('tables', 'Keep editing'),
-				})
-			} catch {
-				// Closing the dialog keeps the changes
-				return false
-			}
-		},
 		/**
 		 * Lets the browser warn before the tab closes or reloads with unsaved changes.
 		 *
