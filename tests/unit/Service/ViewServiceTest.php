@@ -37,6 +37,7 @@ class ViewServiceTest extends TestCase {
 	private MockObject $permissionsService;
 	private MockObject $mapper;
 	private MockObject $activityManager;
+	private MockObject $tableMapper;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -45,6 +46,7 @@ class ViewServiceTest extends TestCase {
 		$this->permissionsService->method('preCheckUserId')->willReturnCallback(static fn (?string $userId) => $userId ?? 'alice');
 		$this->mapper = $this->createMock(ViewMapper::class);
 		$this->activityManager = $this->createMock(ActivityManager::class);
+		$this->tableMapper = $this->createMock(TableMapper::class);
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(static fn (string $text): string => $text);
 
@@ -62,7 +64,7 @@ class ViewServiceTest extends TestCase {
 			$l10n,
 			$this->createMock(FederationService::class),
 			$this->activityManager,
-			new GridWidgetTypes($l10n, $this->mapper, $this->createMock(TableMapper::class), $this->permissionsService),
+			new GridWidgetTypes($l10n, $this->mapper, $this->tableMapper, $this->permissionsService),
 		);
 	}
 
@@ -81,6 +83,22 @@ class ViewServiceTest extends TestCase {
 		$this->permissionsService->method('canManageView')->willReturn(true);
 		$this->mapper->method('find')->with(6)->willReturn($view);
 		$this->mapper->method('update')->willReturnArgument(0);
+	}
+
+	public function testUpdateKeepsAStoredTargetTheSaverCannotRead(): void {
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'data', 'content' => ['target' => ['type' => 'table', 'id' => 4]]]], 'layout' => []];
+		$view = $this->storedView(null);
+		$view->setGridArray($grid);
+		$view->resetUpdatedFields();
+		$this->expectUpdateOf($view);
+		$table = new Table();
+		$table->setId(4);
+		$this->tableMapper->method('findMany')->willReturn([4 => $table]);
+		$this->permissionsService->method('canReadRowsByElement')->willReturn(false);
+
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'bob', true);
+
+		$this->assertSame(['type' => 'table', 'id' => 4], $updated->getGridArray()['widgets'][0]['content']['target'], 'the stored grid tells the target is unchanged');
 	}
 
 	public function testUpdateStoresAValidGridAsJson(): void {
