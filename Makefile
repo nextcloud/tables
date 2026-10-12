@@ -45,7 +45,6 @@ appstore: build
 assemble:
 	mkdir -p $(build_dir)
 	rsync -a \
-	--exclude=babel.config.js \
 	--exclude=build \
 	--exclude=composer.* \
 	--exclude=CONTRIBUTING.md \
