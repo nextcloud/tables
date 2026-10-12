@@ -4,6 +4,7 @@
  */
 import HeaderWidget from './widgets/HeaderWidget.vue'
 import TextWidget from './widgets/TextWidget.vue'
+import DataWidget from './widgets/DataWidget.vue'
 
 export const WIDGET_TYPE_HEADER = 'header'
 export const WIDGET_TYPE_TEXT = 'text'
@@ -17,6 +18,7 @@ export const WIDGET_TYPE_DATA = 'data'
 const widgetComponents = {
 	[WIDGET_TYPE_HEADER]: HeaderWidget,
 	[WIDGET_TYPE_TEXT]: TextWidget,
+	[WIDGET_TYPE_DATA]: DataWidget,
 }
 
 /**
