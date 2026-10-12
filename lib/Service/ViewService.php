@@ -59,6 +59,7 @@ class ViewService extends SuperService {
 		protected IL10N $l,
 		private readonly FederationService $federationService,
 		private readonly ActivityManager $activityManager,
+		private readonly GridWidgetTypes $gridWidgetTypes,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -291,7 +292,11 @@ class ViewService extends SuperService {
 					}
 				}
 
-				if ($value instanceof JsonSerializable) {
+				if ($parameter === ViewUpdatableParameters::GRID) {
+					$value = $this->gridWidgetTypes->sanitizeGrid($value);
+				}
+
+				if ($value instanceof JsonSerializable || is_array($value)) {
 					$insertableValue = json_encode($value);
 				}
 
@@ -716,6 +721,9 @@ class ViewService extends SuperService {
 		$type = $view['type'] ?? View::TYPE_TABLE;
 		$this->assertTypeValid($type);
 		$item->setType($type);
+		if (isset($view['grid'])) {
+			$item->setGridArray($this->gridWidgetTypes->sanitizeGrid($view['grid']));
+		}
 		try {
 			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {

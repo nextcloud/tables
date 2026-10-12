@@ -13,6 +13,46 @@ use OCA\Tables\Db\View;
 use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase {
+	public function testGridArrayIsEmptyWhenNothingIsStored(): void {
+		$view = new View();
+		$this->assertSame(['widgets' => [], 'layout' => []], $view->getGridArray());
+
+		$view->setGrid('null');
+		$this->assertSame(['widgets' => [], 'layout' => []], $view->getGridArray());
+	}
+
+	public function testGridArrayDropsUnknownKeysAndNonLists(): void {
+		$view = new View();
+		$view->setGrid(json_encode(['widgets' => 'oops', 'layout' => [['widgetId' => 'w-1']], 'extra' => true]));
+
+		$this->assertSame(['widgets' => [], 'layout' => [['widgetId' => 'w-1', 'id' => 'w-1']]], $view->getGridArray());
+	}
+
+	public function testGridArrayRoundTrips(): void {
+		$grid = [
+			'widgets' => [['id' => 'w-1', 'type' => 'header', 'configuration' => ['title' => 'Hi', 'showTitle' => false], 'content' => ['title' => 'Hi']]],
+			'layout' => [['id' => 'w-1', 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]],
+		];
+		$view = new View();
+		$view->setGridArray($grid);
+
+		$this->assertSame($grid, $view->getGridArray());
+	}
+
+	public function testGridArrayIdentifiesLayoutItemsSavedWithANumberByTheirWidget(): void {
+		$view = new View();
+		$view->setGridArray(['widgets' => [], 'layout' => [['id' => 1, 'widgetId' => 'w-1', 'gridX' => 0], ['gridX' => 0]]]);
+
+		$this->assertSame([['id' => 'w-1', 'widgetId' => 'w-1', 'gridX' => 0]], $view->getGridArray()['layout']);
+	}
+
+	public function testGridArrayUpgradesWidgetsSavedBeforeTheConfiguration(): void {
+		$view = new View();
+		$view->setGrid(json_encode(['widgets' => [['id' => 'w-1', 'type' => 'text', 'title' => 'How', 'showTitle' => true, 'content' => ['text' => 'x']]], 'layout' => []]));
+
+		$this->assertSame([['id' => 'w-1', 'type' => 'text', 'content' => ['text' => 'x'], 'configuration' => ['title' => 'How', 'showTitle' => true]]], $view->getGridArray()['widgets']);
+	}
+
 	public function testTypeFallsBackToTable(): void {
 		$view = new View();
 		$this->assertSame(View::TYPE_TABLE, $view->getTypeOrDefault());
@@ -33,16 +73,18 @@ class ViewTest extends TestCase {
 		$this->assertSame('table-owner', $view->getOwnership());
 	}
 
-	public function testJsonSerializeCarriesTypeAndTechnicalName(): void {
+	public function testJsonSerializeCarriesTypeGridAndTechnicalName(): void {
 		$view = new View();
 		$view->setType(View::TYPE_GRID);
 		$view->setTechnicalName('home');
 		$view->setCreatedBy('alice');
+		$view->setGridArray(['widgets' => [], 'layout' => []]);
 
 		$json = $view->jsonSerialize();
 
 		$this->assertSame('grid', $json['type']);
 		$this->assertSame('home', $json['technicalName']);
+		$this->assertSame(['widgets' => [], 'layout' => []], $json['grid']);
 		$this->assertSame(-1, $json['tableId']);
 		$this->assertSame('alice', $json['ownership']);
 	}

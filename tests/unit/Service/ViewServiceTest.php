@@ -20,6 +20,7 @@ use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
 use OCA\Tables\Service\FederationService;
+use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
@@ -60,6 +61,7 @@ class ViewServiceTest extends TestCase {
 			$l10n,
 			$this->createMock(FederationService::class),
 			$this->activityManager,
+			new GridWidgetTypes($l10n, $this->mapper),
 		);
 	}
 
@@ -80,6 +82,25 @@ class ViewServiceTest extends TestCase {
 		$this->mapper->method('update')->willReturnArgument(0);
 	}
 
+	public function testUpdateStoresAValidGridAsJson(): void {
+		$view = $this->storedView(null);
+		$this->expectUpdateOf($view);
+		$grid = [
+			'widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi', 'backgroundColor' => '#abc', 'stray' => 'dropped']]],
+			'layout' => [['id' => 1, 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]],
+		];
+
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
+
+		$stored = $updated->getGridArray();
+		$this->assertSame([['id' => 'w-1', 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]], $stored['layout'], 'a layout item is identified by its widget');
+		$this->assertSame('Hi', $stored['widgets'][0]['content']['title']);
+		$this->assertSame('#abc', $stored['widgets'][0]['content']['backgroundColor']);
+		$this->assertSame('left', $stored['widgets'][0]['content']['textAlign'], 'defaults are filled in');
+		$this->assertArrayNotHasKey('stray', $stored['widgets'][0]['content'], 'unknown properties are dropped');
+		$this->assertSame(['title' => '', 'showTitle' => false], $stored['widgets'][0]['configuration'], 'the configuration is filled from the type');
+	}
+
 	public function testUpdateWritesEveryParameterToItsOwnColumn(): void {
 		$this->expectUpdateOf($this->storedView(4));
 
@@ -90,6 +111,33 @@ class ViewServiceTest extends TestCase {
 
 		$this->assertSame('grid', $updated->getType());
 		$this->assertSame([['columnId' => 3, 'mode' => 'ASC']], $updated->getSortArray());
+	}
+
+	public function testUpdateRejectsNonHexWidgetColors(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi', 'backgroundColor' => 'url(evil)']]], 'layout' => []];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('hex color');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
+	}
+
+	public function testUpdateRejectsLayoutItemsWithoutPositions(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text', 'content' => ['text' => 'x']]], 'layout' => [['widgetId' => 'w-1', 'gridX' => 0]]];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('gridY');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
+	}
+
+	public function testUpdateRejectsWidgetsWithoutIdOrType(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['type' => 'text']], 'layout' => []];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('string id and type');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
 	}
 
 	public function testUpdateRejectsAnUnknownType(): void {

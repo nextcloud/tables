@@ -34,6 +34,8 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setTableId(?int $tableId)
  * @method getType(): string
  * @method setType(string $type)
+ * @method getGrid(): ?string
+ * @method setGrid(?string $grid)
  * @method getColumns(): string
  * @method setColumns(string $columns)
  * @method getColumnSettings(): string
@@ -95,6 +97,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
 	protected ?string $type = null;
+	protected ?string $grid = null; // json
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -219,6 +222,56 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
+	/**
+	 * The widgets of a grid view and where they sit.
+	 *
+	 * @return array{widgets: list<array<string, mixed>>, layout: list<array<string, mixed>>}
+	 */
+	public function getGridArray(): array {
+		$grid = $this->getArray($this->getGrid());
+		$widgets = [];
+		foreach (is_array($grid['widgets'] ?? null) ? $grid['widgets'] : [] as $widget) {
+			if (is_array($widget)) {
+				$widgets[] = self::upgradeWidgetShape($widget);
+			}
+		}
+		$layout = [];
+		foreach (is_array($grid['layout'] ?? null) ? $grid['layout'] : [] as $item) {
+			if (is_array($item) && is_string($item['widgetId'] ?? null)) {
+				// a layout item is identified by its widget
+				$item['id'] = $item['widgetId'];
+				$layout[] = $item;
+			}
+		}
+		return ['widgets' => $widgets, 'layout' => $layout];
+	}
+
+	/**
+	 * Grids saved before widgets had a configuration carried title and showTitle on the
+	 * widget itself; they read as the current shape until saved again.
+	 *
+	 * @param array<string, mixed> $widget
+	 * @return array<string, mixed>
+	 */
+	private static function upgradeWidgetShape(array $widget): array {
+		$configuration = is_array($widget['configuration'] ?? null) ? $widget['configuration'] : [];
+		foreach (['title', 'showTitle'] as $legacy) {
+			if (array_key_exists($legacy, $widget)) {
+				if (!array_key_exists($legacy, $configuration)) {
+					$configuration[$legacy] = $widget[$legacy];
+				}
+				unset($widget[$legacy]);
+			}
+		}
+		$widget['configuration'] = $configuration;
+		$widget['content'] = is_array($widget['content'] ?? null) ? $widget['content'] : [];
+		return $widget;
+	}
+
+	public function setGridArray(array $array): void {
+		$this->setGrid(\json_encode($array, JSON_THROW_ON_ERROR));
+	}
+
 	public function getTypeOrDefault(): string {
 		return in_array($this->type, self::TYPES, true) ? $this->type : self::TYPE_TABLE;
 	}
@@ -263,6 +316,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'isFederated' => $this->isFederated(),
 			'sidebarOrder' => $this->sidebarOrder,
 			'type' => $this->getTypeOrDefault(),
+			'grid' => $this->getGridArray(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 
