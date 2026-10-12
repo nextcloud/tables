@@ -24,9 +24,9 @@ class ViewSettings implements JsonSerializable {
 
 	/**
 	 * @param array{cardBackgroundSource?: int|null, cardTitleSource?: int|null, cardBackgroundSourceUuid?: string, cardTitleSourceUuid?: string} $data
-	 * @param array<string, Column> $columnsMap
+	 * @param array<string, Column>|null $columnsMap scheme columns by uuid, or null for ids of this instance
 	 */
-	public static function createFromInputArray(array $data, array $columnsMap = []): self {
+	public static function createFromInputArray(array $data, ?array $columnsMap = null): self {
 		return new self(
 			cardBackgroundSource: self::resolveSource($data, 'cardBackgroundSource', $columnsMap),
 			cardTitleSource: self::resolveSource($data, 'cardTitleSource', $columnsMap),
@@ -36,14 +36,15 @@ class ViewSettings implements JsonSerializable {
 	/**
 	 * A scheme carries the column uuid, because the ids of the table it was exported from mean
 	 * nothing here. A source that no longer resolves is dropped rather than kept, as a stale id
-	 * would otherwise point at an unrelated column.
+	 * would otherwise point at an unrelated column. For the same reason a scheme source given as
+	 * a bare id is dropped.
 	 *
-	 * @param array<string, Column> $columnsMap
+	 * @param array<string, Column>|null $columnsMap
 	 */
-	private static function resolveSource(array $data, string $key, array $columnsMap): ?int {
+	private static function resolveSource(array $data, string $key, ?array $columnsMap): ?int {
 		$uuidKey = $key . 'Uuid';
-		if (array_key_exists($uuidKey, $data)) {
-			$uuid = $data[$uuidKey];
+		if ($columnsMap !== null || array_key_exists($uuidKey, $data)) {
+			$uuid = $data[$uuidKey] ?? null;
 			if (!is_string($uuid) || !isset($columnsMap[$uuid])) {
 				return null;
 			}

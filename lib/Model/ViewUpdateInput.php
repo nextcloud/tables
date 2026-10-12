@@ -127,7 +127,8 @@ class ViewUpdateInput {
 			if (!is_array($data['viewSettings'])) {
 				throw new \InvalidArgumentException('Invalid viewSettings value.');
 			}
-			return ViewSettings::createFromInputArray($data['viewSettings'], $columnsMap);
+			// Only a scheme update passes a columns map. Plain API input already carries ids.
+			return ViewSettings::createFromInputArray($data['viewSettings'], $columnsMap === [] ? null : $columnsMap);
 		}
 
 		return null;

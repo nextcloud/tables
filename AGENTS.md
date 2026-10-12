@@ -254,7 +254,7 @@ On import/export, selection option IDs change. `ColumnService::importColumn()` m
 
 When a stored rule, filter, or condition references a column or option that no longer exists (due to deletion, type change, or import remapping), mark it `broken: true` instead of deleting it. Surface the broken state in the UI. Provide an auto-clear path that removes the flag when the rule is next saved in a valid state.
 
-**Exception — presentational references.** A reference that only selects how a row is *displayed*, rather than which rows or values are returned, is dropped to `null` instead. Card sources (`viewSettings.cardBackgroundSource`, `viewSettings.cardTitleSource`) are the current case, handled in `ViewSettings::resolveSource()`, `ApiTablesController::remapViewSettings()` and `TablesMigrator::remapViewCardSource()`.
+**Exception — presentational references.** A reference that only selects how a row is *displayed*, rather than which rows or values are returned, is dropped to `null` instead. Card sources (`viewSettings.cardBackgroundSource`, `viewSettings.cardTitleSource`) are the current case, handled in `ViewSettings::resolveSource()`, `ViewSettings::remapSources()` (called from `ApiTablesController::createFromScheme()`) and `TablesMigrator::remapViewCardSources()`.
 
 Two reasons this differs from a filter or sort rule:
 

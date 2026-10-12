@@ -304,6 +304,11 @@ class StructureService {
 		if ($viewB instanceof \OCA\Tables\Db\View) {
 			$viewB = $viewB->jsonSerialize();
 		}
+		// A scheme written before card sources existed carries no viewSettings, which leaves
+		// the stored ones alone rather than clearing them.
+		if (!array_key_exists('viewSettings', $viewA)) {
+			$viewA['viewSettings'] = $viewB['viewSettings'] ?? null;
+		}
 
 		return $this->comparableView($viewA) !== $this->comparableView($viewB);
 	}
@@ -314,6 +319,8 @@ class StructureService {
 	 * A scheme written before the layout existed, or by hand, carries neither key. Both
 	 * sides are normalised so such a view does not read as modified on every import,
 	 * which would cost a write, an activity entry and a federation notification each.
+	 *
+	 * Card sources are compared by column uuid, the form prepareViewsData() leaves them in.
 	 */
 	private function comparableView(array $view): array {
 		$viewSettings = is_array($view['viewSettings'] ?? null) ? $view['viewSettings'] : [];
@@ -329,8 +336,8 @@ class StructureService {
 			'filter' => $view['filter'],
 			'layout' => ViewLayout::normalize($view['layout'] ?? null)->value,
 			'viewSettings' => [
-				'cardBackgroundSource' => $viewSettings['cardBackgroundSource'] ?? null,
-				'cardTitleSource' => $viewSettings['cardTitleSource'] ?? null,
+				'cardBackgroundSourceUuid' => $viewSettings['cardBackgroundSourceUuid'] ?? null,
+				'cardTitleSourceUuid' => $viewSettings['cardTitleSourceUuid'] ?? null,
 			],
 		];
 	}

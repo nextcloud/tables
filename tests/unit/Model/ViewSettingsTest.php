@@ -44,6 +44,14 @@ class ViewSettingsTest extends TestCase {
 		$this->assertNull($settings->getCardTitleSource(), 'a uuid that does not resolve is dropped');
 	}
 
+	public function testInputArrayDropsABareIdWhenReadingAScheme(): void {
+		// A scheme id belongs to the instance it was exported from, so only the uuid form counts.
+		$settings = ViewSettings::createFromInputArray(['cardBackgroundSource' => 3, 'cardTitleSource' => 4], []);
+
+		$this->assertNull($settings->getCardBackgroundSource());
+		$this->assertNull($settings->getCardTitleSource());
+	}
+
 	public function testStoredArrayToleratesWhatItCannotUse(): void {
 		$settings = ViewSettings::createFromStoredArray(['cardBackgroundSource' => 'garbage', 'cardTitleSource' => 7]);
 
