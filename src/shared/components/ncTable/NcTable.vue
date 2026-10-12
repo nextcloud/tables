@@ -33,6 +33,9 @@ config                  -> config object for the table
       action-button-sticky [true]
     columns
       show-inline-edit-button [true]
+contextSearchString <string> -> optional search term set by a parent (e.g. an application)
+						   that filters all displayed elements at once. A search string
+						   set on the view itself takes precedence.
 
 Bus events
 ==========
@@ -153,6 +156,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+		contextSearchString: {
+			type: String,
+			default: '',
+		},
 		selectedRows: {
 			type: Array,
 			default: null,
@@ -267,7 +274,7 @@ export default {
 			return this.isFormMode ? t('tables', 'Fill form') : t('tables', 'Create row')
 		},
 		isFilteredComputed() {
-			return (this.localViewSetting?.filter?.length > 0) || !!this.localViewSetting?.searchString
+			return (this.localViewSetting?.filter?.length > 0) || !!this.localViewSetting?.searchString || !!this.contextSearchString
 		},
 
 		sorting() {
@@ -275,7 +282,7 @@ export default {
 		},
 		getSearchedAndFilteredRows() {
 			// if we don't have to search and/or filter
-			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
+			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString && !this.contextSearchString) {
 				// cleanup markers
 				if (this.rows && this.columns) {
 					this.rows.forEach(row => {
@@ -295,7 +302,8 @@ export default {
 			}
 
 			const data = [] // array of rows
-			const searchString = this.viewSetting?.searchString
+			// a search string set on the view itself takes precedence over the context-wide search string
+			const searchString = this.viewSetting?.searchString || this.contextSearchString
 			// each row
 			if (!this.rows || !this.columns) {
 				return []

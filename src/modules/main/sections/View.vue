@@ -14,6 +14,7 @@
 				:columns="columns"
 				:element="view"
 				:is-view="true"
+				:context-search-string="contextSearchString"
 				:can-read-rows="canReadData(view)"
 				:can-create-rows="canCreateRowInElement(view)"
 				:can-edit-rows="canUpdateData(view)"
@@ -136,6 +137,10 @@ export default {
 		viewSetting: {
 			type: Object,
 			default: null,
+		},
+		contextSearchString: {
+			type: String,
+			default: '',
 		},
 
 	},
