@@ -13,6 +13,7 @@
 					<MainForm v-model:description="editColumn.description"
 						v-model:mandatory="editColumn.mandatory"
 						v-model:technical-name="editColumn.technicalName"
+						:original-technical-name="column.technicalName || ''"
 						v-model:title="editColumn.title"
 						v-model:custom-settings="editColumn.customSettings"
 						:edit-column="true"
