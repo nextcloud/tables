@@ -1326,7 +1326,11 @@
                         "nullable": true
                     },
                     "type": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "table",
+                            "grid"
+                        ]
                     },
                     "grid": {
                         "type": "object",

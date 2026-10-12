@@ -72,6 +72,12 @@ class ViewUpdateInputTest extends TestCase {
 		ViewUpdateInput::fromInputArray(['type' => ['grid']]);
 	}
 
+	public function testAnUnknownTypeIsRejected(): void {
+		$this->expectException(InvalidArgumentException::class);
+		$this->expectExceptionMessage('Unknown view type "kanban"');
+		ViewUpdateInput::fromInputArray(['type' => 'kanban']);
+	}
+
 	public function testAGridThatIsNotAnObjectIsRejected(): void {
 		$this->expectException(InvalidArgumentException::class);
 		$this->expectExceptionMessage('"grid" must be an object');

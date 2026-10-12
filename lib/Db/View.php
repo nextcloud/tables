@@ -272,15 +272,29 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->setGrid(\json_encode($array, JSON_THROW_ON_ERROR));
 	}
 
+	/**
+	 * @return 'table'|'grid'
+	 */
 	public function getTypeOrDefault(): string {
-		return in_array($this->type, self::TYPES, true) ? $this->type : self::TYPE_TABLE;
+		return $this->type === self::TYPE_GRID ? self::TYPE_GRID : self::TYPE_TABLE;
 	}
 
 	/**
-	 * A view inherits its ownership from its table; a view without a table is owned by its creator.
+	 * A view of its own, such as a grid view: it has no table and is not a federated view,
+	 * which has no local table either.
+	 */
+	public function isStandalone(): bool {
+		return $this->tableId === null && $this->externalId === null;
+	}
+
+	/**
+	 * A view inherits its ownership from its table; a standalone view is owned by its creator.
 	 */
 	public function getOwnership(): ?string {
-		return $this->ownership ?? $this->createdBy;
+		if ($this->ownership === null && $this->isStandalone()) {
+			return $this->createdBy;
+		}
+		return $this->ownership;
 	}
 
 	private function getSharePermissions(): ?Permissions {

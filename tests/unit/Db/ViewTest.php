@@ -73,6 +73,34 @@ class ViewTest extends TestCase {
 		$this->assertSame('table-owner', $view->getOwnership());
 	}
 
+	public function testOwnershipDoesNotFallBackToCreatorForAViewWithATable(): void {
+		$view = new View();
+		$view->setTableId(4);
+		$view->setCreatedBy('alice');
+
+		$this->assertNull($view->getOwnership(), 'without the joined table owner the creator must not become the owner');
+	}
+
+	public function testOwnershipDoesNotFallBackToCreatorForAFederatedView(): void {
+		$view = new View();
+		$view->setExternalId(17);
+		$view->setCreatedBy('remote-sharer');
+
+		$this->assertNull($view->getOwnership());
+	}
+
+	public function testOnlyAViewWithoutTableAndExternalIdIsStandalone(): void {
+		$view = new View();
+		$this->assertTrue($view->isStandalone());
+
+		$view->setExternalId(17);
+		$this->assertFalse($view->isStandalone(), 'a federated view has no local table but is not standalone');
+
+		$view->setExternalId(null);
+		$view->setTableId(4);
+		$this->assertFalse($view->isStandalone());
+	}
+
 	public function testJsonSerializeCarriesTypeGridAndTechnicalName(): void {
 		$view = new View();
 		$view->setType(View::TYPE_GRID);

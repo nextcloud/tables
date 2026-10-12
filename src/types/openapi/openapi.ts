@@ -1438,7 +1438,8 @@ export type components = {
             readonly isFederated: boolean;
             /** Format: int64 */
             readonly sidebarOrder: number | null;
-            readonly type: string;
+            /** @enum {string} */
+            readonly type: "table" | "grid";
             readonly grid: {
                 readonly widgets: readonly components["schemas"]["GridWidget"][];
                 readonly layout: readonly components["schemas"]["GridLayoutItem"][];

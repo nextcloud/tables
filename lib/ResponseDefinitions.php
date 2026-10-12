@@ -61,7 +61,7 @@ namespace OCA\Tables;
  *  rowsCount: int,
  *  isFederated: bool,
  *  sidebarOrder: int|null,
- *  type: string,
+ *  type: 'table'|'grid',
  *  grid: array{widgets: list<TablesGridWidget>, layout: list<TablesGridLayoutItem>},
  * }
  *

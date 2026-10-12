@@ -130,7 +130,7 @@ class RowService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
-				if ($view->getTableId() === null) {
+				if ($view->isStandalone()) {
 					// a view without a table, such as a grid view, holds no rows
 					return [];
 				}
@@ -234,7 +234,7 @@ class RowService extends SuperService {
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 
-			if ($view->getTableId() === null) {
+			if ($view->isStandalone()) {
 				throw new NotFoundError('The view with id = ' . $viewId . ' has no table to create a row in.');
 			}
 

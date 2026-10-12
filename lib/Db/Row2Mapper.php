@@ -768,6 +768,10 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function isRowInViewPresent(int $rowId, View $view, string $userId): bool {
+		if ($view->getTableId() === null) {
+			// a view without a table holds no rows
+			return false;
+		}
 		return in_array($rowId, $this->getWantedRowIds($userId, $view->getTableId(), $view->getFilterArray()));
 	}
 
@@ -1033,6 +1037,9 @@ class Row2Mapper {
 	 * @return int
 	 */
 	public function countRowsForView(View $view, string $userId): int {
+		if ($view->getTableId() === null) {
+			return 0;
+		}
 		$filter = $view->getFilterArray();
 
 		if (empty($filter)) {
