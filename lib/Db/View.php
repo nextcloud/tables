@@ -223,49 +223,14 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
-	 * The widgets of a grid view and where they sit.
+	 * The widgets of a grid view and where they sit, as GridWidgetTypes stored them.
 	 *
-	 * @return array{widgets: list<array<string, mixed>>, layout: list<array<string, mixed>>}
+	 * @return array{widgets: list<array<array-key, mixed>>, layout: list<array<array-key, mixed>>}
 	 */
 	public function getGridArray(): array {
 		$grid = $this->getArray($this->getGrid());
-		$widgets = [];
-		foreach (is_array($grid['widgets'] ?? null) ? $grid['widgets'] : [] as $widget) {
-			if (is_array($widget)) {
-				$widgets[] = self::upgradeWidgetShape($widget);
-			}
-		}
-		$layout = [];
-		foreach (is_array($grid['layout'] ?? null) ? $grid['layout'] : [] as $item) {
-			if (is_array($item) && is_string($item['widgetId'] ?? null)) {
-				// a layout item is identified by its widget
-				$item['id'] = $item['widgetId'];
-				$layout[] = $item;
-			}
-		}
-		return ['widgets' => $widgets, 'layout' => $layout];
-	}
-
-	/**
-	 * Grids saved before widgets had a configuration carried title and showTitle on the
-	 * widget itself; they read as the current shape until saved again.
-	 *
-	 * @param array<string, mixed> $widget
-	 * @return array<string, mixed>
-	 */
-	private static function upgradeWidgetShape(array $widget): array {
-		$configuration = is_array($widget['configuration'] ?? null) ? $widget['configuration'] : [];
-		foreach (['title', 'showTitle'] as $legacy) {
-			if (array_key_exists($legacy, $widget)) {
-				if (!array_key_exists($legacy, $configuration)) {
-					$configuration[$legacy] = $widget[$legacy];
-				}
-				unset($widget[$legacy]);
-			}
-		}
-		$widget['configuration'] = $configuration;
-		$widget['content'] = is_array($widget['content'] ?? null) ? $widget['content'] : [];
-		return $widget;
+		$list = static fn (mixed $items): array => array_values(array_filter(is_array($items) ? $items : [], 'is_array'));
+		return ['widgets' => $list($grid['widgets'] ?? null), 'layout' => $list($grid['layout'] ?? null)];
 	}
 
 	public function setGridArray(array $array): void {

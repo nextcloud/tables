@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
+use JsonException;
 use JsonSerializable;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
@@ -303,11 +304,19 @@ class ViewService extends SuperService {
 				}
 
 				if ($parameter === ViewUpdatableParameters::GRID) {
-					$value = $this->gridWidgetTypes->sanitizeGrid($value);
+					// the type is applied before the grid, so a request can turn a view into a grid view and fill it
+					if ($view->getTypeOrDefault() !== View::TYPE_GRID) {
+						throw new BadRequestError('Only a grid view holds a grid.');
+					}
+					$value = $this->gridWidgetTypes->sanitizeGrid($value, $userId, $view->getGridArray());
 				}
 
 				if ($value instanceof JsonSerializable || is_array($value)) {
-					$insertableValue = json_encode($value);
+					try {
+						$insertableValue = json_encode($value, JSON_THROW_ON_ERROR);
+					} catch (JsonException $e) {
+						throw new BadRequestError('The view property "' . $parameter->value . '" cannot be stored: ' . $e->getMessage());
+					}
 				}
 
 				$setterMethod = 'set' . ucfirst((string)$parameter->value);
@@ -732,8 +741,9 @@ class ViewService extends SuperService {
 		$type = $view['type'] ?? View::TYPE_TABLE;
 		$this->assertTypeValid($type);
 		$item->setType($type);
-		if (isset($view['grid'])) {
-			$item->setGridArray($this->gridWidgetTypes->sanitizeGrid($view['grid']));
+		// every exported view carries a grid, so only a grid view takes it over
+		if ($type === View::TYPE_GRID && isset($view['grid'])) {
+			$item->setGridArray($this->gridWidgetTypes->sanitizeGrid($view['grid'], $userId));
 		}
 		try {
 			$importedView = $this->mapper->insert($item);

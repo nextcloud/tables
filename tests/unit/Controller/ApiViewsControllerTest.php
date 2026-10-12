@@ -10,11 +10,13 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Controller;
 
 use OCA\Tables\Controller\ApiViewsController;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\GridWidgetTypes;
+use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Http;
 use OCP\IL10N;
@@ -33,7 +35,7 @@ final class ApiViewsControllerTest extends TestCase {
 		$this->viewService = $this->createMock(ViewService::class);
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
-		$this->gridWidgetTypes = new GridWidgetTypes($l10n, $this->createMock(ViewMapper::class));
+		$this->gridWidgetTypes = new GridWidgetTypes($l10n, $this->createMock(ViewMapper::class), $this->createMock(TableMapper::class), $this->createMock(PermissionsService::class));
 		$this->controller = new ApiViewsController($this->createMock(IRequest::class), $this->createMock(LoggerInterface::class), $l10n, 'alice', $this->viewService, $this->gridWidgetTypes);
 	}
 

@@ -9,8 +9,12 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\ResponseDefinitions;
+use OCP\DB\Exception;
 use OCP\IL10N;
 
 /**
@@ -18,10 +22,11 @@ use OCP\IL10N;
  * and one for its content; the frontend renders its forms from them and stored grids
  * are validated against them.
  *
- * @psalm-type GridWidgetProperty = array{type: string, title: string, default: mixed, options?: list<array{value: string, label: string}>, required?: bool}
- * @psalm-type GridWidgetType = array{type: string, title: string, defaultWidth: int, defaultHeight: int, configuration: array<string, GridWidgetProperty>, properties: array<string, GridWidgetProperty>}
- * @psalm-type GridWidget = array{id: string, type: string, configuration: array<string, mixed>, content: array<string, mixed>}
- * @psalm-type GridLayoutItem = array{id: string, widgetId: string, gridX: int, gridY: int, gridWidth: int, gridHeight: int}
+ * @psalm-import-type TablesGridWidgetValue from ResponseDefinitions
+ * @psalm-import-type TablesGridWidget from ResponseDefinitions
+ * @psalm-import-type TablesGridLayoutItem from ResponseDefinitions
+ * @psalm-import-type TablesGridWidgetProperty from ResponseDefinitions
+ * @psalm-import-type TablesGridWidgetType from ResponseDefinitions
  */
 class GridWidgetTypes {
 	public const TYPE_HEADER = 'header';
@@ -31,16 +36,19 @@ class GridWidgetTypes {
 	public const PROPERTY_TYPES = ['string', 'text', 'color', 'boolean', 'integer', 'enum', 'target'];
 
 	private const HEX_COLOR = '/^#[0-9a-fA-F]{3,6}$/';
-	private const LAYOUT_POSITIONS = ['gridX', 'gridY', 'gridWidth', 'gridHeight'];
+	private const LAYOUT_POSITIONS = ['gridX', 'gridY'];
+	private const LAYOUT_SIZES = ['gridWidth', 'gridHeight'];
 
 	public function __construct(
 		private readonly IL10N $l10n,
 		private readonly ViewMapper $viewMapper,
+		private readonly TableMapper $tableMapper,
+		private readonly PermissionsService $permissionsService,
 	) {
 	}
 
 	/**
-	 * @return array<string, GridWidgetType>
+	 * @return array<string, TablesGridWidgetType>
 	 */
 	public function all(): array {
 		return [
@@ -86,7 +94,7 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * @return array<string, GridWidgetProperty>
+	 * @return array<string, TablesGridWidgetProperty>
 	 */
 	private function titleConfiguration(bool $showTitle): array {
 		return [
@@ -96,7 +104,7 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * @return GridWidgetType
+	 * @return TablesGridWidgetType
 	 * @throws BadRequestError
 	 */
 	public function get(string $type): array {
@@ -108,12 +116,15 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * Validates a grid and returns it with every widget reduced to what its schemas allow.
+	 * Validates a grid for the user who stores it and returns it with every widget reduced
+	 * to what its schemas allow. The grid stored so far tells which targets are unchanged.
 	 *
-	 * @return array{widgets: list<GridWidget>, layout: list<GridLayoutItem>}
+	 * @param array<array-key, mixed> $storedGrid
+	 * @return array{widgets: list<TablesGridWidget>, layout: list<TablesGridLayoutItem>}
 	 * @throws BadRequestError
+	 * @throws Exception
 	 */
-	public function sanitizeGrid(mixed $grid): array {
+	public function sanitizeGrid(mixed $grid, string $userId, array $storedGrid = []): array {
 		if (!is_array($grid)) {
 			throw new BadRequestError('The grid must be an object.');
 		}
@@ -134,22 +145,25 @@ class GridWidgetTypes {
 			}
 			$widgets[$sanitized['id']] = $sanitized;
 		}
-		$this->assertTargetsAreNotGridViews($widgets);
+		$widgets = $this->checkTargets($widgets, $userId, $this->storedTargets($storedGrid));
 
 		$layout = [];
 		foreach ($grid['layout'] ?? [] as $item) {
-			$layout[] = $this->sanitizeLayoutItem($item, $widgets);
+			$sanitized = $this->sanitizeLayoutItem($item, $widgets);
+			if (isset($layout[$sanitized['widgetId']])) {
+				throw new BadRequestError('The layout places widget ' . $sanitized['widgetId'] . ' twice.');
+			}
+			$layout[$sanitized['widgetId']] = $sanitized;
 		}
 
-		return ['widgets' => array_values($widgets), 'layout' => $layout];
+		return ['widgets' => array_values($widgets), 'layout' => array_values($layout)];
 	}
 
 	/**
-	 * Returns a widget in the stored shape. A widget saved before the configuration existed
-	 * carried title and showTitle on itself; they move into the configuration.
+	 * Returns a widget in the stored shape.
 	 *
 	 * @param array<array-key, mixed> $widget
-	 * @return GridWidget
+	 * @return TablesGridWidget
 	 * @throws BadRequestError
 	 */
 	public function sanitizeWidget(array $widget): array {
@@ -160,19 +174,11 @@ class GridWidgetTypes {
 		if (!is_array($configuration)) {
 			throw new BadRequestError('The configuration of widget ' . $widget['id'] . ' must be an object.');
 		}
-		foreach (['title', 'showTitle'] as $legacy) {
-			if (array_key_exists($legacy, $widget) && !array_key_exists($legacy, $configuration)) {
-				$configuration[$legacy] = $widget[$legacy];
-			}
-		}
 		$content = $widget['content'] ?? [];
 		if (!is_array($content)) {
 			throw new BadRequestError('The content of widget ' . $widget['id'] . ' must be an object.');
 		}
 		$type = $this->get($widget['type']);
-		if ($widget['type'] === self::TYPE_DATA && !isset($content['target']) && isset($content['targetType'], $content['targetId'])) {
-			$content['target'] = ['type' => $content['targetType'], 'id' => (int)$content['targetId']];
-		}
 		return [
 			'id' => $widget['id'],
 			'type' => $widget['type'],
@@ -182,8 +188,8 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * @param array<string, GridWidget> $widgets
-	 * @return GridLayoutItem
+	 * @param array<string, TablesGridWidget> $widgets
+	 * @return TablesGridLayoutItem
 	 * @throws BadRequestError
 	 */
 	private function sanitizeLayoutItem(mixed $item, array $widgets): array {
@@ -198,6 +204,11 @@ class GridWidgetTypes {
 				throw new BadRequestError('The layout position "' . $position . '" must be a non-negative integer.');
 			}
 		}
+		foreach (self::LAYOUT_SIZES as $size) {
+			if (!is_int($item[$size] ?? null) || $item[$size] < 1) {
+				throw new BadRequestError('The layout size "' . $size . '" must be a positive integer.');
+			}
+		}
 		return [
 			'id' => $item['widgetId'],
 			'widgetId' => $item['widgetId'],
@@ -209,35 +220,72 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * A data widget shows rows, so it cannot point at another grid view.
+	 * A data widget shows rows, so a new or changed target must exist, hold rows and be readable
+	 * for the user; every unusable one gets the same error, so it reveals nothing about others'
+	 * views. A target that was stored before is kept as it is, so a save does not depend on the
+	 * saver's access to widgets they did not touch, and is marked broken once it no longer exists.
 	 *
-	 * @param array<string, GridWidget> $widgets
+	 * @param array<string, TablesGridWidget> $widgets
+	 * @param array<string, array{type: 'table'|'view', id: int}> $storedTargets
+	 * @return array<string, TablesGridWidget>
 	 * @throws BadRequestError
+	 * @throws Exception
 	 */
-	private function assertTargetsAreNotGridViews(array $widgets): void {
-		$viewIds = [];
+	private function checkTargets(array $widgets, string $userId, array $storedTargets): array {
+		$targetIds = ['table' => [], 'view' => []];
 		foreach ($widgets as $widget) {
 			$target = $widget['content']['target'] ?? null;
-			if (is_array($target) && $target['type'] === 'view') {
-				$viewIds[] = $target['id'];
+			if (is_array($target)) {
+				$targetIds[$target['type']][] = $target['id'];
 			}
 		}
-		if ($viewIds === []) {
-			return;
-		}
-		foreach ($this->viewMapper->findMany($viewIds) as $view) {
-			if ($view->getTableId() === null) {
-				throw new BadRequestError('A table or view widget cannot show the view ' . $view->getId() . ', which has no table.');
+		$elements = [
+			'table' => $targetIds['table'] === [] ? [] : $this->tableMapper->findMany($targetIds['table']),
+			'view' => $targetIds['view'] === [] ? [] : $this->viewMapper->findMany($targetIds['view']),
+		];
+		foreach ($widgets as $widgetId => $widget) {
+			$target = $widget['content']['target'] ?? null;
+			if (!is_array($target)) {
+				continue;
+			}
+			$element = $elements[$target['type']][$target['id']] ?? null;
+			$exists = $element !== null && !($element instanceof View && $element->isStandalone());
+			if (($storedTargets[$widgetId] ?? null) === $target) {
+				// an unchanged target is kept; one that no longer exists is marked until the widget is saved valid again
+				if (!$exists) {
+					$widgets[$widgetId]['broken'] = true;
+				}
+				continue;
+			}
+			if (!$exists || !$this->permissionsService->canReadRowsByElement($element, $target['type'], $userId)) {
+				throw new BadRequestError('A table or view widget can only show a table or view whose rows you can read.');
 			}
 		}
+		return $widgets;
+	}
+
+	/**
+	 * The target of every widget in the stored grid, by widget id.
+	 *
+	 * @return array<string, array{type: 'table'|'view', id: int}>
+	 */
+	private function storedTargets(array $storedGrid): array {
+		$targets = [];
+		foreach (is_array($storedGrid['widgets'] ?? null) ? $storedGrid['widgets'] : [] as $widget) {
+			$target = is_array($widget) ? ($widget['content']['target'] ?? null) : null;
+			if (is_string($widget['id'] ?? null) && is_array($target) && in_array($target['type'] ?? null, ['table', 'view'], true) && is_int($target['id'] ?? null)) {
+				$targets[$widget['id']] = ['type' => $target['type'], 'id' => $target['id']];
+			}
+		}
+		return $targets;
 	}
 
 	/**
 	 * Every property checked against its schema, defaults filled in and unknown properties dropped.
 	 *
-	 * @param array<string, GridWidgetProperty> $schema
+	 * @param array<string, TablesGridWidgetProperty> $schema
 	 * @param array<array-key, mixed> $values
-	 * @return array<string, mixed>
+	 * @return array<string, TablesGridWidgetValue>
 	 * @throws BadRequestError
 	 */
 	private function sanitizeProperties(string $type, array $schema, array $values): array {
@@ -250,10 +298,11 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * @param GridWidgetProperty $property
+	 * @param TablesGridWidgetProperty $property
+	 * @return TablesGridWidgetValue
 	 * @throws BadRequestError
 	 */
-	private function sanitizeProperty(string $label, array $property, mixed $value): mixed {
+	private function sanitizeProperty(string $label, array $property, mixed $value): string|bool|int|array|null {
 		$isRequired = $property['required'] ?? false;
 		return match ($property['type']) {
 			'string', 'text' => $this->sanitizeText($label, $value, $isRequired),
@@ -294,18 +343,18 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * @param list<mixed> $allowed
+	 * @param list<string> $allowed
 	 * @throws BadRequestError
 	 */
-	private function sanitizeEnum(string $label, mixed $value, array $allowed): mixed {
-		if (!in_array($value, $allowed, true)) {
+	private function sanitizeEnum(string $label, mixed $value, array $allowed): string {
+		if (!is_string($value) || !in_array($value, $allowed, true)) {
 			throw new BadRequestError('Widget property ' . $label . ' must be one of: ' . implode(', ', $allowed) . '.');
 		}
 		return $value;
 	}
 
 	/**
-	 * @return array{type: string, id: int}|null
+	 * @return array{type: 'table'|'view', id: int}|null
 	 * @throws BadRequestError
 	 */
 	private function sanitizeTarget(string $label, mixed $value, bool $isRequired): ?array {
@@ -315,9 +364,11 @@ class GridWidgetTypes {
 			}
 			return null;
 		}
-		if (!is_array($value) || !in_array($value['type'] ?? null, ['table', 'view'], true) || !is_int($value['id'] ?? null) || $value['id'] <= 0) {
+		$type = is_array($value) ? ($value['type'] ?? null) : null;
+		$id = is_array($value) ? ($value['id'] ?? null) : null;
+		if (($type !== 'table' && $type !== 'view') || !is_int($id) || $id <= 0) {
 			throw new BadRequestError('Widget property ' . $label . ' must name a table or view by id.');
 		}
-		return ['type' => $value['type'], 'id' => $value['id']];
+		return ['type' => $type, 'id' => $id];
 	}
 }

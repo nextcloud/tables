@@ -1218,16 +1218,17 @@ export type components = {
             readonly id: string;
             readonly type: string;
             readonly configuration: {
-                readonly [key: string]: Record<string, never>;
+                readonly [key: string]: components["schemas"]["GridWidgetValue"];
             };
             readonly content: {
-                readonly [key: string]: Record<string, never>;
+                readonly [key: string]: components["schemas"]["GridWidgetValue"];
             };
+            readonly broken?: boolean;
         };
         readonly GridWidgetProperty: {
             readonly type: string;
             readonly title: string;
-            readonly default: Record<string, never>;
+            readonly default: components["schemas"]["GridWidgetValue"];
             readonly options?: readonly {
                 readonly value: string;
                 readonly label: string;
@@ -1248,6 +1249,12 @@ export type components = {
                 readonly [key: string]: components["schemas"]["GridWidgetProperty"];
             };
         };
+        readonly GridWidgetValue: (string | boolean | number | {
+            /** @enum {string} */
+            readonly type: "table" | "view";
+            /** Format: int64 */
+            readonly id: number;
+        }) | null;
         readonly ImportState: {
             /** Format: int64 */
             readonly found_columns_count: number;
