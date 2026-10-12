@@ -160,12 +160,15 @@ export default {
 		},
 	},
 	watch: {
-		row() {
-			if (this.row) {
+		row(newRow, oldRow) {
+			if (newRow) {
+				if (oldRow?.id === newRow.id && this.localRow !== null) {
+					return
+				}
 				if (this.$router.currentRoute.path.includes('/row/')) {
 					this.$router.replace(this.$router.currentRoute.path.split('/row/')[0])
 				}
-				this.$router.push(this.$router.currentRoute.path + '/row/' + this.row.id)
+				this.$router.push(this.$router.currentRoute.path + '/row/' + newRow.id)
 				this.setActiveRowId(null)
 				this.loadValues()
 			}
