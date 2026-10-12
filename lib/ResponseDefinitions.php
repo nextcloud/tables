@@ -226,6 +226,19 @@ namespace OCA\Tables;
  *  errors_count: int,
  * }
  *
+ * @psalm-type TablesMenuItem = array{
+ *   id: int,
+ *   contextId: int,
+ *   label: string,
+ *   icon: string|null,
+ *   targetType: 'view'|'table'|'url',
+ *   targetId: int|null,
+ *   url: string|null,
+ *   technicalName: string|null,
+ *   order: int,
+ *   broken: bool,
+ * }
+ *
  * @psalm-type TablesContext = array{
  *   id: int,
  *   name: string,
@@ -233,6 +246,7 @@ namespace OCA\Tables;
  *   description: string,
  *   owner: string,
  *   ownerType: int,
+ *   menuItems: list<TablesMenuItem>,
  * }
  *
  * @psalm-type TablesContextNavigation = array{
