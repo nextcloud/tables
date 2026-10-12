@@ -7,8 +7,11 @@
 
 namespace OCA\Tables\Listener;
 
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
+use OCP\DB\Exception;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\User\Events\BeforeUserDeletedEvent;
@@ -20,6 +23,8 @@ use Psr\Log\LoggerInterface;
 class UserDeletedListener implements IEventListener {
 	public function __construct(
 		private readonly TableService $tableService,
+		private readonly ViewService $viewService,
+		private readonly ViewMapper $viewMapper,
 		private readonly LoggerInterface $logger,
 	) {
 	}
@@ -40,6 +45,27 @@ class UserDeletedListener implements IEventListener {
 			}
 			$this->logger->debug('tables for the deleted user removed');
 		} catch (InternalError) {
+		}
+
+		$this->deleteViewsWithoutTable($event->getUser()->getUID());
+	}
+
+	/**
+	 * Views without a table belong to their creator, so they go with the user.
+	 */
+	private function deleteViewsWithoutTable(string $userId): void {
+		try {
+			$views = $this->viewMapper->findAllStandaloneOwnedBy($userId);
+		} catch (Exception $e) {
+			$this->logger->error('Views without a table of the deleted user could not be loaded', ['exception' => $e]);
+			return;
+		}
+		foreach ($views as $view) {
+			try {
+				$this->viewService->deleteByObject($view, $userId);
+			} catch (InternalError $e) {
+				$this->logger->error('View ' . $view->getId() . ' of the deleted user could not be deleted', ['exception' => $e]);
+			}
 		}
 	}
 }

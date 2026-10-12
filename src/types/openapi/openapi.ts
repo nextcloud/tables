@@ -1360,7 +1360,7 @@ export type components = {
             readonly technicalName: string | null;
             readonly emoji: string | null;
             /** Format: int64 */
-            readonly tableId: number;
+            readonly tableId: number | null;
             readonly ownership: string;
             readonly ownerDisplayName: string | null;
             readonly createdBy: string;
@@ -1416,6 +1416,7 @@ export type components = {
             readonly isFederated: boolean;
             /** Format: int64 */
             readonly sidebarOrder: number | null;
+            readonly type: string;
         };
     };
     responses: never;

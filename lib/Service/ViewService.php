@@ -147,6 +147,10 @@ class ViewService extends SuperService {
 		}
 
 		$sharedViews = $this->shareService->findViewsSharedWithMe($userId);
+		// views without a table are not listed under any table, so the user's own ones are listed here
+		foreach ($this->mapper->findAllStandaloneOwnedBy($userId) as $standaloneView) {
+			$sharedViews[$standaloneView->getId()] ??= $standaloneView;
+		}
 		$contexts = $this->contextService->findAll($userId);
 		foreach ($contexts as $context) {
 			$nodes = $context->getNodes();
@@ -181,17 +185,27 @@ class ViewService extends SuperService {
 	public function create(
 		string $title,
 		?string $emoji,
-		Table $table,
+		?Table $table,
 		?string $userId = null,
 		?string $technicalName = null,
 		?string $uuid = null,
+		string $type = View::TYPE_TABLE,
+		string $description = '',
 	): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
+		$this->assertTypeValid($type);
+		if ($table === null && $type === View::TYPE_TABLE) {
+			throw new BadRequestError('A table view needs a table.');
+		}
+
 		// security
-		if (!$this->permissionsService->canManageTable($table, $userId)) {
+		if ($table !== null && !$this->permissionsService->canManageTable($table, $userId)) {
 			throw new PermissionError('PermissionError: can not create view');
+		}
+		if ($table === null && $userId === '') {
+			throw new PermissionError('PermissionError: a view without a table needs an owner');
 		}
 
 		$time = new DateTime();
@@ -201,8 +215,9 @@ class ViewService extends SuperService {
 		if ($emoji) {
 			$item->setEmoji($emoji);
 		}
-		$item->setDescription('');
-		$item->setTableId($table->getId());
+		$item->setDescription($description);
+		$item->setTableId($table?->getId());
+		$item->setType($type);
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
@@ -213,8 +228,8 @@ class ViewService extends SuperService {
 		}
 		// ownership is not stored with the record, but it might be necessary upon
 		// further interaction with the view in the running process, as the instance
-		// is cached now. The ownership is always inherited from the table.
-		$item->setOwnership($table->getOwnership());
+		// is cached now. The ownership is inherited from the table, or it is the creator's.
+		$item->setOwnership($table?->getOwnership() ?? $userId);
 		try {
 			$newItem = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {
@@ -258,6 +273,7 @@ class ViewService extends SuperService {
 			}
 
 			foreach ($data->updateDetail() as $parameter => $value) {
+				$insertableValue = null;
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
@@ -266,6 +282,13 @@ class ViewService extends SuperService {
 
 				if ($parameter === ViewUpdatableParameters::TECHNICAL_NAME) {
 					$this->assertTechnicalNameValid($value);
+				}
+
+				if ($parameter === ViewUpdatableParameters::TYPE) {
+					$this->assertTypeValid($value);
+					if ($value === View::TYPE_TABLE && $view->getTableId() === null) {
+						throw new BadRequestError('A view without a table cannot become a table view.');
+					}
 				}
 
 				if ($value instanceof JsonSerializable) {
@@ -427,6 +450,10 @@ class ViewService extends SuperService {
 
 		$this->setIsSharedState($view, $userId);
 
+		if ($view->getTableId() === null) {
+			return;
+		}
+
 		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
 			return;
 		}
@@ -496,6 +523,9 @@ class ViewService extends SuperService {
 					$view->setIsShared(true);
 					$canManageTable = false;
 					try {
+						if ($view->getTableId() === null) {
+							throw new NotFoundError('The view has no table');
+						}
 						try {
 							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
 						} catch (NotFoundError) {
@@ -654,15 +684,16 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int|null $tableId null for a view without a table, such as a grid view
 	 * @param array $view
 	 * @param string $userId
 	 *
 	 * @return View
 	 *
 	 * @throws InternalError
+	 * @throws BadRequestError
 	 */
-	public function importView(int $tableId, array $view, string $userId): View {
+	public function importView(?int $tableId, array $view, string $userId): View {
 		$item = new View();
 		$item->setUuid((isset($view['uuid']) && Uuid::isValid($view['uuid'])) ? $view['uuid'] : null);
 		$item->setTableId($tableId);
@@ -682,6 +713,9 @@ class ViewService extends SuperService {
 		$item->setColumns(json_encode($view['columnSettings']));
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
+		$type = $view['type'] ?? View::TYPE_TABLE;
+		$this->assertTypeValid($type);
+		$item->setType($type);
 		try {
 			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
@@ -699,6 +733,15 @@ class ViewService extends SuperService {
 
 	private function buildDefaultTechnicalName(int $viewId): string {
 		return 'view_' . $viewId;
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function assertTypeValid(string $type): void {
+		if (!in_array($type, View::TYPES, true)) {
+			throw new BadRequestError('Unknown view type "' . $type . '", expected one of: ' . implode(', ', View::TYPES));
+		}
 	}
 
 	/**

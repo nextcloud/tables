@@ -112,6 +112,9 @@ class ColumnService extends SuperService {
 	 * @return Column[]
 	 */
 	public function findAllByManagedView(View $view, string $userId): array {
+		if ($view->getTableId() === null) {
+			return [];
+		}
 		if ($this->permissionsService->canManageView($view, $userId)) {
 			try {
 				return $this->enhanceColumns($this->mapper->findAllByTable($view->getTableId()), $view);
@@ -242,6 +245,9 @@ class ColumnService extends SuperService {
 			} catch (DoesNotExistException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+			if ($view->getTableId() === null) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no table to add a column to.');
 			}
 			try {
 				$table = $this->tableMapper->find($view->getTableId());

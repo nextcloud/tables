@@ -1014,7 +1014,8 @@
                     "hasShares",
                     "rowsCount",
                     "isFederated",
-                    "sidebarOrder"
+                    "sidebarOrder",
+                    "type"
                 ],
                 "properties": {
                     "id": {
@@ -1037,7 +1038,8 @@
                     },
                     "tableId": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "ownership": {
                         "type": "string"
@@ -1257,6 +1259,9 @@
                         "type": "integer",
                         "format": "int64",
                         "nullable": true
+                    },
+                    "type": {
+                        "type": "string"
                     }
                 }
             }

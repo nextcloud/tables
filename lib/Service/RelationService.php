@@ -160,6 +160,10 @@ class RelationService {
 			$targetColumn = $this->columnMapper->find($settings[Column::RELATION_LABEL_COLUMN]);
 			if ($isView) {
 				$view = $this->viewMapper->find($targetId);
+				if ($view->getTableId() === null) {
+					$this->cacheRelationData[$cacheKey] = [];
+					return [];
+				}
 				$rows = $this->row2Mapper->findAll(
 					[$targetColumn->getId()],
 					$view->getTableId(),

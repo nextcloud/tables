@@ -158,6 +158,10 @@ class ActivityManager {
 			$objectTitle = $object->getTitle();
 			$table = $object;
 		} elseif ($object instanceof View) {
+			if ($object->getTableId() === null) {
+				// activities are attached to a table, a view without one has no stream
+				return null;
+			}
 			$objectTitle = $object->getTitle();
 			$table = $this->tableMapper->find($object->getTableId());
 		} elseif ($object instanceof Row2) {
@@ -434,6 +438,9 @@ class ActivityManager {
 		}
 
 		$tableId = $object instanceof Table ? $object->getId() : $object->getTableId();
+		if ($tableId === null) {
+			return;
+		}
 		$table = $object instanceof Table ? $object : $this->tableMapper->find($tableId);
 		$tableOwner = $table->getOwnership();
 		$eventAuthor = $event->getAuthor();
