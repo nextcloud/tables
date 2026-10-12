@@ -45,6 +45,10 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesView from ResponseDefinitions
  */
 class ViewService extends SuperService {
+	// The unique index on (table_id, technical_name) treats a missing table differently per database,
+	// so a view without a table is always named by its id. Its page is named by its menu item instead.
+	private const STANDALONE_TECHNICAL_NAME_ERROR = 'A view without a table is named by its id. Name its page in the application menu instead.';
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
@@ -199,6 +203,9 @@ class ViewService extends SuperService {
 		if ($table === null && $type === View::TYPE_TABLE) {
 			throw new BadRequestError('A table view needs a table.');
 		}
+		if ($table === null && $technicalName !== null) {
+			throw new BadRequestError(self::STANDALONE_TECHNICAL_NAME_ERROR);
+		}
 
 		// security
 		if ($table !== null && !$this->permissionsService->canManageTable($table, $userId)) {
@@ -281,6 +288,9 @@ class ViewService extends SuperService {
 				}
 
 				if ($parameter === ViewUpdatableParameters::TECHNICAL_NAME) {
+					if ($view->isStandalone()) {
+						throw new BadRequestError(self::STANDALONE_TECHNICAL_NAME_ERROR);
+					}
 					$this->assertTechnicalNameValid($value);
 				}
 
@@ -699,7 +709,8 @@ class ViewService extends SuperService {
 		$item->setTableId($tableId);
 		$item->setTitle($view['title']);
 		$item->setEmoji($view['emoji']);
-		$technicalName = $view['technicalName'] ?? null;
+		// a view without a table is always named by its id, whatever the source called it
+		$technicalName = $tableId === null ? null : ($view['technicalName'] ?? null);
 		if ($technicalName !== null) {
 			$this->assertTechnicalNameValid($technicalName);
 			$item->setTechnicalName($technicalName);

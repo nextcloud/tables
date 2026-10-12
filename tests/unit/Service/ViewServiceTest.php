@@ -136,13 +136,44 @@ class ViewServiceTest extends TestCase {
 		});
 		$this->mapper->method('update')->willReturnArgument(0);
 
-		$created = $this->service->create('Home', '🧩', null, 'alice', 'home', null, View::TYPE_GRID, 'Start here');
+		$created = $this->service->create('Home', '🧩', null, 'alice', null, null, View::TYPE_GRID, 'Start here');
 
 		$this->assertNull($created->getTableId());
 		$this->assertSame('alice', $created->getOwnership());
 		$this->assertSame('grid', $created->getType());
 		$this->assertSame('Start here', $created->getDescription());
-		$this->assertSame('home', $created->getTechnicalName());
+		$this->assertSame('view_6', $created->getTechnicalName(), 'named by its id, so it is unique on every database');
+	}
+
+	public function testCreateWithoutTableRefusesAChosenTechnicalName(): void {
+		$this->mapper->expects($this->never())->method('insert');
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('named by its id');
+		$this->service->create('Home', null, null, 'alice', 'home', null, View::TYPE_GRID);
+	}
+
+	public function testUpdateRefusesATechnicalNameOnAViewWithoutTable(): void {
+		$this->expectUpdateOf($this->storedView(null));
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('named by its id');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['technicalName' => 'home']), 'alice', true);
+	}
+
+	public function testImportWithoutTableIgnoresTheSourceTechnicalName(): void {
+		$this->mapper->method('insert')->willReturnCallback(static function (View $view): View {
+			$view->setId(9);
+			return $view;
+		});
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$imported = $this->service->importView(null, [
+			'title' => 'Home', 'emoji' => null, 'description' => '', 'technicalName' => 'home', 'type' => View::TYPE_GRID,
+			'createdAt' => '2026-10-12 10:00:00', 'lastEditAt' => '2026-10-12 10:00:00', 'columnSettings' => [], 'sort' => [], 'filter' => [],
+		], 'alice');
+
+		$this->assertSame('view_9', $imported->getTechnicalName());
 	}
 
 	public function testCreateWithATableStillChecksTheTablePermission(): void {
