@@ -46,7 +46,7 @@
 				<div class="col-4">
 					{{ t('tables', 'Menu') }}
 				</div>
-				<MenuItemsEditor v-model:items="menuItems" />
+				<MenuItemsEditor ref="menuItemsEditor" v-model:items="menuItems" />
 			</div>
 			<div class="row space-T">
 				<div data-cy="createContextShowInNavSwitch">
@@ -62,7 +62,6 @@
 				<div class="fix-col-4 end">
 					<NcButton type="primary"
 						:aria-label="t('tables', 'Create application')"
-						:disabled="!menuItemsValid"
 						data-cy="createContextSubmitBtn"
 						@click="submit">
 						{{ t('tables', 'Create application') }}
@@ -165,6 +164,11 @@ export default {
 			this.$emit('close')
 		},
 		async submit() {
+			// Show every menu error now, and never send a menu the server would refuse
+			this.$refs.menuItemsEditor?.touchAll()
+			if (!this.menuItemsValid) {
+				return
+			}
 			if (this.title === '') {
 				showError(t('tables', 'Cannot create new application. Title is missing.'))
 				this.errorTitle = true

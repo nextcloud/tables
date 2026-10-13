@@ -49,6 +49,7 @@
 					:options="targetOptions"
 					:clearable="false"
 					:searchable="true"
+					:error="shownErrors[index].target"
 					:helper-text="shownErrors[index].target ? t('tables', 'Choose what the entry opens') : ''"
 					label="label"
 					data-cy="menuItemTarget"
@@ -320,6 +321,12 @@ export default {
 			if (!this.touchedKeys[item.key]) {
 				this.touchedKeys = { ...this.touchedKeys, [item.key]: true }
 			}
+		},
+		/**
+		 * Marks every row as touched, so all errors show, for example when the dialog is submitted.
+		 */
+		touchAll() {
+			this.touchedKeys = Object.fromEntries(this.items.map(item => [item.key, true]))
 		},
 		/**
 		 * Makes a row draggable while its handle is held. Releasing the pointer anywhere, or the
