@@ -83,7 +83,8 @@ test.describe('Grid view page', () => {
 		// An NcSelect opens from its indicator, like in the other specs
 		await dialog.locator('[data-cy="addWidgetType"] .vs__open-indicator').click()
 		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'Description' }).first().click()
-		await page.keyboard.press('Escape')
+		// Escape would only leave the select, which keeps the focus after the pick
+		await dialog.getByRole('button', { name: 'Close', exact: true }).click()
 		await expect(dialog).toBeHidden()
 
 		await page.locator('[data-cy="gridWidget"]').getByRole('button', { name: 'Widget actions' }).click()
