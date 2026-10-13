@@ -101,7 +101,7 @@ class MenuItemInput {
 		if (!is_array($data) || !array_is_list($data)) {
 			throw new InvalidArgumentException('The menu items must be a list.');
 		}
-		$items = array_map(static fn (mixed $item): self => self::createFromInputArray($item), $data);
+		$items = array_map(self::createFromInputArray(...), $data);
 		foreach ($items as $position => $item) {
 			$parentIndex = $item->getParentIndex();
 			if ($parentIndex === null) {

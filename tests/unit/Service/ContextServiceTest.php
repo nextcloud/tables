@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Service;
 
 use InvalidArgumentException;
+use OC\DB\Exceptions\DbalException;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
@@ -154,7 +155,10 @@ final class ContextServiceTest extends TestCase {
 	public function testUpdateStoresAChildUnderItsParentAndKeepsTheOrder(): void {
 		$this->contextMapper->method('findById')->willReturn($this->contextWithMenu(7, []));
 		$this->contextMapper->method('update')->willReturnArgument(0);
-		$this->expectExistingTargets([], []);
+		$this->expectExistingTargets([6 => new View()], [4 => new Table()]);
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$relations = [];
+		$this->expectNodeInsertion($relations);
 		$inserted = [];
 		$this->expectMenuReplacement(7, $inserted);
 
@@ -220,21 +224,36 @@ final class ContextServiceTest extends TestCase {
 		$this->assertSame(200, $updated->getPages()[301]['content'][501]['node_rel_id']);
 	}
 
-	public function testAMenuTargetTheOwnerCannotManageIsRefused(): void {
+	public static function unusableNewTargets(): array {
+		return [
+			'exists but cannot be managed' => [[4 => new Table()]],
+			'does not exist' => [[]],
+		];
+	}
+
+	/**
+	 * Both get the same answer, so a save reveals nothing about which ids exist.
+	 *
+	 * @dataProvider unusableNewTargets
+	 */
+	public function testANewMenuTargetThatCannotBeUsedIsRefusedTheSameWay(array $tables): void {
 		$this->contextMapper->method('findById')->willReturn($this->contextWithMenu(7, []));
 		$this->contextMapper->method('update')->willReturnArgument(0);
-		$this->expectExistingTargets([], [4 => new Table()]);
-		$this->permissionsService->method('canManageNodeById')->with(Application::NODE_TYPE_TABLE, 4, 'user-1')->willReturn(false);
+		$this->expectExistingTargets([], $tables);
+		$this->permissionsService->method('canManageNodeById')->willReturn(false);
 		$this->menuItemMapper->expects($this->never())->method('deleteAllByContextId');
 
 		$this->expectException(PermissionError::class);
+		$this->expectExceptionMessage('Owner cannot manage node 4 (type 0)');
 		$this->service->update(7, 'user-1', null, null, null, null, MenuItemInput::createListFromInputArray([
 			['label' => 'Requests', 'targetType' => 'table', 'targetId' => 4],
 		]));
 	}
 
-	public function testAMenuTargetThatNoLongerExistsIsKeptWithoutANode(): void {
-		$this->contextMapper->method('findById')->willReturn($this->contextWithMenu(7, []));
+	public function testAStoredMenuTargetThatNoLongerExistsIsKeptWithoutANode(): void {
+		$this->contextMapper->method('findById')->willReturn($this->contextWithMenu(7, [
+			['targetType' => 'view', 'targetId' => 99, 'url' => null, 'technicalName' => 'gone'],
+		]));
 		$this->contextMapper->method('update')->willReturnArgument(0);
 		$this->expectExistingTargets([], []);
 		$this->contextNodeRelMapper->expects($this->never())->method('insert');
@@ -246,6 +265,29 @@ final class ContextServiceTest extends TestCase {
 		]));
 
 		$this->assertSame([99], array_map(static fn (MenuItem $item) => $item->getTargetId(), $inserted));
+	}
+
+	public function testAnItemSentWithoutANameKeepsTheStoredNameOfItsTarget(): void {
+		$context = $this->contextWithMenu(7, [
+			['targetType' => 'view', 'targetId' => 6, 'url' => null, 'technicalName' => 'home'],
+			['targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org/a', 'technicalName' => 'docs'],
+			['targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org/b', 'technicalName' => 'docs_2'],
+		]);
+		$context->setNodes([101 => ['id' => 101, 'node_id' => 6, 'node_type' => Application::NODE_TYPE_VIEW, 'permissions' => 1]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$inserted = [];
+		$this->expectMenuReplacement(7, $inserted);
+
+		// the view is renamed, the two links swap places and a new link is added
+		$this->service->update(7, 'user-1', null, null, null, null, MenuItemInput::createListFromInputArray([
+			['label' => 'Start', 'targetType' => 'view', 'targetId' => 6],
+			['label' => 'Docs', 'url' => 'https://example.org/b'],
+			['label' => 'Docs', 'url' => 'https://example.org/a'],
+			['label' => 'Docs', 'url' => 'https://example.org/c'],
+		]));
+
+		$this->assertSame(['home', 'docs_2', 'docs', 'docs_3'], array_map(static fn (MenuItem $item) => $item->getTechnicalName(), $inserted));
 	}
 
 	public function testDerivedTechnicalNamesGetASuffixWhenTheMenuAlreadyUsesThem(): void {
@@ -275,6 +317,18 @@ final class ContextServiceTest extends TestCase {
 		]));
 	}
 
+	public function testUpdateRunsAgainWhenTheDatabaseAsksForARetry(): void {
+		$locked = $this->createMock(DbalException::class);
+		$locked->method('isRetryable')->willReturn(true);
+		$this->contextMapper->expects($this->exactly(2))->method('findById')
+			->willReturnOnConsecutiveCalls($this->throwException($locked), $this->contextWithMenu(7, []));
+		$this->contextMapper->method('update')->willReturnArgument(0);
+
+		$updated = $this->service->update(7, 'user-1', 'Renamed', null, null, null);
+
+		$this->assertSame('Renamed', $updated->getName());
+	}
+
 	public function testUpdateLeavesTheMenuAloneWhenNoneIsGiven(): void {
 		$context = $this->contextWithMenu(7, [['id' => 1, 'label' => 'Keep me']]);
 		$this->contextMapper->method('findById')->willReturn($context);
@@ -292,7 +346,10 @@ final class ContextServiceTest extends TestCase {
 			$context->setId(8);
 			return $context;
 		});
-		$this->pageMapper->method('insert')->willReturnArgument(0);
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->setId(3);
+			return $page;
+		});
 		$inserted = [];
 		$this->expectMenuReplacement(8, $inserted);
 

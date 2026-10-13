@@ -1199,7 +1199,7 @@ export type components = {
             /** Format: int64 */
             readonly targetId: number | null;
             readonly url: string | null;
-            readonly technicalName: string | null;
+            readonly technicalName: string;
             /** Format: int64 */
             readonly order: number;
             /** Format: int64 */
@@ -7106,7 +7106,7 @@ export interface operations {
                         readonly order: number;
                     } | null;
                     /**
-                     * @description provide this parameter to replace the menu; parentIndex is the position of the parent item, for one level of nesting; the views and tables it opens become nodes of the context
+                     * @description provide this parameter to replace the menu; parentIndex is the position of the parent item, for one level of nesting; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target
                      * @default null
                      */
                     readonly menuItems?: readonly {
