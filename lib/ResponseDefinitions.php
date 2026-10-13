@@ -234,7 +234,7 @@ namespace OCA\Tables;
  *   targetType: 'view'|'table'|'url',
  *   targetId: int|null,
  *   url: string|null,
- *   technicalName: string|null,
+ *   technicalName: string,
  *   order: int,
  *   parentId: int|null,
  *   broken: bool,

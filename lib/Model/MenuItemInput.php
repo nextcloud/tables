@@ -101,13 +101,13 @@ class MenuItemInput {
 		if (!is_array($data) || !array_is_list($data)) {
 			throw new InvalidArgumentException('The menu items must be a list.');
 		}
-		$items = array_map(static fn (mixed $item): self => self::createFromInputArray($item), $data);
-		foreach ($items as $position => $item) {
+		$items = array_map(self::createFromInputArray(...), $data);
+		foreach ($items as $item) {
 			$parentIndex = $item->getParentIndex();
 			if ($parentIndex === null) {
 				continue;
 			}
-			if ($parentIndex === $position || !isset($items[$parentIndex]) || $items[$parentIndex]->getParentIndex() !== null) {
+			if (!isset($items[$parentIndex]) || $items[$parentIndex]->getParentIndex() !== null) {
 				throw new InvalidArgumentException('A menu item can only sit under a top-level item of the same menu.');
 			}
 		}
