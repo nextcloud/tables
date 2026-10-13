@@ -107,7 +107,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const TYPE_DATETIME = 'datetime';
 	public const TYPE_USERGROUP = 'usergroup';
 	public const TYPE_RELATION = 'relation';
-	public const TYPE_RELATION_LOOKUP = 'relation_lookup';
+	public const TYPE_LOOKUP = 'lookup';
 
 	public const SUBTYPE_DATETIME_DATE = 'date';
 	public const SUBTYPE_DATETIME_TIME = 'time';
@@ -367,6 +367,14 @@ class Column extends EntitySuper implements JsonSerializable {
 			return $className::fromArray($array);
 		}
 		throw new \InvalidArgumentException("Class $className must have a fromArray method");
+	}
+
+	/**
+	 * Virtual columns do not store their own cell data,
+	 * their values are derived from a related column.
+	 */
+	public function isVirtual(): bool {
+		return $this->type === self::TYPE_LOOKUP;
 	}
 
 	/**

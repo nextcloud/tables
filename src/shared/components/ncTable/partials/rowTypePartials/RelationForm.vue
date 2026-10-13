@@ -52,7 +52,7 @@ export default {
 		loading() {
 			const dataStore = useDataStore()
 			const elementId = this.activeView?.id ?? this.activeTable?.id ?? this.column?.tableId
-			if (elementId) {
+			if (elementId || dataStore.publicToken) {
 				return dataStore.getRelationsLoading(!!this.activeView, elementId)
 			}
 			return false
@@ -75,7 +75,7 @@ export default {
 	async mounted() {
 		const viewId = this.activeView?.id ?? null
 		const tableId = this.activeTable?.id ?? this.column?.tableId ?? null
-		if (viewId || tableId) {
+		if (viewId || tableId || useDataStore().publicToken) {
 			await this.loadRelationsFromBE({
 				tableId,
 				viewId,

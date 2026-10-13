@@ -21,7 +21,7 @@ class ColumnsHelper {
 		Column::TYPE_SELECTION,
 		Column::TYPE_USERGROUP,
 		Column::TYPE_RELATION,
-		Column::TYPE_RELATION_LOOKUP,
+		Column::TYPE_LOOKUP,
 	];
 
 	/**

@@ -13,14 +13,36 @@ readonly class RelationSettings {
 		public int $targetId,
 		public int $labelColumn,
 	) {
+		if (!in_array($relationType, ['table', 'view'], true)) {
+			throw new \InvalidArgumentException('Relation type must be table or view.');
+		}
+		if ($targetId <= 0 || $labelColumn <= 0) {
+			throw new \InvalidArgumentException('Relation target and label column IDs must be positive integers.');
+		}
 	}
 
 	public static function fromArray(array $data): self {
+		if (!isset($data['relationType']) || !is_string($data['relationType'])) {
+			throw new \InvalidArgumentException('Relation type is required.');
+		}
 		return new self(
 			relationType: $data['relationType'],
-			targetId: (int)$data['targetId'],
-			labelColumn: (int)$data['labelColumn'],
+			targetId: self::parseIntField($data['targetId'] ?? null, 'targetId'),
+			labelColumn: self::parseIntField($data['labelColumn'] ?? null, 'labelColumn'),
 		);
+	}
+
+	/**
+	 * Settings may arrive as form parameters, where integers are encoded as strings.
+	 */
+	private static function parseIntField(mixed $value, string $field): int {
+		if (is_string($value) && ctype_digit($value)) {
+			$value = (int)$value;
+		}
+		if (!is_int($value)) {
+			throw new \InvalidArgumentException($field . ' must be an integer.');
+		}
+		return $value;
 	}
 
 	public function isView(): bool {

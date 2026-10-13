@@ -4,6 +4,7 @@
  */
 import { Filters } from './filter.js'
 import { MagicFields } from './magicFields.js'
+import { ColumnTypes } from './columnHandler.js'
 
 export class AbstractColumn {
 
@@ -29,6 +30,16 @@ export class AbstractColumn {
 
 	canSort() {
 		return typeof this.sort === 'function'
+	}
+
+	/**
+	 * Virtual columns do not store their own cell data,
+	 * their values are derived from a related column.
+	 *
+	 * @return {boolean}
+	 */
+	isVirtual() {
+		return this.type === ColumnTypes.Lookup
 	}
 
 	getNextSortsResult(nextSorts, rowA, rowB) {
@@ -90,17 +101,6 @@ export class AbstractColumn {
 	 */
 	getValueColumnId() {
 		return this.id
-	}
-
-	/**
-	 * Get the value for form input.
-	 * Default implementation returns the value as-is.
-	 *
-	 * @param {*} value The raw value
-	 * @return {*} The value for form input
-	 */
-	getValueForForm(value) {
-		return value
 	}
 
 }

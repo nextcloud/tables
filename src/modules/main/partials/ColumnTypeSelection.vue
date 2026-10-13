@@ -20,7 +20,7 @@
 				<DatetimeIcon v-if="props.id === 'datetime'" />
 				<ContactsIcon v-if="props.id === 'usergroup'" />
 				<RelationIcon v-if="props.id === 'relation'" />
-				<RelationIcon v-if="props.id === 'relation_lookup'" />
+				<RelationIcon v-if="props.id === 'lookup'" />
 				<div class="multiSelectOptionLabel">
 					{{ props.label }}
 				</div>
@@ -36,7 +36,7 @@
 			<DatetimeIcon v-if="props.id === 'datetime'" />
 			<ContactsIcon v-if="props.id === 'usergroup'" />
 			<RelationIcon v-if="props.id === 'relation'" />
-			<RelationIcon v-if="props.id === 'relation_lookup'" />
+			<RelationIcon v-if="props.id === 'lookup'" />
 			<div class="multiSelectOptionLabel">
 				{{ props.label }}
 			</div>
@@ -96,7 +96,7 @@ export default {
 				{ id: 'datetime', label: t('tables', 'Date and time') },
 				{ id: 'usergroup', label: t('tables', 'Users and groups') },
 				{ id: 'relation', label: t('tables', 'Relation') },
-				{ id: 'relation_lookup', label: t('tables', 'Relation lookup') },
+				{ id: 'lookup', label: t('tables', 'Lookup') },
 			],
 		}
 	},

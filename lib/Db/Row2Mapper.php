@@ -10,7 +10,7 @@ namespace OCA\Tables\Db;
 use DateTime;
 use DateTimeImmutable;
 use OCA\Tables\Constants\UsergroupType;
-use OCA\Tables\Dto\RelationLookupSettings;
+use OCA\Tables\Dto\LookupSettings;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ColumnsHelper;
@@ -77,7 +77,7 @@ class Row2Mapper {
 	 * @throws NotFoundError
 	 */
 	public function find(int $id, array $columns): Row2 {
-		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
+		$columnIdsArray = $this->getColumnIdsWithRelationColumns($columns);
 		$rows = $this->getRows([$id], $columnIdsArray);
 
 		if (count($rows) === 1) {
@@ -176,6 +176,7 @@ class Row2Mapper {
 	 */
 	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
 		try {
+			$showColumnIds = $this->getColumnIdsWithRelationColumns($this->columnMapper->findAll($showColumnIds));
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
 			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
@@ -218,10 +219,12 @@ class Row2Mapper {
 	private function getRowsChunk(array $rowIds, array $columnIds): array {
 		$qb = $this->db->getQueryBuilder();
 
-		$columnIds = $this->addRelationColumnIdsForLookupColumns($columnIds);
-
+		$columnFilter = $qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds'));
 		$qbSqlForColumnTypes = null;
 		foreach ($this->columnsHelper->columns as $columnType) {
+			if ($this->isVirtualColumn($columnType)) {
+				continue;
+			}
 			$qbTmp = $this->db->getQueryBuilder();
 			$qbTmp->select('row_id', 'column_id', 'last_edit_at', 'last_edit_by')
 				->selectAlias($qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'value');
@@ -235,12 +238,9 @@ class Row2Mapper {
 				$qbTmp->selectAlias($qbTmp->createFunction('NULL'), 'value_type');
 			}
 
-			if ($this->isVirtualColumn($columnType)) {
-				continue;
-			}
 			$qbTmp
 				->from('tables_row_cells_' . $columnType)
-				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
+				->where($columnFilter)
 				->andWhere($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY, ':rowsIds')));
 
 			if ($qbSqlForColumnTypes) {
@@ -310,6 +310,10 @@ class Row2Mapper {
 				$column = $sortData['columnId'] > 0 ? $this->columnMapper->find($sortData['columnId']) : null;
 			} catch (DoesNotExistException) {
 				$this->logger->debug('No column found to build filter with for id ' . $sortData['columnId']);
+				continue;
+			}
+
+			if ($column && $column->isVirtual()) {
 				continue;
 			}
 
@@ -901,7 +905,7 @@ class Row2Mapper {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
-		if ($this->isVirtualColumn($column->getType())) {
+		if ($column->isVirtual()) {
 			return;
 		}
 
@@ -943,7 +947,7 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value, Column $column): void {
-		if ($this->isVirtualColumn($column->getType())) {
+		if ($column->isVirtual()) {
 			return;
 		}
 
@@ -957,7 +961,7 @@ class Row2Mapper {
 	 */
 	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
 		$column = $this->columnMapper->find($columnId);
-		if ($this->isVirtualColumn($column->getType())) {
+		if ($column->isVirtual()) {
 			return;
 		}
 		$cellMapper = $this->getCellMapper($column);
@@ -1010,7 +1014,7 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function deleteDataForColumn(Column $column): void {
-		if ($this->isVirtualColumn($column->getType())) {
+		if ($column->isVirtual()) {
 			return;
 		}
 		try {
@@ -1093,7 +1097,7 @@ class Row2Mapper {
 			Column::TYPE_NUMBER => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault()),
 			Column::TYPE_TEXT => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault()),
 			Column::TYPE_USERGROUP => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault()),
-			Column::TYPE_RELATION_LOOKUP => null,
+			Column::TYPE_LOOKUP => null,
 			default => $defaultValue,
 		};
 		return $defaultValue;
@@ -1124,22 +1128,30 @@ class Row2Mapper {
 	}
 
 	public function isVirtualColumn(string $columnType): bool {
-		return $columnType === Column::TYPE_RELATION_LOOKUP;
+		return $columnType === Column::TYPE_LOOKUP;
 	}
 
 	/**
-	 * @param int[] $columnIds
+	 * Maps columns to their IDs and adds the relation column ID for each lookup
+	 * column, so the cells of the underlying relation column get fetched too.
+	 *
+	 * @param Column[] $columns
 	 * @return int[]
 	 */
-	public function addRelationColumnIdsForLookupColumns(array $columnIds): array {
-		$allColumns = $this->columnMapper->findAll($columnIds);
-		foreach ($allColumns as $column) {
-			if ($column->getType() !== Column::TYPE_RELATION_LOOKUP) {
+	public function getColumnIdsWithRelationColumns(array $columns): array {
+		$columnIds = [];
+		foreach ($columns as $column) {
+			$columnIds[] = $column->getId();
+			if (!$column->isVirtual()) {
 				continue;
 			}
 
-			$settings = $column->getCustomSettingsObject(RelationLookupSettings::class);
-			$columnIds[] = $settings->relationColumnId;
+			try {
+				$settings = $column->getCustomSettingsObject(LookupSettings::class);
+				$columnIds[] = $settings->relationColumnId;
+			} catch (\InvalidArgumentException $e) {
+				$this->logger->warning('Invalid lookup settings for column ' . $column->getId(), ['exception' => $e]);
+			}
 		}
 		return array_values(array_unique(array_filter($columnIds)));
 	}

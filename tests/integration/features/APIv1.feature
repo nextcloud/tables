@@ -761,6 +761,7 @@ Feature: APIv1
       | name      | Cherry |
       | available | true   |
     When user "participant1" create view "Available Fruits" with emoji "✅" for "fruits" as "available-fruits"
+    And user "participant1" sets columnSettings "name,available" to view "available-fruits"
     And user "participant1" sets filter to view "available-fruits"
       | column    | operator | value |
       | available | is-equal | true  |
@@ -804,8 +805,8 @@ Feature: APIv1
     When user "participant2" fetches relations for table "secret-orders"
     Then the reported status is "404"
 
-  @api1 @relation @relation-lookup
-  Scenario: Create a relation lookup column and fetch relations for a table
+  @api1 @relation @lookup
+  Scenario: Create a lookup column and fetch relations for a table
     Given table "Products" with emoji "📦" exists for user "participant1" as "products"
     Then column "name" exists with following properties
       | type      | text |
@@ -823,7 +824,7 @@ Feature: APIv1
       | category | Berry  |
     Given table "Orders" with emoji "🛒" exists for user "participant1" as "orders"
     Then relation column "product" exists on table "orders" pointing to table "products" using label column "name"
-    Then relation lookup column "product category" exists on table "orders" for relation column "product" using target column "category"
+    Then lookup column "product category" exists on table "orders" for relation column "product" using target column "category"
     When user "participant1" fetches relations for table "orders"
     Then the reported status is "200"
     Then the relations response contains 2 entries for column "product"
@@ -833,8 +834,8 @@ Feature: APIv1
     Then the relations response for column "product category" has an entry with value "Fruit"
     Then the relations response for column "product category" has an entry with value "Berry"
 
-  @api1 @relation @relation-lookup
-  Scenario: Create a relation lookup column for a relation pointing to a view
+  @api1 @relation @lookup
+  Scenario: Create a lookup column for a relation pointing to a view
     Given table "Fruits" with emoji "🍎" exists for user "participant1" as "fruits"
     Then column "name" exists with following properties
       | type      | text |
@@ -851,9 +852,10 @@ Feature: APIv1
       | name  | Banana |
       | color | Yellow |
     When user "participant1" create view "Fruit View" with emoji "👁" for "fruits" as "fruit-view"
+    And user "participant1" sets columnSettings "name,color" to view "fruit-view"
     Given table "Baskets" with emoji "🧺" exists for user "participant1" as "baskets"
     Then relation column "fruit" exists on table "baskets" pointing to view "fruit-view" using label column "name"
-    Then relation lookup column "fruit color" exists on table "baskets" for relation column "fruit" using target column "color"
+    Then lookup column "fruit color" exists on table "baskets" for relation column "fruit" using target column "color"
     When user "participant1" fetches relations for table "baskets"
     Then the reported status is "200"
     Then the relations response contains 2 entries for column "fruit"

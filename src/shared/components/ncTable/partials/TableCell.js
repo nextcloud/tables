@@ -35,8 +35,8 @@ const COMPONENT_BY_COLUMN_TYPE = {
 	[ColumnTypes.Usergroup]: TableCellUsergroup,
 	[ColumnTypes.Relation]: TableCellRelation,
 	// Loaded asynchronously to break the circular dependency with
-	// TableCellRelationLookup, which resolves cells via getTableCellComponent.
-	[ColumnTypes.RelationLookup]: defineAsyncComponent(() => import('./TableCellRelationLookup.vue')),
+	// TableCellLookup, which resolves cells via getTableCellComponent.
+	[ColumnTypes.Lookup]: defineAsyncComponent(() => import('./TableCellLookup.vue')),
 }
 
 export function getTableCellComponent(column) {

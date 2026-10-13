@@ -12,7 +12,7 @@ use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\ViewMapper;
-use OCA\Tables\Dto\RelationLookupSettings;
+use OCA\Tables\Dto\LookupSettings;
 use OCA\Tables\Dto\RelationSettings;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -24,10 +24,14 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesColumn from ResponseDefinitions
+ * @psalm-import-type TablesPublicColumn from ResponseDefinitions
+ * @psalm-import-type TablesRelationData from ResponseDefinitions
+ * @psalm-import-type TablesRelationValue from ResponseDefinitions
  */
 class RelationService {
-	/** @var array<string, array> Cache for relation data */
-	private array $cacheRelationData = [];
+	/** @var array<string, array> Cache for formatted relation labels */
+	private array $cacheRelationLabels = [];
+	private array $cacheRawRelationData = [];
 
 	public function __construct(
 		private readonly ColumnMapper $columnMapper,
@@ -43,14 +47,14 @@ class RelationService {
 	 * Get all relation data for a table
 	 *
 	 * @param int $tableId
-	 * @return array<int, array{column: ?TablesColumn, values: array<int, array{id: int, value: mixed}>}> Relation data grouped by column ID
+	 * @return TablesRelationData Relation data grouped by column ID
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function getRelationsForTable(int $tableId): array {
+	public function getRelationsForTable(int $tableId, ?string $userId = null): array {
 		// Check table permissions through ColumnService
-		$columns = $this->columnService->findAllByTable($tableId);
+		$columns = $this->columnService->findAllByTable($tableId, $userId);
 
 		return $this->getRelationsForColumnList($columns);
 	}
@@ -59,31 +63,31 @@ class RelationService {
 	 * Get all relation data for a view
 	 *
 	 * @param int $viewId
-	 * @return array<int, array{column: ?TablesColumn, values: array<int, array{id: int, value: mixed}>}> Relation data grouped by column ID
+	 * @return TablesRelationData Relation data grouped by column ID
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function getRelationsForView(int $viewId): array {
+	public function getRelationsForView(int $viewId, ?string $userId = null): array {
 		// Check view permissions through ColumnService
-		$columns = $this->columnService->findAllByView($viewId);
+		$columns = $this->columnService->findAllByView($viewId, $userId);
 
 		return $this->getRelationsForColumnList($columns);
 	}
 
 	/**
-	 * Get relation data for a specific column
+	 * Get relation labels for a specific column
 	 *
 	 * @param Column $column
 	 * @return array<int, array{id: int, value: string}> Indexed per row id
 	 */
-	public function getRelationData(Column $column): array {
+	public function getRelationLabels(Column $column): array {
 		if ($column->getType() !== Column::TYPE_RELATION) {
 			return [];
 		}
 
 		try {
-			return $this->fetchRelationValuesForTarget($column);
+			return $this->fetchRelationLabelsForTarget($column);
 		} catch (\InvalidArgumentException $e) {
 			$this->logger->warning('Invalid relation settings for column ' . $column->getId() . ': ' . $e->getMessage());
 			return [];
@@ -94,41 +98,39 @@ class RelationService {
 	 * Get relation data for a list of columns
 	 *
 	 * @param Column[] $columns
-	 * @return array<int, array{column: ?TablesColumn, values: array<int, array{id: int, value: mixed}>}> Relation data grouped by column ID
+	 * @return TablesRelationData Relation data grouped by column ID
 	 * @throws InternalError
 	 */
 	private function getRelationsForColumnList(array $columns): array {
+		$columnsMap = $this->fetchColumnsByIds($this->collectRelationColumnIds($columns));
+		foreach ($columns as $column) {
+			$columnsMap[$column->getId()] = $column;
+		}
 		$relationColumns = array_filter($columns, fn (Column $column) => $column->getType() === Column::TYPE_RELATION);
-		$relationData = $this->fetchRelationColumns($relationColumns);
-
-		$lookupColumns = array_filter($columns, fn (Column $column) => $column->getType() === Column::TYPE_RELATION_LOOKUP);
-		$relationLookupData = $this->fetchRelationLookupColumns($lookupColumns);
+		$lookupColumns = array_filter($columns, fn (Column $column) => $column->getType() === Column::TYPE_LOOKUP);
+		$this->preloadRelationValues($relationColumns, $lookupColumns, $columnsMap);
+		$relationLabels = $this->fetchRelationLabelsForColumns($relationColumns);
+		$lookupData = $this->fetchLookupColumns($lookupColumns, $columnsMap);
 
 		return array_map(
 			fn (array $data) => ['column' => null, 'values' => $data],
-			$relationData
-		) + $relationLookupData;
+			$relationLabels
+		) + $lookupData;
 	}
 
 	/**
-	 * Fetch relation data for relation columns
+	 * Fetch relation labels for relation columns
 	 *
 	 * @param Column[] $columns
-	 * @return array<int, array<int, array{id: int, value: string}>> Relation data, indexed per column ID and row ID
+	 * @return array<int, array<int, array{id: int, value: string}>> Relation labels, indexed per column ID and row ID
 	 * @throws InternalError
 	 */
-	private function fetchRelationColumns(array $columns): array {
+	private function fetchRelationLabelsForColumns(array $columns): array {
 		$result = [];
-		$fetchedTargets = [];
 
 		foreach ($columns as $column) {
 			try {
-				$settings = $column->getCustomSettingsObject(RelationSettings::class);
-				$targetKey = $this->buildRelationCacheKey($settings->relationType, $settings->targetId, $settings->labelColumn);
-
-				$fetchedTargets[$targetKey] ??= $this->fetchRelationValuesForTarget($column);
-
-				$result[$column->getId()] = $fetchedTargets[$targetKey];
+				$result[$column->getId()] = $this->fetchRelationLabelsForTarget($column);
 			} catch (\InvalidArgumentException $e) {
 				$this->logger->warning('Invalid relation settings for column ' . $column->getId() . ': ' . $e->getMessage());
 			}
@@ -138,36 +140,28 @@ class RelationService {
 	}
 
 	/**
-	 * Fetch relation data for relation lookup columns
+	 * Fetch relation data for lookup columns
 	 *
 	 * @param Column[] $columns
-	 * @return array<int, array{column: ?TablesColumn, values: array<int, array{id: int, value: mixed}>}> Relation data grouped by column ID
+	 * @param array<int, Column> $columnsMap
+	 * @return TablesRelationData Relation data grouped by column ID
 	 * @throws InternalError
 	 */
-	private function fetchRelationLookupColumns(array $columns): array {
+	private function fetchLookupColumns(array $columns, array $columnsMap): array {
 		$result = [];
 
-		// Batch fetch all needed columns to avoid duplicate queries
-		$columnIdsToFetch = $this->collectColumnIdsForLookup($columns);
-		$columnsMap = $this->fetchColumnsByIds($columnIdsToFetch);
-
+		// Reuse the batch-fetched columns to avoid duplicate queries
 		foreach ($columns as $column) {
+			$result[$column->getId()] = ['column' => null, 'values' => []];
 			try {
-				$settings = $column->getCustomSettingsObject(RelationLookupSettings::class);
-				$relationColumn = $columnsMap[$settings->relationColumnId] ?? null;
-				$targetColumn = $columnsMap[$settings->targetColumnId] ?? null;
-
-				if (!$relationColumn || !$targetColumn) {
-					continue;
-				}
-
-				$lookupData = $this->fetchLookupValues($settings, $relationColumn);
+				[$settings, $targetColumn] = $this->resolveLookupTarget($column, $columnsMap);
+				$lookupSettings = $column->getCustomSettingsObject(LookupSettings::class);
 				$result[$column->getId()] = [
 					'column' => $targetColumn->jsonSerialize(),
-					'values' => $lookupData,
+					'values' => $this->fetchRawRelationValues($settings, $lookupSettings->targetColumnId),
 				];
-			} catch (\InvalidArgumentException $e) {
-				$this->logger->warning('Invalid relation lookup settings for column ' . $column->getId() . ': ' . $e->getMessage());
+			} catch (\InvalidArgumentException|DoesNotExistException $e) {
+				$this->logger->warning('Invalid lookup settings for column ' . $column->getId() . ': ' . $e->getMessage());
 			}
 		}
 
@@ -175,35 +169,111 @@ class RelationService {
 	}
 
 	private function getCurrentUserId(): string {
-		$user = $this->userSession->getUser();
-		return $user ? $user->getUID() : 'anonymous';
+		return $this->userSession->getUser()?->getUID() ?? '';
 	}
 
 	/**
-	 * Fetch relation values for a specific target
+	 * @param Column[] $relationColumns
+	 * @param Column[] $lookupColumns
+	 * @param array<int, Column> $columnsMap
+	 */
+	private function preloadRelationValues(array $relationColumns, array $lookupColumns, array $columnsMap): void {
+		$targets = [];
+		foreach ([...$relationColumns, ...$lookupColumns] as $column) {
+			try {
+				if ($column->isVirtual()) {
+					[$settings, $targetColumn] = $this->resolveLookupTarget($column, $columnsMap);
+				} else {
+					$settings = $column->getCustomSettingsObject(RelationSettings::class);
+					$targetColumn = $columnsMap[$settings->labelColumn] ?? null;
+					if (!$targetColumn) {
+						continue;
+					}
+					$this->columnService->assertRelationTargetColumn($settings, $targetColumn);
+				}
+				$targetKey = $settings->relationType . '_' . $settings->targetId;
+				$targets[$targetKey]['settings'] = $settings;
+				$targets[$targetKey]['columnIds'][$targetColumn->getId()] = true;
+			} catch (\InvalidArgumentException|DoesNotExistException $e) {
+				$this->logger->warning('Invalid relation settings for column ' . $column->getId(), ['exception' => $e]);
+			}
+		}
+
+		foreach ($targets as $target) {
+			$settings = $target['settings'];
+			$cacheKeys = [];
+			foreach (array_keys($target['columnIds']) as $columnId) {
+				$key = $this->buildRelationCacheKey($settings->relationType, $settings->targetId, $columnId);
+				if (!isset($this->cacheRawRelationData[$key])) {
+					$cacheKeys[$columnId] = $key;
+				}
+			}
+			if (!$cacheKeys) {
+				continue;
+			}
+			try {
+				$rows = $this->fetchRowsForTarget($settings, array_keys($cacheKeys));
+			} catch (DoesNotExistException) {
+				$rows = [];
+			}
+			foreach ($cacheKeys as $key) {
+				$this->cacheRawRelationData[$key] = [];
+			}
+			foreach ($rows as $row) {
+				$rowId = (int)$row->getId();
+				$values = array_column($row->getData(), 'value', 'columnId');
+				foreach ($cacheKeys as $columnId => $key) {
+					$this->cacheRawRelationData[$key][$rowId] = ['id' => $rowId, 'value' => $values[$columnId] ?? null];
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param array<int, Column> $columnsMap
+	 * @return array{RelationSettings, Column}
+	 */
+	private function resolveLookupTarget(Column $column, array $columnsMap): array {
+		$settings = $column->getCustomSettingsObject(LookupSettings::class);
+		$relation = $columnsMap[$settings->relationColumnId] ?? null;
+		$target = $columnsMap[$settings->targetColumnId] ?? null;
+		if (!$relation || $relation->getType() !== Column::TYPE_RELATION || $relation->getTableId() !== $column->getTableId()) {
+			throw new \InvalidArgumentException('Lookup relation must belong to the same table.');
+		}
+		if (!$target || in_array($target->getType(), [Column::TYPE_RELATION, Column::TYPE_LOOKUP], true)) {
+			throw new \InvalidArgumentException('Lookup target is missing or unsupported.');
+		}
+		$relationSettings = $relation->getCustomSettingsObject(RelationSettings::class);
+		$this->columnService->assertRelationTargetColumn($relationSettings, $target);
+		return [$relationSettings, $target];
+	}
+
+	/**
+	 * Fetch relation labels for a specific target
 	 *
 	 * @param Column $column
 	 * @return array<int, array{id: int, value: string}> Indexed per row id
 	 * @throws InternalError
 	 */
-	private function fetchRelationValuesForTarget(Column $column): array {
+	private function fetchRelationLabelsForTarget(Column $column): array {
 		$settings = $column->getCustomSettingsObject(RelationSettings::class);
 
 		$cacheKey = $this->buildRelationCacheKey($settings->relationType, $settings->targetId, $settings->labelColumn);
-		if (isset($this->cacheRelationData[$cacheKey])) {
-			return $this->cacheRelationData[$cacheKey];
+		if (isset($this->cacheRelationLabels[$cacheKey])) {
+			return $this->cacheRelationLabels[$cacheKey];
 		}
 
 		try {
 			$targetColumn = $this->columnMapper->find($settings->labelColumn);
-			$rows = $this->fetchRowsForTarget($settings, [$settings->labelColumn]);
+			$this->columnService->assertRelationTargetColumn($settings, $targetColumn);
+			$rows = $this->fetchRawRelationValues($settings, $settings->labelColumn);
 		} catch (DoesNotExistException) {
-			$this->cacheRelationData[$cacheKey] = [];
+			$this->cacheRelationLabels[$cacheKey] = [];
 			return [];
 		}
 
-		$result = $this->buildRelationValues($rows, $targetColumn, $settings->labelColumn);
-		$this->cacheRelationData[$cacheKey] = $result;
+		$result = $this->buildRelationLabels($rows, $targetColumn);
+		$this->cacheRelationLabels[$cacheKey] = $result;
 
 		return $result;
 	}
@@ -216,21 +286,29 @@ class RelationService {
 	}
 
 	/**
-	 * Collect all column IDs needed for lookup processing
+	 * Collect all column IDs needed for relation and lookup processing
 	 *
 	 * @param Column[] $columns
 	 * @return int[]
 	 */
-	private function collectColumnIdsForLookup(array $columns): array {
+	private function collectRelationColumnIds(array $columns): array {
 		$columnIds = [];
 
 		foreach ($columns as $column) {
-			$settings = $column->getCustomSettingsObject(RelationLookupSettings::class);
-			$columnIds[] = $settings->targetColumnId;
-			$columnIds[] = $settings->relationColumnId;
+			try {
+				if ($column->getType() === Column::TYPE_LOOKUP) {
+					$settings = $column->getCustomSettingsObject(LookupSettings::class);
+					$columnIds[] = $settings->targetColumnId;
+					$columnIds[] = $settings->relationColumnId;
+				} elseif ($column->getType() === Column::TYPE_RELATION) {
+					$columnIds[] = $column->getCustomSettingsObject(RelationSettings::class)->labelColumn;
+				}
+			} catch (\InvalidArgumentException $e) {
+				$this->logger->warning('Invalid relation settings for column ' . $column->getId(), ['exception' => $e]);
+			}
 		}
 
-		return array_unique($columnIds);
+		return array_values(array_unique($columnIds));
 	}
 
 	/**
@@ -258,29 +336,28 @@ class RelationService {
 	}
 
 	/**
-	 * Fetch lookup values for a relation lookup column
+	 * Fetch raw values for a relation target column
 	 *
-	 * @param RelationLookupSettings $settings
-	 * @param Column $relationColumn
-	 * @return array<int, array{id: int, value: mixed}>
+	 * @param RelationSettings $settings
+	 * @param int $targetColumnId
+	 * @return array<int, array{id: int, value: TablesRelationValue}>
 	 */
-	private function fetchLookupValues(RelationLookupSettings $settings, Column $relationColumn): array {
-		$relationSettings = $relationColumn->getCustomSettingsObject(RelationSettings::class);
-
-		$cacheKey = $this->buildRelationCacheKey($relationSettings->relationType, $relationSettings->targetId, $settings->targetColumnId);
-		if (isset($this->cacheRelationData[$cacheKey])) {
-			return $this->cacheRelationData[$cacheKey];
+	private function fetchRawRelationValues(RelationSettings $settings, int $targetColumnId): array {
+		$cacheKey = $this->buildRelationCacheKey($settings->relationType, $settings->targetId, $targetColumnId);
+		if (isset($this->cacheRawRelationData[$cacheKey])) {
+			return $this->cacheRawRelationData[$cacheKey];
 		}
 
 		try {
-			// Fetch both relation label column and lookup target column in a single query
-			$rows = $this->fetchRowsForTarget($relationSettings, [$relationSettings->labelColumn, $settings->targetColumnId]);
-			$lookupData = $this->buildLookupValues($rows, $relationSettings->labelColumn, $settings->targetColumnId);
+			// Fetch only the requested column; labels do not determine whether a row is referenced
+			$rows = $this->fetchRowsForTarget($settings, [$targetColumnId]);
+			$lookupData = $this->buildRawRelationValues($rows, $targetColumnId);
 
-			$this->cacheRelationData[$cacheKey] = $lookupData;
+			$this->cacheRawRelationData[$cacheKey] = $lookupData;
 			return $lookupData;
 		} catch (DoesNotExistException $e) {
 			$this->logger->warning('Failed to fetch lookup data: ' . $e->getMessage());
+			$this->cacheRawRelationData[$cacheKey] = [];
 			return [];
 		}
 	}
@@ -313,25 +390,19 @@ class RelationService {
 	}
 
 	/**
-	 * Build relation values from rows
+	 * Build relation labels from raw values
 	 *
-	 * @param Row2[] $rows
+	 * @param array<int, array{id: int, value: TablesRelationValue}> $rows
 	 * @param Column $column
-	 * @param int $labelColumnId
 	 * @return array<int, array{id: int, value: string}>
 	 */
-	private function buildRelationValues(array $rows, Column $column, int $labelColumnId): array {
+	private function buildRelationLabels(array $rows, Column $column): array {
 		$result = [];
 
-		foreach ($rows as $row) {
-			$data = $row->getData();
-			$displayFieldData = array_filter($data, fn ($item) => $item['columnId'] === $labelColumnId);
-			$value = reset($displayFieldData)['value'] ?? null;
-
-			$rowId = (int)$row->getId();
+		foreach ($rows as $rowId => $row) {
 			$result[$rowId] = [
 				'id' => $rowId,
-				'value' => $this->formatValue($column, $value),
+				'value' => $this->formatRelationLabel($column, $row['value']),
 			];
 		}
 
@@ -339,35 +410,30 @@ class RelationService {
 	}
 
 	/**
-	 * Build lookup values from rows containing both relation label and target columns
+	 * Build lookup values from rows containing the target column
 	 *
 	 * @param Row2[] $rows
-	 * @param int $relationLabelColumnId
 	 * @param int $targetColumnId
-	 * @return array<int, array{id: int, value: mixed}>
+	 * @return array<int, array{id: int, value: TablesRelationValue}>
 	 */
-	private function buildLookupValues(array $rows, int $relationLabelColumnId, int $targetColumnId): array {
+	private function buildRawRelationValues(array $rows, int $targetColumnId): array {
 		$result = [];
 
 		foreach ($rows as $row) {
 			$data = $row->getData();
 			$rowId = (int)$row->getId();
 
-			// Find the relation label value
-			$relationLabelData = array_filter($data, fn ($item) => $item['columnId'] === $relationLabelColumnId);
-			$relationLabelValue = reset($relationLabelData)['value'] ?? null;
+			// Index the row's values by column ID
+			$values = array_column($data, 'value', 'columnId');
 
 			// Find the target column value
-			$targetData = array_filter($data, fn ($item) => $item['columnId'] === $targetColumnId);
-			$targetValue = reset($targetData)['value'] ?? null;
+			$targetValue = $values[$targetColumnId] ?? null;
 
-			// Only include if relation label exists (meaning this row is referenced)
-			if ($relationLabelValue !== null && $relationLabelValue !== '') {
-				$result[$rowId] = [
-					'id' => $rowId,
-					'value' => $targetValue,
-				];
-			}
+			// A relation references the row ID independently of its label
+			$result[$rowId] = [
+				'id' => $rowId,
+				'value' => $targetValue,
+			];
 		}
 
 		return $result;
@@ -375,21 +441,21 @@ class RelationService {
 
 	/**
 	 * Format a cell value for display as a relation label.
-	 * Relation lookup only supports text-line and number columns.
+	 * Relation labels only support text-line and number columns.
 	 */
-	private function formatValue(Column $column, mixed $value): string {
+	private function formatRelationLabel(Column $column, mixed $value): string {
 		if ($value === null || $value === '' || $value === []) {
 			return '';
 		}
 
 		return match ($column->getType()) {
 			Column::TYPE_TEXT => trim(strip_tags((string)$value)),
-			Column::TYPE_NUMBER => $this->formatNumberValue($column, $value),
+			Column::TYPE_NUMBER => $this->formatNumberLabel($column, $value),
 			default => (string)$value,
 		};
 	}
 
-	private function formatNumberValue(Column $column, mixed $value): string {
+	private function formatNumberLabel(Column $column, mixed $value): string {
 		if ($value === null || $value === '') {
 			return '';
 		}

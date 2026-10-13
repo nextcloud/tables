@@ -76,6 +76,10 @@ test.describe('Test column relation', () => {
 		await expect(
 			page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'Alice' }),
 		).toBeVisible()
+		await page.reload()
+		const row = page.locator('[data-cy="ncTable"] [data-cy="customTableRow"]').filter({ hasText: 'Alice' })
+		await row.locator('.cell-relation .non-edit-mode').click()
+		await expect(row.locator('.cell-relation .vs__selected')).toContainText('Alice')
 	})
 
 	test('Relation labels render inside an application context', async ({ userPage: { page } }) => {

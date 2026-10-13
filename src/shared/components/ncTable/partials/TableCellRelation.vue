@@ -38,8 +38,6 @@ import { translate as t } from '@nextcloud/l10n'
 import { NcSelect } from '@nextcloud/vue'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import { useDataStore } from '../../../../store/data.js'
-import { mapState } from 'pinia'
-import { useTablesStore } from '../../../../store/store.js'
 
 export default {
 	name: 'TableCellRelation',
@@ -74,7 +72,6 @@ export default {
 	},
 
 	computed: {
-		...mapState(useTablesStore, ['activeTable', 'activeView']),
 		allRelations() {
 			const dataStore = useDataStore()
 			return dataStore.getRelations(this.column.id).values || {}
@@ -89,8 +86,8 @@ export default {
 			return this.currentOption ? this.currentOption.value : null
 		},
 		relationOptions() {
-			const activeElement = this.activeView || this.activeTable
-			if (activeElement && !this.loading) {
+			const loading = useDataStore().getRelations(this.column.id).loading
+			if (!loading) {
 				return Object.values(this.allRelations || {})
 					.map(relation => ({ id: relation.id, label: relation.value }))
 			}

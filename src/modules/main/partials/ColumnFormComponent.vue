@@ -23,7 +23,7 @@ import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTyp
 import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
 import UsergroupForm from '../../../shared/components/ncTable/partials/rowTypePartials/UsergroupForm.vue'
 import RelationForm from '../../../shared/components/ncTable/partials/rowTypePartials/RelationForm.vue'
-import RelationLookupForm from '../../../shared/components/ncTable/partials/rowTypePartials/RelationLookupForm.vue'
+import LookupForm from '../../../shared/components/ncTable/partials/rowTypePartials/LookupForm.vue'
 
 export default {
 	name: 'ColumnFormComponent',
@@ -43,7 +43,7 @@ export default {
 		DatetimeTimeForm,
 		UsergroupForm,
 		RelationForm,
-		RelationLookupForm,
+		LookupForm,
 	},
 	props: {
 		column: {
@@ -60,7 +60,7 @@ export default {
 	],
 	data() {
 		return {
-			value_data: this.getValueForColumn(),
+			value_data: this.value,
 		}
 	},
 	computed: {
@@ -81,13 +81,10 @@ export default {
 			this.$emit('update:value', this.value_data)
 		},
 		value() {
-			this.value_data = this.getValueForColumn()
+			this.value_data = this.value
 		},
 	},
 	methods: {
-		getValueForColumn() {
-			return this.column.getValueForForm(this.value)
-		},
 		snakeToCamel(str) {
 			str = str.toLowerCase().replace(/([-_][a-z])/g, group =>
 				group

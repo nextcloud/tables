@@ -162,7 +162,7 @@ final class AnalyticsDatasourceTest extends TestCase {
 
 		$this->relationService
 			->expects($this->once())
-			->method('getRelationData')
+			->method('getRelationLabels')
 			->willReturn([
 				42 => ['id' => 42, 'value' => 'Acme Corp'],
 				43 => ['id' => 43, 'value' => 'Globex'],

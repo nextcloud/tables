@@ -2696,15 +2696,15 @@ class FeatureContext implements Context {
 	}
 
 	/**
-	 * @Then relation lookup column :title exists on table :tableName for relation column :relationColumnName using target column :targetColumnName
+	 * @Then lookup column :title exists on table :tableName for relation column :relationColumnName using target column :targetColumnName
 	 */
-	public function createRelationLookupColumn(string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
+	public function createLookupColumn(string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
 		$relationColumnId = (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'];
 		$targetColumnId = (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'];
 
 		$props = [
 			'title' => $title,
-			'type' => 'relation_lookup',
+			'type' => 'lookup',
 			'mandatory' => 0,
 			'customSettings' => [
 				'relationColumnId' => $relationColumnId,
@@ -2723,22 +2723,22 @@ class FeatureContext implements Context {
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($title, $newColumn['title']);
-		Assert::assertEquals('relation_lookup', $newColumn['type']);
+		Assert::assertEquals('lookup', $newColumn['type']);
 
 		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
 	}
 
 	/**
-	 * @Then relation lookup column :title exists on table :tableName for relation column :relationColumnName using target column :targetColumnName added to view :viewName
+	 * @Then lookup column :title exists on table :tableName for relation column :relationColumnName using target column :targetColumnName added to view :viewName
 	 */
-	public function createRelationLookupColumnAddedToView(string $title, string $tableName, string $relationColumnName, string $targetColumnName, string $viewName): void {
+	public function createLookupColumnAddedToView(string $title, string $tableName, string $relationColumnName, string $targetColumnName, string $viewName): void {
 		$relationColumnId = (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'];
 		$targetColumnId = (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'];
 		$viewId = $this->viewIds[$viewName];
 
 		$props = [
 			'title' => $title,
-			'type' => 'relation_lookup',
+			'type' => 'lookup',
 			'mandatory' => 0,
 			'selectedViewIds' => [$viewId],
 			'customSettings' => [
@@ -2758,7 +2758,7 @@ class FeatureContext implements Context {
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($title, $newColumn['title']);
-		Assert::assertEquals('relation_lookup', $newColumn['type']);
+		Assert::assertEquals('lookup', $newColumn['type']);
 
 		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
 	}

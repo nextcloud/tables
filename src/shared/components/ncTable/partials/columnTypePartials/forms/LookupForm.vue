@@ -4,9 +4,10 @@
 -->
 <template>
 	<div style="width: 100%">
+		<p>{{ t('tables', 'Displays a column from a linked row. Lookup values are read-only.') }}</p>
 		<div class="row space-T">
 			<div class="fix-col-4 title">
-				{{ t('tables', 'Relation Column') }}
+				{{ t('tables', 'Relation column') }}
 			</div>
 			<div class="fix-col-4">
 				<NcSelect v-model="customSettings.relationColumnId"
@@ -21,13 +22,14 @@
 
 		<div class="row space-T">
 			<div class="fix-col-4 title">
-				{{ t('tables', 'Target Column') }}
+				{{ t('tables', 'Column to display') }}
 			</div>
 			<div class="fix-col-4">
 				<NcSelect v-model="customSettings.targetColumnId"
 					:options="targetColumns"
 					:reduce="(option) => option.id"
 					:loading="loadingTargetColumns"
+					:disabled="!selectedRelationColumn || loadingTargetColumns"
 					:aria-label-combobox="t('tables', 'Select target column')"
 					required
 					@update:model-value="onTargetColumnChange" />
@@ -45,7 +47,7 @@ import { useDataStore } from '../../../../../../store/data.js'
 import { ColumnTypes } from '../../../mixins/columnHandler.js'
 
 export default {
-	name: 'RelationLookupForm',
+	name: 'LookupForm',
 	components: {
 		NcSelect,
 	},
@@ -57,12 +59,13 @@ export default {
 	},
 	emits: [
 		'update:customSettings',
+		'update:canSave',
 	],
 	data() {
 		return {
 			customSettings: {
-				relationColumnId: this.column.customSettings.relationColumnId ?? null,
-				targetColumnId: this.column.customSettings.targetColumnId ?? null,
+				relationColumnId: this.column.customSettings?.relationColumnId ?? null,
+				targetColumnId: this.column.customSettings?.targetColumnId ?? null,
 			},
 			relationColumns: [],
 			targetColumns: [],
@@ -71,7 +74,10 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(useTablesStore, ['activeTable', 'views']),
+		...mapState(useTablesStore, ['activeTable', 'activeView']),
+		canSave() {
+			return !!this.selectedRelationColumn && !!this.selectedTargetColumn && !this.loadingRelationColumns && !this.loadingTargetColumns
+		},
 		selectedRelationColumn() {
 			if (!this.customSettings.relationColumnId) {
 				return null
@@ -83,6 +89,12 @@ export default {
 				return null
 			}
 			return this.targetColumns.find(c => c.id === this.customSettings.targetColumnId) || null
+		},
+	},
+	watch: {
+		canSave: {
+			immediate: true,
+			handler(canSave) { this.$emit('update:canSave', canSave) },
 		},
 	},
 	async mounted() {
@@ -100,7 +112,15 @@ export default {
 			this.loadingRelationColumns = true
 			try {
 				const dataStore = useDataStore()
-				const columns = await dataStore.getColumns(null, this.activeTable?.id)
+				const tableId = this.column.tableId ?? this.activeTable?.id ?? this.activeView?.tableId
+				if (!tableId) {
+					this.relationColumns = []
+					return
+				}
+				let columns = dataStore.getColumns(false, tableId)
+				if (!columns.length) {
+					columns = await dataStore.getColumnsFromBE({ tableId, viewId: this.activeView?.id })
+				}
 
 				this.relationColumns = columns
 					.filter(column => column.type === ColumnTypes.Relation)
@@ -114,38 +134,35 @@ export default {
 			}
 		},
 		async loadTargetColumns() {
-			if (!this.selectedRelationColumn?.column?.customSettings) {
-				this.targetColumns = []
+			this.targetColumns = []
+			const relationColumnId = this.customSettings.relationColumnId
+			const relationSettings = this.selectedRelationColumn?.column?.customSettings
+			if (!relationSettings) {
+				this.loadingTargetColumns = false
 				return
 			}
 
 			this.loadingTargetColumns = true
 			try {
 				const dataStore = useDataStore()
-				const relationSettings = this.selectedRelationColumn.column.customSettings
-				if (relationSettings.relationType === 'view') {
-					const view = this.views.find(view => view.id === relationSettings.targetId)
-					await dataStore.loadColumnsFromBE({ view, tableId: null })
-				} else {
-					await dataStore.loadColumnsFromBE({ view: null, tableId: relationSettings.targetId })
-				}
-
-				const columns = dataStore.getColumns(relationSettings.relationType === 'view', relationSettings.targetId)
-
+				let columns = await dataStore.getColumnsFromBE({
+					tableId: relationSettings.relationType === 'table' ? relationSettings.targetId : null,
+					viewId: relationSettings.relationType === 'view' ? relationSettings.targetId : null,
+				})
+				if (relationColumnId !== this.customSettings.relationColumnId) return
+				const existingTarget = dataStore.getRelations(this.column.id).column
+				if (!columns.length && existingTarget?.id === this.customSettings.targetColumnId) columns = [existingTarget]
 				this.targetColumns = columns
-					.filter(column => column.type !== ColumnTypes.RelationLookup)
-					.map(column => ({
-						id: column.id,
-						label: column.title,
-					}))
+					.filter(column => column.id > 0 && column.type !== ColumnTypes.Relation && !column.isVirtual())
+					.map(column => ({ id: column.id, label: column.title }))
 			} finally {
-				this.loadingTargetColumns = false
+				if (relationColumnId === this.customSettings.relationColumnId) this.loadingTargetColumns = false
 			}
 		},
 		async onRelationColumnChange() {
 			this.customSettings.targetColumnId = null
-			await this.loadTargetColumns()
 			this.updateCustomSettings()
+			await this.loadTargetColumns()
 		},
 		onTargetColumnChange() {
 			this.updateCustomSettings()

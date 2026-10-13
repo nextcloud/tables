@@ -3,20 +3,20 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :readonly="column.readonly">
-		<TableCellRelationLookup :column="column" :value="value" />
+	<RowFormWrapper :title="column.title" :mandatory="false" :description="column.description" :readonly="true">
+		<TableCellLookup :column="column" :value="value" />
 	</RowFormWrapper>
 </template>
 
 <script>
 import RowFormWrapper from './RowFormWrapper.vue'
-import TableCellRelationLookup from '../TableCellRelationLookup.vue'
+import TableCellLookup from '../TableCellLookup.vue'
 
 export default {
-	name: 'RelationLookupForm',
+	name: 'LookupForm',
 	components: {
 		RowFormWrapper,
-		TableCellRelationLookup,
+		TableCellLookup,
 	},
 	props: {
 		column: {
@@ -24,7 +24,8 @@ export default {
 			required: true,
 		},
 		value: {
-			required: true,
+			type: [String, Number, Object],
+			default: null,
 		},
 	},
 }

@@ -374,7 +374,7 @@ class RowService extends SuperService {
 		$readOnlyColumns = $view ? $this->extractColumnsByProperty($view, 'isReadonly') : [];
 		$mandatoryColumns = [];
 		foreach ($columns as $column) {
-			if ($column->getMandatory()) {
+			if ($column->getMandatory() && !$column->isVirtual()) {
 				$mandatoryColumns[$column->getId()] = true;
 			}
 		}
@@ -393,7 +393,7 @@ class RowService extends SuperService {
 
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
-			if ($column && $this->row2Mapper->isVirtualColumn($column->getType())) {
+			if ($column && $column->isVirtual()) {
 				continue;
 			}
 
@@ -446,7 +446,7 @@ class RowService extends SuperService {
 			}
 
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
-			if (!$column) {
+			if (!$column || $column->isVirtual()) {
 				continue;
 			}
 
@@ -927,7 +927,7 @@ class RowService extends SuperService {
 		}
 
 		$columnIds = $view->getColumnIds();
-		$columnIds = $this->row2Mapper->addRelationColumnIdsForLookupColumns($columnIds);
+		$columnIds = $this->row2Mapper->getColumnIdsWithRelationColumns($this->columnMapper->findAll($columnIds));
 
 		$row->filterDataByColumns($columnIds);
 		$row->filterDataByAliasByColumns($columnIds);

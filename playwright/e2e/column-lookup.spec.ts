@@ -14,17 +14,17 @@ import {
 	selectFromVueDropdown,
 } from '../support/commands'
 
-const sourceTableTitle = 'Test relation lookup source'
-const targetTableTitle = 'Test relation lookup target'
+const sourceTableTitle = 'Test lookup source'
+const targetTableTitle = 'Test lookup target'
 const nameColumnTitle = 'Name'
 const cityColumnTitle = 'City'
 const relationColumnTitle = 'Refers to'
 const lookupColumnTitle = 'City of person'
 
-test.describe('Test column relation lookup', () => {
+test.describe('Test column lookup', () => {
 	test.setTimeout(60000)
 
-	test('Create relation lookup column, row, and verify looked-up value in table', async ({ userPage: { page } }) => {
+	test('Create lookup column, row, and verify looked-up value in table', async ({ userPage: { page } }) => {
 		await page.goto('/index.php/apps/tables')
 
 		// source table with a name and a city column
@@ -62,12 +62,12 @@ test.describe('Test column relation lookup', () => {
 			page.locator('[data-cy="ncTable"] table tr th').filter({ hasText: relationColumnTitle }),
 		).toBeVisible()
 
-		// relation lookup column reading 'City' through the relation column
+		// lookup column reading 'City' through the relation column
 		await openCreateColumnModal(page, false)
 		await page.locator('[data-cy="columnTypeFormInput"]').clear()
 		await page.locator('[data-cy="columnTypeFormInput"]').fill(lookupColumnTitle)
 		await page.locator('.columnTypeSelection .vs__open-indicator').click()
-		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').getByText('Relation lookup', { exact: true }).click()
+		await page.locator('.vs__dropdown-menu .multiSelectOptionLabel').getByText('Lookup', { exact: true }).click()
 
 		const lookupTargetColumnsResponse = page.waitForResponse(
 			r => r.url().includes('/apps/tables/api/1/tables/')

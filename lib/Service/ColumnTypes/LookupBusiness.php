@@ -9,14 +9,14 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 
-class RelationLookupBusiness extends SuperBusiness {
+class LookupBusiness extends SuperBusiness {
 	/**
 	 * @param mixed $value (array|string|null)
 	 * @param Column|null $column
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
-		// Relation lookup is a virtual column, values come from the related table
+		// Lookup is a virtual column, values come from the related table
 		// No parsing needed for input as this column is read-only
 		return '';
 	}

@@ -252,9 +252,6 @@
                     "customSettings": {
                         "type": "object",
                         "nullable": true,
-                        "required": [
-                            "width"
-                        ],
                         "properties": {
                             "width": {
                                 "type": "integer",
@@ -264,6 +261,29 @@
                                 "type": "boolean"
                             },
                             "imagePreviewSize": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationType": {
+                                "type": "string",
+                                "enum": [
+                                    "table",
+                                    "view"
+                                ]
+                            },
+                            "targetId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "labelColumn": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationColumnId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "targetColumnId": {
                                 "type": "integer",
                                 "format": "int64"
                             }
@@ -610,9 +630,6 @@
                     "customSettings": {
                         "type": "object",
                         "nullable": true,
-                        "required": [
-                            "width"
-                        ],
                         "properties": {
                             "width": {
                                 "type": "integer",
@@ -622,6 +639,29 @@
                                 "type": "boolean"
                             },
                             "imagePreviewSize": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationType": {
+                                "type": "string",
+                                "enum": [
+                                    "table",
+                                    "view"
+                                ]
+                            },
+                            "targetId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "labelColumn": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationColumnId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "targetColumnId": {
                                 "type": "integer",
                                 "format": "int64"
                             }
@@ -688,43 +728,115 @@
                 }
             },
             "RelationData": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "required": [
-                        "column",
-                        "values"
-                    ],
-                    "properties": {
-                        "column": {
-                            "nullable": true,
-                            "allOf": [
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                                "column",
+                                "values"
+                            ],
+                            "properties": {
+                                "column": {
+                                    "nullable": true,
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Column"
+                                        }
+                                    ]
+                                },
+                                "values": {
+                                    "oneOf": [
+                                        {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "object",
+                                                "required": [
+                                                    "id",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "format": "int64"
+                                                    },
+                                                    "value": {
+                                                        "$ref": "#/components/schemas/RelationValue"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "array",
+                                            "maxItems": 0
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "type": "array",
+                        "maxItems": 0
+                    }
+                ]
+            },
+            "RelationValue": {
+                "nullable": true,
+                "anyOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
                                 {
-                                    "$ref": "#/components/schemas/Column"
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                {
+                                    "type": "string"
                                 }
                             ]
-                        },
-                        "values": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "required": [
-                                    "id",
-                                    "value"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "type": "integer",
-                                        "format": "int64"
-                                    },
-                                    "value": {
-                                        "type": "object"
-                                    }
+                        }
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "id",
+                                "type",
+                                "displayName"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "displayName": {
+                                    "type": "string"
                                 }
                             }
                         }
                     }
-                }
+                ]
             },
             "Row": {
                 "type": "object",
@@ -4034,7 +4146,7 @@
                                             "select",
                                             "usergroup",
                                             "relation",
-                                            "relation_lookup"
+                                            "lookup"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -4469,7 +4581,7 @@
                                             "select",
                                             "usergroup",
                                             "relation",
-                                            "relation_lookup"
+                                            "lookup"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -4873,7 +4985,8 @@
                                     },
                                     "customSettings": {
                                         "type": "object",
-                                        "default": {},
+                                        "nullable": true,
+                                        "default": null,
                                         "description": "Custom settings for the column",
                                         "additionalProperties": {
                                             "type": "object"
@@ -5213,50 +5326,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/components/schemas/RelationData"
-                                        },
-                                        {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "required": [
-                                                    "column",
-                                                    "values"
-                                                ],
-                                                "properties": {
-                                                    "column": {
-                                                        "nullable": true,
-                                                        "allOf": [
-                                                            {
-                                                                "$ref": "#/components/schemas/Column"
-                                                            }
-                                                        ]
-                                                    },
-                                                    "values": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "required": [
-                                                                "id",
-                                                                "value"
-                                                            ],
-                                                            "properties": {
-                                                                "id": {
-                                                                    "type": "integer",
-                                                                    "format": "int64"
-                                                                },
-                                                                "value": {
-                                                                    "type": "object"
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ]
+                                    "$ref": "#/components/schemas/RelationData"
                                 }
                             }
                         }
@@ -5367,50 +5437,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/components/schemas/RelationData"
-                                        },
-                                        {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "required": [
-                                                    "column",
-                                                    "values"
-                                                ],
-                                                "properties": {
-                                                    "column": {
-                                                        "nullable": true,
-                                                        "allOf": [
-                                                            {
-                                                                "$ref": "#/components/schemas/Column"
-                                                            }
-                                                        ]
-                                                    },
-                                                    "values": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "required": [
-                                                                "id",
-                                                                "value"
-                                                            ],
-                                                            "properties": {
-                                                                "id": {
-                                                                    "type": "integer",
-                                                                    "format": "int64"
-                                                                },
-                                                                "value": {
-                                                                    "type": "object"
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ]
+                                    "$ref": "#/components/schemas/RelationData"
                                 }
                             }
                         }

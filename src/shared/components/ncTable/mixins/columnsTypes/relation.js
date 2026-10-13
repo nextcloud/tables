@@ -31,14 +31,14 @@ export default class RelationColumn extends AbstractColumn {
 	/**
 	 * Parse the value from input
 	 * @param {unknown} value The value to parse
-	 * @return {unknown} The parsed value
+	 * @return {number|null} The parsed value
 	 */
 	parseValue(value) {
 		if (value === null || value === undefined || value === '') {
 			return null
 		}
-		// For single relations, return the value as is
-		return value
+		// Normalize relation IDs to match numeric option IDs
+		return Number(value)
 	}
 
 	getValueString(valueObject) {

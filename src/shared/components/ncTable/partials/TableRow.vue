@@ -26,7 +26,7 @@
 				:value="getCellValue(col)"
 				:element-id="elementId"
 				:is-view="isView"
-				:can-edit="config.canEditRows" />
+				:can-edit="canEditColumn(col)" />
 		</td>
 		<td v-if="config.showActions && (config.canEditRows || config.canDeleteRows || config.canCreateRows)"
 			:class="{sticky: config.showActions}">
@@ -148,7 +148,7 @@ export default {
 		// to be used to trigger the edit modal instead of inline editing
 		nonInlineEditableColumnTypes() {
 			return [
-				ColumnTypes.RelationLookup,
+				ColumnTypes.Lookup,
 			]
 		},
 	},
@@ -157,9 +157,12 @@ export default {
 		getColumnWidthStyle,
 		getFrozenColumnStyle,
 		getTableCellComponent,
+		canEditColumn(column) {
+			return this.config.canEditRows && !column.isVirtual()
+		},
 		handleCellClick(column) {
 			// If the column type doesn't support inline editing, trigger the edit modal
-			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.config.canEditRows) {
+			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.canEditColumn(column)) {
 				this.$emit('edit-row', this.row.id)
 			}
 		},
