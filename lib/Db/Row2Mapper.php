@@ -769,7 +769,8 @@ class Row2Mapper {
 	 */
 	public function isRowInViewPresent(int $rowId, View $view, string $userId): bool {
 		if ($view->isStandalone()) {
-			// a view without a table holds no rows
+			// A view without a table holds no rows. Federated views read their rows through the
+			// federation proxy, not here.
 			return false;
 		}
 		return in_array($rowId, $this->getWantedRowIds($userId, $view->getTableId(), $view->getFilterArray()));
@@ -1038,6 +1039,8 @@ class Row2Mapper {
 	 */
 	public function countRowsForView(View $view, string $userId): int {
 		if ($view->isStandalone()) {
+			// A view without a table holds no rows. Federated views read their rows through the
+			// federation proxy, not here.
 			return 0;
 		}
 		$filter = $view->getFilterArray();

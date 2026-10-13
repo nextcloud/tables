@@ -20,8 +20,9 @@ use Override;
 
 /**
  * A view's uuid is unique on its own, also for views without a table: the index on
- * (table_id, uuid) does not hold when table_id is null. Imports used to keep the uuid of the
- * source, so views that share one get a fresh uuid first.
+ * (table_id, uuid) does not hold when table_id is null, so it gives way to an index on uuid alone.
+ * Imports and federated proxy views used to keep the uuid of their source, so views that share
+ * one get a fresh uuid first; a local view keeps its own.
  */
 class Version2400Date20261013000000 extends SimpleMigrationStep {
 	public function __construct(
@@ -32,21 +33,28 @@ class Version2400Date20261013000000 extends SimpleMigrationStep {
 	#[Override]
 	public function preSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
 		$select = $this->connection->getQueryBuilder();
-		$select->select('id', 'uuid')
+		$select->select('id', 'uuid', 'external_id')
 			->from('tables_views')
 			->where($select->expr()->isNotNull('uuid'))
 			->orderBy('id', 'ASC');
 		$result = $select->executeQuery();
+		$rows = [];
+		while ($row = $result->fetchAssociative()) {
+			$rows[] = $row;
+		}
+		$result->closeCursor();
+
+		// A local view keeps its uuid; a federated proxy that copied it from its source gets a fresh one
+		usort($rows, static fn (array $a, array $b): int => [$a['external_id'] !== null, (int)$a['id']] <=> [$b['external_id'] !== null, (int)$b['id']]);
 		$seen = [];
 		$duplicateIds = [];
-		while ($row = $result->fetchAssociative()) {
+		foreach ($rows as $row) {
 			if (isset($seen[$row['uuid']])) {
 				$duplicateIds[] = (int)$row['id'];
 				continue;
 			}
 			$seen[$row['uuid']] = true;
 		}
-		$result->closeCursor();
 
 		$update = $this->connection->getQueryBuilder();
 		$update->update('tables_views')
@@ -71,6 +79,10 @@ class Version2400Date20261013000000 extends SimpleMigrationStep {
 			$table = $schema->getTable('tables_views');
 			if (!$table->hasIndex('tables_views_uuid_only_uniq')) {
 				$table->addUniqueIndex(['uuid'], 'tables_views_uuid_only_uniq');
+			}
+			// The uuid-only index covers the old (table_id, uuid) one
+			if ($table->hasIndex('tables_views_uuid_uniq')) {
+				$table->dropIndex('tables_views_uuid_uniq');
 			}
 		}
 

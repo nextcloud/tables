@@ -151,7 +151,11 @@ class FederationProvider implements ISignedCloudFederationProvider {
 			$node->setDescription('');
 		}
 
-		if (property_exists($node, 'uuid')) {
+		if ($node instanceof View) {
+			// Every proxy view gets its own uuid: a view's uuid is unique, and one view can be
+			// federated to several users on the same instance
+			$node->setUuid(null);
+		} elseif (property_exists($node, 'uuid')) {
 			$node->setUuid($metaData['uuid'] ?? null);
 		}
 
