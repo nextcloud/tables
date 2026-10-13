@@ -25,7 +25,7 @@ class MenuItemTest extends TestCase {
 			'targetType' => MenuItem::TARGET_URL,
 			'targetId' => null,
 			'url' => null,
-			'technicalName' => null,
+			'technicalName' => '',
 			'order' => 0,
 			'broken' => false,
 		], $item->jsonSerialize());
@@ -50,6 +50,24 @@ class MenuItemTest extends TestCase {
 		$this->assertSame(6, $json['targetId']);
 		$this->assertSame('home', $json['technicalName']);
 		$this->assertSame(20, $json['order']);
+	}
+
+	public static function targetTypeProvider(): array {
+		return [
+			'view' => [MenuItem::TARGET_VIEW],
+			'table' => [MenuItem::TARGET_TABLE],
+			'url' => [MenuItem::TARGET_URL],
+		];
+	}
+
+	/**
+	 * @dataProvider targetTypeProvider
+	 */
+	public function testJsonSerializeKeepsEachTargetType(string $targetType): void {
+		$item = new MenuItem();
+		$item->setTargetType($targetType);
+
+		$this->assertSame($targetType, $item->jsonSerialize()['targetType']);
 	}
 
 	public function testBrokenIsReportedButNeverStored(): void {
