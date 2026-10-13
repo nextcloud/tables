@@ -21,8 +21,7 @@
 				<span class="menu-items-editor__handle"
 					aria-hidden="true"
 					:title="t('tables', 'Drag to move')"
-					@pointerdown="handleIndex = index"
-					@pointerup="handleIndex = null">
+					@pointerdown="holdHandle(index)">
 					<DragHorizontalVariant :size="20" />
 				</span>
 				<NcIconPicker :close-on-select="true" @select="iconName => update(index, { icon: iconName })">
@@ -39,31 +38,30 @@
 				<NcTextField :model-value="item.label"
 					class="menu-items-editor__field"
 					:label="t('tables', 'Label')"
-					:error="errors[index].label"
-					:helper-text="errors[index].label ? t('tables', 'Give the entry a label') : ''"
+					:error="shownErrors[index].label"
+					:helper-text="shownErrors[index].label ? t('tables', 'Give the entry a label') : ''"
 					data-cy="menuItemLabel"
+					@blur="touch(item)"
 					@update:model-value="value => update(index, { label: value })" />
-				<div class="menu-items-editor__target">
-					<NcSelect :model-value="targetOption(item)"
-						:input-label="t('tables', 'Opens')"
-						:options="targetOptions"
-						:clearable="false"
-						:searchable="true"
-						label="label"
-						data-cy="menuItemTarget"
-						@update:model-value="option => setTarget(index, option)" />
-					<p v-if="errors[index].target" class="menu-items-editor__error">
-						{{ t('tables', 'Choose what the entry opens') }}
-					</p>
-				</div>
+				<NcSelect :model-value="targetOption(item)"
+					class="menu-items-editor__target"
+					:input-label="t('tables', 'Opens')"
+					:options="targetOptions"
+					:clearable="false"
+					:searchable="true"
+					:helper-text="shownErrors[index].target ? t('tables', 'Choose what the entry opens') : ''"
+					label="label"
+					data-cy="menuItemTarget"
+					@update:model-value="option => setTarget(index, option)" />
 				<NcTextField v-if="item.targetType === 'url'"
 					class="menu-items-editor__field"
 					:model-value="item.url ?? ''"
 					:label="t('tables', 'Link')"
-					:error="errors[index].url"
-					:helper-text="errors[index].url ? t('tables', 'Enter an address that starts with http:// or https://') : ''"
+					:error="shownErrors[index].url"
+					:helper-text="shownErrors[index].url ? t('tables', 'Enter an address that starts with http:// or https://') : ''"
 					placeholder="https://"
 					data-cy="menuItemLink"
+					@blur="touch(item)"
 					@update:model-value="value => update(index, { url: value })" />
 				<div class="menu-items-editor__row-actions">
 					<NcButton :disabled="!canMove(items, index, -1)"
@@ -195,6 +193,8 @@ export default {
 			draggedIndex: null,
 			// Only a drag that starts on the handle moves a row, so text in the fields stays selectable
 			handleIndex: null,
+			// Rows the user has left a field of; only their errors show, so a new row does not start red
+			touchedKeys: {},
 		}
 	},
 	computed: {
@@ -237,6 +237,15 @@ export default {
 		 */
 		errors() {
 			return this.items.map(item => menuItemErrors(item))
+		},
+		/**
+		 * The errors shown in the fields: those of rows the user has touched.
+		 *
+		 * @return {Array<{label: boolean, target: boolean, url: boolean}>} the visible errors of each item
+		 */
+		shownErrors() {
+			const none = { label: false, target: false, url: false }
+			return this.items.map((item, index) => this.touchedKeys[item.key] ? this.errors[index] : none)
 		},
 	},
 	methods: {
@@ -299,7 +308,37 @@ export default {
 			if (option.targetType !== 'url' && this.items[index].label === '') {
 				changes.label = option.title
 			}
+			this.touch(this.items[index])
 			this.update(index, changes)
+		},
+		/**
+		 * Marks a row as touched, so its errors show from now on.
+		 *
+		 * @param {object} item an item of the menu
+		 */
+		touch(item) {
+			if (!this.touchedKeys[item.key]) {
+				this.touchedKeys = { ...this.touchedKeys, [item.key]: true }
+			}
+		},
+		/**
+		 * Makes a row draggable while its handle is held. Releasing the pointer anywhere, or the
+		 * browser cancelling it, makes the row plain again, so its fields keep selecting text.
+		 *
+		 * @param {number} index position of the item
+		 */
+		holdHandle(index) {
+			this.handleIndex = index
+			const release = () => {
+				window.removeEventListener('pointerup', release)
+				window.removeEventListener('pointercancel', release)
+				// A drag that already started keeps going; dragEnd resets its own state
+				if (this.draggedIndex === null) {
+					this.handleIndex = null
+				}
+			}
+			window.addEventListener('pointerup', release)
+			window.addEventListener('pointercancel', release)
 		},
 		/**
 		 * Starts dragging a row.
@@ -393,11 +432,6 @@ export default {
 	&__target {
 		flex: 1 1 200px;
 		min-width: 0;
-	}
-
-	&__error {
-		color: var(--color-error-text);
-		margin-top: var(--default-grid-baseline);
 	}
 
 	&__row-actions {
