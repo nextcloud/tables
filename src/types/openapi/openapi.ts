@@ -1199,7 +1199,7 @@ export type components = {
             /** Format: int64 */
             readonly targetId: number | null;
             readonly url: string | null;
-            readonly technicalName: string | null;
+            readonly technicalName: string;
             /** Format: int64 */
             readonly order: number;
             readonly broken: boolean;

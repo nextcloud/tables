@@ -24,8 +24,8 @@ use JsonSerializable;
  * @method setTargetId(?int $targetId): void
  * @method getUrl(): ?string
  * @method setUrl(?string $url): void
- * @method getTechnicalName(): ?string
- * @method setTechnicalName(?string $technicalName): void
+ * @method getTechnicalName(): string
+ * @method setTechnicalName(string $technicalName): void
  * @method getOrder(): int
  * @method setOrder(int $order): void
  * @method isBroken(): bool
@@ -60,7 +60,7 @@ class MenuItem extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
-	 * @return array{id: int, contextId: int, label: string, icon: string|null, targetType: 'view'|'table'|'url', targetId: int|null, url: string|null, technicalName: string|null, order: int, broken: bool}
+	 * @return array{id: int, contextId: int, label: string, icon: string|null, targetType: 'view'|'table'|'url', targetId: int|null, url: string|null, technicalName: string, order: int, broken: bool}
 	 */
 	public function jsonSerialize(): array {
 		return [
@@ -75,7 +75,7 @@ class MenuItem extends EntitySuper implements JsonSerializable {
 			},
 			'targetId' => $this->getTargetId(),
 			'url' => $this->getUrl(),
-			'technicalName' => $this->getTechnicalName(),
+			'technicalName' => $this->technicalName ?? '',
 			'order' => $this->getOrder() ?? 0,
 			'broken' => $this->broken,
 		];

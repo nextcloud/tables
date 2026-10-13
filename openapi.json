@@ -463,8 +463,7 @@
                         "nullable": true
                     },
                     "technicalName": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "order": {
                         "type": "integer",
