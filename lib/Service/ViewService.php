@@ -203,6 +203,9 @@ class ViewService extends SuperService {
 		if ($table === null && $type === View::TYPE_TABLE) {
 			throw new BadRequestError('A table view needs a table.');
 		}
+		if ($table !== null && $type === View::TYPE_GRID) {
+			throw new BadRequestError('A grid view cannot have a table.');
+		}
 		if ($table === null && $technicalName !== null) {
 			throw new BadRequestError(self::STANDALONE_TECHNICAL_NAME_ERROR);
 		}
@@ -295,9 +298,12 @@ class ViewService extends SuperService {
 				}
 
 				if ($parameter === ViewUpdatableParameters::TYPE) {
-					// the value is validated by ViewUpdateInput; this rule needs the stored view
+					// the value is validated by ViewUpdateInput; these rules need the stored view
 					if ($value === View::TYPE_TABLE && $view->getTableId() === null) {
 						throw new BadRequestError('A view without a table cannot become a table view.');
+					}
+					if ($value === View::TYPE_GRID && $view->getTableId() !== null) {
+						throw new BadRequestError('A view with a table cannot become a grid view.');
 					}
 				}
 
@@ -441,6 +447,28 @@ class ViewService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * Deletes the views without a table that the user owns, such as grid views: no table
+	 * takes them along when the user's tables are deleted.
+	 *
+	 * @throws InternalError
+	 */
+	public function deleteAllStandaloneOwnedBy(string $userId): void {
+		try {
+			$views = $this->mapper->findAllStandaloneOwnedBy($userId);
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error('Views without a table of user ' . $userId . ' could not be loaded', ['exception' => $e]);
+			throw new InternalError($e->getMessage());
+		}
+		foreach ($views as $view) {
+			try {
+				$this->deleteByObject($view, $userId);
+			} catch (InternalError $e) {
+				$this->logger->error('View ' . $view->getId() . ' of user ' . $userId . ' could not be deleted', ['exception' => $e]);
+			}
 		}
 	}
 
@@ -705,7 +733,7 @@ class ViewService extends SuperService {
 	 */
 	public function importView(?int $tableId, array $view, string $userId): View {
 		$item = new View();
-		$item->setUuid((isset($view['uuid']) && Uuid::isValid($view['uuid'])) ? $view['uuid'] : null);
+		$item->setUuid($this->freeUuid($view['uuid'] ?? null));
 		$item->setTableId($tableId);
 		$item->setTitle($view['title']);
 		$item->setEmoji($view['emoji']);
@@ -744,6 +772,21 @@ class ViewService extends SuperService {
 
 	private function buildDefaultTechnicalName(int $viewId): string {
 		return 'view_' . $viewId;
+	}
+
+	/**
+	 * The uuid of the source when it is valid and not taken here yet, so an import does not
+	 * create a second view with the same uuid; otherwise null, and the view gets a fresh one.
+	 */
+	private function freeUuid(mixed $uuid): ?string {
+		if (!is_string($uuid) || !Uuid::isValid($uuid)) {
+			return null;
+		}
+		try {
+			return $this->mapper->findByUuid($uuid) === null ? $uuid : null;
+		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception) {
+			return null;
+		}
 	}
 
 	/**
