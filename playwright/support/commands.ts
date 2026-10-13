@@ -316,6 +316,7 @@ export async function createContext(
 	page: Page,
 	title: string,
 	showInNav: boolean = false,
+	resourceTitles: string[] = [],
 ) {
 	await ensureNavigationOpen(page)
 
@@ -340,6 +341,18 @@ export async function createContext(
 	const input = page.locator('[data-cy="createContextTitle"]')
 	await input.clear()
 	await input.fill(title)
+
+	for (const resourceTitle of resourceTitles) {
+		const resourceInput = page
+			.locator('[data-cy="contextResourceForm"] input')
+			.first()
+		await resourceInput.fill(resourceTitle)
+		await page
+			.locator('.vs__dropdown-option')
+			.filter({ hasText: resourceTitle })
+			.first()
+			.click()
+	}
 
 	if (showInNav) {
 		await page
