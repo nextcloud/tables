@@ -59,18 +59,6 @@
 				</NcAppNavigationItem>
 			</ul>
 			<ul v-if="!isLoadingSomething">
-				<NcAppNavigationCaption :name="t('tables', 'Grid views')">
-					<template #actions>
-						<NcActionButton :aria-label="t('tables', 'Create grid view')" icon="icon-add"
-							data-cy="navigationCreateGridViewIcon" @click.prevent="createGridView" />
-					</template>
-				</NcAppNavigationCaption>
-
-				<template v-for="view in getGridViews" :key="'grid-view-' + view.id">
-					<NavigationViewItem :view="view" />
-				</template>
-			</ul>
-			<ul v-if="!isLoadingSomething">
 				<NcAppNavigationCaption :name="t('tables', 'Applications')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create application')" icon="icon-add" data-cy="createContextIcon"
@@ -80,6 +68,19 @@
 
 				<template v-for="node in getAllContexts" :key="node.id">
 					<NavigationContextItem :context="node" />
+				</template>
+			</ul>
+			<!-- After the applications, which tests address as the second list -->
+			<ul v-if="!isLoadingSomething">
+				<NcAppNavigationCaption :name="t('tables', 'Grid views')">
+					<template #actions>
+						<NcActionButton :aria-label="t('tables', 'Create grid view')" icon="icon-add"
+							data-cy="navigationCreateGridViewIcon" @click.prevent="createGridView" />
+					</template>
+				</NcAppNavigationCaption>
+
+				<template v-for="view in getGridViews" :key="'grid-view-' + view.id">
+					<NavigationViewItem :view="view" />
 				</template>
 			</ul>
 

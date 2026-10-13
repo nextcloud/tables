@@ -80,8 +80,9 @@ test.describe('Grid view page', () => {
 		await page.locator('[data-cy="gridViewEdit"]').click()
 		await page.locator('[data-cy="gridViewAddWidget"]').click()
 		const dialog = page.locator('[data-cy="addWidgetModal"]')
-		await dialog.locator('[data-cy="addWidgetType"]').click()
-		await page.getByRole('option', { name: 'Description' }).click()
+		// An NcSelect opens from its indicator, like in the other specs
+		await dialog.locator('[data-cy="addWidgetType"] .vs__open-indicator').click()
+		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'Description' }).first().click()
 		await page.keyboard.press('Escape')
 		await expect(dialog).toBeHidden()
 
