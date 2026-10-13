@@ -60,7 +60,11 @@
 			</div>
 			<div class="row space-R row space-T">
 				<div class="fix-col-4 end">
-					<NcButton type="primary" :aria-label="t('tables', 'Create application')" data-cy="createContextSubmitBtn" @click="submit">
+					<NcButton type="primary"
+						:aria-label="t('tables', 'Create application')"
+						:disabled="!menuItemsValid"
+						data-cy="createContextSubmitBtn"
+						@click="submit">
 						{{ t('tables', 'Create application') }}
 					</NcButton>
 				</div>
@@ -75,7 +79,7 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import MenuItemsEditor from '../../shared/components/ncContextResource/MenuItemsEditor.vue'
-import { toMenuItemPayload } from '../../shared/utils/menuItems.js'
+import { areMenuItemsValid, toMenuItemPayload } from '../../shared/utils/menuItems.js'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
@@ -120,6 +124,16 @@ export default {
 			receivers: [],
 			showInNavigationDefault: false,
 		}
+	},
+	computed: {
+		/**
+		 * Whether every menu item can be saved, so a half-filled item does not fail the whole application.
+		 *
+		 * @return {boolean} true when no menu item has an error
+		 */
+		menuItemsValid() {
+			return areMenuItemsValid(this.menuItems)
+		},
 	},
 	watch: {
 		title() {

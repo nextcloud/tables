@@ -41,7 +41,13 @@ export default {
 		iconName: {
 			immediate: true,
 			async handler(iconName) {
-				this.svg = iconName ? await this.getContextIcon(iconName) : null
+				// Counts the loads, so an icon that a newer choice overtook does not replace it
+				this.iconRequest = (this.iconRequest ?? 0) + 1
+				const request = this.iconRequest
+				const svg = iconName ? await this.getContextIcon(iconName) : null
+				if (request === this.iconRequest) {
+					this.svg = svg
+				}
 			},
 		},
 	},

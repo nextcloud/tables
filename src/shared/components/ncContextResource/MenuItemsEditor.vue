@@ -12,16 +12,24 @@
 				:key="item.key"
 				class="menu-items-editor__item"
 				:class="{ 'menu-items-editor__item--child': item.parentKey !== null, 'menu-items-editor__item--dragging': draggedIndex === index }"
-				draggable="true"
+				:aria-label="itemName(item)"
+				:draggable="handleIndex === index"
 				data-cy="menuItemRow"
 				@dragstart="dragStart(index, $event)"
 				@dragover.prevent="dragOver(index)"
 				@dragend="dragEnd">
-				<span class="menu-items-editor__handle" aria-hidden="true" :title="t('tables', 'Drag to move')">
+				<span class="menu-items-editor__handle"
+					aria-hidden="true"
+					:title="t('tables', 'Drag to move')"
+					@pointerdown="handleIndex = index"
+					@pointerup="handleIndex = null">
 					<DragHorizontalVariant :size="20" />
 				</span>
 				<NcIconPicker :close-on-select="true" @select="iconName => update(index, { icon: iconName })">
-					<NcButton variant="tertiary" :aria-label="t('tables', 'Choose an icon')" :title="t('tables', 'Choose an icon')" data-cy="menuItemIcon">
+					<NcButton variant="tertiary"
+						:aria-label="t('tables', 'Choose an icon for {label}', { label: itemName(item) }, undefined, { escape: false })"
+						:title="t('tables', 'Choose an icon')"
+						data-cy="menuItemIcon">
 						<template #icon>
 							<ApplicationIcon v-if="item.icon" :icon-name="item.icon" :size="20" />
 							<DotsHorizontalCircleOutline v-else :size="20" />
@@ -31,66 +39,79 @@
 				<NcTextField :model-value="item.label"
 					class="menu-items-editor__field"
 					:label="t('tables', 'Label')"
+					:error="errors[index].label"
+					:helper-text="errors[index].label ? t('tables', 'Give the entry a label') : ''"
 					data-cy="menuItemLabel"
 					@update:model-value="value => update(index, { label: value })" />
-				<NcSelect :model-value="targetOption(item)"
-					:input-label="t('tables', 'Opens')"
-					:options="targetOptions"
-					:clearable="false"
-					:searchable="true"
-					label="label"
-					class="menu-items-editor__target"
-					data-cy="menuItemTarget"
-					@update:model-value="option => setTarget(index, option)" />
+				<div class="menu-items-editor__target">
+					<NcSelect :model-value="targetOption(item)"
+						:input-label="t('tables', 'Opens')"
+						:options="targetOptions"
+						:clearable="false"
+						:searchable="true"
+						label="label"
+						data-cy="menuItemTarget"
+						@update:model-value="option => setTarget(index, option)" />
+					<p v-if="errors[index].target" class="menu-items-editor__error">
+						{{ t('tables', 'Choose what the entry opens') }}
+					</p>
+				</div>
 				<NcTextField v-if="item.targetType === 'url'"
 					class="menu-items-editor__field"
 					:model-value="item.url ?? ''"
 					:label="t('tables', 'Link')"
+					:error="errors[index].url"
+					:helper-text="errors[index].url ? t('tables', 'Enter an address that starts with http:// or https://') : ''"
 					placeholder="https://"
+					data-cy="menuItemLink"
 					@update:model-value="value => update(index, { url: value })" />
 				<div class="menu-items-editor__row-actions">
-					<NcButton :disabled="!canMove(index, -1)"
-						:aria-label="t('tables', 'Move up')"
+					<NcButton :disabled="!canMove(items, index, -1)"
+						:aria-label="t('tables', 'Move {label} up', { label: itemName(item) }, undefined, { escape: false })"
 						:title="t('tables', 'Move up')"
 						variant="tertiary"
 						data-cy="menuItemMoveUp"
-						@click="move(index, -1)">
+						@click="emitItems(moveItem(items, index, -1))">
 						<template #icon>
 							<ArrowUp :size="20" />
 						</template>
 					</NcButton>
-					<NcButton :disabled="!canMove(index, 1)"
-						:aria-label="t('tables', 'Move down')"
+					<NcButton :disabled="!canMove(items, index, 1)"
+						:aria-label="t('tables', 'Move {label} down', { label: itemName(item) }, undefined, { escape: false })"
 						:title="t('tables', 'Move down')"
 						variant="tertiary"
 						data-cy="menuItemMoveDown"
-						@click="move(index, 1)">
+						@click="emitItems(moveItem(items, index, 1))">
 						<template #icon>
 							<ArrowDown :size="20" />
 						</template>
 					</NcButton>
 					<NcButton v-if="item.parentKey === null"
-						:disabled="!canIndent(index)"
-						:aria-label="t('tables', 'Move under the entry above')"
+						:disabled="!canIndent(items, index)"
+						:aria-label="t('tables', 'Move {label} under the entry above', { label: itemName(item) }, undefined, { escape: false })"
 						:title="t('tables', 'Move under the entry above')"
 						variant="tertiary"
 						data-cy="menuItemIndent"
-						@click="indent(index)">
+						@click="emitItems(indentItem(items, index))">
 						<template #icon>
 							<FormatIndentIncrease :size="20" />
 						</template>
 					</NcButton>
 					<NcButton v-else
-						:aria-label="t('tables', 'Move to the top level')"
+						:aria-label="t('tables', 'Move {label} to the top level', { label: itemName(item) }, undefined, { escape: false })"
 						:title="t('tables', 'Move to the top level')"
 						variant="tertiary"
 						data-cy="menuItemOutdent"
-						@click="outdent(index)">
+						@click="emitItems(outdentItem(items, index))">
 						<template #icon>
 							<FormatIndentDecrease :size="20" />
 						</template>
 					</NcButton>
-					<NcButton :aria-label="t('tables', 'Remove menu item')" variant="tertiary" data-cy="menuItemRemove" @click="remove(index)">
+					<NcButton :aria-label="t('tables', 'Remove {label}', { label: itemName(item) }, undefined, { escape: false })"
+						:title="t('tables', 'Remove menu item')"
+						variant="tertiary"
+						data-cy="menuItemRemove"
+						@click="emitItems(removeItem(items, index))">
 						<template #icon>
 							<TrashCanOutline :size="20" />
 						</template>
@@ -101,7 +122,7 @@
 		<p v-else class="menu-items-editor__empty">
 			{{ t('tables', 'No menu items yet') }}
 		</p>
-		<NcButton variant="secondary" data-cy="menuItemAdd" @click="add">
+		<NcButton variant="secondary" data-cy="menuItemAdd" @click="emitItems([...items, newMenuItem(items)])">
 			<template #icon>
 				<Plus :size="20" />
 			</template>
@@ -123,16 +144,26 @@ import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { mapState } from 'pinia'
 import ApplicationIcon from '../ApplicationIcon.vue'
 import NcIconPicker from '../ncIconPicker/NcIconPicker.vue'
+import permissionsMixin from '../ncTable/mixins/permissionsMixin.js'
 import { useTablesStore } from '../../../store/store.js'
+import {
+	canIndent,
+	canMove,
+	dragItemOver,
+	indentItem,
+	menuItemErrors,
+	moveItem,
+	newMenuItem,
+	outdentItem,
+	removeItem,
+} from '../../utils/menuItems.js'
 
 const URL_OPTION_ID = 'url'
 
 /**
  * Edits the ordered menu of an application. Every item opens a view, a table or a link, carries an
- * icon, and can sit under the top-level item above it: one level of nesting.
- *
- * The list is flat and ordered; a child carries the key of its parent. A parent always precedes its
- * children, and a parent that moves takes its children along.
+ * icon, and can sit under the top-level item above it: one level of nesting. The list operations
+ * live in utils/menuItems.js.
  */
 export default {
 	name: 'MenuItemsEditor',
@@ -151,6 +182,7 @@ export default {
 		Plus,
 		TrashCanOutline,
 	},
+	mixins: [permissionsMixin],
 	props: {
 		items: {
 			type: Array,
@@ -161,214 +193,148 @@ export default {
 	data() {
 		return {
 			draggedIndex: null,
+			// Only a drag that starts on the handle moves a row, so text in the fields stays selectable
+			handleIndex: null,
 		}
 	},
 	computed: {
 		...mapState(useTablesStore, ['tables', 'views']),
+		/**
+		 * The tables and views the menu can open: only those the user can manage, because the server
+		 * adds them to the application as resources, like the resource picker in the same dialog.
+		 *
+		 * @return {Array<object>} the options of the target select
+		 */
 		targetOptions() {
-			const views = this.views.map(view => ({
-				id: 'view-' + view.id,
-				targetType: 'view',
-				targetId: view.id,
-				label: (view.emoji ? view.emoji + ' ' : '') + view.title + (view.type === 'grid' ? ' (' + t('tables', 'page with widgets') + ')' : ' (' + t('tables', 'view') + ')'),
-			}))
-			const tables = this.tables.map(table => ({
-				id: 'table-' + table.id,
-				targetType: 'table',
-				targetId: table.id,
-				label: (table.emoji ? table.emoji + ' ' : '') + table.title + ' (' + t('tables', 'table') + ')',
-			}))
-			return [...views, ...tables, { id: URL_OPTION_ID, targetType: 'url', targetId: null, label: t('tables', 'External link') }]
+			const views = this.views.filter(view => this.canManageElement(view)).map(view => {
+				const title = (view.emoji ? view.emoji + ' ' : '') + view.title
+				return {
+					id: 'view-' + view.id,
+					targetType: 'view',
+					targetId: view.id,
+					title,
+					label: view.type === 'grid'
+						? t('tables', '{title} (page with widgets)', { title }, undefined, { escape: false })
+						: t('tables', '{title} (view)', { title }, undefined, { escape: false }),
+				}
+			})
+			const tables = this.tables.filter(table => this.canManageTable(table)).map(table => {
+				const title = (table.emoji ? table.emoji + ' ' : '') + table.title
+				return {
+					id: 'table-' + table.id,
+					targetType: 'table',
+					targetId: table.id,
+					title,
+					label: t('tables', '{title} (table)', { title }, undefined, { escape: false }),
+				}
+			})
+			return [...views, ...tables, { id: URL_OPTION_ID, targetType: 'url', targetId: null, title: '', label: t('tables', 'External link') }]
+		},
+		/**
+		 * What is missing or wrong in every item, by position.
+		 *
+		 * @return {Array<{label: boolean, target: boolean, url: boolean}>} the errors of each item
+		 */
+		errors() {
+			return this.items.map(item => menuItemErrors(item))
 		},
 	},
 	methods: {
+		canIndent,
+		canMove,
+		indentItem,
+		moveItem,
+		newMenuItem,
+		outdentItem,
+		removeItem,
+		/**
+		 * The name of an item for screen readers, also while it has no label yet.
+		 *
+		 * @param {object} item an item of the menu
+		 * @return {string} the label, or a placeholder
+		 */
+		itemName(item) {
+			return item.label.trim() || t('tables', 'new menu item')
+		},
+		/**
+		 * The option of the target select that matches an item.
+		 *
+		 * @param {object} item an item of the menu
+		 * @return {object|null} the selected option, or null when its target is not offered
+		 */
 		targetOption(item) {
 			if (item.targetType === 'url') {
 				return this.targetOptions.find(option => option.id === URL_OPTION_ID)
 			}
 			return this.targetOptions.find(option => option.targetType === item.targetType && option.targetId === item.targetId) ?? null
 		},
+		/**
+		 * Hands the changed list to the parent.
+		 *
+		 * @param {Array<object>} items the new list
+		 */
 		emitItems(items) {
 			this.$emit('update:items', items)
 		},
+		/**
+		 * Changes some fields of one item.
+		 *
+		 * @param {number} index position of the item
+		 * @param {object} changes the fields to change
+		 */
 		update(index, changes) {
 			this.emitItems(this.items.map((item, i) => i === index ? { ...item, ...changes } : item))
 		},
+		/**
+		 * Points an item at the chosen target; an item without a label takes the target's title.
+		 *
+		 * @param {number} index position of the item
+		 * @param {object|null} option the chosen option
+		 */
 		setTarget(index, option) {
 			if (!option) {
 				return
 			}
 			const changes = { targetType: option.targetType, targetId: option.targetId }
 			if (option.targetType !== 'url' && this.items[index].label === '') {
-				changes.label = option.label.replace(/\s\([^)]*\)$/, '')
+				changes.label = option.title
 			}
 			this.update(index, changes)
 		},
-		add() {
-			this.emitItems([...this.items, {
-				// two entries added within one millisecond still get their own key
-				key: 'new-' + Date.now() + '-' + this.items.length,
-				label: '',
-				icon: null,
-				targetType: 'url',
-				targetId: null,
-				url: '',
-				technicalName: null,
-				parentKey: null,
-			}])
-		},
-		remove(index) {
-			const removed = this.items[index]
-			// children of a removed parent move to the top level instead of disappearing
-			this.emitItems(this.items
-				.filter((item, i) => i !== index)
-				.map(item => item.parentKey === removed.key ? { ...item, parentKey: null } : item))
-		},
 		/**
-		 * The nearest top-level item above, which is the only possible parent.
+		 * Starts dragging a row.
 		 *
-		 * @param {number} index position of the entry
-		 * @return {object|null}
+		 * @param {number} index position of the item
+		 * @param {DragEvent} event the drag event
 		 */
-		parentAbove(index) {
-			for (let i = index - 1; i >= 0; i--) {
-				if (this.items[i].parentKey === null) {
-					return this.items[i]
-				}
-			}
-			return null
-		},
-		hasChildren(item) {
-			return this.items.some(candidate => candidate.parentKey === item.key)
-		},
-		canIndent(index) {
-			return this.parentAbove(index) !== null && !this.hasChildren(this.items[index])
-		},
-		indent(index) {
-			const parent = this.parentAbove(index)
-			if (!parent || this.hasChildren(this.items[index])) {
-				return
-			}
-			this.update(index, { parentKey: parent.key })
-		},
-		outdent(index) {
-			// a child that leaves its parent lands after the parent's last child, as a top-level entry
-			const items = [...this.items]
-			const [moved] = items.splice(index, 1)
-			let insertAt = items.findIndex(item => item.key === moved.parentKey) + 1
-			while (insertAt < items.length && items[insertAt].parentKey === moved.parentKey) {
-				insertAt++
-			}
-			items.splice(insertAt, 0, { ...moved, parentKey: null })
-			this.emitItems(items)
-		},
-		/**
-		 * An item with its children, as one block that moves together.
-		 *
-		 * @param {number} index position of the entry
-		 * @return {Array<object>}
-		 */
-		block(index) {
-			const item = this.items[index]
-			if (item.parentKey !== null) {
-				return [item]
-			}
-			return [item, ...this.items.filter(candidate => candidate.parentKey === item.key)]
-		},
-		/**
-		 * The entries an item shares its level with: the top-level entries, or the children of its parent.
-		 *
-		 * @param {object} item an entry of the menu
-		 * @return {Array<object>}
-		 */
-		siblings(item) {
-			return this.items.filter(candidate => candidate.parentKey === item.parentKey)
-		},
-		/**
-		 * @param {number} index position of the entry
-		 * @param {number} step -1 to move up, 1 to move down
-		 * @return {boolean}
-		 */
-		canMove(index, step) {
-			const siblings = this.siblings(this.items[index])
-			return siblings[siblings.indexOf(this.items[index]) + step] !== undefined
-		},
-		/**
-		 * Swaps an entry with its neighbour on the same level; a top-level entry moves with its children.
-		 *
-		 * @param {number} index position of the entry
-		 * @param {number} step -1 to move up, 1 to move down
-		 */
-		move(index, step) {
-			const item = this.items[index]
-			const siblings = this.siblings(item)
-			const neighbour = siblings[siblings.indexOf(item) + step]
-			if (!neighbour) {
-				return
-			}
-			const [first, second] = step < 0 ? [neighbour, item] : [item, neighbour]
-			const firstBlock = this.block(this.items.indexOf(first))
-			const secondBlock = this.block(this.items.indexOf(second))
-			const rest = this.items.filter(candidate => !firstBlock.includes(candidate) && !secondBlock.includes(candidate))
-			rest.splice(this.items.indexOf(first), 0, ...secondBlock, ...firstBlock)
-			this.emitItems(rest)
-		},
 		dragStart(index, event) {
 			this.draggedIndex = index
 			if (event?.dataTransfer) {
 				event.dataTransfer.effectAllowed = 'move'
 			}
 		},
+		/**
+		 * Moves the dragged row to where it is dragged over.
+		 *
+		 * @param {number} index position of the item it is dragged over
+		 */
 		dragOver(index) {
-			if (this.draggedIndex === null || this.draggedIndex === index) {
+			if (this.draggedIndex === null) {
 				return
 			}
-			const moving = this.block(this.draggedIndex)
-			const over = this.items[index]
-			if (moving.includes(over)) {
+			const result = dragItemOver(this.items, this.draggedIndex, index)
+			if (result === null) {
 				return
 			}
-			const rest = this.items.filter(item => !moving.includes(item))
-			let insertAt = rest.indexOf(over)
-			if (index > this.draggedIndex) {
-				insertAt += 1
-			}
-			// a child stays a child of the parent whose block it lands in, a parent block stays top-level
-			const head = moving[0]
-			const landingParent = this.parentOfPosition(rest, insertAt)
-			const placed = head.parentKey !== null
-				? [{ ...head, parentKey: landingParent?.key ?? null }]
-				: moving
-			if (head.parentKey === null && landingParent !== null) {
-				// a top-level block cannot land inside another parent's children: move it behind them
-				while (insertAt < rest.length && rest[insertAt].parentKey !== null) {
-					insertAt++
-				}
-			}
-			rest.splice(insertAt, 0, ...placed)
-			this.draggedIndex = rest.indexOf(placed[0])
-			this.emitItems(rest)
+			this.draggedIndex = result.draggedIndex
+			this.emitItems(result.items)
 		},
 		/**
-		 * The parent an item inserted at this position would belong to, or null at the top level.
-		 *
-		 * @param {Array<object>} items the entries without the one being moved
-		 * @param {number} position where the entry would be inserted
-		 * @return {object|null}
+		 * Ends a drag.
 		 */
-		parentOfPosition(items, position) {
-			const previous = items[position - 1]
-			if (!previous) {
-				return null
-			}
-			if (previous.parentKey !== null) {
-				return items.find(item => item.key === previous.parentKey) ?? null
-			}
-			const next = items[position]
-			return next && next.parentKey === previous.key ? previous : null
-		},
 		dragEnd() {
 			this.draggedIndex = null
+			this.handleIndex = null
 		},
 	},
 }
@@ -376,31 +342,31 @@ export default {
 
 <style lang="scss" scoped>
 .menu-items-editor {
-	// the dialog's labels float left, so the editor must start on its own line
+	// The dialog's labels float left, so the editor must start on its own line
 	clear: both;
 	width: 100%;
 	min-width: 0;
 
 	&__help {
 		color: var(--color-text-maxcontrast);
-		margin: 0 0 calc(2 * var(--default-grid-baseline, 4px));
+		margin: 0 0 calc(2 * var(--default-grid-baseline));
 	}
 
 	&__list {
-		margin-bottom: calc(2 * var(--default-grid-baseline, 4px));
+		margin-bottom: calc(2 * var(--default-grid-baseline));
 	}
 
 	&__item {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: flex-end;
-		gap: calc(2 * var(--default-grid-baseline, 4px));
-		padding: calc(2 * var(--default-grid-baseline, 4px)) 0;
+		gap: calc(2 * var(--default-grid-baseline));
+		padding: calc(2 * var(--default-grid-baseline)) 0;
 		border-bottom: 1px solid var(--color-border);
 		list-style: none;
 
 		&--child {
-			padding-inline-start: calc(9 * var(--default-grid-baseline, 4px));
+			padding-inline-start: calc(9 * var(--default-grid-baseline));
 			border-inline-start: 2px solid var(--color-primary-element-light);
 		}
 
@@ -413,8 +379,8 @@ export default {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: var(--default-clickable-area, 44px);
-		height: var(--default-clickable-area, 44px);
+		width: var(--default-clickable-area);
+		height: var(--default-clickable-area);
 		color: var(--color-text-maxcontrast);
 		cursor: grab;
 	}
@@ -429,14 +395,19 @@ export default {
 		min-width: 0;
 	}
 
+	&__error {
+		color: var(--color-error-text);
+		margin-top: var(--default-grid-baseline);
+	}
+
 	&__row-actions {
 		display: flex;
-		gap: calc(1 * var(--default-grid-baseline, 4px));
+		gap: var(--default-grid-baseline);
 	}
 
 	&__empty {
 		color: var(--color-text-maxcontrast);
-		margin-bottom: calc(2 * var(--default-grid-baseline, 4px));
+		margin-bottom: calc(2 * var(--default-grid-baseline));
 	}
 }
 </style>
