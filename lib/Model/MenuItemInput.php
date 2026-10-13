@@ -93,7 +93,7 @@ class MenuItemInput {
 		if (!is_array($data) || !array_is_list($data)) {
 			throw new InvalidArgumentException('The menu items must be a list.');
 		}
-		return array_map(static fn (mixed $item): self => self::createFromInputArray($item), $data);
+		return array_map(self::createFromInputArray(...), $data);
 	}
 
 	/**

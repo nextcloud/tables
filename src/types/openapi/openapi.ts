@@ -7102,7 +7102,7 @@ export interface operations {
                         readonly order: number;
                     } | null;
                     /**
-                     * @description provide this parameter to replace the menu; the views and tables it opens become nodes of the context
+                     * @description provide this parameter to replace the menu; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target
                      * @default null
                      */
                     readonly menuItems?: readonly {

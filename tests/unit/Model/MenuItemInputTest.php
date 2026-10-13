@@ -44,6 +44,8 @@ class MenuItemInputTest extends TestCase {
 			'id of zero' => [['label' => 'X', 'targetType' => 'table', 'targetId' => 0], 'needs its id'],
 			'javascript link' => [['label' => 'X', 'url' => 'javascript:alert(1)'], 'http or https'],
 			'data link' => [['label' => 'X', 'url' => 'data:text/html,hi'], 'http or https'],
+			// carries a host, so only the scheme check stops it
+			'javascript link with a host' => [['label' => 'X', 'url' => 'javascript://example.com/%0Aalert(1)'], 'http or https'],
 			'link without host' => [['label' => 'X', 'url' => 'https://'], 'http or https'],
 			'empty link' => [['label' => 'X', 'url' => ''], 'http or https'],
 			'technical name with a hyphen' => [['label' => 'X', 'url' => 'https://example.org', 'technicalName' => 'my-page'], 'technical name'],

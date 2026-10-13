@@ -141,7 +141,7 @@ class ContextController extends AOCSController {
 	 * @param ?string $iconName provide this parameter to set a new icon
 	 * @param ?string $description provide this parameter to set a new description
 	 * @param ?array{id: int, type: int, permissions: int, order: int} $nodes provide this parameter to set a new list of nodes.
-	 * @psalm-param ?list<array{label: string, icon?: string, targetType: 'view'|'table'|'url', targetId?: int, url?: string, technicalName?: string}> $menuItems provide this parameter to replace the menu; the views and tables it opens become nodes of the context
+	 * @psalm-param ?list<array{label: string, icon?: string, targetType: 'view'|'table'|'url', targetId?: int, url?: string, technicalName?: string}> $menuItems provide this parameter to replace the menu; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *

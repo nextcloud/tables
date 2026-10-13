@@ -161,16 +161,19 @@ class ContextService {
 
 	/**
 	 * Replaces the menu of an application and adds the views and tables it points at
-	 * as nodes, so everyone the application is shared with can open them.
+	 * as nodes, so everyone the application is shared with can open them. Removing an
+	 * item leaves its view or table in the application: it stays a resource until it is
+	 * removed as one.
 	 *
 	 * @param list<MenuItemInput> $menuItems
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
 	protected function replaceMenu(Context $context, array $menuItems, ?string $userId): void {
-		$this->addMenuTargetsAsNodes($context, $menuItems, $userId);
+		$storedMenu = array_values(array_filter($context->getMenuItems() ?? [], is_array(...)));
+		$this->addMenuTargetsAsNodes($context, $menuItems, $storedMenu, $userId);
 
 		$this->menuItemMapper->deleteAllByContextId($context->getId());
-		$technicalNames = $this->menuTechnicalNames($menuItems);
+		$technicalNames = $this->menuTechnicalNames($menuItems, $storedMenu);
 		foreach ($menuItems as $position => $item) {
 			$menuItem = new MenuItem();
 			$menuItem->setContextId($context->getId());
@@ -191,14 +194,16 @@ class ContextService {
 	}
 
 	/**
-	 * The technical name of every menu item, by position: the one given, or one derived from
-	 * the label with a numeric suffix when this menu already uses it.
+	 * The technical name of every menu item, by position: the one given; else the stored name of
+	 * an item with the same target, so a rename or a reorder keeps it; else one derived from the
+	 * label, with a numeric suffix when this menu already uses it.
 	 *
 	 * @param list<MenuItemInput> $menuItems
+	 * @param list<array<array-key, mixed>> $storedMenu
 	 * @return array<int, string>
 	 * @throws InvalidArgumentException
 	 */
-	private function menuTechnicalNames(array $menuItems): array {
+	private function menuTechnicalNames(array $menuItems, array $storedMenu): array {
 		$names = [];
 		$taken = [];
 		foreach ($menuItems as $position => $item) {
@@ -211,6 +216,19 @@ class ContextService {
 			}
 			$names[$position] = $technicalName;
 			$taken[$technicalName] = true;
+		}
+		$storedNames = $this->storedTechnicalNamesByTarget($storedMenu);
+		foreach ($menuItems as $position => $item) {
+			if (isset($names[$position])) {
+				continue;
+			}
+			foreach ($storedNames[self::menuTargetIdentity($item->getTargetType(), $item->getTargetId(), $item->getUrl())] ?? [] as $storedName) {
+				if (!isset($taken[$storedName])) {
+					$names[$position] = $storedName;
+					$taken[$storedName] = true;
+					break;
+				}
+			}
 		}
 		foreach ($menuItems as $position => $item) {
 			if (isset($names[$position])) {
@@ -228,22 +246,69 @@ class ContextService {
 	}
 
 	/**
-	 * Targets that no longer exist are left out; the menu marks them broken.
+	 * The technical names of the stored menu, grouped by target and in menu order.
+	 *
+	 * @param list<array<array-key, mixed>> $storedMenu
+	 * @return array<string, list<string>>
+	 */
+	private function storedTechnicalNamesByTarget(array $storedMenu): array {
+		$names = [];
+		foreach ($storedMenu as $storedItem) {
+			$targetType = $storedItem['targetType'] ?? null;
+			$technicalName = $storedItem['technicalName'] ?? null;
+			if (!is_string($targetType) || !is_string($technicalName) || $technicalName === '') {
+				continue;
+			}
+			$targetId = is_int($storedItem['targetId'] ?? null) ? $storedItem['targetId'] : null;
+			$url = is_string($storedItem['url'] ?? null) ? $storedItem['url'] : null;
+			$names[self::menuTargetIdentity($targetType, $targetId, $url)][] = $technicalName;
+		}
+		return $names;
+	}
+
+	private static function menuTargetIdentity(string $targetType, ?int $targetId, ?string $url): string {
+		return $targetType . ':' . ($targetType === MenuItem::TARGET_URL ? (string)$url : (string)$targetId);
+	}
+
+	/**
+	 * The node a menu target is stored as, keyed so nodes and targets can be compared.
+	 *
+	 * @return array{string, array{int, int}}|null
+	 */
+	private static function menuTargetNode(mixed $targetType, mixed $targetId): ?array {
+		$nodeType = match ($targetType) {
+			MenuItem::TARGET_VIEW => Application::NODE_TYPE_VIEW,
+			MenuItem::TARGET_TABLE => Application::NODE_TYPE_TABLE,
+			default => null,
+		};
+		if ($nodeType === null || !is_int($targetId)) {
+			return null;
+		}
+		return [sprintf('t%di%d', $nodeType, $targetId), [$nodeType, $targetId]];
+	}
+
+	/**
+	 * A new target must exist and be manageable by the user, and every unusable one gets the
+	 * same answer, so the save reveals nothing about others' views and tables. A target that was
+	 * in the stored menu before and no longer exists is kept; the menu marks it broken.
 	 *
 	 * @param list<MenuItemInput> $menuItems
+	 * @param list<array<array-key, mixed>> $storedMenu
 	 * @throws Exception|PermissionError
 	 */
-	private function addMenuTargetsAsNodes(Context $context, array $menuItems, ?string $userId): void {
+	private function addMenuTargetsAsNodes(Context $context, array $menuItems, array $storedMenu, ?string $userId): void {
 		$missing = [];
 		foreach ($menuItems as $item) {
-			$nodeType = match ($item->getTargetType()) {
-				MenuItem::TARGET_VIEW => Application::NODE_TYPE_VIEW,
-				MenuItem::TARGET_TABLE => Application::NODE_TYPE_TABLE,
-				default => null,
-			};
-			$nodeId = $item->getTargetId();
-			if ($nodeType !== null && $nodeId !== null) {
-				$missing[sprintf('t%di%d', $nodeType, $nodeId)] = [$nodeType, $nodeId];
+			$target = self::menuTargetNode($item->getTargetType(), $item->getTargetId());
+			if ($target !== null) {
+				$missing[$target[0]] = $target[1];
+			}
+		}
+		$storedTargets = [];
+		foreach ($storedMenu as $storedItem) {
+			$target = self::menuTargetNode($storedItem['targetType'] ?? null, $storedItem['targetId'] ?? null);
+			if ($target !== null) {
+				$storedTargets[$target[0]] = true;
 			}
 		}
 		$nodes = $context->getNodes() ?? [];
@@ -272,11 +337,12 @@ class ContextService {
 			}
 		}
 
-		foreach ($missing as [$nodeType, $nodeId]) {
-			if (!isset($existing[$nodeType][$nodeId])) {
+		foreach ($missing as $key => [$nodeType, $nodeId]) {
+			$exists = isset($existing[$nodeType][$nodeId]);
+			if (!$exists && isset($storedTargets[$key])) {
 				continue;
 			}
-			if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
+			if (!$exists || !$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
 				throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
 			}
 			$relation = $this->addNodeToContext($context, $nodeId, $nodeType, Application::PERMISSION_READ);
