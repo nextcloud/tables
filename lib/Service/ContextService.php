@@ -378,7 +378,9 @@ class ContextService {
 	 * @throws PermissionError|MultipleObjectsReturnedException|InvalidArgumentException
 	 */
 	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?array $menuItems = null): Context {
-		return $this->atomic(
+		// A transaction that reads before it writes can lose a write lock to a concurrent request
+		// (SQLite answers "database is locked" at once); running it again then succeeds
+		return $this->atomicRetry(
 			fn (): Context => $this->applyUpdate($contextId, $userId, $name, $iconName, $description, $nodes, $menuItems),
 			$this->dbc,
 		);

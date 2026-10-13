@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Service;
 
 use InvalidArgumentException;
+use OC\DB\Exceptions\DbalException;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
@@ -272,6 +273,18 @@ final class ContextServiceTest extends TestCase {
 			['label' => 'A', 'url' => 'https://example.org/a', 'technicalName' => 'home'],
 			['label' => 'B', 'url' => 'https://example.org/b', 'technicalName' => 'home'],
 		]));
+	}
+
+	public function testUpdateRunsAgainWhenTheDatabaseAsksForARetry(): void {
+		$locked = $this->createMock(DbalException::class);
+		$locked->method('isRetryable')->willReturn(true);
+		$this->contextMapper->expects($this->exactly(2))->method('findById')
+			->willReturnOnConsecutiveCalls($this->throwException($locked), $this->contextWithMenu(7, []));
+		$this->contextMapper->method('update')->willReturnArgument(0);
+
+		$updated = $this->service->update(7, 'user-1', 'Renamed', null, null, null);
+
+		$this->assertSame('Renamed', $updated->getName());
 	}
 
 	public function testUpdateLeavesTheMenuAloneWhenNoneIsGiven(): void {
