@@ -53,6 +53,42 @@
 				:generated-filters="viewSetting ? generatedView.filter : null"
 				:columns="allColumns" />
 		</NcAppSettingsSection>
+
+		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="layout" :name="t('tables', 'Layout')">
+			<div class="layout-options">
+				<NcRadioGroup v-model="layout" :label="t('tables', 'Layout')" hide-label>
+					<NcRadioGroupButton :label="t('tables', 'Table')" :value="LAYOUT_TABLE" data-cy="viewLayoutTable" />
+					<NcRadioGroupButton :label="t('tables', 'Tile')" :value="LAYOUT_TILES" data-cy="viewLayoutTiles" />
+					<NcRadioGroupButton :label="t('tables', 'Gallery')" :value="LAYOUT_GALLERY" data-cy="viewLayoutGallery" />
+				</NcRadioGroup>
+			</div>
+			<div class="layout-source-settings">
+				<div class="layout-source-settings__item">
+					<div class="layout-source-settings__label">
+						{{ t('tables', 'Background source') }}
+					</div>
+					<NcSelect
+						v-model="backgroundSourceValue"
+						:options="cardSourceOptions"
+						label="title"
+						:reduce="option => option.id"
+						:placeholder="t('tables', 'No image')"
+						:aria-label-combobox="t('tables', 'Background source')" />
+				</div>
+				<div class="layout-source-settings__item">
+					<div class="layout-source-settings__label">
+						{{ t('tables', 'Title source') }}
+					</div>
+					<NcSelect
+						v-model="titleSourceValue"
+						:options="cardSourceOptions"
+						label="title"
+						:reduce="option => option.id"
+						:placeholder="t('tables', 'Automatic')"
+						:aria-label-combobox="t('tables', 'Title source')" />
+				</div>
+			</div>
+		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="sort" :name="t('tables', 'Sort')">
 			<SortForm
@@ -98,11 +134,20 @@
 		<div v-if="canManageTable(view)" class="row sticky">
 			<div class="fix-col-4 space-T end">
 				<div style="padding-right: var(--default-grid-baseline);">
-					<NcButton v-if="!localLoading && !createView" type="secondary" :aria-label="createNewViewText" @click="createNewView()">
+					<NcButton v-if="!localLoading && !createView"
+						type="secondary"
+						:aria-label="createNewViewText"
+						:disabled="isTitleMissing"
+						@click="createNewView()">
 						{{ createNewViewText }}
 					</NcButton>
 				</div>
-				<NcButton v-if="!localLoading" type="primary" :aria-label="saveText" data-cy="modifyViewBtn" @click="saveView()">
+				<NcButton v-if="!localLoading"
+					type="primary"
+					:aria-label="saveText"
+					:disabled="isTitleMissing"
+					data-cy="modifyViewBtn"
+					@click="saveView()">
 					{{ saveText }}
 				</NcButton>
 			</div>
@@ -116,7 +161,7 @@
 </template>
 
 <script>
-import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcNoteCard } from '@nextcloud/vue'
+import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcNoteCard, NcRadioGroup, NcRadioGroupButton, NcSelect } from '@nextcloud/vue'
 import ChevronDown from 'vue-material-design-icons/ChevronDown.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
@@ -131,6 +176,7 @@ import { mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { normalizeTechnicalName, isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
+import { LAYOUT_GALLERY, LAYOUT_TABLE, LAYOUT_TILES } from '../../shared/constants.ts'
 
 export default {
 	name: 'ViewSettings',
@@ -142,6 +188,9 @@ export default {
 		NcNoteCard,
 		ChevronDown,
 		NotificationsSettings,
+		NcRadioGroup,
+		NcRadioGroupButton,
+		NcSelect,
 		FilterForm,
 		SelectedViewColumns,
 		SortForm,
@@ -181,6 +230,7 @@ export default {
 			technicalName: '',
 			originalTechnicalName: '',
 			technicalNameInvalidError: false,
+			layout: LAYOUT_TABLE,
 			errorTitle: false,
 			selectedColumns: [],
 			allColumns: [],
@@ -194,6 +244,9 @@ export default {
 		}
 	},
 	computed: {
+		LAYOUT_TABLE: () => LAYOUT_TABLE,
+		LAYOUT_TILES: () => LAYOUT_TILES,
+		LAYOUT_GALLERY: () => LAYOUT_GALLERY,
 		mutableFilters: {
 			get() {
 				return this.mutableView.filter
@@ -202,8 +255,43 @@ export default {
 				this.mutableView.filter = filters
 			},
 		},
+		// The server trims the title before it checks it, so a blank title is missing too.
+		isTitleMissing() {
+			return this.title.trim() === ''
+		},
 		showTechnicalNameWarning() {
 			return !this.createView && this.technicalName !== this.originalTechnicalName
+		},
+		cardSourceOptions() {
+			if (!this.columns) return []
+			// Only show columns that are selected/accessible in the current view
+			const cols = this.selectedColumns
+				? this.columns.filter(column => this.selectedColumns.includes(column.id))
+				: this.columns
+			return cols.map(column => ({
+				id: column.id,
+				title: column.title,
+			}))
+		},
+		backgroundSourceValue: {
+			get() {
+				return this.resolveCardSource(this.mutableView?.viewSettings?.cardBackgroundSource)
+			},
+			set(value) {
+				this.ensureMutableViewSettings()
+				this.mutableView.viewSettings.cardBackgroundSource = value ?? null
+			},
+		},
+		titleSourceValue: {
+			get() {
+				// Only what was actually chosen: offering the column the rendering falls back to
+				// would show a value the save does not write.
+				return this.resolveCardSource(this.mutableView?.viewSettings?.cardTitleSource)
+			},
+			set(value) {
+				this.ensureMutableViewSettings()
+				this.mutableView.viewSettings.cardTitleSource = value ?? null
+			},
 		},
 		saveText() {
 			if (this.createView) {
@@ -227,6 +315,9 @@ export default {
 					mergedViewSettings.columnSettings = this.view.columnSettings
 				}
 			}
+			// The layout a viewer switched to is a local adjustment like the others, so saving
+			// the modified view keeps it rather than falling back to the stored one.
+			mergedViewSettings.layout = this.viewSetting.layout ?? this.view.layout ?? LAYOUT_TABLE
 			if (this.viewSetting.sorting) {
 				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
 			} else {
@@ -254,6 +345,17 @@ export default {
 		},
 	},
 	watch: {
+		// A card source has to be cleared once its column leaves the view, not merely hidden
+		// from the select: the stale id would still be saved and the backend rejects it.
+		selectedColumns() {
+			if (!this.columns || !Array.isArray(this.selectedColumns) || !this.mutableView?.viewSettings) {
+				return
+			}
+
+			const settings = this.mutableView.viewSettings
+			settings.cardBackgroundSource = this.resolveCardSource(settings.cardBackgroundSource)
+			settings.cardTitleSource = this.resolveCardSource(settings.cardTitleSource)
+		},
 		title() {
 			if (this.title.length >= 200) {
 				showError(t('tables', 'The title character limit is 200 characters. Please use a shorter title.'))
@@ -309,11 +411,12 @@ export default {
 			}
 		},
 		async saveView() {
-			if (this.title === '') {
+			if (this.isTitleMissing) {
 				let titleErrorText = this.createView ? t('tables', 'Cannot create view.') : t('tables', 'Cannot update view.')
 				titleErrorText += ' ' + t('tables', 'Title is missing.')
 				showError(titleErrorText)
 				this.errorTitle = true
+				return
 			}
 
 			if (!this.isTechnicalNameValid()) {
@@ -336,9 +439,10 @@ export default {
 			}
 		},
 		async createNewView() {
-			if (this.title === '') {
+			if (this.isTitleMissing) {
 				showError(t('tables', 'Cannot create view.') + ' ' + t('tables', 'Title is missing.'))
 				this.errorTitle = true
+				return
 			}
 
 			if (this.technicalName === this.originalTechnicalName) {
@@ -365,6 +469,7 @@ export default {
 				description: this.description,
 				emoji: this.icon,
 				technicalName: normalizeTechnicalName(this.technicalName),
+				layout: this.layout,
 			}
 			return await this.insertNewView({ data })
 		},
@@ -383,7 +488,9 @@ export default {
 					description: this.description,
 					emoji: this.icon,
 					technicalName: normalizeTechnicalName(this.technicalName),
+					layout: this.layout,
 					columnSettings: JSON.stringify(newColumnSettings),
+					viewSettings: JSON.stringify(this.mutableView.viewSettings),
 				},
 			}
 			// Update sorting rules if they don't contain hidden rules (= rules regarding rows the user can not see) that were not overwritten
@@ -409,11 +516,28 @@ export default {
 			this.technicalName = this.mutableView?.technicalName ?? ''
 			this.originalTechnicalName = this.mutableView?.technicalName ?? ''
 			this.technicalNameInvalidError = false
+			this.layout = this.mutableView?.layout ?? LAYOUT_TABLE
+			this.ensureMutableViewSettings()
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
 			this.localLoading = false
 			this.columns = null
+		},
+		ensureMutableViewSettings() {
+			if (!this.mutableView.viewSettings) {
+				this.mutableView.viewSettings = {
+					cardBackgroundSource: null,
+					cardTitleSource: null,
+				}
+			}
+		},
+		resolveCardSource(stored) {
+			if (stored === null || stored === undefined) {
+				return null
+			}
+
+			return this.cardSourceOptions.some(option => option.id === stored) ? stored : null
 		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
@@ -442,6 +566,28 @@ export default {
 :deep(.element-description) {
 	padding-inline: 0 !important;
 	max-width: 100%;
+}
+
+.layout-options {
+	display: flex;
+	justify-content: center;
+	padding-block: 8px;
+}
+
+.layout-options :deep(.checkbox-radio-switch) {
+	display: inline-flex;
+}
+
+.layout-source-settings {
+	display: grid;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.layout-source-settings__label {
+	margin-bottom: 6px;
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
 }
 
 .sticky {
