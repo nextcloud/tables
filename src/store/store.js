@@ -152,13 +152,7 @@ export const useTablesStore = defineStore('store', {
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
 				this.setTables(res.data)
-				let views = []
-				res.data.forEach(table => {
-					if (table.views) {
-						views = views.concat(table.views)
-					}
-				})
-				this.setViews(views)
+				this.replaceViewsOfListedTables(res.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
@@ -166,6 +160,22 @@ export const useTablesStore = defineStore('store', {
 
 			this.setLoading({ key: 'tables', value: false })
 			return true
+		},
+
+		/**
+		 * We have two sources of views, this coming from tables endpoint, and those
+		 * that were shared directly or through contexts.
+		 */
+		replaceViewsOfListedTables(tables) {
+			const tableIdsShippingViews = new Set(
+				tables
+					.filter(table => !table.isShared || table.onSharePermissions?.manage)
+					.map(table => table.id),
+			)
+			const viewsOfOtherTables = this.views.filter(view => !tableIdsShippingViews.has(view.tableId))
+			const viewsOfListedTables = tables.flatMap(table => table.views ?? [])
+
+			this.setViews([...viewsOfListedTables, ...viewsOfOtherTables])
 		},
 
 		async loadViewsSharedWithMeFromBE() {
