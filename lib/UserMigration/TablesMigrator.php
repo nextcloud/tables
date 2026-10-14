@@ -27,6 +27,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
@@ -356,9 +357,20 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 					}
 					unset($setting);
 				}
+				$view = $this->remapViewCardSources($view, $columnIdMap);
 				$this->viewService->importView($newTableId, $view, $userId);
 			}
 		}
+	}
+
+	private function remapViewCardSources(array $view, array $columnIdMap): array {
+		if (!isset($view['viewSettings']) || !is_array($view['viewSettings'])) {
+			return $view;
+		}
+
+		$view['viewSettings'] = ViewSettings::remapSources($view['viewSettings'], $columnIdMap);
+
+		return $view;
 	}
 
 	/**

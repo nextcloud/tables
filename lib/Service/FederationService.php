@@ -147,6 +147,10 @@ class FederationService {
 				'emoji' => $node->getEmoji(),
 				'nodeType' => $share->getNodeType(),
 				'uuid' => property_exists($node, 'uuid') ? $node->getUuid() : null,
+				// The card sources stay behind: they are column ids of this instance and would
+				// address unrelated columns on the receiving one, so the receiver renders the
+				// text-only card layout.
+				'layout' => $node instanceof View ? $node->getLayoutNormalized() : null,
 			]),
 			(string)$share->getNodeId(),
 			$ownerCloudId->getId(),
@@ -212,6 +216,7 @@ class FederationService {
 					'title' => $node->getTitle(),
 					'emoji' => $node->getEmoji(),
 					'nodeType' => $nodeType,
+					'layout' => $node instanceof View ? $node->getLayoutNormalized() : null,
 				]
 			);
 		}
