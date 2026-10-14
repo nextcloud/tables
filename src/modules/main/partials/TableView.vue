@@ -8,6 +8,8 @@
 		:rows="rows"
 		:columns="columns"
 		:element-id="element.id"
+		:layout="element.layout"
+		:view-settings="element.viewSettings"
 		:is-view="isView"
 		:download-title="element.title"
 		:can-read-rows="canReadRows"
