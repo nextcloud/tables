@@ -10,6 +10,7 @@ namespace OCA\Tables\Middleware;
 
 use InvalidArgumentException;
 use OCA\Tables\Constants\ShareReceiverType;
+use OCA\Tables\Db\RowCellUsergroupMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -41,6 +42,7 @@ class ShareControlMiddleware extends Middleware {
 		private readonly IOCMDiscoveryService $ocmDiscoveryService,
 		private readonly ICloudIdManager $cloudIdManager,
 		private readonly ConfigService $configService,
+		private readonly RowCellUsergroupMapper $usergroupMapper,
 	) {
 	}
 
@@ -56,6 +58,10 @@ class ShareControlMiddleware extends Middleware {
 			$tokenInput = $this->request->getParam('token', '');
 			$this->assertShareTokenIsValidAndExisting($tokenInput);
 			$this->assertIsAccessible($tokenInput);
+
+			if ($this->share->getReceiverType() === ShareReceiverType::REMOTE) {
+				$this->usergroupMapper->setUserId($this->share->getReceiver());
+			}
 		}
 	}
 

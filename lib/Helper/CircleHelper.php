@@ -23,6 +23,7 @@ use Throwable;
 class CircleHelper {
 	private bool $circlesEnabled;
 	private ?CirclesManager $circlesManager;
+	private array $federatedUsers = [];
 
 	/**
 	 * @psalm-suppress UndefinedClass
@@ -55,14 +56,14 @@ class CircleHelper {
 		}
 
 		try {
-			$federatedUser = $this->circlesManager->getFederatedUser($userId, Member::TYPE_USER);
-			$this->circlesManager->startSession($federatedUser);
+			$this->federatedUsers[$userId] ??= $this->circlesManager->getFederatedUser($userId, Member::TYPE_USER);
+			$this->circlesManager->startSession($this->federatedUsers[$userId]);
 
 			$circle = $this->circlesManager->getCircle($circleId);
 			return $circle ? ($circle->getDisplayName() ?: $circleId) : $circleId;
 		} catch (Throwable $e) {
 			if ($e->getCode() === 404) {
-				return $this->l10n->t('Deleted team %s.', [$circleId]);
+				return $this->l10n->t('Team not found');
 			}
 
 			$this->logger->warning('Failed to get circle display name: ' . $e->getMessage(), [
