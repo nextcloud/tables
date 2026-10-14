@@ -23,6 +23,8 @@ class NodeService {
 		'createdAt',
 		'lastEditAt',
 		'rowsCount',
+		'layout',
+		'viewSettings',
 	];
 
 	public function __construct(
@@ -34,7 +36,7 @@ class NodeService {
 	/**
 	 * @param 'table'|'view' $nodeType
 	 * @param int $nodeId
-	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int}
+	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout?: 'table'|'tiles'|'gallery', viewSettings?: array{cardBackgroundSource: int|null, cardTitleSource: int|null}}
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
@@ -63,14 +65,14 @@ class NodeService {
 	}
 
 	/**
-	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int}
+	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout: 'table'|'tiles'|'gallery', viewSettings: array{cardBackgroundSource: int|null, cardTitleSource: int|null}}
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	private function publicDataOfView(int $id): array {
 		$view = $this->viewService->find($id, false, '');
-		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int} */
+		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout: 'table'|'tiles'|'gallery', viewSettings: array{cardBackgroundSource: int|null, cardTitleSource: int|null}} */
 		return array_filter($view->jsonSerialize(), static fn (string $key): bool => in_array($key, self::PUBLIC_NODE_KEYS, true), ARRAY_FILTER_USE_KEY);
 	}
 }
