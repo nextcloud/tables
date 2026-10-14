@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="main-view-view">
+	<div class="main-view-view" :class="{ 'main-view-view--cards': isCardLayout }">
 		<div v-if="!activeView && !errorMessage">
 			<div class="icon-loading" />
 		</div>
@@ -13,7 +13,7 @@
 		</div>
 
 		<div v-else-if="activeView">
-			<MainWrapper :element="activeView" :is-view="true" />
+			<MainWrapper :element="activeView" :is-view="true" @update:layout="localLayout = $event" />
 		</div>
 
 		<ErrorMessage v-else-if="errorMessage" :message="errorMessage" />
@@ -31,6 +31,7 @@ import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMix
 import MainModals from '../modules/modals/Modals.vue'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
+import { CARD_LAYOUTS } from '../shared/constants.ts'
 
 export default {
 
@@ -46,11 +47,15 @@ export default {
 	data() {
 		return {
 			errorMessage: null,
+			localLayout: null,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['activeViewId', 'activeView']),
+		isCardLayout() {
+			return CARD_LAYOUTS.includes(this.localLayout ?? this.activeView?.layout)
+		},
 	},
 
 	watch: {
@@ -58,6 +63,7 @@ export default {
 			immediate: true,
 			handler() {
 				this.errorMessage = null
+				this.localLayout = null
 				this.checkView()
 			},
 		},
@@ -95,6 +101,11 @@ export default {
 		// leave room for the navigation toggle that floats over the top left corner of the content
 		padding-inline-start: var(--default-clickable-area, 44px);
 	}
+}
+
+.main-view-view--cards {
+	width: var(--app-content-width, 100%);
+	max-width: var(--app-content-width, 100%);
 }
 
 :deep(h1) {
