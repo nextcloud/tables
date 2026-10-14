@@ -1,7 +1,7 @@
 {
   "name": "tables",
   "description": "Manage data within tables.",
-  "version": "2.3.1",
+  "version": "2.4.0-dev.0",
   "author": "Nextcloud GmbH and Nextcloud contributors",
   "bugs": {
     "url": "https://github.com/nextcloud/tables/issues"
@@ -68,7 +68,6 @@
   },
   "devDependencies": {
     "@cypress/vue": "^7.0.1",
-    "@nextcloud/babel-config": "^1.3.0",
     "@nextcloud/browserslist-config": "^3.1.2",
     "@nextcloud/cypress": "^1.1.0",
     "@nextcloud/e2e-test-server": "^0.6.1",
