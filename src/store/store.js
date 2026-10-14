@@ -401,9 +401,6 @@ export const useTablesStore = defineStore('store', {
 					} else {
 						const shareId = previousReceiver.share_id
 						await this.updateDisplayMode({ shareId, displayMode, target: 'default' })
-						if (previousReceiver.receiver === getCurrentUser().uid && previousReceiver.receiver_type === 'user') {
-							await this.updateDisplayMode({ shareId, displayMode, target: 'self' })
-						}	
 					}
 				}
 			} catch (e) {
