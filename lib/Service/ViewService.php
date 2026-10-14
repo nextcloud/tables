@@ -17,6 +17,7 @@ use JsonSerializable;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
@@ -32,6 +33,7 @@ use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -197,6 +199,7 @@ class ViewService extends SuperService {
 		?string $uuid = null,
 		string $type = View::TYPE_TABLE,
 		string $description = '',
+		?string $layout = null,
 	): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
@@ -204,6 +207,9 @@ class ViewService extends SuperService {
 		$this->assertTypeValid($type);
 		if ($table === null && $type === View::TYPE_TABLE) {
 			throw new BadRequestError('A table view needs a table.');
+		}
+		if ($table !== null && $type === View::TYPE_GRID) {
+			throw new BadRequestError('A grid view cannot have a table.');
 		}
 		if ($table === null && $technicalName !== null) {
 			throw new BadRequestError(self::STANDALONE_TECHNICAL_NAME_ERROR);
@@ -225,6 +231,11 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription($description);
+		try {
+			$item->setLayout(ViewUpdateInput::normalizeLayout($layout));
+		} catch (InvalidArgumentException $e) {
+			throw new BadRequestError($e->getMessage());
+		}
 		$item->setTableId($table?->getId());
 		$item->setType($type);
 		$item->setCreatedBy($userId);
@@ -281,12 +292,22 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not update view with id ' . $id);
 			}
 
+			$cardSourcesRequested = false;
+			// Resolved at most once: the column check and the card source rules both need it,
+			// and it costs a query.
+			$managedColumnIds = null;
+			$columnSelectionChanged = false;
 			foreach ($data->updateDetail() as $parameter => $value) {
-				$insertableValue = null;
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
-					$this->assertInputColumnsAreValid($view, $userId, $value);
+					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
+					$this->assertInputColumnsAreValid($value, $managedColumnIds);
+					$columnSelectionChanged = true;
+				}
+
+				if ($parameter === ViewUpdatableParameters::VIEW_SETTINGS) {
+					$cardSourcesRequested = true;
 				}
 
 				if ($parameter === ViewUpdatableParameters::TECHNICAL_NAME) {
@@ -297,9 +318,12 @@ class ViewService extends SuperService {
 				}
 
 				if ($parameter === ViewUpdatableParameters::TYPE) {
-					// the value is validated by ViewUpdateInput; this rule needs the stored view
+					// the value is validated by ViewUpdateInput; these rules need the stored view
 					if ($value === View::TYPE_TABLE && $view->getTableId() === null) {
 						throw new BadRequestError('A view without a table cannot become a table view.');
+					}
+					if ($value === View::TYPE_GRID && $view->getTableId() !== null) {
+						throw new BadRequestError('A view with a table cannot become a grid view.');
 					}
 				}
 
@@ -311,6 +335,7 @@ class ViewService extends SuperService {
 					$value = $this->gridWidgetTypes->sanitizeGrid($value, $userId, $view->getGridArray());
 				}
 
+				$insertableValue = $value;
 				if ($value instanceof JsonSerializable || is_array($value)) {
 					try {
 						$insertableValue = json_encode($value, JSON_THROW_ON_ERROR);
@@ -320,7 +345,21 @@ class ViewService extends SuperService {
 				}
 
 				$setterMethod = 'set' . ucfirst((string)$parameter->value);
-				$view->$setterMethod($insertableValue ?? $value);
+				$view->$setterMethod($insertableValue);
+			}
+
+			if ($cardSourcesRequested || $columnSelectionChanged) {
+				$candidateIds = $view->getColumnIds();
+				if (empty($candidateIds)) {
+					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
+					$candidateIds = $managedColumnIds;
+				}
+
+				if ($cardSourcesRequested) {
+					$this->assertCardSourceColumnsAreValid($view, $candidateIds);
+				} else {
+					$this->dropOrphanedCardSources($view, $candidateIds);
+				}
 			}
 
 			$time = new DateTime();
@@ -352,14 +391,22 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * @throws InvalidArgumentException
-	 * @throws PermissionError
+	 * The ids of the columns the view may use.
+	 *
+	 * ColumnService depends on this service, so it is looked up rather than injected.
+	 *
+	 * @return list<int>
 	 */
-	protected function assertInputColumnsAreValid(View $view, string $userId, ColumnSettings $columnSettings): void {
+	private function findManagedColumnIds(View $view, string $userId): array {
 		$columnService = \OCP\Server::get(ColumnService::class);
-		$availableColumns = $columnService->findAllByManagedView($view, $userId);
-		$availableColumnIds = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
 
+		return array_map(static fn (Column $column) => $column->getId(), $columnService->findAllByManagedView($view, $userId));
+	}
+
+	/**
+	 * @param list<int> $availableColumnIds
+	 */
+	protected function assertInputColumnsAreValid(ColumnSettings $columnSettings, array $availableColumnIds): void {
 		foreach ($columnSettings->columnInformation() as $columnInfo) {
 			if (!in_array($columnInfo->getId(), $availableColumnIds, true)
 				&& !Column::isValidMetaTypeId($columnInfo->getId())
@@ -367,6 +414,53 @@ class ViewService extends SuperService {
 				throw new InvalidArgumentException('Invalid column ID provided: ' . $columnInfo->getId());
 			}
 		}
+	}
+
+	/**
+	 * Ensures that card view settings reference columns that are part of the view.
+	 *
+	 * @param list<int> $viewColumnIds the columns a card source may point at
+	 * @throws InvalidArgumentException
+	 */
+	protected function assertCardSourceColumnsAreValid(View $view, array $viewColumnIds): void {
+		$viewSettings = $view->getViewSettingsObject();
+
+		$backgroundSource = $viewSettings->getCardBackgroundSource();
+		if ($backgroundSource !== null && !in_array($backgroundSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardBackgroundSource column ID: ' . $backgroundSource);
+		}
+
+		$titleSource = $viewSettings->getCardTitleSource();
+		if ($titleSource !== null && !in_array($titleSource, $viewColumnIds, true)) {
+			throw new InvalidArgumentException('Invalid cardTitleSource column ID: ' . $titleSource);
+		}
+	}
+
+	/**
+	 * Clears card sources that the updated column set no longer contains.
+	 */
+	protected function dropOrphanedCardSources(View $view, array $viewColumnIds): void {
+		// Unlike the assertion, this one writes: with no candidates to compare against it
+		// leaves the stored sources alone rather than clearing them on a bad lookup.
+		if (empty($viewColumnIds)) {
+			return;
+		}
+
+		$viewSettings = $view->getViewSettingsObject();
+		$backgroundSource = $viewSettings->getCardBackgroundSource();
+		$titleSource = $viewSettings->getCardTitleSource();
+
+		$keptBackgroundSource = in_array($backgroundSource, $viewColumnIds, true) ? $backgroundSource : null;
+		$keptTitleSource = in_array($titleSource, $viewColumnIds, true) ? $titleSource : null;
+
+		if ($keptBackgroundSource === $backgroundSource && $keptTitleSource === $titleSource) {
+			return;
+		}
+
+		$view->setViewSettings(json_encode(new ViewSettings(
+			cardBackgroundSource: $keptBackgroundSource,
+			cardTitleSource: $keptTitleSource,
+		)));
 	}
 
 	/**
@@ -455,6 +549,28 @@ class ViewService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * Deletes the views without a table that the user owns, such as grid views: no table
+	 * takes them along when the user's tables are deleted.
+	 *
+	 * @throws InternalError
+	 */
+	public function deleteAllStandaloneOwnedBy(string $userId): void {
+		try {
+			$views = $this->mapper->findAllStandaloneOwnedBy($userId);
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error('Views without a table of user ' . $userId . ' could not be loaded', ['exception' => $e]);
+			throw new InternalError($e->getMessage());
+		}
+		foreach ($views as $view) {
+			try {
+				$this->deleteByObject($view, $userId);
+			} catch (InternalError $e) {
+				$this->logger->error('View ' . $view->getId() . ' of user ' . $userId . ' could not be deleted', ['exception' => $e]);
+			}
 		}
 	}
 
@@ -635,10 +751,22 @@ class ViewService extends SuperService {
 				columnSettings: new ColumnSettings($applicableViewColumnInformationRecords),
 				filterSet: FilterSet::createFromInputArray($applicableFilterArray),
 				sortRuleSet: SortRuleSet::createFromInputArray($filteredSortingRules),
+				viewSettings: $this->removeColumnFromViewSettings($view->getViewSettingsObject(), $columnId),
 			);
 
 			$this->update($view->getId(), $viewUpdateInput);
 		}
+	}
+
+	private function removeColumnFromViewSettings(ViewSettings $viewSettings, int $columnId): ViewSettings {
+		return new ViewSettings(
+			cardBackgroundSource: $viewSettings->getCardBackgroundSource() === $columnId
+				? null
+				: $viewSettings->getCardBackgroundSource(),
+			cardTitleSource: $viewSettings->getCardTitleSource() === $columnId
+				? null
+				: $viewSettings->getCardTitleSource(),
+		);
 	}
 
 	protected function removeColumnFromFilters(array $originalFilterSetArray, int $columnId): array {
@@ -719,7 +847,7 @@ class ViewService extends SuperService {
 	 */
 	public function importView(?int $tableId, array $view, string $userId): View {
 		$item = new View();
-		$item->setUuid((isset($view['uuid']) && Uuid::isValid($view['uuid'])) ? $view['uuid'] : null);
+		$item->setUuid($this->freeUuid($view['uuid'] ?? null));
 		$item->setTableId($tableId);
 		$item->setTitle($view['title']);
 		$item->setEmoji($view['emoji']);
@@ -745,6 +873,12 @@ class ViewService extends SuperService {
 		if ($type === View::TYPE_GRID && isset($view['grid'])) {
 			$item->setGridArray($this->gridWidgetTypes->sanitizeGrid($view['grid'], $userId));
 		}
+		// A scheme may carry a layout this version does not know, which is dropped rather
+		// than rejected so the rest of the view still imports.
+		// Resolved the same way the write path resolves it, so import and create agree: an
+		// explicit layout is stored as given, anything absent or unknown stays null.
+		$item->setLayout(ViewLayout::tryFromMixed($view['layout'] ?? null)?->value);
+		$item->setViewSettings(json_encode($this->createImportedViewSettings($view)));
 		try {
 			$importedView = $this->mapper->insert($item);
 			if ($item->getTechnicalName() === null || $item->getTechnicalName() === '') {
@@ -762,6 +896,21 @@ class ViewService extends SuperService {
 
 	private function buildDefaultTechnicalName(int $viewId): string {
 		return 'view_' . $viewId;
+	}
+
+	/**
+	 * The uuid of the source when it is valid and not taken here yet, so an import does not
+	 * create a second view with the same uuid; otherwise null, and the view gets a fresh one.
+	 */
+	private function freeUuid(mixed $uuid): ?string {
+		if (!is_string($uuid) || !Uuid::isValid($uuid)) {
+			return null;
+		}
+		try {
+			return $this->mapper->findByUuid($uuid) === null ? $uuid : null;
+		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception) {
+			return null;
+		}
 	}
 
 	/**
@@ -796,5 +945,13 @@ class ViewService extends SuperService {
 
 		$this->logger->error($e->getMessage(), ['exception' => $e]);
 		throw new InternalError($context . ': ' . $e->getMessage());
+	}
+
+	private function createImportedViewSettings(array $view): ViewSettings {
+		if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+			return ViewSettings::createFromInputArray($view['viewSettings']);
+		}
+
+		return new ViewSettings();
 	}
 }

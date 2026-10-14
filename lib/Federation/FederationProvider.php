@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Federation;
 
 use OCA\Tables\Constants\ShareReceiverType;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
@@ -149,9 +150,14 @@ class FederationProvider implements ISignedCloudFederationProvider {
 
 		if ($node instanceof View) {
 			$node->setDescription('');
+			$node->setLayout(self::layoutFromMetaData($metaData));
 		}
 
-		if (property_exists($node, 'uuid')) {
+		if ($node instanceof View) {
+			// Every proxy view gets its own uuid: a view's uuid is unique, and one view can be
+			// federated to several users on the same instance
+			$node->setUuid(null);
+		} elseif (property_exists($node, 'uuid')) {
 			$node->setUuid($metaData['uuid'] ?? null);
 		}
 
@@ -226,6 +232,22 @@ class FederationProvider implements ISignedCloudFederationProvider {
 		if (isset($notification['emoji'])) {
 			$node->setEmoji($notification['emoji']);
 		}
+		if ($node instanceof View && isset($notification['layout'])) {
+			$layout = self::layoutFromMetaData($notification);
+			if ($layout !== null) {
+				$node->setLayout($layout);
+			}
+		}
 		$this->getMapperForNodeType($nodeType)->update($node);
+	}
+
+	/**
+	 * The layout a remote instance named, or null when this version does not know it.
+	 *
+	 * The value comes from another server, so it is only accepted as one of the layouts
+	 * this version defines.
+	 */
+	private static function layoutFromMetaData(array $data): ?string {
+		return ViewLayout::tryFromMixed($data['layout'] ?? null)?->value;
 	}
 }
