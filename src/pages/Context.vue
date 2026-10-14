@@ -37,19 +37,19 @@
 					class="resource"
 					:class="{ 'resource--tab-mode': isTabs }">
 					<CustomView v-if="resource.isView"
+						v-model:view-setting="resourceViewSettings[resource.key]"
 						:view="resource"
 						:columns="columns[resource.key]"
 						:rows="rows[resource.key]"
-						:view-setting="viewSettings[resource.key]"
 						@create-column="createColumn(true, resource)"
 						@import="openImportModal(resource, true)"
 						@download-csv="downloadCSV(resource, true)"
 						@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
 					<TableWrapper v-else
+						v-model:view-setting="resourceViewSettings[resource.key]"
 						:table="resource"
 						:columns="columns[resource.key]"
 						:rows="rows[resource.key]"
-						:view-setting="viewSettings[resource.key]"
 						@create-column="createColumn(false, resource)"
 						@import-scheme="openImportSchemeModal(resource)"
 						@import="openImportModal(resource, false)"
@@ -103,7 +103,7 @@ export default {
 		return {
 			loading: true,
 			icon: null,
-			viewSettings: {},
+			resourceViewSettings: {},
 			context: null,
 			contextResources: [],
 			errorMessage: null,
@@ -215,7 +215,7 @@ export default {
 			this.isReloading = true
 			this.loading = true
 			this.contextResources = []
-			this.viewSettings = {}
+			this.resourceViewSettings = {}
 			this.activeResourceIndex = 0
 
 			try {
@@ -263,7 +263,7 @@ export default {
 										})
 										table.key = (table.id).toString()
 										table.isView = false
-										this.viewSettings[table.key] = {}
+										this.resourceViewSettings[table.key] = this.createViewSetting(table)
 										this.contextResources.push(table)
 									}
 
@@ -283,7 +283,7 @@ export default {
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
-										this.viewSettings[view.key] = {}
+										this.resourceViewSettings[view.key] = this.createViewSetting(view)
 										this.contextResources.push(view)
 									}
 								}
@@ -312,6 +312,15 @@ export default {
 		},
 		createColumn(isView, element) {
 			emit('tables:column:create', { isView, element })
+		},
+		createViewSetting(element) {
+			const viewSetting = {}
+
+			if (element?.sort?.length) {
+				viewSetting.presetSorting = [...element.sort]
+			}
+
+			return viewSetting
 		},
 		async downloadCSV(element, isView) {
 			const access = await this.validateExportAccess({
