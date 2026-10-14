@@ -129,7 +129,7 @@ class ViewServiceTest extends TestCase {
 	}
 
 	public function testUpdateAcceptsTheGridTypeAndAGridInOneRequest(): void {
-		$this->expectUpdateOf($this->storedView(4));
+		$this->expectUpdateOf($this->storedView(null));
 
 		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['type' => 'grid', 'grid' => json_encode(['widgets' => [], 'layout' => []])]), 'alice', true);
 
@@ -150,10 +150,10 @@ class ViewServiceTest extends TestCase {
 
 		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray([
 			'sort' => [['columnId' => 3, 'mode' => 'ASC']],
-			'type' => 'grid',
+			'type' => 'table',
 		]), 'alice', true);
 
-		$this->assertSame('grid', $updated->getType());
+		$this->assertSame('table', $updated->getType());
 		$this->assertSame([['columnId' => 3, 'mode' => 'ASC']], $updated->getSortArray());
 	}
 
@@ -204,10 +204,71 @@ class ViewServiceTest extends TestCase {
 		$view = $this->storedView();
 		$this->expectUpdateOf($view);
 
-		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['technicalName' => 'intake_2', 'type' => 'grid']), 'alice', true);
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['technicalName' => 'intake_2', 'type' => 'table']), 'alice', true);
 
 		$this->assertSame('intake_2', $updated->getTechnicalName());
-		$this->assertSame('grid', $updated->getType());
+		$this->assertSame('table', $updated->getType());
+	}
+
+	public function testUpdateRefusesToTurnAViewWithATableIntoAGridView(): void {
+		$this->expectUpdateOf($this->storedView(4));
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('cannot become a grid view');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['type' => 'grid']), 'alice', true);
+	}
+
+	public function testCreateWithATableRefusesAGridType(): void {
+		$table = new Table();
+		$table->setId(4);
+		$this->mapper->expects($this->never())->method('insert');
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('cannot have a table');
+		$this->service->create('Home', null, $table, 'alice', null, null, View::TYPE_GRID);
+	}
+
+	public function testDeleteAllStandaloneOwnedByDeletesEachOfTheUsersViewsWithoutTable(): void {
+		$this->mapper->method('findAllStandaloneOwnedBy')->with('alice')->willReturn([$this->storedView(null), $this->storedView(null)]);
+		$this->permissionsService->method('canManageView')->willReturn(true);
+
+		$this->mapper->expects($this->exactly(2))->method('delete');
+
+		$this->service->deleteAllStandaloneOwnedBy('alice');
+	}
+
+	public function testImportKeepsTheSourceUuidWhenItIsFree(): void {
+		$this->mapper->method('findByUuid')->willReturn(null);
+		$this->expectImportInsert();
+
+		$imported = $this->service->importView(null, $this->importData('0199c8a0-1a2b-7c3d-8e4f-123456789abc'), 'alice');
+
+		$this->assertSame('0199c8a0-1a2b-7c3d-8e4f-123456789abc', $imported->getUuid());
+	}
+
+	public function testImportGivesAViewWhoseUuidIsTakenAFreshOne(): void {
+		$this->mapper->method('findByUuid')->willReturn($this->storedView(null));
+		$this->expectImportInsert();
+
+		$imported = $this->service->importView(null, $this->importData('0199c8a0-1a2b-7c3d-8e4f-123456789abc'), 'alice');
+
+		$this->assertNotSame('0199c8a0-1a2b-7c3d-8e4f-123456789abc', $imported->getUuid());
+		$this->assertNotNull($imported->getUuid());
+	}
+
+	private function expectImportInsert(): void {
+		$this->mapper->method('insert')->willReturnCallback(static function (View $view): View {
+			$view->setId(9);
+			return $view;
+		});
+		$this->mapper->method('update')->willReturnArgument(0);
+	}
+
+	private function importData(string $uuid): array {
+		return [
+			'uuid' => $uuid, 'title' => 'Home', 'emoji' => null, 'description' => '', 'type' => View::TYPE_GRID,
+			'createdAt' => '2026-10-12 10:00:00', 'lastEditAt' => '2026-10-12 10:00:00', 'columnSettings' => [], 'sort' => [], 'filter' => [],
+		];
 	}
 
 	public function testCreateWithoutTableNeedsAGridType(): void {

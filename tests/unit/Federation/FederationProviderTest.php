@@ -104,7 +104,7 @@ class FederationProviderTest extends TestCase {
 		$share->method('getOwner')->willReturn('admin@nextcloud.local');
 		$share->method('getShareSecret')->willReturn('secret456');
 		$share->method('getSharedBy')->willReturn('admin@nextcloud.local');
-		$share->method('getDescription')->willReturn(json_encode(['emoji' => '🦆', 'nodeType' => 'view']));
+		$share->method('getDescription')->willReturn(json_encode(['emoji' => '🦆', 'nodeType' => 'view', 'layout' => 'gallery']));
 
 		$this->viewMapper->expects($this->once())
 			->method('insert')
@@ -113,6 +113,7 @@ class FederationProviderTest extends TestCase {
 				$this->assertEquals('Federation View', $view->getTitle());
 				$this->assertEquals(5, $view->getExternalId());
 				$this->assertEquals('🦆', $view->getEmoji());
+				$this->assertEquals('gallery', $view->getLayout());
 				return $view;
 			});
 
@@ -125,6 +126,30 @@ class FederationProviderTest extends TestCase {
 
 		$result = $this->provider->shareReceived($share);
 		$this->assertEquals('99', $result);
+	}
+
+	public function testAProxyViewGetsItsOwnUuidAndAProxyTableKeepsTheSourceOne(): void {
+		$sourceUuid = '0199c8a0-1a2b-7c3d-8e4f-123456789abc';
+		$stored = [];
+		foreach (['view' => $this->viewMapper, 'table' => $this->tableMapper] as $nodeType => $mapper) {
+			$share = $this->createMock(ICloudFederationShare::class);
+			$share->method('getShareWith')->willReturn('admin');
+			$share->method('getResourceName')->willReturn('Federated ' . $nodeType);
+			$share->method('getProviderId')->willReturn('5');
+			$share->method('getShareSecret')->willReturn('secret-' . $nodeType);
+			$share->method('getDescription')->willReturn(json_encode(['nodeType' => $nodeType, 'uuid' => $sourceUuid]));
+			$mapper->method('insert')->willReturnCallback(static function (Table|View $node) use (&$stored, $nodeType): Table|View {
+				$node->setId(7);
+				$stored[$nodeType] = $node->getUuid();
+				return $node;
+			});
+			$this->provider->shareReceived($share);
+		}
+
+		// Two proxies of one view on this instance would otherwise clash on the uuid index of views
+		$this->assertNotNull($stored['view']);
+		$this->assertNotSame($sourceUuid, $stored['view']);
+		$this->assertSame($sourceUuid, $stored['table']);
 	}
 
 	public function testNotificationReceivedPermissionUpdate(): void {
@@ -177,6 +202,39 @@ class FederationProviderTest extends TestCase {
 
 		$this->assertEquals('New Title', $table->getTitle());
 		$this->assertEquals('🦆', $table->getEmoji());
+	}
+
+	public function testNotificationReceivedNodeUpdateAppliesLayout(): void {
+		$view = new View();
+		$view->setId(1);
+		$view->setExternalId(2);
+		$view->setShareToken('abcdefghijklmnop');
+		$view->setLayout('table');
+
+		$this->viewMapper->method('findByExternalIdAndToken')->willReturn($view);
+		$this->viewMapper->expects($this->exactly(2))->method('update')->with($view);
+
+		$this->provider->notificationReceived(
+			FederationProvider::NOTIFICATION_UPDATE_NODE,
+			'2',
+			[
+				'sharedSecret' => 'abcdefghijklmnop',
+				'nodeType' => 'view',
+				'layout' => 'tiles',
+			]
+		);
+		$this->assertEquals('tiles', $view->getLayout());
+
+		$this->provider->notificationReceived(
+			FederationProvider::NOTIFICATION_UPDATE_NODE,
+			'2',
+			[
+				'sharedSecret' => 'abcdefghijklmnop',
+				'nodeType' => 'view',
+				'layout' => 'carousel',
+			]
+		);
+		$this->assertEquals('tiles', $view->getLayout(), 'an unknown layout is ignored');
 	}
 
 	public function testNotificationReceiveNodeDelete(): void {

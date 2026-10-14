@@ -12,6 +12,7 @@ namespace OCA\Tables\Model;
 use Generator;
 use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\View;
 use OCA\Tables\Service\ValueObject\Emoji;
@@ -35,6 +36,8 @@ class ViewUpdateInput {
 		protected readonly ?int $sidebarOrder = null,
 		protected readonly ?string $type = null,
 		protected readonly ?array $grid = null,
+		protected readonly ?string $layout = null,
+		protected readonly ?ViewSettings $viewSettings = null,
 	) {
 	}
 
@@ -69,6 +72,12 @@ class ViewUpdateInput {
 		if ($this->grid !== null) {
 			yield ViewUpdatableParameters::GRID => $this->grid;
 		}
+		if ($this->layout !== null) {
+			yield ViewUpdatableParameters::LAYOUT => $this->layout;
+		}
+		if ($this->viewSettings !== null) {
+			yield ViewUpdatableParameters::VIEW_SETTINGS => $this->viewSettings;
+		}
 	}
 
 	/**
@@ -80,6 +89,8 @@ class ViewUpdateInput {
 	 *     columns?: list<int>,
 	 *     columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
 	 *     sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
+	 *     layout?: 'table'|'tiles'|'gallery'|null,
+	 *     viewSettings?: array{cardBackgroundSource?: int|null, cardTitleSource?: int|null}|string,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'contains-item'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float|list<array{id: int, label: string, uuid?: string}>}>>,
 	 *     sidebarOrder?: int,
 	 *     type?: 'table'|'grid',
@@ -88,7 +99,7 @@ class ViewUpdateInput {
 	 * @param array $columnsMap
 	 */
 	public static function fromInputArray(array $data, array $columnsMap = []): self {
-		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort', 'grid']);
+		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort', 'grid', 'viewSettings']);
 
 		if (isset($data['columns']) && !isset($data['columnSettings'])) {
 			$logger = Server::get(LoggerInterface::class);
@@ -103,6 +114,9 @@ class ViewUpdateInput {
 			$data['columnSettings'] = $value;
 		}
 
+		$layout = self::normalizeLayout($data['layout'] ?? null);
+		$viewSettings = self::createViewSettingsFromInputData($data, $columnsMap);
+
 		return new self(
 			title: ($data['title'] ?? null) ? new Title($data['title']) : null,
 			technicalName: $data['technicalName'] ?? null,
@@ -114,6 +128,8 @@ class ViewUpdateInput {
 			sidebarOrder: (array_key_exists('sidebarOrder', $data) && $data['sidebarOrder'] !== null) ? (int)$data['sidebarOrder'] : null,
 			type: self::optionalType($data),
 			grid: self::optionalArray($data, 'grid'),
+			layout: $layout,
+			viewSettings: $viewSettings,
 		);
 	}
 
@@ -152,6 +168,37 @@ class ViewUpdateInput {
 			throw new InvalidArgumentException('The view property "' . $key . '" must be an object.');
 		}
 		return $data[$key];
+	}
+
+	private static function createViewSettingsFromInputData(array $data, array $columnsMap = []): ?ViewSettings {
+		if (array_key_exists('viewSettings', $data)) {
+			if ($data['viewSettings'] === null) {
+				return new ViewSettings();
+			}
+			if (!is_array($data['viewSettings'])) {
+				throw new \InvalidArgumentException('Invalid viewSettings value.');
+			}
+			// Only a scheme update passes a columns map. Plain API input already carries ids.
+			return ViewSettings::createFromInputArray($data['viewSettings'], $columnsMap === [] ? null : $columnsMap);
+		}
+
+		return null;
+	}
+
+	public static function normalizeLayout(mixed $layout): ?string {
+		if ($layout === null || $layout === '') {
+			return null;
+		}
+
+		if (!is_string($layout)) {
+			throw new \InvalidArgumentException('Invalid layout value.');
+		}
+
+		if (ViewLayout::tryFrom($layout) === null) {
+			throw new \InvalidArgumentException('Invalid layout value.');
+		}
+
+		return $layout;
 	}
 
 	protected static function transformJsonToArrayInPayload(array $input, array $keys): array {

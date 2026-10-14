@@ -9,6 +9,7 @@ namespace OCA\Tables\Controller;
 
 use Exception;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
@@ -17,6 +18,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
@@ -209,6 +211,9 @@ class ApiTablesController extends AOCSController {
 				$table = $this->service->update($table->getId(), null, null, null, null, $this->userId, $remappedColumnOrder, $remappedSort);
 			}
 			foreach ($views as $view) {
+				// A layout this version does not know is dropped rather than rejected, so the rest
+				// of the scheme still imports.
+				$schemeLayout = ViewLayout::tryFromMixed($view['layout'] ?? null)?->value;
 				$newView = $this->viewService->create(
 					$view['title'],
 					$view['emoji'],
@@ -216,6 +221,7 @@ class ApiTablesController extends AOCSController {
 					$this->userId,
 					technicalName: $view['technicalName'] ?? null,
 					uuid: $view['uuid'] ?? null,
+					layout: $schemeLayout,
 				);
 
 				$inputColumnsArray = [];
@@ -245,13 +251,17 @@ class ApiTablesController extends AOCSController {
 					return $filter;
 				}, $filters), $view['filter']);
 
-				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray(
-					array_merge($inputColumnsArray, [
-						'description' => $view['description'] ?? '',
-						'sort' => $newSort,
-						'filter' => $newFilter,
-					])
-				));
+				$inputData = array_merge($inputColumnsArray, [
+					'description' => $view['description'] ?? '',
+					'sort' => $newSort,
+					'filter' => $newFilter,
+					'layout' => $schemeLayout,
+				]);
+				if (isset($view['viewSettings']) && is_array($view['viewSettings'])) {
+					$inputData['viewSettings'] = ViewSettings::remapSources($view['viewSettings'], $colMap);
+				}
+
+				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray($inputData));
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
