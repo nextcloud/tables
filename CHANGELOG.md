@@ -5,6 +5,36 @@
 
 # Changelog
 
+## 2.3.2
+
+### Added
+* [Feat: Allow image previews of Files image links (tables#2946)](https://github.com/nextcloud/tables/pull/2946)
+* [Feat: Add rector to CI (tables#2949)](https://github.com/nextcloud/tables/pull/2949)
+
+### Fixed
+* [Fix(search): search as the user the provider is given (tables#3011)](https://github.com/nextcloud/tables/pull/3011)
+* [Fix(Handlers): use a composable for (un)subscribing to events (tables#3023)](https://github.com/nextcloud/tables/pull/3023)
+* [Fix(rows): add id tie-breaker so limit/offset pages are stable (tables#3058)](https://github.com/nextcloud/tables/pull/3058)
+* [Fix(migration): use mappers instead of services in db structure repair (tables#3064)](https://github.com/nextcloud/tables/pull/3064)
+* [Fix(federation): accept federated requests from instances on non-default ports (tables#3065)](https://github.com/nextcloud/tables/pull/3065)
+
+### Dependencies
+* [Update nextcloud/ocp dependency (tables#3038)](https://github.com/nextcloud/tables/pull/3038)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^7.5.0 (main) (tables#2963)](https://github.com/nextcloud/tables/pull/2963)
+* [Chore(deps): update dependency psalm/phar to ^6.17.2 (main) (tables#3015)](https://github.com/nextcloud/tables/pull/3015)
+* [Fix(deps): update dependency @nextcloud/files to ^4.1.0 (main) (tables#3016)](https://github.com/nextcloud/tables/pull/3016)
+* [Fix(deps): update dependency @nextcloud/vue to ^9.13.1 (main) (tables#3017)](https://github.com/nextcloud/tables/pull/3017)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.63.3 (main) (tables#3018)](https://github.com/nextcloud/tables/pull/3018)
+* [Fix(deps): update dependency @material-symbols/svg-400 to ^0.47.4 (main) (tables#3031)](https://github.com/nextcloud/tables/pull/3031)
+* [Chore(deps): update dependency rector/rector to ^2.6.7 (main) (tables#3030)](https://github.com/nextcloud/tables/pull/3030)
+* [Chore(deps): update dependency eslint to ^10.11.0 (main) (tables#3032)](https://github.com/nextcloud/tables/pull/3032)
+* [Fix(deps): update dependency @nextcloud/router to ^3.2.0 (main) (tables#3033)](https://github.com/nextcloud/tables/pull/3033)
+* [Chore(deps): update cypress-io/github-action action to v7.4.4 (main) (tables#3039)](https://github.com/nextcloud/tables/pull/3039)
+* [Chore(deps): update dependency @nextcloud/e2e-test-server to ^0.6.1 (main) (tables#3040)](https://github.com/nextcloud/tables/pull/3040)
+* [Chore(deps): update icewind1991/nextcloud-version-matrix action to v1.3.3 (main) (tables#3041)](https://github.com/nextcloud/tables/pull/3041)
+* [Update nextcloud/ocp dependency (tables#3020)](https://github.com/nextcloud/tables/pull/3020)
+* [Fix npm audit (tables#3060)](https://github.com/nextcloud/tables/pull/3060)
+
 ## 2.3.1
 
 ### Added
