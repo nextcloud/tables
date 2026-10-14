@@ -641,6 +641,10 @@ class RowService extends SuperService {
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 
+			if ($view->isStandalone()) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no rows to update.');
+			}
+
 			// is row in view?
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				$e = new \Exception('Update row is not allowed.');
@@ -766,6 +770,9 @@ class RowService extends SuperService {
 			} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+			if ($view->isStandalone()) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no rows to delete.');
 			}
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				$e = new \Exception('Update row is not allowed.');

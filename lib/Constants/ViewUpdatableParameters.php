@@ -20,4 +20,6 @@ enum ViewUpdatableParameters: string {
 	case SIDEBAR_ORDER = 'sidebarOrder';
 	case TYPE = 'type';
 	case GRID = 'grid';
+	case LAYOUT = 'layout';
+	case VIEW_SETTINGS = 'viewSettings';
 }
