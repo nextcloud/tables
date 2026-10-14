@@ -86,4 +86,40 @@ test.describe('Search inside an application', () => {
 			.fill('')
 		await expect(row(viewOne, 'banana row')).toBeVisible()
 	})
+
+	test('Application-wide search filters all resources at once', async ({
+		userPage: { page },
+	}) => {
+		await createSearchFixture(page)
+		await loadContext(page, contextTitle)
+
+		const viewOne = page
+			.locator('[data-cy="contextViewNode"]')
+			.filter({ hasText: viewOneTitle })
+		const viewTwo = page
+			.locator('[data-cy="contextViewNode"]')
+			.filter({ hasText: viewTwoTitle })
+		await expect(viewOne).toHaveCount(1)
+		await expect(viewTwo).toHaveCount(1)
+
+		await page
+			.locator('[data-cy="contextSearchInput"] input')
+			.fill('apple')
+
+		// synchronize on the debounced filter applying before asserting states
+		await expect(row(viewTwo, 'banana row')).toHaveCount(0)
+
+		// both views are filtered
+		await expect(row(viewOne, 'apple row')).toBeVisible()
+		await expect(row(viewOne, 'banana row')).toHaveCount(0)
+		await expect(row(viewTwo, 'apple row')).toBeVisible()
+		await expect(row(viewTwo, 'banana row')).toHaveCount(0)
+
+		// clearing the search restores both views
+		await page
+			.locator('[data-cy="contextSearchInput"] input')
+			.fill('')
+		await expect(row(viewTwo, 'banana row')).toBeVisible()
+		await expect(row(viewOne, 'banana row')).toBeVisible()
+	})
 })
