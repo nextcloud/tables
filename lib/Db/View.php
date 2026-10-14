@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
+use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
@@ -50,6 +52,10 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setEmoji(string $emoji)
  * @method getDescription(): string
  * @method setDescription(string $description)
+ * @method getLayout(): ?string
+ * @method setLayout(?string $layout)
+ * @method getViewSettings(): ?string
+ * @method setViewSettings(?string $viewSettings)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
  * @method getOnSharePermissions(): ?Permissions
@@ -88,6 +94,8 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+	protected ?string $layout = null;
+	protected ?string $viewSettings = null; // json
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -193,11 +201,15 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	private function getArray(?string $json): array {
-		if ($json !== '' && $json !== null && $json !== 'null') {
-			return \json_decode($json, true);
-		} else {
+		if ($json === '' || $json === null || $json === 'null') {
 			return [];
 		}
+
+		// Valid JSON that is not an object still has to satisfy the return type, so a
+		// scalar is treated as no value rather than raising a TypeError on read.
+		$decoded = \json_decode($json, true);
+
+		return is_array($decoded) ? $decoded : [];
 	}
 
 	public function setColumnsArray(array $array):void {
@@ -210,6 +222,14 @@ class View extends EntitySuper implements JsonSerializable {
 
 	public function setFilterArray(array $array):void {
 		$this->setFilter(\json_encode($array));
+	}
+
+	public function getLayoutNormalized(): string {
+		return ViewLayout::normalize($this->layout)->value;
+	}
+
+	public function getViewSettingsObject(): ViewSettings {
+		return ViewSettings::createFromStoredArray($this->getArray($this->getViewSettings()));
 	}
 
 	private function getSharePermissions(): ?Permissions {
@@ -244,6 +264,8 @@ class View extends EntitySuper implements JsonSerializable {
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'isFederated' => $this->isFederated(),
 			'sidebarOrder' => $this->sidebarOrder,
+			'layout' => $this->getLayoutNormalized(),
+			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

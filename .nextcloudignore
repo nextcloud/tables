@@ -10,8 +10,6 @@
 /docs/
 /screenshots/
 /tests
-/babel.config.cjs
-/babel.config.js
 /cypress.config.mjs
 /.editorconfig
 /.eslintrc.cjs
