@@ -116,6 +116,18 @@ class Row2Mapper {
 		return $rowSleeve->getTableId();
 	}
 
+	/**
+	 * @throws InternalError
+	 */
+	public function findIdByUuid(string $uuid, ?int $tableId = null): ?int {
+		try {
+			return $this->rowSleeveMapper->findIdByUuid($uuid, $tableId);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+	}
+
 	public function setUserId(string $userId): void {
 		$this->userId = $userId;
 	}
@@ -722,6 +734,7 @@ class Row2Mapper {
 		foreach ($sleeves as $sleeve) {
 			$rows[$sleeve->getId()] = new Row2();
 			$rows[$sleeve->getId()]->setId($sleeve->getId());
+			$rows[$sleeve->getId()]->setUuid($sleeve->getUuid());
 			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
 			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
 			$rows[$sleeve->getId()]->setLastEditBy($sleeve->getLastEditBy());
@@ -784,12 +797,13 @@ class Row2Mapper {
 		}
 		if ($row->getId()) {
 			// if row has an id from migration or import etc.
-			$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
+			$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getUuid(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
 		} else {
 			// create a new row sleeve to get a new rowId
 			$rowSleeve = $this->createNewRowSleeve($row->getTableId());
 			$row->setId($rowSleeve->getId());
 		}
+		$row->setUuid($rowSleeve->getUuid());
 
 		// write all cells to its db-table
 		foreach ($row->getData() as $cell) {
@@ -848,9 +862,10 @@ class Row2Mapper {
 	/**
 	 * @throws Exception
 	 */
-	private function createRowSleeveFromExistingData(int $id, int $tableId, string $createdAt, string $createdBy, string $lastEditBy, string $lastEditAt): RowSleeve {
+	private function createRowSleeveFromExistingData(int $id, ?string $uuid, int $tableId, string $createdAt, string $createdBy, string $lastEditBy, string $lastEditAt): RowSleeve {
 		$rowSleeve = new RowSleeve();
 		$rowSleeve->setId($id);
+		$rowSleeve->setUuid($uuid);
 		$rowSleeve->setTableId($tableId);
 		$rowSleeve->setCreatedBy($createdBy);
 		$rowSleeve->setCreatedAt($createdAt);

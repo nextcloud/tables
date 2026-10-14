@@ -29,6 +29,7 @@ use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
@@ -207,6 +208,114 @@ class RowService extends SuperService {
 	 * @throws Exception
 	 * @throws InternalError
 	 */
+	/**
+	 * Resolves a row identifier from a route, an integer id or a uuid, to the integer row id.
+	 * A uuid is only looked up within the table, or the table of the view, so a uuid of a
+	 * row in another table is not found.
+	 *
+	 * @throws BadRequestError
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function resolveRowId(string $rowIdentifier, ?int $tableId, ?int $viewId): int {
+		if (preg_match('/^\d+$/', $rowIdentifier) === 1) {
+			return (int)$rowIdentifier;
+		}
+		if (!Uuid::isValid($rowIdentifier)) {
+			throw new BadRequestError('The row identifier is neither a row id nor a uuid.');
+		}
+
+		if ($tableId === null && $viewId !== null) {
+			$tableId = $this->findViewOrFail($viewId)->getTableId();
+		}
+		$rowId = $this->row2Mapper->findIdByUuid(strtolower($rowIdentifier), $tableId);
+		if ($rowId === null) {
+			throw new NotFoundError('Row not found.');
+		}
+		return $rowId;
+	}
+
+	/**
+	 * Finds a row within the table or view it is requested through.
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 */
+	public function findInNode(int $rowId, ?int $tableId, ?int $viewId, string $userId): Row2 {
+		if ($viewId !== null) {
+			return $this->findInView($rowId, $viewId, $userId);
+		}
+		if ($tableId === null) {
+			throw new InternalError('A row is requested without a table or view.');
+		}
+		return $this->findInTable($rowId, $tableId, $userId);
+	}
+
+	/**
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 */
+	private function findInTable(int $rowId, int $tableId, string $userId): Row2 {
+		try {
+			$rowTableId = $this->row2Mapper->getTableIdForRow($rowId);
+		} catch (DoesNotExistException $e) {
+			throw new NotFoundError('Row not found.');
+		} catch (MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		if ($rowTableId !== $tableId || !$this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
+			throw new NotFoundError('Row not found.');
+		}
+
+		try {
+			$columns = $this->columnMapper->findAllByTable($tableId);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		$row = $this->row2Mapper->find($rowId, $columns);
+		$this->attachAliasPayload($row, $columns);
+		return $row;
+	}
+
+	/**
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 */
+	private function findInView(int $rowId, int $viewId, string $userId): Row2 {
+		$view = $this->findViewOrFail($viewId);
+		if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)
+			|| !$this->row2Mapper->isRowInViewPresent($rowId, $view, $userId)) {
+			throw new NotFoundError('Row not found.');
+		}
+
+		try {
+			$columns = $this->columnMapper->findAll($view->getColumnIds());
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		$row = $this->row2Mapper->find($rowId, $columns);
+		$this->attachAliasPayload($row, $columns);
+		return $this->filterRowResult($view, $row);
+	}
+
+	/**
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 */
+	private function findViewOrFail(int $viewId): View {
+		try {
+			return $this->viewMapper->find($viewId);
+		} catch (DoesNotExistException $e) {
+			throw new NotFoundError('View not found.');
+		} catch (MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+	}
+
 	public function create(?int $tableId, ?int $viewId, RowDataInput|array $data, ?string $userId = null): Row2 {
 		if ($userId) {
 			$this->userId = $userId;
@@ -1007,6 +1116,7 @@ class RowService extends SuperService {
 		try {
 			$qb->insert('tables_row_sleeves')
 				->values([
+					'uuid' => $qb->createNamedParameter($this->resolveImportUuid($row['uuid'] ?? null)),
 					'table_id' => $qb->createNamedParameter($table->getId(), IQueryBuilder::PARAM_INT),
 					'created_by' => $qb->createNamedParameter($table->getOwnership()),
 					'created_at' => $qb->createNamedParameter($row['createdAt']),
@@ -1021,6 +1131,22 @@ class RowService extends SuperService {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
 			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
 		}
+	}
+
+	/**
+	 * Keeps the uuid of an exported row when it is valid and no other row uses it yet,
+	 * for example when the same export is imported twice, and generates a new one otherwise.
+	 *
+	 * @throws InternalError
+	 */
+	private function resolveImportUuid(mixed $exportedUuid): string {
+		if (is_string($exportedUuid) && Uuid::isValid($exportedUuid)) {
+			$exportedUuid = strtolower($exportedUuid);
+			if ($this->row2Mapper->findIdByUuid($exportedUuid) === null) {
+				return $exportedUuid;
+			}
+		}
+		return Uuid::v7()->toRfc4122();
 	}
 
 	/**

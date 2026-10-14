@@ -87,6 +87,7 @@ namespace OCA\Tables;
  *
  * @psalm-type TablesRow = array{
  * 	id: int,
+ * 	uuid: ?string,
  * 	tableId: int,
  * 	createdBy: string,
  * 	createdAt: string,

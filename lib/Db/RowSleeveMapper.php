@@ -8,6 +8,7 @@
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -26,6 +27,19 @@ class RowSleeveMapper extends QBMapper {
 		protected LoggerInterface $logger,
 	) {
 		parent::__construct($db, $this->table, RowSleeve::class);
+	}
+
+	/**
+	 * Every row gets its uuid here, whichever path creates it.
+	 *
+	 * @param RowSleeve $entity
+	 * @return RowSleeve
+	 * @throws Exception
+	 */
+	#[\Override]
+	public function insert(Entity $entity): Entity {
+		$entity->assignUuidIfMissing();
+		return parent::insert($entity);
 	}
 
 	/**
@@ -51,6 +65,7 @@ class RowSleeveMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select(
 			$sleeveAlias . '.id',
+			$sleeveAlias . '.uuid',
 			$sleeveAlias . '.table_id',
 			$sleeveAlias . '.created_by',
 			$sleeveAlias . '.created_at',
@@ -76,6 +91,25 @@ class RowSleeveMapper extends QBMapper {
 			->orderBy('id', 'ASC');
 
 		return $this->findEntity($qb);
+	}
+
+	/**
+	 * @param int|null $tableId limits the lookup to one table, null looks in all tables
+	 * @throws Exception
+	 */
+	public function findIdByUuid(string $uuid, ?int $tableId = null): ?int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('uuid', $qb->createNamedParameter($uuid, IQueryBuilder::PARAM_STR)));
+		if ($tableId !== null) {
+			$qb->andWhere($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
+		}
+
+		$result = $qb->executeQuery();
+		$id = $result->fetchOne();
+		$result->closeCursor();
+		return $id === false ? null : (int)$id;
 	}
 
 	/**
