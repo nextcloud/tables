@@ -39,6 +39,9 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.NcTable tr td button').first().click()
 		cy.get('button').contains('Delete').click()
 		cy.get('button').contains('I really').click()
+		// wait for the delete to finish and the row route to close before the next test starts
+		cy.get('.modal__content').should('not.exist')
+		cy.url().should('not.contain', '/row/')
 	})
 
 	it('Insert and test rows - default now', () => {
