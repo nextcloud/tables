@@ -53,6 +53,7 @@ OC.L10N.register(
     "Sort" : "จัดเรียง",
     "Transfer" : "โอนย้าย",
     "Filter" : "ตัวกรอง",
+    "Automatic" : "อัตโนมัติ",
     "Advanced settings" : "การตั้งค่าขั้นสูง",
     "Saving..." : "กำลังบันทึก...",
     "Export" : "ส่งออก",

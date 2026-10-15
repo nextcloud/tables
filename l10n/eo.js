@@ -65,6 +65,8 @@ OC.L10N.register(
     "To" : "Al",
     "Icon" : "Piktogramo",
     "Sort" : "Ordigi",
+    "Gallery" : "Bildaro",
+    "Automatic" : "Aŭtomata",
     "Advanced settings" : "Altanivela agordo",
     "Saving..." : "Konservado...",
     "Export" : "Eksporti",

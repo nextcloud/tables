@@ -44,6 +44,7 @@ OC.L10N.register(
     "Back" : "Tilbake",
     "Sort" : "Sorter",
     "Filter" : "Filter",
+    "Gallery" : "Galleri",
     "Advanced settings" : "Avanserte innstillingar",
     "Saving..." : "Lagrar …",
     "Export" : "Eksporter",

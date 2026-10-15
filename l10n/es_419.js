@@ -55,6 +55,7 @@ OC.L10N.register(
     "Result" : "Resultado",
     "Sort" : "Ordenar",
     "Filter" : "Filtrar",
+    "Automatic" : "Automático",
     "Advanced settings" : "Configuraciones avanzados",
     "Saving..." : "Guardando ...",
     "Export" : "Exportar",

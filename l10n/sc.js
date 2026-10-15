@@ -81,6 +81,7 @@ OC.L10N.register(
     "Sort" : "Assenta",
     "Transfer" : "Tràmuda",
     "Filter" : "Filtru",
+    "Automatic" : "Automàticu",
     "Advanced settings" : "Cunfiguratzione avantzada",
     "Saving..." : "Sarvende...",
     "Export" : "Esporta",

@@ -58,6 +58,7 @@ OC.L10N.register(
     "Icon" : "Ícono",
     "Result" : "Resultado",
     "Filter" : "Filtrar",
+    "Automatic" : "Automático",
     "Advanced settings" : "Configuraciones avanzados",
     "Saving..." : "Guardando...",
     "Export" : "Exportar",

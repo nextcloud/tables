@@ -64,6 +64,8 @@ OC.L10N.register(
     "Failed" : "Fracàs",
     "From" : "De",
     "Sort" : "Triar",
+    "Gallery" : "Galariá",
+    "Automatic" : "Automatic",
     "Advanced settings" : "Paramètres avançats",
     "Saving..." : "Enregistrament...",
     "Export" : "Exportar",

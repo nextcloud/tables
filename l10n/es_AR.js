@@ -75,6 +75,8 @@ OC.L10N.register(
     "Sort" : "Ordenar",
     "Transfer" : "Transferir",
     "Filter" : "Filtrar",
+    "Gallery" : "Galería",
+    "Automatic" : "Automático",
     "Advanced settings" : "Configuraciones avanzadas",
     "Saving..." : "Guardando ...",
     "Export" : "Exportar",

@@ -53,6 +53,8 @@ OC.L10N.register(
     "Result" : "შედეგი",
     "Sort" : "განლაგება",
     "Filter" : "ფილტრი",
+    "Gallery" : "გალერეა",
+    "Automatic" : "ავტომატური",
     "Advanced settings" : "დამატებითი პარამეტრები",
     "Saving..." : "მიმხინარეობს შენახვა…",
     "Export" : "ექსპორტი",

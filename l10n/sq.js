@@ -58,6 +58,8 @@ OC.L10N.register(
     "Result" : "Rezultatet",
     "Sort" : "Renditni",
     "Filter" : "Filtro",
+    "Gallery" : "Galeri",
+    "Automatic" : "Automatike",
     "Advanced settings" : "Rregullime të mëtejshme",
     "Saving..." : "Duke ruajtur...",
     "Export" : "Eksport",

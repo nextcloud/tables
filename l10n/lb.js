@@ -48,6 +48,8 @@ OC.L10N.register(
     "Sort" : "Zortéieren",
     "Transfer" : "Iwwerdroen",
     "Filter" : "Filter",
+    "Gallery" : "Galerie",
+    "Automatic" : "Automatesch",
     "Advanced settings" : "Erweidert Astellungen",
     "Saving..." : "Speicheren...",
     "Export" : "Exportéieren",

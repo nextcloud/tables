@@ -70,6 +70,8 @@ OC.L10N.register(
     "To" : "Līdz",
     "Icon" : "Ikona",
     "Sort" : "Kārtot",
+    "Gallery" : "Galerija",
+    "Automatic" : "Automātisks",
     "Advanced settings" : "Paplašināti iestatījumi",
     "Saving..." : "Saglabā...",
     "Export" : "Izgūt",

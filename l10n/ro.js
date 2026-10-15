@@ -79,6 +79,8 @@ OC.L10N.register(
     "Sort" : "Sortează",
     "Transfer" : "Transfer",
     "Filter" : "Filtru",
+    "Gallery" : "Galerie",
+    "Automatic" : "Automat",
     "Advanced settings" : "Setări avansate",
     "Saving..." : "Se salvează...",
     "Export" : "Exportă",

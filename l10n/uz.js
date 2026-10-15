@@ -74,6 +74,8 @@ OC.L10N.register(
     "Emoji" : "Emoji",
     "Sort" : "Saralash",
     "Filter" : "Filtr",
+    "Gallery" : "Galereya",
+    "Automatic" : "Automatik",
     "Saving..." : "Saqlanmoqda...",
     "Export" : "Eksport",
     "Add to favorites" : "Sevimlilarga qo'shing",

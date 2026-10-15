@@ -38,6 +38,7 @@ OC.L10N.register(
     "Close" : "Cau",
     "Preview" : "Rhagolwg",
     "Sort" : "Trefnu",
+    "Automatic" : "Awtomatig",
     "Saving..." : "Yn cadw...",
     "Export" : "Allforio",
     "Favorites" : "Ffefrynnau",

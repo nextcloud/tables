@@ -124,6 +124,8 @@ OC.L10N.register(
     "Sort" : "מיון",
     "Transfer" : "העברה",
     "Filter" : "מסנן",
+    "Gallery" : "גלריה",
+    "Automatic" : "אוטומטי",
     "Advanced settings" : "הגדרות מתקדמות",
     "Saving..." : "מתבצעת שמירה…",
     "Export" : "ייצוא",

@@ -568,6 +568,7 @@ OC.L10N.register(
     "Show fullscreen" : "Zobrazit na celou obrazovku",
     "Close editor" : "Zavřít editor",
     "Create Row" : "Vytvořit řádek",
+    "Tiles" : "Dlaždice",
     "Uncheck all" : "Zrušit označení všeho",
     "_%n selected row_::_%n selected rows_" : ["%n vybraný řádek","%n vybrané řádky","%n vybraných řádků","%n vybrané řádky"],
     "Go to first page" : "Přejít na první stránku",

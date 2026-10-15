@@ -160,6 +160,8 @@ OC.L10N.register(
     "Icon" : "Biểu tượng",
     "Transfer" : "Truyền",
     "Filter" : "Lọc",
+    "Gallery" : "Ảnh/Album",
+    "Automatic" : "Tự động",
     "Advanced settings" : "Cài đặt nâng cao",
     "Saving..." : "Đang lưu...",
     "Export" : "Xuất ra",

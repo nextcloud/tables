@@ -264,6 +264,8 @@ OC.L10N.register(
     "Title is missing." : "Manjka naziv",
     "New title of the view" : "Nov naziv pogleda",
     "Filter" : "Filter",
+    "Gallery" : "Galerija",
+    "Automatic" : "Samodejno",
     "Advanced settings" : "Napredne nastavitve",
     "Saving..." : "Poteka shranjevanje ...",
     "Do you really want to delete the table \"{table}\"?" : "Ali res želite izbrisati razpredelnico »{table}«?",

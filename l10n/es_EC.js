@@ -229,6 +229,7 @@ OC.L10N.register(
     "Sort" : "Ordenar",
     "Transfer" : "Transferencia",
     "Filter" : "Filtrar",
+    "Automatic" : "Automático",
     "Advanced settings" : "Configuraciones avanzados",
     "Saving..." : "Guardando...",
     "Do you really want to delete the table \"{table}\"?" : "¿Realmente deseas eliminar la tabla \"{table}\"?",
