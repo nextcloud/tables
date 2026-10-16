@@ -10,6 +10,7 @@ namespace OCA\Tables\Service;
 use DateTimeImmutable;
 use LogicException;
 use OC\User\NoUserException;
+use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\BackgroundJob\ImportTableJob;
 use OCA\Tables\Db\Column;
@@ -19,6 +20,8 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ColumnsHelper;
+use OCA\Tables\Model\ImportProblem;
+use OCA\Tables\Model\ImportProblemsFile;
 use OCA\Tables\Model\ImportStats;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -33,21 +36,27 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\BackgroundJob\IJobList;
 use OCP\DB\Exception;
 use OCP\Files\AppData\IAppDataFactory;
+use OCP\Files\Folder;
 use OCP\Files\IAppData;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\Files\SimpleFS\ISimpleFolder;
+use OCP\IL10N;
 use OCP\ITempManager;
 use OCP\IUserManager;
+use OCP\L10N\IFactory;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use SplFileObject;
 use TypeError;
 use function file_exists;
 use function is_string;
 use function is_uploaded_file;
 use function mb_strlen;
+use function mb_substr;
 use function preg_match;
 
 class ImportService extends SuperService {
@@ -68,10 +77,18 @@ class ImportService extends SuperService {
 	private int $countUpdatedRows = 0;
 	private int $countErrors = 0;
 	private int $countParsingErrors = 0;
+	/**
+	 * @var list<ImportProblem>
+	 */
+	private array $problems = [];
 
 	private array $rawColumnTitles = [];
 	private array $rawColumnDataTypes = [];
 	private array $columnsConfig = [];
+
+	private ?SplFileObject $problemsFileStream = null;
+	private ?ImportProblemsFile $storedProblemsFile = null;
+	private readonly IL10N $l10n;
 
 	public const IMPORT_TYPE_USER_FILE = 'user_file';
 	public const IMPORT_TYPE_APP_FILE = 'app_file';
@@ -79,6 +96,8 @@ class ImportService extends SuperService {
 
 	private const MAX_ROWS_FOR_IMMEDIATE_IMPORT = 200;
 	private const MAX_COLUMNS_FOR_IMMEDIATE_IMPORT = 20;
+	private const MAX_PROBLEM_VALUE_LENGTH = 50;
+	private const IMPORTS_FOLDER = 'Tables/Imports';
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -93,13 +112,18 @@ class ImportService extends SuperService {
 		private readonly ColumnsHelper $columnsHelper,
 		private readonly IJobList $jobList,
 		private readonly ITempManager $tempManager,
+		private readonly IFactory $l10nFactory,
+		private readonly ActivityManager $activityManager,
 		IAppDataFactory $appDataFactory,
+		private readonly IFilenameValidator $filenameValidator,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->appData = $appDataFactory->get(Application::APP_ID);
+		$this->l10n = $this->l10nFactory->get(Application::APP_ID);
 	}
 
 	public function previewImport(?int $tableId, ?int $viewId, string $path): array {
+		$this->resetImportState();
 		if ($viewId !== null) {
 			$this->viewId = $viewId;
 		} elseif ($tableId) {
@@ -308,6 +332,7 @@ class ImportService extends SuperService {
 	 * @throws PermissionError
 	 */
 	public function import(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []): array {
+		$this->resetImportState();
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
 			if (!$this->permissionsService->canCreateRows($view)) {
@@ -391,13 +416,15 @@ class ImportService extends SuperService {
 	 * @param ?int $viewId
 	 * @param string $path
 	 * @param bool $createMissingColumns
+	 * @param array $columnsConfig
+	 * @param ?string $originalFileName Original client side name of an uploaded file
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function scheduleImport(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []) {
+	public function scheduleImport(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = [], ?string $originalFileName = null) {
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
 			if (!$this->permissionsService->canCreateRows($view)) {
@@ -436,20 +463,15 @@ class ImportService extends SuperService {
 		}
 
 		$importFileName = null;
-		// uploaded file
+		// uploaded file: copy it into app data so the background job
+		// can read it later without adding it to the user's files
 		if (\file_exists($path)) {
-			$importFileName = 'import_u-' . $this->userId;
-			if ($this->tableId) {
-				$importFileName .= '_t-' . $this->tableId;
+			if ($originalFileName === null || !$this->filenameValidator->isFilenameValid($originalFileName)) {
+				$originalFileName = 'import-' . bin2hex(random_bytes(8));
 			}
-			if ($this->viewId) {
-				$importFileName .= '_v-' . $this->viewId;
-			}
-			$importFileName .= '_' . \date('Y-m-d_H-i-s') . '.' . pathinfo($path, PATHINFO_EXTENSION);
-
-			$this->getImportAppDataDir()
-				->newFile($importFileName)
-				->putContent(\file_get_contents($path));
+			$extension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+			$importFileName = 'import-' . bin2hex(random_bytes(16)) . ($extension !== '' ? '.' . $extension : '');
+			$this->getImportAppDataDir()->newFile($importFileName)->putContent(\file_get_contents($path));
 		}
 
 		$this->jobList->add(
@@ -458,8 +480,9 @@ class ImportService extends SuperService {
 				'user_id' => $this->userId,
 				'table_id' => $this->tableId,
 				'view_id' => $this->viewId,
-				'user_file_path' => $importFileName ? null : $path,
+				'user_file_path' => $importFileName === null ? $path : null,
 				'import_file_name' => $importFileName,
+				'original_file_name' => $originalFileName,
 				'create_missing_columns' => $createMissingColumns,
 				'columns_config' => $columnsConfig,
 			]
@@ -476,12 +499,15 @@ class ImportService extends SuperService {
 	 *                     or Path to uploaded file
 	 * @param bool $createMissingColumns
 	 * @param array $columnsConfig
+	 * @param ?string $originalFileName Original client side name of an uploaded file, used for the issue report name
 	 * @return ImportStats
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 */
-	public function importV2(string $userId, string $importType, string $path, ?int $tableId, ?int $viewId, bool $createMissingColumns = true, array $columnsConfig = []): ImportStats {
+	public function importV2(string $userId, string $importType, string $path, ?int $tableId, ?int $viewId, bool $createMissingColumns = true, array $columnsConfig = [], ?string $originalFileName = null): ImportStats {
+		$this->resetImportState();
+		$this->openProblemsFileStream();
 		$this->userId = $userId;
 		$this->tableId = $tableId;
 		$this->viewId = $viewId;
@@ -514,15 +540,193 @@ class ImportService extends SuperService {
 			throw new NotFoundError('Storage for user could not be found', 0, $e);
 		}
 
-		return new ImportStats(
+		$stats = new ImportStats(
 			count(array_filter($this->columns, fn ($column): bool => $column instanceof Column)),
 			$this->countMatchingColumns,
 			$this->countCreatedColumns,
 			$this->countInsertedRows,
 			$this->countUpdatedRows,
 			$this->countParsingErrors,
-			$this->countErrors
+			$this->countErrors,
+			$this->problems
 		);
+		$this->finishImport($userId, $importType === self::IMPORT_TYPE_USER_FILE ? $path : $originalFileName, $stats);
+		return $stats;
+	}
+
+	/**
+	 * Store the collected issue report and publish the import-finished
+	 * activity entry. Reporting failures must not fail the import itself.
+	 */
+	private function finishImport(string $userId, ?string $sourcePath, ImportStats $stats): void {
+		if ($this->problemsFileStream !== null) {
+			try {
+				$this->storedProblemsFile = $this->storeProblemsFile($userId, $sourcePath);
+				$stats->problemsFile = $this->storedProblemsFile;
+			} catch (\Throwable $e) {
+				$this->logger->warning('Could not store the import problems file: ' . $e->getMessage(), ['exception' => $e]);
+			}
+		}
+
+		try {
+			if ($this->viewId !== null) {
+				$element = $this->tableService->find($this->viewService->find($this->viewId, true, $userId)->getTableId(), true, $userId);
+			} elseif ($this->tableId !== null) {
+				$element = $this->tableService->find($this->tableId, true, $userId);
+			} else {
+				return;
+			}
+			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_TABLE,
+				object: $element,
+				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
+				additionalParams: [
+					'importStats' => $stats->withoutProblems(),
+					'importProblemsFile' => $this->storedProblemsFile,
+				],
+				author: $userId,
+			);
+		} catch (\Throwable $e) {
+			$this->logger->warning('Could not create the import activity entry: ' . $e->getMessage(), ['exception' => $e]);
+		}
+	}
+
+	/**
+	 * File information of the problems file stored by the last import, if any.
+	 * Used by the background job to link the file in notifications.
+	 */
+	public function getStoredProblemsFile(): ?ImportProblemsFile {
+		return $this->storedProblemsFile;
+	}
+
+	private function resetImportState(): void {
+		$this->tableId = null;
+		$this->viewId = null;
+		$this->columns = [];
+		$this->createUnknownColumns = true;
+		$this->idColumnIndex = null;
+		$this->countMatchingColumns = 0;
+		$this->countCreatedColumns = 0;
+		$this->countInsertedRows = 0;
+		$this->countUpdatedRows = 0;
+		$this->countErrors = 0;
+		$this->countParsingErrors = 0;
+		$this->problems = [];
+		$this->rawColumnTitles = [];
+		$this->rawColumnDataTypes = [];
+		$this->columnsConfig = [];
+		$this->problemsFileStream = null;
+		$this->storedProblemsFile = null;
+	}
+
+	private function openProblemsFileStream(): void {
+		$tempPath = $this->tempManager->getTemporaryFile('.csv');
+		if ($tempPath === false) {
+			$this->logger->warning('Could not create a temporary file for the import problems file');
+			return;
+		}
+		$this->problemsFileStream = new SplFileObject($tempPath, 'w+');
+		// UTF-8 BOM so spreadsheet apps detect the encoding
+		$this->problemsFileStream->fwrite("\xEF\xBB\xBF");
+		$this->problemsFileStream->fputcsv([
+			$this->l10n->t('Row'),
+			$this->l10n->t('Column'),
+			$this->l10n->t('Code'),
+			$this->l10n->t('Value'),
+			$this->l10n->t('Problem'),
+		]);
+	}
+
+	/**
+	 * Persist the collected problems file to the user's storage.
+	 * Returns file information for activity/notification parameters or null
+	 * when no problems were recorded.
+	 */
+	public function storeProblemsFile(string $userId, ?string $sourcePath): ?ImportProblemsFile {
+		if ($this->problemsFileStream === null || $this->problems === []) {
+			return null;
+		}
+
+		$importsFolder = $this->getImportsFolder($userId);
+		if ($importsFolder === null) {
+			return null;
+		}
+
+		$baseName = $sourcePath !== null ? (pathinfo($sourcePath, PATHINFO_FILENAME) ?: 'import') : 'import';
+
+		try {
+			$problemsFileName = $baseName . '.import-problems-' . date('Ymd-His') . '.csv';
+			if (!$this->filenameValidator->isFilenameValid($problemsFileName)) {
+				$problemsFileName = 'import-problems-' . bin2hex(random_bytes(8)) . '.csv';
+			}
+			$problemsFileName = $importsFolder->getNonExistingName($problemsFileName);
+			$problemsFile = $importsFolder->newFile($problemsFileName);
+			$this->problemsFileStream->rewind();
+			$problemsFile->putContent($this->problemsFileStream->fread($this->problemsFileStream->getSize()));
+		} catch (NotPermittedException $e) {
+			$this->logger->warning('Could not store the import problems file', ['exception' => $e]);
+			return null;
+		}
+
+		try {
+			$userFolder = $this->rootFolder->getUserFolder($userId);
+			$relativePath = $userFolder->getRelativePath($problemsFile->getPath());
+		} catch (NotPermittedException|NoUserException) {
+			$relativePath = null;
+		}
+
+		return new ImportProblemsFile(
+			$problemsFile->getId(),
+			$problemsFile->getName(),
+			ltrim($relativePath ?? '', '/'),
+		);
+	}
+
+	/**
+	 * Get (and lazily create) the folder used for generated import
+	 * issue reports in the user's storage.
+	 */
+	private function getImportsFolder(string $userId): ?Folder {
+		try {
+			$dir = $this->rootFolder->getUserFolder($userId);
+		} catch (NotPermittedException|NoUserException $e) {
+			$this->logger->warning('Could not open user folder for the import', ['exception' => $e]);
+			return null;
+		}
+
+		foreach (explode('/', self::IMPORTS_FOLDER) as $part) {
+			try {
+				$child = $dir->get($part);
+			} catch (NotFoundException) {
+				try {
+					$child = $dir->newFolder($part);
+				} catch (NotPermittedException $e) {
+					$this->logger->warning('Could not create the imports folder', ['exception' => $e]);
+					return null;
+				}
+			}
+			if (!$child instanceof Folder) {
+				$this->logger->warning('Imports folder path is occupied by a file: ' . $child->getPath());
+				return null;
+			}
+			$dir = $child;
+		}
+
+		return $dir;
+	}
+
+	private function addProblem(string $code, ?int $row = null, ?string $column = null, ?string $value = null): void {
+		if ($value !== null && mb_strlen($value) > self::MAX_PROBLEM_VALUE_LENGTH) {
+			$value = mb_substr($value, 0, self::MAX_PROBLEM_VALUE_LENGTH) . '…';
+		}
+		$this->problemsFileStream?->fputcsv([
+			$row,
+			$column,
+			$code,
+			$value,
+			ImportProblem::describeCode($this->l10n, $code),
+		]);
+		$this->problems[] = new ImportProblem($code, $row, $column, $value, ImportProblem::describeProblem($this->l10n, $code, $value));
 	}
 
 	/**
@@ -545,6 +749,7 @@ class ImportService extends SuperService {
 		$this->getColumns($firstRow, $secondRow);
 
 		if (empty(array_filter($this->columns))) {
+			$this->addProblem(ImportProblem::CODE_NO_COLUMNS_FOUND);
 			return;
 		}
 
@@ -565,11 +770,12 @@ class ImportService extends SuperService {
 	/**
 	 * @return false|string
 	 */
-	private function parseValueByColumnType(string $value, Column $column, IColumnTypeBusiness $columnBusiness): string|false {
+	private function parseValueByColumnType(string $value, Column $column, IColumnTypeBusiness $columnBusiness, int $rowIndex): string|false {
 		try {
 			if (!$columnBusiness->canBeParsedDisplayValue($value, $column)) {
 				$this->logger->warning('Value ' . $value . ' could not be parsed for column ' . $column->getTitle());
 				$this->countParsingErrors++;
+				$this->addProblem(ImportProblem::CODE_PARSE_FAILED, $rowIndex, $column->getTitle(), $value);
 				return '';
 			}
 			return $columnBusiness->parseDisplayValue($value, $column);
@@ -592,11 +798,11 @@ class ImportService extends SuperService {
 		$cellIterator = $row->getCellIterator();
 		$cellIterator->setIterateOnlyExistingCells(false);
 
+		$rowId = null;
 		try {
 			$i = -1;
 			$data = [];
 			$hasData = false;
-			$rowId = null;
 			foreach ($cellIterator as $cell) {
 				$i++;
 
@@ -608,6 +814,7 @@ class ImportService extends SuperService {
 					if ($rowId !== null && !is_numeric($rowId)) {
 						$this->logger->warning('ID column value is not numeric: ' . $rowId);
 						$this->countErrors++;
+						$this->addProblem(ImportProblem::CODE_ID_NOT_NUMERIC, $row->getRowIndex(), null, (string)$rowId);
 						return;
 					}
 					$rowId = (int)$rowId;
@@ -629,6 +836,7 @@ class ImportService extends SuperService {
 					if ($column->getMandatory()) {
 						$this->logger->warning('Mandatory column "' . $column->getTitle() . '" was not set');
 						$this->countErrors++;
+						$this->addProblem(ImportProblem::CODE_MISSING_MANDATORY, $row->getRowIndex(), $column->getTitle());
 						return;
 					}
 					continue;
@@ -658,7 +866,7 @@ class ImportService extends SuperService {
 
 				$data[] = [
 					'columnId' => $column->getId(),
-					'value' => json_decode($this->parseValueByColumnType($value, $column, $columnBusinesses[$column->getId()])),
+					'value' => json_decode($this->parseValueByColumnType($value, $column, $columnBusinesses[$column->getId()], $row->getRowIndex())),
 				];
 			}
 
@@ -677,14 +885,17 @@ class ImportService extends SuperService {
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create/update row while importing, no permission.', ['exception' => $e]);
 			$this->countErrors++;
+			$this->addProblem(ImportProblem::CODE_PERMISSION_DENIED, $row->getRowIndex());
 		} catch (BadRequestError|InternalError $e) {
 			$this->logger->error('Error while creating/updating  new row for import.', ['exception' => $e]);
 			$this->countErrors++;
+			$this->addProblem($rowId ? ImportProblem::CODE_ROW_UPDATE_FAILED : ImportProblem::CODE_ROW_INSERT_FAILED, $row->getRowIndex());
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), 0, $e);
 		} catch (\Throwable $e) {
 			$this->countErrors++;
+			$this->addProblem($rowId ? ImportProblem::CODE_ROW_UPDATE_FAILED : ImportProblem::CODE_ROW_INSERT_FAILED, $row->getRowIndex());
 			$this->logger->error('Error while creating/updating new row for import.', ['exception' => $e]);
 		}
 	}
@@ -812,6 +1023,7 @@ class ImportService extends SuperService {
 					continue;
 				}
 				$this->countErrors++;
+				$this->addProblem(ImportProblem::CODE_EMPTY_COLUMN_TITLE, 1, $cell ? $cell->getColumn() : Coordinate::stringFromColumnIndex($index + 1));
 			}
 			$secondRowCellIterator->next();
 			$index++;
@@ -820,6 +1032,7 @@ class ImportService extends SuperService {
 		if ($hasGapInTitles) {
 			$this->logger->info('Imported table is having a gap in column titles');
 			$this->countErrors++;
+			$this->addProblem(ImportProblem::CODE_COLUMN_TITLE_GAP, 1);
 		}
 
 		$this->rawColumnTitles = $rawColumnTitles;

@@ -221,6 +221,10 @@ class ActivityManager {
 				break;
 			case self::SUBJECT_IMPORT_FINISHED:
 				$subjectParams['importStats'] = $additionalParams['importStats'] ?? null;
+				$subjectParams['importProblemsFile'] = $additionalParams['importProblemsFile'] ?? null;
+				break;
+			case self::SUBJECT_IMPORT_FAILED:
+				$subjectParams['errorMessage'] = $additionalParams['errorMessage'] ?? null;
 				break;
 			default:
 				throw new \Exception(sprintf('Unknown subject "%s" for activity.', $subject));
@@ -322,6 +326,14 @@ class ActivityManager {
 			return;
 		}
 
+		if ($subject === self::SUBJECT_IMPORT_FAILED) {
+			if ($event->getAuthor() !== '') {
+				$event->setAffectedUser($event->getAuthor());
+				$this->manager->publish($event);
+			}
+			return;
+		}
+
 		if ($object instanceof Table || $object instanceof View) {
 			$uniqueAffectedUser = $this->findRecipientsByElement($object);
 		} elseif ($object instanceof Row2 || $object instanceof Column) {
@@ -333,7 +345,15 @@ class ActivityManager {
 			return;
 		}
 
+		$subjectParams = $event->getSubjectParameters();
 		foreach ($uniqueAffectedUser as $userId) {
+			if ($subject === self::SUBJECT_IMPORT_FINISHED) {
+				$params = $subjectParams;
+				if ($userId !== $event->getAuthor()) {
+					unset($params['importStats'], $params['importProblemsFile']);
+				}
+				$event->setSubject($subject, $params);
+			}
 			$event->setAffectedUser($userId);
 
 			/** @noinspection DisconnectedForeachInstructionInspection */
@@ -592,7 +612,17 @@ class ActivityManager {
 		}
 
 		if ($subjectIdentifier === self::SUBJECT_IMPORT_FINISHED) {
-			return $ownActivity ? $l->t('You have imported file to table {table}') : $l->t('{user} has imported file to table {table}');
+			$hasProblemsFile = isset($subjectParams['importProblemsFile']['id'], $subjectParams['importProblemsFile']['name'], $subjectParams['importProblemsFile']['path']);
+			if ($ownActivity) {
+				return $hasProblemsFile
+					? $l->t('You have imported file to table {table} — problems report: {problemsFile}')
+					: $l->t('You have imported file to table {table}');
+			}
+			return $l->t('{user} has imported file to table {table}');
+		}
+
+		if ($subjectIdentifier === self::SUBJECT_IMPORT_FAILED) {
+			return $ownActivity ? $l->t('Your import to table {table} has failed') : $l->t('{user}\'s import to table {table} has failed');
 		}
 
 		return '';
@@ -787,11 +817,17 @@ class ActivityManager {
 		return is_array($sharedWith) && ($sharedWith['type'] ?? null) === ShareReceiverType::LINK;
 	}
 
-	public function getActivityMessage(string $language, $subjectIdentifier) {
+	/**
+	 * @param array<string, mixed> $subjectParams
+	 */
+	public function getActivityMessage(string $language, $subjectIdentifier, array $subjectParams = []) {
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 
 		switch ($subjectIdentifier) {
 			case self::SUBJECT_IMPORT_FINISHED:
+				if (!is_array($subjectParams['importStats'] ?? null)) {
+					return null;
+				}
 				$lines = [
 					$l->t('Found columns: {foundColumnsCount}'),
 					$l->t('Matching columns: {matchingColumnsCount}'),
@@ -802,6 +838,11 @@ class ActivityManager {
 					$l->t('Row creation errors: {errorsCount}'),
 				];
 				return implode("\n", $lines);
+			case self::SUBJECT_IMPORT_FAILED:
+				$errorMessage = $subjectParams['errorMessage'] ?? null;
+				return is_string($errorMessage) && $errorMessage !== ''
+					? $l->t('Error: %s', [$errorMessage])
+					: null;
 			default:
 				return null;
 		}

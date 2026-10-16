@@ -41,6 +41,9 @@ class TablesProvider implements IProvider {
 		$subjectIdentifier = $event->getSubject();
 		$subjectParams = $event->getSubjectParameters();
 		$ownActivity = ($event->getAuthor() === $this->userId);
+		if (!$ownActivity && in_array($subjectIdentifier, [ActivityManager::SUBJECT_IMPORT_FINISHED, ActivityManager::SUBJECT_IMPORT_FAILED], true)) {
+			unset($subjectParams['importStats'], $subjectParams['importProblemsFile'], $subjectParams['errorMessage']);
+		}
 
 		/**
 		 * Map stored parameter objects to rich string types
@@ -206,19 +209,29 @@ class TablesProvider implements IProvider {
 		}
 
 		$messageParameters = [];
-		if ($event->getSubject() === ActivityManager::SUBJECT_IMPORT_FINISHED) {
-			$messageParameters['{foundColumnsCount}'] = $subjectParams['importStats']['foundColumnsCount'];
-			$messageParameters['{matchingColumnsCount}'] = $subjectParams['importStats']['matchingColumnsCount'];
-			$messageParameters['{createdColumnsCount}'] = $subjectParams['importStats']['createdColumnsCount'];
-			$messageParameters['{insertedRowsCount}'] = $subjectParams['importStats']['insertedRowsCount'];
-			$messageParameters['{updatedRowsCount}'] = $subjectParams['importStats']['updatedRowsCount'];
-			$messageParameters['{errorsParsingCount}'] = $subjectParams['importStats']['errorsParsingCount'];
-			$messageParameters['{errorsCount}'] = $subjectParams['importStats']['errorsCount'];
+		if ($event->getSubject() === ActivityManager::SUBJECT_IMPORT_FINISHED && is_array($subjectParams['importStats'] ?? null)) {
+			$messageParameters['{foundColumnsCount}'] = (string)$subjectParams['importStats']['foundColumnsCount'];
+			$messageParameters['{matchingColumnsCount}'] = (string)$subjectParams['importStats']['matchingColumnsCount'];
+			$messageParameters['{createdColumnsCount}'] = (string)$subjectParams['importStats']['createdColumnsCount'];
+			$messageParameters['{insertedRowsCount}'] = (string)$subjectParams['importStats']['insertedRowsCount'];
+			$messageParameters['{updatedRowsCount}'] = (string)$subjectParams['importStats']['updatedRowsCount'];
+			$messageParameters['{errorsParsingCount}'] = (string)$subjectParams['importStats']['errorsParsingCount'];
+			$messageParameters['{errorsCount}'] = (string)$subjectParams['importStats']['errorsCount'];
+
+			if (isset($subjectParams['importProblemsFile']['id'], $subjectParams['importProblemsFile']['name'], $subjectParams['importProblemsFile']['path'])) {
+				$subjectParameters['problemsFile'] = [
+					'type' => 'file',
+					'id' => (string)$subjectParams['importProblemsFile']['id'],
+					'name' => (string)$subjectParams['importProblemsFile']['name'],
+					'path' => (string)$subjectParams['importProblemsFile']['path'],
+					'link' => $this->urlGenerator->linkToRouteAbsolute('files.viewcontroller.showFile', ['fileid' => $subjectParams['importProblemsFile']['id']]),
+				];
+			}
 		}
 
 		try {
 			$subject = $this->activityManager->getActivitySubject($language, $subjectIdentifier, $subjectParams, $ownActivity);
-			$message = $this->activityManager->getActivityMessage($language, $subjectIdentifier);
+			$message = $this->activityManager->getActivityMessage($language, $subjectIdentifier, $subjectParams);
 			$this->parseEvent($event, $subject, $subjectParameters, $message, $messageParameters);
 		} catch (\Exception $e) {
 			$this->logger->warning('Could not parse activity: ' . $e->getMessage(), ['exception' => $e]);
