@@ -330,6 +330,108 @@
                     }
                 }
             },
+            "GridLayoutItem": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "widgetId",
+                    "gridX",
+                    "gridY",
+                    "gridWidth",
+                    "gridHeight"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "widgetId": {
+                        "type": "string"
+                    },
+                    "gridX": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "gridY": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "gridWidth": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "gridHeight": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "GridWidget": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "type",
+                    "configuration",
+                    "content"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "configuration": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/GridWidgetValue"
+                        }
+                    },
+                    "content": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/GridWidgetValue"
+                        }
+                    },
+                    "broken": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "GridWidgetValue": {
+                "nullable": true,
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "id"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "table",
+                                    "view"
+                                ]
+                            },
+                            "id": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                ]
+            },
             "ImportState": {
                 "type": "object",
                 "required": [
@@ -1017,7 +1119,8 @@
                     "rowsCount",
                     "isFederated",
                     "sidebarOrder",
-                    "type"
+                    "type",
+                    "grid"
                 ],
                 "properties": {
                     "id": {
@@ -1295,6 +1398,27 @@
                             "table",
                             "grid"
                         ]
+                    },
+                    "grid": {
+                        "type": "object",
+                        "required": [
+                            "widgets",
+                            "layout"
+                        ],
+                        "properties": {
+                            "widgets": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/GridWidget"
+                                }
+                            },
+                            "layout": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/GridLayoutItem"
+                                }
+                            }
+                        }
                     }
                 }
             }

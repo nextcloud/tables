@@ -1162,6 +1162,35 @@ export type components = {
             readonly displayMode: number;
             readonly userId: string;
         };
+        readonly GridLayoutItem: {
+            readonly id: string;
+            readonly widgetId: string;
+            /** Format: int64 */
+            readonly gridX: number;
+            /** Format: int64 */
+            readonly gridY: number;
+            /** Format: int64 */
+            readonly gridWidth: number;
+            /** Format: int64 */
+            readonly gridHeight: number;
+        };
+        readonly GridWidget: {
+            readonly id: string;
+            readonly type: string;
+            readonly configuration: {
+                readonly [key: string]: components["schemas"]["GridWidgetValue"];
+            };
+            readonly content: {
+                readonly [key: string]: components["schemas"]["GridWidgetValue"];
+            };
+            readonly broken?: boolean;
+        };
+        readonly GridWidgetValue: (string | boolean | number | {
+            /** @enum {string} */
+            readonly type: "table" | "view";
+            /** Format: int64 */
+            readonly id: number;
+        }) | null;
         readonly ImportState: {
             /** Format: int64 */
             readonly found_columns_count: number;
@@ -1426,6 +1455,10 @@ export type components = {
             readonly sidebarOrder: number | null;
             /** @enum {string} */
             readonly type: "table" | "grid";
+            readonly grid: {
+                readonly widgets: readonly components["schemas"]["GridWidget"][];
+                readonly layout: readonly components["schemas"]["GridLayoutItem"][];
+            };
         };
     };
     responses: never;

@@ -36,6 +36,8 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setTableId(?int $tableId)
  * @method getType(): string
  * @method setType(string $type)
+ * @method getGrid(): ?string
+ * @method setGrid(?string $grid)
  * @method getColumns(): string
  * @method setColumns(string $columns)
  * @method getColumnSettings(): string
@@ -101,6 +103,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
 	protected ?string $type = null;
+	protected ?string $grid = null; // json
 	protected ?string $layout = null;
 	protected ?string $viewSettings = null; // json
 
@@ -232,6 +235,21 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
+	 * The widgets of a grid view and where they sit, as GridWidgetTypes stored them.
+	 *
+	 * @return array{widgets: list<array<array-key, mixed>>, layout: list<array<array-key, mixed>>}
+	 */
+	public function getGridArray(): array {
+		$grid = $this->getArray($this->getGrid());
+		$list = static fn (mixed $items): array => array_values(array_filter(is_array($items) ? $items : [], is_array(...)));
+		return ['widgets' => $list($grid['widgets'] ?? null), 'layout' => $list($grid['layout'] ?? null)];
+	}
+
+	public function setGridArray(array $array): void {
+		$this->setGrid(\json_encode($array, JSON_THROW_ON_ERROR));
+	}
+
+	/**
 	 * @return 'table'|'grid'
 	 */
 	public function getTypeOrDefault(): string {
@@ -297,6 +315,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'isFederated' => $this->isFederated(),
 			'sidebarOrder' => $this->sidebarOrder,
 			'type' => $this->getTypeOrDefault(),
+			'grid' => $this->getGridArray(),
 			'layout' => $this->getLayoutNormalized(),
 			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];

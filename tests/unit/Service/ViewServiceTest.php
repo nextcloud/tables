@@ -11,6 +11,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
@@ -20,6 +21,7 @@ use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
 use OCA\Tables\Service\FederationService;
+use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
@@ -35,6 +37,7 @@ class ViewServiceTest extends TestCase {
 	private MockObject $permissionsService;
 	private MockObject $mapper;
 	private MockObject $activityManager;
+	private MockObject $tableMapper;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -43,6 +46,7 @@ class ViewServiceTest extends TestCase {
 		$this->permissionsService->method('preCheckUserId')->willReturnCallback(static fn (?string $userId) => $userId ?? 'alice');
 		$this->mapper = $this->createMock(ViewMapper::class);
 		$this->activityManager = $this->createMock(ActivityManager::class);
+		$this->tableMapper = $this->createMock(TableMapper::class);
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(static fn (string $text): string => $text);
 
@@ -60,6 +64,7 @@ class ViewServiceTest extends TestCase {
 			$l10n,
 			$this->createMock(FederationService::class),
 			$this->activityManager,
+			new GridWidgetTypes($l10n, $this->mapper, $this->tableMapper, $this->permissionsService),
 		);
 	}
 
@@ -80,6 +85,66 @@ class ViewServiceTest extends TestCase {
 		$this->mapper->method('update')->willReturnArgument(0);
 	}
 
+	public function testUpdateKeepsAStoredTargetTheSaverCannotRead(): void {
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'data', 'content' => ['target' => ['type' => 'table', 'id' => 4]]]], 'layout' => []];
+		$view = $this->storedView(null);
+		$view->setGridArray($grid);
+		$view->resetUpdatedFields();
+		$this->expectUpdateOf($view);
+		$table = new Table();
+		$table->setId(4);
+		$this->tableMapper->method('findMany')->willReturn([4 => $table]);
+		$this->permissionsService->method('canReadRowsByElement')->willReturn(false);
+
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'bob', true);
+
+		$this->assertSame(['type' => 'table', 'id' => 4], $updated->getGridArray()['widgets'][0]['content']['target'], 'the stored grid tells the target is unchanged');
+	}
+
+	public function testUpdateStoresAValidGridAsJson(): void {
+		$view = $this->storedView(null);
+		$this->expectUpdateOf($view);
+		$grid = [
+			'widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi', 'backgroundColor' => '#abc', 'stray' => 'dropped']]],
+			'layout' => [['id' => 1, 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]],
+		];
+
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
+
+		$stored = $updated->getGridArray();
+		$this->assertSame([['id' => 'w-1', 'widgetId' => 'w-1', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2]], $stored['layout'], 'a layout item is identified by its widget');
+		$this->assertSame('Hi', $stored['widgets'][0]['content']['title']);
+		$this->assertSame('#abc', $stored['widgets'][0]['content']['backgroundColor']);
+		$this->assertSame('left', $stored['widgets'][0]['content']['textAlign'], 'defaults are filled in');
+		$this->assertArrayNotHasKey('stray', $stored['widgets'][0]['content'], 'unknown properties are dropped');
+		$this->assertSame(['title' => '', 'showTitle' => false], $stored['widgets'][0]['configuration'], 'the configuration is filled from the type');
+	}
+
+	public function testUpdateRefusesAGridOnATableView(): void {
+		$this->expectUpdateOf($this->storedView(4));
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('Only a grid view holds a grid');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode(['widgets' => [], 'layout' => []])]), 'alice', true);
+	}
+
+	public function testUpdateAcceptsTheGridTypeAndAGridInOneRequest(): void {
+		$this->expectUpdateOf($this->storedView(null));
+
+		$updated = $this->service->update(6, ViewUpdateInput::fromInputArray(['type' => 'grid', 'grid' => json_encode(['widgets' => [], 'layout' => []])]), 'alice', true);
+
+		$this->assertSame(['widgets' => [], 'layout' => []], $updated->getGridArray());
+	}
+
+	public function testUpdateRefusesAGridThatCannotBeEncodedInsteadOfWipingIt(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text', 'content' => ['text' => "\xFF"]]], 'layout' => []];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('"grid" cannot be stored');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => $grid]), 'alice', true);
+	}
+
 	public function testUpdateWritesEveryParameterToItsOwnColumn(): void {
 		$this->expectUpdateOf($this->storedView(4));
 
@@ -90,6 +155,33 @@ class ViewServiceTest extends TestCase {
 
 		$this->assertSame('table', $updated->getType());
 		$this->assertSame([['columnId' => 3, 'mode' => 'ASC']], $updated->getSortArray());
+	}
+
+	public function testUpdateRejectsNonHexWidgetColors(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'header', 'content' => ['title' => 'Hi', 'backgroundColor' => 'url(evil)']]], 'layout' => []];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('hex color');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
+	}
+
+	public function testUpdateRejectsLayoutItemsWithoutPositions(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text', 'content' => ['text' => 'x']]], 'layout' => [['widgetId' => 'w-1', 'gridX' => 0]]];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('gridY');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
+	}
+
+	public function testUpdateRejectsWidgetsWithoutIdOrType(): void {
+		$this->expectUpdateOf($this->storedView(null));
+		$grid = ['widgets' => [['type' => 'text']], 'layout' => []];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('string id and type');
+		$this->service->update(6, ViewUpdateInput::fromInputArray(['grid' => json_encode($grid)]), 'alice', true);
 	}
 
 	public function testUpdateRefusesToTurnATablelessViewIntoATableView(): void {
@@ -220,6 +312,22 @@ class ViewServiceTest extends TestCase {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('named by its id');
 		$this->service->update(6, ViewUpdateInput::fromInputArray(['technicalName' => 'home']), 'alice', true);
+	}
+
+	public function testImportOfATableViewDoesNotTakeOverAGrid(): void {
+		$this->mapper->method('insert')->willReturnCallback(static function (View $view): View {
+			$view->setId(9);
+			return $view;
+		});
+		$this->mapper->method('update')->willReturnArgument(0);
+		$grid = ['widgets' => [['id' => 'w-1', 'type' => 'text', 'content' => ['text' => 'x']]], 'layout' => []];
+
+		$imported = $this->service->importView(4, [
+			'title' => 'Open', 'emoji' => null, 'description' => '', 'type' => View::TYPE_TABLE, 'grid' => $grid,
+			'createdAt' => '2026-10-12 10:00:00', 'lastEditAt' => '2026-10-12 10:00:00', 'columnSettings' => [], 'sort' => [], 'filter' => [],
+		], 'alice');
+
+		$this->assertNull($imported->getGrid());
 	}
 
 	public function testImportWithoutTableIgnoresTheSourceTechnicalName(): void {
