@@ -70,6 +70,23 @@ namespace OCA\Tables;
  *  grid: array{widgets: list<TablesGridWidget>, layout: list<TablesGridLayoutItem>},
  * }
  *
+ * @psalm-type TablesGridWidgetProperty = array{
+ *  type: 'string'|'text'|'color'|'boolean'|'integer'|'enum'|'target',
+ *  title: string,
+ *  default: TablesGridWidgetValue,
+ *  options?: list<array{value: string, label: string}>,
+ *  required?: bool,
+ * }
+ *
+ * @psalm-type TablesGridWidgetType = array{
+ *  type: 'header'|'text'|'data',
+ *  title: string,
+ *  defaultWidth: int,
+ *  defaultHeight: int,
+ *  configuration: array<string, TablesGridWidgetProperty>,
+ *  properties: array<string, TablesGridWidgetProperty>,
+ * }
+ *
  * @psalm-type TablesTable = array{
  * 	id: int,
  *  uuid: string,

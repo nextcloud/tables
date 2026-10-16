@@ -25,8 +25,8 @@ use OCP\IL10N;
  * @psalm-import-type TablesGridWidgetValue from ResponseDefinitions
  * @psalm-import-type TablesGridWidget from ResponseDefinitions
  * @psalm-import-type TablesGridLayoutItem from ResponseDefinitions
- * @psalm-type TablesGridWidgetProperty = array{type: string, title: string, default: TablesGridWidgetValue, options?: list<array{value: string, label: string}>, required?: bool}
- * @psalm-type TablesGridWidgetType = array{type: string, title: string, defaultWidth: int, defaultHeight: int, configuration: array<string, TablesGridWidgetProperty>, properties: array<string, TablesGridWidgetProperty>}
+ * @psalm-import-type TablesGridWidgetProperty from ResponseDefinitions
+ * @psalm-import-type TablesGridWidgetType from ResponseDefinitions
  */
 class GridWidgetTypes {
 	public const TYPE_HEADER = 'header';
