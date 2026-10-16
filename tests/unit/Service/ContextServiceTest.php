@@ -373,6 +373,29 @@ final class ContextServiceTest extends TestCase {
 		$this->service->delete(7, 'alice');
 	}
 
+	/**
+	 * On SQLite a transaction that reads before it writes fails at once when another request
+	 * writes meanwhile, so the delete takes the write lock first.
+	 */
+	public function testDeleteRemovesTheApplicationBeforeWhatBelongsToIt(): void {
+		$context = new Context();
+		$context->id = 7;
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->willReturn([]);
+		$calls = [];
+		$this->contextMapper->method('delete')->willReturnCallback(static function (Context $deleted) use (&$calls): Context {
+			$calls[] = 'application';
+			return $deleted;
+		});
+		$this->menuItemMapper->method('deleteAllByContextId')->willReturnCallback(static function () use (&$calls): void {
+			$calls[] = 'menu';
+		});
+
+		$this->service->delete(7, 'alice');
+
+		$this->assertSame(['application', 'menu'], $calls);
+	}
+
 	public function testUpdateReordersStartPageContentsFromSubmittedNodes(): void {
 		$context = new Context();
 		$context->id = 7;

@@ -42,6 +42,12 @@
 				</div>
 				<NcContextResource v-model:resources="resources" v-model:receivers="receivers" />
 			</div>
+			<div class="col-4 row space-T">
+				<div class="col-4">
+					{{ t('tables', 'Menu') }}
+				</div>
+				<MenuItemsEditor ref="menuItemsEditor" v-model:items="menuItems" />
+			</div>
 			<div class="row space-T">
 				<div data-cy="createContextShowInNavSwitch">
 					<NcActionCheckbox :model-value="showInNavigationDefault" @change="changeDisplayMode">
@@ -54,7 +60,10 @@
 			</div>
 			<div class="row space-R row space-T">
 				<div class="fix-col-4 end">
-					<NcButton type="primary" :aria-label="t('tables', 'Create application')" data-cy="createContextSubmitBtn" @click="submit">
+					<NcButton type="primary"
+						:aria-label="t('tables', 'Create application')"
+						data-cy="createContextSubmitBtn"
+						@click="submit">
 						{{ t('tables', 'Create application') }}
 					</NcButton>
 				</div>
@@ -68,6 +77,8 @@ import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextclo
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
+import MenuItemsEditor from '../../shared/components/ncContextResource/MenuItemsEditor.vue'
+import { areMenuItemsValid, toMenuItemPayload } from '../../shared/utils/menuItems.js'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
@@ -84,6 +95,7 @@ export default {
 		NcButton,
 		NcIconSvgWrapper,
 		NcContextResource,
+		MenuItemsEditor,
 		NcActionCheckbox,
 	},
 	mixins: [svgHelper, permissionBitmask],
@@ -106,10 +118,21 @@ export default {
 			customTitleChosen: false,
 			errorTitle: false,
 			description: '',
+			menuItems: [],
 			resources: [],
 			receivers: [],
 			showInNavigationDefault: false,
 		}
+	},
+	computed: {
+		/**
+		 * Whether every menu item can be saved, so a half-filled item does not fail the whole application.
+		 *
+		 * @return {boolean} true when no menu item has an error
+		 */
+		menuItemsValid() {
+			return areMenuItemsValid(this.menuItems)
+		},
 	},
 	watch: {
 		title() {
@@ -141,6 +164,11 @@ export default {
 			this.$emit('close')
 		},
 		async submit() {
+			// Show every menu error now, and never send a menu the server would refuse
+			this.$refs.menuItemsEditor?.touchAll()
+			if (!this.menuItemsValid) {
+				return
+			}
 			if (this.title === '') {
 				showError(t('tables', 'Cannot create new application. Title is missing.'))
 				this.errorTitle = true
@@ -169,6 +197,7 @@ export default {
 				iconName: this.icon.name,
 				description: this.description,
 				nodes: dataResources,
+				menuItems: this.menuItems.map(item => toMenuItemPayload(item, this.menuItems)),
 			}
 			// adding share to oneself to have navigation display control
 			this.receivers.push(
@@ -192,6 +221,7 @@ export default {
 		},
 		reset() {
 			this.title = ''
+			this.menuItems = []
 			this.errorTitle = false
 			this.setIcon(this.randomIcon())
 			this.customTitleChosen = false
