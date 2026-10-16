@@ -70,4 +70,37 @@ class ViewTest extends TestCase {
 			'sources of the wrong type' => ['{"cardBackgroundSource":"3","cardTitleSource":[]}'],
 		];
 	}
+
+	private function makeView(string $columns): View {
+		$view = new View();
+		$view->setColumns($columns);
+		return $view;
+	}
+
+	public function testGetColumnsArrayEmptyReturnsEmpty(): void {
+		$view = $this->makeView('');
+		$this->assertSame([], $view->getColumnsArray());
+	}
+
+	public function testGetColumnsArrayLegacyPlainIdFormat(): void {
+		// Legacy format: plain array of integer column IDs — order is derived from index
+		$view = $this->makeView(\json_encode([10, 20, 30]));
+		$this->assertSame([10, 20, 30], $view->getColumnsArray());
+	}
+
+	public function testGetColumnsArrayObjectFormatIsSortedByOrder(): void {
+		$view = $this->makeView(\json_encode([
+			['columnId' => 5, 'order' => 2, 'readonly' => false, 'mandatory' => false],
+			['columnId' => 3, 'order' => 1, 'readonly' => false, 'mandatory' => false],
+		]));
+		$this->assertSame([3, 5], $view->getColumnsArray());
+	}
+
+	public function testJsonSerializeReturnsColumnIds(): void {
+		$view = $this->makeView(\json_encode([
+			['columnId' => 5, 'order' => 2, 'readonly' => false, 'mandatory' => false],
+			['columnId' => 3, 'order' => 1, 'readonly' => false, 'mandatory' => false],
+		]));
+		$this->assertSame([3, 5], $view->jsonSerialize()['columns']);
+	}
 }
