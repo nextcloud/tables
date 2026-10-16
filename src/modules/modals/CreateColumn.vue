@@ -403,7 +403,7 @@ export default {
 				data.usergroupSelectUsers = this.column.usergroupSelectUsers
 				data.usergroupSelectGroups = this.column.usergroupSelectGroups
 				data.usergroupSelectTeams = this.column.usergroupSelectTeams
-				data.showUserStatus = this.column.showUserStatus
+				data.usergroupShowUserStatus = this.column.showUserStatus
 			} else if (this.column.type === 'number') {
 				data.numberDefault = this.column.numberDefault
 				if (this.column.subtype === '') {

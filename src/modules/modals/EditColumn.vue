@@ -225,6 +225,7 @@ export default {
 
 			data.technicalName = this.normalizeTechnicalName(data.technicalName)
 			data.customSettings = { ...data.customSettings, width: data.customSettings.width }
+			data.usergroupShowUserStatus = data.showUserStatus
 			if (this.isTextLinkColumn(this.column)
 				&& (data.customSettings.showPreview || data.customSettings.imagePreviewSize !== undefined)) {
 				data.customSettings.imagePreviewSize = normalizeImagePreviewSize(data.customSettings.imagePreviewSize)
