@@ -23,7 +23,7 @@ use Throwable;
 class CircleHelper {
 	private bool $circlesEnabled;
 	private ?CirclesManager $circlesManager;
-	private array $federatedUsers = [];
+	private array $circleDisplayNames = [];
 
 	/**
 	 * @psalm-suppress UndefinedClass
@@ -51,13 +51,17 @@ class CircleHelper {
 	}
 
 	public function getCircleDisplayName(string $circleId, string $userId): string {
+		return $this->circleDisplayNames[$userId][$circleId] ??= $this->resolveCircleDisplayName($circleId, $userId);
+	}
+
+	private function resolveCircleDisplayName(string $circleId, string $userId): string {
 		if (!$this->circlesEnabled) {
 			return $circleId;
 		}
 
 		try {
-			$this->federatedUsers[$userId] ??= $this->circlesManager->getFederatedUser($userId, Member::TYPE_USER);
-			$this->circlesManager->startSession($this->federatedUsers[$userId]);
+			$federatedUser = $this->circlesManager->getFederatedUser($userId, Member::TYPE_USER);
+			$this->circlesManager->startSession($federatedUser);
 
 			$circle = $this->circlesManager->getCircle($circleId);
 			return $circle ? ($circle->getDisplayName() ?: $circleId) : $circleId;
