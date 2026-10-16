@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -33,6 +34,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $contextNodeRelMapper;
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
+	private MockObject $menuItemMapper;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -41,6 +43,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
+		$this->menuItemMapper = $this->createMock(MenuItemMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
 		$permissionsService = $this->createMock(PermissionsService::class);
 		$userManager = $this->createMock(IUserManager::class);
@@ -66,7 +69,19 @@ final class ContextServiceTest extends TestCase {
 			$urlGenerator,
 			$this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
+			$this->menuItemMapper,
 		);
+	}
+
+	public function testDeleteRemovesTheMenuOfTheApplication(): void {
+		$context = new Context();
+		$context->id = 7;
+		$this->contextMapper->method('findById')->with(7, 'alice')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->willReturn([]);
+
+		$this->menuItemMapper->expects($this->once())->method('deleteAllByContextId')->with(7);
+
+		$this->service->delete(7, 'alice');
 	}
 
 	public function testUpdateReordersStartPageContentsFromSubmittedNodes(): void {

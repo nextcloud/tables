@@ -14,6 +14,7 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -62,6 +63,7 @@ class ContextService {
 		protected IURLGenerator $urlGenerator,
 		private TableMapper $tableMapper,
 		private ViewMapper $viewMapper,
+		private MenuItemMapper $menuItemMapper,
 	) {
 	}
 
@@ -317,6 +319,7 @@ class ContextService {
 
 		$this->atomic(function () use ($context): void {
 			$this->shareService->deleteAllForContext($context);
+			$this->menuItemMapper->deleteAllByContextId($context->getId());
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
 			foreach ($pageIds as $pageId) {
