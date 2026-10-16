@@ -130,6 +130,10 @@ class RowService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
+				if ($view->isStandalone()) {
+					// a view without a table, such as a grid view, holds no rows
+					return [];
+				}
 
 				$rows = $this->row2Mapper->findAll(
 					$view->getColumnIds(),
@@ -228,6 +232,10 @@ class RowService extends SuperService {
 			} catch (InternalError|Exception|MultipleObjectsReturnedException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+
+			if ($view->isStandalone()) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no table to create a row in.');
 			}
 
 			// security
@@ -633,6 +641,10 @@ class RowService extends SuperService {
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 
+			if ($view->isStandalone()) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no rows to update.');
+			}
+
 			// is row in view?
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				$e = new \Exception('Update row is not allowed.');
@@ -758,6 +770,9 @@ class RowService extends SuperService {
 			} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+			if ($view->isStandalone()) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no rows to delete.');
 			}
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				$e = new \Exception('Update row is not allowed.');

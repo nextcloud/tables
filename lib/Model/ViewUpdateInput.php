@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace OCA\Tables\Model;
 
 use Generator;
+use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
+use OCA\Tables\Db\View;
 use OCA\Tables\Service\ValueObject\Emoji;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
@@ -32,6 +34,7 @@ class ViewUpdateInput {
 		protected readonly ?FilterSet $filterSet = null,
 		protected readonly ?SortRuleSet $sortRuleSet = null,
 		protected readonly ?int $sidebarOrder = null,
+		protected readonly ?string $type = null,
 		protected readonly ?string $layout = null,
 		protected readonly ?ViewSettings $viewSettings = null,
 	) {
@@ -62,6 +65,9 @@ class ViewUpdateInput {
 		if ($this->sortRuleSet) {
 			yield ViewUpdatableParameters::SORT => $this->sortRuleSet;
 		}
+		if ($this->type !== null) {
+			yield ViewUpdatableParameters::TYPE => $this->type;
+		}
 		if ($this->layout !== null) {
 			yield ViewUpdatableParameters::LAYOUT => $this->layout;
 		}
@@ -82,7 +88,8 @@ class ViewUpdateInput {
 	 *     layout?: 'table'|'tiles'|'gallery'|null,
 	 *     viewSettings?: array{cardBackgroundSource?: int|null, cardTitleSource?: int|null}|string,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'contains-item'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float|list<array{id: int, label: string, uuid?: string}>}>>,
-	 *     sidebarOrder?: int
+	 *     sidebarOrder?: int,
+	 *     type?: 'table'|'grid'
 	 * } $data
 	 * @param array $columnsMap
 	 */
@@ -114,9 +121,34 @@ class ViewUpdateInput {
 			filterSet: isset($data['filter']) ? FilterSet::createFromInputArray($data['filter'], $columnsMap) : null,
 			sortRuleSet: isset($data['sort']) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
 			sidebarOrder: (array_key_exists('sidebarOrder', $data) && $data['sidebarOrder'] !== null) ? (int)$data['sidebarOrder'] : null,
+			type: self::optionalType($data),
 			layout: $layout,
 			viewSettings: $viewSettings,
 		);
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	private static function optionalString(array $data, string $key): ?string {
+		if (!isset($data[$key])) {
+			return null;
+		}
+		if (!is_string($data[$key])) {
+			throw new InvalidArgumentException('The view property "' . $key . '" must be a string.');
+		}
+		return $data[$key];
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	private static function optionalType(array $data): ?string {
+		$type = self::optionalString($data, 'type');
+		if ($type !== null && !in_array($type, View::TYPES, true)) {
+			throw new InvalidArgumentException('Unknown view type "' . $type . '", expected one of: ' . implode(', ', View::TYPES) . '.');
+		}
+		return $type;
 	}
 
 	private static function createViewSettingsFromInputData(array $data, array $columnsMap = []): ?ViewSettings {

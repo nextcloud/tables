@@ -128,6 +128,30 @@ class FederationProviderTest extends TestCase {
 		$this->assertEquals('99', $result);
 	}
 
+	public function testAProxyViewGetsItsOwnUuidAndAProxyTableKeepsTheSourceOne(): void {
+		$sourceUuid = '0199c8a0-1a2b-7c3d-8e4f-123456789abc';
+		$stored = [];
+		foreach (['view' => $this->viewMapper, 'table' => $this->tableMapper] as $nodeType => $mapper) {
+			$share = $this->createMock(ICloudFederationShare::class);
+			$share->method('getShareWith')->willReturn('admin');
+			$share->method('getResourceName')->willReturn('Federated ' . $nodeType);
+			$share->method('getProviderId')->willReturn('5');
+			$share->method('getShareSecret')->willReturn('secret-' . $nodeType);
+			$share->method('getDescription')->willReturn(json_encode(['nodeType' => $nodeType, 'uuid' => $sourceUuid]));
+			$mapper->method('insert')->willReturnCallback(static function (Table|View $node) use (&$stored, $nodeType): Table|View {
+				$node->setId(7);
+				$stored[$nodeType] = $node->getUuid();
+				return $node;
+			});
+			$this->provider->shareReceived($share);
+		}
+
+		// Two proxies of one view on this instance would otherwise clash on the uuid index of views
+		$this->assertNotNull($stored['view']);
+		$this->assertNotSame($sourceUuid, $stored['view']);
+		$this->assertSame($sourceUuid, $stored['table']);
+	}
+
 	public function testNotificationReceivedPermissionUpdate(): void {
 		$share = new Share();
 		$share->setNodeId(1);

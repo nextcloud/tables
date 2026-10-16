@@ -89,6 +89,24 @@ class ViewMapper extends QBMapper {
 		return $result;
 	}
 
+	/**
+	 * Views that live without a table and belong to the given user. Federated views have no
+	 * table either, so they are left out by their external id.
+	 *
+	 * @return View[]
+	 * @throws Exception
+	 */
+	public function findAllStandaloneOwnedBy(string $userId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->isNull('table_id'))
+			->andWhere($qb->expr()->isNull('external_id'))
+			->andWhere($qb->expr()->eq('created_by', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
+			->orderBy('id', 'ASC');
+		return $this->findEntities($qb);
+	}
+
 	public function findByExternalIdAndToken(int $externalId, string $shareToken): ?View {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -134,7 +152,7 @@ class ViewMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('v.*', 't.ownership')
 			->from($this->table, 'v')
-			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id');
+			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id');
 
 		if ($tableId !== null) {
 			$qb->where($qb->expr()->eq('v.table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
@@ -239,16 +257,19 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
-	 * @throws DoesNotExistException
-	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
 	 */
 	public function findByUuid(string $uuid): ?View {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('v.*', 't.ownership')
 			->from($this->table, 'v')
-			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
 			->where($qb->expr()->eq('v.uuid', $qb->createNamedParameter($uuid)));
-		return $this->findEntity($qb);
+		try {
+			return $this->findEntity($qb);
+		} catch (DoesNotExistException) {
+			return null;
+		}
 	}
 }
