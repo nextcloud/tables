@@ -11,6 +11,9 @@ import displayError from '../shared/utils/displayError.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 import { getCurrentUser } from '@nextcloud/auth'
 
+// The one request for the widget types while it runs, so widgets that mount together share it
+let widgetTypesRequest = null
+
 export const useTablesStore = defineStore('store', {
 	state: () => ({
 		loading: {
@@ -27,6 +30,7 @@ export const useTablesStore = defineStore('store', {
 		activeRowId: null,
 		activeElementIsView: false,
 		activeContextId: null,
+		widgetTypes: [],
 		appNavCollapsed: false,
 	}),
 
@@ -230,6 +234,20 @@ export const useTablesStore = defineStore('store', {
 			table.views.push(res.data)
 
 			return res.data.id
+		},
+
+		/**
+		 * Loads the widget types the first time a grid needs them.
+		 */
+		async loadWidgetTypes() {
+			if (this.widgetTypes.length > 0) {
+				return
+			}
+			widgetTypesRequest ??= axios.get(generateOcsUrl('/apps/tables/api/2/views/widget-types'))
+				.then(res => { this.widgetTypes = res.data.ocs.data })
+				.catch(e => displayError(e, t('tables', 'Could not load widget types.')))
+				.finally(() => { widgetTypesRequest = null })
+			await widgetTypesRequest
 		},
 
 		async updateView({ id, data }) {
