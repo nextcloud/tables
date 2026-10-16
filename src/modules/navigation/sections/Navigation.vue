@@ -70,6 +70,19 @@
 					<NavigationContextItem :context="node" />
 				</template>
 			</ul>
+			<!-- After the applications, which tests address as the second list -->
+			<ul v-if="!isLoadingSomething">
+				<NcAppNavigationCaption :name="t('tables', 'Grid views')">
+					<template #actions>
+						<NcActionButton :aria-label="t('tables', 'Create grid view')" icon="icon-add"
+							data-cy="navigationCreateGridViewIcon" @click.prevent="createGridView" />
+					</template>
+				</NcAppNavigationCaption>
+
+				<template v-for="view in getGridViews" :key="'grid-view-' + view.id">
+					<NavigationViewItem :view="view" />
+				</template>
+			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
 				<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
@@ -148,13 +161,19 @@ export default {
 			const sharedTableIds = this.getFilteredTables.map(table => table.id)
 
 			return this.views.filter(view => {
-				return !view.isShared && view.ownership === getCurrentUser().uid && sharedTableIds.includes(view.tableId)
+				return view.type !== 'grid' && !view.isShared && view.ownership === getCurrentUser().uid && sharedTableIds.includes(view.tableId)
 			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
 		getSharedViews() {
 			return this.views.filter(view => {
-				return view.isShared && view.ownership !== getCurrentUser().uid
+				return view.type !== 'grid' && view.isShared && view.ownership !== getCurrentUser().uid
 			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
+		},
+		// Grid views are pages, not data, so they get their own list instead of sitting among the tables
+		getGridViews() {
+			return this.views
+				.filter(view => view.type === 'grid' && view.title.toLowerCase().includes(this.filterString.toLowerCase()))
+				.sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getFavoriteTables() {
 			return this.getAllNodes.filter(node => !node.tableId && node.favorite)
@@ -205,6 +224,9 @@ export default {
 		},
 		createContext() {
 			emit('tables:context:create')
+		},
+		createGridView() {
+			emit('tables:view:create-grid')
 		},
 		closeNav() {
 			if (window.innerWidth < 960) {

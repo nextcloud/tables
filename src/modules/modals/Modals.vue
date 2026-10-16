@@ -35,6 +35,10 @@
 			:view-setting="viewToEdit?.viewSetting"
 			@close="viewToEdit = null" />
 		<DeleteView :show-modal="viewToDelete !== null" :view="viewToDelete" @cancel="viewToDelete = null" />
+		<GridViewSettings
+			:show-modal="gridView !== null"
+			:view="gridView?.view ?? null"
+			@close="gridView = null" />
 
 		<Import
 			:show-modal="importToElement !== null"
@@ -76,6 +80,7 @@ import CreateTable from './CreateTable.vue'
 import DeleteView from './DeleteView.vue'
 import EditTable from './EditTable.vue'
 import EditContext from './EditContext.vue'
+import GridViewSettings from './GridViewSettings.vue'
 import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
 import TransferContext from './TransferContext.vue'
@@ -85,6 +90,7 @@ import ImportContextScheme from './ImportContextScheme.vue';
 export default {
 	components: {
 		EditTable,
+		GridViewSettings,
 		DeleteView,
 		CreateTable,
 		Import,
@@ -118,6 +124,7 @@ export default {
 			editRow: null,
 			rowsToDelete: null,
 			viewToEdit: null,
+			gridView: null,
 			showModalCreateTable: false,
 			showModalCreateContext: false,
 			importToElement: null,
@@ -145,7 +152,14 @@ export default {
 
 		// views
 		this.subscribeToEventBus('tables:view:reload', () => { this.reload(true) })
-		this.subscribeToEventBus('tables:view:edit', view => { this.viewToEdit = { ...view, createView: false } })
+		this.subscribeToEventBus('tables:view:edit', view => {
+			if (view?.view?.type === 'grid') {
+				this.gridView = { view: view.view }
+				return
+			}
+			this.viewToEdit = { ...view, createView: false }
+		})
+		this.subscribeToEventBus('tables:view:create-grid', () => { this.gridView = { view: null } })
 		this.subscribeToEventBus('tables:view:create', tableInfos => {
 			this.viewToEdit = {
 				view: { tableId: tableInfos.tableId, sort: [], filter: [] },

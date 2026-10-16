@@ -250,6 +250,19 @@ export const useTablesStore = defineStore('store', {
 			await widgetTypesRequest
 		},
 
+		async insertStandaloneView({ data }) {
+			let res = null
+			try {
+				res = (await axios.post(generateOcsUrl('/apps/tables/api/2/views'), data)).data.ocs.data
+			} catch (e) {
+				displayError(e, t('tables', 'Could not insert view.'))
+				return false
+			}
+
+			this.setViews([...this.views, res])
+			return res
+		},
+
 		async updateView({ id, data }) {
 			let res = null
 
