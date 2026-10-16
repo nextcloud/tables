@@ -175,17 +175,32 @@ class ContextService {
 
 		$this->menuItemMapper->deleteAllByContextId($context->getId());
 		$technicalNames = $this->menuTechnicalNames($menuItems, $storedMenu);
-		foreach ($menuItems as $position => $item) {
-			$menuItem = new MenuItem();
-			$menuItem->setContextId($context->getId());
-			$menuItem->setLabel($item->getLabel());
-			$menuItem->setIcon($item->getIcon());
-			$menuItem->setTargetType($item->getTargetType());
-			$menuItem->setTargetId($item->getTargetId());
-			$menuItem->setUrl($item->getUrl());
-			$menuItem->setTechnicalName($technicalNames[$position]);
-			$menuItem->setOrder(($position + 1) * 10);
-			$this->menuItemMapper->insert($menuItem);
+		$topLevelIds = [];
+		// top-level items first, so a child can point at its parent's id; the order keeps the menu's sequence
+		foreach ([false, true] as $childPass) {
+			foreach ($menuItems as $position => $item) {
+				$parentIndex = $item->getParentIndex();
+				if (($parentIndex !== null) !== $childPass) {
+					continue;
+				}
+				if ($parentIndex !== null && !isset($topLevelIds[$parentIndex])) {
+					throw new InvalidArgumentException('A menu item can only sit under a top-level item of the same menu.');
+				}
+				$menuItem = new MenuItem();
+				$menuItem->setContextId($context->getId());
+				$menuItem->setLabel($item->getLabel());
+				$menuItem->setIcon($item->getIcon());
+				$menuItem->setTargetType($item->getTargetType());
+				$menuItem->setTargetId($item->getTargetId());
+				$menuItem->setUrl($item->getUrl());
+				$menuItem->setTechnicalName($technicalNames[$position]);
+				$menuItem->setOrder(($position + 1) * 10);
+				$menuItem->setParentId($parentIndex === null ? null : $topLevelIds[$parentIndex]);
+				$storedId = $this->menuItemMapper->insert($menuItem)->getId();
+				if ($parentIndex === null) {
+					$topLevelIds[$position] = $storedId;
+				}
+			}
 		}
 
 		$context->setMenuItems(array_map(

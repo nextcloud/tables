@@ -427,6 +427,7 @@
                     "url",
                     "technicalName",
                     "order",
+                    "parentId",
                     "broken"
                 ],
                 "properties": {
@@ -468,6 +469,11 @@
                     "order": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "parentId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
                     },
                     "broken": {
                         "type": "boolean"
@@ -12081,7 +12087,7 @@
                                         "type": "array",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "optional menu of the context, in order; the views and tables it opens become nodes of the context",
+                                        "description": "optional menu of the context, in order; parentIndex is the position of the parent item, for one level of nesting; the views and tables it opens become nodes of the context",
                                         "items": {
                                             "type": "object",
                                             "required": [
@@ -12112,6 +12118,10 @@
                                                 },
                                                 "technicalName": {
                                                     "type": "string"
+                                                },
+                                                "parentIndex": {
+                                                    "type": "integer",
+                                                    "format": "int64"
                                                 }
                                             }
                                         }
@@ -12552,7 +12562,7 @@
                                         "type": "array",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "provide this parameter to replace the menu; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target",
+                                        "description": "provide this parameter to replace the menu; parentIndex is the position of the parent item, for one level of nesting; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target",
                                         "items": {
                                             "type": "object",
                                             "required": [
@@ -12583,6 +12593,10 @@
                                                 },
                                                 "technicalName": {
                                                     "type": "string"
+                                                },
+                                                "parentIndex": {
+                                                    "type": "integer",
+                                                    "format": "int64"
                                                 }
                                             }
                                         }
