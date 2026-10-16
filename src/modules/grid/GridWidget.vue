@@ -9,10 +9,10 @@
 		data-cy="gridWidget">
 		<header v-if="hasHeading" class="grid-widget__header">
 			<h2 :id="headingId" class="grid-widget__title">
-				{{ widget.configuration.showTitle ? widget.configuration.title : typeLabel }}
+				{{ widget.configuration.showTitle ? label : typeLabel }}
 			</h2>
 			<NcActions v-if="editable" :aria-label="t('tables', 'Widget actions')" :force-menu="true">
-				<NcActionButton :close-after-click="true" @click="$emit('configure', widget)">
+				<NcActionButton v-if="isKnownType" :close-after-click="true" @click="$emit('configure', widget)">
 					<template #icon>
 						<CogOutline :size="20" />
 					</template>
@@ -86,8 +86,12 @@ export default {
 		TrashCanOutline,
 	},
 	provide() {
-		// A widget that renders its own heading sits one level below the card's heading
-		return { widgetHeadingLevel: computed(() => this.hasHeading ? 3 : 2) }
+		return {
+			// A widget that renders its own heading sits one level below the card's heading
+			widgetHeadingLevel: computed(() => this.hasHeading ? 3 : 2),
+			// Set when the server marked the widget's stored target as gone
+			widgetBroken: computed(() => this.widget.broken === true),
+		}
 	},
 	props: {
 		widget: {
@@ -123,6 +127,10 @@ export default {
 		},
 		widgetComponent() {
 			return getWidgetComponent(this.widget.type)
+		},
+		// A widget of a type the server does not know is shown, not configured: its schema is unknown
+		isKnownType() {
+			return findWidgetType(this.widgetTypes, this.widget.type) !== null
 		},
 		typeLabel() {
 			return findWidgetType(this.widgetTypes, this.widget.type)?.title ?? this.widget.type
