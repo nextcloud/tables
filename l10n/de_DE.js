@@ -548,6 +548,7 @@ OC.L10N.register(
     "New title of the view" : "Neuer Titel der Ansicht",
     "Filter" : "Filter",
     "Layout" : "Layout",
+    "Gallery" : "Galerie",
     "Background source" : "Hintergrundquelle",
     "Automatic" : "Automatisch",
     "Advanced settings" : "Erweiterte Einstellungen",

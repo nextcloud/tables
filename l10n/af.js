@@ -47,6 +47,7 @@ OC.L10N.register(
     "To" : "Aan",
     "Icon" : "Ikoon",
     "Filter" : "Filter",
+    "Automatic" : "Outomaties",
     "Advanced settings" : "Gevorderde instellings",
     "Saving..." : "Stoor tans…",
     "Export" : "Voer uit",

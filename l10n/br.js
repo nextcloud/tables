@@ -43,6 +43,8 @@ OC.L10N.register(
     "Sort" : "Renkañ",
     "Transfer" : "Treuzkas",
     "Filter" : "Filtre",
+    "Gallery" : "Skeudennoù",
+    "Automatic" : "Otomatek",
     "Saving..." : "Oc'h enroliñ ...",
     "Add to favorites" : "Ouzhpennañ d'ar penndibaboù",
     "Favorites" : "Pennrolloù",

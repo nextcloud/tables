@@ -189,6 +189,8 @@ OC.L10N.register(
     "Transfer this table to another user" : "Перадаць гэту табліцу іншаму карыстальніку",
     "Title is missing." : "Адсутнічае загаловак.",
     "Filter" : "Фільтр",
+    "Layout" : "Макет",
+    "Gallery" : "Галерэя",
     "Advanced settings" : "Пашыраныя налады",
     "Saving..." : "Захаванне…",
     "Do you really want to delete the table \"{table}\"?" : "Вы сапраўды хочаце выдаліць табліцу \"{table}\"?",

@@ -187,6 +187,8 @@ OC.L10N.register(
     "Cannot create view." : "Nun se pue crear la vista.",
     "Title is missing." : "Falta'l títulu.",
     "Filter" : "Peñerar",
+    "Gallery" : "Galería",
+    "Automatic" : "Automáticu",
     "Advanced settings" : "Configuración avanzada",
     "Saving..." : "Guardando…",
     "Export" : "Esportar",

@@ -44,6 +44,7 @@ OC.L10N.register(
     "Please select a file." : "Lütfən, fayl seçin.",
     "Back" : "Geri",
     "Sort" : "Çeşidləmək",
+    "Automatic" : "Avtomatik",
     "Advanced settings" : "İrəliləmiş quraşdırmalar",
     "Saving..." : "Saxlama...",
     "Export" : "Çıxarış",

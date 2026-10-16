@@ -216,6 +216,8 @@ OC.L10N.register(
     "Sort" : "Сортирай",
     "Transfer" : "Прехвърляне",
     "Filter" : "Филтър",
+    "Gallery" : "Галерия",
+    "Automatic" : "Автоматично",
     "Advanced settings" : "Допълнителни настройки",
     "Saving..." : "Записване...",
     "Do you really want to delete the table \"{table}\"?" : "Наистина ли искате да изтриете таблицата \"{table}\"?",
