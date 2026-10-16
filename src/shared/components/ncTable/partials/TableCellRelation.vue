@@ -25,7 +25,7 @@
 				:reduce="(option) => option.id"
 				:aria-label-combobox="t('tables', 'Select relation value')"
 				:disabled="localLoading || !canEditCell()"
-				style="width: 100%;" />
+				class="relation-select" />
 			<div v-if="localLoading" class="loading-indicator">
 				<div class="icon-loading-small icon-loading-inline" />
 			</div>
@@ -169,6 +169,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.relation-select {
+	width: 100%;
+	min-width: 0;
+}
+
 .cell-relation {
 	width: 100%;
 
