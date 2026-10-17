@@ -1,37 +1,4 @@
 {
-    "_hash": "7458136d8d07bf3240e7e1354bfe1c99759786da9bb8c0467eba90ff02465705",
-    "patches": {
-        "thecodingmachine/safe": [
-            {
-                "package": "thecodingmachine/safe",
-                "description": "PHP 8.4 compatibility, patch 1",
-                "url": "patches/thecodingmachine_safe_464.patch",
-                "sha256": "1ce69fe482f3279c0c58592aafadcb2682d41691609f6806a95a6adf99fe98a4",
-                "depth": 1,
-                "extra": {
-                    "provenance": "root"
-                }
-            },
-            {
-                "package": "thecodingmachine/safe",
-                "description": "PHP 8.4 compatibility, patch 2",
-                "url": "patches/thecodingmachine_safe_466.patch",
-                "sha256": "1e66db39edaa0be1aa5077300b76fe77b354b2a178ad30bce47accca83ea2cfc",
-                "depth": 1,
-                "extra": {
-                    "provenance": "root"
-                }
-            },
-            {
-                "package": "thecodingmachine/safe",
-                "description": "PHP 8.4 compatibility, patch 3",
-                "url": "patches/blizzz_safe_6eeee2a20ffb2be3456ae8615b227c78e1ca8a20.patch",
-                "sha256": "95bc42db06a6661ceaddcb9b91f6c1f865b9d9469e8d216d8dd84768c67a6b8f",
-                "depth": 1,
-                "extra": {
-                    "provenance": "root"
-                }
-            }
-        ]
-    }
+    "_hash": "6142bfcb78f54dfbf5247ae5e463f25bdb8fff1890806e2e45aa81a59c211653",
+    "patches": []
 }
