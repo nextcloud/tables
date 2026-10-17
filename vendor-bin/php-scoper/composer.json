@@ -5,7 +5,7 @@
 	},
 	"config": {
 		"platform": {
-			"php": "8.1"
+			"php": "8.2"
 		},
 		"allow-plugins": {
 			"cweagans/composer-patches": true
@@ -17,9 +17,6 @@
 				"PHP 8.4 compatibility, patch 1": "patches/thecodingmachine_safe_464.patch",
 				"PHP 8.4 compatibility, patch 2": "patches/thecodingmachine_safe_466.patch",
 				"PHP 8.4 compatibility, patch 3": "patches/blizzz_safe_6eeee2a20ffb2be3456ae8615b227c78e1ca8a20.patch"
-			},
-			"humbug/php-scoper": {
-				"PHP 8.5 compatibility, patch1": "patches/blizzz_php-scoper_1.patch"
 			}
 		}
 	}
