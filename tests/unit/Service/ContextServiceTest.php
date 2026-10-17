@@ -69,6 +69,74 @@ final class ContextServiceTest extends TestCase {
 		);
 	}
 
+	public function testCreateStoresTabViewEnabled(): void {
+		$this->contextMapper
+			->expects($this->once())
+			->method('insert')
+			->willReturnArgument(0);
+
+		$context = $this->service->create('My app', 'star', 'Some description', [], 'user-1', 0, true);
+
+		self::assertTrue($context->getTabViewEnabled());
+		self::assertTrue($context->jsonSerialize()['tabViewEnabled']);
+	}
+
+	public function testCreateDisablesTabViewByDefault(): void {
+		$this->contextMapper
+			->expects($this->once())
+			->method('insert')
+			->willReturnArgument(0);
+
+		$context = $this->service->create('My app', 'star', 'Some description', [], 'user-1', 0);
+
+		self::assertFalse($context->getTabViewEnabled());
+		self::assertFalse($context->jsonSerialize()['tabViewEnabled']);
+	}
+
+	public function testUpdateSetsTabViewEnabledWhenProvided(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setTabViewEnabled(false);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('findById')
+			->with(7, 'user-1')
+			->willReturn($context);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('update')
+			->with($context)
+			->willReturnArgument(0);
+
+		$updatedContext = $this->service->update(7, 'user-1', null, null, null, null, true);
+
+		self::assertTrue($updatedContext->getTabViewEnabled());
+	}
+
+	public function testUpdateKeepsTabViewEnabledWhenNotProvided(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setTabViewEnabled(true);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('findById')
+			->with(7, 'user-1')
+			->willReturn($context);
+
+		$this->contextMapper
+			->expects($this->once())
+			->method('update')
+			->with($context)
+			->willReturnArgument(0);
+
+		$updatedContext = $this->service->update(7, 'user-1', 'Renamed', null, null, null);
+
+		self::assertTrue($updatedContext->getTabViewEnabled());
+	}
+
 	public function testUpdateReordersStartPageContentsFromSubmittedNodes(): void {
 		$context = new Context();
 		$context->id = 7;

@@ -14,26 +14,47 @@
 							activeContext.name }}
 					</h1>
 				</div>
-				<div class="row space-L context__description">
+				<div v-if="activeContext.description?.trim()" class="row space-L context__description">
 					{{ activeContext.description }}
 				</div>
 			</div>
 
-			<div class="resources">
-				<div v-for="resource in contextResources" :key="resource.key">
-					<div v-if="!resource.isView" class="resource">
-						<TableWrapper v-model:view-setting="resourceViewSettings[resource.key]" :table="resource" :columns="columns[resource.key]"
-							:rows="rows[resource.key]" @create-column="createColumn(false, resource)"
-							@import-scheme="openImportSchemeModal(resource)"
-							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
-							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
-					</div>
-					<div v-else-if="resource.isView" class="resource">
-						<CustomView v-model:view-setting="resourceViewSettings[resource.key]" :view="resource" :columns="columns[resource.key]"
-							:rows="rows[resource.key]" @create-column="createColumn(true, resource)"
-							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
-							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
-					</div>
+			<div class="resources" :class="{ 'resources--tabs': isTabs }">
+				<ContextResourceTabs v-if="isTabs"
+					:resources="contextResources"
+					:active-index="activeResourceIndex"
+					@update:active-index="index => activeResourceIndex = index" />
+
+				<!-- Stacked mode: every resource is shown, one below the other.
+				     Tabs mode: only the active one is shown. The others stay
+				     mounted (v-show) so their state (filters, sorting) is kept. -->
+				<div v-for="(resource, index) in contextResources"
+					v-show="!isTabs || index === activeResourceIndex"
+					:id="isTabs ? `context-resource-panel-${resource.key}` : undefined"
+					:key="resource.key"
+					:role="isTabs ? 'tabpanel' : undefined"
+					:aria-labelledby="isTabs ? `context-resource-tab-${resource.key}` : undefined"
+					class="resource"
+					:class="{ 'resource--tab-mode': isTabs }">
+					<CustomView v-if="resource.isView"
+						v-model:view-setting="resourceViewSettings[resource.key]"
+						:view="resource"
+						:columns="columns[resource.key]"
+						:rows="rows[resource.key]"
+						@create-column="createColumn(true, resource)"
+						@import="openImportModal(resource, true)"
+						@download-csv="downloadCSV(resource, true)"
+						@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
+					<TableWrapper v-else
+						v-model:view-setting="resourceViewSettings[resource.key]"
+						:table="resource"
+						:columns="columns[resource.key]"
+						:rows="rows[resource.key]"
+						@create-column="createColumn(false, resource)"
+						@import-scheme="openImportSchemeModal(resource)"
+						@import="openImportModal(resource, false)"
+						@download-csv="downloadCSV(resource, false)"
+						@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
 				</div>
 			</div>
 		</div>
@@ -50,6 +71,7 @@ import { mapState, mapActions, storeToRefs } from 'pinia'
 import { NcIconSvgWrapper } from '@nextcloud/vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
+import ContextResourceTabs from '../modules/main/sections/ContextResourceTabs.vue'
 import { emit } from '@nextcloud/event-bus'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMixin.js'
@@ -67,6 +89,7 @@ export default {
 		ErrorMessage,
 		TableWrapper,
 		CustomView,
+		ContextResourceTabs,
 	},
 
 	mixins: [exportTableMixin, svgHelper],
@@ -86,11 +109,21 @@ export default {
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
+			activeResourceIndex: 0,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['tables', 'contexts', 'activeContextId', 'views', 'activeContext']),
+
+		// 'tabs' (a tab bar on top, one resource shown at a time) only when
+		// the application was created/edited with the tab-view option enabled
+		// AND there's more than one resource; otherwise everything is just
+		// stacked one below the other.
+		isTabs() {
+			return !!this.activeContext?.tabViewEnabled && this.contextResources.length > 1
+		},
+
 		rows() {
 			const rows = {}
 			if (this.context && this.context.nodes) {
@@ -148,6 +181,13 @@ export default {
 			},
 			immediate: true,
 		},
+		contextResources() {
+			// Keep the active tab in range (e.g. after switching to a context
+			// with fewer resources, or once resources finish loading).
+			if (this.activeResourceIndex >= this.contextResources.length) {
+				this.activeResourceIndex = 0
+			}
+		},
 	},
 
 	async mounted() {
@@ -176,6 +216,7 @@ export default {
 			this.loading = true
 			this.contextResources = []
 			this.resourceViewSettings = {}
+			this.activeResourceIndex = 0
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -360,6 +401,18 @@ export default {
 	min-width: var(--app-content-width, 100%);
 }
 
+.resources {
+	// Height of the tab bar (a single row, see ContextResourceTabs): also the
+	// offset of the table's sticky options bar.
+	--tbl-tabs-h: 48px;
+}
+
+// Switching tabs changes the height of the page: do not let the browser
+// "anchor" the scroll position on an element of the previous tab.
+.resources--tabs {
+	overflow-anchor: none;
+}
+
 .resource {
 	margin: 40px 0;
 	width: max-content;
@@ -369,10 +422,36 @@ export default {
 		margin-inline-start: 0;
 		padding-inline-start: 20px;
 	}
+
+	// The description is shown by the tabs' "i" panel, not inside the resource.
+	&--tab-mode {
+		margin-top: 0;
+
+		&:deep(.element-description) {
+			display: none;
+		}
+	}
 }
 
 :deep(h1) {
 	font-size: unset;
 	font-size: revert;
+}
+</style>
+
+<!-- Not scoped on purpose: these rules target elements rendered by child
+     components (TableWrapper / View). -->
+<style lang="scss">
+.resource.resource--tab-mode {
+	// The active tab already names the table.
+	> div > .row.first-row,
+	.row.space-T {
+		display: none !important;
+	}
+
+	// NcTable assumes a 60px title above its sticky bar: pin it under the tabs.
+	.options.row {
+		top: var(--tbl-tabs-h) !important;
+	}
 }
 </style>
