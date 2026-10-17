@@ -12,12 +12,5 @@
 		}
 	},
 	"extra": {
-		"patches": {
-			"thecodingmachine/safe": {
-				"PHP 8.4 compatibility, patch 1": "patches/thecodingmachine_safe_464.patch",
-				"PHP 8.4 compatibility, patch 2": "patches/thecodingmachine_safe_466.patch",
-				"PHP 8.4 compatibility, patch 3": "patches/blizzz_safe_6eeee2a20ffb2be3456ae8615b227c78e1ca8a20.patch"
-			}
-		}
 	}
 }
