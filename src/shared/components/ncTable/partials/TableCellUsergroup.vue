@@ -7,7 +7,20 @@
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<div v-if="value" class="table-cell-usergroup">
 				<div v-for="item in value" :key="item.id" class="inline usergroup-entry">
-					<NcUserBubble :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="!isUser(item)" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
+					<span v-if="isUser(item)"
+						class="usergroup-user"
+						:class="{ 'usergroup-user--current': isCurrentUser(item) }"
+						:style="{ height: `${entrySize}px` }">
+						<span class="usergroup-user__avatar" data-cy="usergroupUserAvatar" @click.stop>
+							<NcAvatar :user="item.id"
+								:display-name="item.displayName ?? item.id"
+								:size="entrySize - 4"
+								:hide-status="!column.showUserStatus"
+								:disable-tooltip="true" />
+						</span>
+						<span class="usergroup-user__name">{{ item.displayName ?? item.id }}</span>
+					</span>
+					<NcUserBubble v-else :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="true" :display-name="item.displayName ?? item.id" :size="entrySize" />
 				</div>
 			</div>
 		</div>
@@ -45,7 +58,7 @@
 
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
-import { NcUserBubble, NcSelect } from '@nextcloud/vue'
+import { NcAvatar, NcSelect, NcUserBubble } from '@nextcloud/vue'
 import { USERGROUP_TYPE } from '../../../constants.ts'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import searchUserGroup from '../../../mixins/searchUserGroup.js'
@@ -58,8 +71,9 @@ export default {
 	name: 'TableCellUsergroup',
 
 	components: {
-		NcUserBubble,
+		NcAvatar,
 		NcSelect,
+		NcUserBubble,
 	},
 
 	mixins: [
@@ -94,6 +108,9 @@ export default {
 	},
 
 	computed: {
+		entrySize() {
+			return this.column.showUserStatus ? 34 : 20
+		},
 		isCurrentUser() {
 			return (item) => this.isUser(item) && item.id === currentUser?.uid
 		},
@@ -215,6 +232,30 @@ export default {
 
 .usergroup-entry {
 	padding-inline-end: 10px;
+}
+
+.usergroup-user {
+	display: inline-flex;
+	align-items: center;
+	gap: calc(var(--default-grid-baseline) / 2);
+	padding-inline: 2px 8px;
+	border-radius: var(--border-radius-pill);
+	background-color: var(--color-background-dark);
+
+	&--current {
+		background-color: var(--color-primary-element-light);
+	}
+
+	&__avatar {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	&__name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 }
 
 .edit-mode {
