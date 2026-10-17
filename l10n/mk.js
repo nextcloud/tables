@@ -133,6 +133,7 @@ OC.L10N.register(
     "Close editor" : "Затвори го уредникот",
     "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
+    "Content" : "Содржина",
     "Select" : "Избери",
     "This year" : "Оваа година",
     "This week" : "Оваа недела",

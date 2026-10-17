@@ -36,6 +36,7 @@ OC.L10N.register(
     "Please select a file." : "একটি ফাইল নির্বাচন করুন",
     "From" : "From",
     "To" : "To",
+    "Automatic" : "স্বয়ংক্রিয়",
     "Saving..." : "সংরক্ষণ করা হচ্ছে..",
     "Export" : "রপ্তানি",
     "Favorites" : "প্রিয়জন",
