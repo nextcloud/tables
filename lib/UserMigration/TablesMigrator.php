@@ -27,6 +27,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -42,6 +43,7 @@ use OCP\UserMigration\IImportSource;
 use OCP\UserMigration\IMigrator;
 use OCP\UserMigration\ISizeEstimationMigrator;
 use OCP\UserMigration\TMigratorBasicVersionHandling;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
@@ -68,6 +70,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 		protected TableMapper $tableMapper,
 		protected ColumnMapper $columnMapper,
 		protected RowSleeveMapper $rowSleeveMapper,
+		protected ColumnsHelper $columnsHelper,
 		protected ViewMapper $viewMapper,
 		protected ContextMapper $contextMapper,
 		protected ShareMapper $shareMapper,
@@ -84,6 +87,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 		protected RowService $rowService,
 		private ContextService $contextService,
 		private ShareService $shareService,
+		protected LoggerInterface $logger,
 	) {
 	}
 
@@ -280,6 +284,8 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				$userId,
 			);
 
+			$this->rebuildCachedCells($rowIdMap);
+
 			$connection->commit();
 		} catch (\Throwable $e) {
 			$connection->rollBack();
@@ -332,6 +338,26 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				$cell->setLastEditBy($userId);
 				$cell->setLastEditAt($cellData['lastEditAt'] ?? null);
 				$mapper->insert($cell);
+			}
+		}
+	}
+
+	private function rebuildCachedCells(array $rowIdMap): void {
+		$columnsByTable = [];
+		foreach ($rowIdMap as $newRowId) {
+			try {
+				$sleeve = $this->rowSleeveMapper->find($newRowId);
+				$tableId = $sleeve->getTableId();
+				$columnsByTable[$tableId] ??= $this->columnMapper->findAllByTable($tableId);
+				$cachedCells = $this->columnsHelper->getCachedCellsForRow($newRowId, $columnsByTable[$tableId]);
+				$sleeve->setCachedCellsArray($cachedCells);
+				$this->rowSleeveMapper->update($sleeve);
+			} catch (\Throwable $e) {
+				$this->logger->error('Failed to load cells for row during cached_cells rebuild', [
+					'rowId' => $newRowId,
+					'exception' => $e,
+				]);
+				throw $e;
 			}
 		}
 	}
