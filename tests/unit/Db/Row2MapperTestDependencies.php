@@ -219,6 +219,9 @@ trait Row2MapperTestDependencies {
 		$this->columnMapper->method('find')
 			->willReturnCallback(fn ($id) => $columns[$id] ?? throw new DoesNotExistException('test'));
 
+		$this->columnMapper->method('findAll')
+			->willReturnCallback(fn (array $ids) => array_values(array_intersect_key($columns, array_flip($ids))));
+
 		$this->columnMapper->method('preloadColumns');
 		$this->columnMapper->method('getColumnTypes')->willReturn($columnTypes);
 	}

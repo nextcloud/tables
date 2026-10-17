@@ -26,7 +26,7 @@ export default {
 				columns.forEach(column => {
 					// if a normal column
 					if (column.id >= 0) {
-						const set = row.data ? row.data.find(d => d.columnId === column.id) || '' : null
+						const set = row.data ? row.data.find(d => d.columnId === column.getValueColumnId()) || '' : null
 						rowData[column.title] = set ? column.getValueString(set) : ''
 					} else {
 						// if is a meta data column (id < 0)
