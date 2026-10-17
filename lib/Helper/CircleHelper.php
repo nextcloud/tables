@@ -23,6 +23,9 @@ use Throwable;
 class CircleHelper {
 	private bool $circlesEnabled;
 	private ?CirclesManager $circlesManager;
+	private array $circleDisplayNames = [];
+	private array $federatedUsers = [];
+	private array $unreachableUserIds = [];
 
 	/**
 	 * @psalm-suppress UndefinedClass
@@ -50,21 +53,26 @@ class CircleHelper {
 	}
 
 	public function getCircleDisplayName(string $circleId, string $userId): string {
-		if (!$this->circlesEnabled) {
+		return $this->circleDisplayNames[$userId][$circleId] ??= $this->resolveCircleDisplayName($circleId, $userId);
+	}
+
+	private function resolveCircleDisplayName(string $circleId, string $userId): string {
+		if (!$this->circlesEnabled || isset($this->unreachableUserIds[$userId])) {
 			return $circleId;
 		}
 
 		try {
-			$federatedUser = $this->circlesManager->getFederatedUser($userId, Member::TYPE_USER);
+			$federatedUser = $this->federatedUsers[$userId] ??= $this->circlesManager->getFederatedUser($userId, Member::TYPE_USER);
 			$this->circlesManager->startSession($federatedUser);
 
 			$circle = $this->circlesManager->getCircle($circleId);
 			return $circle ? ($circle->getDisplayName() ?: $circleId) : $circleId;
 		} catch (Throwable $e) {
 			if ($e->getCode() === 404) {
-				return $this->l10n->t('Deleted team %s.', [$circleId]);
+				return $this->l10n->t('Team not found');
 			}
 
+			$this->unreachableUserIds[$userId] = true;
 			$this->logger->warning('Failed to get circle display name: ' . $e->getMessage(), [
 				'circleId' => $circleId,
 				'userId' => $userId
