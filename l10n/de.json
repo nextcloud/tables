@@ -784,6 +784,7 @@
     "Confirm" : "Bestätigen",
     "Could not fetch columns for content preview." : "Spalten für die Inhaltsvorschau konnten nicht abgerufen werden.",
     "Could not fetch rows for content preview." : "Zeilen für die Inhaltsvorschau konnten nicht abgerufen werden.",
+    "Could not fetch the layout for content preview." : "Das Layout für die Inhaltsvorschau konnte nicht abgerufen werden.",
     "Render mode" : "Render-Modus",
     "Content" : "Inhalt",
     "Select" : "Auswählen",
