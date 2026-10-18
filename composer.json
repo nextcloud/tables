@@ -49,7 +49,7 @@
     "scoper:update-deps": "./update-scoper-dependencies.sh",
     "post-install-cmd": [
       "composer bin all install --ansi",
-      "vendor/bin/php-scoper add-prefix --force",
+      "@php -d xdebug.mode=off vendor/bin/php-scoper add-prefix --force",
       "@php .lib-vendor-organizer.php lib/Vendor/ OCA\\\\Tables\\\\Vendor",
       "cat .scoper-production-dependencies | uniq | xargs -I {} rm -Rf vendor/{} # Remove origins",
       "cat .scoper-production-dependencies | cut -d / -f1 | uniq | xargs -I {} rmdir vendor/{} || true # Remove empty directories",
@@ -57,7 +57,7 @@
     ],
     "post-update-cmd": [
       "composer bin all update --ansi",
-      "vendor/bin/php-scoper add-prefix --force",
+      "@php -d xdebug.mode=off vendor/bin/php-scoper add-prefix --force",
       "@php .lib-vendor-organizer.php lib/Vendor/ OCA\\\\Tables\\\\Vendor",
       "cat .scoper-production-dependencies | uniq | xargs -I {} rm -Rf vendor/{} # Remove origins",
       "cat .scoper-production-dependencies | cut -d / -f1 | uniq | xargs -I {} rmdir vendor/{} || true # Remove empty directories",
