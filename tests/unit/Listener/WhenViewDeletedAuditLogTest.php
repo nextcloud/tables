@@ -7,6 +7,7 @@
 
 namespace unit\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\View;
 use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Listener\WhenViewDeletedAuditLogListener;
@@ -27,6 +28,7 @@ final class WhenViewDeletedAuditLogTest extends TestCase {
 	public function testHandle(): void {
 		$view = new View();
 		$view->id = 1;
+		$view->setTableId(5);
 
 		$event = new ViewDeletedEvent(view: $view);
 
@@ -34,10 +36,9 @@ final class WhenViewDeletedAuditLogTest extends TestCase {
 			->expects($this->once())
 			->method('log')
 			->with(
-				$this->equalTo("View with ID: {$view->id} was deleted"),
-				$this->equalTo([
-					'view' => $view->jsonSerialize(),
-				])
+				Operation::ViewDeleted,
+				'View with ID: %s was deleted',
+				['viewId' => 1, 'tableId' => 5],
 			);
 
 		$this->listener->handle($event);

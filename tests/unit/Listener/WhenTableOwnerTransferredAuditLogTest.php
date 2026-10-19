@@ -7,6 +7,7 @@
 
 namespace unit\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Listener\WhenTableTransferredAuditLogListener;
@@ -36,12 +37,9 @@ final class WhenTableOwnerTransferredAuditLogTest extends TestCase {
 			->expects($this->once())
 			->method('log')
 			->with(
-				$this->equalTo("Table with ID: {$table->id} was transferred from user with ID: $fromUserId to user with ID: $toUserId"),
-				$this->equalTo([
-					'table' => $table->jsonSerialize(),
-					'fromUserId' => $fromUserId,
-					'toUserId' => $toUserId,
-				])
+				Operation::TableTransferred,
+				'Table with ID: %s was transferred from user with ID: %s to user with ID: %s',
+				['tableId' => 1, 'fromUserId' => $fromUserId, 'toUserId' => $toUserId],
 			);
 
 		$this->listener->handle($event);

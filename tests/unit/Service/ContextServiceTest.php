@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelationMapper;
@@ -18,7 +20,7 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
-use OCP\EventDispatcher\IEventDispatcher;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\IDBConnection;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
@@ -33,6 +35,8 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $contextNodeRelMapper;
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
+	private MockObject $userManager;
+	private MockObject $auditLogService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -43,8 +47,8 @@ final class ContextServiceTest extends TestCase {
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
 		$permissionsService = $this->createMock(PermissionsService::class);
-		$userManager = $this->createMock(IUserManager::class);
-		$eventDispatcher = $this->createMock(IEventDispatcher::class);
+		$this->userManager = $this->createMock(IUserManager::class);
+		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$dbConnection = $this->createMock(IDBConnection::class);
 		$shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
@@ -57,8 +61,8 @@ final class ContextServiceTest extends TestCase {
 			$this->pageContentMapper,
 			$logger,
 			$permissionsService,
-			$userManager,
-			$eventDispatcher,
+			$this->userManager,
+			$this->auditLogService,
 			$dbConnection,
 			$shareService,
 			false,
@@ -67,6 +71,26 @@ final class ContextServiceTest extends TestCase {
 			$this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
 		);
+	}
+
+	public function testTransferLogsPreviousAndNewOwner(): void {
+		$context = new Context();
+		$context->setId(7);
+		$context->setOwnerId('alice');
+		$context->setOwnerType(Application::OWNER_TYPE_USER);
+		$this->contextMapper->method('findById')->with(7)->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->userManager->method('userExists')->with('bob')->willReturn(true);
+
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(
+				Operation::ContextTransferred,
+				'Tables application with ID %s was transferred to user %s',
+				['contextId' => 7, 'toUserId' => 'bob', 'fromUserId' => 'alice'],
+			);
+
+		$this->service->transfer(7, 'bob', Application::OWNER_TYPE_USER);
 	}
 
 	public function testUpdateReordersStartPageContentsFromSubmittedNodes(): void {

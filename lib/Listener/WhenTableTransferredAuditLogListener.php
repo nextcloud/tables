@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\EventDispatcher\Event;
@@ -27,14 +28,10 @@ final class WhenTableTransferredAuditLogListener implements IEventListener {
 			return;
 		}
 
-		$table = $event->getTable();
-		$fromUserId = $event->getFromUserId();
-		$toUserId = $event->getToUserId();
-
-		$this->auditLogService->log("Table with ID: $table->id was transferred from user with ID: $fromUserId to user with ID: $toUserId", [
-			'table' => $table->jsonSerialize(),
-			'fromUserId' => $fromUserId,
-			'toUserId' => $toUserId,
+		$this->auditLogService->log(Operation::TableTransferred, 'Table with ID: %s was transferred from user with ID: %s to user with ID: %s', [
+			'tableId' => $event->getTable()->getId(),
+			'fromUserId' => $event->getFromUserId(),
+			'toUserId' => $event->getToUserId(),
 		]);
 	}
 }

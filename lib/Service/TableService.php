@@ -382,6 +382,7 @@ class TableService extends SuperService {
 			throw new PermissionError('PermissionError: can not change table owner with table id ' . $id);
 		}
 
+		$previousOwnerUserId = $table->getOwnership();
 		$table->setOwnership($newOwnerUserId);
 
 		try {
@@ -398,7 +399,7 @@ class TableService extends SuperService {
 		$event = new TableOwnershipTransferredEvent(
 			table: $table,
 			toUserId: $newOwnerUserId,
-			fromUserId: $userId
+			fromUserId: $previousOwnerUserId,
 		);
 
 		$this->eventDispatcher->dispatchTyped($event);

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\EventDispatcher\Event;
@@ -28,10 +29,10 @@ final class WhenRowDeletedAuditLogListener implements IEventListener {
 		}
 
 		$row = $event->getRow();
-		$rowId = $row->rowId;
 
-		$this->auditLogService->log("Row with ID: $rowId was deleted", [
-			'row' => $row->jsonSerialize(),
+		$this->auditLogService->log(Operation::RowDeleted, 'Row with ID: %s was deleted', [
+			'rowId' => $row->rowId,
+			'tableId' => $row->tableId,
 		]);
 	}
 }

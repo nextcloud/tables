@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service\Support;
 
+use OCA\Tables\AuditLog\Operation;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
 
@@ -17,9 +18,16 @@ final class DefaultAuditLogService implements AuditLogServiceInterface {
 	) {
 	}
 
-	public function log(string $message, array $context): void {
-		$auditEvent = new CriticalActionPerformedEvent($message, $context);
+	/**
+	 * The operation is only passed on to servers whose CriticalActionPerformedEvent supports it.
+	 * The check can be dropped once Nextcloud 36 is the lowest supported server version.
+	 */
+	public function log(Operation $operation, string $message, array $parameters = []): void {
+		$arguments = [$message, $parameters, false];
+		if (method_exists(CriticalActionPerformedEvent::class, 'getOperation')) {
+			$arguments[] = $operation->value;
+		}
 
-		$this->eventDispatcher->dispatchTyped($auditEvent);
+		$this->eventDispatcher->dispatchTyped(new CriticalActionPerformedEvent(...$arguments));
 	}
 }
