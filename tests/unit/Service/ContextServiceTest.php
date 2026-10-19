@@ -13,6 +13,7 @@ use OCA\Tables\AppInfo\Application;
 use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
@@ -159,6 +160,13 @@ final class ContextServiceTest extends TestCase {
 			->method('update')
 			->with($context)
 			->willReturn($context);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [],
+				'removedNodes' => [],
+			]);
 
 		$updatedContext = $this->service->update(7, 'user-1', null, null, null, [
 			[
@@ -178,6 +186,67 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(10, $updatedOrders[502]);
 		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
 		self::assertSame(10, $updatedContext->getPages()[301]['content'][502]['order']);
+	}
+
+	public function testUpdateLogsRemovedNodes(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([
+			101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1],
+		]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->with(7, 'user-1')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$nodeRelation = new ContextNodeRelation();
+		$nodeRelation->id = 101;
+		$this->contextNodeRelMapper->method('findById')->with(101)->willReturn($nodeRelation);
+		$this->contextNodeRelMapper->method('delete')->willReturnArgument(0);
+		$this->pageContentMapper->method('findByNodeRelation')->willReturn([]);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [],
+				'removedNodes' => [['nodeType' => 0, 'nodeId' => 11]],
+			]);
+
+		$this->service->update(7, 'user-1', null, null, null, []);
+	}
+
+	public function testCreateLogsCriticalAction(): void {
+		$this->contextMapper->method('insert')->willReturnCallback(function (Context $context): Context {
+			$context->id = 9;
+			return $context;
+		});
+		$this->pageMapper->method('insert')->willReturnCallback(function (Page $page): Page {
+			$page->id = 1;
+			return $page;
+		});
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextCreated, 'Tables application with ID %s was created for user %s', [
+				'contextId' => 9,
+				'ownerId' => 'alice',
+				'nodes' => [],
+			]);
+
+		$this->service->create('Projects', 'icon', '', [], 'alice', Application::OWNER_TYPE_USER);
+	}
+
+	public function testDeleteLogsCriticalAction(): void {
+		$context = new Context();
+		$context->id = 9;
+		$context->setOwnerId('alice');
+		$this->contextMapper->method('findById')->with(9, 'alice')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->willReturn([]);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextDeleted, 'Tables application with ID %s was deleted', [
+				'contextId' => 9,
+				'ownerId' => 'alice',
+			]);
+
+		$this->service->delete(9, 'alice');
 	}
 
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {

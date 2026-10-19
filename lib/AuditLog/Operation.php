@@ -25,6 +25,9 @@ enum Operation: string {
 	case ViewDeleted = 'tables.view.deleted';
 	case RowDeleted = 'tables.row.deleted';
 	case ColumnDeleted = 'tables.column.deleted';
+	case ContextCreated = 'tables.context.created';
+	case ContextUpdated = 'tables.context.updated';
+	case ContextDeleted = 'tables.context.deleted';
 	case ContextTransferred = 'tables.context.transferred';
 	case ShareCreated = 'tables.share.created';
 	case SharePermissionsUpdated = 'tables.share.permissions_updated';
@@ -47,6 +50,9 @@ enum Operation: string {
 			self::ViewDeleted => 'A view was deleted with its shares',
 			self::RowDeleted => 'A row was deleted',
 			self::ColumnDeleted => 'A column was deleted with its values in all rows',
+			self::ContextCreated => 'An application was created',
+			self::ContextUpdated => 'An application was changed, including tables and views added to or removed from it, which exposes them to the people the application is shared with',
+			self::ContextDeleted => 'An application was deleted with its pages and shares',
 			self::ContextTransferred => 'The ownership of an application was transferred to another user',
 			self::ShareCreated => 'A table, view or application was shared with a user, group, team, remote user or by public link',
 			self::SharePermissionsUpdated => 'The permissions of a share of a table or view were changed',
