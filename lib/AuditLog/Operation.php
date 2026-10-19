@@ -15,10 +15,14 @@ namespace OCA\Tables\AuditLog;
  * so changing one is a breaking change for them. Case names may be renamed.
  */
 enum Operation: string {
+	case TableCreated = 'tables.table.created';
+	case TableArchived = 'tables.table.archived';
+	case TableUnarchived = 'tables.table.unarchived';
 	case TableDeleted = 'tables.table.deleted';
 	case TableTransferred = 'tables.table.transferred';
 	case ViewDeleted = 'tables.view.deleted';
 	case RowDeleted = 'tables.row.deleted';
+	case ColumnDeleted = 'tables.column.deleted';
 	case ContextTransferred = 'tables.context.transferred';
 	case ShareCreated = 'tables.share.created';
 	case SharePermissionsUpdated = 'tables.share.permissions_updated';
@@ -32,10 +36,14 @@ enum Operation: string {
 	 */
 	public function description(): string {
 		return match ($this) {
+			self::TableCreated => 'A table was created, from the web interface, the API, occ tables:add or a template',
+			self::TableArchived => 'A table was archived for all users it is shared with',
+			self::TableUnarchived => 'A table was unarchived',
 			self::TableDeleted => 'A table was deleted with its views, rows and shares',
 			self::TableTransferred => 'The ownership of a table was transferred to another user',
 			self::ViewDeleted => 'A view was deleted with its shares',
 			self::RowDeleted => 'A row was deleted',
+			self::ColumnDeleted => 'A column was deleted with its values in all rows',
 			self::ContextTransferred => 'The ownership of an application was transferred to another user',
 			self::ShareCreated => 'A table, view or application was shared with a user, group, team, remote user or by public link',
 			self::SharePermissionsUpdated => 'The permissions of a share of a table or view were changed',
