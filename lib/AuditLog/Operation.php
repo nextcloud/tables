@@ -25,6 +25,7 @@ enum Operation: string {
 	case ViewDeleted = 'tables.view.deleted';
 	case RowDeleted = 'tables.row.deleted';
 	case ColumnDeleted = 'tables.column.deleted';
+	case ImportCompleted = 'tables.import.completed';
 	case ContextCreated = 'tables.context.created';
 	case ContextUpdated = 'tables.context.updated';
 	case ContextDeleted = 'tables.context.deleted';
@@ -50,6 +51,7 @@ enum Operation: string {
 			self::ViewDeleted => 'A view was deleted with its shares',
 			self::RowDeleted => 'A row was deleted',
 			self::ColumnDeleted => 'A column was deleted with its values in all rows',
+			self::ImportCompleted => 'Rows were imported into a table or view from a spreadsheet, possibly creating columns',
 			self::ContextCreated => 'An application was created',
 			self::ContextUpdated => 'An application was changed, including tables and views added to or removed from it, which exposes them to the people the application is shared with',
 			self::ContextDeleted => 'An application was deleted with its pages and shares',

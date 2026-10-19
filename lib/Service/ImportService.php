@@ -11,6 +11,7 @@ use DateTimeImmutable;
 use LogicException;
 use OC\User\NoUserException;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\BackgroundJob\ImportTableJob;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Dto\Column as ColumnDto;
@@ -21,6 +22,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\ImportStats;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Cell;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -94,6 +96,7 @@ class ImportService extends SuperService {
 		private readonly IJobList $jobList,
 		private readonly ITempManager $tempManager,
 		IAppDataFactory $appDataFactory,
+		private readonly AuditLogServiceInterface $auditLogService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->appData = $appDataFactory->get(Application::APP_ID);
@@ -374,6 +377,7 @@ class ImportService extends SuperService {
 			$this->logger->warning('Storage for user could not be found', ['exception' => $e]);
 			throw new NotFoundError('Storage for user could not be found');
 		}
+		$this->logImportCompleted();
 
 		return [
 			'found_columns_count' => count(array_filter($this->columns, fn ($column): bool => $column instanceof Column)),
@@ -513,6 +517,7 @@ class ImportService extends SuperService {
 			$this->logger->warning('Storage for user could not be found', ['exception' => $e]);
 			throw new NotFoundError('Storage for user could not be found', 0, $e);
 		}
+		$this->logImportCompleted();
 
 		return new ImportStats(
 			count(array_filter($this->columns, fn ($column): bool => $column instanceof Column)),
@@ -933,6 +938,20 @@ class ImportService extends SuperService {
 	 * @return ISimpleFolder
 	 * @throws \OCP\Files\NotPermittedException
 	 */
+	/**
+	 * Only the counts are logged, never the imported values
+	 */
+	private function logImportCompleted(): void {
+		$this->auditLogService->log(Operation::ImportCompleted, 'Rows were imported into %s with ID: %s by user with ID: %s', [
+			'nodeType' => $this->viewId !== null ? 'view' : 'table',
+			'nodeId' => $this->viewId ?? $this->tableId,
+			'userId' => $this->userId,
+			'insertedRows' => $this->countInsertedRows,
+			'updatedRows' => $this->countUpdatedRows,
+			'createdColumns' => $this->countCreatedColumns,
+		]);
+	}
+
 	private function getImportAppDataDir(): ISimpleFolder {
 		try {
 			return $this->appData->getFolder('import');
