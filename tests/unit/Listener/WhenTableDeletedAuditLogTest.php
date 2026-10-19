@@ -7,6 +7,7 @@
 
 namespace unit\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Listener\WhenTableDeletedAuditLogListener;
@@ -27,6 +28,7 @@ final class WhenTableDeletedAuditLogTest extends TestCase {
 	public function testHandle(): void {
 		$table = new Table();
 		$table->id = 1;
+		$table->setOwnership('alice');
 
 		$event = new TableDeletedEvent($table);
 
@@ -34,10 +36,9 @@ final class WhenTableDeletedAuditLogTest extends TestCase {
 			->expects($this->once())
 			->method('log')
 			->with(
-				$this->equalTo("Table with ID: {$table->id} was deleted"),
-				$this->equalTo([
-					'table' => $table->jsonSerialize(),
-				])
+				Operation::TableDeleted,
+				'Table with ID: %s was deleted',
+				['tableId' => 1, 'owner' => 'alice'],
 			);
 
 		$this->listener->handle($event);

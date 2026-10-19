@@ -10,6 +10,7 @@ namespace OCA\Tables\Service;
 
 use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
@@ -30,16 +31,15 @@ use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
-use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
-use OCP\Log\Audit\CriticalActionPerformedEvent;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -54,7 +54,7 @@ class ContextService {
 		private LoggerInterface $logger,
 		private PermissionsService $permissionsService,
 		private IUserManager $userManager,
-		private IEventDispatcher $eventDispatcher,
+		private AuditLogServiceInterface $auditLogService,
 		private IDBConnection $dbc,
 		private ShareService $shareService,
 		private bool $isCLI,
@@ -374,15 +374,11 @@ class ContextService {
 			throw new InternalError('Failed to transfer context ownership: ' . $e->getMessage());
 		}
 
-		$auditEvent = new CriticalActionPerformedEvent(
-			sprintf(
-				'Tables application with ID %d was transferred to user %s',
-				$contextId,
-				$newOwnerId,
-			)
-		);
-
-		$this->eventDispatcher->dispatchTyped($auditEvent);
+		$this->auditLogService->log(Operation::ContextTransferred, 'Tables application with ID %s was transferred to user %s', [
+			'contextId' => $contextId,
+			'toUserId' => $newOwnerId,
+			'fromUserId' => $oldOwnerId,
+		]);
 
 		return $context;
 	}
