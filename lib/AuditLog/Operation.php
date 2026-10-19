@@ -20,6 +20,8 @@ enum Operation: string {
 	case TableUnarchived = 'tables.table.unarchived';
 	case TableDeleted = 'tables.table.deleted';
 	case TableTransferred = 'tables.table.transferred';
+	case ViewCreated = 'tables.view.created';
+	case ViewUpdated = 'tables.view.updated';
 	case ViewDeleted = 'tables.view.deleted';
 	case RowDeleted = 'tables.row.deleted';
 	case ColumnDeleted = 'tables.column.deleted';
@@ -41,6 +43,8 @@ enum Operation: string {
 			self::TableUnarchived => 'A table was unarchived',
 			self::TableDeleted => 'A table was deleted with its views, rows and shares',
 			self::TableTransferred => 'The ownership of a table was transferred to another user',
+			self::ViewCreated => 'A view was created on a table',
+			self::ViewUpdated => 'The filter, columns or settings of a view were changed, which changes the data people the view is shared with can see',
 			self::ViewDeleted => 'A view was deleted with its shares',
 			self::RowDeleted => 'A row was deleted',
 			self::ColumnDeleted => 'A column was deleted with its values in all rows',
