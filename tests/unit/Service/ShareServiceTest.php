@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Service;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
@@ -22,6 +23,7 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -32,6 +34,7 @@ use OCP\IUserManager;
 use OCP\Security\IHasher;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IManager as IShareManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -53,6 +56,7 @@ class ShareServiceTest extends TestCase {
 	protected $shareService;
 	private Share $publicShare;
 	private FederationService $federationService;
+	private AuditLogServiceInterface&MockObject $auditLogService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -71,6 +75,7 @@ class ShareServiceTest extends TestCase {
 		$this->hasher = $this->createMock(IHasher::class);
 		$this->shareManager = $this->createMock(IShareManager::class);
 		$this->federationService = $this->createMock(FederationService::class);
+		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 
 		$this->shareService = new ShareService(
 			$this->permissionsService,
@@ -89,6 +94,7 @@ class ShareServiceTest extends TestCase {
 			$this->hasher,
 			$this->shareManager,
 			$this->federationService,
+			$this->auditLogService,
 		);
 
 		$this->publicShare = new Share();
@@ -114,6 +120,104 @@ class ShareServiceTest extends TestCase {
 		$this->assertFalse($share->getPermissionUpdate());
 		$this->assertFalse($share->getPermissionDelete());
 		$this->assertFalse($share->getPermissionManage());
+	}
+
+	private function createTableShare(): Share {
+		$share = new Share();
+		$share->setId(12);
+		$share->setNodeType('table');
+		$share->setNodeId(5);
+		$share->setReceiverType('user');
+		$share->setReceiver('bob');
+		$share->setToken('secret-token');
+		$share->setPermissionRead(true);
+		$share->setPermissionCreate(false);
+		$share->setPermissionUpdate(false);
+		$share->setPermissionDelete(false);
+		$share->setPermissionManage(false);
+		return $share;
+	}
+
+	private function expectShareAuditLog(Operation $operation, string $message, array $permissions): void {
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with($operation, $message, [
+				'shareId' => 12,
+				'nodeType' => 'table',
+				'nodeId' => 5,
+				'receiverType' => 'user',
+				'receiver' => 'bob',
+				'permissions' => $permissions,
+			]);
+	}
+
+	public function testCreateContextShareLogsCriticalAction(): void {
+		$this->mapper->method('insert')->willReturnCallback(function (Share $share) {
+			$share->setId(3);
+			return $share;
+		});
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ShareCreated, 'Share %s of %s %s was created for %s "%s"', [
+				'shareId' => 3,
+				'nodeType' => 'context',
+				'nodeId' => 1,
+				'receiverType' => 'user',
+				'receiver' => 'user1',
+				'permissions' => ['read' => false, 'create' => false, 'update' => false, 'delete' => false, 'manage' => false],
+			]);
+
+		$this->shareService->create(new ShareCreate(1, 'context', 'user1', 'user', true, true, true, true, true, 0));
+	}
+
+	public function testUpdatePermissionLogsNewPermissions(): void {
+		$this->mapper->method('find')->with(12)->willReturn($this->createTableShare());
+		$this->mapper->method('update')->willReturnArgument(0);
+		$this->permissionsService->method('canManageElementById')->willReturn(true);
+		$this->tableMapper->method('find')->willThrowException(new DoesNotExistException(''));
+		$this->expectShareAuditLog(
+			Operation::SharePermissionsUpdated,
+			'Permissions of share %s of %s %s for %s "%s" were changed',
+			['read' => true, 'create' => true, 'update' => true, 'delete' => false, 'manage' => false],
+		);
+
+		$this->shareService->updatePermission(12, ['create' => true, 'update' => true]);
+	}
+
+	public function testDeleteLogsCriticalAction(): void {
+		$this->mapper->method('find')->with(12)->willReturn($this->createTableShare());
+		$this->permissionsService->method('canManageElementById')->willReturn(true);
+		$this->tableMapper->method('find')->willThrowException(new DoesNotExistException(''));
+		$this->expectShareAuditLog(
+			Operation::ShareDeleted,
+			'Share %s of %s %s for %s "%s" was deleted',
+			['read' => true, 'create' => false, 'update' => false, 'delete' => false, 'manage' => false],
+		);
+
+		$this->shareService->delete(12);
+	}
+
+	public function testDeleteWithoutPermissionDoesNotLog(): void {
+		$this->mapper->method('find')->with(12)->willReturn($this->createTableShare());
+		$this->permissionsService->method('canManageElementById')->willReturn(false);
+		$this->mapper->expects($this->never())->method('delete');
+		$this->auditLogService->expects($this->never())->method('log');
+
+		$this->expectException(PermissionError::class);
+
+		$this->shareService->delete(12);
+	}
+
+	public function testDeleteForShareReviewLogsCriticalAction(): void {
+		$this->mapper->method('find')->with(12)->willReturn($this->createTableShare());
+		$this->tableMapper->method('find')->willThrowException(new DoesNotExistException(''));
+		$this->expectShareAuditLog(
+			Operation::ShareDeleted,
+			'Share %s of %s %s for %s "%s" was deleted through the share review',
+			['read' => true, 'create' => false, 'update' => false, 'delete' => false, 'manage' => false],
+		);
+
+		$this->shareService->deleteForShareReview(12);
 	}
 
 	public function testUpdatePermissionThrowsOnContextShare(): void {
