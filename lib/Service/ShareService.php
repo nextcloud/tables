@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use OCA\Circles\Model\Circle;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextNavigation;
@@ -33,6 +34,7 @@ use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -71,6 +73,7 @@ class ShareService extends SuperService {
 		private readonly IHasher $hasher,
 		private readonly IShareManager $shareManager,
 		private readonly FederationService $federationService,
+		private readonly AuditLogServiceInterface $auditLogService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -320,19 +323,21 @@ class ShareService extends SuperService {
 	 */
 	public function create(ShareCreate $dto): Share {
 		if ($dto->getNodeType() === 'context') {
-			return $this->createContextShare(
+			$share = $this->createContextShare(
 				$dto->getNodeId(),
 				$dto->getReceiver(),
 				$dto->getReceiverType(),
 				$dto->getDisplayMode()
 			);
+			$this->logShareChange(Operation::ShareCreated, 'Share %s of %s %s was created for %s "%s"', $share);
+			return $share;
 		}
 
 		if ($dto->getReceiverType() === ShareReceiverType::REMOTE) {
 			$dto->setShareToken($this->generateShareToken());
 		}
 
-		return $this->createNodeShare(
+		$share = $this->createNodeShare(
 			$dto->getNodeId(),
 			$dto->getNodeType(),
 			$dto->getReceiver(),
@@ -345,6 +350,8 @@ class ShareService extends SuperService {
 			$dto->getPassword(),
 			$dto->getShareToken(),
 		);
+		$this->logShareChange(Operation::ShareCreated, 'Share %s of %s %s was created for %s "%s"', $share);
+		return $share;
 	}
 
 	/**
@@ -651,6 +658,7 @@ class ShareService extends SuperService {
 
 		$share = $this->addReceiverDisplayName($share);
 		$this->triggerShareActivity($share, ActivityManager::SUBJECT_SHARE_UPDATE);
+		$this->logShareChange(Operation::SharePermissionsUpdated, 'Permissions of share %s of %s %s for %s "%s" were changed', $share);
 
 		return $share;
 	}
@@ -731,7 +739,28 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+		$this->logShareChange(Operation::ShareDeleted, 'Share %s of %s %s for %s "%s" was deleted', $item);
 		return $item;
+	}
+
+	/**
+	 * The share token and password are never logged
+	 */
+	private function logShareChange(Operation $operation, string $message, Share $share): void {
+		$this->auditLogService->log($operation, $message, [
+			'shareId' => $share->getId(),
+			'nodeType' => $share->getNodeType(),
+			'nodeId' => $share->getNodeId(),
+			'receiverType' => $share->getReceiverType(),
+			'receiver' => $share->getReceiver(),
+			'permissions' => [
+				'read' => $share->getPermissionRead(),
+				'create' => $share->getPermissionCreate(),
+				'update' => $share->getPermissionUpdate(),
+				'delete' => $share->getPermissionDelete(),
+				'manage' => $share->getPermissionManage(),
+			],
+		]);
 	}
 
 	private function triggerShareActivity(Share $share, string $subject): void {
@@ -817,6 +846,7 @@ class ShareService extends SuperService {
 		if ($share->getNodeType() === 'context') {
 			$this->contextNavigationMapper->deleteByShareId($share->getId());
 		}
+		$this->logShareChange(Operation::ShareDeleted, 'Share %s of %s %s for %s "%s" was deleted through the share review', $share);
 	}
 
 	public function deleteAllForTable(Table $table):void {

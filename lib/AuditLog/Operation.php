@@ -20,6 +20,12 @@ enum Operation: string {
 	case ViewDeleted = 'tables.view.deleted';
 	case RowDeleted = 'tables.row.deleted';
 	case ContextTransferred = 'tables.context.transferred';
+	case ShareCreated = 'tables.share.created';
+	case SharePermissionsUpdated = 'tables.share.permissions_updated';
+	case ShareDeleted = 'tables.share.deleted';
+	case FederatedShareReceived = 'tables.federated_share.received';
+	case FederatedSharePermissionsUpdated = 'tables.federated_share.permissions_updated';
+	case LinkShareAuthenticationFailed = 'tables.link_share.authentication_failed';
 
 	/**
 	 * Short description of when the operation is logged, used for the documentation
@@ -31,6 +37,12 @@ enum Operation: string {
 			self::ViewDeleted => 'A view was deleted with its shares',
 			self::RowDeleted => 'A row was deleted',
 			self::ContextTransferred => 'The ownership of an application was transferred to another user',
+			self::ShareCreated => 'A table, view or application was shared with a user, group, team, remote user or by public link',
+			self::SharePermissionsUpdated => 'The permissions of a share of a table or view were changed',
+			self::ShareDeleted => 'A share was deleted, by someone managing the shared node or through the share review',
+			self::FederatedShareReceived => 'A table or view was shared with a local user from another server',
+			self::FederatedSharePermissionsUpdated => 'The server a table or view was shared from changed the permissions of the share with a local user',
+			self::LinkShareAuthenticationFailed => 'A wrong password was entered for a password protected public link share',
 		};
 	}
 }

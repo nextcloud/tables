@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Federation;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
@@ -19,9 +20,11 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\FederationDisabledError;
 use OCA\Tables\Federation\FederationProvider;
 use OCA\Tables\Service\FederationService;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\Federation\Exceptions\ProviderCouldNotAddShareException;
 use OCP\Federation\ICloudFederationShare;
 use OCP\Federation\ICloudIdManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FederationProviderTest extends TestCase {
@@ -31,6 +34,7 @@ class FederationProviderTest extends TestCase {
 	private ShareMapper $shareMapper;
 	private FederationProvider $provider;
 	private FederationService $federationService;
+	private AuditLogServiceInterface&MockObject $auditLogService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -39,6 +43,7 @@ class FederationProviderTest extends TestCase {
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->cloudIdManager = $this->createMock(ICloudIdManager::class);
 		$this->federationService = $this->createMock(FederationService::class);
+		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 
 		$this->provider = new FederationProvider(
 			$this->tableMapper,
@@ -46,6 +51,7 @@ class FederationProviderTest extends TestCase {
 			$this->shareMapper,
 			$this->cloudIdManager,
 			$this->federationService,
+			$this->auditLogService,
 		);
 	}
 
@@ -57,6 +63,7 @@ class FederationProviderTest extends TestCase {
 		$this->federationService->expects($this->once())
 			->method('ensureIncomingFederationEnabled')
 			->willThrowException(new FederationDisabledError('Federation is disabled'));
+		$this->auditLogService->expects($this->never())->method('log');
 
 		$this->expectException(ProviderCouldNotAddShareException::class);
 		$this->provider->shareReceived($share);
@@ -89,8 +96,18 @@ class FederationProviderTest extends TestCase {
 				$this->assertEquals('table', $share->getNodeType());
 				$this->assertEquals(ShareReceiverType::USER, $share->getReceiverType());
 				$this->assertEquals('admin', $share->getReceiver());
+				$share->setId(30);
 				return $share;
 			});
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::FederatedShareReceived, 'Federated share %s of %s %s from "%s" was received for user "%s"', [
+				'shareId' => 30,
+				'nodeType' => 'table',
+				'nodeId' => 1,
+				'sharedBy' => 'admin@nextcloud.local',
+				'receiver' => 'admin',
+			]);
 
 		$result = $this->provider->shareReceived($share);
 		$this->assertEquals('1', $result);
@@ -130,11 +147,28 @@ class FederationProviderTest extends TestCase {
 
 	public function testNotificationReceivedPermissionUpdate(): void {
 		$share = new Share();
+		$share->setId(30);
 		$share->setNodeId(1);
+		$share->setNodeType('table');
+		$share->setReceiver('admin');
 		$share->setToken('abcdefghijklmnop');
 
 		$this->shareMapper->method('findByToken')->willReturn($share);
 		$this->shareMapper->expects($this->once())->method('update');
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::FederatedSharePermissionsUpdated, 'Permissions of federated share %s of %s %s for "%s" were changed by the sharing server', [
+				'shareId' => 30,
+				'nodeType' => 'table',
+				'nodeId' => 1,
+				'receiver' => 'admin',
+				'permissions' => [
+					'read' => true,
+					'create' => false,
+					'update' => true,
+					'delete' => false,
+				],
+			]);
 
 		$this->provider->notificationReceived(
 			FederationProvider::NOTIFICATION_UPDATE_PERMISSIONS,
