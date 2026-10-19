@@ -16,6 +16,7 @@ use JsonSerializable;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
@@ -35,6 +36,7 @@ use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -61,6 +63,7 @@ class ViewService extends SuperService {
 		protected IL10N $l,
 		private readonly FederationService $federationService,
 		private readonly ActivityManager $activityManager,
+		private readonly AuditLogServiceInterface $auditLogService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -244,6 +247,10 @@ class ViewService extends SuperService {
 			additionalParams: [],
 			author: $userId,
 		);
+		$this->auditLogService->log(Operation::ViewCreated, 'View with ID: %s was created on table with ID: %s', [
+			'viewId' => $newItem->getId(),
+			'tableId' => $table->getId(),
+		]);
 
 		return $newItem;
 	}
@@ -270,7 +277,12 @@ class ViewService extends SuperService {
 			// and it costs a query.
 			$managedColumnIds = null;
 			$columnSelectionChanged = false;
+			$changedDataScope = [];
 			foreach ($data->updateDetail() as $parameter => $value) {
+				if (in_array($parameter, [ViewUpdatableParameters::FILTER, ViewUpdatableParameters::COLUMN_SETTINGS, ViewUpdatableParameters::VIEW_SETTINGS], true)) {
+					$changedDataScope[] = $parameter->value;
+				}
+
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
@@ -326,6 +338,13 @@ class ViewService extends SuperService {
 				changeSet: $changes,
 				subject: ActivityManager::SUBJECT_VIEW_UPDATE,
 			);
+			if ($changedDataScope !== []) {
+				$this->auditLogService->log(Operation::ViewUpdated, 'View with ID: %s of table with ID: %s was updated', [
+					'viewId' => $view->getId(),
+					'tableId' => $view->getTableId(),
+					'changedSettings' => $changedDataScope,
+				]);
+			}
 			return $view;
 		} catch (BadRequestError|InvalidArgumentException $e) {
 			throw $e;
