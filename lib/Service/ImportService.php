@@ -8,6 +8,7 @@
 namespace OCA\Tables\Service;
 
 use DateTimeImmutable;
+use InvalidArgumentException;
 use LogicException;
 use OC\User\NoUserException;
 use OCA\Tables\AppInfo\Application;
@@ -33,7 +34,9 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\BackgroundJob\IJobList;
 use OCP\DB\Exception;
 use OCP\Files\AppData\IAppDataFactory;
+use OCP\Files\File;
 use OCP\Files\IAppData;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
@@ -93,6 +96,7 @@ class ImportService extends SuperService {
 		private readonly ColumnsHelper $columnsHelper,
 		private readonly IJobList $jobList,
 		private readonly ITempManager $tempManager,
+		private readonly IFilenameValidator $filenameValidator,
 		IAppDataFactory $appDataFactory,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -397,7 +401,7 @@ class ImportService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function scheduleImport(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []) {
+	public function scheduleImport(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []): void {
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
 			if (!$this->permissionsService->canCreateRows($view)) {
@@ -436,8 +440,11 @@ class ImportService extends SuperService {
 		}
 
 		$importFileName = null;
-		// uploaded file
-		if (\file_exists($path)) {
+		if (is_uploaded_file($path) && file_exists($path)) {
+			$content = \file_get_contents($path);
+			if ($content === false) {
+				throw new InvalidArgumentException('Cannot read import payload');
+			}
 			$importFileName = 'import_u-' . $this->userId;
 			if ($this->tableId) {
 				$importFileName .= '_t-' . $this->tableId;
@@ -446,10 +453,21 @@ class ImportService extends SuperService {
 				$importFileName .= '_v-' . $this->viewId;
 			}
 			$importFileName .= '_' . \date('Y-m-d_H-i-s') . '.' . pathinfo($path, PATHINFO_EXTENSION);
+			$importFileName = $this->filenameValidator->sanitizeFilename($importFileName);
 
 			$this->getImportAppDataDir()
 				->newFile($importFileName)
-				->putContent(\file_get_contents($path));
+				->putContent($content);
+		} else {
+			try {
+				$userFolder = $this->rootFolder->getUserFolder($this->userId);
+				$node = $userFolder->get($path);
+				if (!$node instanceof File) {
+					throw new InvalidArgumentException('Can only import from a file');
+				}
+			} catch (NotPermittedException|NoUserException|NotFoundException) {
+				throw new InvalidArgumentException('Cannot find import payload');
+			}
 		}
 
 		$this->jobList->add(
