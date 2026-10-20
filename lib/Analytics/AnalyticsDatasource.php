@@ -323,7 +323,7 @@ class AnalyticsDatasource implements IDatasource {
 		return '';
 	}
 
-	private function formatTextValue(Column $column, string $value): string {
+	private function formatTextValue(Column $column, ?string $value): string {
 		if ($value === null || $value === '') {
 			return '';
 		}
