@@ -130,12 +130,12 @@ export default {
 	}
 
 	&.filled {
-		color: var(--color-main-text);
+		color: var(--color-favorite);
 	}
 
 	&.hovering {
 		&.filled {
-			color: var(--color-text-maxcontrast);
+			color: var(--color-favorite);
 		}
 	}
 }
