@@ -294,6 +294,7 @@ class ColumnService extends SuperService {
 		$item = Column::fromDto($columnDto);
 		$item->setTitle($newTitle);
 		$item->setTableId($table->getId());
+		$item->setCustomSettings($this->authorizeRelationTarget($item->getCustomSettings(), $userId));
 		$this->updateMetadata($item, $userId, true);
 
 		try {
@@ -423,7 +424,7 @@ class ColumnService extends SuperService {
 			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
 			$this->validateCustomSettings($columnDto->getCustomSettings());
-			$item->setCustomSettings($columnDto->getCustomSettings());
+			$item->setCustomSettings($this->authorizeRelationTarget($columnDto->getCustomSettings(), $userId, $item->getCustomSettings()));
 
 			$this->updateMetadata($item, $userId);
 			try {
@@ -446,7 +447,7 @@ class ColumnService extends SuperService {
 			} catch (\OCP\DB\Exception $e) {
 				$this->handleColumnPersistDbException($e, static::class . ' - ' . __FUNCTION__);
 			}
-		} catch (BadRequestError $e) {
+		} catch (BadRequestError|PermissionError|NotFoundError $e) {
 			throw $e;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
@@ -504,6 +505,97 @@ class ColumnService extends SuperService {
 					$translatedMessage
 				);
 			}
+		}
+	}
+
+	private function hasRelationTarget(array $settings): bool {
+		return !empty($settings[Column::RELATION_TYPE])
+			&& !empty($settings[Column::RELATION_TARGET_ID])
+			&& !empty($settings[Column::RELATION_LABEL_COLUMN]);
+	}
+
+	/**
+	 * @return array{type: string, targetId: int, labelColumn: int}|null
+	 */
+	private function parseRelationTarget(?string $customSettings): ?array {
+		$settings = $customSettings !== null ? json_decode($customSettings, true) : null;
+		if (!is_array($settings) || !$this->hasRelationTarget($settings)) {
+			return null;
+		}
+
+		return [
+			'type' => (string)$settings[Column::RELATION_TYPE],
+			'targetId' => (int)$settings[Column::RELATION_TARGET_ID],
+			'labelColumn' => (int)$settings[Column::RELATION_LABEL_COLUMN],
+		];
+	}
+
+	private function setRelationTargetAuthor(?string $customSettings, ?string $userId): ?string {
+		if ($customSettings === null) {
+			return null;
+		}
+		$settings = json_decode($customSettings, true);
+		if (!is_array($settings)) {
+			return $customSettings;
+		}
+
+		unset($settings[Column::RELATION_TARGET_SET_BY]);
+		if ((string)$userId !== '' && $this->hasRelationTarget($settings)) {
+			$settings[Column::RELATION_TARGET_SET_BY] = $userId;
+		}
+
+		return json_encode($settings, JSON_THROW_ON_ERROR);
+	}
+
+	/**
+	 * @throws BadRequestError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	private function authorizeRelationTarget(?string $customSettings, ?string $userId, ?string $storedSettings = null): ?string {
+		$target = $this->parseRelationTarget($customSettings);
+		if ($target !== null && $target === $this->parseRelationTarget($storedSettings)) {
+			return $this->setRelationTargetAuthor($customSettings, $this->getRelationTargetAuthor($storedSettings));
+		}
+		if ($target !== null) {
+			$this->assertCanReadRelationTarget($target['type'], $target['targetId'], $target['labelColumn'], $userId);
+		}
+		return $this->setRelationTargetAuthor($customSettings, $userId);
+	}
+
+	private function getRelationTargetAuthor(?string $customSettings): ?string {
+		$settings = $customSettings !== null ? json_decode($customSettings, true) : null;
+		return is_array($settings) && isset($settings[Column::RELATION_TARGET_SET_BY]) ? (string)$settings[Column::RELATION_TARGET_SET_BY] : null;
+	}
+
+	/**
+	 * @throws BadRequestError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	private function assertCanReadRelationTarget(string $relationType, int $targetId, int $labelColumnId, ?string $userId): void {
+		if (!in_array($relationType, [Column::RELATION_TYPE_TABLE, Column::RELATION_TYPE_VIEW], true)) {
+			throw new BadRequestError('Unknown relation type ' . $relationType . '.');
+		}
+		if (!$this->permissionsService->canReadRelationTarget($relationType, $targetId, $userId)) {
+			throw new PermissionError('No permission to use ' . $relationType . ' ' . $targetId . ' as relation target.');
+		}
+
+		if ($relationType === Column::RELATION_TYPE_VIEW) {
+			$view = $this->viewService->find($targetId, true, $userId);
+			if (!in_array($labelColumnId, $view->getColumnIds(), true)) {
+				throw new BadRequestError('Relation label column does not belong to the relation target.');
+			}
+			return;
+		}
+
+		try {
+			$labelColumn = $this->mapper->find($labelColumnId);
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|\OCP\DB\Exception) {
+			throw new BadRequestError('Relation label column does not belong to the relation target.');
+		}
+		if ($labelColumn->getTableId() !== $targetId) {
+			throw new BadRequestError('Relation label column does not belong to the relation target.');
 		}
 	}
 
@@ -779,7 +871,7 @@ class ColumnService extends SuperService {
 		$item->setUsergroupSelectGroups($column['usergroupSelectGroups']);
 		$item->setUsergroupSelectTeams($column['usergroupSelectTeams']);
 		$item->setShowUserStatus($column['showUserStatus']);
-		$item->setCustomSettings(json_encode($column['customSettings']));
+		$item->setCustomSettings($this->setRelationTargetAuthor(json_encode($column['customSettings']) ?: null, $this->userId));
 
 		try {
 			$newColumn = $this->mapper->insert($item);

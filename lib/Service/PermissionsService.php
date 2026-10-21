@@ -8,6 +8,7 @@
 namespace OCA\Tables\Service;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\Share;
@@ -269,6 +270,14 @@ class PermissionsService {
 		$canReadRows = $this->checkPermissionById($tableId, 'table', 'read', $userId);
 		$canCreateRows = $this->checkPermissionById($tableId, 'table', 'create', $userId);
 		return $canCreateRows || $canReadRows;
+	}
+
+	public function canReadRelationTarget(string $relationType, int $targetId, ?string $userId = null): bool {
+		return match ($relationType) {
+			Column::RELATION_TYPE_TABLE => $this->canReadRowsByElementId($targetId, 'table', $userId),
+			Column::RELATION_TYPE_VIEW => $this->canReadRowsByElementId($targetId, 'view', $userId),
+			default => false,
+		};
 	}
 
 	/**

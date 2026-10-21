@@ -25,6 +25,7 @@ class RelationService {
 		private readonly ViewMapper $viewMapper,
 		private readonly Row2Mapper $row2Mapper,
 		private readonly ColumnService $columnService,
+		private readonly PermissionsService $permissionsService,
 		private readonly ?string $userId,
 	) {
 	}
@@ -103,7 +104,7 @@ class RelationService {
 				continue;
 			}
 
-			$target = sprintf('%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn']);
+			$target = sprintf('%s_%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn'], $settings[Column::RELATION_TARGET_SET_BY] ?? '');
 			$groups[$target] ??= [];
 			$groups[$target][] = $column;
 		}
@@ -127,7 +128,7 @@ class RelationService {
 			return [];
 		}
 
-		$target = sprintf('%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn']);
+		$target = sprintf('%s_%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn'], $settings[Column::RELATION_TARGET_SET_BY] ?? '');
 
 		return $this->getRelationDataForTarget($target, $column);
 	}
@@ -153,13 +154,25 @@ class RelationService {
 			return [];
 		}
 
-		$isView = $settings[Column::RELATION_TYPE] === 'view';
+		$relationType = (string)$settings[Column::RELATION_TYPE];
+		$isView = $relationType === Column::RELATION_TYPE_VIEW;
 		$targetId = $settings[Column::RELATION_TARGET_ID] ?? null;
+
+		$targetSetBy = $settings[Column::RELATION_TARGET_SET_BY] ?? '';
+		$authorizeAs = $targetSetBy !== '' ? (string)$targetSetBy : $this->userId;
+		if (!$this->permissionsService->canReadRelationTarget($relationType, (int)$targetId, $authorizeAs)) {
+			$this->cacheRelationData[$cacheKey] = [];
+			return [];
+		}
 
 		try {
 			$targetColumn = $this->columnMapper->find($settings[Column::RELATION_LABEL_COLUMN]);
 			if ($isView) {
 				$view = $this->viewMapper->find($targetId);
+				if (!in_array($targetColumn->getId(), $view->getColumnIds(), true)) {
+					$this->cacheRelationData[$cacheKey] = [];
+					return [];
+				}
 				$rows = $this->row2Mapper->findAll(
 					[$targetColumn->getId()],
 					$view->getTableId(),
