@@ -239,6 +239,53 @@ final class AnalyticsDatasourceTest extends TestCase {
 		], $result['data']);
 	}
 
+	/**
+	 * @dataProvider emptyTextValuesProvider
+	 */
+	public function testReadDataFormatsEmptyTextValues(string $subtype, ?string $value): void {
+		$textColumn = $this->createColumn(1, 'Empty text', 'text', $subtype);
+		$defaultColumn = $this->createColumn(2, 'Default text', 'text', 'line');
+		$defaultColumn->setTextDefault('<b>Fallback</b>');
+
+		$this->columnService
+			->expects($this->once())
+			->method('findAllByTable')
+			->with(123, 'user1')
+			->willReturn([$textColumn, $defaultColumn]);
+
+		$row = new Row2();
+		$row->addCell(1, $value);
+		$row->addCell(2, $value);
+
+		$this->rowService
+			->expects($this->once())
+			->method('findAllByTable')
+			->with(123, 'user1', null, null)
+			->willReturn([$row]);
+
+		$result = $this->datasource->readData([
+			'tableId' => '123',
+			'user_id' => 'user1',
+		]);
+
+		self::assertSame([['', 'Fallback', 1]], $result['data']);
+		self::assertSame(0, $result['error']);
+	}
+
+	/** @return array<string, array{string, ?string}> */
+	public static function emptyTextValuesProvider(): array {
+		return [
+			'null line' => ['line', null],
+			'empty line' => ['line', ''],
+			'null long' => ['long', null],
+			'empty long' => ['long', ''],
+			'null rich' => ['rich', null],
+			'empty rich' => ['rich', ''],
+			'null link' => ['link', null],
+			'empty link' => ['link', ''],
+		];
+	}
+
 	private function mockTableData(): void {
 		$this->columnService
 			->expects($this->once())
