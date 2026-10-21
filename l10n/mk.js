@@ -63,6 +63,7 @@ OC.L10N.register(
     "Edit" : "Уреди",
     "Activity" : "Активност",
     "Owner" : "Сопственик",
+    "Notifications" : "Известувања",
     "Close" : "Затвори",
     "Please select a file." : "Изберете датотека.",
     "Select from Files" : "Избри од датотеките",

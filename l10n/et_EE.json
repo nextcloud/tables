@@ -526,7 +526,7 @@
     "Remove Views" : "Eemalda vaated",
     "No views to remove" : "Pole vaateid, mida eemaldada",
     "Column Order" : "Veergude järjestus",
-    "Sort" : "Sorteeri",
+    "Sort" : "Järjesta",
     "Context \"{name}\" transferred to {user}" : "„{name}“  omand on üle antud kasutajale {user}",
     "Transfer the application \"{context}\" to another user" : "Anna „{context}“ rakenduse omand teisele kasutajale üle",
     "Transfer" : "Anna omand üle",
