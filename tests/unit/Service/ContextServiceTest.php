@@ -16,6 +16,7 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -154,6 +155,108 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(10, $updatedOrders[502]);
 		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
 		self::assertSame(10, $updatedContext->getPages()[301]['content'][502]['order']);
+	}
+
+	public function testANewApplicationGetsAStartPageNamedDashboard(): void {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 7;
+			return $context;
+		});
+		$inserted = [];
+		$this->pageMapper->expects($this->once())->method('insert')
+			->willReturnCallback(static function (Page $page) use (&$inserted): Page {
+				$page->id = 70;
+				$inserted[] = $page;
+				return $page;
+			});
+
+		$context = $this->service->create('Projects', 'star', '', [], 'user-1', 0);
+
+		self::assertSame(Page::TYPE_STARTPAGE, $inserted[0]->getPageType());
+		self::assertSame('dashboard', $inserted[0]->getTechnicalName());
+		self::assertSame('dashboard', $context->getPages()[70]['technicalName']);
+	}
+
+	public function testImportedPagesKeepFreeNamesAndTheRestGetTheDefault(): void {
+		$table = new Table();
+		$table->id = 40;
+		$table->setOwnership('user-1');
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$names = [];
+		$pageId = 80;
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$names, &$pageId): Page {
+			$page->id = $pageId++;
+			$names[$page->getId()] = $page->getTechnicalName();
+			return $page;
+		});
+		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$names, &$pageId): Page {
+			$page->id = $pageId++;
+			$page->setTechnicalName('page_' . $page->getId());
+			$names[$page->getId()] = $page->getTechnicalName();
+			return $page;
+		});
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]],
+			'pages' => [
+				['id' => 1, 'page_type' => Page::TYPE_STARTPAGE],
+				['id' => 2, 'page_type' => Page::TYPE_GRID, 'title' => 'Sales', 'technical_name' => 'sales'],
+				['id' => 3, 'page_type' => Page::TYPE_GRID, 'title' => 'More sales', 'technical_name' => 'sales'],
+				['id' => 4, 'page_type' => Page::TYPE_GRID, 'title' => 'Other', 'technical_name' => 'Bad Name'],
+				['id' => 5, 'page_type' => Page::TYPE_GRID, 'title' => 'Team overview'],
+				['id' => 6, 'page_type' => Page::TYPE_STARTPAGE, 'technicalName' => 'home'],
+				['id' => 7, 'page_type' => Page::TYPE_GRID, 'title' => 'Copied', 'technical_name' => 'page_2'],
+			],
+		], 4);
+
+		self::assertSame([
+			80 => 'dashboard',
+			81 => 'sales',
+			82 => 'page_82',
+			83 => 'page_83',
+			84 => 'page_84',
+			85 => 'home',
+			86 => 'page_86',
+		], $names);
+	}
+
+	public function testAnImportedStartPageLeavesDashboardToThePageExportedWithIt(): void {
+		$table = new Table();
+		$table->id = 40;
+		$table->setOwnership('user-1');
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$names = [];
+		$pageId = 80;
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$names, &$pageId): Page {
+			$page->id = $pageId++;
+			$names[$page->getId()] = $page->getTechnicalName();
+			return $page;
+		});
+		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$names, &$pageId): Page {
+			$page->id = $pageId++;
+			$names[$page->getId()] = 'page_' . $page->getId();
+			return $page;
+		});
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]],
+			'pages' => [
+				['id' => 1, 'page_type' => Page::TYPE_STARTPAGE],
+				['id' => 2, 'page_type' => Page::TYPE_GRID, 'title' => 'Board', 'technical_name' => 'dashboard'],
+			],
+		], 4);
+
+		self::assertSame([80 => 'page_80', 81 => 'dashboard'], $names);
 	}
 
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {
