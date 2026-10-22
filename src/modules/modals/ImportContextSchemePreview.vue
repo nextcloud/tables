@@ -179,6 +179,41 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Menu Section -->
+		<div v-if="previewData.menuItems" class="preview-section preview-section--option">
+			<div class="preview-option">
+				<NcCheckboxRadioSwitch v-model="importMenu" class="preview-option__label" type="switch" data-cy="importSchemeMenu">
+					{{ t('tables', 'Menu') }}
+				</NcCheckboxRadioSwitch>
+				<div v-if="importMenu" class="preview-card__meta preview-card__meta--compare">
+					<ul class="preview-card__meta--before">
+						<li class="preview-card__meta-title">
+							{{ t('tables', 'From') }}:
+						</li>
+						<li v-for="(item, index) in previewData.menuItems.from" :key="index">
+							{{ item.label }}
+						</li>
+					</ul>
+					<ul class="preview-card__meta--after">
+						<li class="preview-card__meta-title">
+							{{ t('tables', 'To') }}:
+						</li>
+						<li v-for="(item, index) in previewData.menuItems.to" :key="index">
+							{{ item.label }}
+						</li>
+					</ul>
+				</div>
+				<ul v-if="importMenu && previewData.menuItems.skipped.length > 0" class="preview-card__meta" data-cy="importSchemeMenuSkipped">
+					<li class="preview-card__meta-title">
+						{{ t('tables', 'Skipped, not available here') }}:
+					</li>
+					<li v-for="item in previewData.menuItems.skipped" :key="item.index">
+						{{ item.label }}
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -236,6 +271,7 @@ export default {
 			importIcon: true,
 			importDescription: true,
 			importNodes: true,
+			importMenu: true,
 			addTablesConfig: [],
 			removeColumnsConfig: [],
 			modifyTablesConfig: [],
@@ -272,6 +308,11 @@ export default {
 			handler() {
 				this.emitPayload()
 			}
+		},
+		importMenu: {
+			handler() {
+				this.emitPayload()
+			},
 		},
 		addTablesConfig: {
 			handler() {
@@ -332,6 +373,10 @@ export default {
 							.map(item => ({uuid: item.uuid, ...item.tableSubmitPayload})),
 				},
 				nodes: this.importNodes ? this.previewData.nodes.to : this.previewData.nodes.from,
+			}
+			// without menuItems the import leaves the menu of the application as it is
+			if (this.importMenu && this.previewData.menuItems) {
+				payload.menuItems = this.previewData.menuItems.to
 			}
 
 			this.$emit('update', payload)

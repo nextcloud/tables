@@ -1056,7 +1056,10 @@ class ContextService {
 					$page->setTechnicalName($technicalNames[$pageKey]);
 					$page = $this->pageMapper->insert($page);
 				}
-				$pageMap[$pageArr['id'] ?? null] = $page;
+				$oldPageId = self::importedKey($pageArr['id'] ?? null);
+				if ($oldPageId !== null) {
+					$pageMap[$oldPageId] = $page;
+				}
 
 				// insert page conten
 				if (!empty($pageArr['content'])) {
@@ -1084,7 +1087,139 @@ class ContextService {
 			}
 		}
 
+		if (is_array($context['menuItems'] ?? null)) {
+			$this->importContextMenu($newContext->getId(), $context['menuItems'], $pageMap, $tableOldId, $table->getId());
+		}
+
 		return $newContext;
+	}
+
+	/**
+	 * Inserts the exported menu of an imported application. An item opening the imported
+	 * table or one of the imported pages points at its new id and a link is kept; an item
+	 * opening anything else, or that is not valid, is skipped with a warning. A parent is
+	 * found by its exported id and the menu is nested by {@see self::nestImportedMenu()}.
+	 * At most {@see MenuItem::MAX_ITEMS_PER_APPLICATION} items are kept.
+	 *
+	 * @param array<array-key, mixed> $menuItems exported menu items
+	 * @param array<array-key, Page> $pageMap imported pages by their exported id
+	 * @throws Exception|InvalidArgumentException
+	 */
+	private function importContextMenu(int $contextId, array $menuItems, array $pageMap, int $tableOldId, int $tableId): void {
+		$kept = [];
+		foreach (array_values($menuItems) as $index => $item) {
+			if (!is_array($item)) {
+				$this->skipImportedMenuItem($index, 'it is not an object');
+				continue;
+			}
+			$id = $item['id'] ?? null;
+			$parentId = $item['parentId'] ?? null;
+			$exportedTargetId = $item['targetId'] ?? null;
+			if (!self::isIdOrNull($id) || !self::isIdOrNull($parentId) || !self::isIdOrNull($exportedTargetId)) {
+				$this->skipImportedMenuItem($index, 'its id, parentId or targetId is not a number');
+				continue;
+			}
+			$targetType = $item['targetType'] ?? null;
+			$targetId = match ($targetType) {
+				MenuItem::TARGET_TABLE => $exportedTargetId === $tableOldId ? $tableId : null,
+				MenuItem::TARGET_PAGE => $exportedTargetId !== null && isset($pageMap[$exportedTargetId]) ? $pageMap[$exportedTargetId]->getId() : null,
+				default => null,
+			};
+			if (in_array($targetType, [MenuItem::TARGET_TABLE, MenuItem::TARGET_PAGE, MenuItem::TARGET_VIEW], true) && $targetId === null) {
+				$this->skipImportedMenuItem($index, 'its ' . $targetType . ' is not part of this import');
+				continue;
+			}
+			if (count($kept) >= MenuItem::MAX_ITEMS_PER_APPLICATION) {
+				$this->skipImportedMenuItem($index, 'a menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items');
+				continue;
+			}
+			try {
+				$input = self::importedMenuInput($item, $targetType, $targetId);
+			} catch (InvalidArgumentException $e) {
+				$this->skipImportedMenuItem($index, $e->getMessage());
+				continue;
+			}
+			$kept[] = ['input' => $input, 'ref' => $id === null ? null : (string)$id, 'parent' => $parentId === null ? null : (string)$parentId];
+		}
+
+		$menu = $this->nestImportedMenu($kept, 'imported menu item');
+		$this->insertMenuItems($contextId, $menu, array_filter(array_map(static fn (MenuItemInput $item): ?string => $item->getTechnicalName(), $menu)));
+	}
+
+	private static function isIdOrNull(mixed $id): bool {
+		return $id === null || is_int($id);
+	}
+
+	private function skipImportedMenuItem(int|string $index, string $reason): void {
+		$this->logger->warning('Skipping imported menu item ' . $index . ': ' . $reason);
+	}
+
+	/**
+	 * The menu item of an imported entry. A technical name that is not valid or has the
+	 * automatic form `item_<id>` is dropped, so the item gets a name of its own.
+	 *
+	 * @param array<array-key, mixed> $entry
+	 * @throws InvalidArgumentException when the item is not valid
+	 */
+	private static function importedMenuInput(array $entry, mixed $targetType, ?int $targetId): MenuItemInput {
+		$name = $entry['technicalName'] ?? null;
+		$keepName = is_string($name) && TechnicalNameValidator::isValid($name) && !MenuItem::isDefaultName($name);
+		return MenuItemInput::createFromInputArray([
+			'label' => $entry['label'] ?? null,
+			'icon' => $entry['icon'] ?? null,
+			'description' => $entry['description'] ?? null,
+			'targetType' => $targetType,
+			'targetId' => $targetId,
+			'url' => $entry['url'] ?? null,
+			'technicalName' => $keepName ? $name : null,
+		]);
+	}
+
+	/**
+	 * Nests the items of an imported menu one level deep. An item sits under its parent
+	 * when that is a top-level item of the import; a child whose parent was skipped or is
+	 * a child itself moves to the top. A technical name taken by an earlier item is
+	 * dropped.
+	 *
+	 * @param list<array{input: MenuItemInput, ref: ?string, parent: ?string, entry?: array<array-key, mixed>}> $items in menu order, with the keys the item and its parent are exported under
+	 * @return list<MenuItemInput>
+	 */
+	private function nestImportedMenu(array $items, string $what): array {
+		$keptRefs = [];
+		foreach ($items as $item) {
+			if ($item['ref'] !== null) {
+				$keptRefs[$item['ref']] = true;
+			}
+		}
+		$topLevelPositions = [];
+		foreach ($items as $position => $item) {
+			$isTopLevel = $item['parent'] === null || !isset($keptRefs[$item['parent']]);
+			if ($isTopLevel && $item['ref'] !== null && !isset($topLevelPositions[$item['ref']])) {
+				$topLevelPositions[$item['ref']] = $position;
+			}
+		}
+
+		$menu = [];
+		$usedNames = [];
+		foreach ($items as $position => $item) {
+			$input = $item['input'];
+			$parentIndex = $item['parent'] !== null ? ($topLevelPositions[$item['parent']] ?? null) : null;
+			if ($item['parent'] !== null && $parentIndex === null) {
+				$this->logger->warning('Moving ' . $what . ' ' . $position . ' to the top of the menu: its parent was skipped or is a child itself.');
+			}
+			$technicalName = $input->getTechnicalName();
+			if ($technicalName !== null && isset($usedNames[$technicalName])) {
+				$technicalName = null;
+			}
+			if ($technicalName !== null) {
+				$usedNames[$technicalName] = true;
+			}
+			$menu[] = new MenuItemInput(
+				$input->getLabel(), $input->getIcon(), $input->getDescription(), $input->getTargetType(),
+				$input->getTargetId(), $input->getUrl(), $technicalName, $parentIndex,
+			);
+		}
+		return $menu;
 	}
 
 	/**
@@ -1253,7 +1388,155 @@ class ContextService {
 			array_values($nodes),
 			$this->getPagesWithWidgets($context),
 			array_values($tables),
+			$this->exportMenu($context, $nodes),
 		);
+	}
+
+	/**
+	 * The menu of an application as a scheme carries it: a table or view by its uuid, a
+	 * page and a parent by their technical name. A broken item is left out.
+	 *
+	 * @param array<array-key, array<string, mixed>> $nodes the nodes of the scheme, with their uuid
+	 * @return list<array{label: string, icon: ?string, description: ?string, targetType: string, technicalName: string, url: ?string, targetUuid: ?string, targetPage: ?string, parent: ?string}>
+	 */
+	private function exportMenu(Context $context, array $nodes): array {
+		$uuids = [];
+		foreach ($nodes as $node) {
+			if (isset($node['node_uuid'])) {
+				$uuids[sprintf('t%di%d', $node['node_type'], $node['node_id'])] = $node['node_uuid'];
+			}
+		}
+		$pageNames = [];
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			$pageNames[(int)$pageId] = $page['technical_name'] ?? null;
+		}
+		$names = [];
+		foreach ($context->getMenuItems() ?? [] as $item) {
+			$names[$item['id']] = $item['technicalName'];
+		}
+
+		$menu = [];
+		foreach ($context->getMenuItems() ?? [] as $item) {
+			if ($item['broken']) {
+				continue;
+			}
+			$target = self::menuTargetNode($item['targetType'], $item['targetId']);
+			$targetUuid = $target !== null ? ($uuids[$target[0]] ?? null) : null;
+			$targetPage = $item['targetType'] === MenuItem::TARGET_PAGE ? ($pageNames[$item['targetId']] ?? null) : null;
+			if (($target !== null && $targetUuid === null) || ($item['targetType'] === MenuItem::TARGET_PAGE && $targetPage === null)) {
+				continue;
+			}
+			$menu[] = [
+				'label' => $item['label'],
+				'icon' => $item['icon'],
+				'description' => $item['description'],
+				'targetType' => $item['targetType'],
+				'technicalName' => $item['technicalName'],
+				'url' => $item['url'],
+				'targetUuid' => $targetUuid,
+				'targetPage' => $targetPage,
+				'parent' => $item['parentId'] !== null ? ($names[$item['parentId']] ?? null) : null,
+			];
+		}
+		return $menu;
+	}
+
+	/**
+	 * Checks every item of the menu of a scheme against this instance. Tables and views
+	 * are found by uuid and must be manageable by the user, unless the import adds them;
+	 * pages are found by technical name. An item that is invalid or whose target is not
+	 * here is skipped, with the reason, and so is every item past
+	 * {@see MenuItem::MAX_ITEMS_PER_APPLICATION}.
+	 *
+	 * @param list<mixed> $schemeMenu
+	 * @param array<string, true> $addedUuids uuids of the tables and views the import adds
+	 * @return array{kept: list<array{input: MenuItemInput, ref: ?string, parent: ?string, entry: array<array-key, mixed>}>, skipped: list<array{index: int, label: mixed, reason: string}>}
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
+	private function resolveSchemeMenu(Context $context, array $schemeMenu, string $userId, array $addedUuids = []): array {
+		$pageIds = [];
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			if (is_string($page['technical_name'] ?? null)) {
+				$pageIds[$page['technical_name']] = (int)$pageId;
+			}
+		}
+
+		$kept = [];
+		$skipped = [];
+		foreach (array_values($schemeMenu) as $index => $entry) {
+			$skip = static function (string $reason) use (&$skipped, $index, $entry): void {
+				$skipped[] = ['index' => $index, 'label' => is_array($entry) ? ($entry['label'] ?? null) : null, 'reason' => $reason];
+			};
+			if (!is_array($entry) || !is_string($entry['targetType'] ?? null)) {
+				$skip('it is not an object with a targetType');
+				continue;
+			}
+			$targetId = null;
+			if ($entry['targetType'] === MenuItem::TARGET_TABLE || $entry['targetType'] === MenuItem::TARGET_VIEW) {
+				$uuid = $entry['targetUuid'] ?? null;
+				if (!is_string($uuid)) {
+					$skip('its ' . $entry['targetType'] . ' has no uuid');
+					continue;
+				}
+				if (isset($addedUuids[$uuid])) {
+					// added by the import, so not here yet; any id passes the check
+					$targetId = PHP_INT_MAX;
+				} else {
+					$node = $entry['targetType'] === MenuItem::TARGET_TABLE ? $this->tableMapper->findByUuid($uuid) : $this->viewMapper->findByUuid($uuid);
+					$nodeType = $entry['targetType'] === MenuItem::TARGET_TABLE ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+					if ($node === null || !$this->permissionsService->canManageNodeById($nodeType, $node->getId(), $userId)) {
+						$skip('its ' . $entry['targetType'] . ' is not here or cannot be managed by the user');
+						continue;
+					}
+					$targetId = $node->getId();
+				}
+			} elseif ($entry['targetType'] === MenuItem::TARGET_PAGE) {
+				$targetPage = $entry['targetPage'] ?? null;
+				$targetId = is_string($targetPage) ? ($pageIds[$targetPage] ?? null) : null;
+				if ($targetId === null) {
+					$skip('the application has no page with its technical name');
+					continue;
+				}
+			}
+			if (count($kept) >= MenuItem::MAX_ITEMS_PER_APPLICATION) {
+				$skip('a menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items');
+				continue;
+			}
+			try {
+				$input = self::importedMenuInput($entry, $entry['targetType'], $targetId);
+			} catch (InvalidArgumentException $e) {
+				$skip($e->getMessage());
+				continue;
+			}
+			$kept[] = [
+				'input' => $input,
+				'ref' => is_string($entry['technicalName'] ?? null) ? $entry['technicalName'] : null,
+				'parent' => is_string($entry['parent'] ?? null) ? $entry['parent'] : null,
+				'entry' => $entry,
+			];
+		}
+		return ['kept' => $kept, 'skipped' => $skipped];
+	}
+
+	/**
+	 * The menu of a scheme for an application of this instance, see
+	 * {@see self::resolveSchemeMenu()}; every skipped item is logged. A parent is found by
+	 * the technical name it was exported under, an automatic `item_<id>` included, and the
+	 * menu is nested by {@see self::nestImportedMenu()}.
+	 *
+	 * @param list<mixed> $schemeMenu
+	 * @return list<MenuItemInput>
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
+	private function importMenu(Context $context, array $schemeMenu, string $userId): array {
+		['kept' => $items, 'skipped' => $skipped] = $this->resolveSchemeMenu($context, $schemeMenu, $userId);
+		foreach ($skipped as $skip) {
+			$this->logger->warning('Skipping menu item ' . $skip['index'] . ' of an imported scheme: ' . $skip['reason']);
+		}
+
+		return $this->nestImportedMenu($items, 'scheme menu item');
 	}
 
 	/**
@@ -1322,7 +1605,46 @@ class ContextService {
 			}
 		}
 
+		if (is_array($updateScheme['menuItems'] ?? null)) {
+			$changes['menuItems'] = $this->previewMenu($context, $currentScheme, $updateScheme['menuItems'], $updateSchemeTables, array_keys($tablesMap), $userId);
+		}
+
 		return $changes;
+	}
+
+	/**
+	 * The menu an import would save, as the menu of the scheme without the items it would
+	 * skip, and the skipped items with the reason.
+	 *
+	 * @param list<mixed> $schemeMenu
+	 * @param array<array-key, mixed> $schemeTables
+	 * @param list<string> $localTableUuids
+	 * @return array{from: list<array<string, mixed>>, to: list<array<array-key, mixed>>, skipped: list<array{index: int, label: mixed, reason: string}>}
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
+	private function previewMenu(Context $context, ContextScheme $currentScheme, array $schemeMenu, array $schemeTables, array $localTableUuids, string $userId): array {
+		$localTableUuids = array_flip($localTableUuids);
+		$addedUuids = [];
+		foreach ($schemeTables as $table) {
+			if (!is_array($table)) {
+				continue;
+			}
+			if (is_string($table['uuid'] ?? null) && !isset($localTableUuids[$table['uuid']])) {
+				$addedUuids[$table['uuid']] = true;
+			}
+			foreach (is_array($table['views'] ?? null) ? $table['views'] : [] as $view) {
+				if (is_array($view) && is_string($view['uuid'] ?? null) && $this->viewMapper->findByUuid($view['uuid']) === null) {
+					$addedUuids[$view['uuid']] = true;
+				}
+			}
+		}
+		['kept' => $kept, 'skipped' => $skipped] = $this->resolveSchemeMenu($context, array_values($schemeMenu), $userId, $addedUuids);
+		return [
+			'from' => $currentScheme->getMenuItems() ?? [],
+			'to' => array_column($kept, 'entry'),
+			'skipped' => $skipped,
+		];
 	}
 
 	/**
@@ -1333,6 +1655,7 @@ class ContextService {
 	 * @param array $nodes
 	 * @param array $tables
 	 * @param string $userId
+	 * @param list<mixed>|null $menuItems the menu of the scheme; null leaves the menu alone
 	 *
 	 * @return Context
 	 *
@@ -1346,7 +1669,7 @@ class ContextService {
 	 * @throws NotFoundExceptionInterface
 	 * @throws PermissionError
 	 */
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId): Context {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?array $menuItems = null): Context {
 		// Validate the structure of the columns and views arrays
 		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
 			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
@@ -1383,6 +1706,9 @@ class ContextService {
 			}
 			$tableService->validateTableScheme($tableScheme);
 			$table = $this->tableMapper->findByUuid($tableScheme['uuid']);
+			if ($table === null) {
+				throw new BadRequestError('The table ' . $tableScheme['uuid'] . ' to modify does not exist.');
+			}
 			$tableService->updateTableStructure($table->getId(), $tableScheme['columns'], $tableScheme['views'], $tableScheme['columnOrder'], $tableScheme['sort'], $userId);
 		}
 
@@ -1391,6 +1717,10 @@ class ContextService {
 		foreach ($nodes as $node) {
 			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
 				$table = $this->tableMapper->findByUuid($node['node_uuid']);
+				if ($table === null) {
+					$this->logger->warning('Skipping a node of an imported scheme: no table has the uuid ' . $node['node_uuid'] . '.');
+					continue;
+				}
 				$resolvedNodes[] = [
 					'id' => $table->getId(),
 					'type' => $node['node_type'],
@@ -1398,6 +1728,10 @@ class ContextService {
 				];
 			} elseif ($node['node_type'] === Application::NODE_TYPE_VIEW) {
 				$view = $this->viewMapper->findByUuid($node['node_uuid']);
+				if ($view === null) {
+					$this->logger->warning('Skipping a node of an imported scheme: no view has the uuid ' . $node['node_uuid'] . '.');
+					continue;
+				}
 				$resolvedNodes[] = [
 					'id' => $view->getId(),
 					'type' => $node['node_type'],
@@ -1406,8 +1740,8 @@ class ContextService {
 			}
 		}
 
-		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
+		$menu = $menuItems !== null ? $this->importMenu($this->contextMapper->findById($contextId, $userId), $menuItems, $userId) : null;
 
-		return $context;
+		return $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes, $menu);
 	}
 }
