@@ -25,6 +25,15 @@
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
 				<PaginationBlock :rows="rows" :element-id="elementId" :is-view="isView" />
+				<NcButton v-if="isView && config.canEditColumns"
+					:aria-label="t('tables', 'Format rules')"
+					type="tertiary"
+					@click="formattingStore.showFormattingManager = true">
+					{{ t('tables', 'Format rules') }}
+					<template #icon>
+						<FormatPaint :size="20" />
+					</template>
+				</NcButton>
 			</div>
 
 			<NcActions v-if="showLayoutToggle"
@@ -109,6 +118,8 @@ import ViewGridOutline from 'vue-material-design-icons/ViewGridOutline.vue'
 import ViewGalleryOutline from 'vue-material-design-icons/ViewGalleryOutline.vue'
 import { CARD_LAYOUTS, LAYOUT_GALLERY, LAYOUT_TABLE, LAYOUT_TILES } from '../../../constants.ts'
 import { resolveLayout } from '../../../utils/viewSetting.js'
+import FormatPaint from 'vue-material-design-icons/FormatPaint.vue'
+import { useFormattingStore } from '../../../../store/formatting.js'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 
 export default {
@@ -127,6 +138,7 @@ export default {
 		ViewListOutline,
 		ViewGridOutline,
 		ViewGalleryOutline,
+		FormatPaint,
 	},
 
 	mixins: [viewportHelper],
@@ -189,6 +201,11 @@ export default {
 		'download-filtered-csv',
 		'set-search-string',
 	],
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
+	},
+
 	data() {
 		return {
 			optionsDivWidth: null,
