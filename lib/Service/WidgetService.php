@@ -13,6 +13,7 @@ use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Model\WidgetInput;
+use OCA\Tables\ResponseDefinitions;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
 
@@ -22,7 +23,7 @@ use OCP\IDBConnection;
  * in their own transaction.
  *
  * @psalm-import-type TablesWidgetSettingValue from Widget
- * @psalm-type TablesWidgetRecord = array{id: int, type: string, title: ?string, icon: ?string, description: ?string, gridX: int, gridY: int, gridWidth: int, gridHeight: int, settings: \stdClass, source: ?array{nodeRelId: int}}
+ * @psalm-import-type TablesWidget from ResponseDefinitions
  */
 class WidgetService {
 	use \OCP\AppFramework\Db\TTransactional;
@@ -36,7 +37,7 @@ class WidgetService {
 
 	/**
 	 * @param int[] $pageIds
-	 * @return array<int, list<TablesWidgetRecord>> widgets by page id, in grid order
+	 * @return array<int, list<TablesWidget>> widgets by page id, in grid order
 	 * @throws Exception
 	 */
 	public function findByPageIds(array $pageIds): array {
@@ -93,6 +94,14 @@ class WidgetService {
 			$this->widgetSourceMapper->insertSource($widget->getId(), $input->nodeRelId);
 		}
 		return $widget;
+	}
+
+	/**
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function findIdsByPageId(int $pageId): array {
+		return $this->widgetMapper->findIdsByPageId($pageId);
 	}
 
 	/**

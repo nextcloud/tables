@@ -1,0 +1,337 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+namespace OCA\Tables\Service;
+
+use OCA\Tables\Db\Context;
+use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\Page;
+use OCA\Tables\Db\PageContentMapper;
+use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\IconHelper;
+use OCA\Tables\Model\WidgetInput;
+use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Validation\TechnicalNameValidator;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\AppFramework\Db\TTransactional;
+use OCP\DB\Exception;
+use OCP\IDBConnection;
+
+/**
+ * The pages of an application and the widgets on them.
+ *
+ * Reads need access to the application, writes need manage permissions on it.
+ *
+ * @psalm-import-type TablesPage from ResponseDefinitions
+ */
+class PageService {
+	use TTransactional;
+
+	private const CHANGED_IN_BETWEEN = 'The page was changed by another save in the meantime. Load it again and retry.';
+
+	public function __construct(
+		private readonly ContextMapper $contextMapper,
+		private readonly PageMapper $pageMapper,
+		private readonly PageContentMapper $pageContentMapper,
+		private readonly WidgetService $widgetService,
+		private readonly PermissionsService $permissionsService,
+		private readonly GridWidgetTypes $gridWidgetTypes,
+		private readonly IDBConnection $dbc,
+	) {
+	}
+
+	/**
+	 * @return TablesPage
+	 * @throws NotFoundError
+	 * @throws Exception
+	 */
+	public function find(int $contextId, int $pageId, string $userId): array {
+		$context = $this->contextMapper->findById($contextId, $userId);
+		$page = $this->getPageArray($context, $pageId);
+		$widgets = $this->widgetService->findByPageIds([$pageId]);
+
+		return [
+			'id' => $pageId,
+			'contextId' => $contextId,
+			'pageType' => (string)$page['page_type'],
+			'technicalName' => (string)$page['technical_name'],
+			'title' => $page['title'] ?? null,
+			'icon' => $page['icon'] ?? null,
+			'description' => $page['description'] ?? null,
+			'widgets' => $widgets[$pageId] ?? [],
+		];
+	}
+
+	/**
+	 * Adds a grid page to an application. Without a technical name the page is named
+	 * `page_<id>`; a given technical name that is taken is refused.
+	 *
+	 * @return TablesPage
+	 * @throws BadRequestError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws Exception
+	 */
+	public function create(int $contextId, string $title, ?string $technicalName, ?string $icon, ?string $description, string $userId): array {
+		$context = $this->getManageableContext($contextId, $userId);
+
+		$page = new Page();
+		$page->setContextId($contextId);
+		$page->setPageType(Page::TYPE_GRID);
+		$page->setTitle($this->validateTitle($title));
+		$page->setIcon($this->validateIcon($icon));
+		$page->setDescription($this->validateDescription($description));
+
+		if ($technicalName !== null) {
+			$page->setTechnicalName($this->validateTechnicalName($technicalName, $context, null));
+			$this->saveNamed(fn () => $this->pageMapper->insert($page), $technicalName);
+		} else {
+			$page = $this->pageMapper->insertWithDefaultName($page);
+		}
+
+		return $this->find($contextId, $page->getId(), $userId);
+	}
+
+	/**
+	 * Changes the fields of a page and, when widgets are given, makes its widgets match
+	 * them in one transaction. A null argument keeps the current value; an empty icon
+	 * or description removes it. A widget's `source` is `{nodeRelId}` of a table or view
+	 * of this application, or null.
+	 *
+	 * @param list<mixed>|null $widgets
+	 * @return TablesPage
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws BadRequestError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws Exception
+	 */
+	public function update(int $contextId, int $pageId, ?string $title, ?string $technicalName, ?string $icon, ?string $description, ?array $widgets, string $userId): array {
+		$context = $this->getManageableContext($contextId, $userId);
+		$pageArray = $this->getPageArray($context, $pageId);
+
+		$page = $this->pageMapper->findById($pageId);
+		if ($title !== null) {
+			$page->setTitle($this->validateTitle($title));
+		}
+		if ($technicalName !== null && $technicalName !== $page->getTechnicalName()) {
+			$page->setTechnicalName($this->validateTechnicalName($technicalName, $context, $pageId));
+		}
+		if ($icon !== null) {
+			$page->setIcon($this->validateIcon($icon));
+		}
+		if ($description !== null) {
+			$page->setDescription($this->validateDescription($description));
+		}
+
+		$rows = null;
+		if ($widgets !== null) {
+			if ($pageArray['page_type'] !== Page::TYPE_GRID) {
+				throw new BadRequestError('Only grid pages hold widgets.');
+			}
+			$rows = $this->readWidgets($widgets, $context, $pageId);
+		}
+
+		$renamed = array_key_exists('technicalName', $page->getUpdatedFields());
+		$this->saveChanges(fn () => $this->atomic(function () use ($page, $rows, $pageId): void {
+			if ($page->getUpdatedFields() !== []) {
+				$this->pageMapper->update($page);
+			}
+			if ($rows !== null) {
+				$this->widgetService->syncPage($pageId, $rows);
+			}
+		}, $this->dbc), $renamed ? (string)$page->getTechnicalName() : null);
+
+		return $this->find($contextId, $pageId, $userId);
+	}
+
+	/**
+	 * Deletes a grid page with its widgets. The start page cannot be deleted.
+	 *
+	 * @return TablesPage the deleted page
+	 * @throws BadRequestError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws Exception
+	 */
+	public function delete(int $contextId, int $pageId, string $userId): array {
+		$context = $this->getManageableContext($contextId, $userId);
+		$pageArray = $this->getPageArray($context, $pageId);
+		if ($pageArray['page_type'] !== Page::TYPE_GRID) {
+			throw new BadRequestError('The start page of an application cannot be deleted.');
+		}
+		$page = $this->find($contextId, $pageId, $userId);
+
+		$this->atomic(function () use ($pageId): void {
+			$this->widgetService->deleteByPageIds([$pageId]);
+			$this->pageContentMapper->deleteByPageId($pageId);
+			$this->pageMapper->deleteByPageId($pageId);
+		}, $this->dbc);
+
+		return $page;
+	}
+
+	/**
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws Exception
+	 */
+	private function getManageableContext(int $contextId, string $userId): Context {
+		$context = $this->contextMapper->findById($contextId, $userId);
+		if (!$this->permissionsService->canManageContext($context, $userId)) {
+			throw new PermissionError(sprintf('User %s cannot manage application %d', $userId, $contextId));
+		}
+		return $context;
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 * @throws NotFoundError
+	 */
+	private function getPageArray(Context $context, int $pageId): array {
+		$pages = $context->getPages() ?? [];
+		if (!isset($pages[$pageId])) {
+			throw new NotFoundError('Page ' . $pageId . ' does not belong to application ' . $context->getId());
+		}
+		return $pages[$pageId];
+	}
+
+	/**
+	 * @param list<mixed> $widgets
+	 * @return list<WidgetInput>
+	 * @throws BadRequestError
+	 * @throws Exception
+	 */
+	private function readWidgets(array $widgets, Context $context, int $pageId): array {
+		if (count($widgets) > GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
+			throw new BadRequestError('A page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . ' widgets.');
+		}
+		$existingIds = array_flip($this->widgetService->findIdsByPageId($pageId));
+		$nodes = $context->getNodes() ?? [];
+		$rows = [];
+		$seenIds = [];
+		foreach (array_values($widgets) as $index => $widget) {
+			$input = $this->gridWidgetTypes->readWidget($index, $widget);
+			if ($input->id !== null && (!isset($existingIds[$input->id]) || isset($seenIds[$input->id]))) {
+				throw new BadRequestError('Widget ' . $index . ' has the id of no other widget on this page.');
+			}
+			if ($input->id !== null) {
+				$seenIds[$input->id] = true;
+			}
+			if ($input->nodeRelId !== null && !isset($nodes[$input->nodeRelId])) {
+				throw new BadRequestError('The source of widget ' . $index . ' must be {nodeRelId} of a table or view of this application.');
+			}
+			$rows[] = $input;
+		}
+		return $rows;
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function validateTitle(string $title): string {
+		$title = trim($title);
+		if ($title === '' || mb_strlen($title) > Page::TITLE_MAX_LENGTH) {
+			throw new BadRequestError('A page title needs 1 to ' . Page::TITLE_MAX_LENGTH . ' characters.');
+		}
+		return $title;
+	}
+
+	/**
+	 * Runs a save of the fields and widgets of a page. A unique index refusing the save
+	 * means the new technical name was taken; a widget no longer on the page, or another
+	 * refusal of the index, means a concurrent save changed the page in between.
+	 *
+	 * @throws BadRequestError
+	 * @throws Exception
+	 */
+	private function saveChanges(callable $save, ?string $newTechnicalName): void {
+		try {
+			$save();
+		} catch (\InvalidArgumentException $e) {
+			throw new BadRequestError(self::CHANGED_IN_BETWEEN, 0, $e);
+		} catch (Exception $e) {
+			if ($e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+				throw $e;
+			}
+			if ($newTechnicalName !== null) {
+				throw new BadRequestError('The technical name ' . $newTechnicalName . ' is already used by a page of this application.', 0, $e);
+			}
+			throw new BadRequestError(self::CHANGED_IN_BETWEEN, 0, $e);
+		}
+	}
+
+	/**
+	 * Runs a save of a page under a technical name that was given, reporting a save the
+	 * unique index refused as a taken name.
+	 *
+	 * @throws BadRequestError
+	 * @throws Exception
+	 */
+	private function saveNamed(callable $save, string $technicalName): void {
+		try {
+			$save();
+		} catch (Exception $e) {
+			if ($e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+				throw $e;
+			}
+			throw new BadRequestError('The technical name ' . $technicalName . ' is already used by a page of this application.');
+		}
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function validateTechnicalName(string $technicalName, Context $context, ?int $pageId): string {
+		if (!TechnicalNameValidator::isValid($technicalName)) {
+			throw new BadRequestError('A technical name has 1 to ' . TechnicalNameValidator::MAX_LENGTH . ' lower case letters, digits and underscores and starts with a letter.');
+		}
+		if (Page::isDefaultName($technicalName) && $technicalName !== Page::DEFAULT_NAME_PREFIX . $pageId) {
+			throw new BadRequestError('The technical name ' . $technicalName . ' is reserved for automatic names.');
+		}
+		foreach ($context->getPages() ?? [] as $id => $page) {
+			if ((int)$id !== $pageId && ($page['technical_name'] ?? null) === $technicalName) {
+				throw new BadRequestError('The technical name ' . $technicalName . ' is already used by a page of this application.');
+			}
+		}
+		return $technicalName;
+	}
+
+	/**
+	 * A named icon, or null for an empty one.
+	 *
+	 * @throws BadRequestError
+	 */
+	private function validateIcon(?string $icon, string $of = 'A page'): ?string {
+		$icon = trim((string)$icon);
+		if ($icon === '') {
+			return null;
+		}
+		if (!IconHelper::isValid($icon)) {
+			throw new BadRequestError($of . ' has an unknown icon: ' . $icon);
+		}
+		return $icon;
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function validateDescription(?string $description): ?string {
+		$description = trim((string)$description);
+		if (mb_strlen($description) > Page::DESCRIPTION_MAX_LENGTH) {
+			throw new BadRequestError('A page description has at most ' . Page::DESCRIPTION_MAX_LENGTH . ' characters.');
+		}
+		return $description === '' ? null : $description;
+	}
+}

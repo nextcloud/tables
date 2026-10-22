@@ -856,7 +856,6 @@ class ContextService {
 	 * @param list<mixed> $widgets
 	 * @param array<array-key, ContextNodeRelation> $nodeRelMap new node relations by exported id
 	 * @throws Exception
-	 * @throws \JsonException
 	 */
 	private function importWidgets(int $pageId, array $widgets, array $nodeRelMap): void {
 		$inputs = [];
