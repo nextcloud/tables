@@ -851,7 +851,10 @@ export type paths = {
         };
         readonly get?: never;
         readonly put?: never;
-        /** [api v2] Preview the changes that would be applied to a context scheme */
+        /**
+         * [api v2] Preview the changes that would be applied to a context scheme
+         * @description When the scheme carries `menuItems`, the changes hold `menuItems` with the current menu under `from`, the items an import would save under `to` and the items it would skip, with the reason, under `skipped`.
+         */
         readonly post: operations["context-preview-scheme-changes"];
         readonly delete?: never;
         readonly options?: never;
@@ -7704,6 +7707,13 @@ export interface operations {
                         readonly addTables: readonly components["schemas"]["Table"][];
                         readonly modifyTables: readonly components["schemas"]["Table"][];
                     };
+                    /**
+                     * @description Menu of the scheme, replacing the menu of the context: tables and views are named by `targetUuid`, pages by their technical name in `targetPage` and parents by their technical name in `parent`; items that cannot be used here are skipped. Left out, the menu stays as it is
+                     * @default null
+                     */
+                    readonly menuItems?: readonly {
+                        readonly [key: string]: Record<string, never>;
+                    }[] | null;
                 };
             };
         };
