@@ -62,6 +62,41 @@ class MenuItemInputTest extends TestCase {
 		MenuItemInput::createFromInputArray($input);
 	}
 
+	public function testKeepsTheParentPositionForOneLevelOfNesting(): void {
+		$items = MenuItemInput::createListFromInputArray([
+			['label' => 'Cases', 'targetType' => 'table', 'targetId' => 4],
+			['label' => 'Open', 'targetType' => 'view', 'targetId' => 6, 'parentIndex' => 0],
+			['label' => 'Docs', 'url' => 'https://example.org', 'parentIndex' => null],
+		]);
+
+		$this->assertSame([null, 0, null], array_map(static fn (MenuItemInput $item) => $item->getParentIndex(), $items));
+	}
+
+	public static function invalidNesting(): array {
+		return [
+			'under a child' => [[null, 0, 1], 'top-level'],
+			'under itself' => [[null, 1], 'top-level'],
+			'under a position that does not exist' => [[null, 5], 'top-level'],
+			'given as a string' => [[null, '0'], 'position of that parent'],
+			'given as a negative number' => [[null, -1], 'position of that parent'],
+		];
+	}
+
+	/**
+	 * @dataProvider invalidNesting
+	 */
+	public function testRejectsInvalidNesting(array $parentIndexes, string $message): void {
+		$items = array_map(
+			static fn (mixed $parentIndex, int $position): array => ['label' => 'Item ' . $position, 'url' => 'https://example.org/' . $position, 'parentIndex' => $parentIndex],
+			$parentIndexes,
+			array_keys($parentIndexes),
+		);
+
+		$this->expectException(InvalidArgumentException::class);
+		$this->expectExceptionMessage($message);
+		MenuItemInput::createListFromInputArray($items);
+	}
+
 	public function testRejectsAMenuThatIsNotAList(): void {
 		$this->expectException(InvalidArgumentException::class);
 		$this->expectExceptionMessage('must be a list');

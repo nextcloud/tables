@@ -28,6 +28,8 @@ use JsonSerializable;
  * @method setTechnicalName(string $technicalName): void
  * @method getOrder(): int
  * @method setOrder(int $order): void
+ * @method getParentId(): ?int
+ * @method setParentId(?int $parentId): void
  * @method isBroken(): bool
  * @method setBroken(bool $broken): void
  */
@@ -45,6 +47,7 @@ class MenuItem extends EntitySuper implements JsonSerializable {
 	protected ?string $url = null;
 	protected ?string $technicalName = null;
 	protected ?int $order = null;
+	protected ?int $parentId = null;
 
 	// virtual: true when the view or table the item points at no longer exists
 	protected bool $broken = false;
@@ -56,11 +59,12 @@ class MenuItem extends EntitySuper implements JsonSerializable {
 		$this->addType('contextId', 'integer');
 		$this->addType('targetId', 'integer');
 		$this->addType('order', 'integer');
+		$this->addType('parentId', 'integer');
 		$this->addType('broken', 'boolean');
 	}
 
 	/**
-	 * @return array{id: int, contextId: int, label: string, icon: string|null, targetType: 'view'|'table'|'url', targetId: int|null, url: string|null, technicalName: string, order: int, broken: bool}
+	 * @return array{id: int, contextId: int, label: string, icon: string|null, targetType: 'view'|'table'|'url', targetId: int|null, url: string|null, technicalName: string, order: int, parentId: int|null, broken: bool}
 	 */
 	public function jsonSerialize(): array {
 		return [
@@ -77,6 +81,7 @@ class MenuItem extends EntitySuper implements JsonSerializable {
 			'url' => $this->getUrl(),
 			'technicalName' => $this->technicalName ?? '',
 			'order' => $this->getOrder() ?? 0,
+			'parentId' => $this->getParentId(),
 			'broken' => $this->broken,
 		];
 	}

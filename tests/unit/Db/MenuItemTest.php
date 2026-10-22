@@ -27,6 +27,7 @@ class MenuItemTest extends TestCase {
 			'url' => null,
 			'technicalName' => '',
 			'order' => 0,
+			'parentId' => null,
 			'broken' => false,
 		], $item->jsonSerialize());
 	}
@@ -41,6 +42,7 @@ class MenuItemTest extends TestCase {
 		$item->setTargetId(6);
 		$item->setTechnicalName('home');
 		$item->setOrder(20);
+		$item->setParentId(4);
 
 		$json = $item->jsonSerialize();
 
@@ -50,6 +52,7 @@ class MenuItemTest extends TestCase {
 		$this->assertSame(6, $json['targetId']);
 		$this->assertSame('home', $json['technicalName']);
 		$this->assertSame(20, $json['order']);
+		$this->assertSame(4, $json['parentId']);
 	}
 
 	public static function targetTypeProvider(): array {
