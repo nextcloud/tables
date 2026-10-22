@@ -279,7 +279,8 @@
                     "iconName",
                     "description",
                     "owner",
-                    "ownerType"
+                    "ownerType",
+                    "menuItems"
                 ],
                 "properties": {
                     "id": {
@@ -301,6 +302,12 @@
                     "ownerType": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "menuItems": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MenuItem"
+                        }
                     }
                 }
             },
@@ -405,6 +412,65 @@
                     },
                     "url": {
                         "type": "string"
+                    }
+                }
+            },
+            "MenuItem": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "contextId",
+                    "label",
+                    "icon",
+                    "targetType",
+                    "targetId",
+                    "url",
+                    "technicalName",
+                    "order",
+                    "broken"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "contextId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "targetType": {
+                        "type": "string",
+                        "enum": [
+                            "view",
+                            "table",
+                            "url"
+                        ]
+                    },
+                    "targetId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "technicalName": {
+                        "type": "string"
+                    },
+                    "order": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "broken": {
+                        "type": "boolean"
                     }
                 }
             },
