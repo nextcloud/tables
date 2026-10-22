@@ -13,6 +13,25 @@
 namespace OCA\Tables;
 
 /**
+ * @psalm-type TablesGridWidgetValue = string|bool|int|array{type: 'table'|'view', id: int}|null
+ *
+ * @psalm-type TablesGridWidget = array{
+ *  id: string,
+ *  type: string,
+ *  configuration: array<string, TablesGridWidgetValue>,
+ *  content: array<string, TablesGridWidgetValue>,
+ *  broken?: bool,
+ * }
+ *
+ * @psalm-type TablesGridLayoutItem = array{
+ *  id: string,
+ *  widgetId: string,
+ *  gridX: int,
+ *  gridY: int,
+ *  gridWidth: int,
+ *  gridHeight: int,
+ * }
+ *
  * @psalm-type TablesView = array{
  * 	id: int,
  *  uuid: string,
@@ -48,6 +67,7 @@ namespace OCA\Tables;
  *  isFederated: bool,
  *  sidebarOrder: int|null,
  *  type: 'table'|'grid',
+ *  grid: array{widgets: list<TablesGridWidget>, layout: list<TablesGridLayoutItem>},
  * }
  *
  * @psalm-type TablesTable = array{

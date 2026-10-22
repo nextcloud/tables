@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
+use JsonException;
 use JsonSerializable;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
@@ -65,6 +66,7 @@ class ViewService extends SuperService {
 		protected IL10N $l,
 		private readonly FederationService $federationService,
 		private readonly ActivityManager $activityManager,
+		private readonly GridWidgetTypes $gridWidgetTypes,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -325,9 +327,22 @@ class ViewService extends SuperService {
 					}
 				}
 
-				$insertableValue = $value instanceof JsonSerializable
-					? json_encode($value)
-					: $value;
+				if ($parameter === ViewUpdatableParameters::GRID) {
+					// the type is applied before the grid, so a request can turn a view into a grid view and fill it
+					if ($view->getTypeOrDefault() !== View::TYPE_GRID) {
+						throw new BadRequestError('Only a grid view holds a grid.');
+					}
+					$value = $this->gridWidgetTypes->sanitizeGrid($value, $userId, $view->getGridArray());
+				}
+
+				$insertableValue = $value;
+				if ($value instanceof JsonSerializable || is_array($value)) {
+					try {
+						$insertableValue = json_encode($value, JSON_THROW_ON_ERROR);
+					} catch (JsonException $e) {
+						throw new BadRequestError('The view property "' . $parameter->value . '" cannot be stored: ' . $e->getMessage());
+					}
+				}
 
 				$setterMethod = 'set' . ucfirst((string)$parameter->value);
 				$view->$setterMethod($insertableValue);
@@ -854,6 +869,10 @@ class ViewService extends SuperService {
 		$type = $view['type'] ?? View::TYPE_TABLE;
 		$this->assertTypeValid($type);
 		$item->setType($type);
+		// every exported view carries a grid, so only a grid view takes it over
+		if ($type === View::TYPE_GRID && isset($view['grid'])) {
+			$item->setGridArray($this->gridWidgetTypes->sanitizeGrid($view['grid'], $userId));
+		}
 		// A scheme may carry a layout this version does not know, which is dropped rather
 		// than rejected so the rest of the view still imports.
 		// Resolved the same way the write path resolves it, so import and create agree: an

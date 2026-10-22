@@ -35,6 +35,7 @@ class ViewUpdateInput {
 		protected readonly ?SortRuleSet $sortRuleSet = null,
 		protected readonly ?int $sidebarOrder = null,
 		protected readonly ?string $type = null,
+		protected readonly ?array $grid = null,
 		protected readonly ?string $layout = null,
 		protected readonly ?ViewSettings $viewSettings = null,
 	) {
@@ -68,6 +69,9 @@ class ViewUpdateInput {
 		if ($this->type !== null) {
 			yield ViewUpdatableParameters::TYPE => $this->type;
 		}
+		if ($this->grid !== null) {
+			yield ViewUpdatableParameters::GRID => $this->grid;
+		}
 		if ($this->layout !== null) {
 			yield ViewUpdatableParameters::LAYOUT => $this->layout;
 		}
@@ -89,12 +93,13 @@ class ViewUpdateInput {
 	 *     viewSettings?: array{cardBackgroundSource?: int|null, cardTitleSource?: int|null}|string,
 	 *     filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'contains-item'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float|list<array{id: int, label: string, uuid?: string}>}>>,
 	 *     sidebarOrder?: int,
-	 *     type?: 'table'|'grid'
+	 *     type?: 'table'|'grid',
+	 *     grid?: array{widgets?: list<array<string, mixed>>, layout?: list<array<string, mixed>>}
 	 * } $data
 	 * @param array $columnsMap
 	 */
 	public static function fromInputArray(array $data, array $columnsMap = []): self {
-		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort', 'viewSettings']);
+		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort', 'grid', 'viewSettings']);
 
 		if (isset($data['columns']) && !isset($data['columnSettings'])) {
 			$logger = Server::get(LoggerInterface::class);
@@ -122,6 +127,7 @@ class ViewUpdateInput {
 			sortRuleSet: isset($data['sort']) ? SortRuleSet::createFromInputArray($data['sort'], $columnsMap) : null,
 			sidebarOrder: (array_key_exists('sidebarOrder', $data) && $data['sidebarOrder'] !== null) ? (int)$data['sidebarOrder'] : null,
 			type: self::optionalType($data),
+			grid: self::optionalArray($data, 'grid'),
 			layout: $layout,
 			viewSettings: $viewSettings,
 		);
@@ -149,6 +155,19 @@ class ViewUpdateInput {
 			throw new InvalidArgumentException('Unknown view type "' . $type . '", expected one of: ' . implode(', ', View::TYPES) . '.');
 		}
 		return $type;
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
+	private static function optionalArray(array $data, string $key): ?array {
+		if (!isset($data[$key])) {
+			return null;
+		}
+		if (!is_array($data[$key])) {
+			throw new InvalidArgumentException('The view property "' . $key . '" must be an object.');
+		}
+		return $data[$key];
 	}
 
 	private static function createViewSettingsFromInputData(array $data, array $columnsMap = []): ?ViewSettings {
