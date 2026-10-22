@@ -12,8 +12,6 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Service\ValueObject\Title;
 
 class ColumnDtoValidator {
-	private const TECHNICAL_NAME_MAX_LENGTH = 200;
-
 	/**
 	 * reserved keys to avoid confusion with meta fields and common row keys.
 	 */
@@ -69,15 +67,15 @@ class ColumnDtoValidator {
 			throw new BadRequestError('Technical name must not be empty.');
 		}
 
-		if (strlen($technicalName) > self::TECHNICAL_NAME_MAX_LENGTH) {
-			throw new BadRequestError('Technical name must be maximum ' . self::TECHNICAL_NAME_MAX_LENGTH . ' characters long.');
+		if (TechnicalNameValidator::isTooLong($technicalName)) {
+			throw new BadRequestError('Technical name must be maximum ' . TechnicalNameValidator::MAX_LENGTH . ' characters long.');
 		}
 
 		if (in_array($technicalName, self::RESERVED_TECHNICAL_NAMES, true)) {
 			throw new BadRequestError('Technical name is reserved.');
 		}
 
-		if (preg_match('/^[a-z][a-z0-9_]*$/', $technicalName) !== 1) {
+		if (!TechnicalNameValidator::hasValidCharacters($technicalName)) {
 			throw new BadRequestError('Technical name must start with a letter and contain only lowercase letters, digits, and underscores.');
 		}
 	}
