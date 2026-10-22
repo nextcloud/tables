@@ -19,7 +19,7 @@ namespace OCA\Tables;
  * 	title: string,
  * 	technicalName: string|null,
  * 	emoji: string|null,
- *  tableId: int,
+ *  tableId: int|null,
  * 	ownership: string,
  * 	ownerDisplayName: string|null,
  * 	createdBy: string,
@@ -47,6 +47,7 @@ namespace OCA\Tables;
  *  rowsCount: int,
  *  isFederated: bool,
  *  sidebarOrder: int|null,
+ *  type: 'table'|'grid',
  * }
  *
  * @psalm-type TablesTable = array{

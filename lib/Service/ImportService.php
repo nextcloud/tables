@@ -310,6 +310,9 @@ class ImportService extends SuperService {
 	public function import(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []): array {
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
+			if ($view->isStandalone()) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no table to import rows into.');
+			}
 			if (!$this->permissionsService->canCreateRows($view)) {
 				throw new PermissionError('create row at the view id = ' . $viewId . ' is not allowed.');
 			}
@@ -400,6 +403,9 @@ class ImportService extends SuperService {
 	public function scheduleImport(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []) {
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
+			if ($view->isStandalone()) {
+				throw new NotFoundError('The view with id = ' . $viewId . ' has no table to import rows into.');
+			}
 			if (!$this->permissionsService->canCreateRows($view)) {
 				throw new PermissionError('create row at the view id = ' . $viewId . ' is not allowed.');
 			}

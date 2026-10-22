@@ -32,8 +32,10 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setTitle(string $title)
  * @method getTechnicalName(): string
  * @method setTechnicalName(?string $technicalName)
- * @method getTableId(): int
- * @method setTableId(int $tableId)
+ * @method getTableId(): ?int
+ * @method setTableId(?int $tableId)
+ * @method getType(): string
+ * @method setType(string $type)
  * @method getColumns(): string
  * @method setColumns(string $columns)
  * @method getColumnSettings(): string
@@ -80,6 +82,10 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setSidebarOrder(?int $sidebarOrder)
  */
 class View extends EntitySuper implements JsonSerializable {
+	public const TYPE_TABLE = 'table';
+	public const TYPE_GRID = 'grid';
+	public const TYPES = [self::TYPE_TABLE, self::TYPE_GRID];
+
 	protected ?string $uuid = null;
 	protected ?string $title = null;
 	protected ?string $technicalName = null;
@@ -94,6 +100,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+	protected ?string $type = null;
 	protected ?string $layout = null;
 	protected ?string $viewSettings = null; // json
 
@@ -224,6 +231,31 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
+	/**
+	 * @return 'table'|'grid'
+	 */
+	public function getTypeOrDefault(): string {
+		return $this->type === self::TYPE_GRID ? self::TYPE_GRID : self::TYPE_TABLE;
+	}
+
+	/**
+	 * A view of its own, such as a grid view: it has no table and is not a federated view,
+	 * which has no local table either.
+	 */
+	public function isStandalone(): bool {
+		return $this->tableId === null && $this->externalId === null;
+	}
+
+	/**
+	 * A view inherits its ownership from its table; a standalone view is owned by its creator.
+	 */
+	public function getOwnership(): ?string {
+		if ($this->ownership === null && $this->isStandalone()) {
+			return $this->createdBy;
+		}
+		return $this->ownership;
+	}
+
 	public function getLayoutNormalized(): string {
 		return ViewLayout::normalize($this->layout)->value;
 	}
@@ -248,7 +280,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'technicalName' => $this->technicalName,
 			'description' => $this->description,
 			'emoji' => $this->emoji,
-			'ownership' => $this->ownership ?: '',
+			'ownership' => $this->getOwnership() ?: '',
 			'createdBy' => $this->createdBy ?: '',
 			'createdAt' => $this->createdAt ?: '',
 			'lastEditBy' => $this->lastEditBy ?: '',
@@ -264,6 +296,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'isFederated' => $this->isFederated(),
 			'sidebarOrder' => $this->sidebarOrder,
+			'type' => $this->getTypeOrDefault(),
 			'layout' => $this->getLayoutNormalized(),
 			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];

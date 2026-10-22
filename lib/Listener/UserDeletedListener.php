@@ -9,6 +9,7 @@ namespace OCA\Tables\Listener;
 
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\User\Events\BeforeUserDeletedEvent;
@@ -20,6 +21,7 @@ use Psr\Log\LoggerInterface;
 class UserDeletedListener implements IEventListener {
 	public function __construct(
 		private readonly TableService $tableService,
+		private readonly ViewService $viewService,
 		private readonly LoggerInterface $logger,
 	) {
 	}
@@ -40,6 +42,13 @@ class UserDeletedListener implements IEventListener {
 			}
 			$this->logger->debug('tables for the deleted user removed');
 		} catch (InternalError) {
+		}
+
+		// views without a table belong to their creator, so they go with the user
+		try {
+			$this->viewService->deleteAllStandaloneOwnedBy($event->getUser()->getUID());
+		} catch (InternalError) {
+			// logged by the service
 		}
 	}
 }

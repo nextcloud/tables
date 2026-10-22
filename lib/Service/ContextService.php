@@ -690,7 +690,7 @@ class ContextService {
 					$view = $viewService->find($node['node_id']);
 					$node['node_uuid'] = $view->getUuid();
 					$node['node_title'] = $view->getTitle();
-					if (isset($tables[$view->getTableId()])) {
+					if ($view->getTableId() === null || isset($tables[$view->getTableId()])) {
 						continue;
 					}
 					$tables[$view->getTableId()] = $tableService->getScheme($view->getTableId(), $userId)->jsonSerialize();
@@ -852,6 +852,9 @@ class ContextService {
 				];
 			} elseif ($node['node_type'] === Application::NODE_TYPE_VIEW) {
 				$view = $this->viewMapper->findByUuid($node['node_uuid']);
+				if ($view === null) {
+					throw new DoesNotExistException('View ' . $node['node_uuid'] . ' does not exist');
+				}
 				$resolvedNodes[] = [
 					'id' => $view->getId(),
 					'type' => $node['node_type'],
