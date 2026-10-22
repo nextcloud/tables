@@ -14,6 +14,8 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItem;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -66,6 +68,7 @@ class ContextService {
 		private ViewMapper $viewMapper,
 		private WidgetService $widgetService,
 		private GridWidgetTypes $gridWidgetTypes,
+		private MenuItemMapper $menuItemMapper,
 	) {
 	}
 
@@ -85,7 +88,11 @@ class ContextService {
 			$this->logger->warning($error);
 			throw new InternalError($error);
 		}
-		return $this->contextMapper->findAll($userId);
+		$contexts = $this->contextMapper->findAll($userId);
+		foreach ($contexts as $context) {
+			$this->markMenuForReader($context, $userId);
+		}
+		return $contexts;
 	}
 
 	public function findForNavigation(string $userId): array {
@@ -130,7 +137,46 @@ class ContextService {
 			throw new InternalError($error);
 		}
 
-		return $this->contextMapper->findById($id, $userId);
+		$context = $this->contextMapper->findById($id, $userId);
+		$this->markMenuForReader($context, $userId);
+		return $context;
+	}
+
+	/**
+	 * Marks a menu item as broken for a reader who cannot open its table or view, the
+	 * way an item whose target is gone is broken for everyone. A table or view of the
+	 * application itself is open to everyone the application is shared with.
+	 */
+	private function markMenuForReader(Context $context, ?string $userId): void {
+		$menuItems = $context->getMenuItems();
+		if ($userId === null || !is_array($menuItems)) {
+			return;
+		}
+		$readableNodes = [];
+		foreach ($context->getNodes() ?? [] as $node) {
+			if (((int)$node['permissions'] & Application::PERMISSION_READ) !== 0) {
+				$readableNodes[sprintf('t%di%d', $node['node_type'], $node['node_id'])] = true;
+			}
+		}
+		$changed = false;
+		foreach ($menuItems as $index => $item) {
+			$nodeType = match ($item['targetType'] ?? null) {
+				MenuItem::TARGET_VIEW => Application::NODE_TYPE_VIEW,
+				MenuItem::TARGET_TABLE => Application::NODE_TYPE_TABLE,
+				default => null,
+			};
+			$nodeId = $item['targetId'] ?? null;
+			if ($nodeType === null || !is_int($nodeId) || ($item['broken'] ?? false) || isset($readableNodes[sprintf('t%di%d', $nodeType, $nodeId)])) {
+				continue;
+			}
+			if (!$this->permissionsService->canAccessNodeById($nodeType, $nodeId, $userId)) {
+				$menuItems[$index]['broken'] = true;
+				$changed = true;
+			}
+		}
+		if ($changed) {
+			$context->setMenuItems($menuItems);
+		}
 	}
 
 	/**
@@ -319,8 +365,12 @@ class ContextService {
 	public function delete(int $contextId, string $userId): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
-		$this->atomic(function () use ($context): void {
+		// Deleting the application first takes the write lock before anything is read, so on
+		// SQLite a concurrent write fails this transaction at once and the retry runs it again.
+		$this->atomicRetry(function () use ($context): void {
+			$this->contextMapper->delete($context);
 			$this->shareService->deleteAllForContext($context);
+			$this->menuItemMapper->deleteAllByContextId($context->getId());
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
 			$this->widgetService->deleteByPageIds($pageIds);
@@ -328,7 +378,6 @@ class ContextService {
 				$this->pageContentMapper->deleteByPageId($pageId);
 				$this->pageMapper->deleteByPageId($pageId);
 			}
-			$this->contextMapper->delete($context);
 		}, $this->dbc);
 		return $context;
 	}
