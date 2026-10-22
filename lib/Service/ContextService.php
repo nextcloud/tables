@@ -329,38 +329,53 @@ class ContextService {
 	}
 
 	/**
-	 * Inserts the items of a menu in their order. An item with a kept technical name is
-	 * saved under it and refused when another save took it; every other item is named
-	 * `item_<id>`.
+	 * Inserts the items of a menu, top-level items first so a child can point at the id
+	 * of its parent; the order keeps the sequence of the menu. An item with a kept
+	 * technical name is saved under it and refused when another save took it; every
+	 * other item is named `item_<id>`.
 	 *
 	 * @param list<MenuItemInput> $menuItems
 	 * @param array<int, string> $keptNames technical names by position
 	 * @throws Exception|InvalidArgumentException
 	 */
 	private function insertMenuItems(int $contextId, array $menuItems, array $keptNames): void {
-		foreach ($menuItems as $position => $item) {
-			$menuItem = new MenuItem();
-			$menuItem->setContextId($contextId);
-			$menuItem->setLabel($item->getLabel());
-			$menuItem->setIcon($item->getIcon());
-			$menuItem->setDescription($item->getDescription());
-			$menuItem->setTargetType($item->getTargetType());
-			$menuItem->setTargetId($item->getTargetId());
-			$menuItem->setUrl($item->getUrl());
-			$menuItem->setOrder(($position + 1) * 10);
-
-			if (!isset($keptNames[$position])) {
-				$this->menuItemMapper->insertWithDefaultName($menuItem);
-				continue;
-			}
-			$menuItem->setTechnicalName($keptNames[$position]);
-			try {
-				$this->menuItemMapper->insert($menuItem);
-			} catch (Exception $e) {
-				if ($e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
-					throw $e;
+		$topLevelIds = [];
+		foreach ([false, true] as $childPass) {
+			foreach ($menuItems as $position => $item) {
+				$parentIndex = $item->getParentIndex();
+				if (($parentIndex !== null) !== $childPass) {
+					continue;
 				}
-				throw new InvalidArgumentException('The technical name ' . $keptNames[$position] . ' is already used by a menu item of this application.');
+				if ($parentIndex !== null && !isset($topLevelIds[$parentIndex])) {
+					throw new InvalidArgumentException('A menu item can only sit under a top-level item of the same menu.');
+				}
+				$menuItem = new MenuItem();
+				$menuItem->setContextId($contextId);
+				$menuItem->setLabel($item->getLabel());
+				$menuItem->setIcon($item->getIcon());
+				$menuItem->setDescription($item->getDescription());
+				$menuItem->setTargetType($item->getTargetType());
+				$menuItem->setTargetId($item->getTargetId());
+				$menuItem->setUrl($item->getUrl());
+				$menuItem->setOrder(($position + 1) * 10);
+				$menuItem->setParentId($parentIndex === null ? null : $topLevelIds[$parentIndex]);
+
+				if (isset($keptNames[$position])) {
+					$menuItem->setTechnicalName($keptNames[$position]);
+					try {
+						$this->menuItemMapper->insert($menuItem);
+					} catch (Exception $e) {
+						if ($e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+							throw $e;
+						}
+						throw new InvalidArgumentException('The technical name ' . $keptNames[$position] . ' is already used by a menu item of this application.');
+					}
+				} else {
+					$this->menuItemMapper->insertWithDefaultName($menuItem);
+				}
+				if ($parentIndex === null) {
+					$topLevelIds[$position] = $menuItem->getId();
+				}
 			}
 		}
 	}
