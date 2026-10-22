@@ -11,6 +11,7 @@ namespace OCA\Tables\Tests\Unit\Controller;
 
 use OCA\Tables\Controller\ContextController;
 use OCA\Tables\Db\Context;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Model\MenuItemInput;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -140,6 +141,27 @@ final class ContextControllerTest extends TestCase {
 		$this->contextService->method('update')->willThrowException(new \InvalidArgumentException('The technical name docs is already used by a menu item of this application.'));
 
 		$response = $this->controller->update(7, null, null, null, null, [['label' => 'Docs', 'url' => 'https://example.org', 'technicalName' => 'docs']]);
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+	}
+
+	public function testImportingASchemePassesItsMenu(): void {
+		$context = new Context();
+		$context->setMenuItems([]);
+		$menu = [['label' => 'Docs', 'targetType' => 'url', 'url' => 'https://example.org']];
+		$this->contextService->expects($this->once())->method('importScheme')
+			->with(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', $menu)
+			->willReturn($context);
+
+		$response = $this->controller->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], $menu);
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+	}
+
+	public function testImportingASchemeThatCannotBeAppliedIsABadRequest(): void {
+		$this->contextService->method('importScheme')->willThrowException(new BadRequestError('The table x to modify does not exist.'));
+
+		$response = $this->controller->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []]);
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
 	}
