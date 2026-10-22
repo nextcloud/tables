@@ -835,18 +835,19 @@ class ShareService extends SuperService {
 		}
 	}
 
+	/**
+	 * A database error is passed on, so a transaction around the call fails as a whole.
+	 *
+	 * @throws Exception
+	 */
 	public function deleteAllForContext(Context $context): void {
-		try {
-			$this->atomic(function () use ($context): void {
-				$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
-				foreach ($shares as $share) {
-					$this->contextNavigationMapper->deleteByShareId($share->getId());
-				}
-				$this->mapper->deleteByNode($context->getId(), 'context');
-			}, $this->dbc);
-		} catch (Exception) {
-			$this->logger->error('something went wrong while deleting shares for context: ' . $context->getId());
-		}
+		$this->atomic(function () use ($context): void {
+			$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
+			foreach ($shares as $share) {
+				$this->contextNavigationMapper->deleteByShareId($share->getId());
+			}
+			$this->mapper->deleteByNode($context->getId(), 'context');
+		}, $this->dbc);
 	}
 
 	/**

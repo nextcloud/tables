@@ -14,6 +14,7 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
@@ -58,7 +59,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$l10n->method('t')->willReturnArgument(0);
 		$userHelper = $this->createMock(UserHelper::class);
 		$userHelper->method('getGroupIdsForUser')->willReturn([]);
-		$this->contextMapper = new ContextMapper($this->connectionAdapter, $userHelper, $this->createMock(GroupHelper::class));
+		$this->contextMapper = new ContextMapper($this->connectionAdapter, $userHelper, $this->createMock(GroupHelper::class), new MenuItemMapper($this->connectionAdapter));
 		$this->nodeRelMapper = new ContextNodeRelationMapper($this->connectionAdapter);
 		$this->pageMapper = new PageMapper($this->connectionAdapter);
 		$this->widgetService = new WidgetService(
@@ -83,6 +84,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			$this->createMock(ViewMapper::class),
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
+			new MenuItemMapper($this->connectionAdapter),
 		);
 	}
 

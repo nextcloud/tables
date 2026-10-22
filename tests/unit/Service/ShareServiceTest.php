@@ -247,4 +247,14 @@ class ShareServiceTest extends TestCase {
 		$this->expectException(Exception::class);
 		$this->shareService->deleteForShareReview(5);
 	}
+
+	public function testDeletingTheSharesOfAContextPassesADatabaseErrorOn(): void {
+		$context = new \OCA\Tables\Db\Context();
+		$context->id = 7;
+		$this->mapper->method('findAllSharesForNode')->willReturn([]);
+		$this->mapper->method('deleteByNode')->willThrowException(new Exception('locked'));
+
+		$this->expectException(Exception::class);
+		$this->shareService->deleteAllForContext($context);
+	}
 }

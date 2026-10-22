@@ -14,6 +14,8 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItem;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -31,6 +33,7 @@ class ContextMapperTest extends DatabaseTestCase {
 	private ContextMapper $mapper;
 	private ContextNodeRelationMapper $nodeRelMapper;
 	private PageMapper $pageMapper;
+	private MenuItemMapper $menuItemMapper;
 	private PageContentMapper $pageContentMapper;
 	/** @var Context[] */
 	private array $contexts = [];
@@ -39,7 +42,8 @@ class ContextMapperTest extends DatabaseTestCase {
 		parent::setUp();
 		$userHelper = $this->createMock(UserHelper::class);
 		$userHelper->method('getGroupIdsForUser')->willReturn([]);
-		$this->mapper = new ContextMapper($this->connectionAdapter, $userHelper, $this->createMock(GroupHelper::class));
+		$this->menuItemMapper = new MenuItemMapper($this->connectionAdapter);
+		$this->mapper = new ContextMapper($this->connectionAdapter, $userHelper, $this->createMock(GroupHelper::class), $this->menuItemMapper);
 		$this->nodeRelMapper = new ContextNodeRelationMapper($this->connectionAdapter);
 		$this->pageMapper = new PageMapper($this->connectionAdapter);
 		$this->pageContentMapper = new PageContentMapper($this->connectionAdapter);
@@ -52,6 +56,7 @@ class ContextMapperTest extends DatabaseTestCase {
 				$this->pageMapper->deleteByPageId($pageId);
 			}
 			$this->nodeRelMapper->deleteAllByContextId($context->getId());
+			$this->menuItemMapper->deleteAllByContextId($context->getId());
 			$this->mapper->delete($context);
 		}
 		parent::tearDown();
@@ -82,6 +87,28 @@ class ContextMapperTest extends DatabaseTestCase {
 		$this->assertSame('dashboard', $pages[$startPage->getId()]['technical_name']);
 		$this->assertSame([$firstContent->getId(), $secondContent->getId()], array_keys($pages[$startPage->getId()]['content']));
 		$this->assertSame([$first->getId(), $second->getId()], array_keys($this->mapper->findById($context->getId(), self::OWNER)->getNodes()));
+	}
+
+	public function testTheApplicationsContainingANodeAreFoundWithoutTheirMenus(): void {
+		$context = $this->createContext();
+		$this->addNode($context, 11);
+		$other = $this->createContext();
+		$this->addNode($other, 12);
+		$menuItem = new MenuItem();
+		$menuItem->setContextId($context->getId());
+		$menuItem->setLabel('Home');
+		$menuItem->setTargetType(MenuItem::TARGET_URL);
+		$menuItem->setUrl('https://example.com');
+		$menuItem->setTechnicalName('home');
+		$this->menuItemMapper->insert($menuItem);
+
+		$found = $this->mapper->findAllContainingNode(Application::NODE_TYPE_TABLE, 11, self::OWNER);
+
+		$this->assertSame([$context->getId()], array_map(static fn (Context $context): int => $context->getId(), $found));
+		$this->assertSame([11], array_column($found[0]->getNodes(), 'node_id'));
+		$this->assertNull($found[0]->getMenuItems());
+		$this->assertArrayNotHasKey('menuItems', $found[0]->jsonSerialize());
+		$this->assertSame(['home'], array_column($this->mapper->findById($context->getId(), self::OWNER)->getMenuItems(), 'technicalName'));
 	}
 
 	private function createContext(): Context {
