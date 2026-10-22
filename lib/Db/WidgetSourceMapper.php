@@ -51,6 +51,33 @@ class WidgetSourceMapper extends QBMapper {
 	}
 
 	/**
+	 * The given node relations that belong to the application of a page.
+	 *
+	 * @param int[] $nodeRelIds
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function filterNodeRelIdsOfPageContext(int $pageId, array $nodeRelIds): array {
+		if ($nodeRelIds === []) {
+			return [];
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('r.id')
+			->from('tables_contexts_rel_context_node', 'r')
+			->innerJoin('r', 'tables_contexts_page', 'p', $qb->expr()->eq('p.context_id', 'r.context_id'))
+			->where($qb->expr()->eq('p.id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->in('r.id', $qb->createNamedParameter($nodeRelIds, IQueryBuilder::PARAM_INT_ARRAY)));
+
+		$result = $qb->executeQuery();
+		$ids = [];
+		while ($row = $result->fetchAssociative()) {
+			$ids[] = (int)$row['id'];
+		}
+		$result->closeCursor();
+		return $ids;
+	}
+
+	/**
 	 * Points a widget at a node relation, or removes its source when null.
 	 *
 	 * @throws Exception
