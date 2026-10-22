@@ -30,6 +30,7 @@ use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
+use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\WidgetService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -163,6 +164,37 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->assertSame('Where to start', $gridPages[0]['widgets'][0]['description']);
 	}
 
+	public function testTheMenuIsImportedWithItsPagesAndNesting(): void {
+		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
+		$this->service->update($context->getId(), self::OWNER, null, null, null, null, MenuItemInput::createListFromInputArray([
+			['label' => 'Overview', 'targetType' => 'page', 'targetId' => $gridPageId, 'technicalName' => 'overview'],
+			['label' => 'Docs', 'url' => 'https://example.org', 'icon' => 'book', 'description' => 'How it works', 'parentIndex' => 0],
+		]));
+		$table = new Table();
+		$table->id = 4244;
+		$table->setOwnership(self::OWNER);
+		$exported = json_decode(json_encode(array_merge(
+			$this->contextMapper->findById($context->getId(), self::OWNER)->jsonSerialize(),
+			['pages' => $this->service->getPagesWithWidgets($this->contextMapper->findById($context->getId(), self::OWNER))],
+		)), true);
+		$exported['nodes'][$relation->getId()]['node_id'] = 4244;
+		$this->assertStringStartsWith('item_', $exported['menuItems'][1]['technicalName']);
+
+		$imported = $this->service->importContext($table, $exported, 4244);
+		$this->assertNotNull($imported);
+		$this->contextIds[] = $imported->getId();
+
+		$importedContext = $this->contextMapper->findById($imported->getId(), self::OWNER);
+		$menu = $importedContext->getMenuItems();
+		$importedGridPageId = array_key_first(array_filter($importedContext->getPages(), static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID));
+		$this->assertSame(
+			[['overview', 'page', $importedGridPageId, null, null], ['item_' . $menu[1]['id'], 'url', null, 'book', 'How it works']],
+			array_map(static fn (array $item): array => [$item['technicalName'], $item['targetType'], $item['targetId'], $item['icon'], $item['description']], $menu),
+		);
+		$this->assertSame([null, $menu[0]['id']], array_column($menu, 'parentId'));
+		$this->assertNotSame($gridPageId, $importedGridPageId);
+	}
+
 	public function testRemovingTheNodeKeepsTheWidgetAndDeletingTheContextRemovesIt(): void {
 		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
 
@@ -269,5 +301,39 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$addedContent = array_values(array_filter(array_values($updated['pages'])[0]['content'], static fn (array $content): bool => isset($content['nodeRelId'])));
 		$this->assertSame(['id', 'pageId', 'nodeRelId', 'order'], array_keys($addedContent[0]));
 		$this->assertSame($added['id'], $addedContent[0]['nodeRelId']);
+	}
+
+	public function testASchemeRoundTripKeepsAChildUnderAnAutomaticallyNamedParent(): void {
+		$source = $this->service->create('Source', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER, []);
+		$this->contextIds[] = $source->getId();
+		$this->service->update($source->getId(), self::OWNER, null, null, null, null, MenuItemInput::createListFromInputArray([
+			['label' => 'Help', 'url' => 'https://example.org/help'],
+			['label' => 'Docs', 'url' => 'https://example.org/docs', 'parentIndex' => 0],
+		]));
+		$scheme = json_decode(json_encode($this->service->getScheme($source->getId(), self::OWNER)), true);
+		$this->assertStringStartsWith('item_', $scheme['menuItems'][0]['technicalName']);
+		$this->assertSame($scheme['menuItems'][0]['technicalName'], $scheme['menuItems'][1]['parent']);
+
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER, []);
+		$this->contextIds[] = $target->getId();
+		// the preview lists all tables through the session user, which a test run has not
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('findAll')->willReturn([]);
+		$container = \OC::$server->getAppContainerForService(TableService::class) ?? \OC::$server;
+		$realTableService = \OCP\Server::get(TableService::class);
+		$container->registerService(TableService::class, static fn () => $tableService);
+		try {
+			$preview = $this->service->compareSchemeChanges($target->getId(), ['menuItems' => [...$scheme['menuItems'], ['label' => 'Gone', 'targetType' => 'view', 'targetUuid' => 'no-such-view']]], self::OWNER);
+		} finally {
+			$container->registerService(TableService::class, static fn () => $realTableService);
+		}
+		$this->service->importScheme($target->getId(), 'Target', 'tables', '', [], ['addTables' => [], 'modifyTables' => []], self::OWNER, $scheme['menuItems']);
+
+		$menu = $this->contextMapper->findById($target->getId(), self::OWNER)->getMenuItems();
+		$this->assertSame(['Help', 'Docs'], array_column($menu, 'label'));
+		$this->assertSame([null, $menu[0]['id']], array_column($menu, 'parentId'));
+		$this->assertSame(['Help', 'Docs'], array_column($preview['menuItems']['to'], 'label'));
+		$this->assertSame([], $preview['menuItems']['from']);
+		$this->assertSame([['index' => 2, 'label' => 'Gone']], array_map(static fn (array $skip): array => ['index' => $skip['index'], 'label' => $skip['label']], $preview['menuItems']['skipped']));
 	}
 }
