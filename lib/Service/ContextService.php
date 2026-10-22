@@ -25,6 +25,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
@@ -63,6 +64,8 @@ class ContextService {
 		protected IURLGenerator $urlGenerator,
 		private TableMapper $tableMapper,
 		private ViewMapper $viewMapper,
+		private WidgetService $widgetService,
+		private GridWidgetTypes $gridWidgetTypes,
 	) {
 	}
 
@@ -320,6 +323,7 @@ class ContextService {
 			$this->shareService->deleteAllForContext($context);
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
+			$this->widgetService->deleteByPageIds($pageIds);
 			foreach ($pageIds as $pageId) {
 				$this->pageContentMapper->deleteByPageId($pageId);
 				$this->pageMapper->deleteByPageId($pageId);
@@ -333,6 +337,7 @@ class ContextService {
 		try {
 			$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
 			$this->atomic(function () use ($nodeRelIds): void {
+				$this->widgetService->deleteSourcesByNodeRelIds($nodeRelIds);
 				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
 			}, $this->dbc);
@@ -432,9 +437,12 @@ class ContextService {
 	 * @throws Exception
 	 */
 	public function removeNodeFromContextAndPages(int $nodeRelationId): array {
-		$nodeRelation = $this->removeNodeFromContextById($nodeRelationId);
-		$contents = $this->removeNodeRelFromAllPages($nodeRelation);
-		return [$nodeRelation, $contents];
+		return $this->atomic(function () use ($nodeRelationId): array {
+			$this->widgetService->deleteSourcesByNodeRelIds([$nodeRelationId]);
+			$nodeRelation = $this->removeNodeFromContextById($nodeRelationId);
+			$contents = $this->removeNodeRelFromAllPages($nodeRelation);
+			return [$nodeRelation, $contents];
+		}, $this->dbc);
 	}
 
 	/**
@@ -618,15 +626,26 @@ class ContextService {
 
 		// insert nodes
 		$nodeRelMap = [];
+		// the relations of the table being imported, the only node a widget source can keep
+		$sourceRelMap = [];
 		if (!empty($context['nodes'])) {
 			foreach ($context['nodes'] as $nodeArr) {
+				$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0;
 				$contextNodeRel = new ContextNodeRelation();
 				$contextNodeRel->setContextId($newContext->getId());
 				$contextNodeRel->setNodeId($table->getId());
-				$contextNodeRel->setNodeType($nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0);
+				$contextNodeRel->setNodeType($nodeType);
 				$contextNodeRel->setPermissions($nodeArr['permissions'] ?? 0);
 				$contextNodeRel = $this->contextNodeRelMapper->insert($contextNodeRel);
-				$nodeRelMap[$nodeArr['id'] ?? null] = $contextNodeRel;
+				$oldRelId = self::importedKey($nodeArr['id'] ?? null);
+				if ($oldRelId === null) {
+					continue;
+				}
+				$nodeRelMap[$oldRelId] = $contextNodeRel;
+				$oldNodeId = $nodeArr['node_id'] ?? $nodeArr['nodeId'] ?? null;
+				if (is_numeric($nodeType) && (int)$nodeType === Application::NODE_TYPE_TABLE && is_numeric($oldNodeId) && (int)$oldNodeId === $tableOldId) {
+					$sourceRelMap[$oldRelId] = $contextNodeRel;
+				}
 			}
 		}
 
@@ -638,6 +657,9 @@ class ContextService {
 				$page = new Page();
 				$page->setContextId($newContext->getId());
 				$page->setPageType($pageArr['page_type'] ?? $pageArr['pageType'] ?? '');
+				$page->setTitle($this->importedText($pageArr['title'] ?? null, Page::TITLE_MAX_LENGTH, 'page title'));
+				$page->setIcon($this->importedIcon($pageArr['icon'] ?? null));
+				$page->setDescription($this->importedText($pageArr['description'] ?? null, Page::DESCRIPTION_MAX_LENGTH, 'page description'));
 				if ($technicalNames[$pageKey] === null) {
 					$page = $this->pageMapper->insertWithDefaultName($page);
 				} else {
@@ -649,14 +671,25 @@ class ContextService {
 				// insert page conten
 				if (!empty($pageArr['content'])) {
 					foreach ($pageArr['content'] as $contentArr) {
+						$oldNodeRelId = self::importedKey($contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null);
+						$newNodeRel = $oldNodeRelId !== null ? ($nodeRelMap[$oldNodeRelId] ?? null) : null;
+						if ($newNodeRel === null) {
+							continue;
+						}
 						$pageContent = new PageContent();
 						$pageContent->setPageId($page->getId());
-						$oldNodeRelId = $contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null;
-						$newNodeRel = $nodeRelMap[$oldNodeRelId] ?? null;
-						$pageContent->setNodeRelId($newNodeRel ? $newNodeRel->getId() : null);
+						$pageContent->setNodeRelId($newNodeRel->getId());
 						$pageContent->setOrder($contentArr['order'] ?? 100);
 						$this->pageContentMapper->insert($pageContent);
 					}
+				}
+
+				$widgets = is_array($pageArr['widgets'] ?? null) ? array_values($pageArr['widgets']) : [];
+				if (count($widgets) > GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
+					$this->logger->warning('Skipping ' . (count($widgets) - GridWidgetTypes::MAX_WIDGETS_PER_PAGE) . ' imported widgets: a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . '.');
+				}
+				foreach (array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE) as $index => $widgetArr) {
+					$this->importWidget($page->getId(), $index, $widgetArr, $sourceRelMap);
 				}
 			}
 		}
@@ -692,6 +725,91 @@ class ContextService {
 			}
 		}
 		return $names;
+	}
+
+	/**
+	 * The pages of an application with the widgets of each page under `widgets`.
+	 *
+	 * @throws Exception
+	 */
+	public function getPagesWithWidgets(Context $context): array {
+		$pages = $context->getPages() ?? [];
+		$widgets = $this->widgetService->findByPageIds(array_keys($pages));
+		foreach ($pages as $pageId => $page) {
+			$pages[$pageId]['widgets'] = $widgets[$pageId] ?? [];
+		}
+		return $pages;
+	}
+
+	/**
+	 * Inserts an exported widget on a page. Its source is remapped to the imported node
+	 * relation of the table being imported, and dropped when it showed another node. A
+	 * widget that would not be saved through the API, for its type, settings, title,
+	 * description, place on the grid or the shape of its source, is skipped.
+	 *
+	 * @param array<array-key, ContextNodeRelation> $nodeRelMap imported node relations of the table by their exported id
+	 * @throws Exception
+	 * @throws \JsonException
+	 */
+	private function importWidget(int $pageId, int $index, mixed $widgetArr, array $nodeRelMap): void {
+		if (!is_array($widgetArr) || !is_string($widgetArr['type'] ?? null)) {
+			return;
+		}
+		try {
+			$hasSource = $this->gridWidgetTypes->get($widgetArr['type'])['hasSource'];
+			$settings = $this->gridWidgetTypes->sanitizeSettings($widgetArr['type'], $widgetArr['settings'] ?? null);
+			$title = $this->gridWidgetTypes->validateTitle($index, $widgetArr['title'] ?? null);
+			$description = $this->gridWidgetTypes->validateDescription($index, $widgetArr['description'] ?? null);
+			$position = $this->gridWidgetTypes->validatePosition($index, $widgetArr);
+			$source = $widgetArr['source'] ?? null;
+			$oldNodeRelId = is_array($source) ? ($source['nodeRelId'] ?? null) : null;
+			if (($source !== null && !is_array($source)) || ($oldNodeRelId !== null && !is_int($oldNodeRelId))) {
+				throw new BadRequestError('The source of widget ' . $index . ' must be an object with a numeric nodeRelId.');
+			}
+		} catch (BadRequestError $e) {
+			$this->logger->warning('Skipping an imported widget: ' . $e->getMessage(), ['exception' => $e]);
+			return;
+		}
+		$newNodeRel = $hasSource && $oldNodeRelId !== null ? ($nodeRelMap[$oldNodeRelId] ?? null) : null;
+		$this->widgetService->insert(
+			$pageId,
+			$widgetArr['type'],
+			$title,
+			$position,
+			$settings,
+			$newNodeRel?->getId(),
+			$this->importedIcon($widgetArr['icon'] ?? null),
+			$description,
+		);
+	}
+
+	/**
+	 * An exported id usable as an array key, or null for a value of another type.
+	 */
+	private static function importedKey(mixed $id): int|string|null {
+		return is_int($id) || is_string($id) ? $id : null;
+	}
+
+	/**
+	 * An exported text, trimmed, or null when it is empty, not a text or too long.
+	 */
+	private function importedText(mixed $text, int $maxLength, string $what): ?string {
+		if ($text === null) {
+			return null;
+		}
+		if (!is_string($text) || mb_strlen(trim($text)) > $maxLength) {
+			$this->logger->warning('Dropping an imported ' . $what . ': it is not a text of at most ' . $maxLength . ' characters.');
+			return null;
+		}
+		$text = trim($text);
+		return $text === '' ? null : $text;
+	}
+
+	/**
+	 * An exported icon name, or null when this instance has no such icon.
+	 */
+	private function importedIcon(mixed $icon): ?string {
+		return is_string($icon) && IconHelper::isValid($icon) ? $icon : null;
 	}
 
 	/**
@@ -743,7 +861,7 @@ class ContextService {
 			$context->getIcon(),
 			$context->getDescription(),
 			array_values($nodes),
-			$context->getPages(),
+			$this->getPagesWithWidgets($context),
 			array_values($tables),
 		);
 	}

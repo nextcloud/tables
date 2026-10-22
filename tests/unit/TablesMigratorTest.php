@@ -150,6 +150,35 @@ class TablesMigratorTest extends TestCase {
 		$this->assertTrue(true);
 	}
 
+	public function testExportWritesTheWidgetsOfEveryContextPage(): void {
+		$user = $this->createMock(IUser::class);
+		$exportDestination = $this->createMock(IExportDestination::class);
+		$user->method('getUID')->willReturn('user1');
+		$this->favoritesService->method('findAll')->willReturn([]);
+		$this->tableMapper->method('findAll')->willReturn([]);
+		$this->columnMapper->method('findAllByTableIds')->willReturn([]);
+		$this->rowSleeveMapper->method('findAllByTableIds')->willReturn([]);
+		$this->viewMapper->method('findAll')->willReturn([]);
+		$this->shareMapper->method('findAllSharesForTablesAndContexts')->willReturn([]);
+
+		$context = new Context();
+		$context->id = 3;
+		$context->setPages([5 => ['id' => 5, 'page_type' => 'grid', 'content' => []]]);
+		$this->contextMapper->method('findAll')->willReturn([$context]);
+		$widget = ['id' => 9, 'type' => 'text', 'settings' => ['text' => 'Hi'], 'source' => null];
+		$this->contextService->method('getPagesWithWidgets')->with($context)
+			->willReturn([5 => ['id' => 5, 'page_type' => 'grid', 'content' => [], 'widgets' => [$widget]]]);
+
+		$files = [];
+		$exportDestination->method('addFileContents')->willReturnCallback(static function (string $path, string $content) use (&$files): void {
+			$files[$path] = $content;
+		});
+		$this->migrator->export($user, $exportDestination, $this->createMock(NullOutput::class));
+
+		$contexts = json_decode($files['contexts.json'], true);
+		$this->assertSame([$widget], $contexts[0]['pages'][5]['widgets']);
+	}
+
 	public function testExportFailure(): void {
 		$user = $this->createMock(IUser::class);
 		$exportDestination = $this->createMock(IExportDestination::class);
