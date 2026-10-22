@@ -31,6 +31,7 @@ use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
+use OCA\Tables\Model\MenuItemInput;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Validation\TechnicalNameValidator;
@@ -40,6 +41,7 @@ use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
+use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
@@ -69,6 +71,7 @@ class ContextService {
 		private WidgetService $widgetService,
 		private GridWidgetTypes $gridWidgetTypes,
 		private MenuItemMapper $menuItemMapper,
+		private IL10N $l10n,
 	) {
 	}
 
@@ -180,10 +183,15 @@ class ContextService {
 	}
 
 	/**
+	 * Creates an application with its start page. Without a menu it gets a "Dashboard"
+	 * item opening the start page; a given menu, even an empty one, is stored as it is,
+	 * where a page item without an id opens the start page.
+	 *
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
+	 * @param list<MenuItemInput>|null $menuItems
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
-	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType): Context {
+	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType, ?array $menuItems = null): Context {
 		$context = new Context();
 		$context->setName(trim($name));
 		$context->setIcon(trim($iconName));
@@ -191,7 +199,7 @@ class ContextService {
 		$context->setOwnerId($ownerId);
 		$context->setOwnerType($ownerType);
 
-		$this->atomic(function () use ($context, $nodes): void {
+		$this->atomic(function () use ($context, $nodes, $menuItems, $ownerId): void {
 			$this->contextMapper->insert($context);
 
 			if (!empty($nodes)) {
@@ -199,9 +207,302 @@ class ContextService {
 				$this->insertNodesFromArray($context, $nodes);
 			}
 			$this->insertPage($context);
+			$startPageId = self::startPageId($context->getPages() ?? []);
+			$menu = $menuItems ?? [];
+			if ($startPageId !== null) {
+				$menu = $menuItems === null
+					? [$this->dashboardItem($startPageId)]
+					: array_map(static fn (MenuItemInput $item): MenuItemInput => $item->pointsAtNewStartPage() ? $item->withPageId($startPageId) : $item, $menuItems);
+			}
+			$this->replaceMenu($context, $menu, $ownerId);
 		}, $this->dbc);
 
+		$this->shapeAddedForResponse($context, [], [], true);
 		return $context;
+	}
+
+	/**
+	 * Puts the nodes and start page contents a save added into the shape the application
+	 * endpoints have always returned for them: a node as its relation and a content entry
+	 * as its row. While saving, every lookup uses the shape of the context mapper.
+	 *
+	 * @param array<array-key, true> $knownNodeIds relation ids the application had before the save
+	 * @param array<array-key, true> $knownContentIds content ids the application had before the save
+	 * @param bool $isNew a new application lists its nodes and leaves the page id out of its contents
+	 */
+	private function shapeAddedForResponse(Context $context, array $knownNodeIds, array $knownContentIds, bool $isNew): void {
+		$nodes = $context->getNodes();
+		if (is_array($nodes)) {
+			foreach ($nodes as $relId => $node) {
+				if (!isset($knownNodeIds[$relId]) && isset($node['node_id'])) {
+					$nodes[$relId] = [
+						'id' => $node['id'],
+						'contextId' => $context->getId(),
+						'nodeId' => $node['node_id'],
+						'nodeType' => $node['node_type'],
+						'permissions' => $node['permissions'],
+					];
+				}
+			}
+			$context->setNodes($isNew ? array_values($nodes) : $nodes);
+		}
+		$pages = $context->getPages();
+		if (is_array($pages)) {
+			foreach ($pages as $pageId => $page) {
+				foreach ($page['content'] ?? [] as $contentId => $content) {
+					if (isset($knownContentIds[$contentId]) || !isset($content['node_rel_id'])) {
+						continue;
+					}
+					$pages[$pageId]['content'][$contentId] = $isNew
+						? ['id' => $contentId, 'nodeRelId' => $content['node_rel_id'], 'order' => $content['order']]
+						: ['id' => $contentId, 'pageId' => $pageId, 'nodeRelId' => $content['node_rel_id'], 'order' => $content['order']];
+				}
+			}
+			$context->setPages($pages);
+		}
+	}
+
+	/**
+	 * The "Dashboard" item opening the start page, the menu of a new application created
+	 * without one.
+	 */
+	private function dashboardItem(int $startPageId): MenuItemInput {
+		return new MenuItemInput(
+			label: $this->l10n->t('Dashboard'),
+			icon: null,
+			description: null,
+			targetType: MenuItem::TARGET_PAGE,
+			targetId: $startPageId,
+			url: null,
+			technicalName: Page::START_PAGE_NAME,
+		);
+	}
+
+	/**
+	 * @param array<array-key, mixed> $pages
+	 */
+	private static function startPageId(array $pages): ?int {
+		foreach ($pages as $pageId => $page) {
+			if (is_array($page) && ($page['page_type'] ?? $page['pageType'] ?? null) === Page::TYPE_STARTPAGE) {
+				return (int)$pageId;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Replaces the menu of an application and adds the views and tables it opens as nodes,
+	 * so everyone the application is shared with can open them. Removing an item leaves
+	 * its view or table in the application. A page item must open a page of this
+	 * application; a stored one whose page is gone is kept and read as broken.
+	 *
+	 * @param list<MenuItemInput> $menuItems
+	 * @throws Exception|PermissionError|InvalidArgumentException
+	 */
+	protected function replaceMenu(Context $context, array $menuItems, ?string $userId): void {
+		if (count($menuItems) > MenuItem::MAX_ITEMS_PER_APPLICATION) {
+			throw new InvalidArgumentException('An application menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items.');
+		}
+		$storedMenu = array_values(array_filter($context->getMenuItems() ?? [], is_array(...)));
+		$pageIds = array_map(intval(...), array_keys($context->getPages() ?? []));
+		foreach ($storedMenu as $storedItem) {
+			if (($storedItem['targetType'] ?? null) === MenuItem::TARGET_PAGE && is_int($storedItem['targetId'] ?? null)) {
+				$pageIds[] = $storedItem['targetId'];
+			}
+		}
+		foreach ($menuItems as $item) {
+			if ($item->getTargetType() === MenuItem::TARGET_PAGE && !in_array($item->getTargetId(), $pageIds, true)) {
+				throw new InvalidArgumentException('A menu item can only open a page of its own application.');
+			}
+		}
+
+		$keptNames = $this->keptTechnicalNames($menuItems, $storedMenu);
+		$this->addMenuTargetsAsNodes($context, $menuItems, $storedMenu, $userId);
+
+		$this->menuItemMapper->deleteAllByContextId($context->getId());
+		$this->insertMenuItems($context->getId(), $menuItems, $keptNames);
+
+		$context->setMenuItems(array_map(
+			static fn (MenuItem $menuItem): array => $menuItem->jsonSerialize(),
+			$this->menuItemMapper->findByContextId($context->getId()),
+		));
+	}
+
+	/**
+	 * Inserts the items of a menu in their order. An item with a kept technical name is
+	 * saved under it and refused when another save took it; every other item is named
+	 * `item_<id>`.
+	 *
+	 * @param list<MenuItemInput> $menuItems
+	 * @param array<int, string> $keptNames technical names by position
+	 * @throws Exception|InvalidArgumentException
+	 */
+	private function insertMenuItems(int $contextId, array $menuItems, array $keptNames): void {
+		foreach ($menuItems as $position => $item) {
+			$menuItem = new MenuItem();
+			$menuItem->setContextId($contextId);
+			$menuItem->setLabel($item->getLabel());
+			$menuItem->setIcon($item->getIcon());
+			$menuItem->setDescription($item->getDescription());
+			$menuItem->setTargetType($item->getTargetType());
+			$menuItem->setTargetId($item->getTargetId());
+			$menuItem->setUrl($item->getUrl());
+			$menuItem->setOrder(($position + 1) * 10);
+
+			if (!isset($keptNames[$position])) {
+				$this->menuItemMapper->insertWithDefaultName($menuItem);
+				continue;
+			}
+			$menuItem->setTechnicalName($keptNames[$position]);
+			try {
+				$this->menuItemMapper->insert($menuItem);
+			} catch (Exception $e) {
+				if ($e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+					throw $e;
+				}
+				throw new InvalidArgumentException('The technical name ' . $keptNames[$position] . ' is already used by a menu item of this application.');
+			}
+		}
+	}
+
+	/**
+	 * The technical names items keep, by position: the one given, else the stored name
+	 * of an item with the same target, so renaming or moving an item keeps it.
+	 *
+	 * @param list<MenuItemInput> $menuItems
+	 * @param list<array<array-key, mixed>> $storedMenu
+	 * @return array<int, string>
+	 * @throws InvalidArgumentException when two items are given the same name or a given
+	 *                                  name has the automatic form and is not the item's stored one
+	 */
+	private function keptTechnicalNames(array $menuItems, array $storedMenu): array {
+		$storedNames = [];
+		foreach ($storedMenu as $storedItem) {
+			$targetType = $storedItem['targetType'] ?? null;
+			$technicalName = $storedItem['technicalName'] ?? null;
+			if (!is_string($targetType) || !is_string($technicalName) || $technicalName === '') {
+				continue;
+			}
+			$targetId = is_int($storedItem['targetId'] ?? null) ? $storedItem['targetId'] : null;
+			$url = is_string($storedItem['url'] ?? null) ? $storedItem['url'] : null;
+			$storedNames[self::menuTargetIdentity($targetType, $targetId, $url)][] = $technicalName;
+		}
+
+		$names = [];
+		$taken = [];
+		foreach ($menuItems as $position => $item) {
+			$technicalName = $item->getTechnicalName();
+			if ($technicalName === null) {
+				continue;
+			}
+			if (isset($taken[$technicalName])) {
+				throw new InvalidArgumentException('Two menu items share the technical name "' . $technicalName . '".');
+			}
+			$identity = self::menuTargetIdentity($item->getTargetType(), $item->getTargetId(), $item->getUrl());
+			if (MenuItem::isDefaultName($technicalName) && !in_array($technicalName, $storedNames[$identity] ?? [], true)) {
+				throw new InvalidArgumentException('The technical name ' . $technicalName . ' is reserved for automatic names.');
+			}
+			$names[$position] = $technicalName;
+			$taken[$technicalName] = true;
+		}
+
+		foreach ($menuItems as $position => $item) {
+			if (isset($names[$position])) {
+				continue;
+			}
+			foreach ($storedNames[self::menuTargetIdentity($item->getTargetType(), $item->getTargetId(), $item->getUrl())] ?? [] as $storedName) {
+				if (!isset($taken[$storedName])) {
+					$names[$position] = $storedName;
+					$taken[$storedName] = true;
+					break;
+				}
+			}
+		}
+		return $names;
+	}
+
+	private static function menuTargetIdentity(string $targetType, ?int $targetId, ?string $url): string {
+		return $targetType . ':' . ($targetType === MenuItem::TARGET_URL ? (string)$url : (string)$targetId);
+	}
+
+	/**
+	 * The node a menu target is stored as, keyed so nodes and targets can be compared.
+	 *
+	 * @return array{string, array{int, int}}|null
+	 */
+	private static function menuTargetNode(mixed $targetType, mixed $targetId): ?array {
+		$nodeType = match ($targetType) {
+			MenuItem::TARGET_VIEW => Application::NODE_TYPE_VIEW,
+			MenuItem::TARGET_TABLE => Application::NODE_TYPE_TABLE,
+			default => null,
+		};
+		if ($nodeType === null || !is_int($targetId)) {
+			return null;
+		}
+		return [sprintf('t%di%d', $nodeType, $targetId), [$nodeType, $targetId]];
+	}
+
+	/**
+	 * Adds the views and tables a menu opens to the application and its start page. A
+	 * new target must exist and be manageable by the user, and every unusable one gets
+	 * the same answer, so a save reveals nothing about the views and tables of others. A
+	 * target that was in the stored menu before and is gone is kept.
+	 *
+	 * @param list<MenuItemInput> $menuItems
+	 * @param list<array<array-key, mixed>> $storedMenu
+	 * @throws Exception|PermissionError
+	 */
+	private function addMenuTargetsAsNodes(Context $context, array $menuItems, array $storedMenu, ?string $userId): void {
+		$missing = [];
+		foreach ($menuItems as $item) {
+			$target = self::menuTargetNode($item->getTargetType(), $item->getTargetId());
+			if ($target !== null) {
+				$missing[$target[0]] = $target[1];
+			}
+		}
+		$storedTargets = [];
+		foreach ($storedMenu as $storedItem) {
+			$target = self::menuTargetNode($storedItem['targetType'] ?? null, $storedItem['targetId'] ?? null);
+			if ($target !== null) {
+				$storedTargets[$target[0]] = true;
+			}
+		}
+		$nodes = $context->getNodes() ?? [];
+		foreach ($nodes as $node) {
+			unset($missing[sprintf('t%di%d', $node['node_type'], $node['node_id'])]);
+		}
+		if ($missing === []) {
+			return;
+		}
+
+		$targetIds = [Application::NODE_TYPE_VIEW => [], Application::NODE_TYPE_TABLE => []];
+		foreach ($missing as [$nodeType, $nodeId]) {
+			$targetIds[$nodeType][] = $nodeId;
+		}
+		$existing = [
+			Application::NODE_TYPE_VIEW => $this->viewMapper->findMany($targetIds[Application::NODE_TYPE_VIEW]),
+			Application::NODE_TYPE_TABLE => $this->tableMapper->findMany($targetIds[Application::NODE_TYPE_TABLE]),
+		];
+
+		$pages = $context->getPages() ?? [];
+		$startPageId = self::startPageId($pages);
+		foreach ($missing as $key => [$nodeType, $nodeId]) {
+			$exists = isset($existing[$nodeType][$nodeId]);
+			if (!$exists && isset($storedTargets[$key])) {
+				continue;
+			}
+			if (!$exists || !$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
+				throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
+			}
+			$relation = $this->addNodeToContext($context, $nodeId, $nodeType, Application::PERMISSION_READ);
+			$nodes[$relation->getId()] = $relation->toContextNode();
+			if ($startPageId !== null) {
+				$content = $this->addNodeRelToPage($relation, null, $startPageId);
+				$pages[$startPageId]['content'][$content->getId()] = $content->toPageContent();
+			}
+		}
+		$context->setNodes($nodes);
+		$context->setPages($pages);
 	}
 
 	/**
@@ -209,9 +510,32 @@ class ContextService {
 	 * @throws Exception
 	 * @throws DoesNotExistException
 	 * @throws PermissionError|MultipleObjectsReturnedException
+	 * @param list<MenuItemInput>|null $menuItems replaces the menu when given
+	 * @throws InvalidArgumentException
 	 */
-	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
+	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?array $menuItems = null): Context {
+		// A transaction that reads before it writes can lose its write lock to a concurrent
+		// request (SQLite answers "database is locked" at once); running it again succeeds.
+		return $this->atomicRetry(
+			fn (): Context => $this->applyUpdate($contextId, $userId, $name, $iconName, $description, $nodes, $menuItems),
+			$this->dbc,
+		);
+	}
+
+	/**
+	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
+	 * @throws Exception
+	 * @throws DoesNotExistException
+	 * @throws PermissionError|MultipleObjectsReturnedException
+	 * @param list<MenuItemInput>|null $menuItems
+	 */
+	private function applyUpdate(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?array $menuItems): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
+		$knownNodeIds = array_fill_keys(array_keys($context->getNodes() ?? []), true);
+		$knownContentIds = [];
+		foreach ($context->getPages() ?? [] as $page) {
+			$knownContentIds += array_fill_keys(array_keys($page['content'] ?? []), true);
+		}
 
 		if ($name !== null) {
 			$context->setName(trim($name));
@@ -293,8 +617,8 @@ class ContextService {
 					$node['order'] ?? 100,
 					$userId
 				);
-				$currentNodes[$addedNode->getId()] = $addedNode->jsonSerialize();
-				$currentPages[$updatedContent->getPageId()]['content'][$updatedContent->getId()] = $updatedContent->jsonSerialize();
+				$currentNodes[$addedNode->getId()] = $addedNode->toContextNode();
+				$currentPages[$updatedContent->getPageId()]['content'][$updatedContent->getId()] = $updatedContent->toPageContent();
 			}
 			unset($nodesBeingAdded);
 
@@ -354,7 +678,11 @@ class ContextService {
 			$context->setNodes($currentNodes);
 			$context->setPages($currentPages);
 		}
+		if ($menuItems !== null) {
+			$this->replaceMenu($context, $menuItems, $userId);
+		}
 
+		$this->shapeAddedForResponse($context, $knownNodeIds, $knownContentIds, false);
 		return $context;
 	}
 
@@ -599,9 +927,7 @@ class ContextService {
 
 				$this->pageContentMapper->insert($pageContent);
 
-				$addedPage['content'][$pageContent->getId()] = $pageContent->jsonSerialize();
-				// the content is already embedded in the page
-				unset($addedPage['content'][$pageContent->getId()]['pageId']);
+				$addedPage['content'][$pageContent->getId()] = $pageContent->toPageContent();
 			}
 		}
 
@@ -625,7 +951,7 @@ class ContextService {
 					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
 				}
 				$contextNodeRel = $this->addNodeToContext($context, $nodeId, $nodeType, $node['permissions'] ?? Application::PERMISSION_READ);
-				$addedNodes[] = $contextNodeRel->jsonSerialize();
+				$addedNodes[$contextNodeRel->getId()] = $contextNodeRel->toContextNode();
 			} catch (Exception $e) {
 				$this->logger->warning('Could not add node {ntype}/{nid} to context {cid}, skipping.', [
 					'app' => Application::APP_ID,
