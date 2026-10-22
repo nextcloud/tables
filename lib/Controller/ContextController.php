@@ -15,6 +15,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
@@ -386,11 +387,7 @@ class ContextController extends AOCSController {
 	}
 
 	protected function isValidIcon(string $iconName): bool {
-		if ($iconName === '' || !preg_match('/^[a-zA-Z0-9-]+$/', $iconName)) {
-			return false;
-		}
-		$iconPath = dirname(__DIR__, 2) . '/img/material/' . $iconName . '.svg';
-		return file_exists($iconPath);
+		return IconHelper::isValid($iconName);
 	}
 
 	/**
