@@ -30,6 +30,19 @@ class PageContent extends Entity implements \JsonSerializable {
 		$this->addType('order', 'integer');
 	}
 
+	/**
+	 * The content as a page of an application carries it, in the shape the context
+	 * mapper reads it.
+	 *
+	 * @return array{order: int, node_rel_id: int}
+	 */
+	public function toPageContent(): array {
+		return [
+			'order' => (int)$this->getOrder(),
+			'node_rel_id' => (int)$this->getNodeRelId(),
+		];
+	}
+
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->getId(),

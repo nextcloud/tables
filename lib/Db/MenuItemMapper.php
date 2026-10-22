@@ -35,7 +35,7 @@ class MenuItemMapper extends QBMapper {
 	public function insertWithDefaultName(MenuItem $menuItem): MenuItem {
 		return $this->atomic(function () use ($menuItem): MenuItem {
 			$menuItem = $this->insert($menuItem);
-			$menuItem->setTechnicalName('item_' . $menuItem->getId());
+			$menuItem->setTechnicalName(MenuItem::DEFAULT_NAME_PREFIX . $menuItem->getId());
 			return $this->update($menuItem);
 		}, $this->db);
 	}

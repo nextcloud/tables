@@ -44,6 +44,8 @@ class MenuItem extends EntitySuper implements JsonSerializable {
 	public const TARGET_URL = 'url';
 	public const TARGET_PAGE = 'page';
 	public const TARGET_TYPES = [self::TARGET_VIEW, self::TARGET_TABLE, self::TARGET_URL, self::TARGET_PAGE];
+	public const DEFAULT_NAME_PREFIX = 'item_';
+	public const MAX_ITEMS_PER_APPLICATION = 200;
 
 	protected ?int $contextId = null;
 	protected ?string $label = null;
@@ -68,6 +70,14 @@ class MenuItem extends EntitySuper implements JsonSerializable {
 		$this->addType('order', 'integer');
 		$this->addType('parentId', 'integer');
 		$this->addType('broken', 'boolean');
+	}
+
+	/**
+	 * Whether a technical name has the form of the automatic `item_<id>`. Such names are
+	 * reserved, so a given name never collides with the name a later item gets.
+	 */
+	public static function isDefaultName(string $technicalName): bool {
+		return preg_match('/^' . self::DEFAULT_NAME_PREFIX . '[0-9]+$/', $technicalName) === 1;
 	}
 
 	/**

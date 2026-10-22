@@ -89,4 +89,11 @@ class MenuItemTest extends TestCase {
 	public function testTargetTypesAreTheFourKnownOnes(): void {
 		$this->assertSame(['view', 'table', 'url', 'page'], MenuItem::TARGET_TYPES);
 	}
+
+	public function testOnlyTheAutomaticFormIsADefaultName(): void {
+		$this->assertTrue(MenuItem::isDefaultName('item_7'));
+		foreach (['item', 'item_', 'item_7a', 'my_item_7', 'page_7', 'docs'] as $name) {
+			$this->assertFalse(MenuItem::isDefaultName($name), $name);
+		}
+	}
 }
