@@ -981,6 +981,46 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/ocs/v2.php/apps/tables/api/2/views/widget-types": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * [api v2] The widget types a grid view can hold
+         * @description Every type carries two schemas: the configuration of the widget on the page and its content.
+         */
+        readonly get: operations["api_views-widget-types"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/views": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * [api v2] Create a grid view, a view without a table
+         * @description The view belongs to the user who creates it and can be placed in an application menu. It is named by its id, so it takes no technical name.
+         */
+        readonly post: operations["api_views-create"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/rows": {
         readonly parameters: {
             readonly query?: never;
@@ -1184,6 +1224,32 @@ export type components = {
                 readonly [key: string]: components["schemas"]["GridWidgetValue"];
             };
             readonly broken?: boolean;
+        };
+        readonly GridWidgetProperty: {
+            /** @enum {string} */
+            readonly type: "string" | "text" | "color" | "boolean" | "integer" | "enum" | "target";
+            readonly title: string;
+            readonly default: components["schemas"]["GridWidgetValue"];
+            readonly options?: readonly {
+                readonly value: string;
+                readonly label: string;
+            }[];
+            readonly required?: boolean;
+        };
+        readonly GridWidgetType: {
+            /** @enum {string} */
+            readonly type: "header" | "text" | "data";
+            readonly title: string;
+            /** Format: int64 */
+            readonly defaultWidth: number;
+            /** Format: int64 */
+            readonly defaultHeight: number;
+            readonly configuration: {
+                readonly [key: string]: components["schemas"]["GridWidgetProperty"];
+            };
+            readonly properties: {
+                readonly [key: string]: components["schemas"]["GridWidgetProperty"];
+            };
         };
         readonly GridWidgetValue: (string | boolean | number | {
             /** @enum {string} */
@@ -8155,6 +8221,154 @@ export interface operations {
                 };
             };
             /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_views-widget-types": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Widget types returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["GridWidgetType"][];
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_views-create": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Title of the view */
+                    readonly title: string;
+                    /**
+                     * @description Emoji shown with the title
+                     * @default null
+                     */
+                    readonly emoji?: string | null;
+                    /**
+                     * @description Description shown on the page
+                     * @default
+                     */
+                    readonly description?: string;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description View created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["View"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid title or emoji */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             readonly 500: {
                 headers: {
                     readonly [name: string]: unknown;
