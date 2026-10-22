@@ -6919,6 +6919,20 @@ export interface operations {
                         /** Format: int64 */
                         readonly permissions?: number;
                     }[];
+                    /**
+                     * @description optional menu of the context, in order; the views and tables it opens become nodes of the context
+                     * @default null
+                     */
+                    readonly menuItems?: readonly {
+                        readonly label: string;
+                        readonly icon?: string;
+                        /** @enum {string} */
+                        readonly targetType: "view" | "table" | "url";
+                        /** Format: int64 */
+                        readonly targetId?: number;
+                        readonly url?: string;
+                        readonly technicalName?: string;
+                    }[] | null;
                 };
             };
         };
@@ -7109,6 +7123,20 @@ export interface operations {
                         /** Format: int64 */
                         readonly order: number;
                     } | null;
+                    /**
+                     * @description provide this parameter to replace the menu; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target
+                     * @default null
+                     */
+                    readonly menuItems?: readonly {
+                        readonly label: string;
+                        readonly icon?: string;
+                        /** @enum {string} */
+                        readonly targetType: "view" | "table" | "url";
+                        /** Format: int64 */
+                        readonly targetId?: number;
+                        readonly url?: string;
+                        readonly technicalName?: string;
+                    }[] | null;
                 };
             };
         };
