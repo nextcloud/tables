@@ -28,6 +28,8 @@ use JsonSerializable;
  * @method setNodes(array $value): void
  * @method getPages(): array
  * @method setPages(array $value): void
+ * @method getMenuItems(): array
+ * @method setMenuItems(array $value): void
  */
 class Context extends EntitySuper implements JsonSerializable {
 	protected ?string $name = null;
@@ -40,8 +42,9 @@ class Context extends EntitySuper implements JsonSerializable {
 	protected ?array $sharing = null;
 	protected ?array $nodes = null;
 	protected ?array $pages = null;
+	protected ?array $menuItems = null;
 
-	protected const VIRTUAL_PROPERTIES = ['sharing', 'nodes', 'pages'];
+	protected const VIRTUAL_PROPERTIES = ['sharing', 'nodes', 'pages', 'menuItems'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -56,8 +59,12 @@ class Context extends EntitySuper implements JsonSerializable {
 			'iconName' => $this->getIcon(),
 			'description' => $this->getDescription(),
 			'owner' => $this->getOwnerId(),
-			'ownerType' => $this->getOwnerType()
+			'ownerType' => $this->getOwnerType(),
 		];
+		// left out where the menus are not loaded, such as for the navigation bar
+		if (is_array($this->menuItems)) {
+			$data['menuItems'] = array_values($this->menuItems);
+		}
 
 		// extended data
 		if (is_array($this->sharing) || is_array($this->nodes) || is_array($this->pages)) {
