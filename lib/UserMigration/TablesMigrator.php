@@ -122,6 +122,9 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 			$exportDestination->addFileContents(self::FILE_VIEWS, json_encode($views));
 
 			$contexts = $this->contextMapper->findAll($uid);
+			foreach ($contexts as $context) {
+				$context->setPages($this->contextService->getPagesWithWidgets($context));
+			}
 			$exportDestination->addFileContents(self::FILE_CONTEXTS, json_encode($contexts));
 			$contextIds = array_map(fn ($c) => $c->getId(), $contexts);
 
