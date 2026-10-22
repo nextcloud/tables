@@ -30,6 +30,7 @@ use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
+use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -525,6 +526,7 @@ class ContextService {
 		$page = new Page();
 		$page->setContextId($context->getId());
 		$page->setPageType(Page::TYPE_STARTPAGE);
+		$page->setTechnicalName(Page::START_PAGE_NAME);
 		$this->pageMapper->insert($page);
 
 		$addedPage = $page->jsonSerialize();
@@ -631,11 +633,17 @@ class ContextService {
 		// insert pages
 		$pageMap = [];
 		if (!empty($context['pages'])) {
-			foreach ($context['pages'] as $pageArr) {
+			$technicalNames = $this->importedPageNames($context['pages']);
+			foreach ($context['pages'] as $pageKey => $pageArr) {
 				$page = new Page();
 				$page->setContextId($newContext->getId());
 				$page->setPageType($pageArr['page_type'] ?? $pageArr['pageType'] ?? '');
-				$page = $this->pageMapper->insert($page);
+				if ($technicalNames[$pageKey] === null) {
+					$page = $this->pageMapper->insertWithDefaultName($page);
+				} else {
+					$page->setTechnicalName($technicalNames[$pageKey]);
+					$page = $this->pageMapper->insert($page);
+				}
 				$pageMap[$pageArr['id'] ?? null] = $page;
 
 				// insert page conten
@@ -654,6 +662,36 @@ class ContextService {
 		}
 
 		return $newContext;
+	}
+
+	/**
+	 * The technical names of the pages of an imported application, by page key. A valid
+	 * exported name is kept unless an earlier page of the import uses it or it has the
+	 * reserved form `page_<id>`, a start page without one gets `dashboard` while it is
+	 * free, and null leaves the default name.
+	 *
+	 * @param array<array-key, mixed> $pages exported pages
+	 * @return array<array-key, ?string>
+	 */
+	private function importedPageNames(array $pages): array {
+		$names = [];
+		$taken = [];
+		foreach ($pages as $key => $pageArr) {
+			$name = is_array($pageArr) ? ($pageArr['technical_name'] ?? $pageArr['technicalName'] ?? null) : null;
+			$names[$key] = null;
+			if (is_string($name) && TechnicalNameValidator::isValid($name) && !Page::isDefaultName($name) && !isset($taken[$name])) {
+				$names[$key] = $name;
+				$taken[$name] = true;
+			}
+		}
+		foreach ($pages as $key => $pageArr) {
+			$isStartPage = is_array($pageArr) && ($pageArr['page_type'] ?? $pageArr['pageType'] ?? '') === Page::TYPE_STARTPAGE;
+			if ($names[$key] === null && $isStartPage && !isset($taken[Page::START_PAGE_NAME])) {
+				$names[$key] = Page::START_PAGE_NAME;
+				$taken[Page::START_PAGE_NAME] = true;
+			}
+		}
+		return $names;
 	}
 
 	/**
