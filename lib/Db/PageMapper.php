@@ -7,6 +7,8 @@
 
 namespace OCA\Tables\Db;
 
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
@@ -34,6 +36,20 @@ class PageMapper extends QBMapper {
 			$page->setTechnicalName(Page::DEFAULT_NAME_PREFIX . $page->getId());
 			return $this->update($page);
 		}, $this->db);
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function findById(int $pageId): Page {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)));
+
+		return $this->findEntity($qb);
 	}
 
 	/**
