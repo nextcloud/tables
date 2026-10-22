@@ -15,8 +15,8 @@ use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Validation\TechnicalNameValidator;
 
 /**
- * A submitted menu item, checked on its own: its label, icon, description, target and
- * technical name. Whether a target may be used is up to the application it is saved in.
+ * A submitted menu item, checked on its own: its label, icon, description, target,
+ * technical name and the position of its parent. Whether a target may be used is up to the application it is saved in.
  */
 class MenuItemInput {
 	public const MAX_LABEL_LENGTH = 200;
@@ -35,6 +35,7 @@ class MenuItemInput {
 		private readonly ?int $targetId,
 		private readonly ?string $url,
 		private readonly ?string $technicalName,
+		private readonly ?int $parentIndex = null,
 		private readonly bool $allowNewStartPage = false,
 	) {
 		if (trim($this->label) === '' || mb_strlen($this->label) > self::MAX_LABEL_LENGTH) {
@@ -86,6 +87,10 @@ class MenuItemInput {
 				throw new InvalidArgumentException('The menu item property "' . $optional . '" must be a string.');
 			}
 		}
+		$parentIndex = $data['parentIndex'] ?? null;
+		if ($parentIndex !== null && (!is_int($parentIndex) || $parentIndex < 0)) {
+			throw new InvalidArgumentException('The parent of a menu item is given as the position of that parent in the menu.');
+		}
 
 		return new self(
 			label: trim($data['label']),
@@ -95,11 +100,15 @@ class MenuItemInput {
 			targetId: $isUrl ? null : $targetId,
 			url: $isUrl ? trim((string)($data['url'] ?? '')) : null,
 			technicalName: self::emptyToNull($data['technicalName'] ?? null),
+			parentIndex: $parentIndex,
 			allowNewStartPage: $allowNewStartPage,
 		);
 	}
 
 	/**
+	 * A menu with one level of nesting: an item may sit under a top-level item of the
+	 * same menu, named by its position.
+	 *
 	 * @param bool $allowNewStartPage see createFromInputArray()
 	 * @return list<self>
 	 * @throws InvalidArgumentException
@@ -108,7 +117,14 @@ class MenuItemInput {
 		if (!is_array($data) || !array_is_list($data)) {
 			throw new InvalidArgumentException('The menu items must be a list.');
 		}
-		return array_map(static fn (mixed $item): self => self::createFromInputArray($item, $allowNewStartPage), $data);
+		$items = array_map(static fn (mixed $item): self => self::createFromInputArray($item, $allowNewStartPage), $data);
+		foreach ($items as $item) {
+			$parentIndex = $item->getParentIndex();
+			if ($parentIndex !== null && (!isset($items[$parentIndex]) || $items[$parentIndex]->getParentIndex() !== null)) {
+				throw new InvalidArgumentException('A menu item can only sit under a top-level item of the same menu.');
+			}
+		}
+		return $items;
 	}
 
 	/**
@@ -124,7 +140,7 @@ class MenuItemInput {
 	 * @throws InvalidArgumentException
 	 */
 	public function withPageId(int $pageId): self {
-		return new self($this->label, $this->icon, $this->description, MenuItem::TARGET_PAGE, $pageId, null, $this->technicalName);
+		return new self($this->label, $this->icon, $this->description, MenuItem::TARGET_PAGE, $pageId, null, $this->technicalName, $this->parentIndex);
 	}
 
 	/**
@@ -174,5 +190,12 @@ class MenuItemInput {
 
 	public function getTechnicalName(): ?string {
 		return $this->technicalName;
+	}
+
+	/**
+	 * The position of the parent item in the same menu, or null for a top-level item.
+	 */
+	public function getParentIndex(): ?int {
+		return $this->parentIndex;
 	}
 }
