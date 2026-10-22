@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
  * A widget on a grid page: its type, optional title, icon and description, its place
  * on the grid and its settings, stored as one JSON object.
  *
- * @psalm-type TablesWidgetSettingValue = string|int|float|bool|null
+ * @psalm-import-type TablesWidgetValue from ResponseDefinitions
  *
  * @method getPageId(): int
  * @method setPageId(int $value): void
@@ -60,7 +61,7 @@ class Widget extends Entity implements \JsonSerializable {
 	}
 
 	/**
-	 * @return array<string, TablesWidgetSettingValue>
+	 * @return array<string, TablesWidgetValue>
 	 */
 	public function getSettingsArray(): array {
 		$settings = $this->getSettings();
@@ -68,14 +69,14 @@ class Widget extends Entity implements \JsonSerializable {
 			return [];
 		}
 		$decoded = json_decode($settings, true);
-		/** @var array<string, TablesWidgetSettingValue> */
+		/** @var array<string, TablesWidgetValue> */
 		return is_array($decoded) ? $decoded : [];
 	}
 
 	/**
 	 * Stores the settings as one JSON object, `{}` when there are none.
 	 *
-	 * @param array<string, TablesWidgetSettingValue> $settings
+	 * @param array<string, TablesWidgetValue> $settings
 	 * @throws \JsonException
 	 */
 	public function setSettingsArray(array $settings): void {
