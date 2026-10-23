@@ -252,9 +252,6 @@
                     "customSettings": {
                         "type": "object",
                         "nullable": true,
-                        "required": [
-                            "width"
-                        ],
                         "properties": {
                             "width": {
                                 "type": "integer",
@@ -264,6 +261,29 @@
                                 "type": "boolean"
                             },
                             "imagePreviewSize": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationType": {
+                                "type": "string",
+                                "enum": [
+                                    "table",
+                                    "view"
+                                ]
+                            },
+                            "targetId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "labelColumn": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationColumnId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "targetColumnId": {
                                 "type": "integer",
                                 "format": "int64"
                             }
@@ -610,9 +630,6 @@
                     "customSettings": {
                         "type": "object",
                         "nullable": true,
-                        "required": [
-                            "width"
-                        ],
                         "properties": {
                             "width": {
                                 "type": "integer",
@@ -622,6 +639,29 @@
                                 "type": "boolean"
                             },
                             "imagePreviewSize": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationType": {
+                                "type": "string",
+                                "enum": [
+                                    "table",
+                                    "view"
+                                ]
+                            },
+                            "targetId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "labelColumn": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "relationColumnId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "targetColumnId": {
                                 "type": "integer",
                                 "format": "int64"
                             }
@@ -686,6 +726,117 @@
                         }
                     }
                 }
+            },
+            "RelationData": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                                "column",
+                                "values"
+                            ],
+                            "properties": {
+                                "column": {
+                                    "nullable": true,
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Column"
+                                        }
+                                    ]
+                                },
+                                "values": {
+                                    "oneOf": [
+                                        {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "object",
+                                                "required": [
+                                                    "id",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "format": "int64"
+                                                    },
+                                                    "value": {
+                                                        "$ref": "#/components/schemas/RelationValue"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "array",
+                                            "maxItems": 0
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "type": "array",
+                        "maxItems": 0
+                    }
+                ]
+            },
+            "RelationValue": {
+                "nullable": true,
+                "anyOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "id",
+                                "type",
+                                "displayName"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "displayName": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ]
             },
             "Row": {
                 "type": "object",
@@ -3994,7 +4145,8 @@
                                             "datetime",
                                             "select",
                                             "usergroup",
-                                            "relation"
+                                            "relation",
+                                            "lookup"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -4428,7 +4580,8 @@
                                             "datetime",
                                             "select",
                                             "usergroup",
-                                            "relation"
+                                            "relation",
+                                            "lookup"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -4832,7 +4985,8 @@
                                     },
                                     "customSettings": {
                                         "type": "object",
-                                        "default": {},
+                                        "nullable": true,
+                                        "default": null,
                                         "description": "Custom settings for the column",
                                         "additionalProperties": {
                                             "type": "object"
@@ -5062,6 +5216,228 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Column"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/tables/{tableId}/relations": {
+            "get": {
+                "operationId": "api1-index-table-relations",
+                "summary": "Get all relation data for a table",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "api1"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "tableId",
+                        "in": "path",
+                        "description": "Table ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relation data returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RelationData"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/views/{viewId}/relations": {
+            "get": {
+                "operationId": "api1-index-view-relations",
+                "summary": "Get all relation data for a view",
+                "description": "This endpoint allows CORS requests",
+                "tags": [
+                    "api1"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "viewId",
+                        "in": "path",
+                        "description": "View ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relation data returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RelationData"
                                 }
                             }
                         }

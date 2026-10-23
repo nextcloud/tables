@@ -53,6 +53,7 @@ use ValueError;
  * @psalm-import-type TablesShare from ResponseDefinitions
  * @psalm-import-type TablesColumn from ResponseDefinitions
  * @psalm-import-type TablesRow from ResponseDefinitions
+ * @psalm-import-type TablesRelationData from ResponseDefinitions
  * @psalm-import-type TablesImportState from ResponseDefinitions
  * @psalm-import-type TablesContextNavigation from ResponseDefinitions
  */
@@ -831,7 +832,7 @@ class Api1Controller extends ApiController {
 	 * Get all relation data for a table
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRelationData, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Relation data returned
 	 * 403: No permissions
@@ -841,6 +842,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableRelations(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->relationService->getRelationsForTable($tableId));
@@ -863,7 +865,7 @@ class Api1Controller extends ApiController {
 	 * Get all relation data for a view
 	 *
 	 * @param int $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, array<string, array<string, array{id: int, label: string}>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRelationData, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Relation data returned
 	 * 403: No permissions
@@ -873,6 +875,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewRelations(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->relationService->getRelationsForView($viewId));
@@ -897,7 +900,7 @@ class Api1Controller extends ApiController {
 	 * @param int|null $tableId Table ID
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation'|'lookup' $type Column main type
 	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
@@ -1057,7 +1060,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
 	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
-	 * @param array<string, mixed> $customSettings Custom settings for the column
+	 * @param array<string, mixed>|null $customSettings Custom settings for the column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
@@ -1100,7 +1103,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupSelectGroups,
 		?bool $usergroupSelectTeams,
 		?bool $usergroupShowUserStatus,
-		?array $customSettings = [],
+		?array $customSettings = null,
 	): DataResponse {
 		try {
 			$item = $this->columnService->update(
@@ -1131,7 +1134,7 @@ class Api1Controller extends ApiController {
 					usergroupSelectGroups: $usergroupSelectGroups,
 					usergroupSelectTeams: $usergroupSelectTeams,
 					showUserStatus: $usergroupShowUserStatus,
-					customSettings: json_encode($customSettings),
+					customSettings: $customSettings !== null ? json_encode($customSettings) : null,
 				)
 			);
 			return new DataResponse($item->jsonSerialize());
@@ -1681,7 +1684,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup'|'relation'|'lookup' $type Column main type
 	 * @param string|null $technicalName Technical name of the column
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory

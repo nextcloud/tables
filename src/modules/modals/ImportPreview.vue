@@ -120,7 +120,8 @@ export default {
 				return []
 			}
 
-			const columns = this.existingColumns.map(column => ({
+			const filteredColumns = this.existingColumns.filter(column => !column.isVirtual())
+			const columns = filteredColumns.map(column => ({
 				id: column.id,
 				label: column.title,
 			}))

@@ -16,13 +16,17 @@ use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Dto\LookupSettings;
+use OCA\Tables\Dto\RelationSettings;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\SelectionOptions;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\Title;
@@ -54,6 +58,7 @@ class ColumnService extends SuperService {
 		private readonly IL10N $l,
 		private readonly UserHelper $userHelper,
 		private readonly ColumnDtoValidator $columnDtoValidator,
+		private readonly ViewMapper $viewMapper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -294,6 +299,7 @@ class ColumnService extends SuperService {
 		$item = Column::fromDto($columnDto);
 		$item->setTitle($newTitle);
 		$item->setTableId($table->getId());
+		$this->validateRelationSettings($item);
 		$this->updateMetadata($item, $userId, true);
 
 		try {
@@ -423,7 +429,10 @@ class ColumnService extends SuperService {
 			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
 			$this->validateCustomSettings($columnDto->getCustomSettings());
-			$item->setCustomSettings($columnDto->getCustomSettings());
+			if ($columnDto->getCustomSettings() !== null) {
+				$item->setCustomSettings($columnDto->getCustomSettings());
+			}
+			$this->validateRelationSettings($item);
 
 			$this->updateMetadata($item, $userId);
 			try {
@@ -503,6 +512,55 @@ class ColumnService extends SuperService {
 					null,
 					$translatedMessage
 				);
+			}
+		}
+	}
+
+	private function validateRelationSettings(Column $column): void {
+		try {
+			if ($column->getType() === Column::TYPE_RELATION) {
+				$settings = $column->getCustomSettingsObject(RelationSettings::class);
+				$label = $this->mapper->find($settings->labelColumn);
+				$this->assertRelationTargetColumn($settings, $label);
+				if (!(($label->getType() === Column::TYPE_TEXT && $label->getSubtype() === 'line')
+					|| ($label->getType() === Column::TYPE_NUMBER && $label->getSubtype() === ''))) {
+					throw new \InvalidArgumentException('Relation labels must use a text-line or number column.');
+				}
+			}
+			if ($column->getType() !== Column::TYPE_LOOKUP) {
+				return;
+			}
+			if ($column->getMandatory()) {
+				throw new \InvalidArgumentException('Lookup columns cannot be mandatory.');
+			}
+			$settings = $column->getCustomSettingsObject(LookupSettings::class);
+			$relation = $this->mapper->find($settings->relationColumnId);
+			if ($relation->getType() !== Column::TYPE_RELATION || $relation->getTableId() !== $column->getTableId()) {
+				throw new \InvalidArgumentException('Lookup relation must be a relation column in the same table.');
+			}
+			$target = $this->mapper->find($settings->targetColumnId);
+			$this->assertRelationTargetColumn($relation->getCustomSettingsObject(RelationSettings::class), $target);
+			if (in_array($target->getType(), [Column::TYPE_RELATION, Column::TYPE_LOOKUP], true)) {
+				throw new \InvalidArgumentException('Lookup targets cannot be relation or lookup columns.');
+			}
+		} catch (\InvalidArgumentException|DoesNotExistException $e) {
+			throw new BadRequestError($e->getMessage(), 0, $e);
+		}
+	}
+
+	public function assertRelationTargetColumn(RelationSettings $settings, Column $column): void {
+		$view = $settings->isView() ? $this->viewMapper->find($settings->targetId) : null;
+		$tableId = $view ? $view->getTableId() : $settings->targetId;
+		if ($column->getTableId() !== $tableId || ($view && !in_array($column->getId(), $view->getColumnIds(), true))) {
+			throw new \InvalidArgumentException('Column must belong to the relation target table or view.');
+		}
+	}
+
+	public function validateSortRules(SortRuleSet $sort): void {
+		$columnIds = array_filter(array_column($sort->jsonSerialize(), 'columnId'), fn (int $id) => $id > 0);
+		foreach ($this->mapper->findAll($columnIds) as $column) {
+			if ($column->isVirtual()) {
+				throw new \InvalidArgumentException('Lookup columns cannot be used in saved sorting rules.');
 			}
 		}
 	}
@@ -652,6 +710,11 @@ class ColumnService extends SuperService {
 		foreach ($titles as $title) {
 			$i++;
 			foreach ($allColumns as $column) {
+				// Skip matching columns with type lookup
+				if ($column->isVirtual()) {
+					continue;
+				}
+
 				if ($column->getTitle() === $title) {
 					$result[$i] = $column;
 					$countMatchingColumns++;

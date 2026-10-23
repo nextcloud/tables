@@ -79,6 +79,7 @@ export default {
 				ColumnTypes.SelectionMulti,
 				ColumnTypes.TextLink,
 				ColumnTypes.Usergroup,
+				ColumnTypes.Lookup,
 			].includes(col.type)
 		},
 		eligibleColumns(selectedId) {
