@@ -10,6 +10,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
@@ -25,6 +26,7 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\SelectionOptions;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCA\Tables\Validation\ColumnDtoValidator;
@@ -54,6 +56,7 @@ class ColumnService extends SuperService {
 		private readonly IL10N $l,
 		private readonly UserHelper $userHelper,
 		private readonly ColumnDtoValidator $columnDtoValidator,
+		private readonly AuditLogServiceInterface $auditLogService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -614,6 +617,10 @@ class ColumnService extends SuperService {
 
 		if (!$skipRowCleanup) {
 			$this->viewService->deleteColumnDataFromViews($id, $table);
+			$this->auditLogService->log(Operation::ColumnDeleted, 'Column with ID: %s of table with ID: %s was deleted', [
+				'columnId' => $id,
+				'tableId' => $item->getTableId(),
+			]);
 		}
 
 		return $this->enhanceColumn($item);

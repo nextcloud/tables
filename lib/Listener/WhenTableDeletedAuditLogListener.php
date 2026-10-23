@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\EventDispatcher\Event;
@@ -29,8 +30,9 @@ final class WhenTableDeletedAuditLogListener implements IEventListener {
 
 		$table = $event->getTable();
 
-		$this->auditLogService->log("Table with ID: $table->id was deleted", [
-			'table' => $table->jsonSerialize(),
+		$this->auditLogService->log(Operation::TableDeleted, 'Table with ID: %s was deleted', [
+			'tableId' => $table->getId(),
+			'owner' => $table->getOwnership(),
 		]);
 	}
 }

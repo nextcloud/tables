@@ -10,6 +10,7 @@ namespace OCA\Tables\Service;
 
 use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
@@ -30,16 +31,15 @@ use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
-use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
-use OCP\Log\Audit\CriticalActionPerformedEvent;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -54,7 +54,7 @@ class ContextService {
 		private LoggerInterface $logger,
 		private PermissionsService $permissionsService,
 		private IUserManager $userManager,
-		private IEventDispatcher $eventDispatcher,
+		private AuditLogServiceInterface $auditLogService,
 		private IDBConnection $dbc,
 		private ShareService $shareService,
 		private bool $isCLI,
@@ -150,6 +150,11 @@ class ContextService {
 			}
 			$this->insertPage($context);
 		}, $this->dbc);
+		$this->auditLogService->log(Operation::ContextCreated, 'Tables application with ID %s was created for user %s', [
+			'contextId' => $context->getId(),
+			'ownerId' => $ownerId,
+			'nodes' => array_map(static fn (array $node): array => ['nodeType' => (int)$node['type'], 'nodeId' => (int)$node['id']], $nodes),
+		]);
 
 		return $context;
 	}
@@ -174,6 +179,8 @@ class ContextService {
 		}
 
 		$hasUpdatedNodeInformation = false;
+		$addedNodes = [];
+		$removedNodes = [];
 		if ($nodes !== null) {
 			$currentNodes = $context->getNodes();
 			$currentPages = $context->getPages();
@@ -216,6 +223,7 @@ class ContextService {
 			$hasUpdatedNodeInformation = $hasUpdatedNodeInformation || !empty($nodesBeingAdded) || !empty($nodesBeingRemoved);
 
 			foreach ($nodesBeingRemoved as $node) {
+				$removedNodes[] = ['nodeType' => (int)$node['node_type'], 'nodeId' => (int)$node['node_id']];
 				/** @var ContextNodeRelation $removedNode */
 				/** @var PageContent[] $removedContents */
 				[$removedNode, $removedContents] = $this->removeNodeFromContextAndPages($node['id']);
@@ -232,6 +240,7 @@ class ContextService {
 				if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
 					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
 				}
+				$addedNodes[] = ['nodeType' => $nodeType, 'nodeId' => $nodeId];
 
 				/** @var ContextNodeRelation $addedNode */
 				/** @var PageContent $updatedContent */
@@ -304,6 +313,11 @@ class ContextService {
 			$context->setNodes($currentNodes);
 			$context->setPages($currentPages);
 		}
+		$this->auditLogService->log(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+			'contextId' => $contextId,
+			'addedNodes' => $addedNodes,
+			'removedNodes' => $removedNodes,
+		]);
 
 		return $context;
 	}
@@ -325,6 +339,10 @@ class ContextService {
 			}
 			$this->contextMapper->delete($context);
 		}, $this->dbc);
+		$this->auditLogService->log(Operation::ContextDeleted, 'Tables application with ID %s was deleted', [
+			'contextId' => $context->getId(),
+			'ownerId' => $context->getOwnerId(),
+		]);
 		return $context;
 	}
 
@@ -374,15 +392,11 @@ class ContextService {
 			throw new InternalError('Failed to transfer context ownership: ' . $e->getMessage());
 		}
 
-		$auditEvent = new CriticalActionPerformedEvent(
-			sprintf(
-				'Tables application with ID %d was transferred to user %s',
-				$contextId,
-				$newOwnerId,
-			)
-		);
-
-		$this->eventDispatcher->dispatchTyped($auditEvent);
+		$this->auditLogService->log(Operation::ContextTransferred, 'Tables application with ID %s was transferred to user %s', [
+			'contextId' => $contextId,
+			'toUserId' => $newOwnerId,
+			'fromUserId' => $oldOwnerId,
+		]);
 
 		return $context;
 	}

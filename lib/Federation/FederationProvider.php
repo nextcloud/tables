@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Federation;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Constants\ViewLayout;
 use OCA\Tables\Db\Share;
@@ -20,6 +21,7 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\FederationDisabledError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\FederationService;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Federation\Exceptions\BadRequestException;
@@ -42,6 +44,7 @@ class FederationProvider implements ISignedCloudFederationProvider {
 		private readonly ShareMapper $shareMapper,
 		private readonly ICloudIdManager $cloudIdManager,
 		private readonly FederationService $federationService,
+		private readonly AuditLogServiceInterface $auditLogService,
 	) {
 	}
 
@@ -89,10 +92,17 @@ class FederationProvider implements ISignedCloudFederationProvider {
 		$localShare = $this->buildShareForFederationNode($share, $nodeId, $nodeType, $localUser);
 
 		try {
-			$this->shareMapper->insert($localShare);
+			$localShare = $this->shareMapper->insert($localShare);
 		} catch (\Exception $e) {
 			throw new ProviderCouldNotAddShareException('Could not create share for federated share: ' . $e->getMessage());
 		}
+		$this->auditLogService->log(Operation::FederatedShareReceived, 'Federated share %s of %s %s from "%s" was received for user "%s"', [
+			'shareId' => $localShare->getId(),
+			'nodeType' => $nodeType,
+			'nodeId' => $nodeId,
+			'sharedBy' => $share->getSharedBy(),
+			'receiver' => $localUser,
+		]);
 
 		return (string)$nodeId;
 	}

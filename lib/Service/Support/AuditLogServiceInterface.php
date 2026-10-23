@@ -8,6 +8,11 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service\Support;
 
+use OCA\Tables\AuditLog\Operation;
+
 interface AuditLogServiceInterface {
-	public function log(string $message, array $context): void;
+	/**
+	 * @param array<string, mixed> $parameters named values for the placeholders of $message, in order, optionally followed by more context
+	 */
+	public function log(Operation $operation, string $message, array $parameters = []): void;
 }

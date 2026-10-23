@@ -9,8 +9,11 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
@@ -18,7 +21,7 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
-use OCP\EventDispatcher\IEventDispatcher;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\IDBConnection;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
@@ -33,6 +36,8 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $contextNodeRelMapper;
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
+	private MockObject $userManager;
+	private MockObject $auditLogService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -43,8 +48,8 @@ final class ContextServiceTest extends TestCase {
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
 		$permissionsService = $this->createMock(PermissionsService::class);
-		$userManager = $this->createMock(IUserManager::class);
-		$eventDispatcher = $this->createMock(IEventDispatcher::class);
+		$this->userManager = $this->createMock(IUserManager::class);
+		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$dbConnection = $this->createMock(IDBConnection::class);
 		$shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
@@ -57,8 +62,8 @@ final class ContextServiceTest extends TestCase {
 			$this->pageContentMapper,
 			$logger,
 			$permissionsService,
-			$userManager,
-			$eventDispatcher,
+			$this->userManager,
+			$this->auditLogService,
 			$dbConnection,
 			$shareService,
 			false,
@@ -67,6 +72,26 @@ final class ContextServiceTest extends TestCase {
 			$this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
 		);
+	}
+
+	public function testTransferLogsPreviousAndNewOwner(): void {
+		$context = new Context();
+		$context->setId(7);
+		$context->setOwnerId('alice');
+		$context->setOwnerType(Application::OWNER_TYPE_USER);
+		$this->contextMapper->method('findById')->with(7)->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->userManager->method('userExists')->with('bob')->willReturn(true);
+
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(
+				Operation::ContextTransferred,
+				'Tables application with ID %s was transferred to user %s',
+				['contextId' => 7, 'toUserId' => 'bob', 'fromUserId' => 'alice'],
+			);
+
+		$this->service->transfer(7, 'bob', Application::OWNER_TYPE_USER);
 	}
 
 	public function testUpdateReordersStartPageContentsFromSubmittedNodes(): void {
@@ -135,6 +160,13 @@ final class ContextServiceTest extends TestCase {
 			->method('update')
 			->with($context)
 			->willReturn($context);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [],
+				'removedNodes' => [],
+			]);
 
 		$updatedContext = $this->service->update(7, 'user-1', null, null, null, [
 			[
@@ -154,6 +186,67 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(10, $updatedOrders[502]);
 		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
 		self::assertSame(10, $updatedContext->getPages()[301]['content'][502]['order']);
+	}
+
+	public function testUpdateLogsRemovedNodes(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([
+			101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1],
+		]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->with(7, 'user-1')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$nodeRelation = new ContextNodeRelation();
+		$nodeRelation->id = 101;
+		$this->contextNodeRelMapper->method('findById')->with(101)->willReturn($nodeRelation);
+		$this->contextNodeRelMapper->method('delete')->willReturnArgument(0);
+		$this->pageContentMapper->method('findByNodeRelation')->willReturn([]);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [],
+				'removedNodes' => [['nodeType' => 0, 'nodeId' => 11]],
+			]);
+
+		$this->service->update(7, 'user-1', null, null, null, []);
+	}
+
+	public function testCreateLogsCriticalAction(): void {
+		$this->contextMapper->method('insert')->willReturnCallback(function (Context $context): Context {
+			$context->id = 9;
+			return $context;
+		});
+		$this->pageMapper->method('insert')->willReturnCallback(function (Page $page): Page {
+			$page->id = 1;
+			return $page;
+		});
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextCreated, 'Tables application with ID %s was created for user %s', [
+				'contextId' => 9,
+				'ownerId' => 'alice',
+				'nodes' => [],
+			]);
+
+		$this->service->create('Projects', 'icon', '', [], 'alice', Application::OWNER_TYPE_USER);
+	}
+
+	public function testDeleteLogsCriticalAction(): void {
+		$context = new Context();
+		$context->id = 9;
+		$context->setOwnerId('alice');
+		$this->contextMapper->method('findById')->with(9, 'alice')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->willReturn([]);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextDeleted, 'Tables application with ID %s was deleted', [
+				'contextId' => 9,
+				'ownerId' => 'alice',
+			]);
+
+		$this->service->delete(9, 'alice');
 	}
 
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {

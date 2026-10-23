@@ -7,6 +7,7 @@
 
 namespace unit\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Listener\WhenRowDeletedAuditLogListener;
@@ -35,10 +36,9 @@ final class WhenRowDeletedAuditLogTest extends TestCase {
 			->expects($this->once())
 			->method('log')
 			->with(
-				$this->equalTo("Row with ID: {$row->getId()} was deleted"),
-				$this->equalTo([
-					'row' => $row->toPublicRow()->jsonSerialize(),
-				])
+				Operation::RowDeleted,
+				'Row with ID: %s was deleted',
+				['rowId' => 1, 'tableId' => 161],
 			);
 
 		$this->listener->handle($event);

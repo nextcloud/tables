@@ -13,6 +13,7 @@ use DateTime;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Dto\Column as ColumnDto;
@@ -31,6 +32,7 @@ use OCA\Tables\Model\TableScheme;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\App\IAppManager;
@@ -72,6 +74,7 @@ class TableService extends SuperService {
 		protected Defaults $themingDefaults,
 		private ActivityManager $activityManager,
 		private FederationService $federationService,
+		private AuditLogServiceInterface $auditLogService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -348,6 +351,11 @@ class TableService extends SuperService {
 			additionalParams: [],
 			author: $userId
 		);
+		$this->auditLogService->log(Operation::TableCreated, 'Table with ID: %s was created by user with ID: %s', [
+			'tableId' => $table->getId(),
+			'owner' => $userId,
+			'template' => $template,
+		]);
 		return $table;
 	}
 
@@ -382,6 +390,7 @@ class TableService extends SuperService {
 			throw new PermissionError('PermissionError: can not change table owner with table id ' . $id);
 		}
 
+		$previousOwnerUserId = $table->getOwnership();
 		$table->setOwnership($newOwnerUserId);
 
 		try {
@@ -398,7 +407,7 @@ class TableService extends SuperService {
 		$event = new TableOwnershipTransferredEvent(
 			table: $table,
 			toUserId: $newOwnerUserId,
-			fromUserId: $userId
+			fromUserId: $previousOwnerUserId,
 		);
 
 		$this->eventDispatcher->dispatchTyped($event);
@@ -528,6 +537,7 @@ class TableService extends SuperService {
 		}
 
 		$changes = new ChangeSet($table);
+		$wasArchived = $table->getArchived();
 		$time = new DateTime();
 		if ($title !== null) {
 			$title = (string)new Title($title);
@@ -572,6 +582,13 @@ class TableService extends SuperService {
 			changeSet: $changes,
 			subject: ActivityManager::SUBJECT_TABLE_UPDATE
 		);
+		if ($archived !== null && $archived !== $wasArchived) {
+			$this->auditLogService->log(
+				$archived ? Operation::TableArchived : Operation::TableUnarchived,
+				$archived ? 'Table with ID: %s was archived' : 'Table with ID: %s was unarchived',
+				['tableId' => $table->getId()],
+			);
+		}
 		return $table;
 	}
 

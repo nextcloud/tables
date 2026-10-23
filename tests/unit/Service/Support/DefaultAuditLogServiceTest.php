@@ -7,6 +7,7 @@
 
 namespace unit\Service\Support;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Service\Support\DefaultAuditLogService;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
@@ -24,14 +25,16 @@ final class DefaultAuditLogServiceTest extends TestCase {
 	}
 
 	public function testLog(): void {
-		$message = 'Test message';
-		$context = ['key' => 'value'];
+		$message = 'Table with ID: %s was deleted';
+		$parameters = ['tableId' => 1];
 
 		$this->eventDispatcher
 			->expects($this->once())
 			->method('dispatchTyped')
-			->with($this->callback(fn (CriticalActionPerformedEvent $event) => $event->getLogMessage() === $message && $event->getParameters() === $context));
+			->with($this->callback(fn (CriticalActionPerformedEvent $event) => $event->getLogMessage() === $message
+				&& $event->getParameters() === $parameters
+				&& (!method_exists($event, 'getOperation') || $event->getOperation() === 'tables.table.deleted')));
 
-		$this->service->log($message, $context);
+		$this->service->log(Operation::TableDeleted, $message, $parameters);
 	}
 }
