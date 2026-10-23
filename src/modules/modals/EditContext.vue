@@ -37,11 +37,19 @@
 				<NcContextResource v-model:resources="resources" v-model:receivers="receivers" />
 			</div>
 			<div class="row space-T">
-				<NcActionCheckbox :model-value="showInNavigationDefault" @change="changeDisplayMode">
+				<NcCheckboxRadioSwitch :model-value="showInNavigationDefault" @update:model-value="changeDisplayMode">
 					{{ t('tables', 'Show in app list') }}
-				</NcActionCheckbox>
+				</NcCheckboxRadioSwitch>
 				<p class="nav-display-subtext">
 					{{ t('tables', 'This can be overridden by a per-account preference') }}
+				</p>
+			</div>
+			<div class="row space-T">
+				<NcCheckboxRadioSwitch :model-value="tabViewEnabled" @update:model-value="changeTabView">
+					{{ t('tables', 'Show resources as tabs') }}
+				</NcCheckboxRadioSwitch>
+				<p class="nav-display-subtext">
+					{{ t('tables', 'Display each table or view in a tab instead of one long stacked page.') }}
 				</p>
 			</div>
 			<div class="row space-T">
@@ -68,7 +76,7 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/style.css'
@@ -90,7 +98,7 @@ export default {
 		NcIconPicker,
 		NcIconSvgWrapper,
 		NcContextResource,
-		NcActionCheckbox,
+		NcCheckboxRadioSwitch,
 	},
 	mixins: [svgHelper, permissionBitmask, permissionsMixin],
 	props: {
@@ -123,6 +131,7 @@ export default {
 			PERMISSION_DELETE,
 			prepareDeleteContext: false,
 			showInNavigationDefault: false,
+			tabViewEnabled: false,
 		}
 	},
 	computed: {
@@ -147,6 +156,7 @@ export default {
 				this.resources = context ? this.getContextResources(context) : []
 				this.receivers = context ? this.getContextReceivers(context) : []
 				this.showInNavigationDefault = this.getNavDisplay(context)
+				this.tabViewEnabled = !!context.tabViewEnabled
 			}
 		},
 	},
@@ -177,6 +187,7 @@ export default {
 					iconName: this.icon.name,
 					description: this.description,
 					nodes: dataResources,
+					tabViewEnabled: this.tabViewEnabled,
 				}
 				const context = this.getContext(this.contextId)
 				// adding share to oneself to have navigation display control
@@ -206,6 +217,7 @@ export default {
 			this.receivers = context ? this.getContextReceivers(context) : []
 			this.prepareDeleteContext = false
 			this.showInNavigationDefault = this.getNavDisplay(context)
+			this.tabViewEnabled = !!context?.tabViewEnabled
 		},
 		getNavDisplay(context) {
 			const shares = Object.keys(context.sharing || {})
@@ -284,6 +296,9 @@ export default {
 		},
 		changeDisplayMode() {
 			this.showInNavigationDefault = !this.showInNavigationDefault
+		},
+		changeTabView() {
+			this.tabViewEnabled = !this.tabViewEnabled
 		},
 		actionTransfer() {
 			emit('tables:context:edit', null)

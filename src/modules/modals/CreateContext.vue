@@ -44,12 +44,20 @@
 			</div>
 			<div class="row space-T">
 				<div data-cy="createContextShowInNavSwitch">
-					<NcActionCheckbox :model-value="showInNavigationDefault" @change="changeDisplayMode">
+					<NcCheckboxRadioSwitch :model-value="showInNavigationDefault" @update:model-value="changeDisplayMode">
 						{{ t('tables', 'Show in app list') }}
-					</NcActionCheckbox>
+					</NcCheckboxRadioSwitch>
 				</div>
 				<p class="nav-display-subtext">
 					{{ t('tables', 'This can be overridden by a per-account preference') }}
+				</p>
+			</div>
+			<div class="row space-T">
+				<NcCheckboxRadioSwitch :model-value="tabViewEnabled" @update:model-value="changeTabView">
+					{{ t('tables', 'Show resources as tabs') }}
+				</NcCheckboxRadioSwitch>
+				<p class="nav-display-subtext">
+					{{ t('tables', 'Display each table or view in a tab instead of one long stacked page.') }}
 				</p>
 			</div>
 			<div class="row space-R row space-T">
@@ -64,7 +72,7 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
@@ -84,7 +92,7 @@ export default {
 		NcButton,
 		NcIconSvgWrapper,
 		NcContextResource,
-		NcActionCheckbox,
+		NcCheckboxRadioSwitch,
 	},
 	mixins: [svgHelper, permissionBitmask],
 	props: {
@@ -109,6 +117,7 @@ export default {
 			resources: [],
 			receivers: [],
 			showInNavigationDefault: false,
+			tabViewEnabled: false,
 		}
 	},
 	watch: {
@@ -169,6 +178,7 @@ export default {
 				iconName: this.icon.name,
 				description: this.description,
 				nodes: dataResources,
+				tabViewEnabled: this.tabViewEnabled,
 			}
 			// adding share to oneself to have navigation display control
 			this.receivers.push(
@@ -179,7 +189,7 @@ export default {
 					isUser: true,
 					key: 'user-' + getCurrentUser().uid,
 				})
-			const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
+			const displayMode = this.showInNavigationDefault ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
 			const res = await this.insertNewContext({ data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 			if (res) {
 				return res.id
@@ -188,14 +198,18 @@ export default {
 			}
 		},
 		changeDisplayMode() {
-			this.showInNavigation = !this.showInNavigation
+			this.showInNavigationDefault = !this.showInNavigationDefault
 		},
+		changeTabView() {
+			this.tabViewEnabled = !this.tabViewEnabled
+		},	
 		reset() {
 			this.title = ''
 			this.errorTitle = false
 			this.setIcon(this.randomIcon())
 			this.customTitleChosen = false
 			this.showInNavigationDefault = false
+			this.tabViewEnabled = false
 		},
 	},
 }
