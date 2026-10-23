@@ -95,6 +95,7 @@
 		:name="t('tables', 'Import successful')"
 		size="small">
 		<template #actions>
+			<ImportProblemsFileButton :problems-file="importResults.result?.problemsFile" />
 			<NcButton :aria-label="t('tables', 'Close')" @click="closeResultsDialog()">
 				{{ t('tables', 'Close') }}
 			</NcButton>
@@ -121,6 +122,7 @@ import axios from '@nextcloud/axios'
 import { translate as t } from '@nextcloud/l10n'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import ImportResults from './ImportResults.vue'
+import ImportProblemsFileButton from './ImportProblemsFileButton.vue'
 
 export default {
 	name: 'FileActionImport',
@@ -129,6 +131,7 @@ export default {
 		NcButton,
 		NcDialog,
 		ImportResults,
+		ImportProblemsFileButton,
 		NcLoadingIcon,
 		NcSelect,
 		NcCheckboxRadioSwitch,

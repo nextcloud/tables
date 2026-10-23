@@ -85,6 +85,7 @@
 
 				<div class="row">
 					<div class="fix-col-4 space-T end">
+						<ImportProblemsFileButton :problems-file="result.problemsFile" class="problems-file-button" />
 						<NcButton :aria-label="t('tables', 'Done')" type="primary" @click="actionCloseAndReload">
 							{{ t('tables', 'Done') }}
 						</NcButton>
@@ -129,6 +130,7 @@ import { mapState, mapActions } from 'pinia'
 import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
 import ImportResults from './ImportResults.vue'
 import ImportPreview from './ImportPreview.vue'
+import ImportProblemsFileButton from './ImportProblemsFileButton.vue'
 import { translate as t } from '@nextcloud/l10n'
 import { useDataStore } from '../../store/data.js'
 
@@ -144,6 +146,7 @@ export default {
 		NcButton,
 		ImportResults,
 		ImportPreview,
+		ImportProblemsFileButton,
 		NcCheckboxRadioSwitch,
 		RowFormWrapper,
 		NcEmptyContent,
@@ -520,6 +523,10 @@ export default {
 
 	.information :deep(.row.space-T) {
 		padding-top: calc(var(--default-grid-baseline) * 2);
+	}
+
+	.problems-file-button {
+		margin-inline-end: auto;
 	}
 
 	.import-filename {
