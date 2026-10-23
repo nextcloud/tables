@@ -44,48 +44,14 @@
       "allowedVersions": "<4"
     },
     {
-      "matchPackageNames": ["vue"],
-      "allowedVersions": "<3"
-    },
-    {
-      "matchPackageNames": ["vue-router"],
-      "allowedVersions": "<4"
-    },
-    {
-      "matchPackageNames": ["pinia"],
-      "allowedVersions": "<3",
-      "description": "Pin to Vue 2-compatible major"
-    },
-    {
-      "matchPackageNames": ["@vueuse/core"],
-      "allowedVersions": "<12"
-    },
-    {
-      "matchPackageNames": ["@vue/test-utils"],
-      "allowedVersions": "<2"
-    },
-    {
-      "matchPackageNames": ["@nextcloud/stylelint-config"],
-      "allowedVersions": "<=3.1.1",
-      "description": "Pin due to stylelint peer dependency conflict"
-    },
-    {
-      "matchPackageNames": ["@vue/tsconfig"],
-      "allowedVersions": "<=0.5.1"
-    },
-    {
       "matchPackageNames": ["typescript"],
-      "allowedVersions": "<=5.3.3"
+      "allowedVersions": "<7",
+      "description": "Hold back TypeScript 7 (native Go port) until vue-tsc supports it"
     },
     {
       "groupName": "cypress",
       "matchPackageNames": ["cypress", "@nextcloud/cypress"],
       "matchPackagePrefixes": ["@cypress/"]
-    },
-    {
-      "matchPackageNames": ["phpoffice/phpspreadsheet"],
-      "allowedVersions": "<1.30",
-      "description": "Pinned as later version have a regressive bug"
     }
   ]
 }
