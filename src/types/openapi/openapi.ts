@@ -1200,6 +1200,7 @@ export type components = {
             readonly owner: string;
             /** Format: int64 */
             readonly ownerType: number;
+            readonly menuItems?: readonly components["schemas"]["MenuItem"][];
         };
         readonly ContextNavigation: {
             /** Format: int64 */
@@ -1233,6 +1234,26 @@ export type components = {
         readonly LinkShare: {
             readonly shareToken: string;
             readonly url: string;
+        };
+        readonly MenuItem: {
+            /** Format: int64 */
+            readonly id: number;
+            /** Format: int64 */
+            readonly contextId: number;
+            readonly label: string;
+            readonly icon: string | null;
+            readonly description: string | null;
+            /** @enum {string} */
+            readonly targetType: "view" | "table" | "url" | "page";
+            /** Format: int64 */
+            readonly targetId: number | null;
+            readonly url: string | null;
+            readonly technicalName: string;
+            /** Format: int64 */
+            readonly order: number;
+            /** Format: int64 */
+            readonly parentId: number | null;
+            readonly broken: boolean;
         };
         readonly NotifyConfig: {
             readonly "notify-assigned": boolean;
