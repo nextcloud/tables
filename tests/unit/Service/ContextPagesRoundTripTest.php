@@ -25,6 +25,7 @@ use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\MenuItemInput;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PermissionsService;
@@ -36,6 +37,7 @@ use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -50,6 +52,8 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 	private ContextNodeRelationMapper $nodeRelMapper;
 	private PageMapper $pageMapper;
 	private WidgetService $widgetService;
+	private PermissionsService&MockObject $permissionsService;
+	private TableMapper&MockObject $tableMapper;
 	/** @var int[] */
 	private array $contextIds = [];
 
@@ -72,7 +76,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			$this->pageMapper,
 			new PageContentMapper($this->connectionAdapter),
 			$this->createMock(LoggerInterface::class),
-			$this->createMock(PermissionsService::class),
+			$this->permissionsService = $this->createMock(PermissionsService::class),
 			$this->createMock(IUserManager::class),
 			$this->createMock(IEventDispatcher::class),
 			$this->connectionAdapter,
@@ -80,11 +84,12 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			false,
 			$this->createMock(INavigationManager::class),
 			$this->createMock(IURLGenerator::class),
-			$this->createMock(TableMapper::class),
+			$this->tableMapper = $this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			new MenuItemMapper($this->connectionAdapter),
+			$l10n,
 		);
 	}
 
@@ -196,5 +201,73 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->widgetService->insert($page->getId(), 'data', null, ['gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5], [], $relation->getId());
 
 		return [$context, $relation, $page->getId()];
+	}
+
+	/**
+	 * The frontend sends a table both as a node and as a menu target.
+	 */
+	public function testATableInBothTheNodesAndTheMenuIsAddedOnceOnCreateAndUpdate(): void {
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$this->tableMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => array_combine($ids, array_map(static fn (): Table => new Table(), $ids)));
+		$node = static fn (int $id): array => ['id' => $id, 'type' => Application::NODE_TYPE_TABLE, 'permissions' => Application::PERMISSION_READ];
+		$item = static fn (int $id): array => ['label' => 'Table ' . $id, 'targetType' => 'table', 'targetId' => $id];
+
+		$created = $this->service->create('Nodes and menu', 'tables', '', [$node(990501)], self::OWNER, Application::OWNER_TYPE_USER,
+			MenuItemInput::createListFromInputArray([$item(990501)], allowNewStartPage: true));
+		$this->contextIds[] = $created->getId();
+		$this->assertSame([990501], $this->storedNodeIds($created->getId()));
+
+		$this->service->update($created->getId(), self::OWNER, null, null, null, [$node(990501), $node(990502)],
+			MenuItemInput::createListFromInputArray([$item(990501), $item(990502)]));
+		$this->assertSame([990501, 990502], $this->storedNodeIds($created->getId()));
+	}
+
+	/**
+	 * The node ids of an application, once for every relation, and the start page holds
+	 * each relation once.
+	 *
+	 * @return list<int>
+	 */
+	private function storedNodeIds(int $contextId): array {
+		$context = $this->contextMapper->findById($contextId, self::OWNER);
+		$nodeIds = array_values(array_map(static fn (array $node): int => $node['node_id'], $context->getNodes()));
+		sort($nodeIds);
+		$startPage = array_values(array_filter($context->getPages(), static fn (array $page): bool => $page['page_type'] === Page::TYPE_STARTPAGE))[0];
+		$this->assertCount(count($nodeIds), $startPage['content']);
+		return $nodeIds;
+	}
+
+	/**
+	 * The responses of creating and updating an application keep the shape they had
+	 * before menus: a new application lists its nodes as relations and its start page
+	 * contents by id, and an update returns a node it added as its relation.
+	 */
+	public function testCreateAndUpdateResponsesKeepTheirNodeShape(): void {
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$node = static fn (int $id, int $permissions): array => ['id' => $id, 'type' => Application::NODE_TYPE_TABLE, 'permissions' => $permissions];
+
+		$created = $this->service->create('Shape', 'tables', '', [$node(990601, 1), $node(990602, 3)], self::OWNER, Application::OWNER_TYPE_USER);
+		$this->contextIds[] = $id = $created->getId();
+		$json = json_decode(json_encode($created), true);
+		[$first, $second] = $json['nodes'];
+		$this->assertSame(array_keys($json['nodes']), [0, 1]);
+		$this->assertSame(['id' => $first['id'], 'contextId' => $id, 'nodeId' => 990601, 'nodeType' => 0, 'permissions' => 1], $first);
+		$this->assertSame(['id' => $second['id'], 'contextId' => $id, 'nodeId' => 990602, 'nodeType' => 0, 'permissions' => 3], $second);
+		$startPage = array_values($json['pages'])[0];
+		$this->assertSame(['id', 'contextId', 'pageType', 'technicalName', 'title', 'icon', 'description', 'content'], array_keys($startPage));
+		$contentIds = array_keys($startPage['content']);
+		$this->assertSame([
+			['id' => $contentIds[0], 'nodeRelId' => $first['id'], 'order' => 10],
+			['id' => $contentIds[1], 'nodeRelId' => $second['id'], 'order' => 20],
+		], array_values($startPage['content']));
+
+		$updated = json_decode(json_encode($this->service->update($id, self::OWNER, null, null, null, [$node(990602, 1), $node(990603, 1)])), true);
+		$this->assertSame([$second['id']], array_values(array_diff(array_keys($updated['nodes']), [max(array_keys($updated['nodes']))])));
+		$added = $updated['nodes'][max(array_keys($updated['nodes']))];
+		$this->assertSame(['id', 'contextId', 'nodeId', 'nodeType', 'permissions'], array_keys($added));
+		$this->assertSame(['id', 'node_id', 'node_type', 'permissions'], array_keys($updated['nodes'][$second['id']]));
+		$addedContent = array_values(array_filter(array_values($updated['pages'])[0]['content'], static fn (array $content): bool => isset($content['nodeRelId'])));
+		$this->assertSame(['id', 'pageId', 'nodeRelId', 'order'], array_keys($addedContent[0]));
+		$this->assertSame($added['id'], $addedContent[0]['nodeRelId']);
 	}
 }

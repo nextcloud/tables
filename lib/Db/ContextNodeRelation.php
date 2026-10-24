@@ -35,6 +35,21 @@ class ContextNodeRelation extends Entity implements \JsonSerializable {
 		$this->addType('permissions', 'integer');
 	}
 
+	/**
+	 * The relation as an application carries it among its nodes, in the shape the
+	 * context mapper reads it.
+	 *
+	 * @return array{id: int, node_id: int, node_type: int, permissions: int}
+	 */
+	public function toContextNode(): array {
+		return [
+			'id' => (int)$this->getId(),
+			'node_id' => (int)$this->getNodeId(),
+			'node_type' => (int)$this->getNodeType(),
+			'permissions' => (int)$this->getPermissions(),
+		];
+	}
+
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->getId(),

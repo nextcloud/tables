@@ -17,6 +17,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\MenuItemInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -31,6 +32,9 @@ use OCP\DB\Exception;
 use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IRequest;
+use OCP\IUserManager;
+use OCP\Security\RateLimiting\ILimiter;
+use OCP\Security\RateLimiting\IRateLimitExceededException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,6 +43,8 @@ use Psr\Log\LoggerInterface;
  */
 
 class ContextController extends AOCSController {
+	private const MENU_SAVES_PER_MINUTE = 60;
+
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
@@ -49,6 +55,8 @@ class ContextController extends AOCSController {
 		private readonly IDBConnection $db,
 		private readonly ColumnService $columnService,
 		private readonly ViewService $viewService,
+		private readonly ILimiter $limiter,
+		private readonly IUserManager $userManager,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
 	}
@@ -101,6 +109,7 @@ class ContextController extends AOCSController {
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
 	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context
+	 * @psalm-param ?list<array{label: string, icon?: string, description?: string, targetType?: 'view'|'table'|'url'|'page', targetId?: int, url?: string, technicalName?: string}> $menuItems optional menu of the context, in order; the views and tables it opens become nodes of the context and a page item without a targetId opens the start page; without a menu the context gets one item opening the start page
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
@@ -109,7 +118,7 @@ class ContextController extends AOCSController {
 	 * 403: lacking permissions on a resource
 	 */
 	#[NoAdminRequired]
-	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
+	public function create(string $name, string $iconName, string $description = '', array $nodes = [], ?array $menuItems = null): DataResponse {
 		try {
 			if (!$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
@@ -121,13 +130,16 @@ class ContextController extends AOCSController {
 				$this->sanitizeInputNodes($nodes),
 				$this->userId,
 				0,
+				$menuItems !== null ? MenuItemInput::createListFromInputArray($menuItems, allowNewStartPage: true) : null,
 			)->jsonSerialize());
 		} catch (Exception $e) {
 			return $this->handleError($e);
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
 		} catch (InvalidArgumentException $e) {
-			return $this->handleError(new InternalError($e->getMessage(), $e->getCode(), $e));
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
 		}
 	}
 
@@ -139,18 +151,23 @@ class ContextController extends AOCSController {
 	 * @param ?string $iconName provide this parameter to set a new icon
 	 * @param ?string $description provide this parameter to set a new description
 	 * @param ?array{id: int, type: int, permissions: int, order: int} $nodes provide this parameter to set a new list of nodes.
+	 * @psalm-param ?list<array{label: string, icon?: string, description?: string, targetType?: 'view'|'table'|'url'|'page', targetId?: int, url?: string, technicalName?: string}> $menuItems provide this parameter to replace the menu; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_TOO_MANY_REQUESTS, array{message: string}, array{}>
 	 *
 	 * 200: returning the full context information
 	 * 400: bad request
 	 * 403: No permissions
 	 * 404: Not found
+	 * 429: Too many saves of a menu, a user can save 60 a minute
 	 *
 	 * @CanManageContext
 	 */
 	#[NoAdminRequired]
-	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
+	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes, ?array $menuItems = null): DataResponse {
+		if ($menuItems !== null && !$this->registerMenuSave()) {
+			return new DataResponse(['message' => $this->n->t('Too many menu saves, try again in a minute.')], Http::STATUS_TOO_MANY_REQUESTS);
+		}
 		try {
 			if ($iconName !== null && !$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
@@ -163,6 +180,7 @@ class ContextController extends AOCSController {
 				$iconName,
 				$description,
 				$nodes,
+				$menuItems !== null ? MenuItemInput::createListFromInputArray($menuItems) : null,
 			)->jsonSerialize());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			return $this->handleError($e);
@@ -170,6 +188,27 @@ class ContextController extends AOCSController {
 			return $this->handlePermissionError($e);
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (InvalidArgumentException $e) {
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+		}
+	}
+
+	/**
+	 * Counts a save of a menu against the limit of the user, as many a minute as saves of a
+	 * page. Saves without a menu are not limited.
+	 */
+	private function registerMenuSave(): bool {
+		$user = $this->userManager->get($this->userId);
+		if ($user === null) {
+			return true;
+		}
+		try {
+			$this->limiter->registerUserRequest('tables-context-menu-save', self::MENU_SAVES_PER_MINUTE, 60, $user);
+			return true;
+		} catch (IRateLimitExceededException) {
+			return false;
 		}
 	}
 
