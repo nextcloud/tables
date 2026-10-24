@@ -29,6 +29,8 @@ class Page extends Entity implements \JsonSerializable {
 	public const TYPE_GRID = 'grid';
 	public const START_PAGE_NAME = 'dashboard';
 	public const DEFAULT_NAME_PREFIX = 'page_';
+	public const TITLE_MAX_LENGTH = 200;
+	public const DESCRIPTION_MAX_LENGTH = 2000;
 
 	protected ?int $contextId = null;
 	protected ?string $pageType = null;
