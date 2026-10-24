@@ -12,14 +12,15 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Db\WidgetSourceMapper;
+use OCA\Tables\ResponseDefinitions;
 use OCP\DB\Exception;
 
 /**
  * Stores the widgets of grid pages, settings included, and the node a data widget
  * shows. Callers check permissions and run writes in a transaction.
  *
- * @psalm-import-type TablesWidgetSettingValue from Widget
- * @psalm-type TablesWidgetRecord = array{id: int, type: string, title: ?string, icon: ?string, description: ?string, gridX: int, gridY: int, gridWidth: int, gridHeight: int, settings: \stdClass, source: ?array{nodeRelId: int}}
+ * @psalm-import-type TablesWidget from ResponseDefinitions
+ * @psalm-import-type TablesWidgetValue from ResponseDefinitions
  */
 class WidgetService {
 	public function __construct(
@@ -30,7 +31,7 @@ class WidgetService {
 
 	/**
 	 * @param int[] $pageIds
-	 * @return array<int, list<TablesWidgetRecord>> widgets by page id, in grid order
+	 * @return array<int, list<TablesWidget>> widgets by page id, in grid order
 	 * @throws Exception
 	 */
 	public function findByPageIds(array $pageIds): array {
@@ -60,7 +61,7 @@ class WidgetService {
 
 	/**
 	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
+	 * @param array<string, TablesWidgetValue> $settings
 	 * @throws \InvalidArgumentException when the source is not a node of the application of the page
 	 * @throws Exception
 	 * @throws \JsonException
@@ -72,7 +73,7 @@ class WidgetService {
 
 	/**
 	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
+	 * @param array<string, TablesWidgetValue> $settings
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
@@ -87,11 +88,19 @@ class WidgetService {
 	}
 
 	/**
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function findIdsByPageId(int $pageId): array {
+		return $this->widgetMapper->findIdsByPageId($pageId);
+	}
+
+	/**
 	 * Makes the widgets of a page match the given list: widgets with an id are updated,
 	 * widgets without one are inserted and widgets of the page that are not listed are
 	 * deleted. A widget listed without an icon or description has none.
 	 *
-	 * @param list<array{id: ?int, type: string, title: ?string, icon?: ?string, description?: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetSettingValue>, nodeRelId: ?int}> $widgets
+	 * @param list<array{id: ?int, type: string, title: ?string, icon?: ?string, description?: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetValue>, nodeRelId: ?int}> $widgets
 	 * @throws \InvalidArgumentException when an id is not one of a widget of the page, or a
 	 *                                   source is not a node of the application of the page
 	 * @throws Exception
@@ -178,7 +187,7 @@ class WidgetService {
 
 	/**
 	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
+	 * @param array<string, TablesWidgetValue> $settings
 	 * @throws \JsonException
 	 */
 	private function applyFields(Widget $widget, string $type, ?string $title, array $position, array $settings, ?string $icon, ?string $description): void {
