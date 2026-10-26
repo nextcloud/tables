@@ -57,7 +57,7 @@ class Version2020Date20260513185340 extends SimpleMigrationStep {
 				'comment' => 'UUIDv7 identifier to support structural updates across instances',
 			]);
 		}
-		if (!$targetTable->hasUniqueConstraint($indexName)) {
+		if (!$targetTable->hasIndex($indexName)) {
 			$targetTable->addUniqueIndex(['table_id', self::COL_UUID], $indexName);
 		}
 	}
