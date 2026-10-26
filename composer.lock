@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "73683bb705bf2c0a22cfb289aa638ae6",
+    "content-hash": "ee11071d013db661f0b51a16064a895d",
     "packages": [
         {
             "name": "bamarni/composer-bin-plugin",
@@ -574,16 +574,16 @@
         },
         {
             "name": "symfony/uid",
-            "version": "v6.4.47",
+            "version": "v6.4.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/uid.git",
-                "reference": "2266f787b76bbbc339f4fdb40111ca461782f282"
+                "reference": "357c45dd54432a5062b2707685800109374c80bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/uid/zipball/2266f787b76bbbc339f4fdb40111ca461782f282",
-                "reference": "2266f787b76bbbc339f4fdb40111ca461782f282",
+                "url": "https://api.github.com/repos/symfony/uid/zipball/357c45dd54432a5062b2707685800109374c80bb",
+                "reference": "357c45dd54432a5062b2707685800109374c80bb",
                 "shasum": ""
             },
             "require": {
@@ -628,7 +628,7 @@
                 "uuid"
             ],
             "support": {
-                "source": "https://github.com/symfony/uid/tree/v6.4.47"
+                "source": "https://github.com/symfony/uid/tree/v6.4.48"
             },
             "funding": [
                 {
@@ -648,7 +648,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-23T16:05:37+00:00"
+            "time": "2026-10-12T14:16:54+00:00"
         }
     ],
     "packages-dev": [
