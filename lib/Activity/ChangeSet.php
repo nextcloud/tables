@@ -24,11 +24,11 @@ class ChangeSet implements \JsonSerializable {
 		}
 	}
 
-	public function setBefore($before) {
+	public function setBefore(Entity $before) {
 		$this->before = clone $before;
 	}
 
-	public function setAfter($after) {
+	public function setAfter(Entity $after) {
 		$this->after = clone $after;
 	}
 
