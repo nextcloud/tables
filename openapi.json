@@ -12308,6 +12308,48 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "menuItems": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "optional menu of the context, in order; the views and tables it opens become nodes of the context and a page item without a targetId opens the start page; without a menu the context gets one item opening the start page",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "label"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "icon": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "targetType": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "view",
+                                                        "table",
+                                                        "url",
+                                                        "page"
+                                                    ]
+                                                },
+                                                "targetId": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "url": {
+                                                    "type": "string"
+                                                },
+                                                "technicalName": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -12738,6 +12780,48 @@
                                             "order": {
                                                 "type": "integer",
                                                 "format": "int64"
+                                            }
+                                        }
+                                    },
+                                    "menuItems": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "provide this parameter to replace the menu; the views and tables it opens become nodes of the context, and an item without a technicalName keeps the one stored for the same target",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "label"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "icon": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "targetType": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "view",
+                                                        "table",
+                                                        "url",
+                                                        "page"
+                                                    ]
+                                                },
+                                                "targetId": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "url": {
+                                                    "type": "string"
+                                                },
+                                                "technicalName": {
+                                                    "type": "string"
+                                                }
                                             }
                                         }
                                     }
