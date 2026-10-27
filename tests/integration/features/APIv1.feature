@@ -764,6 +764,7 @@ Feature: APIv1
     And user "participant1" sets filter to view "available-fruits"
       | column    | operator | value |
       | available | is-equal | true  |
+    And user "participant1" sets columnSettings "name,available" to view "available-fruits"
     Given table "Smoothies" with emoji "🥤" exists for user "participant1" as "smoothies"
     Then relation column "ingredient" exists on table "smoothies" pointing to view "available-fruits" using label column "name"
     When user "participant1" fetches relations for table "smoothies"
@@ -803,6 +804,51 @@ Feature: APIv1
     Then relation column "product" exists on table "secret-orders" pointing to table "secret-products" using label column "name"
     When user "participant2" fetches relations for table "secret-orders"
     Then the reported status is "404"
+
+  @api1 @relation @table-sharing
+  Scenario: Unauthorized user cannot create a relation column to a table
+    Given table "Secret Products" with emoji "🔒" exists for user "participant1" as "secret-products"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Given table "My Orders" with emoji "🛒" exists for user "participant2" as "my-orders"
+    When user "participant2" attempts to create relation column "product" on table "my-orders" pointing to table "secret-products" using label column "name"
+    Then the reported status is "403"
+
+  @api1 @relation @table-sharing
+  Scenario: Shared relation column shows labels without access to the target table
+    Given table "Products" with emoji "📦" exists for user "participant1" as "products"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then row exists with following values
+      | name | Apple |
+    Given table "Orders" with emoji "🛒" exists for user "participant1" as "orders"
+    Then relation column "product" exists on table "orders" pointing to table "products" using label column "name"
+    Then user "participant1" shares table with user "participant2"
+    When user "participant2" fetches relations for table "orders"
+    Then the reported status is "200"
+    Then the relations response contains 1 entries for column "product"
+    Then the relations response for column "product" has an entry with label "Apple"
+
+  @api1 @relation
+  Scenario: Relation column to a view cannot use a column hidden in the view
+    Given table "Fruits" with emoji "🍎" exists for user "participant1" as "fruits"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then column "price" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    When user "participant1" create view "Names only" with emoji "🏷️" for "fruits" as "names-only"
+    And user "participant1" sets columnSettings "name" to view "names-only"
+    Given table "Smoothies" with emoji "🥤" exists for user "participant1" as "smoothies"
+    When user "participant1" attempts to create relation column "ingredient" on table "smoothies" pointing to view "names-only" using label column "price"
+    Then the reported status is "400"
 
   @api1 @columns @rows
   Scenario: Column technicalName is returned and dataByAlias maps alias to row values

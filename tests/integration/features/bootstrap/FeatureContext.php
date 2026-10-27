@@ -2595,96 +2595,65 @@ class FeatureContext implements Context {
 	 * @Then relation column :title exists on table :tableName pointing to table :targetTableName using label column :labelColumnName
 	 */
 	public function createRelationColumnToTable(string $title, string $tableName, string $targetTableName, string $labelColumnName): void {
-		$targetId = $this->tableIds[$targetTableName];
-		$labelColumnId = $this->collectionManager->getByAlias('column', $labelColumnName)['id'];
-
-		$props = [
-			'title' => $title,
-			'type' => 'relation',
-			'mandatory' => 0,
-			'customSettings' => [
-				'relationType' => 'table',
-				'targetId' => $targetId,
-				'labelColumn' => $labelColumnId,
-			],
-		];
-
-		$this->sendRequest(
-			'POST',
-			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
-			$props
-		);
-
-		$newColumn = $this->getDataFromResponse($this->response);
-		$this->columnId = $newColumn['id'];
-
-		Assert::assertEquals(200, $this->response->getStatusCode());
-		Assert::assertEquals($title, $newColumn['title']);
-		Assert::assertEquals('relation', $newColumn['type']);
-
-		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+		$this->sendCreateRelationColumnRequest($title, $tableName, 'table', $this->tableIds[$targetTableName], $labelColumnName);
+		$this->assertRelationColumnCreated($title);
 	}
 
 	/**
 	 * @Then relation column :title exists on table :tableName pointing to table :targetTableName using label column :labelColumnName added to view :viewName
 	 */
 	public function createRelationColumnToTableAddedToView(string $title, string $tableName, string $targetTableName, string $labelColumnName, string $viewName): void {
-		$targetId = $this->tableIds[$targetTableName];
-		$labelColumnId = $this->collectionManager->getByAlias('column', $labelColumnName)['id'];
-		$viewId = $this->viewIds[$viewName];
-
-		$props = [
-			'title' => $title,
-			'type' => 'relation',
-			'mandatory' => 0,
-			'selectedViewIds' => [$viewId],
-			'customSettings' => [
-				'relationType' => 'table',
-				'targetId' => $targetId,
-				'labelColumn' => $labelColumnId,
-			],
-		];
-
-		$this->sendRequest(
-			'POST',
-			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
-			$props
-		);
-
-		$newColumn = $this->getDataFromResponse($this->response);
-		$this->columnId = $newColumn['id'];
-
-		Assert::assertEquals(200, $this->response->getStatusCode());
-		Assert::assertEquals($title, $newColumn['title']);
-		Assert::assertEquals('relation', $newColumn['type']);
-
-		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+		$this->sendCreateRelationColumnRequest($title, $tableName, 'table', $this->tableIds[$targetTableName], $labelColumnName, [$this->viewIds[$viewName]]);
+		$this->assertRelationColumnCreated($title);
 	}
 
 	/**
 	 * @Then relation column :title exists on table :tableName pointing to view :targetViewName using label column :labelColumnName
 	 */
 	public function createRelationColumnToView(string $title, string $tableName, string $targetViewName, string $labelColumnName): void {
-		$targetId = $this->viewIds[$targetViewName];
-		$labelColumnId = $this->collectionManager->getByAlias('column', $labelColumnName)['id'];
+		$this->sendCreateRelationColumnRequest($title, $tableName, 'view', $this->viewIds[$targetViewName], $labelColumnName);
+		$this->assertRelationColumnCreated($title);
+	}
 
+	/**
+	 * @When user :user attempts to create relation column :title on table :tableName pointing to table :targetTableName using label column :labelColumnName
+	 */
+	public function userAttemptsToCreateRelationColumnToTable(string $user, string $title, string $tableName, string $targetTableName, string $labelColumnName): void {
+		$this->setCurrentUser($user);
+		$this->sendCreateRelationColumnRequest($title, $tableName, 'table', $this->tableIds[$targetTableName], $labelColumnName);
+	}
+
+	/**
+	 * @When user :user attempts to create relation column :title on table :tableName pointing to view :targetViewName using label column :labelColumnName
+	 */
+	public function userAttemptsToCreateRelationColumnToView(string $user, string $title, string $tableName, string $targetViewName, string $labelColumnName): void {
+		$this->setCurrentUser($user);
+		$this->sendCreateRelationColumnRequest($title, $tableName, 'view', $this->viewIds[$targetViewName], $labelColumnName);
+	}
+
+	private function sendCreateRelationColumnRequest(string $title, string $tableName, string $relationType, int $targetId, string $labelColumnName, array $selectedViewIds = []): void {
 		$props = [
 			'title' => $title,
 			'type' => 'relation',
 			'mandatory' => 0,
 			'customSettings' => [
-				'relationType' => 'view',
+				'relationType' => $relationType,
 				'targetId' => $targetId,
-				'labelColumn' => $labelColumnId,
+				'labelColumn' => $this->collectionManager->getByAlias('column', $labelColumnName)['id'],
 			],
 		];
+		if ($selectedViewIds !== []) {
+			$props['selectedViewIds'] = $selectedViewIds;
+		}
 
 		$this->sendRequest(
 			'POST',
 			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
 			$props
 		);
+	}
 
+	private function assertRelationColumnCreated(string $title): void {
 		$newColumn = $this->getDataFromResponse($this->response);
 		$this->columnId = $newColumn['id'];
 

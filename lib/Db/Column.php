@@ -121,6 +121,9 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const RELATION_TYPE = 'relationType';
 	public const RELATION_TARGET_ID = 'targetId';
 	public const RELATION_LABEL_COLUMN = 'labelColumn';
+	public const RELATION_TARGET_SET_BY = 'targetSetBy';
+	public const RELATION_TYPE_TABLE = 'table';
+	public const RELATION_TYPE_VIEW = 'view';
 
 	protected ?string $uuid = null;
 	protected ?string $title = null;
