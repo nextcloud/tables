@@ -36,6 +36,7 @@ use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Validation\TechnicalNameValidator;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -811,10 +812,10 @@ class ViewService extends SuperService {
 	 * @throws BadRequestError
 	 */
 	private function assertTechnicalNameValid(string $technicalName): void {
-		if (strlen($technicalName) > 200) {
-			throw new BadRequestError('Technical name must not exceed 200 characters.');
+		if (TechnicalNameValidator::isTooLong($technicalName)) {
+			throw new BadRequestError('Technical name must not exceed ' . TechnicalNameValidator::MAX_LENGTH . ' characters.');
 		}
-		if (!preg_match('/^[a-z][a-z0-9_]*$/', $technicalName)) {
+		if (!TechnicalNameValidator::hasValidCharacters($technicalName)) {
 			throw new BadRequestError('Technical name must start with a lowercase letter and contain only lowercase letters, numbers, and underscores.');
 		}
 	}
