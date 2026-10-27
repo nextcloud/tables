@@ -228,6 +228,21 @@ namespace OCA\Tables;
  *  errors_count: int,
  * }
  *
+ * @psalm-type TablesMenuItem = array{
+ *   id: int,
+ *   contextId: int,
+ *   label: string,
+ *   icon: string|null,
+ *   description: string|null,
+ *   targetType: 'view'|'table'|'url'|'page',
+ *   targetId: int|null,
+ *   url: string|null,
+ *   technicalName: string,
+ *   order: int,
+ *   parentId: int|null,
+ *   broken: bool,
+ * }
+ *
  * @psalm-type TablesContext = array{
  *   id: int,
  *   name: string,
@@ -235,6 +250,7 @@ namespace OCA\Tables;
  *   description: string,
  *   owner: string,
  *   ownerType: int,
+ *   menuItems?: list<TablesMenuItem>,
  * }
  *
  * @psalm-type TablesWidgetValue = string|int|float|bool|null

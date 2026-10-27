@@ -13,6 +13,7 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -37,6 +38,9 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
 	private MockObject $widgetService;
+	private MockObject $menuItemMapper;
+	private MockObject $permissionsService;
+	private MockObject $shareService;
 	private MockObject $dbConnection;
 
 	protected function setUp(): void {
@@ -47,14 +51,15 @@ final class ContextServiceTest extends TestCase {
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
-		$permissionsService = $this->createMock(PermissionsService::class);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$userManager = $this->createMock(IUserManager::class);
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$this->dbConnection = $this->createMock(IDBConnection::class);
 		$this->widgetService = $this->createMock(WidgetService::class);
+		$this->menuItemMapper = $this->createMock(MenuItemMapper::class);
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
-		$shareService = $this->createMock(ShareService::class);
+		$this->shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
 
@@ -64,11 +69,11 @@ final class ContextServiceTest extends TestCase {
 			$this->pageMapper,
 			$this->pageContentMapper,
 			$logger,
-			$permissionsService,
+			$this->permissionsService,
 			$userManager,
 			$eventDispatcher,
 			$this->dbConnection,
-			$shareService,
+			$this->shareService,
 			false,
 			$navigationManager,
 			$urlGenerator,
@@ -76,6 +81,7 @@ final class ContextServiceTest extends TestCase {
 			$this->createMock(ViewMapper::class),
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
+			$this->menuItemMapper,
 		);
 	}
 
@@ -177,6 +183,35 @@ final class ContextServiceTest extends TestCase {
 		$this->contextMapper->expects($this->once())->method('delete')->with($context);
 
 		$this->service->delete(7, 'user-1');
+	}
+
+	public function testDeleteRemovesTheApplicationBeforeWhatBelongsToIt(): void {
+		$context = new Context();
+		$context->id = 7;
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->willReturn([301]);
+		$calls = [];
+		$this->contextMapper->method('delete')->willReturnCallback(static function (Context $deleted) use (&$calls): Context {
+			$calls[] = 'application';
+			return $deleted;
+		});
+		$this->menuItemMapper->method('deleteAllByContextId')->with(7)->willReturnCallback(static function () use (&$calls): void {
+			$calls[] = 'menu';
+		});
+		$this->contextNodeRelMapper->method('deleteAllByContextId')->willReturnCallback(static function () use (&$calls): void {
+			$calls[] = 'nodes';
+		});
+		$this->widgetService->method('deleteByPageIds')->willReturnCallback(static function () use (&$calls): void {
+			$calls[] = 'widgets';
+		});
+		$this->pageMapper->method('deleteByPageId')->willReturnCallback(static function () use (&$calls): int {
+			$calls[] = 'page';
+			return 1;
+		});
+
+		$this->service->delete(7, 'alice');
+
+		$this->assertSame(['application', 'menu', 'nodes', 'widgets', 'page'], $calls);
 	}
 
 	public function testDeletingANodeUnlinksItsWidgets(): void {
@@ -566,5 +601,50 @@ final class ContextServiceTest extends TestCase {
 		], 5);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
+	}
+
+	public function testAMenuItemIsBrokenForAReaderWhoCannotOpenItsTarget(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([101 => ['id' => 101, 'node_id' => 11, 'node_type' => 0, 'permissions' => 1]]);
+		$context->setMenuItems([
+			['id' => 1, 'targetType' => 'table', 'targetId' => 11, 'broken' => false],
+			['id' => 2, 'targetType' => 'table', 'targetId' => 5, 'broken' => false],
+			['id' => 3, 'targetType' => 'view', 'targetId' => 6, 'broken' => false],
+			['id' => 4, 'targetType' => 'url', 'targetId' => null, 'broken' => false],
+			['id' => 5, 'targetType' => 'table', 'targetId' => 9, 'broken' => true],
+		]);
+		$this->contextMapper->method('findById')->willReturnCallback(static fn (): Context => clone $context);
+		$this->contextMapper->method('findAll')->willReturnCallback(static fn (): array => [clone $context]);
+		$this->permissionsService->method('canAccessNodeById')->willReturnCallback(
+			static fn (int $nodeType, int $nodeId, string $userId): bool => $userId === 'owner' || ($nodeType === 1 && $nodeId === 6),
+		);
+
+		self::assertSame([false, false, false, false, true], array_column($this->service->findById(7, 'owner')->getMenuItems(), 'broken'));
+		self::assertSame([false, true, false, false, true], array_column($this->service->findById(7, 'sharee')->getMenuItems(), 'broken'));
+		self::assertSame([false, true, false, false, true], array_column($this->service->findAll('sharee')[0]->getMenuItems(), 'broken'));
+	}
+
+	public function testDeletingAnApplicationRetriesATransientDatabaseError(): void {
+		$context = new Context();
+		$context->id = 7;
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->willReturn([]);
+		$deadlock = \OC\DB\Exceptions\DbalException::wrap(new \Doctrine\DBAL\Exception\DeadlockException(
+			\Doctrine\DBAL\Driver\PDO\Exception::new(new \PDOException('deadlock')),
+			null,
+		));
+		$attempts = 0;
+		$this->shareService->method('deleteAllForContext')->willReturnCallback(static function () use (&$attempts, $deadlock): void {
+			if (++$attempts === 1) {
+				throw $deadlock;
+			}
+		});
+		$this->contextMapper->expects($this->exactly(2))->method('delete');
+		$this->dbConnection->expects($this->once())->method('rollBack');
+
+		$this->service->delete(7, 'alice');
+
+		self::assertSame(2, $attempts);
 	}
 }
