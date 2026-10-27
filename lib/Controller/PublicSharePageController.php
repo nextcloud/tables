@@ -9,10 +9,12 @@ declare(strict_types=1);
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Service\NodeService;
 use OCA\Tables\Service\ShareService;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCA\Tables\Share\SharePageShareDataDecorator;
 use OCA\Text\Event\LoadEditor;
@@ -44,6 +46,7 @@ class PublicSharePageController extends AuthPublicShareController {
 		private readonly NodeService $nodeService,
 		private readonly IInitialState $initialState,
 		private readonly IEventDispatcher $eventDispatcher,
+		private readonly AuditLogServiceInterface $auditLogService,
 	) {
 		parent::__construct($appName, $request, $session, $urlGenerator);
 		$token = $request->getParam('token');
@@ -101,6 +104,18 @@ class PublicSharePageController extends AuthPublicShareController {
 		$templateParameters = ['share' => new SharePageShareDataDecorator($this->share)];
 
 		return new TemplateResponse('core', 'publicshareauth', $templateParameters, 'guest');
+	}
+
+	protected function authFailed(): void {
+		if ($this->share === null) {
+			return;
+		}
+
+		$this->auditLogService->log(Operation::LinkShareAuthenticationFailed, 'Wrong password entered for link share %s of %s %s', [
+			'shareId' => $this->share->getId(),
+			'nodeType' => $this->share->getNodeType(),
+			'nodeId' => $this->share->getNodeId(),
+		]);
 	}
 
 	protected function showAuthFailed(): TemplateResponse {

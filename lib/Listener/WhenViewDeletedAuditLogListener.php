@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Listener;
 
+use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\EventDispatcher\Event;
@@ -29,8 +30,9 @@ final class WhenViewDeletedAuditLogListener implements IEventListener {
 
 		$view = $event->getView();
 
-		$this->auditLogService->log("View with ID: $view->id was deleted", [
-			'view' => $view->jsonSerialize(),
+		$this->auditLogService->log(Operation::ViewDeleted, 'View with ID: %s was deleted', [
+			'viewId' => $view->getId(),
+			'tableId' => $view->getTableId(),
 		]);
 	}
 }
