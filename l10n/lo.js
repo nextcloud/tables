@@ -553,6 +553,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["ເລືອກ %n ແຖວ"],
     "Go to first page" : "ໄປໜ້າທຳອິດ",
     "Go to previous page" : "ກັບໄປໜ້າກ່ອນໜ້າ",
+    "Page" : "ໜ້າ",
     "Page number" : "ໝາຍເລກໜ້າ",
     "Go to next page" : "ໄປໜ້າຕໍ່ໄປ",
     "Go to last page" : "ໄປໜ້າສຸດທ້າຍ",

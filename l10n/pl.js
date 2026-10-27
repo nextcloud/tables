@@ -273,6 +273,7 @@ OC.L10N.register(
     "Open link" : "Otwórz link",
     "Close editor" : "Zamknij edytor",
     "Go to previous page" : "Przejdź do poprzedniej strony",
+    "Page" : "Strona",
     "Confirmation" : "Potwierdzenie",
     "Confirm" : "Potwierdź",
     "Content" : "Zawartość",

@@ -526,6 +526,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n أعمدة محددة","%n عمود محدد","%n أعمدة محددة","%n أعمدة محددة","%n أعمدة محددة","%n أعمدة محددة"],
     "Go to first page" : "إنتقِل إلى الصفحة الأولى",
     "Go to previous page" : "عُد إلى الصفحة السابقة",
+    "Page" : "صفحة",
     "Page number" : "رقم الصفحة",
     "Go to next page" : "إنتقِل إلى الصفحة التالية",
     "Go to last page" : "إنتقِل إلى الصفحة الأخيرة",

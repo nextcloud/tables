@@ -532,6 +532,7 @@ OC.L10N.register(
     "The default value is greater than the maximum allowed value." : "O valor padrão é maior do que o valor máximo permitido.",
     "Default value" : "Valor padrão",
     "Decimals" : "Decimais",
+    "Minimum" : "Mínimo",
     "Maximum" : "Máximo",
     "Prefix" : "Prefixo",
     "Suffix" : "Sufixo",

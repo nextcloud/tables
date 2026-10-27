@@ -422,6 +422,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n kiválasztott sor","%n kiválasztott sor"],
     "Go to first page" : "Ugrás az első oldalra",
     "Go to previous page" : "Ugrás az előző oldalra",
+    "Page" : "Oldal",
     "Page number" : "Oldalszám",
     "Go to next page" : "Ugrás a következő oldalra",
     "Go to last page" : "Ugrás az utolsó oldalra",

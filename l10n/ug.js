@@ -554,6 +554,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["تاللانغان %n قۇر","تاللانغان %n قۇر"],
     "Go to first page" : "بىرىنچى بەتكە بېرىڭ",
     "Go to previous page" : "ئالدىنقى بەتكە بېرىڭ",
+    "Page" : "بەت",
     "Page number" : "بەت نومۇرى",
     "Go to next page" : "كېيىنكى بەتكە بېرىڭ",
     "Go to last page" : "ئاخىرقى بەتكە بېرىڭ",

@@ -296,6 +296,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n fila seleccionada","%n files seleccionades"],
     "Go to first page" : "Ves a la primera pàgina",
     "Go to previous page" : "Torna a la pàgina anterior",
+    "Page" : "Pàgina",
     "Page number" : "Número de página",
     "Go to next page" : "Ves a la pàgina següent",
     "Go to last page" : "Ves a l'última pàgina",

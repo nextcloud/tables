@@ -505,6 +505,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n merket rad","%n merkede rader"],
     "Go to first page" : "Gå til første side",
     "Go to previous page" : "Gå til forrige side",
+    "Page" : "Side",
     "Page number" : "Sidenummer",
     "Go to next page" : "Gå til neste side",
     "Go to last page" : "Gå til siste side",

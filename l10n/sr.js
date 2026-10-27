@@ -556,6 +556,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n изабрани ред","%n изабрана реда","%n изабраних редова"],
     "Go to first page" : "Иди на прву страницу",
     "Go to previous page" : "Иди на претходну страницу",
+    "Page" : "Страница",
     "Page number" : "Број странице",
     "Go to next page" : "Иди на наредну страницу",
     "Go to last page" : "Иди на последњу страницу",

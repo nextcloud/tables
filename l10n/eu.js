@@ -360,6 +360,7 @@ OC.L10N.register(
     "Uncheck all" : "Desautatu dena",
     "_%n selected row_::_%n selected rows_" : ["Hautatutako errenkada %n","%n hautatutako errenkada"],
     "Go to previous page" : "Itzuli aurreko orrira",
+    "Page" : "Orria",
     "Confirmation" : "Berrespena",
     "Confirm" : "Berretsi",
     "Render mode" : "Errenderizatze modua",

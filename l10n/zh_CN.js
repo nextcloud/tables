@@ -440,6 +440,7 @@ OC.L10N.register(
     "Close editor" : "关闭编辑器",
     "Go to first page" : "前往第一页",
     "Go to previous page" : "回到前一页",
+    "Page" : "页面",
     "Page number" : "页码",
     "Go to next page" : "前往下一页",
     "Go to last page" : "前往最后一页",

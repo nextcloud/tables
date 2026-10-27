@@ -561,6 +561,7 @@
     "_%n selected row_::_%n selected rows_" : ["%n fila seleccionada","%n filas seleccionadas"],
     "Go to first page" : "Ir á primeira páxina",
     "Go to previous page" : "Ir á páxina anterior",
+    "Page" : "Páxina",
     "Page number" : "Número de páxina",
     "Go to next page" : "Ir á páxina seguinte",
     "Go to last page" : "Ir á última páxina",

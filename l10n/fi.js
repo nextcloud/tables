@@ -499,6 +499,7 @@ OC.L10N.register(
     "_%n selected row_::_%n selected rows_" : ["%n valittu rivi","%n valittua riviä"],
     "Go to first page" : "Siirry ensimmäiselle sivulle",
     "Go to previous page" : "Siirry edelliselle sivulle",
+    "Page" : "Sivu",
     "Page number" : "Sivunumero",
     "Go to next page" : "Mene seuraavalle sivulle",
     "Go to last page" : "Mene viimeiselle sivulle",
