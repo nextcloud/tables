@@ -239,7 +239,8 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
-	 * @throws DoesNotExistException
+	 * The view with the given uuid, or null when there is none.
+	 *
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 */
@@ -249,6 +250,10 @@ class ViewMapper extends QBMapper {
 			->from($this->table, 'v')
 			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
 			->where($qb->expr()->eq('v.uuid', $qb->createNamedParameter($uuid)));
-		return $this->findEntity($qb);
+		try {
+			return $this->findEntity($qb);
+		} catch (DoesNotExistException) {
+			return null;
+		}
 	}
 }

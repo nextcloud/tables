@@ -26,6 +26,7 @@ use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Model\MenuItemInput;
 use OCA\Tables\Tests\Unit\Database\DbErrorStub;
@@ -49,6 +50,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $menuItemMapper;
 	private MockObject $permissionsService;
 	private MockObject $shareService;
+	private MockObject $logger;
 	private MockObject $dbConnection;
 	private MockObject $tableMapper;
 	private MockObject $viewMapper;
@@ -60,7 +62,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->tableMapper = $this->createMock(TableMapper::class);
 		$this->viewMapper = $this->createMock(ViewMapper::class);
@@ -1031,6 +1033,131 @@ final class ContextServiceTest extends TestCase {
 		$this->assertSame([3, null], array_map(static fn (MenuItem $item) => $item->getTargetId(), $inserted));
 	}
 
+	public function testTheSchemeCarriesTheMenuByUuidAndTechnicalName(): void {
+		$context = $this->contextWithMenu(7, [
+			['id' => 1, 'label' => 'Dashboard', 'icon' => 'home', 'description' => null, 'targetType' => 'page', 'targetId' => 301, 'url' => null, 'technicalName' => 'dashboard', 'order' => 10, 'parentId' => null, 'broken' => false],
+			['id' => 2, 'label' => 'Docs', 'icon' => null, 'description' => 'How it works', 'targetType' => 'url', 'targetId' => null, 'url' => 'https://example.org', 'technicalName' => 'docs', 'order' => 20, 'parentId' => 1, 'broken' => false],
+			['id' => 3, 'label' => 'Gone', 'icon' => null, 'description' => null, 'targetType' => 'view', 'targetId' => 99, 'url' => null, 'technicalName' => 'gone', 'order' => 30, 'parentId' => null, 'broken' => true],
+			['id' => 4, 'label' => 'Not exported', 'icon' => null, 'description' => null, 'targetType' => 'table', 'targetId' => 98, 'url' => null, 'technicalName' => 'hidden', 'order' => 40, 'parentId' => null, 'broken' => false],
+		]);
+		$context->setPages([301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'dashboard', 'content' => []]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+
+		$menu = $this->service->getScheme(7, 'user-1')->getMenuItems();
+
+		$this->assertSame([
+			['label' => 'Dashboard', 'icon' => 'home', 'description' => null, 'targetType' => 'page', 'technicalName' => 'dashboard', 'url' => null, 'targetUuid' => null, 'targetPage' => 'dashboard', 'parent' => null],
+			['label' => 'Docs', 'icon' => null, 'description' => 'How it works', 'targetType' => 'url', 'technicalName' => 'docs', 'url' => 'https://example.org', 'targetUuid' => null, 'targetPage' => null, 'parent' => 'dashboard'],
+		], $menu);
+	}
+
+	public function testImportingASchemeReplacesTheMenuWithWhatCanBeUsedHere(): void {
+		$context = $this->contextWithMenu(7, []);
+		$context->setPages([301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'dashboard', 'content' => []]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$relations = [];
+		$this->expectNodeInsertion($relations);
+		$this->expectExistingTargets([], [4 => new Table()]);
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content): PageContent {
+			$content->id = 501;
+			return $content;
+		});
+		$table = new Table();
+		$table->id = 4;
+		$this->tableMapper->method('findByUuid')->willReturnMap([['table-uuid', $table], ['missing-uuid', null]]);
+		$this->viewMapper->method('findByUuid')->willReturn(null);
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$inserted = [];
+		$this->expectMenuReplacement(7, $inserted);
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', [
+			['label' => 'Dashboard', 'targetType' => 'page', 'targetPage' => 'dashboard', 'technicalName' => 'dashboard'],
+			['label' => 'Requests', 'targetType' => 'table', 'targetUuid' => 'table-uuid', 'technicalName' => 'requests', 'parent' => 'dashboard'],
+			['label' => 'Missing table', 'targetType' => 'table', 'targetUuid' => 'missing-uuid'],
+			['label' => 'Missing view', 'targetType' => 'view', 'targetUuid' => 'view-uuid'],
+			['label' => 'Missing page', 'targetType' => 'page', 'targetPage' => 'overview'],
+			['label' => 'Bad link', 'targetType' => 'url', 'url' => 'javascript:alert(1)'],
+			['label' => 'Docs', 'targetType' => 'url', 'url' => 'https://example.org', 'technicalName' => 'requests', 'parent' => 'missing'],
+			['label' => 'Guide', 'targetType' => 'url', 'url' => 'https://example.org/guide', 'technicalName' => 'item_4'],
+		]);
+
+		$this->assertSame([
+			['Dashboard', 'page', 301, 'dashboard', null],
+			['Docs', 'url', null, 'item_2', null],
+			['Guide', 'url', null, 'item_3', null],
+			['Requests', 'table', 4, 'requests', null],
+		], self::describeMenu($inserted));
+		$this->assertSame([null, null, null, 1], array_map(static fn (MenuItem $item) => $item->getParentId(), $inserted));
+		$this->assertSame([10, 30, 40, 20], array_map(static fn (MenuItem $item) => $item->getOrder(), $inserted));
+		$this->assertSame([[4, Application::NODE_TYPE_TABLE]], array_map(static fn (ContextNodeRelation $relation): array => [$relation->getNodeId(), $relation->getNodeType()], $relations));
+	}
+
+	public function testImportingASchemeWithoutAMenuLeavesTheMenuAlone(): void {
+		$this->contextMapper->method('findById')->willReturn($this->contextWithMenu(7, []));
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->menuItemMapper->expects($this->never())->method('deleteAllByContextId');
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1');
+	}
+
+	public function testImportingASchemeRefusesToModifyATableThatIsNotHere(): void {
+		$this->tableMapper->method('findByUuid')->willReturn(null);
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('does not exist');
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => [['uuid' => 'missing-uuid', 'title' => 'T', 'columns' => [], 'views' => [], 'columnOrder' => [], 'sort' => []]]], 'user-1');
+	}
+
+	public function testAnImportedApplicationKeepsTheMenuItemsItCanUse(): void {
+		$table = new Table();
+		$table->id = 40;
+		$table->setOwnership('user-1');
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 80;
+			return $page;
+		});
+		$inserted = [];
+		$this->menuItemMapper->method('insert')->willReturnCallback(static function (MenuItem $item) use (&$inserted): MenuItem {
+			$item->id = 900 + count($inserted);
+			$inserted[] = $item;
+			return $item;
+		});
+		$this->menuItemMapper->method('insertWithDefaultName')->willReturnCallback(static function (MenuItem $item) use (&$inserted): MenuItem {
+			$item->id = 900 + count($inserted);
+			$item->setTechnicalName('item_' . $item->getId());
+			$inserted[] = $item;
+			return $item;
+		});
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]],
+			'pages' => [3 => ['id' => 3, 'page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'dashboard']],
+			'menuItems' => [
+				['id' => 11, 'label' => 'Dashboard', 'targetType' => 'page', 'targetId' => 3, 'technicalName' => 'dashboard', 'parentId' => null],
+				['id' => 12, 'label' => 'Tasks', 'targetType' => 'table', 'targetId' => 4, 'technicalName' => 'tasks', 'parentId' => 11],
+				['id' => 13, 'label' => 'Other table', 'targetType' => 'table', 'targetId' => 5, 'technicalName' => 'other', 'parentId' => null],
+				['id' => 14, 'label' => 'A view', 'targetType' => 'view', 'targetId' => 6, 'technicalName' => 'a_view', 'parentId' => null],
+				['id' => 15, 'label' => 'Docs', 'targetType' => 'url', 'url' => 'https://example.org', 'icon' => 'book', 'technicalName' => 'tasks', 'parentId' => 13],
+				['id' => 16, 'label' => 'Guide', 'targetType' => 'url', 'url' => 'https://example.org/guide', 'technicalName' => 'item_903', 'parentId' => null],
+			],
+		], 4);
+
+		$this->assertSame([
+			['Dashboard', 'page', 80, 'dashboard', null],
+			['Docs', 'url', null, 'item_901', 'book'],
+			['Guide', 'url', null, 'item_902', null],
+			['Tasks', 'table', 40, 'tasks', null],
+		], self::describeMenu($inserted));
+		$this->assertSame([null, null, null, 900], array_map(static fn (MenuItem $item) => $item->getParentId(), $inserted));
+	}
+
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {
 		$pageContent = new PageContent();
 		$pageContent->id = $id;
@@ -1250,5 +1377,168 @@ final class ContextServiceTest extends TestCase {
 		$items = array_fill(0, MenuItem::MAX_ITEMS_PER_APPLICATION, ['label' => 'Docs', 'url' => 'https://example.org']);
 
 		$this->service->update(7, 'user-1', null, null, null, null, MenuItemInput::createListFromInputArray($items));
+	}
+
+	/**
+	 * Mocks the inserts of an imported application and collects its menu items.
+	 *
+	 * @param list<MenuItem> $inserted
+	 */
+	private function recordImportedMenu(array &$inserted): Table {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 80;
+			return $page;
+		});
+		$record = static function (MenuItem $item) use (&$inserted): MenuItem {
+			$item->id = 900 + count($inserted);
+			$item->setTechnicalName($item->getTechnicalName() ?? 'item_' . $item->getId());
+			$inserted[] = $item;
+			return $item;
+		};
+		$this->menuItemMapper->method('insert')->willReturnCallback($record);
+		$this->menuItemMapper->method('insertWithDefaultName')->willReturnCallback($record);
+		$table = new Table();
+		$table->id = 40;
+		$table->setOwnership('user-1');
+		return $table;
+	}
+
+	public function testAnImportedApplicationMenuStaysOneLevelDeep(): void {
+		$inserted = [];
+		$table = $this->recordImportedMenu($inserted);
+		$url = static fn (int $id, ?int $parentId): array => ['id' => $id, 'label' => 'Item ' . $id, 'targetType' => 'url', 'url' => 'https://example.org/' . $id, 'parentId' => $parentId];
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]],
+			'menuItems' => [$url(11, null), $url(12, 11), $url(13, 12), $url(14, 13)],
+		], 4);
+
+		$byLabel = [];
+		foreach ($inserted as $item) {
+			$byLabel[$item->getLabel()] = $item;
+		}
+		$this->assertNull($byLabel['Item 11']->getParentId());
+		$this->assertSame($byLabel['Item 11']->getId(), $byLabel['Item 12']->getParentId());
+		$this->assertNull($byLabel['Item 13']->getParentId());
+		$this->assertNull($byLabel['Item 14']->getParentId());
+	}
+
+	public function testABrokenMenuInAnExportFileIsSkippedWithAReason(): void {
+		$inserted = [];
+		$table = $this->recordImportedMenu($inserted);
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]],
+			'pages' => [['id' => [3], 'page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'dashboard']],
+			'menuItems' => [
+				'not an item',
+				['id' => [11], 'label' => 'Array id', 'targetType' => 'url', 'url' => 'https://example.org'],
+				['id' => 12, 'label' => 'Array parent', 'targetType' => 'url', 'url' => 'https://example.org', 'parentId' => ['x']],
+				['id' => 13, 'label' => 'Array target', 'targetType' => 'page', 'targetId' => [3]],
+				['id' => 14, 'label' => 'Other table', 'targetType' => 'table', 'targetId' => 5],
+				['id' => 15, 'label' => 'Kept', 'targetType' => 'url', 'url' => 'https://example.org'],
+			],
+		], 4);
+
+		$this->assertSame(['Kept'], array_map(static fn (MenuItem $item): string => $item->getLabel(), $inserted));
+		$skips = array_values(array_filter($warnings, static fn (string $message): bool => str_starts_with($message, 'Skipping imported menu item')));
+		$this->assertCount(5, $skips);
+		$this->assertStringContainsString('not a number', $skips[1]);
+		$this->assertStringContainsString('table is not part of this import', $skips[4]);
+	}
+
+	public function testAnImportedMenuKeepsAtMostTheMaximumNumberOfItems(): void {
+		$inserted = [];
+		$table = $this->recordImportedMenu($inserted);
+		$items = [];
+		for ($i = 1; $i <= MenuItem::MAX_ITEMS_PER_APPLICATION + 3; $i++) {
+			$items[] = ['id' => $i, 'label' => 'Item ' . $i, 'targetType' => 'url', 'url' => 'https://example.org/' . $i];
+		}
+
+		$this->service->importContext($table, ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'menuItems' => $items], 4);
+
+		$this->assertCount(MenuItem::MAX_ITEMS_PER_APPLICATION, $inserted);
+	}
+
+	public function testASchemeMenuStaysOneLevelDeepAndKeepsAutomaticallyNamedParents(): void {
+		$context = $this->contextWithMenu(7, []);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$inserted = [];
+		$this->expectMenuReplacement(7, $inserted);
+		$url = static fn (string $label, string $name, ?string $parent): array => ['label' => $label, 'targetType' => 'url', 'url' => 'https://example.org/' . $label, 'technicalName' => $name, 'parent' => $parent];
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', [
+			$url('A', 'item_7', null),
+			$url('B', 'item_8', 'item_7'),
+			$url('C', 'item_9', 'item_8'),
+		]);
+
+		$byLabel = [];
+		foreach ($inserted as $item) {
+			$byLabel[$item->getLabel()] = $item;
+		}
+		$this->assertSame($byLabel['A']->getId(), $byLabel['B']->getParentId());
+		$this->assertNull($byLabel['C']->getParentId());
+		$this->assertNull($byLabel['A']->getParentId());
+	}
+
+	public function testASchemeItemWithAnInvalidNameIsKeptUnderANameOfItsOwn(): void {
+		$context = $this->contextWithMenu(7, []);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$inserted = [];
+		$this->expectMenuReplacement(7, $inserted);
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', [
+			['label' => 'Docs', 'targetType' => 'url', 'url' => 'https://example.org', 'technicalName' => 'Not Valid!'],
+		]);
+
+		$this->assertSame([['Docs', 'url', null, 'item_1', null]], self::describeMenu($inserted));
+	}
+
+	public function testASchemeItemWhoseParentWasSkippedMovesUpAndCanBeAParent(): void {
+		$context = $this->contextWithMenu(7, []);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$inserted = [];
+		$this->expectMenuReplacement(7, $inserted);
+		$url = static fn (string $label, string $name, ?string $parent): array => ['label' => $label, 'targetType' => 'url', 'url' => 'https://example.org/' . $label, 'technicalName' => $name, 'parent' => $parent];
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', [
+			$url('A', 'a', 'missing'),
+			$url('B', 'b', 'a'),
+		]);
+
+		$byLabel = [];
+		foreach ($inserted as $item) {
+			$byLabel[$item->getLabel()] = $item;
+		}
+		$this->assertNull($byLabel['A']->getParentId());
+		$this->assertSame($byLabel['A']->getId(), $byLabel['B']->getParentId());
+	}
+
+	public function testASchemeMenuKeepsAtMostTheMaximumNumberOfItems(): void {
+		$context = $this->contextWithMenu(7, []);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$inserted = [];
+		$this->expectMenuReplacement(7, $inserted);
+		$items = array_fill(0, MenuItem::MAX_ITEMS_PER_APPLICATION + 2, ['label' => 'Docs', 'targetType' => 'url', 'url' => 'https://example.org']);
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', $items);
+
+		$this->assertCount(MenuItem::MAX_ITEMS_PER_APPLICATION, $inserted);
 	}
 }
