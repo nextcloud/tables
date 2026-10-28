@@ -19,6 +19,8 @@ use Psr\Log\LoggerInterface;
 
 /** @template-extends QBMapper<Share> */
 class ShareMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_shares';
 
 	public function __construct(
@@ -99,17 +101,18 @@ class ShareMapper extends QBMapper {
 			return [];
 		}
 
-		$chunks = [[]];
-		// deduct extra parameters (sender, node type, receiver type)
-		foreach (array_chunk($receivers, 1000 - 3) as $receiversChunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('*')
-				->from($this->table)
-				->where($qb->expr()->in('receiver', $qb->createNamedParameter($receiversChunk, IQueryBuilder::PARAM_STR_ARRAY)))
-				->andWhere($qb->expr()->neq('sender', $qb->createNamedParameter($userId)))
-				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType)))
-				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType)));
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->in('receiver', $qb->createParameter('receivers')))
+			->andWhere($qb->expr()->neq('sender', $qb->createNamedParameter($userId)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType)))
+			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType)));
 
+		$chunks = [];
+		// deduct extra parameters (sender, node type, receiver type)
+		foreach (array_chunk($receivers, self::DB_CHUNK_SIZE - 3) as $receiversChunk) {
+			$qb->setParameter('receivers', $receiversChunk, IQueryBuilder::PARAM_STR_ARRAY);
 			$chunks[] = $this->findEntities($qb);
 		}
 
@@ -154,18 +157,19 @@ class ShareMapper extends QBMapper {
 			$extraParams++;
 		}
 
-		$chunks = [[]];
-		foreach (array_chunk($nodeIds, 1000 - $extraParams) as $nodeIdsChunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('*')
-				->from($this->table)
-				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
-				->andWhere($qb->expr()->in('node_id', $qb->createNamedParameter($nodeIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->in('node_id', $qb->createParameter('nodeIds')));
 
-			if (!empty($excluded)) {
-				$qb->andWhere($qb->expr()->notIn('receiver_type', $qb->createNamedParameter($excluded, IQueryBuilder::PARAM_STR_ARRAY)));
-			}
+		if (!empty($excluded)) {
+			$qb->andWhere($qb->expr()->notIn('receiver_type', $qb->createNamedParameter($excluded, IQueryBuilder::PARAM_STR_ARRAY)));
+		}
 
+		$chunks = [];
+		foreach (array_chunk($nodeIds, self::DB_CHUNK_SIZE - $extraParams) as $nodeIdsChunk) {
+			$qb->setParameter('nodeIds', $nodeIdsChunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$chunks[] = $this->findEntities($qb);
 		}
 
@@ -176,20 +180,21 @@ class ShareMapper extends QBMapper {
 	 * @param int[] $tableIds
 	 * @return int[]
 	 */
-	public function findLinkSharesForTables(array $tableIds): array {
+	public function findTableIdsWithLinkShares(array $tableIds): array {
 		if (empty($tableIds)) {
 			return [];
 		}
 
-		$linkTableIds = [];
-		foreach (array_chunk($tableIds, 1000 - 2) as $tableIdsChunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->selectDistinct('node_id')
-				->from($this->table)
-				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
-				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter(ShareReceiverType::LINK, IQueryBuilder::PARAM_STR)))
-				->andWhere($qb->expr()->in('node_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+		$qb = $this->db->getQueryBuilder();
+		$qb->selectDistinct('node_id')
+			->from($this->table)
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter(ShareReceiverType::LINK, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->in('node_id', $qb->createParameter('tableIds')));
 
+		$linkTableIds = [];
+		foreach (array_chunk($tableIds, self::DB_CHUNK_SIZE - 2) as $tableIdsChunk) {
+			$qb->setParameter('tableIds', $tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
 			while ($row = $result->fetchAssociative()) {
 				$linkTableIds[] = (int)$row['node_id'];

@@ -80,11 +80,6 @@ class ViewService extends SuperService {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
-		// security
-		if (!$this->permissionsService->canManageTable($table, $userId)) {
-			throw new PermissionError('PermissionError: can not read views for tableId ' . $table->getId());
-		}
-
 		$viewsByTable = $this->findForTables([$table], $userId, [$table->getId() => $tableRowsCount]);
 		return $viewsByTable[$table->getId()] ?? [];
 	}
@@ -95,6 +90,7 @@ class ViewService extends SuperService {
 	 * @param array<int, int|null> $tableRowsCounts
 	 * @return array<int, View[]>
 	 * @throws InternalError
+	 * @throws PermissionError
 	 */
 	public function findForTables(array $tables, ?string $userId = null, array $tableRowsCounts = []): array {
 		/** @var string $userId */
@@ -102,6 +98,13 @@ class ViewService extends SuperService {
 
 		if (empty($tables)) {
 			return [];
+		}
+
+		// security
+		foreach ($tables as $table) {
+			if (!$this->permissionsService->canManageTable($table, $userId)) {
+				throw new PermissionError('PermissionError: can not read views for tableId ' . $table->getId());
+			}
 		}
 
 		$tableIds = array_map(static fn (Table $table) => $table->getId(), $tables);
@@ -601,7 +604,7 @@ class ViewService extends SuperService {
 
 			if (!empty($ownedViewIds)) {
 				try {
-					$sharesCounts = $this->shareService->countSharesForViews($ownedViewIds);
+					$sharesCounts = $this->shareService->countSharesForNodes('view', $ownedViewIds);
 				} catch (InternalError $e) {
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
 				}
@@ -698,7 +701,7 @@ class ViewService extends SuperService {
 					$view->setHasShares($sharesCount > 0);
 				} else {
 					try {
-						$counts = $this->shareService->countSharesForViews([$view->getId()]);
+						$counts = $this->shareService->countSharesForNodes('view', [$view->getId()]);
 						$view->setHasShares(($counts[$view->getId()] ?? 0) > 0);
 					} catch (InternalError) {
 					}

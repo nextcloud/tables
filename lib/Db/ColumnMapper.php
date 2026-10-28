@@ -18,6 +18,8 @@ use Psr\Log\LoggerInterface;
 
 /** @template-extends QBMapper<Column> */
 class ColumnMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_columns';
 	private readonly CappedMemoryCache $cacheColumn;
 
@@ -174,14 +176,15 @@ class ColumnMapper extends QBMapper {
 			return [];
 		}
 
-		$counts = array_fill_keys($tableIds, 0);
-		foreach (array_chunk($tableIds, 1000 - 1) as $tableIdsChunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('table_id', $qb->func()->count('*', 'counter'))
-				->from($this->table)
-				->where($qb->expr()->in('table_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
-				->groupBy('table_id');
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('table_id', $qb->func()->count('*', 'counter'))
+			->from($this->table)
+			->where($qb->expr()->in('table_id', $qb->createParameter('tableIds')))
+			->groupBy('table_id');
 
+		$counts = array_fill_keys($tableIds, 0);
+		foreach (array_chunk($tableIds, self::DB_CHUNK_SIZE - 1) as $tableIdsChunk) {
+			$qb->setParameter('tableIds', $tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
 			while ($row = $result->fetchAssociative()) {
 				$counts[(int)$row['table_id']] = (int)$row['counter'];

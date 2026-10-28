@@ -73,13 +73,14 @@ class ViewMapper extends QBMapper {
 		}
 
 		$missing = array_keys($missing);
-		foreach (array_chunk($missing, 1000) as $missingChunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('v.*', 't.ownership')
-				->from($this->table, 'v')
-				->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
-				->where($qb->expr()->in('v.id', $qb->createNamedParameter($missingChunk, IQueryBuilder::PARAM_INT_ARRAY)));
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->where($qb->expr()->in('v.id', $qb->createParameter('viewIds')));
 
+		foreach (array_chunk($missing, self::DB_CHUNK_SIZE) as $missingChunk) {
+			$qb->setParameter('viewIds', $missingChunk, IQueryBuilder::PARAM_INT_ARRAY);
 			foreach ($this->findEntities($qb) as $entity) {
 				$id = $entity->getId();
 				$this->cache[(string)$id] = $entity;
@@ -158,16 +159,17 @@ class ViewMapper extends QBMapper {
 			return [];
 		}
 
-		$chunks = [[]];
-		foreach (array_chunk($tableIds, self::DB_CHUNK_SIZE - 1) as $tableIdsChunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('v.*', 't.ownership')
-				->from($this->table, 'v')
-				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
-				->where($qb->expr()->in('v.table_id', $qb->createNamedParameter($tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
-				->addOrderBy('v.sidebar_order', 'ASC')
-				->addOrderBy('v.id', 'ASC');
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->where($qb->expr()->in('v.table_id', $qb->createParameter('tableIds')))
+			->addOrderBy('v.sidebar_order', 'ASC')
+			->addOrderBy('v.id', 'ASC');
 
+		$chunks = [];
+		foreach (array_chunk($tableIds, self::DB_CHUNK_SIZE - 1) as $tableIdsChunk) {
+			$qb->setParameter('tableIds', $tableIdsChunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$chunks[] = $this->findEntities($qb);
 		}
 

@@ -202,24 +202,41 @@ class TableService extends SuperService {
 		}
 
 		// add the rows and columns counts
-		$rowsCounts = $this->rowService->getRowsCountForTables($tableIds, $userId);
-		$columnsCounts = $this->columnService->getColumnsCountForTables($tableIds, $userId);
+		$rowsCounts = [];
+		try {
+			$rowsCounts = $this->rowService->getRowsCountForTables($tableIds, $userId);
+		} catch (InternalError|PermissionError|OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+		$columnsCounts = [];
+		try {
+			$columnsCounts = $this->columnService->getColumnsCountForTables($tableIds, $userId);
+		} catch (InternalError|PermissionError|OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
 		foreach ($tables as $table) {
 			$table->setRowsCount($rowsCounts[$table->getId()] ?? 0);
 			$table->setColumnsCount($columnsCounts[$table->getId()] ?? 0);
 		}
 
 		// set hasShares / public isShared in one batch
-		if ($userId === '') {
-			$linkShareTableIds = $this->shareService->getTableIdsWithLinkShares($tableIds);
-			$linkShareTableIds = array_flip($linkShareTableIds);
-			foreach ($tables as $table) {
+		$linkShareTableIds = [];
+		$sharesCount = [];
+		try {
+			if ($userId === '') {
+				$linkShareTableIds = $this->shareService->getTableIdsWithLinkShares($tableIds);
+				$linkShareTableIds = array_flip($linkShareTableIds);
+			} else {
+				$sharesCount = $this->shareService->countSharesForNodes('table', $tableIds);
+			}
+		} catch (InternalError|PermissionError|OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+		foreach ($tables as $table) {
+			if ($userId === '') {
 				$table->setIsShared(isset($linkShareTableIds[$table->getId()]));
 				$table->setOnSharePermissions(new Permissions(read: true));
-			}
-		} else {
-			$sharesCount = $this->shareService->countSharesForTables($tableIds);
-			foreach ($tables as $table) {
+			} else {
 				$table->setHasShares(($sharesCount[$table->getId()] ?? 0) > 0);
 			}
 		}
@@ -240,8 +257,13 @@ class TableService extends SuperService {
 		// add the corresponding views if it is an own table, or you have table manage rights
 		$tablesToLoadViews = [];
 		foreach ($tables as $table) {
-			if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
-				$tablesToLoadViews[] = $table;
+			$table->setViews([]);
+			try {
+				if ($this->permissionsService->canManageTable($table, $userId)) {
+					$tablesToLoadViews[] = $table;
+				}
+			} catch (InternalError|PermissionError|OcpDbException $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}
 		}
 
@@ -659,9 +681,10 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function getScheme(int $id, ?string $userId = null): TableScheme {
-		$table = $this->find($id, skipTableEnhancement: true);
-		$columns = $this->columnService->findAllByTable($id, null, $table);
-		$this->enhanceTables([$table], $userId ?? '');
+		$userId = $this->permissionsService->preCheckUserId($userId);
+		$table = $this->find($id, skipTableEnhancement: true, userId: $userId);
+		$columns = $this->columnService->findAllByTable($id, $userId, $table);
+		$this->enhanceTables([$table], $userId);
 		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'), $table->getColumnOrderSettingsArray(), $table->getSortArray(), $table->getUuid());
 	}
 

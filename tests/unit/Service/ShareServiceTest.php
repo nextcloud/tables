@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\AuditLog\Operation;
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
@@ -121,6 +122,41 @@ class ShareServiceTest extends TestCase {
 		$this->assertFalse($share->getPermissionUpdate());
 		$this->assertFalse($share->getPermissionDelete());
 		$this->assertFalse($share->getPermissionManage());
+	}
+
+	public function testCountSharesForNodesCountsAllSendersAndIncludesZeros(): void {
+		$firstShare = new Share();
+		$firstShare->setNodeId(1);
+		$firstShare->setSender('alice');
+		$secondShare = new Share();
+		$secondShare->setNodeId(1);
+		$secondShare->setSender('bob');
+		$this->mapper->expects($this->exactly(2))->method('findAllSharesForNodes')
+			->withConsecutive(['table', [1, 2], [ShareReceiverType::CIRCLE]], ['view', [1, 2], [ShareReceiverType::CIRCLE]])
+			->willReturn([$firstShare, $secondShare]);
+
+		foreach (['table', 'view'] as $nodeType) {
+			$this->assertSame([1 => 2, 2 => 0], $this->shareService->countSharesForNodes($nodeType, [1, 2]));
+		}
+	}
+
+	public function testCountSharesForNodesKeepsCirclesWhenEnabled(): void {
+		$this->circleHelper->method('isCirclesEnabled')->willReturn(true);
+		$this->mapper->expects($this->once())->method('findAllSharesForNodes')->with('view', [1], [])->willReturn([]);
+
+		$this->assertSame([1 => 0], $this->shareService->countSharesForNodes('view', [1]));
+	}
+
+	public function testCountSharesForNodesSkipsEmptyInput(): void {
+		$this->mapper->expects($this->never())->method('findAllSharesForNodes');
+
+		$this->assertSame([], $this->shareService->countSharesForNodes('table', []));
+	}
+
+	public function testGetTableIdsWithLinkSharesUsesRenamedMapperMethod(): void {
+		$this->mapper->expects($this->once())->method('findTableIdsWithLinkShares')->with([1, 2])->willReturn([2]);
+
+		$this->assertSame([2], $this->shareService->getTableIdsWithLinkShares([1, 2]));
 	}
 
 	private function createTableShare(): Share {
