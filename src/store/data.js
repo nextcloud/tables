@@ -292,7 +292,7 @@ export const useDataStore = defineStore('data', {
 			}
 			viewCountRefreshTimers.set(tableId, setTimeout(() => {
 				viewCountRefreshTimers.delete(tableId)
-				useTablesStore().reloadViewsOfTable({ tableId })
+				useTablesStore().refreshViewsRowsCount({ tableId })
 			}, VIEW_COUNT_REFRESH_DELAY))
 		},
 
