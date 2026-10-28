@@ -230,7 +230,12 @@ class Row2Mapper {
 			if ($columnId < 0) {
 				continue;
 			}
-			$columns[$columnId] = $this->columnMapper->find($columnId);
+			try {
+				$columns[$columnId] = $this->columnMapper->find($columnId);
+			} catch (DoesNotExistException) {
+				$this->logger->debug('No column found to load rows with for id ' . $columnId);
+				continue;
+			}
 			$mappers[$columnId] = $this->getCellMapper($columns[$columnId]);
 		}
 

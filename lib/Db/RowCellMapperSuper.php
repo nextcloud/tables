@@ -21,6 +21,9 @@ use OCP\IDBConnection;
  * @template TOutgoing Type the API is using
  */
 class RowCellMapperSuper extends QBMapper {
+	use RowCellBulkFetchTrait;
+
+	protected const DB_CHUNK_SIZE = 1_000;
 
 	public function __construct(IDBConnection $db, string $table, string $class) {
 		parent::__construct($db, $table, $class);

@@ -10,8 +10,13 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\RowSleeveMapper;
+use OCA\Tables\Helper\ColumnsHelper;
+use OCA\Tables\Migration\CacheSleeveCells;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\Migration\IOutput;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -308,6 +313,89 @@ class Row2MapperTest extends DatabaseTestCase {
 		$this->assertSame('Alice Updated', $cachedCells[$columnMapping['name']]['value'] ?? null);
 		$this->assertArrayHasKey($columnMapping['age'], $cachedCells);
 		$this->assertArrayHasKey($columnMapping['skills'], $cachedCells);
+	}
+
+	public function testFindAllSkipsMissingRequestedColumns(): void {
+		foreach ([false, true] as $cachingComplete) {
+			$this->sleeveCellCachingComplete = $cachingComplete;
+			$rows = $this->mapper->findAll(
+				[...self::$testColumnIds, 999999],
+				self::$testTableId,
+				userId: 'test_user',
+			);
+			$this->assertSame(self::$testRowIds, array_map(fn ($row) => $row->getId(), $rows));
+
+			$rows = $this->mapper->findAll([999999], self::$testTableId, userId: 'test_user');
+			$this->assertCount(5, $rows);
+			foreach ($rows as $row) {
+				$this->assertSame([], $row->getData());
+			}
+		}
+	}
+
+	public function testGetCachedCellsForRowsBatchesColumnsByType(): void {
+		$columns = $this->columnMapper->findAllByTable(self::$testTableId);
+		$expected = [];
+		foreach (self::$testRowIds as $rowId) {
+			$expected[$rowId] = [];
+			foreach ($columns as $column) {
+				$cellMapper = $this->columnsHelper->getCellMapperFromType($column->getType());
+				foreach ($cellMapper->findManyByRowAndColumn($rowId, $column->getId()) as $cell) {
+					$expected[$rowId][$column->getId()] = $cellMapper->toArray($cell);
+				}
+			}
+		}
+
+		$columnTypes = array_unique(array_map(fn (Column $column) => $column->getType(), $columns));
+		$this->columnsHelper->expects($this->exactly(count($columnTypes)))
+			->method('getCellMapperFromType');
+
+		$this->assertEquals($expected, $this->columnsHelper->getCachedCellsForRows(self::$testRowIds, $columns));
+		$this->assertSame([], $this->columnsHelper->getCachedCellsForRows([], $columns));
+		$this->assertSame([123 => []], $this->columnsHelper->getCachedCellsForRows([123], []));
+	}
+
+	public function testCacheMigrationPreservesConcurrentChanges(): void {
+		$table = $this->createTestTable();
+		$editedRow = $this->createTestRowWithData($table['id']);
+		$pendingRow = $this->createTestRowWithData($table['id']);
+		$deletedRow = $this->createTestRowWithData($table['id']);
+		$expectedCache = [123 => ['value' => 'Concurrent edit']];
+		$rowSleeveMapper = $this->createMock(RowSleeveMapper::class);
+		$rowSleeveMapper->method('find')->willReturnCallback(function (int $rowId) use ($editedRow, $deletedRow, $expectedCache) {
+			$sleeve = $this->rowSleeveMapper->find($rowId);
+			if ($rowId === $editedRow['id']) {
+				$sleeve->setCachedCellsArray($expectedCache);
+				$sleeve->setLastEditBy('concurrent_user');
+				$this->rowSleeveMapper->update($sleeve);
+			} elseif ($rowId === $deletedRow['id']) {
+				$this->rowSleeveMapper->deleteById($rowId);
+			}
+			return $sleeve;
+		});
+		$rowSleeveMapper->expects($this->never())->method('update');
+
+		$columnMapper = new ColumnMapper($this->connectionAdapter, $this->logger);
+		$columnsHelper = $this->createMock(ColumnsHelper::class);
+		$columnsHelper->method('getCachedCellsForRows')
+			->willReturnCallback(fn (array $rowIds) => array_fill_keys($rowIds, []));
+		$this->sleeveCellCachingComplete = false;
+		$this->appConfig->expects($this->once())->method('setValueBool');
+		$migration = new CacheSleeveCells(
+			$this->connectionAdapter,
+			$columnMapper,
+			$columnsHelper,
+			$rowSleeveMapper,
+			$this->appConfig,
+			$this->logger,
+		);
+		$migration->run($this->createMock(IOutput::class));
+
+		$sleeve = $this->rowSleeveMapper->find($editedRow['id']);
+		$this->assertSame($expectedCache, $sleeve->getCachedCellsArray());
+		$this->assertSame('concurrent_user', $sleeve->getLastEditBy());
+		$this->assertSame('[]', $this->rowSleeveMapper->find($pendingRow['id'])->getCachedCells());
+		$this->assertSame([], $this->rowSleeveMapper->findMultiple([$deletedRow['id']]));
 	}
 
 	/**

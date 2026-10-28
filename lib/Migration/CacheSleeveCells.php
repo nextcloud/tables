@@ -11,7 +11,6 @@ namespace OCA\Tables\Migration;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Config\ConfigLexicon;
-use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Helper\ColumnsHelper;
@@ -52,13 +51,15 @@ class CacheSleeveCells implements IRepairStep {
 		}
 
 		$pendingRowsQuery = $this->buildPendingRowIdsQuery();
+		$cacheUpdateQuery = $this->buildCacheUpdateQuery();
 		foreach ($this->getTableIds() as $tableId) {
 			$pendingRowsQuery->setParameter('tableId', $tableId, IQueryBuilder::PARAM_INT);
 			$columns = $this->columnMapper->findAllByTable($tableId);
 
 			while ($rowIds = $this->fetchPendingRowIds($pendingRowsQuery)) {
+				$cachedCellsByRow = $this->columnsHelper->getCachedCellsForRows($rowIds, $columns);
 				foreach ($rowIds as $rowId) {
-					$this->cacheCellsForRow($rowId, $columns);
+					$this->cacheCellsForRow($rowId, $cachedCellsByRow[$rowId], $cacheUpdateQuery);
 				}
 			}
 
@@ -69,9 +70,9 @@ class CacheSleeveCells implements IRepairStep {
 	}
 
 	/**
-	 * @param Column[] $columns
+	 * @param array<int, mixed> $cachedCells
 	 */
-	private function cacheCellsForRow(int $rowId, array $columns): void {
+	private function cacheCellsForRow(int $rowId, array $cachedCells, IQueryBuilder $cacheUpdateQuery): void {
 		try {
 			$sleeve = $this->rowSleeveMapper->find($rowId);
 		} catch (DoesNotExistException) {
@@ -79,9 +80,18 @@ class CacheSleeveCells implements IRepairStep {
 			return;
 		}
 
-		$cachedCells = $this->columnsHelper->getCachedCellsForRow($rowId, $columns);
 		$sleeve->setCachedCellsArray($cachedCells);
-		$this->rowSleeveMapper->update($sleeve);
+		$cacheUpdateQuery->setParameter('rowId', $rowId, IQueryBuilder::PARAM_INT);
+		$cacheUpdateQuery->setParameter('cachedCells', $sleeve->getCachedCells(), IQueryBuilder::PARAM_STR);
+		$cacheUpdateQuery->executeStatement();
+	}
+
+	private function buildCacheUpdateQuery(): IQueryBuilder {
+		$qb = $this->db->getQueryBuilder();
+		return $qb->update('tables_row_sleeves')
+			->set('cached_cells', $qb->createParameter('cachedCells'))
+			->where($qb->expr()->eq('id', $qb->createParameter('rowId')))
+			->andWhere($qb->expr()->isNull('cached_cells'));
 	}
 
 	/**

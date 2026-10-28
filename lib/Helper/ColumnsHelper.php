@@ -139,15 +139,29 @@ class ColumnsHelper {
 	 * @return array<int, mixed>
 	 */
 	public function getCachedCellsForRow(int $rowId, array $columns): array {
-		$cachedCells = [];
+		return $this->getCachedCellsForRows([$rowId], $columns)[$rowId];
+	}
+
+	public function getCachedCellsForRows(array $rowIds, array $columns): array {
+		$cachedCells = array_fill_keys($rowIds, []);
+		if ($rowIds === []) {
+			return $cachedCells;
+		}
+
+		$columnIdsByType = [];
 		foreach ($columns as $column) {
-			$cellMapper = $this->getCellMapperFromType($column->getType());
-			$columnId = $column->getId();
-			foreach ($cellMapper->findManyByRowAndColumn($rowId, $columnId) as $cell) {
+			$columnIdsByType[$column->getType()][] = $column->getId();
+		}
+
+		foreach ($columnIdsByType as $columnType => $columnIds) {
+			$cellMapper = $this->getCellMapperFromType($columnType);
+			foreach ($cellMapper->findAllByRowIdsAndColumnIds($rowIds, $columnIds) as $cell) {
+				$rowId = $cell->getRowId();
+				$columnId = $cell->getColumnId();
 				if ($cellMapper->hasMultipleValues()) {
-					$cachedCells[$columnId][] = $cellMapper->toArray($cell);
+					$cachedCells[$rowId][$columnId][] = $cellMapper->toArray($cell);
 				} else {
-					$cachedCells[$columnId] = $cellMapper->toArray($cell);
+					$cachedCells[$rowId][$columnId] = $cellMapper->toArray($cell);
 				}
 			}
 		}

@@ -7,6 +7,9 @@
 
 namespace OCA\Tables\Db;
 
+use OCP\DB\IResult;
+use OCP\DB\QueryBuilder\IExpressionBuilder;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use PHPUnit\Framework\TestCase;
 
@@ -61,5 +64,50 @@ class RowCellNumberMapperTest extends TestCase {
 	 */
 	public function testFormatRowData(mixed $stored, ?int $expected): void {
 		$this->assertSame($expected, $this->mapper->formatRowData($this->column, ['value' => $stored]));
+	}
+
+	public function testBulkFetchChunksRowsAndColumnsUsingOneQueryBuilder(): void {
+		$qb = $this->createMock(IQueryBuilder::class);
+		foreach (['select', 'from', 'where', 'andWhere'] as $method) {
+			$qb->method($method)->willReturnSelf();
+		}
+		$qb->method('expr')->willReturn($this->createMock(IExpressionBuilder::class));
+		$parameters = [];
+		$qb->method('setParameter')->willReturnCallback(function (string $name, array $values, int $type) use (&$parameters, $qb) {
+			$this->assertSame(IQueryBuilder::PARAM_INT_ARRAY, $type);
+			$this->assertLessThanOrEqual(1_000, count($values));
+			$parameters[$name] = $values;
+			return $qb;
+		});
+		$chunks = [];
+		$qb->expects($this->exactly(4))->method('executeQuery')
+			->willReturnCallback(function () use (&$chunks, &$parameters) {
+				$chunks[] = [count($parameters['rowIds']), count($parameters['columnIds'])];
+				$result = $this->createMock(IResult::class);
+				foreach (['fetch', 'fetchAssociative'] as $method) {
+					$result->method($method)->willReturnOnConsecutiveCalls(
+						['id' => count($chunks), 'row_id' => $parameters['rowIds'][0], 'column_id' => $parameters['columnIds'][0], 'value' => 42],
+						false,
+					);
+				}
+				return $result;
+			});
+		$db = $this->createMock(IDBConnection::class);
+		$db->expects($this->once())->method('getQueryBuilder')->willReturn($qb);
+		$mapper = new RowCellNumberMapper($db);
+
+		$cells = $mapper->findAllByRowIdsAndColumnIds(range(1, 1_001), range(1, 1_001));
+
+		$this->assertSame([[1_000, 1_000], [1, 1_000], [1_000, 1], [1, 1]], $chunks);
+		$this->assertSame([1, 2, 3, 4], array_map(fn (RowCellNumber $cell) => $cell->getId(), $cells));
+	}
+
+	public function testBulkFetchSkipsEmptyInputs(): void {
+		$db = $this->createMock(IDBConnection::class);
+		$db->expects($this->never())->method('getQueryBuilder');
+		$mapper = new RowCellNumberMapper($db);
+
+		$this->assertSame([], $mapper->findAllByRowIdsAndColumnIds([], [1]));
+		$this->assertSame([], $mapper->findAllByRowIdsAndColumnIds([1], []));
 	}
 }
