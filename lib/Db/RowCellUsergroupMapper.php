@@ -10,6 +10,7 @@ namespace OCA\Tables\Db;
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
+use OCA\Tables\Share\ShareContext;
 use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -26,6 +27,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		private CircleHelper $circleHelper,
 		private GroupHelper $groupHelper,
 		protected IUserSession $userSession,
+		private ShareContext $shareContext,
 	) {
 		parent::__construct($db, $this->table, RowCellUsergroup::class);
 	}
@@ -49,7 +51,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		if ($valueType === UsergroupType::USER) {
 			$displayName = $this->userManager->getDisplayName($value) ?? $value;
 		} elseif ($valueType === UsergroupType::CIRCLE) {
-			$displayName = $this->circleHelper->getCircleDisplayName($value, ($this->userSession->getUser()?->getUID() ?: '')) ?: $value;
+			$displayName = $this->circleHelper->getCircleDisplayName($value, $this->getCurrentUserId()) ?: $value;
 		} elseif ($valueType === UsergroupType::GROUP) {
 			$displayName = $this->groupHelper->getGroupDisplayName($value) ?: $value;
 		}
@@ -62,5 +64,14 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 
 	public function hasMultipleValues(): bool {
 		return true;
+	}
+
+	private function getCurrentUserId(): string {
+		$remoteUserId = $this->shareContext->getRemoteUserId();
+		if ($remoteUserId !== null) {
+			return $remoteUserId;
+		}
+
+		return $this->userSession->getUser()?->getUID() ?: '';
 	}
 }

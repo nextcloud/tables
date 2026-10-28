@@ -17,6 +17,7 @@ use OCA\Tables\Middleware\Attribute\AssertShareAccessIsAccessible;
 use OCA\Tables\Service\ConfigService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareToken;
+use OCA\Tables\Share\ShareContext;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
@@ -41,6 +42,7 @@ class ShareControlMiddleware extends Middleware {
 		private readonly IOCMDiscoveryService $ocmDiscoveryService,
 		private readonly ICloudIdManager $cloudIdManager,
 		private readonly ConfigService $configService,
+		private readonly ShareContext $shareContext,
 	) {
 	}
 
@@ -56,6 +58,7 @@ class ShareControlMiddleware extends Middleware {
 			$tokenInput = $this->request->getParam('token', '');
 			$this->assertShareTokenIsValidAndExisting($tokenInput);
 			$this->assertIsAccessible($tokenInput);
+			$this->shareContext->setShare($this->share);
 		}
 	}
 
