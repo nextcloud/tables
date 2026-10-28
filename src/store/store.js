@@ -282,6 +282,23 @@ export const useTablesStore = defineStore('store', {
 			return true
 		},
 
+		async refreshViewsRowsCount({ tableId }) {
+			let res = null
+			try {
+				res = await axios.get(generateUrl('/apps/tables/view/table/' + tableId))
+			} catch (e) {
+				console.info('Could not refresh view row counts', e)
+				return false
+			}
+			res.data.forEach(view => {
+				const existing = this.getView(view.id)
+				if (existing) {
+					existing.rowsCount = view.rowsCount
+				}
+			})
+			return true
+		},
+
 		async updateTable({ id, data }) {
 			let res = null
 

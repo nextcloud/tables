@@ -101,7 +101,7 @@ export default {
 			this.$emit('update:layout', layout ?? null)
 		},
 		activeRowId() {
-			this.reload()
+			this.openActiveRow()
 		},
 	},
 
@@ -205,13 +205,17 @@ export default {
 					id: this.element.id,
 					isView: this.isView,
 				}
-				if (this.activeRowId) {
-					const row = this.dataStore.getRows(this.isView, this.element.id).find(r => r.id === this.activeRowId)
-					if (row) {
-						emit('tables:row:edit', { row, columns: this.dataStore.getColumns(this.isView, this.element.id), isView: this.isView, elementId: this.element.id, element: this.element })
-					}
-				}
+				this.openActiveRow()
 				this.localLoading = false
+			}
+		},
+		openActiveRow() {
+			if (!this.activeRowId || !this.element) {
+				return
+			}
+			const row = this.dataStore.getRows(this.isView, this.element.id).find(r => r.id === this.activeRowId)
+			if (row) {
+				emit('tables:row:edit', { row, columns: this.dataStore.getColumns(this.isView, this.element.id), isView: this.isView, elementId: this.element.id, element: this.element })
 			}
 		},
 	},
