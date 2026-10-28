@@ -237,6 +237,49 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
+	 * Filter and sort rules are the sharer's configuration and are withheld from
+	 * share recipients that cannot manage the parent table.
+	 *
+	 * The redaction has to happen while serialising, never by writing to the
+	 * entity: ViewMapper caches views per request and hands the very same
+	 * instance to every other consumer, including the row queries built from
+	 * getFilterArray(). Blanking the property there would drop the filter from
+	 * those queries and expose rows the view excludes.
+	 */
+	private function hidesRuleDetails(): bool {
+		return (bool)$this->isShared && !($this->getOnSharePermissions()?->manageTable ?? false);
+	}
+
+	/**
+	 * Sort rules are cut off at the first rule on a column the recipient cannot see.
+	 *
+	 * The rows arrive sorted by every rule and the web UI sorts them again by the
+	 * rules it receives. Only a prefix of the rules keeps that re-sort from changing
+	 * the server's order; skipping a hidden rule in the middle would not.
+	 *
+	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
+	 */
+	private function getSortArrayForOutput(): array {
+		$sortArray = $this->getSortArray();
+		if (!$this->hidesRuleDetails()) {
+			return $sortArray;
+		}
+
+		$visibleColumnIds = $this->getColumnIds();
+		$visibleSortPrefix = [];
+		foreach ($sortArray as $sortRule) {
+			if (!Column::isValidMetaTypeId($sortRule['columnId'])
+				&& !in_array($sortRule['columnId'], $visibleColumnIds, true)
+			) {
+				break;
+			}
+			$visibleSortPrefix[] = $sortRule;
+		}
+
+		return $visibleSortPrefix;
+	}
+
+	/**
 	 * @psalm-return TablesView
 	 */
 	public function jsonSerialize(): array {
@@ -255,7 +298,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt ?: '',
 			'columns' => $this->getColumnsArray(),
 			'columnSettings' => $this->getColumnsSettingsArray(),
-			'sort' => $this->getSortArray(),
+			'sort' => $this->getSortArrayForOutput(),
 			'isShared' => (bool)$this->isShared,
 			'favorite' => $this->favorite,
 			'onSharePermissions' => $this->getSharePermissions()?->jsonSerialize(),
@@ -267,7 +310,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'layout' => $this->getLayoutNormalized(),
 			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];
-		$serialisedJson['filter'] = $this->getFilterArray();
+		$serialisedJson['filter'] = $this->hidesRuleDetails() ? [] : $this->getFilterArray();
 
 		return $serialisedJson;
 	}

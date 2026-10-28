@@ -958,6 +958,34 @@ Feature: APIv2
     When user "participant4-v2" attempts to fetch all shares of view v1
     Then the reported status is 404
 
+  @api2 @sharing @views @rows
+  Scenario: A read-only recipient of a filtered view never receives the excluded rows
+    Given table "Filtered table" with emoji "🔒" exists for user "participant1-v2" as "t1" via v2
+    And column "team" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 0                      |
+      | description   | Team owning the row    |
+    And using table "t1"
+    And user "participant1-v2" creates row "r-red" with following values:
+      | team | red |
+    And user "participant1-v2" creates row "r-blue" with following values:
+      | team | blue |
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columnSettings "team" to view "v1"
+    And user "participant1-v2" sets filter to view "v1"
+      | column | operator | value |
+      | team   | is-equal | red   |
+    And user "participant1-v2" shares view "v1" with "participant2-v2"
+    And user "participant1-v2" sets permission "create" to "false"
+    And user "participant1-v2" sets permission "update" to "false"
+    # The owner keeps the whole table, the recipient only ever sees the filtered subset
+    Then the user "participant1-v2" fetches table "t1", it has exactly these rows "r-red,r-blue"
+    And the user "participant2-v2" fetches view "v1", it has exactly these rows "r-red"
+    # Resolving the view link enhances the view and reads its rows in one request,
+    # which is where the excluded rows used to leak
+    And the user "participant2-v2" resolves a reference to view "v1", it has exactly these rows "r-red"
+
   @api2 @rows @views
   Scenario: Create rows on a view via v2 without access
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2

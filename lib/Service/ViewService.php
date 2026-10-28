@@ -543,31 +543,10 @@ class ViewService extends SuperService {
 		} catch (InternalError|PermissionError) {
 		}
 
-		// Remove detailed view filtering and sorting information if necessary
-		if ($view->getIsShared() && !$view->getOnSharePermissions()->manageTable) {
-			$view->setFilterArray([]);
-
-			$rawSortArray = $view->getSortArray();
-			if ($rawSortArray) {
-				$view->setSortArray(
-					array_map(
-						static function (array $sortRule) use ($view): array {
-							if (isset($sortRule['columnId'])
-								&& (
-									Column::isValidMetaTypeId($sortRule['columnId'])
-									|| in_array($sortRule['columnId'], $view->getColumnIds(), true)
-								)
-							) {
-								return $sortRule;
-							}
-							// Instead of sort rule just indicate that there is a rule, but hide details
-							return [];
-						},
-						$rawSortArray
-					)
-				);
-			}
-		}
+		// Filter and sort details are withheld from share recipients by
+		// View::jsonSerialize(). They must not be stripped from the entity here:
+		// ViewMapper caches it for the whole request, so the row queries built
+		// from it would lose the filter and return excluded rows.
 
 		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_VIEW, $view->getId())) {
 			$view->setFavorite(true);
