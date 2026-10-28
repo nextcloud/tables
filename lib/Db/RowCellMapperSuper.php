@@ -21,6 +21,9 @@ use OCP\IDBConnection;
  * @template TOutgoing Type the API is using
  */
 class RowCellMapperSuper extends QBMapper {
+	use RowCellBulkFetchTrait;
+
+	protected const DB_CHUNK_SIZE = 1_000;
 
 	public function __construct(IDBConnection $db, string $table, string $class) {
 		parent::__construct($db, $table, $class);
@@ -50,6 +53,10 @@ class RowCellMapperSuper extends QBMapper {
 
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
 		$cell->setValue($data);
+	}
+
+	public function toArray(RowCellSuper $cell): array {
+		return ['value' => $cell->getValue()];
 	}
 
 	public function getDbParamType() {
@@ -114,6 +121,33 @@ class RowCellMapperSuper extends QBMapper {
 			->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)));
 		return $this->findEntity($qb);
+	}
+
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @return RowCellSuper[]
+	 */
+	public function findManyByRowAndColumn(int $rowId, int $columnId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)));
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @throws Exception
+	 * @return RowCellSuper[]
+	 */
+	public function findAllForRow(int $rowId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)));
+		return $this->findEntities($qb);
 	}
 
 	/**

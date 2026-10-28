@@ -21,20 +21,20 @@ trait RowCellBulkFetchTrait {
 			return [];
 		}
 
-		$chunkSize = 500;
-		$results = [];
-		foreach (array_chunk($rowIds, $chunkSize) as $rowIdChunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('*')
-				->from($this->table)
-				->where($qb->expr()->in('row_id', $qb->createNamedParameter($rowIdChunk, IQueryBuilder::PARAM_INT_ARRAY)))
-				->andWhere($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY)));
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where($qb->expr()->in('row_id', $qb->createParameter('rowIds')))
+			->andWhere($qb->expr()->in('column_id', $qb->createParameter('columnIds')));
 
-			$chunkResults = $this->findEntities($qb);
-			if (!empty($chunkResults)) {
-				$results = array_merge($results, $chunkResults);
+		$results = [];
+		foreach (array_chunk($columnIds, self::DB_CHUNK_SIZE) as $columnIdChunk) {
+			$qb->setParameter('columnIds', $columnIdChunk, IQueryBuilder::PARAM_INT_ARRAY);
+			foreach (array_chunk($rowIds, self::DB_CHUNK_SIZE) as $rowIdChunk) {
+				$qb->setParameter('rowIds', $rowIdChunk, IQueryBuilder::PARAM_INT_ARRAY);
+				$results[] = $this->findEntities($qb);
 			}
 		}
-		return $results;
+		return array_merge(...$results);
 	}
 }
