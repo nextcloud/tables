@@ -107,7 +107,7 @@
     "Could not write file to disk" : "無法將檔案寫入磁碟",
     "A PHP extension stopped the file upload" : "某個 PHP 擴充功能終止檔案的上傳",
     "No file uploaded or file size exceeds maximum of %s" : "沒有上傳檔案或檔案大小超過 %s 的最大值",
-    "Deleted team %s." : "已刪除團隊 %s。",
+    "Team not found" : "找不到團隊",
     "A new table row has been created in view %2$s by %1$s." : "%1$s 已在檢視 %2$s 中建立新的資料表列。",
     "A new table row has been created in table %2$s by %1$s." : "%1$s 已在資料表 %2$s 中建立新的資料表列。",
     "{user} has created a new {row} in view {view}" : "{user} 已在檢視 {view} 中建立新的 {row}",

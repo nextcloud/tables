@@ -109,7 +109,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Не удалось записать файл на диск",
     "A PHP extension stopped the file upload" : "Загрузку файла прервало расширение PHP",
     "No file uploaded or file size exceeds maximum of %s" : "Файл не загружен или его размер превышает %s",
-    "Deleted team %s." : "Команда %s удалена.",
+    "Team not found" : "Команда не найдена",
     "A new table row has been created in view %2$s by %1$s." : "%1$s создал(а) новую строку таблицы в представлении %2$s.",
     "A new table row has been created in table %2$s by %1$s." : "%1$s создал(а) новую строку таблицы в таблице %2$s.",
     "{user} has created a new {row} in view {view}" : "{user} создал(а) строку {row} в представлении {view}",

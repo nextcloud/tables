@@ -109,7 +109,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Tidak dapat menulis berkas ke diska",
     "A PHP extension stopped the file upload" : "Ekstensi PHP menghentikan proses unggah berkas",
     "No file uploaded or file size exceeds maximum of %s" : "Gagal unggah berkas atau ukuran melampaui batas maksimum %s",
-    "Deleted team %s." : "Tim %s telah dihapus.",
+    "Team not found" : "Tim tidak ditemukan",
     "A new table row has been created in view %2$s by %1$s." : "Baris tabel baru telah dibuat pada tampilan %2$s oleh %1$s.",
     "A new table row has been created in table %2$s by %1$s." : "Baris tabel baru telah dibuat pada tabel %2$s oleh %1$s.",
     "{user} has created a new {row} in view {view}" : "{user} telah membuat {row} baru pada tampilan {view}",

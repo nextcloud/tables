@@ -109,7 +109,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Faili kirjutamine kettale ei õnnestunud",
     "A PHP extension stopped the file upload" : "PHP laiendus peatas faili üleslaadimise",
     "No file uploaded or file size exceeds maximum of %s" : "Faili ei laaditud üles või selle suurus ületab maksimaalse %s",
-    "Deleted team %s." : "„%s“ tiim on kustutatud.",
+    "Team not found" : "Tiimi ei leidu",
     "A new table row has been created in view %2$s by %1$s." : "%1$s lisas „%2$s“ vaatesse uue tabelirea.",
     "A new table row has been created in table %2$s by %1$s." : "%1$s lisas „%2$s“ tabelise uue tabelirea.",
     "{user} has created a new {row} in view {view}" : "{user} on „{view}“ vaatesse lisanud uue {row}. rea",

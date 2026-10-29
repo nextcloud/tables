@@ -107,7 +107,7 @@
     "Could not write file to disk" : "Dosya diske yazılamadı",
     "A PHP extension stopped the file upload" : "Bir PHP eklentisi dosyanın yüklenmesini engelledi",
     "No file uploaded or file size exceeds maximum of %s" : "Herhangi bir dosya yüklenmedi ya da %s olan en büyük dosya boyutu sınırı aşıldı",
-    "Deleted team %s." : "%s takımı silindi.",
+    "Team not found" : "Takım bulunamadı",
     "A new table row has been created in view %2$s by %1$s." : "%1$s tarafından %2$s görünümünde yeni bir tablo satırı oluşturuldu.",
     "A new table row has been created in table %2$s by %1$s." : "%1$s tarafından %2$s tablosunda yeni bir tablo satırı oluşturuldu.",
     "{user} has created a new {row} in view {view}" : "{user}, {view} görünümünde yeni bir {row} oluşturdu",

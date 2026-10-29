@@ -109,7 +109,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Kunne ikke skrive filen til disken",
     "A PHP extension stopped the file upload" : "En PHP-udvidelse stoppede filoverførslen",
     "No file uploaded or file size exceeds maximum of %s" : "Ingen fil blev overført, eller filstørrelsen overskrider maksimum på %s",
-    "Deleted team %s." : "Teamet %s er slettet.",
+    "Team not found" : "Teamet blev ikke fundet",
     "A new table row has been created in view %2$s by %1$s." : "%1$s har oprettet en ny række i visningen %2$s.",
     "A new table row has been created in table %2$s by %1$s." : "%1$s har oprettet en ny række i tabellen %2$s.",
     "{user} has created a new {row} in view {view}" : "{user} har oprettet {row} i visningen {view}",

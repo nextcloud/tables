@@ -107,7 +107,7 @@
     "Could not write file to disk" : "Δεν ήταν δυνατή η εγγραφή του αρχείου στο δίσκο",
     "A PHP extension stopped the file upload" : "Μια επέκταση PHP σταμάτησε τη μεταφόρτωση του αρχείου",
     "No file uploaded or file size exceeds maximum of %s" : "Δεν μεταφορτώθηκε αρχείο ή το μέγεθος αρχείου υπερβαίνει το μέγιστο %s",
-    "Deleted team %s." : "Διαγράφηκε η ομάδα %s.",
+    "Team not found" : "Η ομάδα δεν βρέθηκε",
     "A new table row has been created in view %2$s by %1$s." : "Δημιουργήθηκε μια νέα γραμμή πίνακα στην προβολή %2$s από τον/την %1$s.",
     "A new table row has been created in table %2$s by %1$s." : "Δημιουργήθηκε μια νέα γραμμή πίνακα στον πίνακα %2$s από τον/την %1$s.",
     "{user} has created a new {row} in view {view}" : "Ο/Η {user} δημιούργησε μια νέα {row} στην προβολή {view}",

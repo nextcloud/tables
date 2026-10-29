@@ -109,7 +109,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Nu s-a putut scrie fișierul pe disc",
     "A PHP extension stopped the file upload" : "O extensie PHP a oprit încărcarea fișierului",
     "No file uploaded or file size exceeds maximum of %s" : "Nu a fost încărcat niciun fișier sau dimensiunea depășește maximul de %s",
-    "Deleted team %s." : "Echipa %s a fost ștearsă.",
+    "Team not found" : "Echipa nu a fost găsită",
     "A new table row has been created in view %2$s by %1$s." : "Un rând nou a fost creat în vizualizarea %2$s de %1$s.",
     "A new table row has been created in table %2$s by %1$s." : "Un rând nou a fost creat în tabelul %2$s de %1$s.",
     "{user} has created a new {row} in view {view}" : "{user} a creat un {row} nou în vizualizarea {view}",

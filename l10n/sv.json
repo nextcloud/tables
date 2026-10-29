@@ -107,7 +107,7 @@
     "Could not write file to disk" : "Det gick inte att skriva filen till disken",
     "A PHP extension stopped the file upload" : "Ett PHP-tillägg stoppade filuppladdningen",
     "No file uploaded or file size exceeds maximum of %s" : "Ingen fil uppladdad eller filstorleken överstiger max %s",
-    "Deleted team %s." : "Teamet %s borttaget.",
+    "Team not found" : "Teamet hittades inte",
     "A new table row has been created in view %2$s by %1$s." : "En ny tabellrad skapades i vyn %2$s av %1$s.",
     "A new table row has been created in table %2$s by %1$s." : "En ny tabellrad skapades i tabellen %2$s av %1$s.",
     "{user} has created a new {row} in view {view}" : "{user} har skapat en ny {row} i vyn {view}",

@@ -14,6 +14,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Файлыг диск рүү бичиж чадсангүй",
     "A PHP extension stopped the file upload" : "PHP өргөтгөл файл байршуулалтыг зогсоосон",
     "No file uploaded or file size exceeds maximum of %s" : "Файл байршуулаагүй эсвэл файлын хэмжээ %s хамгийн ихээс хэтэрсэн",
+    "Team not found" : "Баг олдсонгүй",
     "Members" : "–ì–∏—à“Ø“Ø–¥",
     "Date" : "–û–Ω —Å–∞—Ä ”©–¥”©—Ä",
     "Comments" : "–°—ç—Ç–≥—ç–≥–¥–ª“Ø“Ø–¥",

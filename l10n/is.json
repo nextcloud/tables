@@ -15,6 +15,7 @@
     "Could not write file to disk" : "Tókst ekki að skrifa skrá á disk.",
     "A PHP extension stopped the file upload" : "PHP-viðbót stöðvaði innsendingu skráar",
     "No file uploaded or file size exceeds maximum of %s" : "Engin innsend skrá eða að skráarstærð fór fram úr hámarksstæðinni %s",
+    "Team not found" : "Teymi fannst ekki",
     "ToDo list" : "Verkefnalisti",
     "Members" : "Meðlimir",
     "Date" : "Dagsetning",

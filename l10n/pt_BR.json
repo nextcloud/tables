@@ -107,7 +107,7 @@
     "Could not write file to disk" : "Não foi possível gravar o arquivo no disco",
     "A PHP extension stopped the file upload" : "Uma extensão PHP interrompeu o upload do arquivo",
     "No file uploaded or file size exceeds maximum of %s" : "Ou nenhum arquivo foi carregado ou o tamanho do arquivo excede o máximo de %s",
-    "Deleted team %s." : "Equipe %s excluída.",
+    "Team not found" : "Equipe não encontrada",
     "A new table row has been created in view %2$s by %1$s." : "Uma nova linha da tabela foi criada na visualização %2$s por %1$s.",
     "A new table row has been created in table %2$s by %1$s." : "Uma nova linha da tabela foi criada na tabela %2$s por %1$s.",
     "{user} has created a new {row} in view {view}" : "{user} criou uma nova {row} na visualização {view}",

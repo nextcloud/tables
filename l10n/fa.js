@@ -47,7 +47,6 @@ OC.L10N.register(
     "Could not write file to disk" : "امکان نوشتن فایل روی دیسک وجود نداشت",
     "A PHP extension stopped the file upload" : "یک افزونه PHP آپلود فایل را متوقف کرد",
     "No file uploaded or file size exceeds maximum of %s" : "هیچ فایلی آپلود نشد یا حجم فایل از حداکثر %s بیشتر است",
-    "Deleted team %s." : "تیم %s حذف شد.",
     "Nextcloud tables" : "جداول نکست‌کلود",
     "_%n row_::_%n rows_" : ["%n row","%n rows"],
     "table" : "جدول",

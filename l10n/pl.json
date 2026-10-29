@@ -22,6 +22,7 @@
     "Could not write file to disk" : "Nie można zapisać pliku na dysku",
     "A PHP extension stopped the file upload" : "Rozszerzenie PHP zatrzymało wysyłanie pliku",
     "No file uploaded or file size exceeds maximum of %s" : "Brak wysłanego pliku lub rozmiar pliku przekracza maksymalny limit %s",
+    "Team not found" : "Nie znaleziono zespołu",
     "Nextcloud tables" : "Tabele Nextcloud",
     "_%n row_::_%n rows_" : ["wiersz","wierszy","wierszy","wierszy"],
     "table" : "tabela",

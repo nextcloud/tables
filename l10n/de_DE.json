@@ -107,7 +107,7 @@
     "Could not write file to disk" : "Die Datei konnte nicht auf die Festplatte geschrieben werden",
     "A PHP extension stopped the file upload" : "Eine PHP-Erweiterung hat das Hochladen der Datei gestoppt",
     "No file uploaded or file size exceeds maximum of %s" : "Keine Datei hochgeladen oder die Dateigröße überschreitet %s",
-    "Deleted team %s." : "Team %s gelöscht.",
+    "Team not found" : "Team nicht gefunden",
     "A new table row has been created in view %2$s by %1$s." : "Eine neue Tabellenzeile wurde in der Ansicht %2$s von %1$s erstellt.",
     "A new table row has been created in table %2$s by %1$s." : "Eine neue Tabellenzeile wurde in der Tabelle %2$s von %1$s erstellt.",
     "{user} has created a new {row} in view {view}" : "{user} hat eine neue Zeile {row} in der Ansicht {view} erstellt",

@@ -109,7 +109,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Nepodarilo sa zapísať súbor na disk",
     "A PHP extension stopped the file upload" : "Rozšírenie PHP zastavilo nahrávanie súboru",
     "No file uploaded or file size exceeds maximum of %s" : "Nenahral sa žiadny súbor alebo jeho veľkosť presiahla %s",
-    "Deleted team %s." : "Tím %s bol odstránený.",
+    "Team not found" : "Tím sa nepodarilo nájsť",
     "A new table row has been created in view %2$s by %1$s." : "Nový riadok tabuľky bol vytvorený v zobrazení %2$s používateľom %1$s.",
     "A new table row has been created in table %2$s by %1$s." : "Nový riadok tabuľky bol vytvorený v tabuľke %2$s používateľom %1$s.",
     "{user} has created a new {row} in view {view}" : "Používateľ {user} vytvoril nový {row} v zobrazení {view}.",

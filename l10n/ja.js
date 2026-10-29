@@ -23,6 +23,7 @@ OC.L10N.register(
     "Could not write file to disk" : "ファイルをディスクに書き込めませんでした",
     "A PHP extension stopped the file upload" : "PHP拡張機能がファイルのアップロードを停止しました",
     "No file uploaded or file size exceeds maximum of %s" : "ファイルがアップロードされていないか、ファイルサイズが最大 %s を超えています",
+    "Team not found" : "チームが見つかりません",
     "Nextcloud tables" : "Nextcloud Tables",
     "_%n row_::_%n rows_" : ["%n 行"],
     "table" : "テーブル",
