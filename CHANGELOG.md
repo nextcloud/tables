@@ -5,6 +5,69 @@
 
 # Changelog
 
+## 2.4.0
+
+### Added
+
+* [🖼 Add persistent per-view layout modes (table / tiles / gallery) (tables#2407)](https://github.com/nextcloud/tables/pull/2407)
+* [Feat: expand audit logging (tables#3125)](https://github.com/nextcloud/tables/pull/3125)
+
+### Fixed
+
+* [Fix(relation): Fix ellipsis for long selected relation labels (tables#2878)](https://github.com/nextcloud/tables/pull/2878)
+* [Fix(sidebar): keep views the table listing does not carry (tables#2953)](https://github.com/nextcloud/tables/pull/2953)
+* [Fix(views): return column IDs from getColumnsArray() (tables#3083)](https://github.com/nextcloud/tables/pull/3083)
+* [Fix(columns): persist the show user status setting of user columns (tables#3084)](https://github.com/nextcloud/tables/pull/3084)
+* [Fix(federation): show team names to remote team members (tables#3097)](https://github.com/nextcloud/tables/pull/3097)
+* [Feat(ux): Make filled stars more readable (vs. outlined stars) (tables#3124)](https://github.com/nextcloud/tables/pull/3124)
+* [Fix(analytics): prevent report failures on empty text cells (tables#3126)](https://github.com/nextcloud/tables/pull/3126)
+* [Fix(Import): make import file windows compatible (no trailing dots) (tables#3143)](https://github.com/nextcloud/tables/pull/3143)
+* [Fix(Migration): properly check for an existing index (tables#3163)](https://github.com/nextcloud/tables/pull/3163)
+* [Fix(UI): do not do a page reload when a row was edited through a view (tables#3169)](https://github.com/nextcloud/tables/pull/3169)
+
+### Dependencies
+
+* [Fix(deps): update phpoffice/phpspreadsheet to 5.10 (tables#3098)](https://github.com/nextcloud/tables/pull/3098)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.64.5 (main) (tables#3103)](https://github.com/nextcloud/tables/pull/3103)
+* [Chore(deps): update dependency phpunit/phpunit to v9.6.38 (main) (tables#3104)](https://github.com/nextcloud/tables/pull/3104)
+* [Chore(deps): update dependency rector/rector to ^2.7.0 (main) (tables#3105)](https://github.com/nextcloud/tables/pull/3105)
+* [Chore(deps): update dependency vite to ^7.3.7 (main) (tables#3106)](https://github.com/nextcloud/tables/pull/3106)
+* [Fix(deps): update dependency dompurify to ^3.4.16 (main) (tables#3107)](https://github.com/nextcloud/tables/pull/3107)
+* [Fix(deps): update dependency humbug/php-scoper to ^0.18.20 (main) (tables#3108)](https://github.com/nextcloud/tables/pull/3108)
+* [Fix(deps): update dependency symfony/uid to ^6.4.47 (main) (tables#3109)](https://github.com/nextcloud/tables/pull/3109)
+* [Fix(deps): update tiptap to ^3.31.4 (main) (tables#3110)](https://github.com/nextcloud/tables/pull/3110)
+* [Chore(deps): update dependency @playwright/test to ^1.64.0 (main) (tables#3111)](https://github.com/nextcloud/tables/pull/3111)
+* [Chore(deps): update dependency eslint to ^10.12.0 (main) (tables#3112)](https://github.com/nextcloud/tables/pull/3112)
+* [Chore(deps): update dependency psalm/phar to ^6.20.0 (main) (tables#3113)](https://github.com/nextcloud/tables/pull/3113)
+* [Fix(deps): update dependency @material-symbols/svg-400 to ^0.48.0 (main) (tables#3114)](https://github.com/nextcloud/tables/pull/3114)
+* [Update nextcloud/ocp dependency (tables#3121)](https://github.com/nextcloud/tables/pull/3121)
+* [Fix npm audit (tables#3122)](https://github.com/nextcloud/tables/pull/3122)
+* [Refactor(deps): Remove deprecated package version restrictions (tables#3123)](https://github.com/nextcloud/tables/pull/3123)
+* [Chore(deps): update dependency dompurify to v3.4.17 [security] (main) (tables#3140)](https://github.com/nextcloud/tables/pull/3140)
+* [Chore(deps): update dependency @nextcloud/stylelint-config to ^3.2.2 (main) (tables#3144)](https://github.com/nextcloud/tables/pull/3144)
+* [Chore(deps): update dependency @playwright/test to ^1.64.1 (main) (tables#3145)](https://github.com/nextcloud/tables/pull/3145)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.64.9 (main) (tables#3146)](https://github.com/nextcloud/tables/pull/3146)
+* [Fix(deps): update dependency dompurify to ^3.4.17 (main) (tables#3148)](https://github.com/nextcloud/tables/pull/3148)
+* [Fix(deps): update dependency symfony/uid to ^6.4.48 (main) (tables#3149)](https://github.com/nextcloud/tables/pull/3149)
+* [Fix(deps): update dependency vue to ^3.5.44 (main) (tables#3150)](https://github.com/nextcloud/tables/pull/3150)
+* [Fix(deps): update dependency vue-router to ^4.6.4 (main) (tables#3151)](https://github.com/nextcloud/tables/pull/3151)
+* [Chore(deps): update dependency @vue/tsconfig to ^0.9.1 (main) (tables#3152)](https://github.com/nextcloud/tables/pull/3152)
+* [Chore(deps): update dependency eslint to ^10.13.0 (main) (tables#3153)](https://github.com/nextcloud/tables/pull/3153)
+* [Fix(deps): update dependency vue-material-design-icons to ^5.4.0 (main) (tables#3154)](https://github.com/nextcloud/tables/pull/3154)
+* [Update nextcloud/ocp dependency (tables#3155)](https://github.com/nextcloud/tables/pull/3155)
+* [Fix npm audit (tables#3157)](https://github.com/nextcloud/tables/pull/3157)
+* [Fix(deps): update tiptap to ^3.32.0 (main) (tables#3158)](https://github.com/nextcloud/tables/pull/3158)
+* [Fix(deps): update dependency @vueuse/core to v15 (main) (tables#3160)](https://github.com/nextcloud/tables/pull/3160)
+* [Ci(dev-deps): bump PHP req and deps in tests/integration (tables#3164)](https://github.com/nextcloud/tables/pull/3164)
+* [Fix npm audit (tables#3170)](https://github.com/nextcloud/tables/pull/3170)
+
+### Other
+
+* [Ci(cypress): use bundled viewer on server master (tables#3102)](https://github.com/nextcloud/tables/pull/3102)
+* [Ci: don't pull viewer for server-master, it is integrated there now (tables#3127)](https://github.com/nextcloud/tables/pull/3127)
+* [Refactor: consolidate relation target resolution (tables#3166)](https://github.com/nextcloud/tables/pull/3166)
+* [Refactor(views): consolidate sorting in one entity (tables#3172)](https://github.com/nextcloud/tables/pull/3172)
+
 ## 2.3.2
 
 ### Added
