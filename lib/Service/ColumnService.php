@@ -303,7 +303,7 @@ class ColumnService extends SuperService {
 		$item->setTitle($newTitle);
 		$item->setTableId($table->getId());
 		$item->setCustomSettings($this->authorizeRelationTarget($item->getCustomSettings(), $userId));
-		$this->validateRelationSettings($item);
+		$this->validateRelationSettings($item, $userId);
 		$this->updateMetadata($item, $userId, true);
 
 		try {
@@ -376,6 +376,7 @@ class ColumnService extends SuperService {
 		try {
 			/** @var Column $item */
 			$item = $this->mapper->find($columnId);
+			$storedColumn = clone $item;
 
 			// security
 			if (!$this->permissionsService->canUpdateColumnsByTableId($item->getTableId())) {
@@ -436,7 +437,7 @@ class ColumnService extends SuperService {
 			if ($columnDto->getCustomSettings() !== null) {
 				$item->setCustomSettings($this->authorizeRelationTarget($columnDto->getCustomSettings(), $userId, $item->getCustomSettings()));
 			}
-			$this->validateRelationSettings($item);
+			$this->validateRelationSettings($item, $userId, $storedColumn);
 
 			$this->updateMetadata($item, $userId);
 			try {
@@ -611,7 +612,7 @@ class ColumnService extends SuperService {
 		}
 	}
 
-	private function validateRelationSettings(Column $column): void {
+	private function validateRelationSettings(Column $column, ?string $userId, ?Column $storedColumn = null): void {
 		try {
 			if ($column->getType() === Column::TYPE_RELATION) {
 				$settings = $column->getCustomSettingsObject(RelationSettings::class);
@@ -634,9 +635,20 @@ class ColumnService extends SuperService {
 				throw new \InvalidArgumentException('Lookup relation must be a relation column in the same table.');
 			}
 			$target = $this->mapper->find($settings->targetColumnId);
-			$this->assertRelationTargetColumn($relation->getCustomSettingsObject(RelationSettings::class), $target);
+			$relationSettings = $relation->getCustomSettingsObject(RelationSettings::class);
+			$this->assertRelationTargetColumn($relationSettings, $target);
 			if (in_array($target->getType(), [Column::TYPE_RELATION, Column::TYPE_LOOKUP], true)) {
 				throw new \InvalidArgumentException('Lookup targets cannot be relation or lookup columns.');
+			}
+			$storedLookupSettings = null;
+			try {
+				if ($storedColumn?->getType() === Column::TYPE_LOOKUP) {
+					$storedLookupSettings = $storedColumn->getCustomSettingsObject(LookupSettings::class);
+				}
+			} catch (\InvalidArgumentException) {
+			}
+			if ($storedLookupSettings != $settings) {
+				$this->assertCanReadRelationTarget($relationSettings->relationType, $relationSettings->targetId, $settings->targetColumnId, $userId);
 			}
 		} catch (\InvalidArgumentException|DoesNotExistException $e) {
 			throw new BadRequestError($e->getMessage(), 0, $e);

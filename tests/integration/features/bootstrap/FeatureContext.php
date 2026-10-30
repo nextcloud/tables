@@ -2668,24 +2668,7 @@ class FeatureContext implements Context {
 	 * @Then lookup column :title exists on table :tableName for relation column :relationColumnName using target column :targetColumnName
 	 */
 	public function createLookupColumn(string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
-		$relationColumnId = (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'];
-		$targetColumnId = (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'];
-
-		$props = [
-			'title' => $title,
-			'type' => 'lookup',
-			'mandatory' => 0,
-			'customSettings' => [
-				'relationColumnId' => $relationColumnId,
-				'targetColumnId' => $targetColumnId,
-			],
-		];
-
-		$this->sendRequest(
-			'POST',
-			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
-			$props
-		);
+		$this->sendCreateLookupColumnRequest($title, $tableName, $relationColumnName, $targetColumnName);
 
 		$newColumn = $this->getDataFromResponse($this->response);
 		$this->columnId = $newColumn['id'];
@@ -2695,6 +2678,55 @@ class FeatureContext implements Context {
 		Assert::assertEquals('lookup', $newColumn['type']);
 
 		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+	}
+
+	#[When('user :user attempts to create lookup column :title on table :tableName for relation column :relationColumnName using target column :targetColumnName')]
+	public function userAttemptsToCreateLookupColumn(string $user, string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
+		$this->setCurrentUser($user);
+		$this->sendCreateLookupColumnRequest($title, $tableName, $relationColumnName, $targetColumnName);
+		if ($this->response->getStatusCode() === 200) {
+			$column = $this->getDataFromResponse($this->response);
+			Assert::assertEquals($title, $column['title']);
+			Assert::assertEquals('lookup', $column['type']);
+			Assert::assertEquals($this->collectionManager->getByAlias('column', $relationColumnName)['id'], $column['customSettings']['relationColumnId']);
+			Assert::assertEquals($this->collectionManager->getByAlias('column', $targetColumnName)['id'], $column['customSettings']['targetColumnId']);
+		}
+	}
+
+	private function sendCreateLookupColumnRequest(string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
+			[
+				'title' => $title,
+				'type' => 'lookup',
+				'mandatory' => 0,
+				'customSettings' => [
+					'relationColumnId' => (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'],
+					'targetColumnId' => (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'],
+				],
+			]
+		);
+	}
+
+	#[When('user :user attempts to update lookup column :columnName for relation column :relationColumnName using target column :targetColumnName')]
+	public function userAttemptsToUpdateLookupColumn(string $user, string $columnName, string $relationColumnName, string $targetColumnName, ?TableNode $properties = null): void {
+		$this->setCurrentUser($user);
+		$column = $this->collectionManager->getByAlias('column', $columnName);
+		$settings = array_merge($properties?->getRowsHash() ?? [], [
+			'relationColumnId' => (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'],
+			'targetColumnId' => (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'],
+		]);
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/columns/' . $column['id'],
+			['customSettings' => $settings]
+		);
+		if ($this->response->getStatusCode() === 200) {
+			$updated = $this->getDataFromResponse($this->response);
+			Assert::assertEquals($column['id'], $updated['id']);
+			Assert::assertEquals($settings, $updated['customSettings']);
+		}
 	}
 
 	/**
