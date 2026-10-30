@@ -119,12 +119,12 @@ class ShareMapper extends QBMapper {
 	/**
 	 * @param string $nodeType
 	 * @param int $nodeId
-	 * @param string $sender
+	 * @param string|null $sender
 	 * @param array<string> $excluded receiver types to exclude from results
 	 * @return Share[]
 	 * @throws Exception
 	 */
-	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender = '', array $excluded = []): array {
+	public function findAllSharesForNode(string $nodeType, int $nodeId, ?string $sender = '', array $excluded = []): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
