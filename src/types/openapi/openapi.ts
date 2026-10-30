@@ -488,6 +488,46 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/index.php/apps/tables/v2/import/table/{tableId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Import data into a table from a file in the user's storage
+         * @description Small files are imported synchronously and the result is returned in `result`. Larger files are queued as a background job and `async` is set to true; the import stats are then published via an activity entry once the job finished.
+         */
+        readonly post: operations["import-import-v2-in-table"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/v2/import/view/{viewId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Import data into a view from a file in the user's storage
+         * @description Small files are imported synchronously and the result is returned in `result`. Larger files are queued as a background job and `async` is set to true; the import stats are then published via an activity entry once the job finished.
+         */
+        readonly post: operations["import-import-v2-in-view"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/ocs/v2.php/apps/tables/api/2/init": {
         readonly parameters: {
             readonly query?: never;
@@ -1162,6 +1202,14 @@ export type components = {
             readonly displayMode: number;
             readonly userId: string;
         };
+        readonly ImportProblem: {
+            readonly code: string;
+            /** Format: int64 */
+            readonly row: number | null;
+            readonly column: string | null;
+            readonly value: string | null;
+            readonly description: string | null;
+        };
         readonly ImportState: {
             /** Format: int64 */
             readonly found_columns_count: number;
@@ -1177,6 +1225,33 @@ export type components = {
             readonly errors_parsing_count: number;
             /** Format: int64 */
             readonly errors_count: number;
+        };
+        readonly ImportStats: {
+            /** Format: int64 */
+            readonly foundColumnsCount: number;
+            /** Format: int64 */
+            readonly matchingColumnsCount: number;
+            /** Format: int64 */
+            readonly createdColumnsCount: number;
+            /** Format: int64 */
+            readonly insertedRowsCount: number;
+            /** Format: int64 */
+            readonly updatedRowsCount: number;
+            /** Format: int64 */
+            readonly errorsParsingCount: number;
+            /** Format: int64 */
+            readonly errorsCount: number;
+            readonly problems: readonly components["schemas"]["ImportProblem"][];
+            readonly problemsFile: {
+                /** Format: int64 */
+                readonly id: number;
+                readonly name: string;
+                readonly path: string;
+            } | null;
+        };
+        readonly ImportV2Response: {
+            readonly async: boolean;
+            readonly result?: components["schemas"]["ImportStats"];
         };
         readonly Index: {
             readonly tables: readonly components["schemas"]["Table"][];
@@ -4440,6 +4515,204 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["ImportState"];
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "import-import-v2-in-table": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Path to a file in the user's storage */
+                    readonly path: string;
+                    /**
+                     * @description Create missing columns
+                     * @default true
+                     */
+                    readonly createMissingColumns?: boolean;
+                    /**
+                     * @description Column configuration for the import
+                     * @default []
+                     */
+                    readonly columnsConfig?: readonly {
+                        readonly [key: string]: Record<string, never>;
+                    }[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Import finished or queued */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["ImportV2Response"];
+                };
+            };
+            /** @description Invalid request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "import-import-v2-in-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Path to a file in the user's storage */
+                    readonly path: string;
+                    /**
+                     * @description Create missing columns
+                     * @default true
+                     */
+                    readonly createMissingColumns?: boolean;
+                    /**
+                     * @description Column configuration for the import
+                     * @default []
+                     */
+                    readonly columnsConfig?: readonly {
+                        readonly [key: string]: Record<string, never>;
+                    }[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Import finished or queued */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["ImportV2Response"];
+                };
+            };
+            /** @description Invalid request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description Current user is not logged in */

@@ -11,6 +11,7 @@ namespace OCA\Tables\Notification;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\PermissionsService;
+use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
@@ -363,7 +364,56 @@ class Notifier implements INotifier {
 			->setRichSubject($subject, $richParams)
 			->setLink($link);
 
+		$this->addImportDetailsMessage($notification, $l, $params);
+
 		return $notification;
+	}
+
+	/**
+	 * @param array<string, mixed> $params
+	 */
+	private function addImportDetailsMessage(INotification $notification, IL10N $l, array $params): void {
+		if ($notification->getSubject() === ActivityManager::SUBJECT_IMPORT_FINISHED) {
+			$stats = $params['importStats'] ?? null;
+			if (!is_array($stats)) {
+				return;
+			}
+			$problemCount = (int)($stats['errorsCount'] ?? 0) + (int)($stats['errorsParsingCount'] ?? 0);
+			if ($problemCount <= 0) {
+				return;
+			}
+			$lines = [$l->n(
+				'%n problem occurred during the import',
+				'%n problems occurred during the import',
+				$problemCount,
+			)];
+			$report = $params['importProblemsFile'] ?? null;
+			if (is_array($report) && isset($report['id'], $report['name'], $report['path'])) {
+				$lines[] = $l->t('Problems report: {file}');
+				$message = implode("\n", $lines);
+				$notification->setParsedMessage(str_replace('{file}', (string)$report['name'], $message));
+				$notification->setRichMessage($message, [
+					'file' => [
+						'type' => 'file',
+						'id' => (string)$report['id'],
+						'name' => (string)$report['name'],
+						'path' => (string)$report['path'],
+						'link' => $this->url->linkToRouteAbsolute('files.viewcontroller.showFile', ['fileid' => $report['id']]),
+					],
+				]);
+				return;
+			}
+
+			$notification->setParsedMessage(implode("\n", $lines));
+			return;
+		}
+
+		if ($notification->getSubject() === ActivityManager::SUBJECT_IMPORT_FAILED) {
+			$errorMessage = $params['errorMessage'] ?? null;
+			if (is_string($errorMessage) && $errorMessage !== '') {
+				$notification->setParsedMessage($l->t('Error: %s', [$errorMessage]));
+			}
+		}
 	}
 
 	private function tablesUrl(string $endpoint): string {

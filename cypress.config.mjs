@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+import { exec } from 'node:child_process'
 import { defineConfig } from 'cypress'
 import vitePreprocessor from 'cypress-vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
@@ -23,6 +24,20 @@ export default defineConfig({
 				plugins: [vue(), nodePolyfills()],
 				configFile: false,
 			}))
+
+			on('task', {
+				log(message) {
+					console.log(message)
+					return null
+				},
+				exec({ command, timeout = 60000 }) {
+					return new Promise((resolve) => {
+						exec(command, { timeout, cwd: config.projectRoot }, (error, stdout, stderr) => {
+							resolve({ code: error ? (error.code ?? 1) : 0, stdout, stderr })
+						})
+					})
+				},
+			})
 
 			// Disable spell checking to prevent rendering differences
 			on('before:browser:launch', (browser, launchOptions) => {
