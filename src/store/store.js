@@ -534,6 +534,88 @@ export const useTablesStore = defineStore('store', {
 			await widgetTypesRequest
 		},
 
+		/**
+		 * @param {object} params parameters
+		 * @param {number} params.contextId id of the application
+		 * @param {number} params.pageId id of the page
+		 * @return {Promise<object>} the page with its widgets
+		 */
+		async loadContextPage({ contextId, pageId }) {
+			return (await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/{contextId}/pages/{pageId}', { contextId, pageId }))).data.ocs.data
+		},
+
+		/**
+		 * Adds a grid page and loads the application again, so its page bar shows it.
+		 *
+		 * @param {object} params parameters
+		 * @param {number} params.contextId id of the application
+		 * @param {object} params.data title, icon, technical name and description of the page
+		 * @return {Promise<object|null>} the new page, or null when it could not be added
+		 */
+		async createContextPage({ contextId, data }) {
+			let page
+			try {
+				page = (await axios.post(generateOcsUrl('/apps/tables/api/2/contexts/{contextId}/pages', { contextId }), data)).data.ocs.data
+			} catch (e) {
+				displayError(e, t('tables', 'Could not add the page.'))
+				return null
+			}
+			await this.reloadContextQuietly(contextId)
+			return page
+		},
+
+		/**
+		 * Changes the fields of a page and, when given, saves all its widgets at once.
+		 *
+		 * @param {object} params parameters
+		 * @param {number} params.contextId id of the application
+		 * @param {number} params.pageId id of the page
+		 * @param {object} params.data title, icon, technical name, description and widgets; left out keeps a value
+		 * @return {Promise<object|null>} the page, or null when it could not be saved
+		 */
+		async updateContextPage({ contextId, pageId, data }) {
+			let page
+			try {
+				page = (await axios.patch(generateOcsUrl('/apps/tables/api/2/contexts/{contextId}/pages/{pageId}', { contextId, pageId }), data)).data.ocs.data
+			} catch (e) {
+				displayError(e, t('tables', 'Could not save the page.'))
+				return null
+			}
+			await this.reloadContextQuietly(contextId)
+			return page
+		},
+
+		/**
+		 * @param {object} params parameters
+		 * @param {number} params.contextId id of the application
+		 * @param {number} params.pageId id of the page
+		 * @return {Promise<boolean>} whether the page was deleted
+		 */
+		async deleteContextPage({ contextId, pageId }) {
+			try {
+				await axios.delete(generateOcsUrl('/apps/tables/api/2/contexts/{contextId}/pages/{pageId}', { contextId, pageId }))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not delete the page.'))
+				return false
+			}
+			await this.reloadContextQuietly(contextId)
+			return true
+		},
+
+		/**
+		 * Loads an application again after one of its pages changed. The change itself
+		 * already succeeded, so a failure here is only reported by loadContext.
+		 *
+		 * @param {number} contextId id of the application
+		 */
+		async reloadContextQuietly(contextId) {
+			try {
+				await this.loadContext({ id: contextId })
+			} catch {
+				// loadContext reported the error
+			}
+		},
+
 		async getContextsTablesAndViews() {
 			for (const context of this.contexts) {
 				for (const node of Object.values(context?.nodes)) {
