@@ -11,6 +11,7 @@ namespace OCA\Tables\Tests\Unit\Model;
 
 use InvalidArgumentException;
 use OCA\Tables\Constants\ViewUpdatableParameters;
+use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use PHPUnit\Framework\TestCase;
@@ -90,6 +91,37 @@ class ViewUpdateInputTest extends TestCase {
 		$this->expectException(InvalidArgumentException::class);
 
 		ViewUpdateInput::fromInputArray(['viewSettings' => 5]);
+	}
+
+	public function testColumnsBecomeColumnSettingsInListOrder(): void {
+		$columnSettings = $this->updates(ViewUpdateInput::fromInputArray(['columns' => [5, 3]]))[ViewUpdatableParameters::COLUMN_SETTINGS->value];
+
+		$this->assertInstanceOf(ColumnSettings::class, $columnSettings);
+		$this->assertSame([
+			['columnId' => 5, 'order' => 0, 'readonly' => false, 'mandatory' => false],
+			['columnId' => 3, 'order' => 1, 'readonly' => false, 'mandatory' => false],
+		], $columnSettings->jsonSerialize());
+	}
+
+	public function testColumnsArriveAsJsonFromTheClient(): void {
+		$columnSettings = $this->updates(ViewUpdateInput::fromInputArray(['columns' => '[5,3]']))[ViewUpdatableParameters::COLUMN_SETTINGS->value];
+
+		$this->assertSame([5, 3], array_map(static fn (array $setting): int => $setting['columnId'], $columnSettings->jsonSerialize()));
+	}
+
+	public function testColumnSettingsTakePrecedenceOverColumns(): void {
+		$columnSettings = $this->updates(ViewUpdateInput::fromInputArray([
+			'columns' => [5, 3],
+			'columnSettings' => [['columnId' => 7, 'order' => 0]],
+		]))[ViewUpdatableParameters::COLUMN_SETTINGS->value];
+
+		$this->assertSame([7], array_map(static fn (array $setting): int => $setting['columnId'], $columnSettings->jsonSerialize()));
+	}
+
+	public function testColumnsThatAreNotAListAreRejected(): void {
+		$this->expectException(InvalidArgumentException::class);
+
+		ViewUpdateInput::fromInputArray(['columns' => 'abc']);
 	}
 
 	/**
