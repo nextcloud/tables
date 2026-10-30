@@ -10,10 +10,10 @@
 		<header v-if="hasHeading || editable"
 			class="grid-widget__header"
 			:class="{ 'grid-widget__header--floating': !hasHeading }">
-			<h2 v-if="hasHeading" :id="headingId" class="grid-widget__title">
+			<component :is="'h' + gridHeadingLevel" v-if="hasHeading" :id="headingId" class="grid-widget__title">
 				<NamedIcon v-if="widget.icon" :name="widget.icon" :size="20" />
 				<span class="grid-widget__title-text">{{ label }}</span>
-			</h2>
+			</component>
 			<NcActions v-if="editable" :aria-label="t('tables', 'Widget actions')" :force-menu="true">
 				<NcActionButton v-if="isKnownType" :close-after-click="true" @click="$emit('configure', widget)">
 					<template #icon>
@@ -95,10 +95,14 @@ export default {
 		NamedIcon,
 		TrashCanOutline,
 	},
+	inject: {
+		// The level of the widget titles, one below the heading of the page around the grid
+		gridHeadingLevel: { default: 2 },
+	},
 	provide() {
 		return {
 			// A widget that renders its own heading sits one level below the card's heading
-			widgetHeadingLevel: computed(() => this.hasHeading ? 3 : 2),
+			widgetHeadingLevel: computed(() => this.hasHeading ? this.gridHeadingLevel + 1 : this.gridHeadingLevel),
 		}
 	},
 	props: {

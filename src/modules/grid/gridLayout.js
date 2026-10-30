@@ -6,6 +6,18 @@
 import { translate as t } from '@nextcloud/l10n'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.ts'
 
+/** The page type of a grid page, as the API returns it. */
+export const PAGE_TYPE_GRID = 'grid'
+
+/** The page type of the start page of an application. */
+export const PAGE_TYPE_START = 'startpage'
+
+/** Technical names of pages: lower case letters, digits and underscores, starting with a letter. */
+export const PAGE_TECHNICAL_NAME_PATTERN = /^[a-z][a-z0-9_]*$/
+
+/** Names of this form are kept for the names the server gives pages itself. */
+export const PAGE_TECHNICAL_NAME_RESERVED = /^page_\d+$/
+
 /** Number of columns of a grid page. */
 export const GRID_COLUMNS = 12
 
@@ -213,4 +225,55 @@ export function gridToWidgets(grid, widgetTypes) {
 		}
 		return saved
 	})
+}
+
+/**
+ * The pages of an application in the order of its page bar: the start page, then the grid
+ * pages in the order they were added.
+ *
+ * @param {object} context an application as the API returns it
+ * @return {Array} its pages
+ */
+export function contextPages(context) {
+	const pages = Object.values(context?.pages ?? {})
+	return [
+		...pages.filter(page => page.page_type === PAGE_TYPE_START),
+		...pages.filter(page => page.page_type === PAGE_TYPE_GRID).sort((a, b) => a.id - b.id),
+	]
+}
+
+/**
+ * @param {object} page a page as the API returns it, or as listed in an application
+ * @return {boolean} whether it is the start page of its application
+ */
+export function isStartPage(page) {
+	return (page?.pageType ?? page?.page_type) === PAGE_TYPE_START
+}
+
+/**
+ * @param {object} page a page as the API returns it, or as listed in an application
+ * @return {string} its title; the start page is called Start page until it gets one
+ */
+export function pageTitle(page) {
+	return page?.title || (isStartPage(page) ? t('tables', 'Start page') : '')
+}
+
+/**
+ * Why a technical name typed for a page cannot be used. An empty name is fine: the server then
+ * names the page itself.
+ *
+ * @param {string} name the name as typed
+ * @return {string|null} the reason, or null when the name can be used
+ */
+export function pageTechnicalNameError(name) {
+	if (!name) {
+		return null
+	}
+	if (name.length > 200 || !PAGE_TECHNICAL_NAME_PATTERN.test(name)) {
+		return t('tables', 'Use lower case letters, digits and underscores, starting with a letter.')
+	}
+	if (PAGE_TECHNICAL_NAME_RESERVED.test(name)) {
+		return t('tables', 'Names like page_1 are given automatically. Choose another name.')
+	}
+	return null
 }
