@@ -55,7 +55,7 @@ class FormattingRuleColMapperTest extends TestCase {
 	}
 
 	public function testSyncForRuleBuildsOneInsertAndBindsEachColumn(): void {
-		$qbs = array_map(fn () => $this->makeQb(), range(0, 1)); // one delete, one reused insert
+		$qbs = array_map($this->makeQb(...), range(0, 1)); // one delete, one reused insert
 		$db = $this->createMock(IDBConnection::class);
 		$db->expects($this->exactly(2))
 			->method('getQueryBuilder')

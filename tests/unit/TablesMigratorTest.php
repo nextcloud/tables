@@ -400,13 +400,11 @@ class TablesMigratorTest extends TestCase {
 		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
 
 		$importSource->method('getFileContents')->willReturnCallback(
-			static function (string $file) use ($tableData, $viewData): string {
-				return match ($file) {
-					'tables.json' => json_encode([$tableData]),
-					'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
-					'views.json' => json_encode([$viewData]),
-					default => json_encode([]),
-				};
+			static fn (string $file): string => match ($file) {
+				'tables.json' => json_encode([$tableData]),
+				'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+				'views.json' => json_encode([$viewData]),
+				default => json_encode([]),
 			}
 		);
 
@@ -470,13 +468,11 @@ class TablesMigratorTest extends TestCase {
 		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
 
 		$importSource->method('getFileContents')->willReturnCallback(
-			static function (string $file) use ($tableData, $viewData): string {
-				return match ($file) {
-					'tables.json' => json_encode([$tableData]),
-					'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
-					'views.json' => json_encode([$viewData]),
-					default => json_encode([]),
-				};
+			static fn (string $file): string => match ($file) {
+				'tables.json' => json_encode([$tableData]),
+				'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+				'views.json' => json_encode([$viewData]),
+				default => json_encode([]),
 			}
 		);
 
@@ -625,13 +621,11 @@ class TablesMigratorTest extends TestCase {
 		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
 
 		$importSource->method('getFileContents')->willReturnCallback(
-			static function (string $file) use ($tableData, $viewData): string {
-				return match ($file) {
-					'tables.json' => json_encode([$tableData]),
-					'columns.json' => json_encode([]),
-					'views.json' => json_encode([$viewData]),
-					default => json_encode([]),
-				};
+			static fn (string $file): string => match ($file) {
+				'tables.json' => json_encode([$tableData]),
+				'columns.json' => json_encode([]),
+				'views.json' => json_encode([$viewData]),
+				default => json_encode([]),
 			}
 		);
 
@@ -694,13 +688,11 @@ class TablesMigratorTest extends TestCase {
 		$viewData = ['tableId' => 1, 'title' => 'V', 'formatting' => $formatting];
 
 		$importSource->method('getFileContents')->willReturnCallback(
-			static function (string $file) use ($tableData, $viewData): string {
-				return match ($file) {
-					'tables.json' => json_encode([$tableData]),
-					'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
-					'views.json' => json_encode([$viewData]),
-					default => json_encode([]),
-				};
+			static fn (string $file): string => match ($file) {
+				'tables.json' => json_encode([$tableData]),
+				'columns.json' => json_encode([['id' => 10, 'tableId' => 1]]),
+				'views.json' => json_encode([$viewData]),
+				default => json_encode([]),
 			}
 		);
 

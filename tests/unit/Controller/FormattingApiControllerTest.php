@@ -41,11 +41,9 @@ class FormattingApiControllerTest extends TestCase {
 	public function testCreateRuleSetReturnsCreatedRuleSet(): void {
 		$created = ['id' => 'rs-1', 'title' => 'Highlights', 'rules' => []];
 		$this->formattingService->expects($this->once())->method('createRuleSet')
-			->with(5, 'user1', $this->callback(function (FormattingRuleSetInput $input): bool {
-				return $input->getTitle() === 'Highlights'
-					&& $input->getTargetType() === 'row'
-					&& $input->getMode() === 'first-match';
-			}))
+			->with(5, 'user1', $this->callback(fn (FormattingRuleSetInput $input): bool => $input->getTitle() === 'Highlights'
+				&& $input->getTargetType() === 'row'
+				&& $input->getMode() === 'first-match'))
 			->willReturn($created);
 
 		$response = $this->controller->createRuleSet(5, 'Highlights', 'row', null, 'first-match');
@@ -92,9 +90,7 @@ class FormattingApiControllerTest extends TestCase {
 
 	public function testUpdateRuleSetPassesIdAndInput(): void {
 		$this->formattingService->expects($this->once())->method('updateRuleSet')
-			->with(5, 'rs-1', 'user1', $this->callback(function (FormattingRuleSetInput $input): bool {
-				return $input->getTargetType() === 'column' && $input->getTargetCol() === 9 && !$input->isEnabled();
-			}))
+			->with(5, 'rs-1', 'user1', $this->callback(fn (FormattingRuleSetInput $input): bool => $input->getTargetType() === 'column' && $input->getTargetCol() === 9 && !$input->isEnabled()))
 			->willReturn(['id' => 'rs-1']);
 
 		$response = $this->controller->updateRuleSet(5, 'rs-1', 'T', 'column', 9, 'all-matches', false);
@@ -142,11 +138,9 @@ class FormattingApiControllerTest extends TestCase {
 
 	public function testCreateRuleMapsStyleParameterToFormat(): void {
 		$this->formattingService->expects($this->once())->method('createRule')
-			->with(5, 'rs-1', 'user1', $this->callback(function (FormattingRuleInput $input): bool {
-				return $input->getTitle() === 'Red'
-					&& $input->getFormat()->toArray() === ['backgroundColor' => '#ff0000']
-					&& $input->getCondition()->collectColumnIds() === [3];
-			}))
+			->with(5, 'rs-1', 'user1', $this->callback(fn (FormattingRuleInput $input): bool => $input->getTitle() === 'Red'
+				&& $input->getFormat()->toArray() === ['backgroundColor' => '#ff0000']
+				&& $input->getCondition()->collectColumnIds() === [3]))
 			->willReturn(['id' => 'rule-1']);
 
 		$response = $this->controller->createRule(

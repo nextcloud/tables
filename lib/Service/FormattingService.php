@@ -462,7 +462,7 @@ class FormattingService extends SuperService {
 	private function loadView(int $viewId): View {
 		try {
 			return $this->viewMapper->find($viewId);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			throw new NotFoundError('View not found: ' . $viewId);
 		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -512,7 +512,7 @@ class FormattingService extends SuperService {
 	 */
 	private function checkColumnOwnership(int $tableId, ?int $targetCol, array $rules): void {
 		try {
-			$validIds = array_flip(array_map('intval', $this->columnMapper->findAllIdsByTable($tableId)));
+			$validIds = array_flip(array_map(intval(...), $this->columnMapper->findAllIdsByTable($tableId)));
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Failed to validate column ownership');

@@ -60,7 +60,7 @@ class FormattingRuleColMapper {
 
 		$result = $qb->executeQuery();
 		$rows = [];
-		while ($row = $result->fetch()) {
+		while ($row = $result->fetchAssociative()) {
 			$rows[] = ['rule_id' => (string)$row['rule_id'], 'view_id' => (int)$row['view_id']];
 		}
 		$result->closeCursor();
