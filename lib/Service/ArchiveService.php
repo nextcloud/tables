@@ -112,7 +112,7 @@ class ArchiveService {
 
 		foreach ($entities as $entity) {
 			$override = $overrides[$entity->getId()] ?? null;
-			$archived = $override !== null ? $override->isArchived() : $entity->isArchived();
+			$archived = $override?->isArchived() ?? $entity->isArchived();
 
 			// The resolved value describes the entity for this user only, so it must
 			// never be persisted: the mappers cache the entity for the whole request
