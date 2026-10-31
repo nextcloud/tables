@@ -55,7 +55,7 @@ class ArchiveCleanupListener implements IEventListener {
 			// A member that stands for a group or a nested team has to be expanded
 			// into the accounts behind it; only those hold archive overrides.
 			$basedOn = $member->getUserType() === Member::TYPE_USER ? null : $member->getBasedOn();
-			$members = $basedOn !== null ? $basedOn->getInheritedMembers() : [$member];
+			$members = $basedOn?->getInheritedMembers() ?? [$member];
 
 			$userIds = [];
 			foreach ($members as $affectedMember) {
