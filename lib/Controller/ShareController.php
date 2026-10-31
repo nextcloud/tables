@@ -77,14 +77,12 @@ class ShareController extends Controller {
 		bool $permissionManage = false,
 		int $displayMode = Application::NAV_ENTRY_MODE_ALL,
 	): DataResponse {
-		$dto = new ShareCreate(
+		return $this->handleError(fn () => $this->service->create(new ShareCreate(
 			$nodeId, $nodeType, $receiver, $receiverType,
 			$permissionRead, $permissionCreate, $permissionUpdate,
 			$permissionDelete, $permissionManage, $displayMode,
 			null, null,
-		);
-
-		return $this->handleError(fn () => $this->service->create($dto));
+		)));
 	}
 
 	#[NoAdminRequired]

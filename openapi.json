@@ -3434,11 +3434,29 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "View deleted",
+                        "description": "Share returned",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Share"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Receiver type not supported for this node type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -3615,6 +3633,24 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Share"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Receiver type not supported for this node type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
                                 }
                             }
                         }
