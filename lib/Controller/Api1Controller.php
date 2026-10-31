@@ -841,6 +841,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableRelations(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->relationService->getRelationsForTable($tableId));
@@ -873,6 +874,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewRelations(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->relationService->getRelationsForView($viewId));
