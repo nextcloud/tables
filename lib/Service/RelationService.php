@@ -11,6 +11,7 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Dto\RelationSettings;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -99,12 +100,12 @@ class RelationService {
 		$groups = [];
 
 		foreach ($columns as $column) {
-			$settings = $column->getCustomSettingsArray();
-			if (empty($settings['relationType']) || empty($settings['targetId']) || empty($settings['labelColumn'])) {
+			$settings = $this->getRelationSettings($column);
+			if ($settings === null) {
 				continue;
 			}
 
-			$target = sprintf('%s_%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn'], $settings[Column::RELATION_TARGET_SET_BY] ?? '');
+			$target = sprintf('%s_%s_%s_%s', $settings->relationType, $settings->targetId, $settings->labelColumn, $settings->targetSetBy);
 			$groups[$target] ??= [];
 			$groups[$target][] = $column;
 		}
@@ -123,12 +124,12 @@ class RelationService {
 			return [];
 		}
 
-		$settings = $column->getCustomSettingsArray();
-		if (empty($settings['relationType']) || empty($settings['targetId']) || empty($settings['labelColumn'])) {
+		$settings = $this->getRelationSettings($column);
+		if ($settings === null) {
 			return [];
 		}
 
-		$target = sprintf('%s_%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn'], $settings[Column::RELATION_TARGET_SET_BY] ?? '');
+		$target = sprintf('%s_%s_%s_%s', $settings->relationType, $settings->targetId, $settings->labelColumn, $settings->targetSetBy);
 
 		return $this->getRelationDataForTarget($target, $column);
 	}
@@ -148,25 +149,25 @@ class RelationService {
 			return $this->cacheRelationData[$cacheKey];
 		}
 
-		$settings = $column->getCustomSettingsArray();
-		if (empty($settings[Column::RELATION_TYPE]) || empty($settings[Column::RELATION_TARGET_ID]) || empty($settings[Column::RELATION_LABEL_COLUMN])) {
+		$settings = $this->getRelationSettings($column);
+		if ($settings === null) {
 			$this->cacheRelationData[$cacheKey] = [];
 			return [];
 		}
 
-		$relationType = (string)$settings[Column::RELATION_TYPE];
-		$isView = $relationType === Column::RELATION_TYPE_VIEW;
-		$targetId = $settings[Column::RELATION_TARGET_ID] ?? null;
+		$relationType = $settings->relationType;
+		$isView = $settings->isView();
+		$targetId = $settings->targetId;
 
-		$targetSetBy = $settings[Column::RELATION_TARGET_SET_BY] ?? '';
-		$authorizeAs = $targetSetBy !== '' ? (string)$targetSetBy : $this->userId;
-		if (!$this->permissionsService->canReadRelationTarget($relationType, (int)$targetId, $authorizeAs)) {
+		$targetSetBy = $settings->targetSetBy;
+		$authorizeAs = $targetSetBy !== '' ? $targetSetBy : $this->userId;
+		if (!$this->permissionsService->canReadRelationTarget($relationType, $targetId, $authorizeAs)) {
 			$this->cacheRelationData[$cacheKey] = [];
 			return [];
 		}
 
 		try {
-			$targetColumn = $this->columnMapper->find($settings[Column::RELATION_LABEL_COLUMN]);
+			$targetColumn = $this->columnMapper->find($settings->labelColumn);
 			if ($isView) {
 				$view = $this->viewMapper->find($targetId);
 				if (!in_array($targetColumn->getId(), $view->getColumnIds(), true)) {
@@ -201,7 +202,7 @@ class RelationService {
 		$result = [];
 		foreach ($rows as $row) {
 			$data = $row->getData();
-			$displayFieldData = array_filter($data, fn ($item) => $item['columnId'] === (int)$settings[Column::RELATION_LABEL_COLUMN]);
+			$displayFieldData = array_filter($data, fn ($item) => $item['columnId'] === $settings->labelColumn);
 			$value = reset($displayFieldData)['value'] ?? null;
 
 			// Structure compatible with Row2 format: {id: int, label: string}
@@ -214,5 +215,13 @@ class RelationService {
 
 		$this->cacheRelationData[$cacheKey] = $result;
 		return $result;
+	}
+
+	private function getRelationSettings(Column $column): ?RelationSettings {
+		try {
+			return $column->getCustomSettingsObject(RelationSettings::class);
+		} catch (\InvalidArgumentException) {
+			return null;
+		}
 	}
 }
