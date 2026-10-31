@@ -37,11 +37,11 @@
 				<NcContextResource v-model:resources="resources" v-model:receivers="receivers" />
 			</div>
 			<div class="row space-T">
-				<NcActionCheckbox :model-value="showInNavigationDefault" @change="changeDisplayMode">
+				<NcActionCheckbox :model-value="showInNavigationDefault" :disabled="isArchived" @change="changeDisplayMode">
 					{{ t('tables', 'Show in app list') }}
 				</NcActionCheckbox>
 				<p class="nav-display-subtext">
-					{{ t('tables', 'This can be overridden by a per-account preference') }}
+					{{ isArchived ? t('tables', 'An archived application is never listed in the app list') : t('tables', 'This can be overridden by a per-account preference') }}
 				</p>
 			</div>
 			<div class="row space-T">
@@ -129,6 +129,11 @@ export default {
 		...mapState(useTablesStore, ['getContext', 'tables', 'views', 'activeContextId']),
 		localContext() {
 			return this.getContext(this.contextId)
+		},
+		// An archived application is filtered out of the app list entirely, so the
+		// setting would read as a promise the menu does not keep.
+		isArchived() {
+			return this.localContext?.archived ?? false
 		},
 	},
 	watch: {
