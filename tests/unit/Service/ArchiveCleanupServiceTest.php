@@ -14,7 +14,6 @@ use OCA\Tables\BackgroundJob\CleanupArchiveOverridesJob;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
-use OCA\Tables\Db\UserArchive;
 use OCA\Tables\Db\UserArchiveMapper;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Service\ArchiveCleanupService;
