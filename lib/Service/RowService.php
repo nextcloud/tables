@@ -635,9 +635,9 @@ class RowService extends SuperService {
 
 			// is row in view?
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
-				$e = new \Exception('Update row is not allowed.');
+				$e = new \Exception('Row not found.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 
 			// fetch all needed columns
@@ -652,7 +652,7 @@ class RowService extends SuperService {
 			if ($tableId !== $item->getTableId()) {
 				$e = new \Exception('Row does not belong to table with id ' . $tableId);
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 
 			// security
@@ -755,20 +755,23 @@ class RowService extends SuperService {
 			}
 			try {
 				$view = $this->viewMapper->find($viewId);
-			} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			} catch (InternalError|MultipleObjectsReturnedException|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			} catch (DoesNotExistException $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
-				$e = new \Exception('Update row is not allowed.');
+				$e = new \Exception('Row not found.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
 			if ($tableId !== null && $tableId !== $item->getTableId()) {
 				$e = new \Exception('Row does not belong to table with id ' . $tableId);
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 
 			// security
