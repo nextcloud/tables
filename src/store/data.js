@@ -8,6 +8,7 @@ import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import displayError from '../shared/utils/displayError.js'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
+import { ColumnTypes } from '../shared/components/ncTable/mixins/columnHandler.js'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { getCurrentUser } from '@nextcloud/auth'
@@ -36,6 +37,8 @@ export const useDataStore = defineStore('data', {
 		publicToken: null,
 		relations: {},
 		relationsLoading: {},
+		relationsLoaded: {},
+		relationColumnIds: {},
 	}),
 
 	getters: {
@@ -58,7 +61,7 @@ export const useDataStore = defineStore('data', {
 			return state.relations[columnId]
 		},
 		getRelationsLoading: (state) => (isView, elementId) => {
-			const stateId = genStateKey(isView, elementId)
+			const stateId = state.publicToken ? 'public-' + state.publicToken : genStateKey(isView, elementId)
 			return state.relationsLoading[stateId] === true
 		},
 	},
@@ -71,6 +74,8 @@ export const useDataStore = defineStore('data', {
 			this.publicToken = null
 			this.relations = {}
 			this.relationsLoading = {}
+			this.relationsLoaded = {}
+			this.relationColumnIds = {}
 		},
 
 		setPublicToken(token) {
@@ -197,6 +202,9 @@ export const useDataStore = defineStore('data', {
 			if (stateId) {
 				this.columns[stateId].push(parseCol(res.data))
 				this.loading[stateId] = false
+				if ([ColumnTypes.Relation, ColumnTypes.Lookup].includes(res.data.type)) {
+					await this.loadRelationsFromBE({ tableId: isView ? null : elementId, viewId: isView ? elementId : null, force: true })
+				}
 			}
 			return true
 		},
@@ -217,7 +225,10 @@ export const useDataStore = defineStore('data', {
 			if (stateId && this.columns[stateId]) {
 				const col = res.data
 				const index = this.columns[stateId].findIndex(c => c.id === col.id)
-				this.columns[stateId][index] = parseCol(col)
+				if (index !== -1) this.columns[stateId][index] = parseCol(col)
+				if ([ColumnTypes.Relation, ColumnTypes.Lookup].includes(col.type)) {
+					await this.loadRelationsFromBE({ tableId: isView ? null : elementId, viewId: isView ? elementId : null, force: true })
+				}
 			}
 
 			return true
@@ -233,42 +244,57 @@ export const useDataStore = defineStore('data', {
 
 			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.columns[stateId]) {
+				const column = this.columns[stateId].find(c => c.id === id)
 				const filteredColumns = this.columns[stateId].filter(c => c.id !== id)
 				this.columns[stateId] = filteredColumns
+				if ([ColumnTypes.Relation, ColumnTypes.Lookup].includes(column?.type)) {
+					await this.loadRelationsFromBE({ tableId: isView ? null : elementId, viewId: isView ? elementId : null, force: true })
+				}
 			}
 
 			return true
 		},
 
 		// RELATIONS
-		async loadRelationsFromBE({ tableId, viewId, force = false }) {
-			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
+		async loadRelationsFromBE({ tableId, viewId, token = this.publicToken, force = false }) {
+			const stateId = token ? 'public-' + token : genStateKey(!!viewId, viewId ?? tableId)
 
 			// prevent double-loading
-			if (this.relationsLoading[stateId] === true || (this.relationsLoading[stateId] === false && !force)) {
+			if (this.relationsLoading[stateId] || (this.relationsLoaded[stateId] && !force)) {
 				return
 			}
 
 			this.relationsLoading[stateId] = true
-
-			let res = null
+			const columnIds = new Set([
+				...(this.relationColumnIds[stateId] ?? []),
+				...(this.columns[stateId] ?? [])
+					.filter(column => [ColumnTypes.Relation, ColumnTypes.Lookup].includes(column.type))
+					.map(column => String(column.id)),
+			])
+			columnIds.forEach(id => { this.relations[id] = { ...this.getRelations(id), loading: true } })
 
 			try {
-				if (viewId) {
-					res = await axios.get(generateUrl('/apps/tables/api/1/views/' + viewId + '/relations'))
-				} else {
-					res = await axios.get(generateUrl('/apps/tables/api/1/tables/' + tableId + '/relations'))
-				}
+				const url = token
+					? generateOcsUrl('/apps/tables/api/2/public/' + token + '/relations')
+					: generateUrl('/apps/tables/api/1/' + (viewId ? 'views/' + viewId : 'tables/' + tableId) + '/relations')
+				const res = await axios.get(url)
+				const data = token ? res.data.ocs.data : res.data
+				const parsed = Object.fromEntries(Object.entries(data).map(([columnId, relations]) => [columnId, {
+					...relations,
+					column: relations.column ? parseCol(relations.column) : null,
+					loading: false,
+				}]))
+				columnIds.forEach(id => { this.relations[id] = parsed[id] ?? { column: null, values: {}, loading: false } })
+				Object.assign(this.relations, parsed)
+				this.relationColumnIds[stateId] = Object.keys(parsed)
+				this.relationsLoaded[stateId] = true
 			} catch (e) {
+				columnIds.forEach(id => { this.relations[id] = { column: null, values: {}, loading: false } })
+				this.relationsLoaded[stateId] = false
 				displayError(e, t('tables', 'Could not load relation data.'))
+			} finally {
 				this.relationsLoading[stateId] = false
-				return {}
 			}
-
-			Object.entries(res.data).forEach(([columnId, relations]) => {
-				this.relations[columnId] = relations
-			})
-			this.relationsLoading[stateId] = false
 		},
 
 		// ROWS

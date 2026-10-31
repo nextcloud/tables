@@ -29,7 +29,7 @@
 			{{ t('tables', 'Mandatory') }}
 		</div>
 		<div class="fix-col-4">
-			<NcCheckboxRadioSwitch v-model="localMandatory" type="switch" />
+			<NcCheckboxRadioSwitch v-model="localMandatory" type="switch" :disabled="mandatoryDisabled" />
 		</div>
 
 		<!-- add to views -->
@@ -148,6 +148,10 @@ export default {
 			type: Boolean,
 			default: null,
 		},
+		mandatoryDisabled: {
+			type: Boolean,
+			default: false,
+		},
 		technicalName: {
 			type: String,
 			default: null,
@@ -214,7 +218,7 @@ export default {
 			set(technicalName) { this.$emit('update:technicalName', technicalName) },
 		},
 		localMandatory: {
-			get() { return this.mandatory },
+			get() { return !this.mandatoryDisabled && this.mandatory },
 			set(mandatory) { this.$emit('update:mandatory', mandatory) },
 		},
 		localSelectedViews: {
@@ -237,6 +241,12 @@ export default {
 		},
 	},
 	watch: {
+		mandatoryDisabled: {
+			immediate: true,
+			handler(disabled) {
+				if (disabled && this.mandatory) this.$emit('update:mandatory', false)
+			},
+		},
 		technicalNameInvalidError: 'expandAdvancedOnError',
 		widthInvalidError: 'expandAdvancedOnError',
 	},

@@ -556,6 +556,7 @@ class TableService extends SuperService {
 			$table->setColumnOrder(\json_encode($columnSettings->jsonSerialize()));
 		}
 		if ($sort !== null) {
+			$this->columnService->validateSortRules($sort);
 			$table->setSort(\json_encode($sort->jsonSerialize()));
 		}
 		$table->setLastEditBy($userId);
@@ -801,6 +802,7 @@ class TableService extends SuperService {
 
 		// Update sort rules
 		$sortRuleSet = SortRuleSet::createFromInputArray($sort, $columnsMap);
+		$this->columnService->validateSortRules($sortRuleSet);
 		$table->setSort(\json_encode($sortRuleSet->jsonSerialize()));
 
 		try {
