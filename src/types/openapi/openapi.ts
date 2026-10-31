@@ -332,6 +332,46 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}/relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Get all relation data for a table
+         * @description This endpoint allows CORS requests
+         */
+        readonly get: operations["api1-index-table-relations"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Get all relation data for a view
+         * @description This endpoint allows CORS requests
+         */
+        readonly get: operations["api1-index-view-relations"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/index.php/apps/tables/api/1/tables/{tableId}/rows/simple": {
         readonly parameters: {
             readonly query?: never;
@@ -1137,10 +1177,16 @@ export type components = {
             } | null;
             readonly customSettings: {
                 /** Format: int64 */
-                readonly width: number;
+                readonly width?: number;
                 readonly showPreview?: boolean;
                 /** Format: int64 */
                 readonly imagePreviewSize?: number;
+                /** @enum {string} */
+                readonly relationType?: "table" | "view";
+                /** Format: int64 */
+                readonly targetId?: number;
+                /** Format: int64 */
+                readonly labelColumn?: number;
             } | null;
         };
         readonly Context: {
@@ -1245,10 +1291,16 @@ export type components = {
             } | null;
             readonly customSettings: {
                 /** Format: int64 */
-                readonly width: number;
+                readonly width?: number;
                 readonly showPreview?: boolean;
                 /** Format: int64 */
                 readonly imagePreviewSize?: number;
+                /** @enum {string} */
+                readonly relationType?: "table" | "view";
+                /** Format: int64 */
+                readonly targetId?: number;
+                /** Format: int64 */
+                readonly labelColumn?: number;
             } | null;
         };
         readonly PublicRow: {
@@ -3619,6 +3671,154 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-table-relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Relation data returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly [key: string]: {
+                            readonly [key: string]: {
+                                /** Format: int64 */
+                                readonly id: number;
+                                readonly label: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-view-relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Relation data returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly [key: string]: {
+                            readonly [key: string]: {
+                                /** Format: int64 */
+                                readonly id: number;
+                                readonly label: string;
+                            };
+                        };
+                    };
                 };
             };
             /** @description Current user is not logged in */

@@ -169,9 +169,12 @@ namespace OCA\Tables;
  *     mandatory: bool,
  *  },
  *  customSettings: ?array{
- *     width: int,
+ *     width?: int,
  *     showPreview?: bool,
  *     imagePreviewSize?: int,
+ *     relationType?: 'table'|'view',
+ *     targetId?: int,
+ *     labelColumn?: int,
  *  },
  * }
  *
@@ -212,9 +215,12 @@ namespace OCA\Tables;
  *      mandatory: bool,
  *   },
  *   customSettings: ?array{
- *      width: int,
+ *      width?: int,
  *      showPreview?: bool,
  *      imagePreviewSize?: int,
+ *      relationType?: 'table'|'view',
+ *      targetId?: int,
+ *      labelColumn?: int,
  *   },
  *  }
  *
