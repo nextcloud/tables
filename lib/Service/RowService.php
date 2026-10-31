@@ -847,12 +847,13 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $tableId
+	 * @param string|null $userId
 	 * @return int
 	 *
 	 * @throws PermissionError
 	 */
-	public function getRowsCount(int $tableId): int {
-		if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
+	public function getRowsCount(int $tableId, ?string $userId = null): int {
+		if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
 			return $this->row2Mapper->countRowsForTable($tableId);
 		} else {
 			throw new PermissionError('no read access for counting to table id = ' . $tableId);

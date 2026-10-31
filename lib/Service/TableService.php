@@ -187,7 +187,7 @@ class TableService extends SuperService {
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
 			try {
-				$shares = $this->shareService->findAll('table', $table->getId());
+				$shares = $this->shareService->findAll('table', $table->getId(), $userId);
 				$table->setHasShares(count($shares) !== 0);
 			} catch (InternalError) {
 			}
@@ -198,7 +198,7 @@ class TableService extends SuperService {
 			$table->setRowsCount($rowCountsByTableId[$table->getId()] ?? 0);
 		} else {
 			try {
-				$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
+				$table->setRowsCount($this->rowService->getRowsCount($table->getId(), $userId));
 			} catch (PermissionError) {
 				$table->setRowsCount(0);
 			}
@@ -206,7 +206,7 @@ class TableService extends SuperService {
 
 		// add the column count
 		try {
-			$table->setColumnsCount($this->columnService->getColumnsCount($table->getId()));
+			$table->setColumnsCount($this->columnService->getColumnsCount($table->getId(), $userId));
 		} catch (PermissionError) {
 			$table->setColumnsCount(0);
 		}
@@ -215,7 +215,7 @@ class TableService extends SuperService {
 
 		if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
 			// add the corresponding views if it is an own table, or you have table manage rights
-			$table->setViews($this->viewService->findAll($table));
+			$table->setViews($this->viewService->findAll($table, $userId));
 		}
 
 		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {
