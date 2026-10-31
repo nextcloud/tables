@@ -131,8 +131,15 @@ export default {
 					return ''
 				}
 
+				// Only a string can carry a magic-value reference. Number and boolean values
+				// reach this getter from number and selection columns, where calling a string
+				// method on them would throw and blank the editor.
+				if (typeof this.filterEntry?.value !== 'string') {
+					return this.filterEntry?.value
+				}
+
 				// if the value starts with @, we try to load the magic-value object
-				if (this.filterEntry?.value.substr(0, 1) === '@') {
+				if (this.filterEntry.value.substr(0, 1) === '@') {
 					const magicFieldId = this.getMagicFieldId()
 					return this.magicFields.find(item => item.id === magicFieldId || item.id === magicFieldId.substr(1))
 				}
