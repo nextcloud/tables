@@ -18,6 +18,7 @@ use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\FormattingService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
@@ -57,6 +58,7 @@ final class ColumnServiceAuditLogTest extends TestCase {
 			$this->createMock(UserHelper::class),
 			$this->createMock(ColumnDtoValidator::class),
 			$this->auditLogService,
+			$this->createMock(FormattingService::class),
 		);
 
 		$column = new Column();

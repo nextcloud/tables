@@ -57,6 +57,7 @@ class ColumnService extends SuperService {
 		private readonly UserHelper $userHelper,
 		private readonly ColumnDtoValidator $columnDtoValidator,
 		private readonly AuditLogServiceInterface $auditLogService,
+		private readonly FormattingService $formattingService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -378,6 +379,13 @@ class ColumnService extends SuperService {
 			$this->columnDtoValidator->validate($columnDto);
 			$title = $this->normalizeTitle($columnDto->getTitle(), false);
 
+			$oldType = $item->getType();
+			$oldSubtype = $item->getSubtype();
+			// Nullable: a column whose stored selection_options is the literal 'null' yields no
+			// array here, and array_column() would raise a TypeError that update()'s catch of
+			// Exception does not cover, leaving the column permanently un-editable.
+			$oldSelectionOptionIds = array_column($item->getSelectionOptionsArray() ?? [], 'id');
+
 			if ($title !== null) {
 				$item->setTitle($title);
 			}
@@ -432,6 +440,20 @@ class ColumnService extends SuperService {
 			$this->updateMetadata($item, $userId);
 			try {
 				$updatedColumn = $this->mapper->update($item);
+
+				$newType = $updatedColumn->getType();
+				$newSubtype = $updatedColumn->getSubtype();
+				if ($oldType !== $newType || $oldSubtype !== $newSubtype) {
+					$fullType = $newSubtype ? $newType . '-' . $newSubtype : $newType;
+					$this->formattingService->handleColumnTypeChange($updatedColumn->getId(), $fullType);
+				}
+				$dtoOptions = $columnDto->getSelectionOptions();
+				if ($dtoOptions !== null) {
+					$newOptionIds = array_column(json_decode($dtoOptions, true) ?? [], 'id');
+					foreach (array_diff($oldSelectionOptionIds, $newOptionIds) as $deletedId) {
+						$this->formattingService->handleSelectionOptionDeletion($updatedColumn->getId(), (int)$deletedId);
+					}
+				}
 
 				$this->activityManager->triggerEvent(
 					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
@@ -694,6 +716,12 @@ class ColumnService extends SuperService {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		// Only once the column is really gone. Flagging the rules first would leave them
+		// broken against a column that still exists if the delete failed, and the junction
+		// rows that identify them would already have been dropped, so a retry would find
+		// nothing left to flag.
+		$this->formattingService->handleColumnDeletion($item->getId());
+
 		$this->activityManager->triggerEvent(
 			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
 			object: $item,
@@ -834,11 +862,11 @@ class ColumnService extends SuperService {
 	 * @param Table $table
 	 * @param array $column
 	 *
-	 * @return int
+	 * @return array{columnId: int, selectionOptionIdMap: array<int, int>}
 	 *
 	 * @throws InternalError
 	 */
-	public function importColumn(Table $table, array $column): int {
+	public function importColumn(Table $table, array $column): array {
 		$item = new Column();
 		if (isset($column['uuid'])) {
 			$uuid = (string)$column['uuid'];
@@ -894,7 +922,36 @@ class ColumnService extends SuperService {
 			$this->logger->error('importColumn insert error: ' . $e->getMessage());
 			throw new InternalError('importColumn insert error: ' . $e->getMessage());
 		}
-		return $newColumn->getId();
+
+		return [
+			'columnId' => $newColumn->getId(),
+			'selectionOptionIdMap' => self::pairSelectionOptionIds(
+				$column['selectionOptions'] ?? [],
+				$newColumn->getSelectionOptionsArray(),
+			),
+		];
+	}
+
+	/**
+	 * Pair a column's incoming selection options with the ones it ended up with, by position.
+	 *
+	 * Option ids are assigned per column, so importing a column renumbers them and anything
+	 * that stored a reference to one — a filter, a formatting condition — has to be told what
+	 * it became. The result is only meaningful for the column it came from.
+	 *
+	 * @return array<int, int> old option id => new option id
+	 */
+	public static function pairSelectionOptionIds(array $oldOptions, array $newOptions): array {
+		$map = [];
+		foreach ($oldOptions as $idx => $oldOption) {
+			$oldId = $oldOption['id'] ?? null;
+			if ($oldId === null) {
+				continue;
+			}
+			$map[(int)$oldId] = (int)($newOptions[$idx]['id'] ?? $oldId);
+		}
+
+		return $map;
 	}
 
 	private function buildDefaultTechnicalName(int $columnId): string {

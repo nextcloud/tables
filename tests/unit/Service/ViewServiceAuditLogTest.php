@@ -11,6 +11,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\AuditLog\Operation;
+use OCA\Tables\Db\FormattingRuleColMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -20,6 +21,7 @@ use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
 use OCA\Tables\Service\FederationService;
+use OCA\Tables\Service\FormattingService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
@@ -61,6 +63,8 @@ final class ViewServiceAuditLogTest extends TestCase {
 			$this->createMock(FederationService::class),
 			$this->createMock(ActivityManager::class),
 			$this->auditLogService,
+			$this->createMock(FormattingRuleColMapper::class),
+			$this->createMock(FormattingService::class),
 		);
 	}
 

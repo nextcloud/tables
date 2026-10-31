@@ -29,6 +29,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
+use OCA\Tables\Model\FormattingRuleSets;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
@@ -836,19 +837,37 @@ class ContextService {
 		foreach ($tables['addTables'] as $tableScheme) {
 			$tableService->validateTableScheme($tableScheme);
 			$table = $tableService->importTable($tableScheme, $userId);
+			$selectionOptionIdMap = [];
 			foreach ($tableScheme['columns'] as $columnData) {
-				$columnService->importColumn($table, $columnData);
+				$result = $columnService->importColumn($table, $columnData);
+				if (isset($columnData['id'])) {
+					$selectionOptionIdMap[(int)$columnData['id']] = $result['selectionOptionIdMap'];
+				}
 			}
 			$newColumns = $columnService->findAllByTable($table->getId(), $userId, $table);
 			$columnsMap = [];
 			foreach ($newColumns as $column) {
 				$columnsMap[$column->getUuid()] = $column;
 			}
+
+			// Formatting addresses columns by id, so it needs the old-to-new mapping the other
+			// view properties get from $columnsMap. importColumn() preserves the uuid, which is
+			// what lets a scheme's column id be paired with the column it became here.
+			$columnIdMap = [];
+			foreach ($tableScheme['columns'] as $columnData) {
+				$uuid = $columnData['uuid'] ?? null;
+				if ($uuid !== null && isset($columnData['id'], $columnsMap[$uuid])) {
+					$columnIdMap[(int)$columnData['id']] = $columnsMap[$uuid]->getId();
+				}
+			}
 			foreach ($tableScheme['views'] as $viewData) {
 				$viewData['viewSettings'] = ViewSettings::createFromInputArray($viewData['viewSettings'] ?? [], $columnsMap)->jsonSerialize();
 				$viewData['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($viewData['columnSettings'], $columnsMap)->jsonSerialize();
 				$viewData['sort'] = SortRuleSet::createFromInputArray($viewData['sort'], $columnsMap)->jsonSerialize();
 				$viewData['filter'] = FilterSet::createFromInputArray($viewData['filter'], $columnsMap)->jsonSerialize();
+				if (isset($viewData['formatting']) && is_array($viewData['formatting'])) {
+					$viewData['formatting'] = FormattingRuleSets::remapIds($viewData['formatting'], $columnIdMap, $selectionOptionIdMap);
+				}
 				$viewService->importView($table->getId(), $viewData, $userId);
 			}
 		}

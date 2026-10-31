@@ -27,6 +27,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Model\FormattingRuleSets;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -188,6 +189,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 		$tableIdMap = [];
 		$contextIdMap = [];
 		$columnIdMap = [];
+		$selectionOptionIdMap = [];
 		$rowIdMap = [];
 		$userId = $user->getUID();
 		$connection = $this->tableMapper->getDBConnection();
@@ -199,7 +201,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 
 				$this->importFavorites($importSource, $newTable, $table);
 
-				$columnIdMap = $this->importColumns($importSource, $newTable, $table, $columnIdMap);
+				[$columnIdMap, $selectionOptionIdMap] = $this->importColumns($importSource, $newTable, $table, $columnIdMap, $selectionOptionIdMap);
 
 				$needsUpdate = false;
 				if (!empty($table['columnOrder'])) {
@@ -232,7 +234,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				$tableIdMap[$table['id']] = $newTable->getId();
 			}
 
-			$this->importViews($importSource, $tableIdMap, $columnIdMap, $userId);
+			$this->importViews($importSource, $tableIdMap, $columnIdMap, $selectionOptionIdMap, $userId);
 			$this->importShares($importSource, $tableIdMap, $contextIdMap, $userId);
 
 			$this->importRowCells(
@@ -340,11 +342,12 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	 * @param IImportSource $importSource
 	 * @param array $tableIdMap
 	 * @param array $columnIdMap
+	 * @param array $selectionOptionIdMap
 	 * @param string $userId
 	 *
 	 * @return void
 	 */
-	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, string $userId): void {
+	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, array $selectionOptionIdMap, string $userId): void {
 		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($views as $view) {
 			if (isset($tableIdMap[$view['tableId']])) {
@@ -358,6 +361,9 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 					unset($setting);
 				}
 				$view = $this->remapViewCardSources($view, $columnIdMap);
+				if (!empty($view['formatting'])) {
+					$view['formatting'] = FormattingRuleSets::remapIds($view['formatting'], $columnIdMap, $selectionOptionIdMap);
+				}
 				$this->viewService->importView($newTableId, $view, $userId);
 			}
 		}
@@ -394,18 +400,23 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	 * @param Table $newTable
 	 * @param array $table
 	 * @param array $columnIdMap
+	 * @param array $selectionOptionIdMap
 	 *
-	 * @return array
+	 * @return array{array, array} [$columnIdMap, $selectionOptionIdMap]
 	 */
-	private function importColumns(IImportSource $importSource, Table $newTable, array $table, array $columnIdMap): array {
+	private function importColumns(IImportSource $importSource, Table $newTable, array $table, array $columnIdMap, array $selectionOptionIdMap): array {
 		$columns = json_decode($importSource->getFileContents(self::FILE_COLUMNS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 		foreach ($columns as $column) {
 			if ($table['id'] === $column['tableId']) {
-				$newColumnId = $this->columnService->importColumn($newTable, $column);
-				$columnIdMap[$column['id']] = $newColumnId;
+				$result = $this->columnService->importColumn($newTable, $column);
+				$columnIdMap[$column['id']] = $result['columnId'];
+				// Option ids are only unique within their own column, so the per-column maps
+				// are kept apart. Merging them into one would let the first column's option 0
+				// answer for every other column's option 0.
+				$selectionOptionIdMap[(int)$column['id']] = $result['selectionOptionIdMap'];
 			}
 		}
-		return $columnIdMap;
+		return [$columnIdMap, $selectionOptionIdMap];
 	}
 
 	/**

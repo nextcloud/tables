@@ -123,6 +123,33 @@ class ViewTest extends TestCase {
 		return $view;
 	}
 
+	private static function ruleSet(array $columnIds, string $targetType = 'row', ?int $targetCol = null): array {
+		return [
+			'id' => 'set-' . implode('-', $columnIds),
+			'title' => 'Set',
+			'targetType' => $targetType,
+			'targetCol' => $targetCol,
+			'mode' => 'first-match',
+			'sortOrder' => 0,
+			'enabled' => true,
+			'broken' => false,
+			'rules' => array_map(static fn (int $columnId): array => [
+				'id' => 'rule-' . $columnId,
+				'title' => 'Rule',
+				'sortOrder' => 0,
+				'enabled' => true,
+				'broken' => false,
+				'condition' => ['groups' => [['conditions' => [[
+					'columnId' => $columnId,
+					'columnType' => 'text',
+					'operator' => 'is-equal',
+					'value' => 'secret',
+				]]]]],
+				'format' => ['backgroundColor' => '#ff0000'],
+			], $columnIds),
+		];
+	}
+
 	public function testOwnerSeesFilterAndSort(): void {
 		$view = $this->makeFilteredView([['columnId' => 33, 'mode' => 'ASC']]);
 
@@ -189,5 +216,73 @@ class ViewTest extends TestCase {
 		$serialised = $this->makeSharedView(false, $sort)->jsonSerialize();
 
 		$this->assertSame([['columnId' => 33, 'mode' => 'DESC']], $serialised['sort']);
+	}
+
+	public function testOwnerSeesEveryFormattingRule(): void {
+		$formatting = [self::ruleSet([33, 99])];
+		$view = $this->makeFilteredView();
+		$view->setFormattingArray($formatting);
+
+		$this->assertSame($formatting, $view->jsonSerialize()['formatting']);
+	}
+
+	public function testRecipientKeepsFormattingOnVisibleAndMetaColumns(): void {
+		$formatting = [self::ruleSet([33, Column::TYPE_META_ID])];
+		$view = $this->makeSharedView(false);
+		$view->setFormattingArray($formatting);
+
+		$this->assertSame($formatting, $view->jsonSerialize()['formatting']);
+	}
+
+	/**
+	 * A rule comparing a hidden column against a value would hand the recipient both the
+	 * column and the value, while colouring nothing: the rows never carry that column.
+	 */
+	public function testRecipientLosesFormattingRulesOnHiddenColumns(): void {
+		$view = $this->makeSharedView(false);
+		$view->setFormattingArray([self::ruleSet([33, 99])]);
+
+		$serialised = $view->jsonSerialize();
+
+		$this->assertCount(1, $serialised['formatting']);
+		$this->assertSame(['rule-33'], array_column($serialised['formatting'][0]['rules'], 'id'));
+	}
+
+	public function testRecipientLosesARuleSetLeftWithoutRules(): void {
+		$view = $this->makeSharedView(false);
+		$view->setFormattingArray([self::ruleSet([99]), self::ruleSet([33])]);
+
+		$serialised = $view->jsonSerialize();
+
+		$this->assertSame(['set-33'], array_column($serialised['formatting'], 'id'));
+	}
+
+	public function testRecipientLosesARuleSetTargetingAHiddenColumn(): void {
+		$view = $this->makeSharedView(false);
+		$view->setFormattingArray([self::ruleSet([33], 'column', 99)]);
+
+		$this->assertSame([], $view->jsonSerialize()['formatting']);
+	}
+
+	public function testRecipientWithTableManageSeesEveryFormattingRule(): void {
+		$formatting = [self::ruleSet([33, 99])];
+		$view = $this->makeSharedView(true);
+		$view->setFormattingArray($formatting);
+
+		$this->assertSame($formatting, $view->jsonSerialize()['formatting']);
+	}
+
+	/**
+	 * The entity is cached for the whole request, so the rules the service reads back
+	 * must be the stored ones, not the recipient's view of them.
+	 */
+	public function testSerialisingForRecipientKeepsFormattingOnEntity(): void {
+		$formatting = [self::ruleSet([33, 99])];
+		$view = $this->makeSharedView(false);
+		$view->setFormattingArray($formatting);
+
+		$view->jsonSerialize();
+
+		$this->assertSame($formatting, $view->getFormattingArray());
 	}
 }
