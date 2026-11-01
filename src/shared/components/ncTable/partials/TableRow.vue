@@ -21,6 +21,12 @@
 				'frozen-column--last': index === pinnedColumnIndex,
 			}"
 			@click="handleCellClick(col)">
+			<span v-for="(mark, markIndex) in cellMarkers(col.id, index === 0)"
+				:key="markIndex"
+				class="formatting-marker">
+				<component :is="markerComponent(mark.marker)" :size="16" />
+				<span class="hidden-visually">{{ markerLabel(mark) }}</span>
+			</span>
 			<component :is="getTableCellComponent(col)"
 				:column="col"
 				:row-id="row.id"
@@ -77,6 +83,7 @@ import {
 } from '../../../constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
 import { useFormattingStore } from '../../../../store/formatting.js'
+import { markerComponent } from '../../../../components/formatting/markers.js'
 
 export default {
 	name: 'TableRow',
@@ -141,8 +148,12 @@ export default {
 	},
 
 	computed: {
+		formattingApplies() {
+			return this.formattingStore.appliesTo(this.isView ? this.elementId : null)
+		},
+
 		rowFormatting() {
-			return this.selected ? {} : this.formattingStore.rowStyle(this.row.id)
+			return this.selected || !this.formattingApplies ? {} : this.formattingStore.rowStyle(this.row.id)
 		},
 		getSelection: {
 			get: () => { return this.selected },
@@ -164,7 +175,31 @@ export default {
 	},
 	methods: {
 		cellFormatting(columnId) {
-			return this.selected ? {} : this.formattingStore.cellStyle(this.row.id, columnId)
+			return this.selected || !this.formattingApplies ? {} : this.formattingStore.cellStyle(this.row.id, columnId)
+		},
+
+		markerComponent,
+
+		/**
+		 * @param {number} columnId the column this cell belongs to
+		 * @param {boolean} isFirstColumn whether this is the row's first visible cell
+		 * @return {Array} the markers to draw here
+		 */
+		cellMarkers(columnId, isFirstColumn) {
+			if (!this.formattingApplies) {
+				return []
+			}
+			return this.formattingStore.cellMarkers(this.row.id, columnId, isFirstColumn)
+		},
+
+		/**
+		 * @param {object} mark a marker with the title of the rule set that set it
+		 * @return {string} what a screen reader reads in place of the colour
+		 */
+		markerLabel(mark) {
+			return mark.title
+				? t('tables', 'Marked by rule set {title}', { title: mark.title })
+				: t('tables', 'Marked by a formatting rule set')
 		},
 		t,
 		getColumnWidthStyle,
@@ -231,6 +266,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.formatting-marker {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+	margin-inline-end: calc(var(--default-grid-baseline) * 0.5);
+}
 
 tr.selected {
 	background-color: var(--color-primary-light) !important;

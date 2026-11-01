@@ -25,13 +25,13 @@
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
 				<PaginationBlock :rows="rows" :element-id="elementId" :is-view="isView" />
-				<NcButton v-if="isView && config.canEditColumns"
+				<NcButton v-if="isView && config.canManageFormatting && formattingStore.appliesTo(elementId)"
 					:aria-label="t('tables', 'Format rules')"
 					type="tertiary"
 					@click="formattingStore.showFormattingManager = true">
 					{{ t('tables', 'Format rules') }}
 					<template #icon>
-						<FormatPaint :size="20" />
+						<PaletteOutline :size="20" />
 					</template>
 				</NcButton>
 			</div>
@@ -118,7 +118,7 @@ import ViewGridOutline from 'vue-material-design-icons/ViewGridOutline.vue'
 import ViewGalleryOutline from 'vue-material-design-icons/ViewGalleryOutline.vue'
 import { CARD_LAYOUTS, LAYOUT_GALLERY, LAYOUT_TABLE, LAYOUT_TILES } from '../../../constants.ts'
 import { resolveLayout } from '../../../utils/viewSetting.js'
-import FormatPaint from 'vue-material-design-icons/FormatPaint.vue'
+import PaletteOutline from 'vue-material-design-icons/PaletteOutline.vue'
 import { useFormattingStore } from '../../../../store/formatting.js'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 
@@ -138,7 +138,7 @@ export default {
 		ViewListOutline,
 		ViewGridOutline,
 		ViewGalleryOutline,
-		FormatPaint,
+		PaletteOutline,
 	},
 
 	mixins: [viewportHelper],
