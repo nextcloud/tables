@@ -370,10 +370,20 @@ export async function openCreateColumnModal(
 	await expect(page.locator('[data-cy="columnTypeFormInput"]')).toBeVisible()
 }
 
+/**
+ * Creates an application. Tables and views given by title are its resources from the start, so
+ * its start page shows them.
+ *
+ * @param page the page
+ * @param title the title of the application
+ * @param showInNav whether it shows in the app list
+ * @param resourceTitles titles of its tables and views
+ */
 export async function createContext(
 	page: Page,
 	title: string,
 	showInNav: boolean = false,
+	resourceTitles: string[] = [],
 ) {
 	await ensureNavigationOpen(page)
 
@@ -403,6 +413,13 @@ export async function createContext(
 		await page
 			.locator('[data-cy="createContextShowInNavSwitch"] input')
 			.check({ force: true })
+	}
+	for (const resourceTitle of resourceTitles) {
+		const resourceInput = createContextModal.locator('[data-cy="contextResourceForm"] input').first()
+		await resourceInput.click()
+		await resourceInput.fill(resourceTitle)
+		await page.getByRole('option', { name: new RegExp(resourceTitle, 'i') }).first().click()
+		await expect(createContextModal.locator('[data-cy="contextResourceList"]')).toContainText(resourceTitle)
 	}
 	await page.locator('[data-cy="createContextSubmitBtn"]').click()
 

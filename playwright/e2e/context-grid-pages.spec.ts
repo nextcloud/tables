@@ -48,21 +48,46 @@ async function pickOption(page: Page, selectCy: string, option: string) {
 }
 
 test.describe('Grid pages of an application', () => {
-	test('The start page lists the tables as before, with the page bar under the description', async ({ userPage: { page, user } }) => {
+	test('The start page of a new application shows its name and its tables as widgets', async ({ userPage: { page, user } }) => {
 		const first = await createTableViaApi(page.request, user, 'grid first table')
 		const second = await createTableViaApi(page.request, user, 'grid second table')
 		const contextId = await createApplicationViaApi(page.request, user, 'grid existing app', [first, second])
 
 		await openApplication(page, contextId)
 
-		const firstHeading = page.locator('h1', { hasText: 'grid first table' })
-		const secondHeading = page.locator('h1', { hasText: 'grid second table' })
-		await expect(firstHeading).toBeVisible()
-		await expect(secondHeading).toBeVisible()
+		const startPage = page.locator('[data-cy="startPageGrid"]')
+		await expect(startPage).toBeVisible()
+		await expect(startPage.locator('.header-widget')).toContainText('grid existing app')
+		const firstHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid first table' })
+		const secondHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid second table' })
+		await expect(firstHeading).toBeVisible({ timeout: 30000 })
+		await expect(secondHeading).toBeVisible({ timeout: 30000 })
 		expect((await firstHeading.boundingBox())!.y).toBeLessThan((await secondHeading.boundingBox())!.y)
+		await expect(page.locator('[data-cy="gridWidget"]')).toHaveCount(3)
 		await expect(page.locator('[data-cy="contextStartPageLink"]')).toHaveAttribute('aria-selected', 'true')
 		await expect(page.locator('[data-cy="contextPageAdd"]')).toBeVisible()
-		await expect(page.locator('[data-cy="gridPage"]')).toHaveCount(0)
+		await expect(page.locator('.resources')).toHaveCount(0)
+	})
+
+	test('The start page can be edited like a grid page, but not deleted', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid start edit table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid start edit app', [table])
+		await openApplication(page, contextId)
+
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.locator('[data-cy="gridPageAddWidget"]').click()
+		await pickOption(page, 'addWidgetType', 'Description')
+		await page.locator('[data-cy="widgetFieldText"] textarea').fill('Read this first')
+		await page.locator('[data-cy="addWidgetSubmit"]').click()
+		const saved = page.waitForResponse(r => /\/pages\/\d+/.test(r.url()) && r.request().method() === 'PATCH')
+		await page.locator('[data-cy="gridPageSave"]').click()
+		expect((await saved).ok()).toBe(true)
+
+		await page.reload()
+		await expect(page.getByText('Read this first')).toBeVisible({ timeout: 30000 })
+		// With only one action left the menu shows it as a button of its own
+		await expect(page.getByRole('button', { name: 'Edit page details' })).toBeVisible()
+		await expect(page.getByRole('button', { name: 'Page actions' })).toHaveCount(0)
 	})
 
 	test('A new page holds a header and a table of the application after a reload', async ({ userPage: { page, user } }) => {

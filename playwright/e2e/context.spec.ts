@@ -56,6 +56,21 @@ async function expectSelectedShare(page: Page, userId: string) {
 	).toBeVisible()
 }
 
+/**
+ * Places a table of the application on its start page. Tables added after the application was
+ * created are not placed there by themselves.
+ */
+async function addTableWidgetToStartPage(page: Page, tableTitle: string) {
+	await page.locator('[data-cy="gridPageEdit"]').click()
+	await page.locator('[data-cy="gridPageAddWidget"]').click()
+	await selectFromVueDropdown(page, '[data-cy="addWidgetType"] input', 'Table or view')
+	await selectFromVueDropdown(page, '[data-cy="addWidgetNode"] input', tableTitle)
+	await page.locator('[data-cy="addWidgetSubmit"]').click()
+	const saved = page.waitForResponse(r => /\/pages\/\d+/.test(r.url()) && r.request().method() === 'PATCH')
+	await page.locator('[data-cy="gridPageSave"]').click()
+	expect((await saved).ok()).toBe(true)
+}
+
 test.describe('Manage a context', () => {
 	test.describe.configure({ mode: 'serial' })
 
@@ -95,8 +110,15 @@ test.describe('Manage a context', () => {
 		await loadContext(page, `updated ${contextTitle}`)
 
 		await expect(page.locator('h1', { hasText: `updated ${contextTitle}` })).toBeVisible()
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible()
-		await expect(page.locator('h1', { hasText: viewTitle })).toBeVisible()
+		// Tables and views added after the application was created are not placed on its start page
+		await expect(page.locator('[data-cy="startPageGrid"]')).toBeVisible()
+		await expect(page.locator('h1', { hasText: tableTitle })).toHaveCount(0)
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.locator('[data-cy="gridPageAddWidget"]').click()
+		await selectFromVueDropdown(page, '[data-cy="addWidgetType"] input', 'Table or view')
+		await page.locator('[data-cy="addWidgetNode"] input').click()
+		await expect(page.locator('.vs__dropdown-menu li').filter({ hasText: tableTitle })).toBeVisible()
+		await expect(page.locator('.vs__dropdown-menu li').filter({ hasText: viewTitle })).toBeVisible()
 	})
 
 	test('Share context with resources', async ({ userPage: { page }, request }) => {
@@ -121,6 +143,7 @@ test.describe('Manage a context', () => {
 
 		await loadContext(page, contextTitle)
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible({ timeout: 10000 })
+		await addTableWidgetToStartPage(page, tableTitle)
 		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible({ timeout: 10000 })
 
 		// verify context was shared properly
@@ -221,6 +244,7 @@ test.describe('Manage a context', () => {
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible()
+		await addTableWidgetToStartPage(page, tableTitle)
 		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible()
 
 		await openContextEditModal(page, contextTitle)
@@ -248,6 +272,7 @@ test.describe('Manage a context', () => {
 		await expect(page.locator('[data-cy="contextResourceList"]')).toContainText(tableTitle)
 		await expect(page.locator('[data-cy="contextResourcePerms"]')).toContainText(tableTitle)
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
+		await addTableWidgetToStartPage(page, tableTitle)
 
 		await createTextLineColumn(page, 'title', '', '', true)
 		await page.locator('button').filter({ hasText: 'Create row' }).first().click()
@@ -293,6 +318,7 @@ test.describe('Manage a context', () => {
 		await updatePermsResponse
 
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible({ timeout: 10000 })
+		await addTableWidgetToStartPage(page, tableTitle)
 		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible({ timeout: 10000 })
 
 		// verify that shared user can modify and delete data in the resource
