@@ -49,6 +49,7 @@ final class ContextServiceTest extends TestCase {
 	/** @var list<string> the writes of a test in the order they ran */
 	private array $calls = [];
 	private MockObject $widgetService;
+	private MockObject $permissionsService;
 	private MockObject $dbConnection;
 
 	protected function setUp(): void {
@@ -727,6 +728,54 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(Page::TYPE_STARTPAGE, $inserted[0]->getPageType());
 		self::assertSame('dashboard', $inserted[0]->getSlug());
 		self::assertSame('dashboard', $context->getPages()[70]['slug']);
+	}
+
+	public static function startPagesOfNewApplications(): array {
+		return [
+			'a header, then a table or view per node' => [
+				[['id' => 5, 'type' => 0], ['id' => 9, 'type' => 1]],
+				[['header', 0, 'Intake portal', 'Requests', null], ['data', 2, null, null, 41], ['data', 7, null, null, 42]],
+			],
+			'only a header without tables' => [[], [['header', 0, 'Intake portal', 'Requests', null]]],
+		];
+	}
+
+	/**
+	 * @dataProvider startPagesOfNewApplications
+	 * @param list<array{0: string, 1: int, 2: ?string, 3: ?string, 4: ?int}> $expected type, row, heading, subheading and source of each widget
+	 */
+	public function testANewApplicationStartsWithItsWidgets(array $nodes, array $expected): void {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 3;
+			return $page;
+		});
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$relId = 40;
+		$this->contextNodeRelMapper->method('insert')->willReturnCallback(static function (ContextNodeRelation $relation) use (&$relId): ContextNodeRelation {
+			$relation->id = ++$relId;
+			return $relation;
+		});
+		$contentId = 100;
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content) use (&$contentId): PageContent {
+			$content->id = ++$contentId;
+			return $content;
+		});
+		$widgets = [];
+		$this->widgetService->expects($this->once())->method('insertAll')->willReturnCallback(static function (int $pageId, array $inputs) use (&$widgets): array {
+			foreach ($inputs as $input) {
+				$widgets[] = [$input->type, $input->gridY, $input->settings['heading'] ?? null, $input->settings['subheading'] ?? null, $input->nodeRelId];
+			}
+			return [];
+		});
+
+		$context = $this->service->create('Intake portal', 'heart', 'Requests', $nodes, 'user-1', 0);
+
+		self::assertSame($expected, $widgets);
+		self::assertCount(count($nodes), $context->getPages()[3]['content'] ?? [], 'every table or view keeps its own page content');
 	}
 
 	public static function importedPages(): array {
