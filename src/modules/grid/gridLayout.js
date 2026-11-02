@@ -138,6 +138,8 @@ export function pageToGrid(page) {
 			// An empty settings map arrives as a JSON array
 			settings: Array.isArray(widget.settings) ? {} : copy(widget.settings ?? {}),
 			nodeRelId: widget.source?.nodeRelId ?? null,
+			parentKey: widget.parentId ? 'w' + widget.parentId : null,
+			parentTab: widget.parentTab ?? null,
 		})),
 		layout: widgets.map(widget => ({
 			widgetId: 'w' + widget.id,
@@ -204,7 +206,9 @@ export function applicationNodeOptions(nodes, tables, views) {
  */
 export function gridToWidgets(grid, widgetTypes) {
 	const positions = Object.fromEntries(grid.layout.map(item => [item.widgetId, item]))
-	return grid.widgets.filter(widget => positions[widget.key]).map(widget => {
+	const placed = grid.widgets.filter(widget => positions[widget.key])
+	const indexOfKey = Object.fromEntries(placed.map((widget, index) => [widget.key, index]))
+	return placed.map(widget => {
 		const { gridX, gridY, gridWidth, gridHeight } = positions[widget.key]
 		const saved = {
 			type: widget.type,
@@ -223,8 +227,49 @@ export function gridToWidgets(grid, widgetTypes) {
 		if (findWidgetType(widgetTypes, widget.type)?.hasSource) {
 			saved.source = widget.nodeRelId ? { nodeRelId: widget.nodeRelId } : null
 		}
+		if (widget.parentKey && indexOfKey[widget.parentKey] !== undefined) {
+			saved.parentIndex = indexOfKey[widget.parentKey]
+			saved.parentTab = widget.parentTab
+		}
 		return saved
 	})
+}
+
+/**
+ * The titles of the tabs of a tabs widget: the non-empty lines of its tabs setting, as on the server.
+ *
+ * @param {object} settings the settings of the widget
+ * @return {Array<string>} the titles
+ */
+export function tabTitles(settings) {
+	return String(settings?.tabs ?? '').split('\n').map(line => line.trim()).filter(line => line !== '')
+}
+
+/**
+ * The layout of one level of a grid: the widgets on the page itself, or those in one tab.
+ *
+ * @param {{widgets: Array, layout: Array}} grid the grid
+ * @param {string|null} parentKey the key of the tabs widget, or null for the page itself
+ * @param {number|null} tab the position of the tab
+ * @return {Array} the layout items of that level
+ */
+export function levelLayout(grid, parentKey = null, tab = null) {
+	const level = new Set(grid.widgets
+		.filter(widget => (widget.parentKey ?? null) === parentKey && (parentKey === null || widget.parentTab === tab))
+		.map(widget => widget.key))
+	return grid.layout.filter(item => level.has(item.widgetId))
+}
+
+/**
+ * The layout with the items of one level replaced by their new positions.
+ *
+ * @param {Array} layout the whole layout
+ * @param {Array} levelItems changed items of one level
+ * @return {Array} the whole layout
+ */
+export function mergeLayout(layout, levelItems) {
+	const changed = Object.fromEntries(levelItems.map(item => [item.widgetId, item]))
+	return layout.map(item => changed[item.widgetId] ?? item)
 }
 
 /**
