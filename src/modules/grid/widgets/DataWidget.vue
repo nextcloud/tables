@@ -26,6 +26,7 @@
 				:columns="columns"
 				:rows="rows"
 				:view-setting="viewSetting"
+				collapse-description
 				@create-column="createColumn"
 				@import="openImportModal"
 				@download-csv="downloadCSV(rows)"
@@ -39,6 +40,7 @@
 				:columns="columns"
 				:rows="rows"
 				:view-setting="viewSetting"
+				collapse-description
 				@create-column="createColumn"
 				@import="openImportModal"
 				@import-scheme="openImportSchemeModal"
