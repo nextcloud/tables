@@ -28,6 +28,8 @@ class GridWidgetTypes {
 	public const TYPE_DATA = 'data';
 
 	public const GRID_COLUMNS = 12;
+	public const HEADER_HEIGHT = 2;
+	public const DATA_HEIGHT = 5;
 	public const GRID_MAX_HEIGHT = 100;
 	public const GRID_MAX_Y = 10000;
 	public const TITLE_MAX_LENGTH = 200;
@@ -51,8 +53,8 @@ class GridWidgetTypes {
 			self::TYPE_HEADER => [
 				'type' => self::TYPE_HEADER,
 				'title' => $this->l10n->t('Header'),
-				'defaultWidth' => 12,
-				'defaultHeight' => 2,
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => self::HEADER_HEIGHT,
 				'hasSource' => false,
 				'settings' => [
 					'heading' => ['type' => 'string', 'title' => $this->l10n->t('Heading'), 'default' => '', 'required' => true],
@@ -79,12 +81,44 @@ class GridWidgetTypes {
 			self::TYPE_DATA => [
 				'type' => self::TYPE_DATA,
 				'title' => $this->l10n->t('Table or view'),
-				'defaultWidth' => 12,
-				'defaultHeight' => 5,
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => self::DATA_HEIGHT,
 				'hasSource' => true,
 				'settings' => [],
 			],
 		];
+	}
+
+	/**
+	 * The widgets a start page starts with: a header with the name and description of its
+	 * application, then one full width table or view widget per node, in the given order.
+	 * Without a name there is no header.
+	 *
+	 * @param list<int> $nodeRelIds node relations of the application, in page order
+	 * @return list<array{type: string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetValue>, nodeRelId: ?int}>
+	 */
+	public static function startPageWidgets(string $name, string $description, array $nodeRelIds): array {
+		$widgets = [];
+		$gridY = 0;
+		if (trim($name) !== '') {
+			$widgets[] = [
+				'type' => self::TYPE_HEADER,
+				'position' => ['gridX' => 0, 'gridY' => $gridY, 'gridWidth' => self::GRID_COLUMNS, 'gridHeight' => self::HEADER_HEIGHT],
+				'settings' => ['heading' => $name, 'subheading' => $description, 'textAlign' => 'start', 'backgroundColor' => '', 'textColor' => ''],
+				'nodeRelId' => null,
+			];
+			$gridY += self::HEADER_HEIGHT;
+		}
+		foreach (array_slice($nodeRelIds, 0, self::MAX_WIDGETS_PER_PAGE - count($widgets)) as $nodeRelId) {
+			$widgets[] = [
+				'type' => self::TYPE_DATA,
+				'position' => ['gridX' => 0, 'gridY' => $gridY, 'gridWidth' => self::GRID_COLUMNS, 'gridHeight' => self::DATA_HEIGHT],
+				'settings' => [],
+				'nodeRelId' => $nodeRelId,
+			];
+			$gridY += self::DATA_HEIGHT;
+		}
+		return $widgets;
 	}
 
 	/**
