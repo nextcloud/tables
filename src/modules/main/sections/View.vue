@@ -5,7 +5,8 @@
 <template>
 	<div>
 		<ElementTitle v-model:view-setting="localViewSetting" :active-element="view" :is-table="false" :show-title="showTitle" />
-		<TableDescription :description="view.description" :read-only="true" />
+		<CollapsibleDescription v-if="collapseDescription" :description="view.description ?? ''" />
+		<TableDescription v-else :description="view.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="view" />
 			<TableView v-else
@@ -101,12 +102,14 @@ import IconImport from 'vue-material-design-icons/Import.vue'
 import ListBoxOutline from 'vue-material-design-icons/ListBoxOutline.vue'
 import ElementTitle from './ElementTitle.vue'
 import TableDescription from './TableDescription.vue'
+import CollapsibleDescription from './CollapsibleDescription.vue'
 
 import { hasLocalViewAdjustments } from '../../../shared/utils/viewSetting.js'
 
 export default {
 	components: {
 		TableDescription,
+		CollapsibleDescription,
 		EmptyView,
 		TrayArrowDown,
 		TableView,
@@ -126,6 +129,11 @@ export default {
 		view: {
 			type: Object,
 			default: null,
+		},
+		// Shows the description behind a button, where it would take the room of the rows
+		collapseDescription: {
+			type: Boolean,
+			default: false,
 		},
 		columns: {
 			type: Array,
