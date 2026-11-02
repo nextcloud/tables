@@ -57,7 +57,7 @@ describe('grid layout', () => {
 		const grid = pageToGrid(page)
 
 		expect(grid.widgets.map(widget => widget.key)).to.deep.equal(['w11', 'w12', 'w13', 'w14'])
-		expect(grid.widgets[0]).to.deep.equal({ key: 'w11', id: 11, type: 'header', title: '', icon: null, description: '', settings: { heading: 'Hi', textAlign: 'center' }, nodeRelId: null })
+		expect(grid.widgets[0]).to.deep.equal({ key: 'w11', id: 11, type: 'header', title: '', icon: null, description: '', settings: { heading: 'Hi', textAlign: 'center' }, nodeRelId: null, parentKey: null, parentTab: null })
 		expect(grid.widgets[1]).to.deep.include({ title: 'Tasks', icon: 'check', description: 'Open work', settings: {}, nodeRelId: 4 })
 		expect(grid.layout[2]).to.deep.equal({ widgetId: 'w13', gridX: 6, gridY: 2, gridWidth: 6, gridHeight: 5 })
 		expect(widgetTarget(grid.widgets[1], nodes)).to.deep.equal({ type: 'table', id: 40 })

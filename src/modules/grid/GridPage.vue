@@ -74,7 +74,7 @@
 			</template>
 		</NcEmptyContent>
 
-		<GridCanvas :layout="activeGrid.layout" :editable="isEditing" @layout-change="onLayoutChange">
+		<GridCanvas :layout="pageLayout" :editable="isEditing" @layout-change="onLayoutChange">
 			<template #widget="{ item, narrow }">
 				<GridWidget v-if="widgetsById[item.widgetId]"
 					:widget="widgetsById[item.widgetId]"
@@ -91,6 +91,7 @@
 		<AddWidget :show-modal="addWidgetOpen"
 			:editing-widget="widgetBeingConfigured"
 			:nodes="context.nodes"
+			:allow-tabs="targetTab === null"
 			@close="closeAddWidget"
 			@submit="onWidgetSubmit" />
 	</div>
@@ -113,7 +114,7 @@ import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, isStartPage, levelLayout, mergeLayout, nextFreeRow, pageTitle, pageToGrid, tabTitles } from './gridLayout.js'
 
 /**
  * A grid page of an application: its widgets on a grid, with an edit mode that saves the
@@ -141,6 +142,16 @@ export default {
 		return {
 			// Widget titles sit below the title of the page, or of the application on a start page without one
 			gridHeadingLevel: computed(() => this.showHeading ? 3 : 2),
+			// What a tabs widget needs to show and change the widgets in its tabs
+			gridActions: {
+				grid: () => this.activeGrid,
+				nodes: () => this.context.nodes,
+				changeLayout: this.onLayoutChange,
+				configure: this.configureWidget,
+				remove: this.removeWidget,
+				move: this.moveWidget,
+				addToTab: this.openAddWidgetInTab,
+			},
 		}
 	},
 	props: {
@@ -199,6 +210,8 @@ export default {
 			saving: false,
 			addWidgetOpen: false,
 			widgetBeingConfigured: null,
+			// The tab a new widget goes into, as {parentKey, tab}; null for the page itself
+			targetTab: null,
 		}
 	},
 	computed: {
@@ -224,6 +237,10 @@ export default {
 				return t('tables', 'Add a header, a description or a table.')
 			}
 			return this.canEdit ? t('tables', 'Edit the page to add widgets.') : ''
+		},
+		// The widgets on the page itself; those in tabs are shown by their tabs widget
+		pageLayout() {
+			return levelLayout(this.activeGrid)
 		},
 		widgetsById() {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.key, widget]))
@@ -273,13 +290,26 @@ export default {
 			if (!this.isEditing) {
 				return
 			}
-			this.draftGrid = { ...this.draftGrid, layout }
+			// A canvas shows one level of the grid, the page itself or one tab
+			this.draftGrid = { ...this.draftGrid, layout: mergeLayout(this.draftGrid.layout, layout) }
 		},
 		/**
 		 * Opens the dialog for a new widget.
 		 */
 		openAddWidget() {
 			this.widgetBeingConfigured = null
+			this.targetTab = null
+			this.addWidgetOpen = true
+		},
+		/**
+		 * Opens the dialog for a new widget in a tab of a tabs widget.
+		 *
+		 * @param {object} tabsWidget the tabs widget
+		 * @param {number} tab the position of the tab
+		 */
+		openAddWidgetInTab(tabsWidget, tab) {
+			this.widgetBeingConfigured = null
+			this.targetTab = { parentKey: tabsWidget.key, tab }
 			this.addWidgetOpen = true
 		},
 		/**
@@ -288,6 +318,7 @@ export default {
 		closeAddWidget() {
 			this.addWidgetOpen = false
 			this.widgetBeingConfigured = null
+			this.targetTab = null
 		},
 		/**
 		 * Opens the dialog for a widget on the grid.
@@ -296,20 +327,30 @@ export default {
 		 */
 		configureWidget(widget) {
 			this.widgetBeingConfigured = widget
+			this.targetTab = widget.parentKey ? { parentKey: widget.parentKey, tab: widget.parentTab } : null
 			this.addWidgetOpen = true
 		},
 		/**
-		 * Updates the configured widget, or places a new one below the others.
+		 * Updates the configured widget, or places a new one below the others on its level. A tabs
+		 * widget that loses tabs moves the widgets of those tabs into its last one.
 		 *
 		 * @param {{type: string, title: string, icon: string|null, description: string, settings: object, nodeRelId: number|null}} payload the widget from the dialog
 		 */
 		onWidgetSubmit(payload) {
 			if (this.widgetBeingConfigured) {
+				const configuredKey = this.widgetBeingConfigured.key
+				const lastTab = Math.max(0, tabTitles(payload.settings).length - 1)
 				this.draftGrid = {
 					...this.draftGrid,
-					widgets: this.draftGrid.widgets.map(widget => widget.key === this.widgetBeingConfigured.key
-						? { ...widget, title: payload.title, icon: payload.icon, description: payload.description, settings: payload.settings, nodeRelId: payload.nodeRelId }
-						: widget),
+					widgets: this.draftGrid.widgets.map(widget => {
+						if (widget.key === configuredKey) {
+							return { ...widget, title: payload.title, icon: payload.icon, description: payload.description, settings: payload.settings, nodeRelId: payload.nodeRelId }
+						}
+						if (widget.parentKey === configuredKey && widget.parentTab > lastTab) {
+							return { ...widget, parentTab: lastTab }
+						}
+						return widget
+					}),
 				}
 				this.closeAddWidget()
 				return
@@ -317,12 +358,13 @@ export default {
 			const key = 'new-' + payload.type + '-' + Date.now()
 			const widgetType = findWidgetType(this.widgetTypes, payload.type)
 			const size = { gridWidth: widgetType?.defaultWidth ?? 6, gridHeight: widgetType?.defaultHeight ?? 3 }
+			const parent = this.targetTab ? { parentKey: this.targetTab.parentKey, parentTab: this.targetTab.tab } : { parentKey: null, parentTab: null }
 			this.draftGrid = {
-				widgets: [...this.draftGrid.widgets, { key, id: null, ...payload }],
+				widgets: [...this.draftGrid.widgets, { key, id: null, ...payload, ...parent }],
 				layout: [...this.draftGrid.layout, {
 					widgetId: key,
 					gridX: 0,
-					gridY: nextFreeRow(this.draftGrid.layout),
+					gridY: nextFreeRow(levelLayout(this.draftGrid, parent.parentKey, parent.parentTab)),
 					gridWidth: size.gridWidth,
 					gridHeight: size.gridHeight,
 				}],
@@ -354,14 +396,17 @@ export default {
 			}
 		},
 		/**
-		 * Removes a widget and its place on the grid.
+		 * Removes a widget and its place on the grid; a tabs widget takes the widgets in its tabs along.
 		 *
 		 * @param {object} widget the widget to remove
 		 */
 		removeWidget(widget) {
+			const removed = new Set(this.draftGrid.widgets
+				.filter(item => item.key === widget.key || item.parentKey === widget.key)
+				.map(item => item.key))
 			this.draftGrid = {
-				widgets: this.draftGrid.widgets.filter(item => item.key !== widget.key),
-				layout: this.draftGrid.layout.filter(item => item.widgetId !== widget.key),
+				widgets: this.draftGrid.widgets.filter(item => !removed.has(item.key)),
+				layout: this.draftGrid.layout.filter(item => !removed.has(item.widgetId)),
 			}
 		},
 		/**
