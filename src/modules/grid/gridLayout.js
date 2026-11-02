@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { translate as t } from '@nextcloud/l10n'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.ts'
 
 /** Number of columns of a grid page. */
@@ -41,6 +42,16 @@ function copy(value) {
  */
 export function findWidgetType(widgetTypes, type) {
 	return widgetTypes.find(widgetType => widgetType.type === type) ?? null
+}
+
+/**
+ * The settings a new widget of this type starts with: every setting at its default.
+ *
+ * @param {object|null} widgetType a type from the server
+ * @return {object} the settings
+ */
+export function defaultSettings(widgetType) {
+	return Object.fromEntries(Object.entries(widgetType?.settings ?? {}).map(([name, setting]) => [name, copy(setting.default)]))
 }
 
 /**
@@ -144,6 +155,31 @@ export function widgetTarget(widget, nodes) {
 		return null
 	}
 	return { type: nodeType === NODE_TYPE_VIEW ? 'view' : 'table', id: parseInt(node.node_id) }
+}
+
+/**
+ * The tables and views of the application a data widget can show, with their titles.
+ *
+ * @param {object} nodes the nodes of the application by relation id
+ * @param {Array} tables tables known to the store
+ * @param {Array} views views known to the store
+ * @return {Array<{id: number, label: string}>} one option per node relation, by relation id
+ */
+export function applicationNodeOptions(nodes, tables, views) {
+	return Object.values(nodes ?? {}).map(node => {
+		const nodeType = parseInt(node.node_type)
+		const nodeId = parseInt(node.node_id)
+		const element = nodeType === NODE_TYPE_VIEW
+			? views.find(view => view.id === nodeId)
+			: tables.find(table => table.id === nodeId)
+		const title = element ? (element.emoji ? element.emoji + ' ' : '') + element.title : '#' + nodeId
+		return {
+			id: parseInt(node.id),
+			label: nodeType === NODE_TYPE_VIEW
+				? t('tables', '{title} (view)', { title }, undefined, { escape: false })
+				: title,
+		}
+	})
 }
 
 /**
