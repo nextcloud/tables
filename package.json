@@ -53,6 +53,7 @@
     "@vueuse/core": "^15.0.0",
     "debounce": "^3.0.0",
     "dompurify": "^3.4.17",
+    "gridstack": "^13.3.0",
     "papaparse": "^5.7.0",
     "pinia": "^4.1.0",
     "vue": "^3.5.44",
