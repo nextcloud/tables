@@ -54,7 +54,7 @@
     "debounce": "^3.0.0",
     "dompurify": "^3.4.17",
     "papaparse": "^5.7.0",
-    "pinia": "^2.3.1",
+    "pinia": "^4.1.0",
     "vue": "^3.5.44",
     "vue-material-design-icons": "^5.4.0",
     "vue-router": "^4.6.4"
