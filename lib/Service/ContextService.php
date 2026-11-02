@@ -28,6 +28,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Helper\TextHelper;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
@@ -562,6 +563,7 @@ class ContextService {
 		$addedPage = $page->jsonSerialize();
 
 		$i = 1;
+		$nodeRelIds = [];
 		$contextNodes = $context->getNodes();
 		if ($contextNodes) {
 			foreach ($contextNodes as $node) {
@@ -575,8 +577,11 @@ class ContextService {
 				$addedPage['content'][$pageContent->getId()] = $pageContent->jsonSerialize();
 				// the content is already embedded in the page
 				unset($addedPage['content'][$pageContent->getId()]['pageId']);
+				$nodeRelIds[] = (int)$node['id'];
 			}
 		}
+
+		$this->insertStartPageWidgets($page->getId(), $context->getName(), $context->getDescription(), $nodeRelIds);
 
 		$context->setPages([$addedPage['id'] => $addedPage]);
 	}
@@ -728,6 +733,7 @@ class ContextService {
 			}
 
 			// insert page conten
+			$contentRelIds = [];
 			if (!empty($pageArr['content'])) {
 				foreach ($pageArr['content'] as $contentArr) {
 					$oldNodeRelId = self::importedKey($contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null);
@@ -740,7 +746,13 @@ class ContextService {
 					$pageContent->setNodeRelId($newNodeRel->getId());
 					$pageContent->setOrder($contentArr['order'] ?? 100);
 					$this->pageContentMapper->insert($pageContent);
+					$contentRelIds[] = $newNodeRel->getId();
 				}
+			}
+
+			// A start page exported before pages held widgets starts filled, like a new one
+			if ($page->getPageType() === Page::TYPE_STARTPAGE && !array_key_exists('widgets', $pageArr)) {
+				$this->insertStartPageWidgets($page->getId(), $newContext->getName(), $newContext->getDescription(), array_values(array_unique($contentRelIds)));
 			}
 
 			$widgets = is_array($pageArr['widgets'] ?? null) ? array_values($pageArr['widgets']) : [];
@@ -752,7 +764,7 @@ class ContextService {
 
 		if (!$hasStartPage) {
 			$this->logger->warning('An imported application had no start page; it gets a new one.');
-			$this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_NAME, $technicalNames, true), array_values($nodeRelMap));
+			$this->insertImportedStartPage($newContext, in_array(Page::START_PAGE_NAME, $technicalNames, true), array_values($nodeRelMap));
 		}
 
 		return $newContext;
@@ -765,9 +777,9 @@ class ContextService {
 	 * @param list<ContextNodeRelation> $nodeRelations
 	 * @throws Exception
 	 */
-	private function insertImportedStartPage(int $contextId, bool $startPageNameTaken, array $nodeRelations): void {
+	private function insertImportedStartPage(Context $context, bool $startPageNameTaken, array $nodeRelations): void {
 		$page = new Page();
-		$page->setContextId($contextId);
+		$page->setContextId($context->getId());
 		$page->setPageType(Page::TYPE_STARTPAGE);
 		if ($startPageNameTaken) {
 			$page = $this->pageMapper->insertWithDefaultName($page);
@@ -782,6 +794,24 @@ class ContextService {
 			$pageContent->setOrder(10 * ($i + 1));
 			$this->pageContentMapper->insert($pageContent);
 		}
+		$this->insertStartPageWidgets($page->getId(), $context->getName(), $context->getDescription(), array_map(static fn (ContextNodeRelation $relation): int => $relation->getId(), $nodeRelations));
+	}
+
+	/**
+	 * Fills a new start page: a header with the name and description of its application,
+	 * then one table or view widget per node, as far as a page holds them.
+	 *
+	 * @param list<int> $nodeRelIds node relations of the application, in page order
+	 * @throws Exception
+	 * @throws \JsonException
+	 */
+	private function insertStartPageWidgets(int $pageId, string $name, string $description, array $nodeRelIds): void {
+		$widgets = $this->gridWidgetTypes->startPageWidgets($name, $description, $nodeRelIds);
+		$placed = count(array_filter($widgets, static fn (WidgetInput $widget): bool => $widget->nodeRelId !== null));
+		if ($placed < count($nodeRelIds)) {
+			$this->logger->warning('The start page of application "' . $name . '" shows ' . $placed . ' of its ' . count($nodeRelIds) . ' tables and views: a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . ' widgets.');
+		}
+		$this->widgetService->insertAll($pageId, $widgets);
 	}
 
 	/**

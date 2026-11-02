@@ -125,8 +125,9 @@ class ContextPageController extends AOCSController {
 	 * [api v2] Change a page or its widgets
 	 *
 	 * Fields left out keep their value; an empty icon or description removes it. A given
-	 * `widgets` list replaces the widgets of the grid page: listed widgets with an `id`
-	 * are updated, others are added, and widgets not listed are deleted.
+	 * `widgets` list replaces the widgets of the page, a grid page or the start page:
+	 * listed widgets with an `id` are updated, others are added, and widgets not listed
+	 * are deleted.
 	 *
 	 * A widget has a `type`, `gridX`, `gridY`, `gridWidth` and `gridHeight` on a grid of
 	 * 12 columns, `settings` following the schema of its type, and optionally an `id`,
