@@ -60,13 +60,16 @@ class WidgetService {
 				'gridHeight' => $widget->getGridHeight(),
 				'settings' => $widget->getSettingsForResponse(),
 				'source' => isset($sources[$id]) ? ['nodeRelId' => $sources[$id]] : null,
+				'parentId' => $widget->getParentId(),
+				'parentTab' => $widget->getParentTab(),
 			];
 		}
 		return $byPage;
 	}
 
 	/**
-	 * Adds widgets to a page, in one transaction. Their ids are ignored.
+	 * Adds widgets to a page, in one transaction. Their ids are ignored; a widget in a tab
+	 * names its tabs widget by its position in the list.
 	 *
 	 * @param list<WidgetInput> $widgets
 	 * @return list<Widget>
@@ -77,7 +80,9 @@ class WidgetService {
 	public function insertAll(int $pageId, array $widgets): array {
 		return $this->atomic(function () use ($pageId, $widgets): array {
 			$this->assertSourcesOfPage($pageId, $widgets);
-			return array_map(fn (WidgetInput $widget): Widget => $this->insertWidget($pageId, $widget), $widgets);
+			$saved = array_map(fn (WidgetInput $widget): Widget => $this->insertWidget($pageId, $widget), $widgets);
+			$this->saveParents($widgets, $saved);
+			return $saved;
 		}, $this->db);
 	}
 
@@ -90,6 +95,7 @@ class WidgetService {
 		$widget->setPageId($pageId);
 		$this->applyFields($widget, $input);
 		$widget = $this->widgetMapper->insert($widget);
+		$widget->resetUpdatedFields();
 		if ($input->nodeRelId !== null) {
 			$this->widgetSourceMapper->insertSource($widget->getId(), $input->nodeRelId);
 		}
@@ -157,21 +163,45 @@ class WidgetService {
 			$this->deleteByIds(array_values(array_diff(array_keys($existing), $listedIds)));
 			$sources = $this->widgetSourceMapper->findNodeRelIdsByWidgetIds($listedIds);
 
-			foreach ($widgets as $input) {
+			$saved = [];
+			foreach ($widgets as $index => $input) {
 				if ($input->id === null) {
-					$this->insertWidget($pageId, $input);
+					$saved[$index] = $this->insertWidget($pageId, $input);
 					continue;
 				}
 				// A new entity would not mark a field set to its default, such as a null title, as changed.
 				$widget = $existing[$input->id];
 				$this->applyFields($widget, $input);
-				$this->widgetMapper->update($widget);
+				$saved[$index] = $widget;
 				if (($sources[$input->id] ?? null) !== $input->nodeRelId) {
 					$this->widgetSourceMapper->setSource($input->id, $input->nodeRelId);
 				}
 			}
+			$this->saveParents($widgets, $saved);
 			return $this->findByPageIds([$pageId])[$pageId] ?? [];
 		}, $this->db);
+	}
+
+	/**
+	 * Puts each saved widget in the tab its input names, or on the page, once every widget
+	 * has an id, so a widget can name a tabs widget listed after it. Writes what changed.
+	 *
+	 * @param list<WidgetInput> $inputs
+	 * @param array<int, Widget> $saved the saved widgets by their position in `$inputs`
+	 * @throws Exception
+	 */
+	private function saveParents(array $inputs, array $saved): void {
+		foreach ($inputs as $index => $input) {
+			$widget = $saved[$index];
+			$parentId = $input->parentIndex === null ? null : $saved[$input->parentIndex]->getId();
+			$parentTab = $input->parentIndex === null ? null : $input->parentTab;
+			if ($widget->getParentId() !== $parentId || $widget->getParentTab() !== $parentTab) {
+				$widget->setParentId($parentId);
+				$widget->setParentTab($parentTab);
+			}
+			// a widget with nothing changed is skipped by the mapper
+			$this->widgetMapper->update($widget);
+		}
 	}
 
 	/**

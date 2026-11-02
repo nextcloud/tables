@@ -107,7 +107,7 @@ class ContextPageControllerTest extends TestCase {
 	public function testWidgetTypesListsEveryType(): void {
 		$response = $this->controller->widgetTypes();
 
-		$this->assertSame(['header', 'text', 'data'], array_column($response->getData(), 'type'));
+		$this->assertSame(['header', 'text', 'data', 'tabs'], array_column($response->getData(), 'type'));
 		$this->assertSame('{}', json_encode($response->getData()[2]['settings']), 'a type without settings has an empty object');
 		$this->assertIsArray($response->getData()[0]['settings']);
 	}

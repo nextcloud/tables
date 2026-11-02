@@ -37,6 +37,10 @@ use OCP\AppFramework\Db\Entity;
  * @method setGridHeight(int $value): void
  * @method getSettings(): ?string
  * @method setSettings(?string $value): void
+ * @method getParentId(): ?int
+ * @method setParentId(?int $value): void
+ * @method getParentTab(): ?int
+ * @method setParentTab(?int $value): void
  */
 class Widget extends Entity {
 	/** Non-ASCII text and slashes are stored as written, so limits count the text itself. */
@@ -52,6 +56,8 @@ class Widget extends Entity {
 	protected ?int $gridWidth = null;
 	protected ?int $gridHeight = null;
 	protected ?string $settings = null;
+	protected ?int $parentId = null;
+	protected ?int $parentTab = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -60,6 +66,8 @@ class Widget extends Entity {
 		$this->addType('gridY', 'integer');
 		$this->addType('gridWidth', 'integer');
 		$this->addType('gridHeight', 'integer');
+		$this->addType('parentId', 'integer');
+		$this->addType('parentTab', 'integer');
 	}
 
 	/**
