@@ -72,6 +72,7 @@ import { mapActions } from 'pinia'
 import { NcButton, NcSelect, NcDateTimePickerNative, NcTextField } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
+import { selectionReferenceFor } from '../../../../../shared/components/ncTable/mixins/selectionReference.js'
 import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
 import { AdditionalInputTypes } from '../../../../../shared/components/ncTable/mixins/magicFields.js'
 import { FilterIds } from '../../../../../shared/components/ncTable/mixins/filter.js'
@@ -131,8 +132,12 @@ export default {
 					return ''
 				}
 
+				if (typeof this.filterEntry?.value !== 'string') {
+					return this.filterEntry?.value
+				}
+
 				// if the value starts with @, we try to load the magic-value object
-				if (this.filterEntry?.value.substr(0, 1) === '@') {
+				if (this.filterEntry.value.substr(0, 1) === '@') {
 					const magicFieldId = this.getMagicFieldId()
 					return this.magicFields.find(item => item.id === magicFieldId || item.id === magicFieldId.substr(1))
 				}
@@ -199,11 +204,7 @@ export default {
 			) {
 				const fields = []
 				this.selectedColumn.getPossibleMagicFields().forEach(field => {
-					if (field.id.substr(0, 1) !== '@') {
-						const id = field.id
-						field.id = '@' + id
-					}
-					fields.push({ ...field })
+					fields.push({ ...field, id: '@' + field.id })
 				})
 				if (this.term) {
 					return [this.term, fields]
@@ -217,7 +218,7 @@ export default {
 				const options = []
 				this.selectedColumn.selectionOptions?.forEach(item => {
 					options.push({
-						id: '@selection-id-' + item.id,
+						id: selectionReferenceFor(item.id),
 						label: item.label,
 					})
 				})
