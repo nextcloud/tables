@@ -59,6 +59,8 @@ class WidgetService {
 				'gridHeight' => $widget->getGridHeight(),
 				'settings' => $widget->getSettingsObject(),
 				'source' => isset($sources[$id]) ? ['nodeRelId' => $sources[$id]] : null,
+				'parentId' => $widget->getParentId(),
+				'parentTab' => $widget->getParentTab(),
 			];
 		}
 		return $byPage;
@@ -102,8 +104,10 @@ class WidgetService {
 	 * Makes the widgets of a page match the given list: widgets with an id are updated,
 	 * widgets without one are inserted and widgets of the page that are not listed are
 	 * deleted, in one transaction. A widget listed without an icon or description has none.
+	 * A widget in a tab names its tabs widget by its position in the list (`parentIndex`)
+	 * and the tab by its position (`parentTab`).
 	 *
-	 * @param list<array{id: ?int, type: string, title: ?string, icon?: ?string, description?: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetValue>, nodeRelId: ?int}> $widgets
+	 * @param list<array{id: ?int, type: string, title: ?string, icon?: ?string, description?: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetValue>, nodeRelId: ?int, parentIndex?: ?int, parentTab?: ?int}> $widgets
 	 * @throws \InvalidArgumentException when an id is not one of a widget of the page, or a
 	 *                                   source is not a node of the application of the page
 	 * @throws Exception
@@ -127,20 +131,41 @@ class WidgetService {
 			}
 			$this->deleteByIds(array_values(array_diff(array_keys($existing), $listedIds)));
 
-			foreach ($widgets as $data) {
+			$saved = [];
+			foreach ($widgets as $index => $data) {
 				if ($data['id'] === null) {
-					$this->insertWidget($pageId, $data['type'], $data['title'], $data['position'], $data['settings'], $data['nodeRelId'], $data['icon'] ?? null, $data['description'] ?? null);
+					$saved[$index] = $this->insertWidget($pageId, $data['type'], $data['title'], $data['position'], $data['settings'], $data['nodeRelId'], $data['icon'] ?? null, $data['description'] ?? null);
 					continue;
 				}
 				// A new entity would not mark a field set to its default, such as a null title, as changed.
 				$widget = $existing[$data['id']];
 				$this->applyFields($widget, $data['type'], $data['title'], $data['position'], $data['settings'], $data['icon'] ?? null, $data['description'] ?? null);
+				$saved[$index] = $widget;
+				$this->widgetSourceMapper->setSource($data['id'], $data['nodeRelId']);
+			}
+
+			// Parents are set once every widget has an id, so a tab can name a widget listed after it
+			foreach ($widgets as $index => $data) {
+				$widget = $saved[$index];
+				$parentIndex = $data['parentIndex'] ?? null;
+				$widget->setParentId($parentIndex === null ? null : $saved[$parentIndex]->getId());
+				$widget->setParentTab($parentIndex === null ? null : ($data['parentTab'] ?? null));
 				if ($widget->getUpdatedFields() !== []) {
 					$this->widgetMapper->update($widget);
 				}
-				$this->widgetSourceMapper->setSource($data['id'], $data['nodeRelId']);
 			}
 		}, $this->db);
+	}
+
+	/**
+	 * Puts a widget in a tab of a tabs widget.
+	 *
+	 * @throws Exception
+	 */
+	public function setParent(Widget $widget, int $parentId, int $parentTab): void {
+		$widget->setParentId($parentId);
+		$widget->setParentTab($parentTab);
+		$this->widgetMapper->update($widget);
 	}
 
 	/**

@@ -116,6 +116,8 @@ class WidgetServiceTest extends DatabaseTestCase {
 				'gridHeight' => 2,
 				'settings' => ['color' => null, 'level' => 2, 'showTitle' => false, 'text' => 'Projects'],
 				'source' => null,
+				'parentId' => null,
+				'parentTab' => null,
 			],
 			[
 				'id' => $data->getId(),
@@ -129,6 +131,8 @@ class WidgetServiceTest extends DatabaseTestCase {
 				'gridHeight' => 5,
 				'settings' => [],
 				'source' => ['nodeRelId' => $this->rel(31)],
+				'parentId' => null,
+				'parentTab' => null,
 			],
 		], json_decode(json_encode($byPage[$this->page]), true));
 	}
@@ -192,6 +196,24 @@ class WidgetServiceTest extends DatabaseTestCase {
 		}
 
 		$this->assertSame([$kept->getId()], array_column($this->service->findByPageIds([$this->page])[$this->page], 'id'));
+	}
+
+	public function testSyncPutsWidgetsInTabsAndTakesThemOutAgain(): void {
+		$tabs = $this->service->insert($this->page, 'tabs', null, $this->position(0, 0, 12, 8), ['tabs' => "Open\nClosed"], null);
+
+		$this->service->syncPage($this->page, [
+			['id' => null, 'type' => 'text', 'title' => null, 'position' => $this->position(0, 0, 6, 2), 'settings' => ['text' => 'A'], 'nodeRelId' => null, 'parentIndex' => 1, 'parentTab' => 1],
+			['id' => $tabs->getId(), 'type' => 'tabs', 'title' => null, 'position' => $this->position(0, 0, 12, 8), 'settings' => ['tabs' => "Open\nClosed"], 'nodeRelId' => null, 'parentIndex' => null, 'parentTab' => null],
+		]);
+		$widgets = $this->service->findByPageIds([$this->page])[$this->page];
+		$inTab = array_values(array_filter($widgets, static fn (array $widget): bool => $widget['type'] === 'text'))[0];
+		$this->assertSame([$tabs->getId(), 1], [$inTab['parentId'], $inTab['parentTab']]);
+
+		$this->service->syncPage($this->page, [
+			['id' => $inTab['id'], 'type' => 'text', 'title' => null, 'position' => $this->position(0, 9, 6, 2), 'settings' => ['text' => 'A'], 'nodeRelId' => null],
+		]);
+		$widgets = $this->service->findByPageIds([$this->page])[$this->page];
+		$this->assertSame([[$inTab['id'], null, null]], array_map(static fn (array $widget): array => [$widget['id'], $widget['parentId'], $widget['parentTab']], $widgets));
 	}
 
 	public function testSyncRejectsTheIdOfAWidgetOnAnotherPage(): void {

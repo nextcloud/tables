@@ -58,6 +58,8 @@ class WidgetMapperTest extends DatabaseTestCase {
 			'gridWidth' => 8,
 			'gridHeight' => 4,
 			'settings' => '{"heading":"Projects","showTitle":false}',
+			'parentId' => null,
+			'parentTab' => null,
 		], $serialized);
 	}
 

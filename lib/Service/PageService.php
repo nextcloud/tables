@@ -33,7 +33,7 @@ use OCP\IDBConnection;
  *
  * @psalm-import-type TablesPage from ResponseDefinitions
  * @psalm-import-type TablesWidgetValue from ResponseDefinitions
- * @psalm-type TablesWidgetInput = array{id: ?int, type: string, title: ?string, icon: ?string, description: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetValue>, nodeRelId: ?int}
+ * @psalm-type TablesWidgetInput = array{id: ?int, type: string, title: ?string, icon: ?string, description: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetValue>, nodeRelId: ?int, parentIndex: ?int, parentTab: ?int}
  */
 class PageService {
 	use TTransactional;
@@ -241,7 +241,7 @@ class PageService {
 				throw new BadRequestError('Widget ' . $index . ' is a ' . $type . ' widget, which shows no table or view.');
 			}
 
-			$rows[] = [
+			$row = [
 				'id' => $id,
 				'type' => $type,
 				'title' => $this->gridWidgetTypes->validateTitle($index, $widget['title'] ?? null),
@@ -250,9 +250,63 @@ class PageService {
 				'position' => $this->gridWidgetTypes->validatePosition($index, $widget),
 				'settings' => $this->gridWidgetTypes->sanitizeSettings($type, $widget['settings'] ?? null),
 				'nodeRelId' => $source === null ? null : $this->sourceOf($index, $source, $context),
+				'parentIndex' => $this->readParentIndex($index, $widget),
+				'parentTab' => null,
 			];
+			if ($type === GridWidgetTypes::TYPE_TABS && count(GridWidgetTypes::tabTitles($row['settings'])) > GridWidgetTypes::MAX_TABS) {
+				throw new BadRequestError('Widget ' . $index . ' has more than ' . GridWidgetTypes::MAX_TABS . ' tabs.');
+			}
+			$rows[] = $row;
+		}
+		$widgets = array_values($widgets);
+		foreach (array_keys($rows) as $index) {
+			$rows[$index]['parentTab'] = $this->validateParent($index, $rows, $widgets[$index]['parentTab'] ?? null);
 		}
 		return $rows;
+	}
+
+	/**
+	 * The position in the list of the tabs widget a widget sits in, or null for a widget on
+	 * the page itself.
+	 *
+	 * @param array<array-key, mixed> $widget
+	 * @throws BadRequestError
+	 */
+	private function readParentIndex(int $index, array $widget): ?int {
+		$parentIndex = $widget['parentIndex'] ?? null;
+		if ($parentIndex !== null && !is_int($parentIndex)) {
+			throw new BadRequestError('The parentIndex of widget ' . $index . ' must be a number.');
+		}
+		return $parentIndex;
+	}
+
+	/**
+	 * Checks where a widget sits: on the page, or in a tab of a tabs widget of the same page
+	 * that sits on the page itself, so tabs go one level deep. Returns the tab.
+	 *
+	 * @param list<array{type: string, settings: array<string, TablesWidgetValue>, parentIndex: ?int}> $rows
+	 * @throws BadRequestError
+	 */
+	private function validateParent(int $index, array $rows, mixed $parentTab): ?int {
+		$parentIndex = $rows[$index]['parentIndex'];
+		if ($parentIndex === null) {
+			if ($parentTab !== null) {
+				throw new BadRequestError('Widget ' . $index . ' names a tab but no tabs widget.');
+			}
+			return null;
+		}
+		$parent = $rows[$parentIndex] ?? null;
+		if ($parentIndex === $index || $parent === null || $parent['type'] !== GridWidgetTypes::TYPE_TABS) {
+			throw new BadRequestError('Widget ' . $index . ' must sit in a tabs widget of the same page.');
+		}
+		if ($parent['parentIndex'] !== null || $rows[$index]['type'] === GridWidgetTypes::TYPE_TABS) {
+			throw new BadRequestError('Widget ' . $index . ' would nest tabs more than one level deep.');
+		}
+		$tabCount = count(GridWidgetTypes::tabTitles($parent['settings']));
+		if (!is_int($parentTab) || $parentTab < 0 || $parentTab >= $tabCount) {
+			throw new BadRequestError('Widget ' . $index . ' must name one of the ' . $tabCount . ' tabs of its tabs widget.');
+		}
+		return $parentTab;
 	}
 
 	/**
