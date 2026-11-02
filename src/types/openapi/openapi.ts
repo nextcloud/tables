@@ -956,6 +956,7 @@ export type paths = {
          * [api v2] Change a page or its widgets
          * @description Fields left out keep their value; an empty icon or description removes it. A given `widgets` list replaces the widgets of the page, a grid page or the start page: listed widgets with an `id` are updated, others are added, and widgets not listed are deleted.
          *     A widget has a `type`, `gridX`, `gridY`, `gridWidth` and `gridHeight` on a grid of 12 columns, `settings` following the schema of its type, and optionally an `id`, `title`, `icon` and `description`. A data widget's `source` is `{nodeRelId}` of a table or view of this application, or null.
+         *     A widget in a tab of a tabs widget has `parentIndex`, the position of that tabs widget in `widgets`, and `parentTab`, the position of the tab. Tabs go one level deep: a tabs widget sits on the page itself and holds no tabs widget.
          */
         readonly patch: operations["context_page-update"];
         readonly trace?: never;
@@ -1558,6 +1559,10 @@ export type components = {
                 /** Format: int64 */
                 readonly nodeRelId: number;
             } | null;
+            /** Format: int64 */
+            readonly parentId: number | null;
+            /** Format: int64 */
+            readonly parentTab: number | null;
         };
         readonly WidgetSettingSchema: {
             /** @enum {string} */
