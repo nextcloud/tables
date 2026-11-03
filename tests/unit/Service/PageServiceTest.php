@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
@@ -73,6 +74,7 @@ class PageServiceTest extends TestCase {
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->createMock(IDBConnection::class),
+			$this->createMock(MenuItemMapper::class),
 		);
 	}
 
