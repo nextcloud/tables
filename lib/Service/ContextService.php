@@ -562,6 +562,7 @@ class ContextService {
 		$addedPage = $page->jsonSerialize();
 
 		$i = 1;
+		$nodeRelIds = [];
 		$contextNodes = $context->getNodes();
 		if ($contextNodes) {
 			foreach ($contextNodes as $node) {
@@ -575,7 +576,12 @@ class ContextService {
 				$addedPage['content'][$pageContent->getId()] = $pageContent->jsonSerialize();
 				// the content is already embedded in the page
 				unset($addedPage['content'][$pageContent->getId()]['pageId']);
+				$nodeRelIds[] = (int)$node['id'];
 			}
+		}
+
+		foreach (GridWidgetTypes::startPageWidgets($context->getName(), $context->getDescription(), $nodeRelIds) as $widget) {
+			$this->widgetService->insert($page->getId(), $widget['type'], null, $widget['position'], $widget['settings'], $widget['nodeRelId']);
 		}
 
 		$context->setPages([$addedPage['id'] => $addedPage]);
@@ -718,6 +724,7 @@ class ContextService {
 				$pageMap[$pageArr['id'] ?? null] = $page;
 
 				// insert page conten
+				$contentRelIds = [];
 				if (!empty($pageArr['content'])) {
 					foreach ($pageArr['content'] as $contentArr) {
 						$oldNodeRelId = self::importedKey($contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null);
@@ -730,6 +737,14 @@ class ContextService {
 						$pageContent->setNodeRelId($newNodeRel->getId());
 						$pageContent->setOrder($contentArr['order'] ?? 100);
 						$this->pageContentMapper->insert($pageContent);
+						$contentRelIds[] = $newNodeRel->getId();
+					}
+				}
+
+				// A start page exported before pages held widgets starts filled, like a new one
+				if ($page->getPageType() === Page::TYPE_STARTPAGE && !array_key_exists('widgets', $pageArr)) {
+					foreach (GridWidgetTypes::startPageWidgets($newContext->getName(), $newContext->getDescription(), array_values(array_unique($contentRelIds))) as $widget) {
+						$this->widgetService->insert($page->getId(), $widget['type'], null, $widget['position'], $widget['settings'], $widget['nodeRelId']);
 					}
 				}
 

@@ -133,6 +133,39 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->assertSame(json_encode($expected), json_encode($withoutIds($gridPages[0]['widgets'])));
 	}
 
+	public function testAStartPageExportedWithoutWidgetsIsFilledOnImportAndOneWithAnEmptyListIsNot(): void {
+		[$context, $relation] = $this->createContextWithGridPage();
+		$exported = json_decode(json_encode(array_merge(
+			$this->contextMapper->findById($context->getId(), self::OWNER)->jsonSerialize(),
+			['pages' => $this->service->getPagesWithWidgets($this->contextMapper->findById($context->getId(), self::OWNER))],
+		)), true);
+		$exported['nodes'][$relation->getId()]['node_id'] = 4244;
+		$startPageKey = array_key_first(array_filter($exported['pages'], static fn (array $page): bool => $page['page_type'] === Page::TYPE_STARTPAGE));
+
+		$older = $exported;
+		unset($older['pages'][$startPageKey]['widgets']);
+		$withoutWidgets = $exported;
+		$withoutWidgets['pages'][$startPageKey]['widgets'] = [];
+
+		$startPageWidgets = function (array $export, int $tableId): array {
+			$table = new Table();
+			$table->id = $tableId;
+			$table->setOwnership(self::OWNER);
+			$imported = $this->service->importContext($table, $export, 4244);
+			$this->assertNotNull($imported);
+			$this->contextIds[] = $imported->getId();
+			$importedContext = $this->contextMapper->findById($imported->getId(), self::OWNER);
+			$pages = array_values(array_filter($this->service->getPagesWithWidgets($importedContext), static fn (array $page): bool => $page['page_type'] === Page::TYPE_STARTPAGE));
+			return array_map(static fn (array $widget): array => [$widget['type'], $widget['source']['nodeRelId'] ?? null], $pages[0]['widgets']);
+		};
+
+		$filled = $startPageWidgets($older, 4244);
+		$this->assertSame('header', $filled[0][0]);
+		$this->assertSame(['data'], array_unique(array_column(array_slice($filled, 1), 0)));
+		$this->assertNotEmpty(array_slice($filled, 1));
+		$this->assertSame([], $startPageWidgets($withoutWidgets, 4245));
+	}
+
 	public function testAnUnknownIconIsDroppedOnImport(): void {
 		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
 		$table = new Table();

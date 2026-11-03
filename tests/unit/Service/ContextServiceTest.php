@@ -22,6 +22,7 @@ use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Db\Widget;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -41,6 +42,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $userManager;
 	private MockObject $auditLogService;
 	private MockObject $widgetService;
+	private MockObject $permissionsService;
 	private MockObject $dbConnection;
 
 	protected function setUp(): void {
@@ -51,7 +53,7 @@ final class ContextServiceTest extends TestCase {
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
-		$permissionsService = $this->createMock(PermissionsService::class);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$this->dbConnection = $this->createMock(IDBConnection::class);
@@ -68,7 +70,7 @@ final class ContextServiceTest extends TestCase {
 			$this->pageMapper,
 			$this->pageContentMapper,
 			$logger,
-			$permissionsService,
+			$this->permissionsService,
 			$this->userManager,
 			$this->auditLogService,
 			$this->dbConnection,
@@ -405,6 +407,50 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(Page::TYPE_STARTPAGE, $inserted[0]->getPageType());
 		self::assertSame('dashboard', $inserted[0]->getTechnicalName());
 		self::assertSame('dashboard', $context->getPages()[70]['technicalName']);
+	}
+
+	public static function startPagesOfNewApplications(): array {
+		return [
+			'a header, then a table or view per node' => [
+				[['id' => 5, 'type' => 0], ['id' => 9, 'type' => 1]],
+				[['header', 0, 'Intake portal', 'Requests', null], ['data', 2, null, null, 41], ['data', 7, null, null, 42]],
+			],
+			'only a header without tables' => [[], [['header', 0, 'Intake portal', 'Requests', null]]],
+		];
+	}
+
+	/**
+	 * @dataProvider startPagesOfNewApplications
+	 * @param list<array{0: string, 1: int, 2: ?string, 3: ?string, 4: ?int}> $expected type, row, heading, subheading and source of each widget
+	 */
+	public function testANewApplicationStartsWithItsWidgets(array $nodes, array $expected): void {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 3;
+			return $page;
+		});
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$relId = 40;
+		$this->contextNodeRelMapper->method('insert')->willReturnCallback(static function (ContextNodeRelation $relation) use (&$relId): ContextNodeRelation {
+			$relation->id = ++$relId;
+			return $relation;
+		});
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content) use (&$relId): PageContent {
+			$content->id = 100 + $relId;
+			return $content;
+		});
+		$widgets = [];
+		$this->widgetService->method('insert')->willReturnCallback(static function (int $pageId, string $type, ?string $title, array $position, array $settings, ?int $nodeRelId) use (&$widgets): Widget {
+			$widgets[] = [$type, $position['gridY'], $settings['heading'] ?? null, $settings['subheading'] ?? null, $nodeRelId];
+			return new Widget();
+		});
+
+		$this->service->create('Intake portal', 'heart', 'Requests', $nodes, 'user-1', 0);
+
+		self::assertSame($expected, $widgets);
 	}
 
 	public static function importedPages(): array {

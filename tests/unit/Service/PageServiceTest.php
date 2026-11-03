@@ -338,11 +338,13 @@ class PageServiceTest extends TestCase {
 		$this->service->update(7, self::GRID_PAGE, null, null, null, null, $widgets, 'alice');
 	}
 
-	public function testTheStartPageHoldsNoWidgets(): void {
+	public function testTheStartPageHoldsWidgets(): void {
 		$this->permissionsService->method('canManageContext')->willReturn(true);
+		$this->widgetService->expects($this->once())->method('syncPage')->with(self::START_PAGE, $this->callback(static fn (array $rows): bool => array_column($rows, 'type') === ['text']));
 
-		$this->expectException(BadRequestError::class);
-		$this->service->update(7, self::START_PAGE, null, null, null, null, [], 'alice');
+		$this->service->update(7, self::START_PAGE, null, null, null, null, [
+			['type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hello']],
+		], 'alice');
 	}
 
 	public function testDeleteRemovesAGridPageWithItsWidgets(): void {
