@@ -15,6 +15,8 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItem;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -66,6 +68,7 @@ class ContextService {
 		private ViewMapper $viewMapper,
 		private WidgetService $widgetService,
 		private GridWidgetTypes $gridWidgetTypes,
+		private MenuItemMapper $menuItemMapper,
 	) {
 	}
 
@@ -134,6 +137,9 @@ class ContextService {
 	}
 
 	/**
+	 * Creates an application with its start page and a menu of one item, without a
+	 * title, opening the start page.
+	 *
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
@@ -153,6 +159,12 @@ class ContextService {
 				$this->insertNodesFromArray($context, $nodes);
 			}
 			$this->insertPage($context);
+
+			$startPageItem = new MenuItem();
+			$startPageItem->setContextId($context->getId());
+			$startPageItem->setOrder(0);
+			$startPageItem->setPageId((int)array_key_first($context->getPages()));
+			$this->menuItemMapper->insert($startPageItem);
 		}, $this->dbc);
 		$this->auditLogService->log(Operation::ContextCreated, 'Tables application with ID %s was created for user %s', [
 			'contextId' => $context->getId(),
@@ -343,6 +355,7 @@ class ContextService {
 
 		$this->atomic(function () use ($context): void {
 			$this->shareService->deleteAllForContext($context);
+			$this->menuItemMapper->deleteByContextId($context->getId());
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
 			$this->widgetService->deleteByPageIds($pageIds);
@@ -364,6 +377,7 @@ class ContextService {
 			$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
 			$this->atomic(function () use ($nodeRelIds): void {
 				$this->widgetService->deleteSourcesByNodeRelIds($nodeRelIds);
+				$this->menuItemMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
 			}, $this->dbc);
@@ -461,6 +475,7 @@ class ContextService {
 	public function removeNodeFromContextAndPages(int $nodeRelationId): array {
 		return $this->atomic(function () use ($nodeRelationId): array {
 			$this->widgetService->deleteSourcesByNodeRelIds([$nodeRelationId]);
+			$this->menuItemMapper->deleteByNodeRelIds([$nodeRelationId]);
 			$nodeRelation = $this->removeNodeFromContextById($nodeRelationId);
 			$contents = $this->removeNodeRelFromAllPages($nodeRelation);
 			return [$nodeRelation, $contents];
