@@ -11,13 +11,31 @@ declare(strict_types=1);
 namespace OCA\Tables\Migration;
 
 use Closure;
+use Doctrine\DBAL\Schema\Table;
 use OCP\DB\Exception;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\Schema\ITable;
 use OCP\DB\Types;
+use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version000700Date20230916000000 extends SimpleMigrationStep {
+	/**
+	 * Indices on the values of cell tables, by cell type, as AddMissingIndicesListener adds them to
+	 * existing installations. Text values cannot be indexed on Oracle, and only by prefix on MySQL.
+	 */
+	private const VALUE_INDICES = [
+		'number' => 'tables_row_cells_number_cv',
+		'datetime' => 'tables_row_cells_datetime_cv',
+		'selection' => 'tables_row_cells_selection_cv',
+	];
+	private const TEXT_VALUE_PREFIX_LENGTH = 64;
+
+	public function __construct(
+		private readonly IDBConnection $connection,
+	) {
+	}
 
 	/**
 	 * this is a copy from the definition set in OCA\Tables\Helper\ColumnsHelper with added types
@@ -80,7 +98,22 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
 			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);
 			$table->addIndex(['column_id', 'row_id']);
+			$this->addValueIndex($table, $name, $type);
 			$table->setPrimaryKey(['id']);
+		}
+	}
+
+	private function addValueIndex(Table|ITable $table, string $name, string $type): void {
+		$indexName = self::VALUE_INDICES[$name] ?? null;
+		if ($indexName === null) {
+			return;
+		}
+		if ($type !== Types::TEXT) {
+			$table->addIndex(['column_id', 'value'], $indexName);
+			return;
+		}
+		if ($this->connection->getDatabaseProvider() !== IDBConnection::PLATFORM_ORACLE) {
+			$table->addIndex(['column_id', 'value'], $indexName, [], ['lengths' => [null, self::TEXT_VALUE_PREFIX_LENGTH]]);
 		}
 	}
 

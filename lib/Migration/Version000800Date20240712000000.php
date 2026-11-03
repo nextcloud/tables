@@ -12,10 +12,23 @@ namespace OCA\Tables\Migration;
 use Closure;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
+use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version000800Date20240712000000 extends SimpleMigrationStep {
+	/**
+	 * As AddMissingIndicesListener adds it to existing installations. Text values cannot be indexed
+	 * on Oracle, and only by prefix on MySQL.
+	 */
+	private const VALUE_INDEX = 'tables_row_cells_usergroup_cv';
+	private const TEXT_VALUE_PREFIX_LENGTH = 64;
+
+	public function __construct(
+		private readonly IDBConnection $connection,
+	) {
+	}
+
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
@@ -40,6 +53,9 @@ class Version000800Date20240712000000 extends SimpleMigrationStep {
 			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
 			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);
 			$table->addIndex(['column_id', 'row_id']);
+			if ($this->connection->getDatabaseProvider() !== IDBConnection::PLATFORM_ORACLE) {
+				$table->addIndex(['column_id', 'value'], self::VALUE_INDEX, [], ['lengths' => [null, self::TEXT_VALUE_PREFIX_LENGTH]]);
+			}
 			$table->setPrimaryKey(['id']);
 			return $schema;
 		}
