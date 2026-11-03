@@ -145,6 +145,7 @@ OC.L10N.register(
     "This week" : "Šonedēļ",
     "Now" : "Tagad",
     "seconds ago" : "pirms vairākām sekundēm",
+    "Share not found" : "Kopīgojums nav atrasts",
     "Back to %s" : "Atgriezties %s"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");
