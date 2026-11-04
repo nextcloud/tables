@@ -13,6 +13,7 @@ use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
+use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
@@ -76,6 +77,7 @@ class ActivityManager {
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
 		private readonly ColumnMapper $columnMapper,
+		private readonly Row2Mapper $row2Mapper,
 		private readonly ShareService $shareService,
 		protected readonly CappedMemoryCache $cache,
 		private readonly ?string $userId,
@@ -374,7 +376,7 @@ class ActivityManager {
 				continue;
 			}
 
-			$uniqueAffectedUser = $this->findRecipientsByElement($view);
+			$uniqueAffectedUser = $this->row2Mapper->filterUsersSeeingRow($object->getId(), $view, $this->findRecipientsByElement($view));
 
 			foreach ($uniqueAffectedUser as $userId) {
 				$subjectParams['view'] = $view;

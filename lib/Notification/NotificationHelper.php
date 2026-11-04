@@ -308,6 +308,7 @@ class NotificationHelper {
 				objectId: (string)$rowId,
 				authorId: $authorId,
 				configKey: ConfigService::NOTIFY_ROW_KEY,
+				rowId: $rowId,
 			);
 
 			if (!empty($assignedTargets)) {
@@ -334,17 +335,23 @@ class NotificationHelper {
 		}
 	}
 
-	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey): void {
-		$recipients = $this->activityManager->findRecipientsByElement($element);
-
-		foreach ($recipients as $receiverId) {
+	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey, ?int $rowId = null): void {
+		$recipients = [];
+		foreach ($this->activityManager->findRecipientsByElement($element) as $receiverId) {
 			if (!is_string($receiverId) || $receiverId === '' || $receiverId === $authorId) {
 				continue;
 			}
 			if ($configKey !== null && !$this->configService->isNotifyEnabledForScope($receiverId, $element instanceof Table ? 'table' : 'view', $element->getId(), $configKey)) {
 				continue;
 			}
+			$recipients[] = $receiverId;
+		}
 
+		if ($rowId !== null && $element instanceof View) {
+			$recipients = $this->row2Mapper->filterUsersSeeingRow($rowId, $element, $recipients);
+		}
+
+		foreach ($recipients as $receiverId) {
 			$params = array_merge($subjectParams, ['isViewContext' => $element instanceof View]);
 			if ($element instanceof View) {
 				$params['view'] = [
