@@ -284,11 +284,12 @@ class MenuService {
 	 *
 	 * @param list<mixed> $exported
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @param array<string, int> $schemePageIds see {@see self::readExported()}
 	 * @return list<array{index: int, title: ?string, reason: string}>
 	 * @throws Exception
 	 */
-	public function import(Context $context, array $exported, \Closure $nodeRelIdOf): array {
-		['items' => $items, 'skipped' => $skipped] = $this->readExported($context, $exported, $nodeRelIdOf);
+	public function import(Context $context, array $exported, \Closure $nodeRelIdOf, array $schemePageIds = []): array {
+		['items' => $items, 'skipped' => $skipped] = $this->readExported($context, $exported, $nodeRelIdOf, $schemePageIds);
 
 		$this->atomic(function () use ($context, $items): void {
 			$this->menuItemMapper->deleteByContextId($context->getId());
@@ -314,12 +315,13 @@ class MenuService {
 	 *
 	 * @param list<mixed> $exported
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @param array<string, int> $schemePageIds ids of the pages of a scheme by the technical name it gives them, ahead of the pages of the application
 	 * @return array{items: list<array{item: MenuItem, entry: array<array-key, mixed>, index: int, parent: ?int}>, skipped: list<array{index: int, title: ?string, reason: string}>}
 	 */
-	public function readExported(Context $context, array $exported, \Closure $nodeRelIdOf): array {
-		$pageIds = [];
+	public function readExported(Context $context, array $exported, \Closure $nodeRelIdOf, array $schemePageIds = []): array {
+		$pageIds = $schemePageIds;
 		foreach ($context->getPages() ?? [] as $pageId => $page) {
-			$pageIds[(string)$page['technical_name']] = (int)$pageId;
+			$pageIds[(string)$page['technical_name']] ??= (int)$pageId;
 		}
 
 		$items = [];
