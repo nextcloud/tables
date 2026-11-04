@@ -180,9 +180,9 @@ class PageServiceTest extends TestCase {
 		], 'alice');
 
 		$this->assertSame([
-			['id' => 31, 'type' => 'header', 'title' => 'Intro', 'icon' => null, 'description' => null, 'position' => ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2], 'settings' => ['heading' => 'Welcome', 'subheading' => '', 'textAlign' => 'start', 'backgroundColor' => '', 'textColor' => ''], 'nodeRelId' => null],
-			['id' => null, 'type' => 'data', 'title' => null, 'icon' => 'star', 'description' => 'Open tasks', 'position' => ['gridX' => 0, 'gridY' => 2, 'gridWidth' => 6, 'gridHeight' => 5], 'settings' => [], 'nodeRelId' => self::NODE_REL],
-			['id' => null, 'type' => 'data', 'title' => null, 'icon' => null, 'description' => null, 'position' => ['gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5], 'settings' => [], 'nodeRelId' => null],
+			['id' => 31, 'type' => 'header', 'title' => 'Intro', 'icon' => null, 'description' => null, 'position' => ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2], 'settings' => ['heading' => 'Welcome', 'subheading' => '', 'textAlign' => 'start', 'backgroundColor' => '', 'textColor' => ''], 'nodeRelId' => null, 'parentIndex' => null, 'parentTab' => null],
+			['id' => null, 'type' => 'data', 'title' => null, 'icon' => 'star', 'description' => 'Open tasks', 'position' => ['gridX' => 0, 'gridY' => 2, 'gridWidth' => 6, 'gridHeight' => 5], 'settings' => [], 'nodeRelId' => self::NODE_REL, 'parentIndex' => null, 'parentTab' => null],
+			['id' => null, 'type' => 'data', 'title' => null, 'icon' => null, 'description' => null, 'position' => ['gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5], 'settings' => [], 'nodeRelId' => null, 'parentIndex' => null, 'parentTab' => null],
 		], $synced);
 	}
 
@@ -317,6 +317,12 @@ class PageServiceTest extends TestCase {
 			'invalid setting' => [[['type' => 'header', 'settings' => ['heading' => '']] + $at], 'header.heading is required'],
 			'outside the grid' => [[['type' => 'text', 'gridX' => 8, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]], 'does not fit in 12 columns'],
 			'invalid title' => [[['type' => 'text', 'title' => 5] + $at], 'The title of widget 0'],
+			'tab without tabs widget' => [[['type' => 'text', 'parentTab' => 0] + $at], 'names a tab but no tabs widget'],
+			'parent not a tabs widget' => [[['type' => 'text'] + $at, ['type' => 'text', 'parentIndex' => 0, 'parentTab' => 0] + $at], 'Widget 1 must sit in a tabs widget'],
+			'parentIndex not a number' => [[['type' => 'text', 'parentIndex' => '0', 'parentTab' => 0] + $at], 'parentIndex of widget 0 must be a number'],
+			'tabs in tabs' => [[['type' => 'tabs', 'settings' => ['tabs' => 'A']] + $at, ['type' => 'tabs', 'settings' => ['tabs' => 'B'], 'parentIndex' => 0, 'parentTab' => 0] + $at], 'more than one level deep'],
+			'unknown tab' => [[['type' => 'tabs', 'settings' => ['tabs' => "A\nB"]] + $at, ['type' => 'text', 'parentIndex' => 0, 'parentTab' => 2] + $at], 'one of the 2 tabs'],
+			'too many tabs' => [[['type' => 'tabs', 'settings' => ['tabs' => implode("\n", range(1, 21))]] + $at], 'more than 20 tabs'],
 			'unknown icon' => [[['type' => 'text', 'icon' => 'no-such-icon'] + $at], 'Widget 0 has an unknown icon'],
 			'icon not text' => [[['type' => 'text', 'icon' => 5] + $at], 'The icon of widget 0'],
 			'source on a header' => [[['type' => 'header', 'settings' => ['heading' => 'A'], 'source' => ['nodeRelId' => self::NODE_REL]] + $at], 'shows no table or view'],
@@ -336,6 +342,22 @@ class PageServiceTest extends TestCase {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage($message);
 		$this->service->update(7, self::GRID_PAGE, null, null, null, null, $widgets, 'alice');
+	}
+
+	public function testUpdateSavesWidgetsInTheTabsOfATabsWidgetListedAfterThem(): void {
+		$this->permissionsService->method('canManageContext')->willReturn(true);
+		$synced = null;
+		$this->widgetService->expects($this->once())->method('syncPage')->willReturnCallback(function (int $pageId, array $rows) use (&$synced): void {
+			$synced = $rows;
+		});
+		$at = ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2];
+
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [
+			['type' => 'text', 'settings' => ['text' => 'In the second tab'], 'parentIndex' => 1, 'parentTab' => 1] + $at,
+			['type' => 'tabs', 'settings' => ['tabs' => "Open\n\n Closed "]] + $at,
+		], 'alice');
+
+		$this->assertSame([[1, 1], [null, null]], array_map(static fn (array $row): array => [$row['parentIndex'], $row['parentTab']], $synced));
 	}
 
 	public function testTheStartPageHoldsWidgets(): void {

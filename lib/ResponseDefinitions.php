@@ -274,6 +274,8 @@ namespace OCA\Tables;
  *   gridHeight: int,
  *   settings: array<string, TablesWidgetValue>|\stdClass,
  *   source: ?array{nodeRelId: int},
+ *   parentId: ?int,
+ *   parentTab: ?int,
  * }
  *
  * @psalm-type TablesPage = array{

@@ -166,6 +166,35 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->assertSame([], $startPageWidgets($withoutWidgets, 4245));
 	}
 
+	public function testWidgetsInTabsComeAlongInTheirTabsWidgetAndOrphansAreSkipped(): void {
+		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
+		$tabs = $this->widgetService->insert($gridPageId, 'tabs', null, ['gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 8], ['tabs' => "Open\nClosed"], null);
+		$inTab = $this->widgetService->insert($gridPageId, 'text', null, ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2], ['text' => 'Closed ones'], null);
+		$this->widgetService->setParent($inTab, $tabs->getId(), 1);
+		$exported = json_decode(json_encode(array_merge(
+			$this->contextMapper->findById($context->getId(), self::OWNER)->jsonSerialize(),
+			['pages' => $this->service->getPagesWithWidgets($this->contextMapper->findById($context->getId(), self::OWNER))],
+		)), true);
+		$exported['nodes'][$relation->getId()]['node_id'] = 4246;
+		// A widget whose tabs widget did not come along
+		$exported['pages'][$gridPageId]['widgets'][] = ['type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Orphan'], 'parentId' => 999999, 'parentTab' => 0];
+		$table = new Table();
+		$table->id = 4246;
+		$table->setOwnership(self::OWNER);
+
+		$imported = $this->service->importContext($table, $exported, 4246);
+		$this->assertNotNull($imported);
+		$this->contextIds[] = $imported->getId();
+
+		$pages = $this->service->getPagesWithWidgets($this->contextMapper->findById($imported->getId(), self::OWNER));
+		$grid = array_values(array_filter($pages, static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID))[0];
+		$importedTabs = array_values(array_filter($grid['widgets'], static fn (array $widget): bool => $widget['type'] === 'tabs'))[0];
+		$texts = array_values(array_filter($grid['widgets'], static fn (array $widget): bool => $widget['type'] === 'text'));
+		$this->assertCount(1, $texts);
+		$this->assertSame([$importedTabs['id'], 1], [$texts[0]['parentId'], $texts[0]['parentTab']]);
+		$this->assertNotSame($tabs->getId(), $importedTabs['id']);
+	}
+
 	public function testAnUnknownIconIsDroppedOnImport(): void {
 		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
 		$table = new Table();

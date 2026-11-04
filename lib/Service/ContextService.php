@@ -22,6 +22,7 @@ use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Db\Widget;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -752,9 +753,7 @@ class ContextService {
 				if (count($widgets) > GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
 					$this->logger->warning('Skipping ' . (count($widgets) - GridWidgetTypes::MAX_WIDGETS_PER_PAGE) . ' imported widgets: a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . '.');
 				}
-				foreach (array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE) as $index => $widgetArr) {
-					$this->importWidget($page->getId(), $index, $widgetArr, $sourceRelMap);
-				}
+				$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $sourceRelMap);
 			}
 		}
 
@@ -806,6 +805,47 @@ class ContextService {
 	}
 
 	/**
+	 * Inserts the exported widgets of a page: those on the page first, then those in a tab,
+	 * which go into the imported tabs widget they were in. A widget whose tabs widget or tab
+	 * did not come along, or that would nest tabs, is skipped.
+	 *
+	 * @param list<mixed> $widgets exported widgets
+	 * @param array<array-key, ContextNodeRelation> $nodeRelMap imported node relations of the table by their exported id
+	 * @throws Exception
+	 */
+	private function importWidgets(int $pageId, array $widgets, array $nodeRelMap): void {
+		$parentOf = static fn (mixed $widgetArr): mixed => is_array($widgetArr) ? ($widgetArr['parentId'] ?? null) : null;
+		$tabsWidgets = [];
+		foreach ($widgets as $index => $widgetArr) {
+			if ($parentOf($widgetArr) !== null) {
+				continue;
+			}
+			$widget = $this->importWidget($pageId, $index, $widgetArr, $nodeRelMap);
+			$oldId = self::importedKey($widgetArr['id'] ?? null);
+			if ($widget !== null && $oldId !== null && $widget->getType() === GridWidgetTypes::TYPE_TABS) {
+				$tabsWidgets[$oldId] = $widget;
+			}
+		}
+		foreach ($widgets as $index => $widgetArr) {
+			$oldParentId = $parentOf($widgetArr);
+			if ($oldParentId === null) {
+				continue;
+			}
+			$parent = is_int($oldParentId) || is_string($oldParentId) ? ($tabsWidgets[$oldParentId] ?? null) : null;
+			$parentTab = $widgetArr['parentTab'] ?? null;
+			if ($parent === null || ($widgetArr['type'] ?? null) === GridWidgetTypes::TYPE_TABS
+				|| !is_int($parentTab) || $parentTab < 0 || $parentTab >= count(GridWidgetTypes::tabTitles($parent->getSettings() ?? []))) {
+				$this->logger->warning('Skipping imported widget ' . $index . ': its tabs widget or tab did not come along.');
+				continue;
+			}
+			$widget = $this->importWidget($pageId, $index, $widgetArr, $nodeRelMap);
+			if ($widget !== null) {
+				$this->widgetService->setParent($widget, $parent->getId(), $parentTab);
+			}
+		}
+	}
+
+	/**
 	 * Inserts an exported widget on a page. Its source is remapped to the imported node
 	 * relation of the table being imported, and dropped when it showed another node. A
 	 * widget that would not be saved through the API, for its type, settings, title,
@@ -814,9 +854,9 @@ class ContextService {
 	 * @param array<array-key, ContextNodeRelation> $nodeRelMap imported node relations of the table by their exported id
 	 * @throws Exception
 	 */
-	private function importWidget(int $pageId, int $index, mixed $widgetArr, array $nodeRelMap): void {
+	private function importWidget(int $pageId, int $index, mixed $widgetArr, array $nodeRelMap): ?Widget {
 		if (!is_array($widgetArr) || !is_string($widgetArr['type'] ?? null)) {
-			return;
+			return null;
 		}
 		try {
 			$hasSource = $this->gridWidgetTypes->get($widgetArr['type'])['hasSource'];
@@ -831,10 +871,10 @@ class ContextService {
 			}
 		} catch (BadRequestError $e) {
 			$this->logger->warning('Skipping an imported widget: ' . $e->getMessage(), ['exception' => $e]);
-			return;
+			return null;
 		}
 		$newNodeRel = $hasSource && $oldNodeRelId !== null ? ($nodeRelMap[$oldNodeRelId] ?? null) : null;
-		$this->widgetService->insert(
+		return $this->widgetService->insert(
 			$pageId,
 			$widgetArr['type'],
 			$title,

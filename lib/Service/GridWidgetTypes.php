@@ -26,6 +26,7 @@ class GridWidgetTypes {
 	public const TYPE_HEADER = 'header';
 	public const TYPE_TEXT = 'text';
 	public const TYPE_DATA = 'data';
+	public const TYPE_TABS = 'tabs';
 
 	public const GRID_COLUMNS = 12;
 	public const HEADER_HEIGHT = 2;
@@ -35,6 +36,7 @@ class GridWidgetTypes {
 	public const TITLE_MAX_LENGTH = 200;
 	public const DESCRIPTION_MAX_LENGTH = 2000;
 	public const MAX_WIDGETS_PER_PAGE = 100;
+	public const MAX_TABS = 20;
 	/** Bytes of the settings as stored JSON. */
 	public const SETTINGS_MAX_BYTES = 60000;
 
@@ -86,6 +88,16 @@ class GridWidgetTypes {
 				'hasSource' => true,
 				'settings' => [],
 			],
+			self::TYPE_TABS => [
+				'type' => self::TYPE_TABS,
+				'title' => $this->l10n->t('Tabs'),
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => 8,
+				'hasSource' => false,
+				'settings' => [
+					'tabs' => ['type' => 'text', 'title' => $this->l10n->t('Tabs, one per line'), 'default' => '', 'required' => true],
+				],
+			],
 		];
 	}
 
@@ -119,6 +131,17 @@ class GridWidgetTypes {
 			$gridY += self::DATA_HEIGHT;
 		}
 		return $widgets;
+	}
+
+	/**
+	 * The titles of the tabs of a tabs widget: the non-empty lines of its `tabs` setting.
+	 *
+	 * @param array<string, TablesWidgetValue> $settings
+	 * @return list<string>
+	 */
+	public static function tabTitles(array $settings): array {
+		$lines = array_map(trim(...), explode("\n", (string)($settings['tabs'] ?? '')));
+		return array_values(array_filter($lines, static fn (string $line): bool => $line !== ''));
 	}
 
 	/**

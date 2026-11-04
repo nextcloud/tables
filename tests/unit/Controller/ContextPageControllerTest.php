@@ -108,6 +108,6 @@ class ContextPageControllerTest extends TestCase {
 	public function testWidgetTypesListsEveryType(): void {
 		$response = $this->controller->widgetTypes();
 
-		$this->assertSame(['header', 'text', 'data'], array_column($response->getData(), 'type'));
+		$this->assertSame(['header', 'text', 'data', 'tabs'], array_column($response->getData(), 'type'));
 	}
 }

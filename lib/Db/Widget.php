@@ -48,6 +48,8 @@ class Widget extends Entity implements \JsonSerializable {
 	protected ?int $gridWidth = null;
 	protected ?int $gridHeight = null;
 	protected ?array $settings = null;
+	protected ?int $parentId = null;
+	protected ?int $parentTab = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -57,6 +59,8 @@ class Widget extends Entity implements \JsonSerializable {
 		$this->addType('gridWidth', 'integer');
 		$this->addType('gridHeight', 'integer');
 		$this->addType('settings', Types::JSON);
+		$this->addType('parentId', 'integer');
+		$this->addType('parentTab', 'integer');
 	}
 
 	/**
@@ -82,6 +86,8 @@ class Widget extends Entity implements \JsonSerializable {
 			'gridWidth' => $this->getGridWidth(),
 			'gridHeight' => $this->getGridHeight(),
 			'settings' => $this->getSettingsObject(),
+			'parentId' => $this->getParentId(),
+			'parentTab' => $this->getParentTab(),
 		];
 	}
 }
