@@ -69,6 +69,7 @@ class ContextService {
 		private WidgetService $widgetService,
 		private GridWidgetTypes $gridWidgetTypes,
 		private MenuItemMapper $menuItemMapper,
+		private MenuService $menuService,
 	) {
 	}
 
@@ -655,15 +656,20 @@ class ContextService {
 	}
 
 	/**
+	 * Imports an application of a user's data that holds the given table. Its menu keeps
+	 * the links, the items for its pages and the items for the table, found by the uuid
+	 * it was exported with.
+	 *
 	 * @param Table $table
 	 * @param array $context
 	 * @param int $tableOldId
+	 * @param string|null $tableOldUuid
 	 *
 	 * @return Context|null
 	 *
 	 * @throws \Exception
 	 */
-	public function importContext(Table $table, array $context, int $tableOldId): ?Context {
+	public function importContext(Table $table, array $context, int $tableOldId, ?string $tableOldUuid = null): ?Context {
 		// checking if any node in $context['nodes'] matches the old table id
 		$hasMatchingNode = false;
 		if (!empty($context['nodes'])) {
@@ -758,7 +764,46 @@ class ContextService {
 			}
 		}
 
+		if (is_array($context['menu'] ?? null)) {
+			$tableRelation = reset($sourceRelMap);
+			$this->logSkippedMenuItems($this->menuService->import(
+				$this->contextMapper->findById($newContext->getId()),
+				$context['menu'],
+				static fn (string $kind, string $uuid): ?int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false ? $tableRelation->getId() : null,
+			));
+		}
+
 		return $newContext;
+	}
+
+	/**
+	 * @param list<array{index: int, title: ?string, reason: string}> $skipped
+	 */
+	private function logSkippedMenuItems(array $skipped): void {
+		foreach ($skipped as $item) {
+			$this->logger->warning('Skipping imported menu item ' . $item['index'] . ': ' . $item['reason']);
+		}
+	}
+
+	/**
+	 * The node relation of an application for an exported table or view, found by uuid.
+	 */
+	private function nodeRelIdByUuid(Context $context, string $kind, string $uuid): ?int {
+		try {
+			$node = $kind === 'table' ? $this->tableMapper->findByUuid($uuid) : $this->viewMapper->findByUuid($uuid);
+		} catch (DoesNotExistException) {
+			return null;
+		}
+		if ($node === null) {
+			return null;
+		}
+		$nodeType = $kind === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+		foreach ($context->getNodes() ?? [] as $relId => $relation) {
+			if ($relation['node_type'] === $nodeType && $relation['node_id'] === $node->getId()) {
+				return (int)$relId;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -926,6 +971,7 @@ class ContextService {
 			array_values($nodes),
 			$this->getPagesWithWidgets($context),
 			array_values($tables),
+			$this->menuService->export($context),
 		);
 	}
 
@@ -995,6 +1041,24 @@ class ContextService {
 			}
 		}
 
+		if (is_array($updateScheme['menu'] ?? null)) {
+			$schemeUuids = [];
+			foreach ($changes['nodes']['to'] ?? [] as $node) {
+				$kind = ($node['node_type'] ?? null) === Application::NODE_TYPE_VIEW ? 'view' : 'table';
+				$schemeUuids[$kind][(string)($node['node_uuid'] ?? '')] = true;
+			}
+			['items' => $items, 'skipped' => $skipped] = $this->menuService->readExported(
+				$context,
+				$updateScheme['menu'],
+				static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
+			);
+			$changes['menu'] = [
+				'from' => $currentScheme->getMenu(),
+				'to' => array_column($items, 'entry'),
+				'skipped' => $skipped,
+			];
+		}
+
 		return $changes;
 	}
 
@@ -1019,7 +1083,7 @@ class ContextService {
 	 * @throws NotFoundExceptionInterface
 	 * @throws PermissionError
 	 */
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId): Context {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?array $menu = null): Context {
 		// Validate the structure of the columns and views arrays
 		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
 			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
@@ -1080,6 +1144,14 @@ class ContextService {
 		}
 
 		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
+		if ($menu !== null) {
+			$withNodes = $this->contextMapper->findById($contextId, $userId);
+			$this->logSkippedMenuItems($this->menuService->import(
+				$withNodes,
+				$menu,
+				fn (string $kind, string $uuid): ?int => $this->nodeRelIdByUuid($withNodes, $kind, $uuid),
+			));
+		}
 
 		return $context;
 	}

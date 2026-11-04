@@ -82,6 +82,7 @@ final class ContextServiceTest extends TestCase {
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->createMock(MenuItemMapper::class),
+			$this->createMock(MenuService::class),
 		);
 	}
 
