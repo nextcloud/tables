@@ -22,8 +22,11 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\INavigationManager;
@@ -43,6 +46,12 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $auditLogService;
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
+	private MockObject $logger;
+	private MockObject $permissionsService;
+	private MockObject $tableMapper;
+	private MockObject $viewMapper;
+	/** @var list<mixed> */
+	private array $serviceArguments;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -51,8 +60,10 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
-		$permissionsService = $this->createMock(PermissionsService::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
+		$this->tableMapper = $this->createMock(TableMapper::class);
+		$this->viewMapper = $this->createMock(ViewMapper::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$this->dbConnection = $this->createMock(IDBConnection::class);
@@ -63,13 +74,13 @@ final class ContextServiceTest extends TestCase {
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
 
-		$this->service = new ContextService(
+		$this->serviceArguments = [
 			$this->contextMapper,
 			$this->contextNodeRelMapper,
 			$this->pageMapper,
 			$this->pageContentMapper,
-			$logger,
-			$permissionsService,
+			$this->logger,
+			$this->permissionsService,
 			$this->userManager,
 			$this->auditLogService,
 			$this->dbConnection,
@@ -77,13 +88,14 @@ final class ContextServiceTest extends TestCase {
 			false,
 			$navigationManager,
 			$urlGenerator,
-			$this->createMock(TableMapper::class),
-			$this->createMock(ViewMapper::class),
+			$this->tableMapper,
+			$this->viewMapper,
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->createMock(MenuItemMapper::class),
 			$this->createMock(MenuService::class),
-		);
+		];
+		$this->service = new ContextService(...$this->serviceArguments);
 	}
 
 	public function testTransferLogsPreviousAndNewOwner(): void {
@@ -599,5 +611,80 @@ final class ContextServiceTest extends TestCase {
 		], 5);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
+	}
+
+	/**
+	 * @return array<string, array{?int}>
+	 */
+	public static function tablesThatCannotBeModified(): array {
+		return [
+			'not here' => [null],
+			'here but cannot be managed' => [5],
+		];
+	}
+
+	/**
+	 * @dataProvider tablesThatCannotBeModified
+	 */
+	public function testImportingASchemeRefusesToModifyATableThatIsNotHereOrCannotBeManagedAlike(?int $tableId): void {
+		$this->tableMapper->method('findByUuid')->willReturnCallback(static function () use ($tableId): Table {
+			if ($tableId === null) {
+				throw new DoesNotExistException('No table');
+			}
+			$table = new Table();
+			$table->id = $tableId;
+			return $table;
+		});
+		$this->permissionsService->method('canManageNodeById')->willReturn(false);
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('The table some-uuid to modify is not here or cannot be managed by the user.');
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => [['uuid' => 'some-uuid', 'title' => 'T', 'columns' => [], 'views' => [], 'columnOrder' => [], 'sort' => []]]], 'user-1');
+	}
+
+	public function testImportingASchemeSkipsANodeThatIsNotHereOrCannotBeManagedAlike(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([101 => ['id' => 101, 'node_id' => 3, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$tables = [];
+		foreach (['shared-but-already-a-node' => 3, 'manageable' => 4, 'not-manageable' => 5] as $uuid => $id) {
+			$tables[$uuid] = new Table();
+			$tables[$uuid]->id = $id;
+		}
+		$this->tableMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): Table => $tables[$uuid] ?? throw new DoesNotExistException('No table'));
+		$view = new View();
+		$view->id = 6;
+		$this->viewMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): View => $uuid === 'not-manageable-view' ? $view : throw new DoesNotExistException('No view'));
+		$this->permissionsService->method('canManageNodeById')->willReturnCallback(static fn (int $type, int $id): bool => $type === Application::NODE_TYPE_TABLE && $id === 4);
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
+		$node = static fn (int $type, string $uuid): array => ['node_type' => $type, 'node_uuid' => $uuid, 'permissions' => 1];
+
+		$service = $this->getMockBuilder(ContextService::class)->setConstructorArgs($this->serviceArguments)->onlyMethods(['update'])->getMock();
+		$service->expects($this->once())->method('update')
+			->with(7, 'user-1', 'Intake', 'star', '', [
+				['id' => 3, 'type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 4, 'type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+			])
+			->willReturn($context);
+
+		$service->importScheme(7, 'Intake', 'star', '', [
+			$node(Application::NODE_TYPE_TABLE, 'shared-but-already-a-node'),
+			$node(Application::NODE_TYPE_TABLE, 'manageable'),
+			$node(Application::NODE_TYPE_TABLE, 'not-manageable'),
+			$node(Application::NODE_TYPE_TABLE, 'missing'),
+			$node(Application::NODE_TYPE_VIEW, 'not-manageable-view'),
+			$node(Application::NODE_TYPE_VIEW, 'missing-view'),
+		], ['addTables' => [], 'modifyTables' => []], 'user-1');
+
+		$this->assertSame([
+			'Skipping a node of an imported scheme: no table with the uuid not-manageable is here and can be managed by the user.',
+			'Skipping a node of an imported scheme: no table with the uuid missing is here and can be managed by the user.',
+			'Skipping a node of an imported scheme: no view with the uuid not-manageable-view is here and can be managed by the user.',
+			'Skipping a node of an imported scheme: no view with the uuid missing-view is here and can be managed by the user.',
+		], $warnings);
 	}
 }
