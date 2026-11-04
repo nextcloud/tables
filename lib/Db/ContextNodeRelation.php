@@ -29,9 +29,9 @@ class ContextNodeRelation extends Entity implements \JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
-		$this->addType('context_id', 'integer');
-		$this->addType('node_id', 'integer');
-		$this->addType('node_type', 'integer');
+		$this->addType('contextId', 'integer');
+		$this->addType('nodeId', 'integer');
+		$this->addType('nodeType', 'integer');
 		$this->addType('permissions', 'integer');
 	}
 
