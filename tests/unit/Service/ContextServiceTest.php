@@ -20,7 +20,6 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
-use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
@@ -328,9 +327,6 @@ final class ContextServiceTest extends TestCase {
 	}
 
 	public function testImportContextRemapsSourcesAndSkipsInvalidWidgets(): void {
-		$table = new Table();
-		$table->id = 77;
-		$table->setOwnership('user-1');
 		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
 			$context->id = 8;
 			return $context;
@@ -358,7 +354,7 @@ final class ContextServiceTest extends TestCase {
 			return new \OCA\Tables\Db\Widget();
 		});
 
-		$this->service->importContext($table, [
+		$this->service->importContext([
 			'name' => 'Projects',
 			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
 			'pages' => [[
@@ -379,7 +375,7 @@ final class ContextServiceTest extends TestCase {
 					['type' => 'text', 'title' => '  Notes ', 'gridX' => 6, 'gridY' => 11, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null],
 				],
 			]],
-		], 5);
+		], 'user-1', [5 => 77], []);
 
 		self::assertSame(['overview', 'Overview', 'star', 'At a glance'], [$insertedPages[0]->getTechnicalName(), $insertedPages[0]->getTitle(), $insertedPages[0]->getIcon(), $insertedPages[0]->getDescription()]);
 		self::assertCount(4, $inserted);
@@ -448,9 +444,6 @@ final class ContextServiceTest extends TestCase {
 	 * @param array<int, array{0: string, 1: string}> $expected type and technical name by page id
 	 */
 	public function testImportedPages(array $pages, array $expected): void {
-		$table = new Table();
-		$table->id = 40;
-		$table->setOwnership('user-1');
 		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
 			$context->id = 8;
 			return $context;
@@ -469,7 +462,7 @@ final class ContextServiceTest extends TestCase {
 			return $page;
 		});
 
-		$this->service->importContext($table, ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
+		$this->service->importContext(['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 'user-1', [4 => 40], []);
 
 		self::assertSame($expected, $inserted);
 	}
@@ -524,40 +517,66 @@ final class ContextServiceTest extends TestCase {
 		return ['type' => 'data', 'title' => null, 'gridX' => 0, 'gridY' => $gridY, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => $source];
 	}
 
-	public function testAnImportedWidgetSourceKeepsOnlyTheTableBeingImported(): void {
+	public function testAnApplicationIsImportedOnceWithEachNodeOnItsOwnTableOrView(): void {
 		$exported = [
 			'name' => 'Projects',
 			'nodes' => [
-				['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1],
-				['id' => 102, 'node_id' => 6, 'node_type' => 0, 'permissions' => 1],
+				['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 102, 'node_id' => 6, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 3],
+				['id' => 103, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+				['id' => 104, 'node_id' => 9, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
 			],
 			'pages' => [[
 				'id' => 301,
 				'page_type' => Page::TYPE_GRID,
 				'technical_name' => 'overview',
-				'content' => [],
-				'widgets' => [self::dataWidget(0, ['nodeRelId' => 101]), self::dataWidget(5, ['nodeRelId' => 102])],
+				'content' => [['node_rel_id' => 101, 'order' => 10], ['node_rel_id' => 103, 'order' => 20], ['node_rel_id' => 104, 'order' => 30]],
+				'widgets' => [
+					self::dataWidget(0, ['nodeRelId' => 101]),
+					self::dataWidget(5, ['nodeRelId' => 102]),
+					self::dataWidget(10, ['nodeRelId' => 103]),
+					self::dataWidget(15, ['nodeRelId' => 104]),
+				],
 			]],
 		];
 		$record = $this->recordImport();
-		$table = new Table();
-		$table->id = 78;
-		$table->setOwnership('user-1');
+		$contents = [];
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content) use (&$contents): PageContent {
+			$contents[] = $content->getNodeRelId();
+			return $content;
+		});
 
-		// the migrator imports the application once per table it holds; this is table 6
-		$this->service->importContext($table, $exported, 6);
+		$imported = $this->service->importContext($exported, 'user-1', [5 => 77, 6 => 78], [5 => 90]);
 
-		$relationOfTable6 = $record['relations'][1];
-		self::assertSame([null, $relationOfTable6->getId()], array_column($record['widgets'], 5));
+		self::assertNotNull($imported);
+		self::assertSame('user-1', $imported->getOwnerId());
+		self::assertSame(
+			[[Application::NODE_TYPE_TABLE, 77, 1], [Application::NODE_TYPE_TABLE, 78, 3], [Application::NODE_TYPE_VIEW, 90, 1]],
+			array_map(static fn (ContextNodeRelation $relation): array => [$relation->getNodeType(), $relation->getNodeId(), $relation->getPermissions()], $record['relations']),
+		);
+		self::assertSame([501, 503], $contents);
+		self::assertSame([501, 502, 503, null], array_column($record['widgets'], 5));
+	}
+
+	public function testAnApplicationWithoutImportedNodesIsNotImported(): void {
+		$this->contextMapper->expects($this->never())->method('insert');
+
+		$imported = $this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [
+				['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE],
+				['id' => 102, 'node_id' => '6', 'node_type' => Application::NODE_TYPE_TABLE],
+				['id' => 103, 'node_id' => 6, 'node_type' => 7],
+			],
+		], 'user-1', [6 => 78], [5 => 90]);
+
+		self::assertNull($imported);
 	}
 
 	public function testABrokenExportFileSkipsTheWidgetInsteadOfFailing(): void {
 		$record = $this->recordImport();
-		$table = new Table();
-		$table->id = 77;
-		$table->setOwnership('user-1');
 
-		$this->service->importContext($table, [
+		$this->service->importContext([
 			'name' => 'Projects',
 			'nodes' => [['id' => [101], 'node_id' => 5, 'node_type' => 0, 'permissions' => 1], ['id' => 102, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
 			'pages' => [[
@@ -575,7 +594,7 @@ final class ContextServiceTest extends TestCase {
 					self::dataWidget(20, ['nodeRelId' => 102]),
 				],
 			]],
-		], 5);
+		], 'user-1', [5 => 77], []);
 
 		self::assertSame([null, null], [$record['pages'][0]->getTitle(), $record['pages'][0]->getDescription()]);
 		self::assertCount(1, $record['widgets']);
@@ -584,19 +603,16 @@ final class ContextServiceTest extends TestCase {
 
 	public function testAnImportedPageKeepsAtMostTheMaximumNumberOfWidgets(): void {
 		$record = $this->recordImport();
-		$table = new Table();
-		$table->id = 77;
-		$table->setOwnership('user-1');
 		$widgets = [];
 		for ($i = 0; $i < GridWidgetTypes::MAX_WIDGETS_PER_PAGE + 5; $i++) {
 			$widgets[] = ['type' => 'text', 'title' => null, 'gridX' => 0, 'gridY' => $i * 2, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null];
 		}
 
-		$this->service->importContext($table, [
+		$this->service->importContext([
 			'name' => 'Projects',
 			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
 			'pages' => [['id' => 301, 'page_type' => Page::TYPE_GRID, 'technical_name' => 'one', 'content' => [], 'widgets' => $widgets]],
-		], 5);
+		], 'user-1', [5 => 77], []);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
 	}

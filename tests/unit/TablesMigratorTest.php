@@ -22,6 +22,7 @@ use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -342,6 +343,7 @@ class TablesMigratorTest extends TestCase {
 		];
 		$views = [
 			[
+				'id' => 30,
 				'tableId' => 1,
 				'title' => 'Nested settings',
 				'columnSettings' => [['columnId' => 10, 'order' => 0]],
@@ -351,6 +353,7 @@ class TablesMigratorTest extends TestCase {
 				],
 			],
 			[
+				'id' => 31,
 				'tableId' => 1,
 				'title' => 'Without settings',
 				'columnSettings' => [['columnId' => 11, 'order' => 0]],
@@ -403,5 +406,48 @@ class TablesMigratorTest extends TestCase {
 		$this->assertSame(20, $importedViews[0]['columnSettings'][0]['columnId']);
 		$this->assertArrayNotHasKey('viewSettings', $importedViews[1]);
 		$this->assertSame(21, $importedViews[1]['columnSettings'][0]['columnId']);
+	}
+
+	public function testImportImportsEachApplicationOnceWithItsTablesAndViews(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('user1');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$context = ['id' => 7, 'name' => 'Projects', 'nodes' => [
+			['id' => 1, 'node_id' => 1, 'node_type' => 0],
+			['id' => 2, 'node_id' => 2, 'node_type' => 0],
+			['id' => 3, 'node_id' => 30, 'node_type' => 1],
+		]];
+		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
+			'tables.json' => json_encode([['id' => 1, 'title' => 'Tasks'], ['id' => 2, 'title' => 'People']]),
+			'views.json' => json_encode([['id' => 30, 'tableId' => 2, 'title' => 'Team']]),
+			'contexts.json' => json_encode([$context]),
+			default => json_encode([]),
+		});
+		$this->tableMapper->method('getDBConnection')->willReturn(new class {
+			public function beginTransaction(): void {
+			}
+			public function commit(): void {
+			}
+			public function rollBack(): void {
+			}
+		});
+		$this->tableService->method('importTable')->willReturnCallback(static function (array $table): Table {
+			$newTable = new Table();
+			$newTable->setId($table['id'] * 100);
+			return $newTable;
+		});
+		$this->viewService->method('importView')->willReturnCallback(static function (int $tableId, array $view): View {
+			$newView = new View();
+			$newView->setId($view['id'] * 10);
+			return $newView;
+		});
+
+		$this->contextService->expects($this->once())
+			->method('importContext')
+			->with($context, 'user1', [1 => 100, 2 => 200], [30 => 300])
+			->willReturn($this->createMock(Context::class));
+
+		$this->migrator->import($user, $importSource, new NullOutput());
 	}
 }
