@@ -28,6 +28,7 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\GridWidgetTypes;
+use OCA\Tables\Service\MenuService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
@@ -87,6 +88,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->createMock(MenuItemMapper::class),
+			$this->createMock(MenuService::class),
 		);
 	}
 
