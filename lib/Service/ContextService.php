@@ -23,6 +23,7 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
@@ -786,14 +787,23 @@ class ContextService {
 	}
 
 	/**
-	 * The node relation of an application for an exported table or view, found by uuid.
+	 * The table or view (by kind, `table` or `view`) with a uuid, or null when it is not here.
+	 *
+	 * @throws Exception
 	 */
-	private function nodeRelIdByUuid(Context $context, string $kind, string $uuid): ?int {
+	private function findNodeByUuid(string $kind, string $uuid): Table|View|null {
 		try {
-			$node = $kind === 'table' ? $this->tableMapper->findByUuid($uuid) : $this->viewMapper->findByUuid($uuid);
+			return $kind === 'table' ? $this->tableMapper->findByUuid($uuid) : $this->viewMapper->findByUuid($uuid);
 		} catch (DoesNotExistException) {
 			return null;
 		}
+	}
+
+	/**
+	 * The node relation of an application for an exported table or view, found by uuid.
+	 */
+	private function nodeRelIdByUuid(Context $context, string $kind, string $uuid): ?int {
+		$node = $this->findNodeByUuid($kind, $uuid);
 		if ($node === null) {
 			return null;
 		}
@@ -1119,28 +1129,41 @@ class ContextService {
 				throw new BadRequestError('Table scheme must include a UUID for modification.');
 			}
 			$tableService->validateTableScheme($tableScheme);
-			$table = $this->tableMapper->findByUuid($tableScheme['uuid']);
+			$table = $this->findNodeByUuid('table', $tableScheme['uuid']);
+			if ($table === null || !$this->permissionsService->canManageNodeById(Application::NODE_TYPE_TABLE, $table->getId(), $userId)) {
+				throw new BadRequestError('The table ' . $tableScheme['uuid'] . ' to modify is not here or cannot be managed by the user.');
+			}
 			$tableService->updateTableStructure($table->getId(), $tableScheme['columns'], $tableScheme['views'], $tableScheme['columnOrder'], $tableScheme['sort'], $userId);
 		}
 
-		// Resolve node ids for the new tables and views
+		// A node whose table or view is not here, or is new to the application and cannot be
+		// managed by the user, is skipped the same way, like a menu item.
+		$currentNodes = [];
+		foreach ($this->contextMapper->findById($contextId, $userId)->getNodes() ?? [] as $node) {
+			$currentNodes[sprintf('t%di%d', $node['node_type'], $node['node_id'])] = true;
+		}
 		$resolvedNodes = [];
 		foreach ($nodes as $node) {
-			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
-				$table = $this->tableMapper->findByUuid($node['node_uuid']);
-				$resolvedNodes[] = [
-					'id' => $table->getId(),
-					'type' => $node['node_type'],
-					'permissions' => $node['permissions'],
-				];
-			} elseif ($node['node_type'] === Application::NODE_TYPE_VIEW) {
-				$view = $this->viewMapper->findByUuid($node['node_uuid']);
-				$resolvedNodes[] = [
-					'id' => $view->getId(),
-					'type' => $node['node_type'],
-					'permissions' => $node['permissions'],
-				];
+			$kind = match ($node['node_type']) {
+				Application::NODE_TYPE_TABLE => 'table',
+				Application::NODE_TYPE_VIEW => 'view',
+				default => null,
+			};
+			if ($kind === null) {
+				continue;
 			}
+			$found = $this->findNodeByUuid($kind, $node['node_uuid']);
+			if ($found === null
+				|| (!isset($currentNodes[sprintf('t%di%d', $node['node_type'], $found->getId())])
+					&& !$this->permissionsService->canManageNodeById($node['node_type'], $found->getId(), $userId))) {
+				$this->logger->warning('Skipping a node of an imported scheme: no ' . $kind . ' with the uuid ' . $node['node_uuid'] . ' is here and can be managed by the user.');
+				continue;
+			}
+			$resolvedNodes[] = [
+				'id' => $found->getId(),
+				'type' => $node['node_type'],
+				'permissions' => $node['permissions'],
+			];
 		}
 
 		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
