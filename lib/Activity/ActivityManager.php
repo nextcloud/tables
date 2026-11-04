@@ -359,7 +359,6 @@ class ActivityManager {
 
 		$changedColumnIds = [];
 		$tableId = $object->getTableId();
-		$owner = $this->tableMapper->find($tableId)->getOwnership();
 
 		if ($event->getSubject() === self::SUBJECT_ROW_UPDATE) {
 			foreach ($event->getSubjectParameters()['changeCols'] ?? [] as $changeCol) {
@@ -393,8 +392,6 @@ class ActivityManager {
 		$event->setType(self::EVENT_TYPE_VIEW_COLUMN);
 		$subjectParams['isViewContext'] = true;
 
-		$tableId = $object->getTableId();
-		$owner = $this->tableMapper->find($tableId)->getOwnership();
 		$affectedViews = $this->getAffectedViewsForColumn($object);
 
 		foreach ($affectedViews as $view) {
