@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\UserMigration;
 
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\RowCellDatetime;
@@ -31,6 +32,7 @@ use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
+use OCA\Tables\Service\MenuService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
@@ -84,6 +86,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 		protected RowService $rowService,
 		private ContextService $contextService,
 		private ShareService $shareService,
+		private MenuService $menuService,
 	) {
 	}
 
@@ -123,7 +126,10 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 
 			$contexts = $this->contextMapper->findAll($uid);
 			$this->contextService->addWidgetsToPages($contexts);
-			$exportDestination->addFileContents(self::FILE_CONTEXTS, json_encode($contexts));
+			$exportDestination->addFileContents(self::FILE_CONTEXTS, json_encode(array_map(
+				fn (Context $context): array => $context->jsonSerialize() + ['menu' => $this->menuService->export($context)],
+				$contexts,
+			)));
 			$contextIds = array_map(fn ($c) => $c->getId(), $contexts);
 
 			$shares = $this->shareMapper->findAllSharesForTablesAndContexts($tableIds, $contextIds);
@@ -438,7 +444,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	 */
 	private function importContexts(array $contexts, Table $newTable, array $table, array &$contextIdMap): void {
 		foreach ($contexts as $context) {
-			$newContext = $this->contextService->importContext($newTable, $context, $table['id']);
+			$newContext = $this->contextService->importContext($newTable, $context, $table['id'], $table['uuid'] ?? null);
 			if ($newContext !== null) {
 				$contextIdMap[$context['id']] = $newContext->getId();
 			}

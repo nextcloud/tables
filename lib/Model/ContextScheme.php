@@ -18,6 +18,7 @@ class ContextScheme implements JsonSerializable {
 		protected ?array $nodes = [],
 		protected ?array $pages = [],
 		protected ?array $tables = [],
+		protected ?array $menu = [],
 	) {
 	}
 
@@ -45,6 +46,10 @@ class ContextScheme implements JsonSerializable {
 		return $this->tables;
 	}
 
+	public function getMenu(): ?array {
+		return $this->menu;
+	}
+
 	public function jsonSerialize(): mixed {
 		return [
 			'name' => $this->name,
@@ -53,6 +58,7 @@ class ContextScheme implements JsonSerializable {
 			'nodes' => $this->nodes,
 			'pages' => $this->pages,
 			'tables' => $this->tables,
+			'menu' => $this->menu,
 		];
 	}
 }

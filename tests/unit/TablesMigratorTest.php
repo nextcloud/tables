@@ -26,6 +26,7 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
+use OCA\Tables\Service\MenuService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
@@ -60,6 +61,7 @@ class TablesMigratorTest extends TestCase {
 	private $rowService;
 	private $contextService;
 	private $shareService;
+	private $menuService;
 
 	protected function setUp(): void {
 		$this->l10n = $this->createMock(IL10N::class);
@@ -83,6 +85,7 @@ class TablesMigratorTest extends TestCase {
 		$this->contextService = $this->createMock(ContextService::class);
 		$this->shareService = $this->createMock(ShareService::class);
 
+		$this->menuService = $this->createMock(MenuService::class);
 		$this->migrator = new TablesMigrator(
 			$this->l10n,
 			$this->tableMapper,
@@ -103,7 +106,8 @@ class TablesMigratorTest extends TestCase {
 			$this->columnService,
 			$this->rowService,
 			$this->contextService,
-			$this->shareService
+			$this->shareService,
+			$this->menuService,
 		);
 	}
 
@@ -150,7 +154,7 @@ class TablesMigratorTest extends TestCase {
 		$this->assertTrue(true);
 	}
 
-	public function testExportWritesTheWidgetsOfEveryContextPage(): void {
+	public function testExportWritesTheWidgetsAndTheMenuOfEveryContext(): void {
 		$user = $this->createMock(IUser::class);
 		$exportDestination = $this->createMock(IExportDestination::class);
 		$user->method('getUID')->willReturn('user1');
@@ -171,6 +175,9 @@ class TablesMigratorTest extends TestCase {
 				$contexts[0]->setPages([5 => ['id' => 5, 'page_type' => 'grid', 'content' => [], 'widgets' => [$widget]]]);
 			});
 
+		$menu = [['parent' => null, 'title' => 'Site', 'displayTitle' => 'Site', 'icon' => null, 'description' => null, 'target' => ['url' => 'https://nextcloud.com']]];
+		$this->menuService->method('export')->with($context)->willReturn($menu);
+
 		$files = [];
 		$exportDestination->method('addFileContents')->willReturnCallback(static function (string $path, string $content) use (&$files): void {
 			$files[$path] = $content;
@@ -179,6 +186,7 @@ class TablesMigratorTest extends TestCase {
 
 		$contexts = json_decode($files['contexts.json'], true);
 		$this->assertSame([$widget], $contexts[0]['pages'][5]['widgets']);
+		$this->assertSame($menu, $contexts[0]['menu']);
 	}
 
 	public function testExportFailure(): void {
