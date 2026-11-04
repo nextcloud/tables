@@ -117,11 +117,15 @@ export const useTablesStore = defineStore('store', {
 		},
 		setTable(table) {
 			const index = this.tables.findIndex(t => t.id === table.id)
-			this.tables.splice(index, 1, table)
+			if (index !== -1) {
+				this.tables[index] = table
+			}
 		},
 		setView(view) {
 			const index = this.views.findIndex(v => v.id === view.id)
-			this.views[index] = view
+			if (index !== -1) {
+				this.views[index] = view
+			}
 		},
 		setContext(context) {
 			const index = this.contexts.findIndex(c => c.id === context.id)
@@ -242,11 +246,8 @@ export const useTablesStore = defineStore('store', {
 				return false
 			}
 
-			const view = res.data
-			const views = this.views
-			const index = views.findIndex(v => v.id === view.id)
-			views[index] = view
-			this.setViews([...views])
+			this.setView(res.data)
+			this.setViews([...this.views])
 			return true
 		},
 
@@ -260,7 +261,9 @@ export const useTablesStore = defineStore('store', {
 
 			const views = this.views
 			const index = views.findIndex(v => v.id === viewId)
-			views.splice(index, 1)
+			if (index !== -1) {
+				views.splice(index, 1)
+			}
 			this.setViews([...views])
 			return true
 		},
@@ -269,12 +272,7 @@ export const useTablesStore = defineStore('store', {
 			let res = null
 			try {
 				res = await axios.get(generateUrl('/apps/tables/view/table/' + tableId))
-				// Set Views
-				const views = this.views
-				res.data.forEach(view => {
-					const index = views.findIndex(v => v.id === view.id)
-					this.views[index] = view
-				})
+				res.data.forEach(view => this.setView(view))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not reload view.'))
 				return false
@@ -309,10 +307,7 @@ export const useTablesStore = defineStore('store', {
 				return false
 			}
 
-			const table = res.data
-			const tables = this.tables
-			const index = tables.findIndex(t => t.id === table.id)
-			this.tables[index] = table
+			this.setTable(res.data)
 			return true
 		},
 
@@ -325,6 +320,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.views.findIndex(v => v.id === id)
+			if (index === -1) {
+				return true
+			}
 			const view = this.views[index]
 			view.favorite = true
 			this.setView(view)
@@ -341,6 +339,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.views.findIndex(v => v.id === id)
+			if (index === -1) {
+				return true
+			}
 			const view = this.views[index]
 			view.favorite = false
 			this.setView(view)
@@ -357,6 +358,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.tables.findIndex(t => t.id === id)
+			if (index === -1) {
+				return true
+			}
 			const table = this.tables[index]
 			table.favorite = true
 			this.setTable(table)
@@ -373,6 +377,9 @@ export const useTablesStore = defineStore('store', {
 			}
 
 			const index = this.tables.findIndex(t => t.id === id)
+			if (index === -1) {
+				return true
+			}
 			const table = this.tables[index]
 			table.favorite = false
 			this.setTable(table)
@@ -467,7 +474,9 @@ export const useTablesStore = defineStore('store', {
 
 			const context = res.data.ocs.data
 			const index = this.contexts.findIndex(c => c.id === context.id)
-			this.contexts[index] = context
+			if (index !== -1) {
+				this.contexts[index] = context
+			}
 
 			return true
 		},
@@ -482,7 +491,9 @@ export const useTablesStore = defineStore('store', {
 
 			const tables = this.tables
 			const index = tables.findIndex(t => t.id === id)
-			tables.splice(index, 1)
+			if (index !== -1) {
+				tables.splice(index, 1)
+			}
 			this.setTables([...tables])
 			return true
 		},
@@ -631,7 +642,9 @@ export const useTablesStore = defineStore('store', {
 
 			const contexts = this.contexts
 			const index = contexts.findIndex(c => c.id === id)
-			contexts.splice(index, 1)
+			if (index !== -1) {
+				contexts.splice(index, 1)
+			}
 			this.setContexts([...contexts])
 			return true
 		},
@@ -645,7 +658,9 @@ export const useTablesStore = defineStore('store', {
 			}
 			const contexts = this.contexts
 			const index = contexts.findIndex(c => c.id === context.id)
-			contexts.splice(index, 1)
+			if (index !== -1) {
+				contexts.splice(index, 1)
+			}
 			this.setContexts([...contexts])
 			return true
 		},
@@ -660,7 +675,9 @@ export const useTablesStore = defineStore('store', {
 
 			const tables = this.tables
 			const index = tables.findIndex(t => t.id === tableId)
-			tables.splice(index, 1)
+			if (index !== -1) {
+				tables.splice(index, 1)
+			}
 			this.setTables([...tables])
 			return true
 		},
