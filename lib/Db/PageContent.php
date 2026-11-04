@@ -25,8 +25,8 @@ class PageContent extends Entity implements \JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
-		$this->addType('page_id', 'integer');
-		$this->addType('node_rel_id', 'integer');
+		$this->addType('pageId', 'integer');
+		$this->addType('nodeRelId', 'integer');
 		$this->addType('order', 'integer');
 	}
 
