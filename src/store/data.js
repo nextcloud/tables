@@ -215,9 +215,8 @@ export const useDataStore = defineStore('data', {
 
 			const stateId = genStateKey(isView, elementId)
 			if (stateId && this.columns[stateId]) {
-				const col = res.data
-				const index = this.columns[stateId].findIndex(c => c.id === col.id)
-				this.columns[stateId][index] = parseCol(col)
+				const col = parseCol(res.data)
+				this.columns[stateId] = this.columns[stateId].map(c => c.id === col.id ? col : c)
 			}
 
 			return true
@@ -381,8 +380,7 @@ export const useDataStore = defineStore('data', {
 			const stateId = 'public-' + token
 			if (this.rows[stateId]) {
 				const row = res?.data?.ocs?.data
-				const index = this.rows[stateId].findIndex(r => r.id === rowId)
-				this.rows[stateId][index] = row
+				this.rows[stateId] = this.rows[stateId].map(r => r.id === rowId ? row : r)
 			}
 			return true
 		},
