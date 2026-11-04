@@ -8,6 +8,8 @@ const MENU_SWITCH = '[data-cy="importSchemeMenu"]'
 const SKIPPED = '[data-cy="importSchemeMenuSkipped"]'
 const NODES_SWITCH = '[data-cy="importSchemeNodes"]'
 const TO_ITEMS = '[data-cy="importSchemeMenuTo"]'
+const PAGES_SWITCH = '[data-cy="importSchemePages"]'
+const PAGES_SKIPPED = '[data-cy="importSchemePagesSkipped"]'
 
 const schemeMenu = [
 	{ parent: null, title: 'Reports', displayTitle: 'Reports', icon: null, description: null, target: null },
@@ -71,23 +73,65 @@ describe('Import application scheme preview', () => {
 		cy.get(TO_ITEMS).eq(3).should('contain', 'Untitled item').and('contain', 'Page')
 	})
 
+	it('sends the pages of the scheme with the import', () => {
+		mountPreview(undefined, undefined, { from: [{ slug: 'dashboard', title: 'Old start' }], to: schemePages, skipped: [] })
+			.then(({ wrapper }) => {
+				cy.get(PAGES_SWITCH).should('exist')
+				cy.contains('Old start').should('exist')
+				cy.contains('Overview').should('exist')
+				cy.wrap(null).then(() => {
+					expect(lastPayload(wrapper).pages).to.deep.equal(schemePages)
+				})
+			})
+	})
+
+	it('leaves the pages out when the switch is turned off', () => {
+		mountPreview(undefined, undefined, { from: [], to: schemePages, skipped: [] })
+			.then(({ wrapper }) => {
+				cy.get(PAGES_SWITCH).click({ force: true })
+				cy.wrap(null).then(() => {
+					expect(lastPayload(wrapper)).to.not.have.property('pages')
+				})
+			})
+	})
+
+	it('lists the pages and widgets the import would skip', () => {
+		mountPreview(undefined, undefined, {
+			from: [],
+			to: [],
+			skipped: [
+				{ pageIndex: 0, page: 'Overview', widgetIndex: 2, widget: 'Elsewhere', reason: 'its table is not here or cannot be managed by the user' },
+				{ pageIndex: 1, page: 'Second start', widgetIndex: null, widget: null, reason: 'an application has one start page' },
+			],
+		})
+
+		cy.get(PAGES_SKIPPED).should('contain', 'Overview: Elsewhere').and('contain', 'Second start')
+	})
+
 	it('has no menu section for a preview without a menu', () => {
 		mountPreview(undefined)
 			.then(({ wrapper }) => {
 				cy.get(MENU_SWITCH).should('not.exist')
+				cy.get(PAGES_SWITCH).should('not.exist')
 				cy.wrap(null).then(() => {
 					expect(lastPayload(wrapper)).to.not.have.property('menu')
+					expect(lastPayload(wrapper)).to.not.have.property('pages')
 				})
 			})
 	})
 })
 
+const schemePages = [
+	{ page_type: 'grid', slug: 'overview', title: 'Overview', widgets: [{ type: 'data', title: 'Tasks', source: { targetType: 'table', targetUuid: 'table-uuid' } }] },
+]
+
 /**
  * @param {object|undefined} menu the menu part of the preview response
  * @param {object} nodes the nodes part of the preview response
+ * @param {object|undefined} pages the pages part of the preview response
  * @return {Cypress.Chainable} the mount result
  */
-function mountPreview(menu, nodes = { from: [], to: [] }) {
+function mountPreview(menu, nodes = { from: [], to: [] }, pages = undefined) {
 	return cy.mount(ImportContextSchemePreview, {
 		props: {
 			previewData: {
@@ -98,6 +142,7 @@ function mountPreview(menu, nodes = { from: [], to: [] }) {
 				addTables: {},
 				modifyTables: {},
 				...(menu === undefined ? {} : { menu }),
+				...(pages === undefined ? {} : { pages }),
 			},
 		},
 	})

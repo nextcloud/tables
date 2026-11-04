@@ -439,14 +439,16 @@ class MenuService {
 	 * as the import takes it back: page targets name the slug of the page of the application
 	 * they stand for and show the title they get there, an item names its group by the group's position among the
 	 * kept items, and only tables and views among the scheme's nodes count as having come
-	 * along.
+	 * along. A page the import adds is not there yet; `$addedPageIds` lists those by
+	 * exported id.
 	 *
 	 * @param list<mixed> $menu
 	 * @param array<array-key, mixed> $schemePages
 	 * @param array<array-key, mixed> $schemeNodes
+	 * @param array<int, int> $addedPageIds
 	 * @return array{to: list<array<array-key, mixed>>, skipped: list<array{index: int, title: ?string, reason: string}>}
 	 */
-	public function previewSchemeImport(Context $context, array $menu, array $schemePages, array $schemeNodes): array {
+	public function previewSchemeImport(Context $context, array $menu, array $schemePages, array $schemeNodes, array $addedPageIds = []): array {
 		$schemeUuids = [];
 		foreach ($schemeNodes as $node) {
 			$kind = ($node['node_type'] ?? null) === Application::NODE_TYPE_VIEW ? 'view' : 'table';
@@ -457,7 +459,7 @@ class MenuService {
 			$context,
 			$menu,
 			static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
-			static fn (string $slug): ?int => $pageIds[$slug] ?? null,
+			static fn (int $pageId): ?int => $pageIds[$pageId] ?? $addedPageIds[$pageId] ?? null,
 		);
 		$pages = $context->getPages() ?? [];
 		$positions = array_flip(array_column($items, 'index'));
