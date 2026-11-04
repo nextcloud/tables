@@ -229,6 +229,41 @@
 				</ul>
 			</div>
 		</div>
+
+		<!-- Pages Section -->
+		<div v-if="previewData.pages" class="preview-section preview-section--option">
+			<div class="preview-option">
+				<NcCheckboxRadioSwitch v-model="importPages" class="preview-option__label" type="switch" data-cy="importSchemePages">
+					{{ t('tables', 'Pages') }}
+				</NcCheckboxRadioSwitch>
+				<div v-if="importPages" class="preview-card__meta preview-card__meta--compare">
+					<ul class="preview-card__meta--before">
+						<li class="preview-card__meta-title">
+							{{ t('tables', 'From') }}:
+						</li>
+						<li v-for="(page, index) in previewData.pages.from" :key="index">
+							{{ page.title || page.slug }}
+						</li>
+					</ul>
+					<ul class="preview-card__meta--after">
+						<li class="preview-card__meta-title">
+							{{ t('tables', 'To') }}:
+						</li>
+						<li v-for="(page, index) in previewData.pages.to" :key="index">
+							{{ page.title || page.technical_name || page.slug }}
+						</li>
+					</ul>
+				</div>
+				<ul v-if="importPages && previewData.pages.skipped.length > 0" class="preview-card__meta" data-cy="importSchemePagesSkipped">
+					<li class="preview-card__meta-title">
+						{{ t('tables', 'Skipped, not available here') }}:
+					</li>
+					<li v-for="item in previewData.pages.skipped" :key="item.pageIndex + '-' + item.widgetIndex">
+						{{ skippedPageLabel(item) }}
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -288,6 +323,7 @@ export default {
 			importDescription: true,
 			importNodes: true,
 			importMenu: true,
+			importPages: true,
 			addTablesConfig: [],
 			removeColumnsConfig: [],
 			modifyTablesConfig: [],
@@ -346,6 +382,11 @@ export default {
 			}
 		},
 		importMenu: {
+			handler() {
+				this.emitPayload()
+			},
+		},
+		importPages: {
 			handler() {
 				this.emitPayload()
 			},
@@ -442,6 +483,18 @@ export default {
 				: t('tables', 'View: {title}', { title: node.node_title }, undefined, { escape: false })
 		},
 
+		/**
+		 * @param {object} item a skipped page, or a skipped widget of a page
+		 * @return {string} the page, and the widget when it is one
+		 */
+		skippedPageLabel(item) {
+			const page = item.page || t('tables', 'Untitled page')
+			if (item.widgetIndex === null) {
+				return page
+			}
+			return t('tables', '{page}: {widget}', { page, widget: item.widget || t('tables', 'Untitled widget') }, undefined, { escape: false })
+		},
+
 		getShortDescription(description) {
 			if (!description) {
 				return ''
@@ -468,6 +521,10 @@ export default {
 			// without a menu the import leaves the menu of the application as it is
 			if (this.importMenu && this.menuPreview) {
 				payload.menu = this.menuPreview.to
+			}
+			// without pages the import leaves the pages of the application as they are
+			if (this.importPages && this.previewData.pages) {
+				payload.pages = this.previewData.pages.to
 			}
 
 			this.$emit('update', payload)
