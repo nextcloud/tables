@@ -21,7 +21,6 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
-use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
@@ -656,32 +655,26 @@ class ContextService {
 	}
 
 	/**
-	 * Imports an application of a user's data that holds the given table. Its menu keeps
-	 * the links, the items for its pages and the items for the table, found by the uuid
-	 * it was exported with.
+	 * Imports an exported application with each node pointing at the table or view it was
+	 * imported as. A node that was not imported is left out, together with the page
+	 * contents and widget sources showing it. An application none of whose nodes was
+	 * imported is not imported.
 	 *
-	 * @param Table $table
-	 * @param array $context
-	 * @param int $tableOldId
-	 * @param string|null $tableOldUuid
-	 *
-	 * @return Context|null
+	 * @param array<array-key, mixed> $context exported application
+	 * @param array<int, int> $tableIds new table ids by exported id
+	 * @param array<int, int> $viewIds new view ids by exported id
 	 *
 	 * @throws \Exception
 	 */
-	public function importContext(Table $table, array $context, int $tableOldId, ?string $tableOldUuid = null): ?Context {
-		// checking if any node in $context['nodes'] matches the old table id
-		$hasMatchingNode = false;
-		if (!empty($context['nodes'])) {
-			foreach ($context['nodes'] as $nodeArr) {
-				if (($nodeArr['node_id'] ?? null) == $tableOldId) {
-					$hasMatchingNode = true;
-					break;
-				}
+	public function importContext(array $context, string $ownerId, array $tableIds, array $viewIds): ?Context {
+		$nodes = [];
+		foreach (is_array($context['nodes'] ?? null) ? $context['nodes'] : [] as $nodeArr) {
+			$node = is_array($nodeArr) ? self::importedNode($nodeArr, $tableIds, $viewIds) : null;
+			if ($node !== null) {
+				$nodes[] = [$nodeArr, ...$node];
 			}
 		}
-
-		if (!$hasMatchingNode) {
+		if ($nodes === []) {
 			return null;
 		}
 
@@ -689,32 +682,21 @@ class ContextService {
 		$newContext->setName($context['name'] ?? '');
 		$newContext->setIcon($context['iconName'] ?? '');
 		$newContext->setDescription($context['description'] ?? '');
-		$newContext->setOwnerId($table->getOwnership() ?? '');
+		$newContext->setOwnerId($ownerId);
 		$newContext->setOwnerType($context['ownerType'] ?? 0);
 		$this->contextMapper->insert($newContext);
 
-		// insert nodes
 		$nodeRelMap = [];
-		// the relations of the table being imported, the only node a widget source can keep
-		$sourceRelMap = [];
-		if (!empty($context['nodes'])) {
-			foreach ($context['nodes'] as $nodeArr) {
-				$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0;
-				$contextNodeRel = new ContextNodeRelation();
-				$contextNodeRel->setContextId($newContext->getId());
-				$contextNodeRel->setNodeId($table->getId());
-				$contextNodeRel->setNodeType($nodeType);
-				$contextNodeRel->setPermissions($nodeArr['permissions'] ?? 0);
-				$contextNodeRel = $this->contextNodeRelMapper->insert($contextNodeRel);
-				$oldRelId = self::importedKey($nodeArr['id'] ?? null);
-				if ($oldRelId === null) {
-					continue;
-				}
+		foreach ($nodes as [$nodeArr, $nodeType, $nodeId]) {
+			$contextNodeRel = new ContextNodeRelation();
+			$contextNodeRel->setContextId($newContext->getId());
+			$contextNodeRel->setNodeId($nodeId);
+			$contextNodeRel->setNodeType($nodeType);
+			$contextNodeRel->setPermissions($nodeArr['permissions'] ?? 0);
+			$contextNodeRel = $this->contextNodeRelMapper->insert($contextNodeRel);
+			$oldRelId = self::importedKey($nodeArr['id'] ?? null);
+			if ($oldRelId !== null) {
 				$nodeRelMap[$oldRelId] = $contextNodeRel;
-				$oldNodeId = $nodeArr['node_id'] ?? $nodeArr['nodeId'] ?? null;
-				if (is_numeric($nodeType) && (int)$nodeType === Application::NODE_TYPE_TABLE && is_numeric($oldNodeId) && (int)$oldNodeId === $tableOldId) {
-					$sourceRelMap[$oldRelId] = $contextNodeRel;
-				}
 			}
 		}
 
@@ -768,7 +750,7 @@ class ContextService {
 			if (count($widgets) > GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
 				$this->logger->warning('Skipping ' . (count($widgets) - GridWidgetTypes::MAX_WIDGETS_PER_PAGE) . ' imported widgets: a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . '.');
 			}
-			$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $sourceRelMap);
+			$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $nodeRelMap);
 		}
 
 		if (!$hasStartPage) {
@@ -777,11 +759,11 @@ class ContextService {
 		}
 
 		if (is_array($context['menu'] ?? null)) {
-			$tableRelation = reset($sourceRelMap);
+			$imported = $this->contextMapper->findById($newContext->getId());
 			$this->logSkippedMenuItems($this->menuService->import(
-				$this->contextMapper->findById($newContext->getId()),
+				$imported,
 				$context['menu'],
-				static fn (string $kind, string $uuid): ?int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false ? $tableRelation->getId() : null,
+				fn (string $kind, string $uuid): ?int => $this->nodeRelIdByUuid($imported, $kind, $uuid),
 				static fn (int $pageId): ?int => ($pageMap[$pageId] ?? null)?->getId(),
 			));
 		}
@@ -813,6 +795,28 @@ class ContextService {
 			$pageContent->setOrder(10 * ($i + 1));
 			$this->pageContentMapper->insert($pageContent);
 		}
+	}
+
+	/**
+	 * The node type and new id of an exported node, or null when it was not imported.
+	 *
+	 * @param array<array-key, mixed> $nodeArr
+	 * @param array<int, int> $tableIds new table ids by exported id
+	 * @param array<int, int> $viewIds new view ids by exported id
+	 * @return array{0: int, 1: int}|null
+	 */
+	private static function importedNode(array $nodeArr, array $tableIds, array $viewIds): ?array {
+		$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? null;
+		$oldNodeId = $nodeArr['node_id'] ?? $nodeArr['nodeId'] ?? null;
+		if (!is_int($oldNodeId)) {
+			return null;
+		}
+		$nodeId = match ($nodeType) {
+			Application::NODE_TYPE_TABLE => $tableIds[$oldNodeId] ?? null,
+			Application::NODE_TYPE_VIEW => $viewIds[$oldNodeId] ?? null,
+			default => null,
+		};
+		return $nodeId === null ? null : [$nodeType, $nodeId];
 	}
 
 	/**
