@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<tr v-if="row" :class="{ selected }">
+	<tr v-if="row" :class="{ selected }" :style="rowFormatting">
 		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<NcCheckboxRadioSwitch :model-value="selected" @update:model-value="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
@@ -11,6 +11,7 @@
 			:style="{
 				...getColumnWidthStyle(col),
 				...getFrozenColumnStyle(col, index, pinnedColumnIndex, config.canSelectRows, visibleColumns, columnWidths),
+				...cellFormatting(col.id),
 			}"
 			:class="{
 				'search-result': getCell(col.id)?.searchStringFound,
@@ -20,6 +21,12 @@
 				'frozen-column--last': index === pinnedColumnIndex,
 			}"
 			@click="handleCellClick(col)">
+			<span v-for="(mark, markIndex) in cellMarkers(col.id, index === 0)"
+				:key="markIndex"
+				class="formatting-marker">
+				<component :is="markerComponent(mark.marker)" :size="16" />
+				<span class="hidden-visually">{{ markerLabel(mark) }}</span>
+			</span>
 			<component :is="getTableCellComponent(col)"
 				:column="col"
 				:row-id="row.id"
@@ -75,6 +82,8 @@ import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
+import { useFormattingStore } from '../../../../store/formatting.js'
+import { markerComponent } from '../../../../components/formatting/markers.js'
 
 export default {
 	name: 'TableRow',
@@ -88,6 +97,7 @@ export default {
 	},
 
 	mixins: [activityMixin],
+
 	props: {
 		row: {
 			type: Object,
@@ -132,7 +142,19 @@ export default {
 		'edit-row',
 		'update-row-selection',
 	],
+
+	setup() {
+		return { formattingStore: useFormattingStore() }
+	},
+
 	computed: {
+		formattingApplies() {
+			return this.formattingStore.appliesTo(this.isView ? this.elementId : null)
+		},
+
+		rowFormatting() {
+			return this.selected || !this.formattingApplies ? {} : this.formattingStore.rowStyle(this.row.id)
+		},
 		getSelection: {
 			get: () => { return this.selected },
 			set: () => { alert('updating selection') },
@@ -152,6 +174,33 @@ export default {
 		},
 	},
 	methods: {
+		cellFormatting(columnId) {
+			return this.selected || !this.formattingApplies ? {} : this.formattingStore.cellStyle(this.row.id, columnId)
+		},
+
+		markerComponent,
+
+		/**
+		 * @param {number} columnId the column this cell belongs to
+		 * @param {boolean} isFirstColumn whether this is the row's first visible cell
+		 * @return {Array} the markers to draw here
+		 */
+		cellMarkers(columnId, isFirstColumn) {
+			if (!this.formattingApplies) {
+				return []
+			}
+			return this.formattingStore.cellMarkers(this.row.id, columnId, isFirstColumn)
+		},
+
+		/**
+		 * @param {object} mark a marker with the title of the rule set that set it
+		 * @return {string} what a screen reader reads in place of the colour
+		 */
+		markerLabel(mark) {
+			return mark.title
+				? t('tables', 'Marked by rule set {title}', { title: mark.title })
+				: t('tables', 'Marked by a formatting rule set')
+		},
 		t,
 		getColumnWidthStyle,
 		getFrozenColumnStyle,
@@ -217,6 +266,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.formatting-marker {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+	margin-inline-end: calc(var(--default-grid-baseline) * 0.5);
+}
 
 tr.selected {
 	background-color: var(--color-primary-light) !important;

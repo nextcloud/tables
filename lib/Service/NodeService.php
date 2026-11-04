@@ -14,7 +14,11 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
+use OCA\Tables\ResponseDefinitions;
 
+/**
+ * @psalm-import-type TablesFormattingRuleSet from ResponseDefinitions
+ */
 class NodeService {
 	private const PUBLIC_NODE_KEYS = [
 		'title',
@@ -36,7 +40,7 @@ class NodeService {
 	/**
 	 * @param 'table'|'view' $nodeType
 	 * @param int $nodeId
-	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout?: 'table'|'tiles'|'gallery', viewSettings?: array{cardBackgroundSource: int|null, cardTitleSource: int|null}}
+	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout?: 'table'|'tiles'|'gallery', viewSettings?: array{cardBackgroundSource: int|null, cardTitleSource: int|null}, formatting?: list<TablesFormattingRuleSet>}
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
@@ -65,14 +69,33 @@ class NodeService {
 	}
 
 	/**
-	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout: 'table'|'tiles'|'gallery', viewSettings: array{cardBackgroundSource: int|null, cardTitleSource: int|null}}
+	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout: 'table'|'tiles'|'gallery', viewSettings: array{cardBackgroundSource: int|null, cardTitleSource: int|null}, formatting: list<TablesFormattingRuleSet>}
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	private function publicDataOfView(int $id): array {
 		$view = $this->viewService->find($id, false, '');
-		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout: 'table'|'tiles'|'gallery', viewSettings: array{cardBackgroundSource: int|null, cardTitleSource: int|null}} */
-		return array_filter($view->jsonSerialize(), static fn (string $key): bool => in_array($key, self::PUBLIC_NODE_KEYS, true), ARRAY_FILTER_USE_KEY);
+		$publicData = array_filter($view->jsonSerialize(), static fn (string $key): bool => in_array($key, self::PUBLIC_NODE_KEYS, true), ARRAY_FILTER_USE_KEY);
+		$publicData['formatting'] = self::withoutRuleTitles($view->getFormattingArrayForRecipient());
+		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int, layout: 'table'|'tiles'|'gallery', viewSettings: array{cardBackgroundSource: int|null, cardTitleSource: int|null}, formatting: list<TablesFormattingRuleSet>} */
+		return $publicData;
+	}
+
+	/**
+	 * @param list<TablesFormattingRuleSet> $formatting
+	 * @return list<TablesFormattingRuleSet>
+	 */
+	private static function withoutRuleTitles(array $formatting): array {
+		foreach ($formatting as &$ruleSet) {
+			$ruleSet['title'] = '';
+			foreach ($ruleSet['rules'] ?? [] as &$rule) {
+				$rule['title'] = '';
+			}
+			unset($rule);
+		}
+		unset($ruleSet);
+
+		return $formatting;
 	}
 }

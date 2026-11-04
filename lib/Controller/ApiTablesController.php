@@ -17,11 +17,13 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\FormattingRuleSets;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\FormattingService;
 use OCA\Tables\Service\StructureService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
@@ -29,6 +31,7 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -52,6 +55,7 @@ class ApiTablesController extends AOCSController {
 		private readonly IAppManager $appManager,
 		private readonly IDBConnection $db,
 		private readonly StructureService $structureService,
+		private readonly FormattingService $formattingService,
 		string $userId,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
@@ -138,6 +142,7 @@ class ApiTablesController extends AOCSController {
 	 * 400: Invalid request data
 	 */
 	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
 	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = [], ?string $uuid = null): DataResponse {
 		try {
 			ColumnSettings::createFromInputArray($columnOrder);
@@ -149,6 +154,7 @@ class ApiTablesController extends AOCSController {
 			$this->db->beginTransaction();
 			$table = $this->service->create($title, 'custom', $emoji, $description, uuid: $uuid);
 			$colMap = [];
+			$selectionOptionIdMap = [];
 			foreach ($columns as $column) {
 				if (isset($column['uuid']) && !Uuid::isValid($column['uuid'])) {
 					throw new \InvalidArgumentException('Invalid UUID provided');
@@ -188,6 +194,10 @@ class ApiTablesController extends AOCSController {
 					)
 				);
 				$colMap[$column['id']] = $col->getId();
+				$selectionOptionIdMap[(int)$column['id']] = ColumnService::pairSelectionOptionIds(
+					$column['selectionOptions'] ?? [],
+					$col->getSelectionOptionsArray() ?? [],
+				);
 			}
 			if (!empty($columnOrder) || !empty($sort)) {
 				$remappedColumnOrder = null;
@@ -262,6 +272,13 @@ class ApiTablesController extends AOCSController {
 				}
 
 				$this->viewService->update($newView->getId(), ViewUpdateInput::fromInputArray($inputData));
+
+				if (!empty($view['formatting']) && is_array($view['formatting'])) {
+					$this->formattingService->saveForView(
+						$newView->getId(),
+						FormattingRuleSets::remapIds($view['formatting'], $colMap, $selectionOptionIdMap),
+					);
+				}
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
@@ -338,6 +355,7 @@ class ApiTablesController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
+	#[UserRateLimit(limit: 20, period: 60)]
 	public function importScheme(int $id, string $title, string $emoji, string $description, array $columns, array $views, array $columnOrder = [], array $sort = []): DataResponse {
 		try {
 			$this->db->beginTransaction();

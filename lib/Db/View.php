@@ -23,6 +23,7 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @psalm-suppress PropertyNotSetInConstructor
  *
  * @psalm-import-type TablesView from ResponseDefinitions
+ * @psalm-import-type TablesFormattingRuleSet from ResponseDefinitions
  *
  * @method getId(): int
  * @method setId(int $id)
@@ -78,6 +79,8 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setShareToken(?string $shareToken)
  * @method getSidebarOrder(): ?int
  * @method setSidebarOrder(?int $sidebarOrder)
+ * @method getFormatting(): ?string
+ * @method setFormatting(?string $formatting)
  */
 class View extends EntitySuper implements JsonSerializable {
 	protected ?string $uuid = null;
@@ -96,6 +99,7 @@ class View extends EntitySuper implements JsonSerializable {
 	protected ?string $filter = null; // json
 	protected ?string $layout = null;
 	protected ?string $viewSettings = null; // json
+	protected ?string $formatting = null; // json
 
 	protected ?int $externalId = null;
 	protected ?string $shareToken = null;
@@ -232,6 +236,21 @@ class View extends EntitySuper implements JsonSerializable {
 		return ViewSettings::createFromStoredArray($this->getArray($this->getViewSettings()));
 	}
 
+	public function getFormattingArray(): array {
+		return $this->getArray($this->getFormatting());
+	}
+
+	/**
+	 * @throws \InvalidArgumentException
+	 */
+	public function setFormattingArray(array $array): void {
+		$encoded = \json_encode($array);
+		if ($encoded === false) {
+			throw new \InvalidArgumentException('Formatting configuration is not encodable: ' . json_last_error_msg());
+		}
+		$this->setFormatting($encoded);
+	}
+
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
@@ -280,6 +299,78 @@ class View extends EntitySuper implements JsonSerializable {
 	}
 
 	/**
+	 * @return list<TablesFormattingRuleSet>
+	 */
+	private function getFormattingArrayForOutput(): array {
+		return $this->hidesRuleDetails() ? $this->getFormattingArrayForRecipient() : $this->getFormattingArray();
+	}
+
+	/**
+	 * @return list<TablesFormattingRuleSet>
+	 */
+	public function getFormattingArrayForRecipient(): array {
+		return $this->pruneFormattingForRecipient($this->getFormattingArray());
+	}
+
+	/**
+	 * @param list<TablesFormattingRuleSet> $formatting
+	 * @return list<TablesFormattingRuleSet>
+	 */
+	public function pruneFormattingForRecipient(array $formatting): array {
+		if ($formatting === []) {
+			return [];
+		}
+
+		$visibleColumnIds = array_flip($this->getColumnIds());
+		$visibleRuleSets = [];
+		foreach ($formatting as $ruleSet) {
+			if (($ruleSet['targetType'] ?? null) !== 'column') {
+				$ruleSet['targetCol'] = null;
+			} elseif (!$this->isVisibleColumnId($ruleSet['targetCol'] ?? null, $visibleColumnIds)) {
+				continue;
+			}
+
+			$rules = $ruleSet['rules'] ?? [];
+			$visibleRules = array_values(array_filter(
+				$rules,
+				fn (array $rule): bool => $this->conditionsOnVisibleColumns($rule, $visibleColumnIds),
+			));
+			if ($rules !== [] && $visibleRules === []) {
+				continue;
+			}
+
+			$ruleSet['rules'] = $visibleRules;
+			$visibleRuleSets[] = $ruleSet;
+		}
+
+		return $visibleRuleSets;
+	}
+
+	/**
+	 * @param array<int, int> $visibleColumnIds the view's column ids as keys
+	 */
+	private function isVisibleColumnId(mixed $columnId, array $visibleColumnIds): bool {
+		return is_int($columnId)
+			&& (Column::isValidMetaTypeId($columnId) || isset($visibleColumnIds[$columnId]));
+	}
+
+	/**
+	 * @param array<string, mixed> $rule
+	 * @param array<int, int> $visibleColumnIds the view's column ids as keys
+	 */
+	private function conditionsOnVisibleColumns(array $rule, array $visibleColumnIds): bool {
+		foreach ($rule['condition']['groups'] ?? [] as $group) {
+			foreach ($group['conditions'] ?? [] as $condition) {
+				if (!$this->isVisibleColumnId($condition['columnId'] ?? null, $visibleColumnIds)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * @psalm-return TablesView
 	 */
 	public function jsonSerialize(): array {
@@ -311,6 +402,7 @@ class View extends EntitySuper implements JsonSerializable {
 			'viewSettings' => $this->getViewSettingsObject()->jsonSerialize(),
 		];
 		$serialisedJson['filter'] = $this->hidesRuleDetails() ? [] : $this->getFilterArray();
+		$serialisedJson['formatting'] = $this->getFormattingArrayForOutput();
 
 		return $serialisedJson;
 	}

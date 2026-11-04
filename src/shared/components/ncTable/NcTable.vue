@@ -115,16 +115,9 @@ import { useEventBusSubscriptions } from '../../composables/useEventBusSubscript
 import { parseCol } from './mixins/columnParser.js'
 import { AbstractColumn } from './mixins/columnClass.js'
 import { translate as t } from '@nextcloud/l10n'
-import {
-	TYPE_META_CREATED_AT,
-	TYPE_META_CREATED_BY,
-	TYPE_META_ID,
-	TYPE_META_UPDATED_AT,
-	TYPE_META_UPDATED_BY,
-} from '../../constants.ts'
-import { MetaColumns } from './mixins/metaColumns.js'
-import { MagicFields } from './mixins/magicFields.js'
-import { FilterIds, getFiltersForColumn } from './mixins/filter.js'
+import { MetaColumns, getCellForColumn } from './mixins/metaColumns.js'
+import { resolveMagicValues } from './mixins/magicFields.js'
+import { getFiltersForColumn } from './mixins/filter.js'
 
 export default {
 	name: 'NcTable',
@@ -198,6 +191,10 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		canManageFormatting: {
+			type: Boolean,
+			default: false,
+		},
 		canDeleteColumns: {
 			type: Boolean,
 			default: true,
@@ -260,6 +257,7 @@ export default {
 				canDeleteRows: this.canDeleteRows,
 				canCreateColumns: this.canCreateColumns,
 				canEditColumns: this.canEditColumns,
+				canManageFormatting: this.canManageFormatting,
 				canDeleteColumns: this.canDeleteColumns,
 				canDeleteTable: this.canDeleteTable,
 				canSelectRows: this.canSelectRows,
@@ -330,41 +328,14 @@ export default {
 					let filterStatus = null
 					let searchStatus = true
 					const filters = getFiltersForColumn(column, this.viewSetting)
-					let cell
-					if (column.id < 0) {
-						cell = { columnId: column.id }
-						switch (column.id) {
-						case TYPE_META_ID:
-							cell.value = row.id
-							break
-						case TYPE_META_CREATED_BY:
-							cell.value = row.createdBy
-							break
-						case TYPE_META_UPDATED_BY:
-							cell.value = row.editedBy
-							break
-						case TYPE_META_CREATED_AT:
-							cell.value = row.createdAt
-							break
-						case TYPE_META_UPDATED_AT:
-							cell.value = row.editedAt
-							break
-						}
-					} else {
-						cell = row.data.find(item => item && item.columnId === column.id)
-					}
-
-					if (cell === undefined) {
-						const defaultValue = typeof column.default === 'function' ? column.default() : null
-						cell = { columnId: column.id, value: column.parseValue(defaultValue) }
-					}
+					const cell = getCellForColumn(row, column)
 					// cleanup possible old markers
 					delete cell.searchStringFound
 					delete cell.filterFound
 
 					// apply filters (if any)
 					filters.forEach(fil => {
-						this.addMagicFieldsValues(fil)
+						resolveMagicValues(fil)
 						if (filterStatus === null || filterStatus === true) {
 							filterStatus = column.isFilterFound(cell, fil)
 						}
@@ -447,18 +418,6 @@ export default {
 		setSearchString(str) {
 			this.localViewSetting.searchString = str !== '' ? str : null
 			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
-		},
-		addMagicFieldsValues(filter) {
-			if (FilterIds.ContainsItem === filter.operator.id) {
-				return
-			}
-
-			Object.values(MagicFields).forEach(field => {
-				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
-				if (filter.value !== newFilterValue) {
-					filter.magicValuesEnriched = newFilterValue
-				}
-			})
 		},
 	},
 }

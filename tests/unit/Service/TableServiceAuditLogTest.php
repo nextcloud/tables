@@ -18,6 +18,7 @@ use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
 use OCA\Tables\Service\FederationService;
+use OCA\Tables\Service\FormattingService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
@@ -69,6 +70,7 @@ final class TableServiceAuditLogTest extends TestCase {
 			$this->createMock(ActivityManager::class),
 			$this->createMock(FederationService::class),
 			$this->auditLogService,
+			$this->createMock(FormattingService::class),
 		);
 	}
 

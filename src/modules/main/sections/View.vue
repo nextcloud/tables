@@ -20,6 +20,7 @@
 				:can-delete-rows="canDeleteData(view)"
 				:can-create-columns="canManageTable(view)"
 				:can-edit-columns="canManageTable(view)"
+				:can-manage-formatting="canManageElement(view)"
 				:can-delete-columns="canManageTable(view)"
 				:can-delete-table="canManageTable(view)"
 				@download-filtered-csv="rows => $emit('download-filtered-csv', rows)">

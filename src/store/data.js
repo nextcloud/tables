@@ -32,6 +32,7 @@ export const useDataStore = defineStore('data', {
 	state: () => ({
 		loading: {},
 		rows: {},
+		rowsRevision: 0,
 		columns: {},
 		publicToken: null,
 		relations: {},
@@ -313,6 +314,7 @@ export const useDataStore = defineStore('data', {
 			}
 
 			this.rows[stateId] = res.data
+			this.rowsRevision++
 			this.loading[stateId] = false
 			this.syncElementRowsCount({ isView: !!viewId, elementId: viewId ?? tableId })
 			return true
@@ -330,6 +332,7 @@ export const useDataStore = defineStore('data', {
 			}
 
 			this.rows[stateId] = res.data.ocs.data
+			this.rowsRevision++
 			this.loading[stateId] = false
 			return true
 		},
@@ -337,6 +340,7 @@ export const useDataStore = defineStore('data', {
 		removeRows({ isView, elementId }) {
 			const stateId = genStateKey(isView, elementId)
 			this.rows[stateId] = []
+			this.rowsRevision++
 		},
 
 		async updateRow({ id, isView, elementId, data }) {
@@ -361,6 +365,7 @@ export const useDataStore = defineStore('data', {
 				const row = res.data.ocs.data
 				const updatedRows = this.rows[stateId].map(r => r.id === row.id ? row : r)
 				this.rows[stateId] = updatedRows
+				this.rowsRevision++
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 				this.syncElementRowsCount({ isView, elementId })
 				const parentTableId = row?.tableId ?? (isView ? useTablesStore().getView(elementId)?.tableId : elementId)
@@ -383,6 +388,7 @@ export const useDataStore = defineStore('data', {
 				const row = res?.data?.ocs?.data
 				const index = this.rows[stateId].findIndex(r => r.id === rowId)
 				this.rows[stateId][index] = row
+				this.rowsRevision++
 			}
 			return true
 		},
@@ -404,6 +410,7 @@ export const useDataStore = defineStore('data', {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
 				this.rows[stateId][newIndex] = row
+				this.rowsRevision++
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 				this.syncElementRowsCount({ isView: !!viewId, elementId: viewId ?? tableId })
 				const tablesStore = useTablesStore()
@@ -432,6 +439,7 @@ export const useDataStore = defineStore('data', {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
 				this.rows[stateId][newIndex] = row
+				this.rowsRevision++
 			}
 
 			return true
@@ -456,6 +464,7 @@ export const useDataStore = defineStore('data', {
 			if (stateId && this.rows[stateId]) {
 				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
 				this.rows[stateId] = filteredRows
+				this.rowsRevision++
 				this.syncElementRowsCount({ isView, elementId })
 				const tablesStore = useTablesStore()
 				const parentTableId = viewId ? tablesStore.getView(viewId)?.tableId : elementId
@@ -478,6 +487,7 @@ export const useDataStore = defineStore('data', {
 			if (this.rows[stateId]) {
 				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
 				this.rows[stateId] = filteredRows
+				this.rowsRevision++
 			}
 			return true
 		},
@@ -501,6 +511,7 @@ export const useDataStore = defineStore('data', {
 			if (rowInView === false) {
 				emit('tables:row:animate')
 				this.rows[stateId] = this.rows[stateId].filter(r => r.id !== rowId)
+				this.rowsRevision++
 			}
 		},
 
@@ -508,6 +519,7 @@ export const useDataStore = defineStore('data', {
 			const stateId = genStateKey(isView, elementId)
 			if (stateId) {
 				this.rows[stateId] = rows
+				this.rowsRevision++
 			}
 		},
 	},

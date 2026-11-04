@@ -18,6 +18,7 @@ import PublicElement from './PublicElement.vue'
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 import { useDataStore } from '../../../store/data.js'
 import { useTablesStore } from '../../../store/store.js'
+import { useFormattingStore } from '../../../store/formatting.js'
 import { computed } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
@@ -51,7 +52,7 @@ export default {
 		const rows = computed(() => getRows.value(false, stateKey))
 		const columns = computed(() => getColumns.value(false, stateKey))
 
-		return { rows, columns }
+		return { rows, columns, formattingStore: useFormattingStore() }
 	},
 
 	data() {
@@ -78,6 +79,7 @@ export default {
 
 	beforeMount() {
 		this.setPublicToken(this.token)
+		this.formattingStore.loadForPublicView(nodeData.formatting)
 		this.loadData()
 	},
 

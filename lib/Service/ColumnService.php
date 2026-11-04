@@ -57,6 +57,7 @@ class ColumnService extends SuperService {
 		private readonly UserHelper $userHelper,
 		private readonly ColumnDtoValidator $columnDtoValidator,
 		private readonly AuditLogServiceInterface $auditLogService,
+		private readonly FormattingService $formattingService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -378,6 +379,12 @@ class ColumnService extends SuperService {
 			$this->columnDtoValidator->validate($columnDto);
 			$title = $this->normalizeTitle($columnDto->getTitle(), false);
 
+			$oldType = $item->getType();
+			$oldSubtype = $item->getSubtype();
+			$touchesSelectionOptions = $columnDto->getSelectionOptions() !== null
+				|| $columnDto->getSelectionDefault() !== null;
+			$oldSelectionOptionIds = array_column($item->getSelectionOptionsArray() ?? [], 'id');
+
 			if ($title !== null) {
 				$item->setTitle($title);
 			}
@@ -432,6 +439,17 @@ class ColumnService extends SuperService {
 			$this->updateMetadata($item, $userId);
 			try {
 				$updatedColumn = $this->mapper->update($item);
+
+				if ($oldType !== $updatedColumn->getType() || $oldSubtype !== $updatedColumn->getSubtype()) {
+					$this->formattingService->handleColumnTypeChange($updatedColumn->getId());
+				}
+				if ($touchesSelectionOptions) {
+					$newOptionIds = array_column($updatedColumn->getSelectionOptionsArray() ?? [], 'id');
+					$this->formattingService->handleSelectionOptionDeletion(
+						$updatedColumn->getId(),
+						array_map(intval(...), array_values(array_diff($oldSelectionOptionIds, $newOptionIds))),
+					);
+				}
 
 				$this->activityManager->triggerEvent(
 					objectType: ActivityManager::TABLES_OBJECT_COLUMN,
@@ -694,6 +712,8 @@ class ColumnService extends SuperService {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		$this->formattingService->handleColumnDeletion($item->getId());
+
 		$this->activityManager->triggerEvent(
 			objectType: ActivityManager::TABLES_OBJECT_COLUMN,
 			object: $item,
@@ -834,11 +854,11 @@ class ColumnService extends SuperService {
 	 * @param Table $table
 	 * @param array $column
 	 *
-	 * @return int
+	 * @return array{columnId: int, selectionOptionIdMap: array<int, int>}
 	 *
 	 * @throws InternalError
 	 */
-	public function importColumn(Table $table, array $column): int {
+	public function importColumn(Table $table, array $column): array {
 		$item = new Column();
 		if (isset($column['uuid'])) {
 			$uuid = (string)$column['uuid'];
@@ -894,7 +914,49 @@ class ColumnService extends SuperService {
 			$this->logger->error('importColumn insert error: ' . $e->getMessage());
 			throw new InternalError('importColumn insert error: ' . $e->getMessage());
 		}
-		return $newColumn->getId();
+
+		return [
+			'columnId' => $newColumn->getId(),
+			'selectionOptionIdMap' => self::pairSelectionOptionIds(
+				$column['selectionOptions'] ?? [],
+				$newColumn->getSelectionOptionsArray() ?? [],
+			),
+		];
+	}
+
+	/**
+	 * @param list<array{id?: int|string, uuid?: string}> $schemeColumns the scheme's columns
+	 * @param array<string, Column> $columnsByUuid the columns this import produced, keyed by uuid
+	 * @return array<int, int> old column id => new column id
+	 */
+	public static function pairSchemeColumnIds(array $schemeColumns, array $columnsByUuid): array {
+		$map = [];
+		foreach ($schemeColumns as $schemeColumn) {
+			$uuid = $schemeColumn['uuid'] ?? null;
+			if ($uuid !== null && isset($schemeColumn['id'], $columnsByUuid[$uuid])) {
+				$map[(int)$schemeColumn['id']] = $columnsByUuid[$uuid]->getId();
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * @return array<int, int> old option id => new option id
+	 */
+	public static function pairSelectionOptionIds(array $oldOptions, array $newOptions): array {
+		$newOptions = array_values($newOptions);
+		$map = [];
+		foreach (array_values($oldOptions) as $idx => $oldOption) {
+			$oldId = is_array($oldOption) ? ($oldOption['id'] ?? null) : null;
+			$newId = $newOptions[$idx]['id'] ?? null;
+			if ($oldId === null || $newId === null) {
+				continue;
+			}
+			$map[(int)$oldId] = (int)$newId;
+		}
+
+		return $map;
 	}
 
 	private function buildDefaultTechnicalName(int $columnId): string {

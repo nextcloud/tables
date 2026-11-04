@@ -36,6 +36,10 @@
 							@edit-column="col => $emit('edit-column', col)"
 							@delete-column="col => $emit('delete-column', col)"
 							@pin-column="id => $emit('pin-column', id)" />
+						<FormattingColumnPopover v-if="viewId"
+							:column-id="col.id"
+							:view-id="viewId"
+							:can-manage="!!config.canManageFormatting" />
 					</div>
 					<div v-if="getFilterForColumn(col).length > 0" class="filter-wrapper">
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
@@ -59,6 +63,7 @@
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
+import FormattingColumnPopover from '../../../../components/formatting/FormattingColumnPopover.vue'
 import { getFilterWithId, getFiltersForColumn } from '../mixins/filter.js'
 import { getColumnWidthStyle, getFrozenColumnStyle } from '../mixins/columnHandler.js'
 
@@ -66,6 +71,7 @@ export default {
 
 	components: {
 		FilterLabel,
+		FormattingColumnPopover,
 		NcCheckboxRadioSwitch,
 		TableHeaderColumnOptions,
 	},
@@ -74,6 +80,10 @@ export default {
 		columns: {
 			type: Array,
 			default: () => [],
+		},
+		viewId: {
+			type: Number,
+			default: null,
 		},
 		rows: {
 			type: Array,

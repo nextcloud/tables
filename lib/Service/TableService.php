@@ -26,6 +26,7 @@ use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\FilterSet;
+use OCA\Tables\Model\FormattingRuleSets;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\TableScheme;
@@ -75,6 +76,7 @@ class TableService extends SuperService {
 		private ActivityManager $activityManager,
 		private FederationService $federationService,
 		private AuditLogServiceInterface $auditLogService,
+		private FormattingService $formattingService,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -765,8 +767,12 @@ class TableService extends SuperService {
 		}
 
 		// Add new columns
+		$selectionOptionIdMap = [];
 		foreach ($columns['addColumns'] as $columnData) {
-			$this->columnService->importColumn($table, $columnData);
+			$result = $this->columnService->importColumn($table, $columnData);
+			if (isset($columnData['id'])) {
+				$selectionOptionIdMap[(int)$columnData['id']] = $result['selectionOptionIdMap'];
+			}
 		}
 
 		// Remove columns
@@ -795,6 +801,11 @@ class TableService extends SuperService {
 			$columnsMap[$column->getUuid()] = $column;
 		}
 
+		$columnIdMap = ColumnService::pairSchemeColumnIds($columns['addColumns'], $columnsMap);
+		foreach ($updatedColumns as $column) {
+			$columnIdMap[$column->getId()] ??= $column->getId();
+		}
+
 		// Update column order
 		$columnSettings = ColumnSettings::createFromInputArray($columnOrder, $columnsMap);
 		$table->setColumnOrder(\json_encode($columnSettings->jsonSerialize()));
@@ -816,6 +827,9 @@ class TableService extends SuperService {
 			$view['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($view['columnSettings'], $columnsMap)->jsonSerialize();
 			$view['sort'] = SortRuleSet::createFromInputArray($view['sort'], $columnsMap)->jsonSerialize();
 			$view['filter'] = FilterSet::createFromInputArray($view['filter'], $columnsMap)->jsonSerialize();
+			if (isset($view['formatting']) && is_array($view['formatting'])) {
+				$view['formatting'] = FormattingRuleSets::remapIds($view['formatting'], $columnIdMap, $selectionOptionIdMap);
+			}
 			$this->viewService->importView($tableId, $view, $userId);
 		}
 
@@ -825,6 +839,16 @@ class TableService extends SuperService {
 			$toView = $item['to'];
 			$existingView = $this->viewService->find($fromView['id'], userId: $userId);
 			$this->viewService->update($existingView->getId(), ViewUpdateInput::fromInputArray($toView, $columnsMap), $userId);
+			if (isset($toView['formatting']) && is_array($toView['formatting'])) {
+				try {
+					$this->formattingService->saveForView(
+						$existingView->getId(),
+						FormattingRuleSets::remapIds($toView['formatting'], $columnIdMap, $selectionOptionIdMap),
+					);
+				} catch (\InvalidArgumentException|NotFoundError|InternalError $e) {
+					$this->logger->warning('Could not import formatting for view ' . $existingView->getId() . ': ' . $e->getMessage(), ['exception' => $e]);
+				}
+			}
 		}
 
 		// Remove views
