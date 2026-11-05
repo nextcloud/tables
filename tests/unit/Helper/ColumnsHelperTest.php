@@ -36,29 +36,30 @@ final class ColumnsHelperTest extends TestCase {
 			'checked' => ['@checked', false],
 			'unchecked' => ['@unchecked', false],
 			'stars' => ['@stars-3', false],
-			'today' => ['@datetime-date-today', false],
-			'start of year' => ['@datetime-date-start-of-year', false],
-			'start of month' => ['@datetime-date-start-of-month', false],
-			'start of week' => ['@datetime-date-start-of-week', false],
-			'time now' => ['@datetime-time-now', false],
-			'now' => ['@datetime-now', false],
+			'today' => ['@datetime-date-today', false, true],
+			'start of year' => ['@datetime-date-start-of-year', false, true],
+			'start of month' => ['@datetime-date-start-of-month', false, true],
+			'start of week' => ['@datetime-date-start-of-week', false, true],
+			'time now' => ['@datetime-time-now', false, true],
+			'now' => ['@datetime-now', false, true],
 			'exact date' => ['@datetime-exact-date:2026-01-01', false],
-			'days ahead' => ['@datetime-days-ahead:3', false],
-			'days ago' => ['@datetime-days-ago:3', false],
+			'days ahead' => ['@datetime-days-ahead:3', false, true],
+			'days ago' => ['@datetime-days-ago:3', false, true],
 		];
 	}
 
 	/**
 	 * @dataProvider placeholderProvider
 	 */
-	public function testUserDependenceMatchesResolution(string $value, bool $userDependent): void {
+	public function testUserDependenceMatchesResolution(string $value, bool $userDependent, bool $clockBased = false): void {
 		$this->assertSame($userDependent, $this->helper->isUserDependentPlaceholder($value));
 
-		$alice = $this->helper->resolveSearchValue($value, 'alice');
-		$bob = $this->helper->resolveSearchValue($value, 'bob');
-		if (str_starts_with($value, '@my-email')) {
+		// Clock based values may change between two calls, and unknown placeholders resolve to themselves
+		if ($clockBased || $value === '@my-email') {
 			return;
 		}
+		$alice = $this->helper->resolveSearchValue($value, 'alice');
+		$bob = $this->helper->resolveSearchValue($value, 'bob');
 		$this->assertSame($userDependent, $alice !== $bob);
 	}
 }
