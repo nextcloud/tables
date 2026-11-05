@@ -7,6 +7,7 @@ import {
 	GRID_BREAKPOINT_MEDIUM,
 	GRID_BREAKPOINT_SINGLE,
 	GRID_COLUMNS,
+	applicationNodeOptions,
 	applyNodePositions,
 	cloneGrid,
 	columnsForWidth,
@@ -64,6 +65,16 @@ describe('grid layout', () => {
 		expect(widgetTarget(grid.widgets[3], nodes)).to.equal(null)
 		// The table or view left the application
 		expect(widgetTarget(grid.widgets[1], { 5: nodes[5] })).to.equal(null)
+	})
+
+	it('offers only the tables and views of the application', () => {
+		const tables = [{ id: 40, title: 'Tasks', emoji: '✅' }, { id: 41, title: 'Salaries', emoji: '' }]
+		const views = [{ id: 50, title: 'Open', emoji: '' }]
+
+		expect(applicationNodeOptions(nodes, tables, views)).to.deep.equal([
+			{ id: 4, label: '✅ Tasks' },
+			{ id: 5, label: 'Open (view)' },
+		])
 	})
 
 	it('saves widgets with their id, and a source only for types that have one', () => {
