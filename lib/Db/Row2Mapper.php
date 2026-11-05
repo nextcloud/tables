@@ -43,6 +43,10 @@ class Row2Mapper {
 	) {
 	}
 
+	public function importSleeve(RowSleeve $sleeve): RowSleeve {
+		return $this->rowSleeveMapper->insertImported($sleeve);
+	}
+
 	/**
 	 * @param Row2 $row
 	 * @return Row2

@@ -12,6 +12,7 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\RowSleeve;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
@@ -32,9 +33,7 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
-use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\EventDispatcher\IEventDispatcher;
-use OCP\IDBConnection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -58,7 +57,6 @@ class RowService extends SuperService {
 		private readonly ColumnsHelper $columnsHelper,
 		private readonly ActivityManager $activityManager,
 		private readonly NotificationHelper $notificationHelper,
-		private readonly IDBConnection $connection,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 
@@ -1003,23 +1001,27 @@ class RowService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function importRow(Table $table, array $row): int {
-		$qb = $this->connection->getQueryBuilder();
-		try {
-			$qb->insert('tables_row_sleeves')
-				->values([
-					'table_id' => $qb->createNamedParameter($table->getId(), IQueryBuilder::PARAM_INT),
-					'created_by' => $qb->createNamedParameter($table->getOwnership()),
-					'created_at' => $qb->createNamedParameter($row['createdAt']),
-					'last_edit_by' => $qb->createNamedParameter($table->getOwnership()),
-					'last_edit_at' => $qb->createNamedParameter($row['lastEditAt']),
-				]);
-			$qb->executeStatement();
-			$id = $this->connection->lastInsertId('*PREFIX*tables_row_sleeves');
+		$tableId = $table->getId();
+		$owner = $table->getOwnership();
+		if ($tableId === null || $owner === null) {
+			throw new \InvalidArgumentException('An imported row requires a stored destination table and owner.');
+		}
 
-			return $id;
-		} catch (\Exception $e) {
+		$sleeve = new RowSleeve();
+		if (isset($row['uuid']) && !is_string($row['uuid'])) {
+			throw new \InvalidArgumentException('Archived row UUID must be a string or null.');
+		}
+		$sleeve->setUuid($row['uuid'] ?? null);
+		$sleeve->setTableId($tableId);
+		$sleeve->setCreatedBy($owner);
+		$sleeve->setCreatedAt($row['createdAt']);
+		$sleeve->setLastEditBy($owner);
+		$sleeve->setLastEditAt($row['lastEditAt']);
+		try {
+			return $this->row2Mapper->importSleeve($sleeve)->getId();
+		} catch (Exception $e) {
 			$this->logger->error('userMigrationImport insert error: ' . $e->getMessage());
-			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage());
+			throw new InternalError('userMigrationImport insert error: ' . $e->getMessage(), 0, $e);
 		}
 	}
 
