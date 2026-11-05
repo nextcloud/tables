@@ -3,8 +3,8 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="row first-row" :class="{ 'form-mode': isFormMode }">
-		<h1>
+	<div v-if="showTitle || isFiltered || isViewSettingSet || (!isTable && activeElement.isShared)" class="row first-row" :class="{ 'form-mode': isFormMode }">
+		<h1 v-if="showTitle">
 			{{ activeElement.emoji }}&nbsp;{{ activeElement.title }}
 		</h1>
 		<div class="info">
@@ -65,6 +65,11 @@ export default {
 		isFormMode: {
 			type: Boolean,
 			default: false,
+		},
+		// False where the title is already shown around it, as on a grid page widget
+		showTitle: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	emits: [
