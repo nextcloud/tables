@@ -786,26 +786,27 @@ class RowService extends SuperService {
 
 		try {
 			$columns = $this->loadColumnsForData($item->getData() ?? []);
+			$viewRecipients = $this->activityManager->findViewRecipientsSeeingRow($item);
+			$deletedRow = $this->row2Mapper->delete($item);
 			$this->attachAliasPayload($item, $columns);
 
-			// View recipients are resolved by row visibility, so notify while the row still exists
+			$event = new RowDeletedEvent($item, $item->getData());
+
+			$this->eventDispatcher->dispatchTyped($event);
 			$this->activityManager->triggerEvent(
 				objectType: ActivityManager::TABLES_OBJECT_ROW,
-				object: $item,
+				object: $deletedRow,
 				subject: ActivityManager::SUBJECT_ROW_DELETE,
 				author: $userId,
+				viewRecipientsSeeingRow: $viewRecipients,
 			);
 			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_ROW,
-				object: $item,
+				object: $deletedRow,
 				subject: ActivityManager::SUBJECT_ROW_DELETE,
 				author: $this->userId,
+				viewRecipientsSeeingRow: $viewRecipients,
 			);
-
-			$deletedRow = $this->row2Mapper->delete($item);
-
-			$event = new RowDeletedEvent($item, $item->getData());
-			$this->eventDispatcher->dispatchTyped($event);
 
 			return $this->filterRowResult($view ?? null, $deletedRow);
 		} catch (Exception $e) {

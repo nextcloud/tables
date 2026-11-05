@@ -47,8 +47,9 @@ class NotificationHelper {
 	 * @param string $subject
 	 * @param array<string, mixed> $additionalParams
 	 * @param string|null $author
+	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow view id => users seeing the row, resolved before it was deleted
 	 */
-	public function sendNotification(string $objectType, Table|View|Row2|Column $object, string $subject, array $additionalParams = [], ?string $author = null): void {
+	public function sendNotification(string $objectType, Table|View|Row2|Column $object, string $subject, array $additionalParams = [], ?string $author = null, ?array $viewRecipientsSeeingRow = null): void {
 		try {
 			switch ($objectType) {
 				case ActivityManager::TABLES_OBJECT_TABLE:
@@ -63,7 +64,7 @@ class NotificationHelper {
 					break;
 				case ActivityManager::TABLES_OBJECT_ROW:
 					if ($object instanceof Row2) {
-						$this->sendRowNotification($object, $subject, $additionalParams, $author);
+						$this->sendRowNotification($object, $subject, $additionalParams, $author, $viewRecipientsSeeingRow);
 					}
 					break;
 				case ActivityManager::TABLES_OBJECT_COLUMN:
@@ -247,7 +248,10 @@ class NotificationHelper {
 	 * @param array<string, mixed> $additionalParams
 	 * @param mixed $author
 	 */
-	private function sendRowNotification(Row2 $row, string $subject, array $additionalParams, $author): void {
+	/**
+	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow
+	 */
+	private function sendRowNotification(Row2 $row, string $subject, array $additionalParams, $author, ?array $viewRecipientsSeeingRow): void {
 		if (!in_array($subject, [
 			ActivityManager::SUBJECT_ROW_CREATE,
 			ActivityManager::SUBJECT_ROW_UPDATE,
@@ -309,6 +313,7 @@ class NotificationHelper {
 				authorId: $authorId,
 				configKey: ConfigService::NOTIFY_ROW_KEY,
 				rowId: $rowId,
+				viewRecipientsSeeingRow: $viewRecipientsSeeingRow,
 			);
 
 			if (!empty($assignedTargets)) {
@@ -335,7 +340,10 @@ class NotificationHelper {
 		}
 	}
 
-	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey, ?int $rowId = null): void {
+	/**
+	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow
+	 */
+	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey, ?int $rowId = null, ?array $viewRecipientsSeeingRow = null): void {
 		$recipients = [];
 		foreach ($this->activityManager->findRecipientsByElement($element) as $receiverId) {
 			if (!is_string($receiverId) || $receiverId === '' || $receiverId === $authorId) {
@@ -347,7 +355,9 @@ class NotificationHelper {
 			$recipients[] = $receiverId;
 		}
 
-		if ($rowId !== null && $element instanceof View) {
+		if ($element instanceof View && $viewRecipientsSeeingRow !== null) {
+			$recipients = array_values(array_intersect($recipients, $viewRecipientsSeeingRow[$element->getId()] ?? []));
+		} elseif ($element instanceof View && $rowId !== null) {
 			$recipients = $this->row2Mapper->filterUsersSeeingRow($rowId, $element, $recipients);
 		}
 

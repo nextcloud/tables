@@ -110,12 +110,30 @@ final class NotificationHelperTest extends TestCase {
 		$this->assertSame([], $this->notifiedUsers);
 	}
 
+	public function testDeleteNotificationUsesPrecomputedViewRecipients(): void {
+		$this->row2Mapper->expects($this->never())->method('filterUsersSeeingRow');
+
+		$this->helper->sendNotification(
+			ActivityManager::TABLES_OBJECT_ROW,
+			$this->row(),
+			ActivityManager::SUBJECT_ROW_DELETE,
+			[],
+			'author',
+			[7 => ['visible', 'not-subscribed']],
+		);
+
+		$this->assertSame(['visible'], $this->notifiedUsers);
+	}
+
 	private function sendRowCreated(): void {
+		$this->helper->sendNotification(ActivityManager::TABLES_OBJECT_ROW, $this->row(), ActivityManager::SUBJECT_ROW_CREATE, [], 'author');
+	}
+
+	private function row(): Row2 {
 		$row = new Row2();
 		$row->setId(self::ROW_ID);
 		$row->setTableId(self::TABLE_ID);
 		$row->setData([]);
-
-		$this->helper->sendNotification(ActivityManager::TABLES_OBJECT_ROW, $row, ActivityManager::SUBJECT_ROW_CREATE, [], 'author');
+		return $row;
 	}
 }
