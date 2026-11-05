@@ -55,8 +55,8 @@ test.describe('Grid pages of an application', () => {
 
 		await openApplication(page, contextId)
 
-		const firstHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid first table' })
-		const secondHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid second table' })
+		const firstHeading = page.locator('h1', { hasText: 'grid first table' })
+		const secondHeading = page.locator('h1', { hasText: 'grid second table' })
 		await expect(firstHeading).toBeVisible()
 		await expect(secondHeading).toBeVisible()
 		expect((await firstHeading.boundingBox())!.y).toBeLessThan((await secondHeading.boundingBox())!.y)
@@ -123,7 +123,7 @@ test.describe('Grid pages of an application', () => {
 		const startPage = Object.values(application.pages as Record<string, { page_type: string, content: object }>).find(entry => entry.page_type === 'startpage')
 		expect(Object.keys(startPage!.content)).toHaveLength(1)
 		await page.locator('[data-cy="contextStartPageLink"]').click()
-		await expect(page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid table in app' })).toBeVisible({ timeout: 30000 })
+		await expect(page.locator('h1', { hasText: 'grid table in app' })).toBeVisible({ timeout: 30000 })
 		await expect(page.locator('[data-cy="gridPage"]')).toHaveCount(0)
 	})
 
