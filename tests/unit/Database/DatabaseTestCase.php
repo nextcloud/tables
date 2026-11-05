@@ -15,6 +15,7 @@ use OC\DB\ConnectionFactory;
 use OC\DB\MigrationService;
 use OC\Migration\NullOutput;
 use OC\SystemConfig;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Server;
 use PHPUnit\Framework\TestCase;
@@ -234,6 +235,7 @@ abstract class DatabaseTestCase extends TestCase {
 	protected function createTestRow(int $tableId, array $data = []) {
 		$defaultData = [
 			'table_id' => $tableId,
+			'uuid' => Uuid::v7()->toRfc4122(),
 			'created_by' => 'user1',
 			'created_at' => date('Y-m-d H:i:s'),
 			'last_edit_by' => 'user1',

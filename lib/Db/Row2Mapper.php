@@ -44,6 +44,10 @@ class Row2Mapper {
 	) {
 	}
 
+	public function importSleeve(RowSleeve $sleeve, ?string $archivedUuid): RowSleeve {
+		return $this->rowSleeveMapper->insertImported($sleeve, $archivedUuid);
+	}
+
 	/**
 	 * @param Row2 $row
 	 * @return Row2

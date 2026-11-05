@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+namespace OCA\Tables\Tests\Unit\Service;
+
+use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\RowSleeve;
+use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Helper\ColumnsHelper;
+use OCA\Tables\Notification\NotificationHelper;
+use OCA\Tables\Service\PermissionsService;
+use OCA\Tables\Service\RowService;
+use OCA\Tables\Service\RowVisibilityService;
+use OCP\EventDispatcher\IEventDispatcher;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
+
+class RowServiceUuidTest extends TestCase {
+	private RowService $service;
+	private Row2Mapper $rows;
+
+	protected function setUp(): void {
+		$this->rows = $this->createMock(Row2Mapper::class);
+		$this->service = new RowService(new NullLogger(), 'alice', $this->createMock(PermissionsService::class), $this->createMock(ColumnMapper::class),
+			$this->createMock(ViewMapper::class), $this->createMock(TableMapper::class), $this->rows, $this->createMock(IEventDispatcher::class),
+			$this->createMock(ColumnsHelper::class), $this->createMock(ActivityManager::class), $this->createMock(NotificationHelper::class),
+			$this->createMock(RowVisibilityService::class));
+	}
+
+	/** @dataProvider archiveIdentities */
+	public function testArchiveIdentityGoesThroughSleeveInsertionBoundary(mixed $uuid, ?string $expected, bool $includeUuid = true): void {
+		$table = new Table();
+		$table->setId(5);
+		$table->setOwnership('alice');
+		$this->rows->expects($this->once())->method('importSleeve')->willReturnCallback(function (RowSleeve $sleeve, ?string $archivedUuid) use ($expected): RowSleeve {
+			$this->assertSame($expected, $archivedUuid);
+			$this->assertNull($sleeve->getUuid());
+			$this->assertSame(5, $sleeve->getTableId());
+			$this->assertSame('alice', $sleeve->getCreatedBy());
+			$sleeve->setId(99);
+			return $sleeve;
+		});
+		$archive = ['createdAt' => '2020-01-01 00:00:00', 'lastEditAt' => '2020-01-02 00:00:00'];
+		if ($includeUuid) {
+			$archive['uuid'] = $uuid;
+		}
+		$this->assertSame(99, $this->service->importRow($table, $archive));
+	}
+
+	public static function archiveIdentities(): array {
+		return [
+			'older archive without UUID' => [null, null, false],
+			'no UUID' => [null, null],
+			'UUIDv7 in upper case' => ['019F90C5-8576-7F0B-9B14-9BF49B2826CF', '019f90c5-8576-7f0b-9b14-9bf49b2826cf'],
+			'not a string' => [3, null],
+			'array' => [[], null],
+			'empty string' => ['', null],
+			'UUIDv4' => ['019f90c5-8576-4f0b-9b14-9bf49b2826cf', null],
+		];
+	}
+}
