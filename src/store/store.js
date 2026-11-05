@@ -231,7 +231,7 @@ export const useTablesStore = defineStore('store', {
 			views.push(res.data)
 			this.setViews(views)
 			const table = this.tables.find(t => t.id === res.data.tableId)
-			table.views.push(res.data)
+			table?.views.push(res.data)
 
 			return res.data.id
 		},
