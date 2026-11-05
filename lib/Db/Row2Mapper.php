@@ -830,7 +830,7 @@ class Row2Mapper {
 				fn (string $userId): bool => $this->isRowInViewPresent($rowId, $view, $userId),
 			));
 		} catch (\Throwable $e) {
-			$this->logger->warning('Could not evaluate visibility of row ' . $rowId . ' in view ' . $view->getId(), ['exception' => $e]);
+			$this->logger->error('Could not evaluate visibility of row ' . $rowId . ' in view ' . $view->getId(), ['exception' => $e]);
 			return [];
 		}
 	}

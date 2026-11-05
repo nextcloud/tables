@@ -272,7 +272,6 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->userId);
-			$this->rowVisibility->forget($insertedRow->getId());
 			$this->attachAliasPayload($insertedRow, $columns);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
@@ -695,7 +694,6 @@ class RowService extends SuperService {
 		}
 
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
-		$this->rowVisibility->forget($updatedRow->getId());
 		$this->attachAliasPayload($updatedRow, $columns);
 
 		try {
@@ -797,8 +795,8 @@ class RowService extends SuperService {
 
 		try {
 			$columns = $this->loadColumnsForData($item->getData() ?? []);
-			// Activity and notification recipients of the delete come from this snapshot, the row is gone when they are sent
-			$this->rowVisibility->forget($id);
+			// Delete activities and notifications only learn their view recipients from this snapshot, because the
+			// row is gone when they are sent. Any other code path deleting rows has to take the snapshot first.
 			$this->activityManager->snapshotRowVisibility($item);
 			$deletedRow = $this->row2Mapper->delete($item);
 			$this->attachAliasPayload($item, $columns);

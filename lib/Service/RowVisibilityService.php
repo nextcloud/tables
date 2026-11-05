@@ -13,12 +13,11 @@ use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\View;
 
 /**
- * Resolves which users see a row in a view, memoized per request so that
- * activities and notifications for the same row event share one evaluation.
+ * Resolves which users see a row in a view, memoized so that activities and
+ * notifications of one row operation share one evaluation. RowService drops
+ * the entry with forget() when the operation ends.
  */
 class RowVisibilityService {
-	private const MAX_ROWS = 100;
-
 	/** @var array<int, array<string, array<string, bool>>> rowId => view key => userId => visible */
 	private array $memo = [];
 
@@ -42,7 +41,7 @@ class RowVisibilityService {
 			foreach ($unknown as $userId) {
 				$known[$userId] = isset($visible[$userId]);
 			}
-			$this->remember($rowId, $viewKey, $known);
+			$this->memo[$rowId][$viewKey] = $known;
 		}
 
 		return array_values(array_filter($userIds, static fn (string $userId): bool => $known[$userId]));
@@ -50,15 +49,5 @@ class RowVisibilityService {
 
 	public function forget(int $rowId): void {
 		unset($this->memo[$rowId]);
-	}
-
-	/**
-	 * @param array<string, bool> $known
-	 */
-	private function remember(int $rowId, string $viewKey, array $known): void {
-		if (!isset($this->memo[$rowId]) && count($this->memo) >= self::MAX_ROWS) {
-			unset($this->memo[array_key_first($this->memo)]);
-		}
-		$this->memo[$rowId][$viewKey] = $known;
 	}
 }
