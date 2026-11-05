@@ -87,11 +87,11 @@ class RowOCSController extends AOCSController {
 		try {
 			if ($tableId !== null && $this->federationService->isNodeFederated($tableId, 'table')) {
 				$table = $this->tableService->find($nodeId, true);
-				return new DataResponse($this->federationService->createRow($table, $data));
+				return new DataResponse($this->federationService->createRow($table, $data) + ['uuid' => null]);
 			}
 			if ($viewId !== null && $this->federationService->isNodeFederated($viewId, 'view')) {
 				$view = $this->viewService->find($nodeId, false, $this->userId);
-				return new DataResponse($this->federationService->createRow($view, $data));
+				return new DataResponse($this->federationService->createRow($view, $data) + ['uuid' => null]);
 			}
 			return new DataResponse($this->rowService->create($tableId, $viewId, $newRowData)->jsonSerialize());
 		} catch (BadRequestError $e) {
@@ -140,11 +140,11 @@ class RowOCSController extends AOCSController {
 		try {
 			if ($tableId !== null && $this->federationService->isNodeFederated($tableId, 'table')) {
 				$table = $this->tableService->find($nodeId, true);
-				return new DataResponse($this->federationService->updateRow($table, $rowId, $data));
+				return new DataResponse($this->federationService->updateRow($table, $rowId, $data) + ['uuid' => null]);
 			}
 			if ($viewId !== null && $this->federationService->isNodeFederated($viewId, 'view')) {
 				$view = $this->viewService->find($nodeId, false, $this->userId);
-				return new DataResponse($this->federationService->updateRow($view, $rowId, $data));
+				return new DataResponse($this->federationService->updateRow($view, $rowId, $data) + ['uuid' => null]);
 			}
 			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $data, $this->userId, $tableId)->jsonSerialize());
 		} catch (BadRequestError $e) {
@@ -185,11 +185,11 @@ class RowOCSController extends AOCSController {
 		try {
 			if ($tableId !== null && $this->federationService->isNodeFederated($tableId, 'table')) {
 				$table = $this->tableService->find($nodeId, true);
-				return new DataResponse($this->federationService->deleteRow($table, $rowId));
+				return new DataResponse($this->federationService->deleteRow($table, $rowId) + ['uuid' => null]);
 			}
 			if ($viewId !== null && $this->federationService->isNodeFederated($viewId, 'view')) {
 				$view = $this->viewService->find($nodeId, false, $this->userId);
-				return new DataResponse($this->federationService->deleteRow($view, $rowId));
+				return new DataResponse($this->federationService->deleteRow($view, $rowId) + ['uuid' => null]);
 			}
 			return new DataResponse($this->rowService->delete($rowId, $viewId, $this->userId, $tableId)->jsonSerialize());
 		} catch (NotFoundError $e) {

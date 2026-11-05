@@ -11,6 +11,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\RowSleeve;
 use OCA\Tables\Db\Table;
@@ -35,6 +36,15 @@ class RowServiceUuidTest extends TestCase {
 			$this->createMock(ViewMapper::class), $this->createMock(TableMapper::class), $this->rows, $this->createMock(IEventDispatcher::class),
 			$this->createMock(ColumnsHelper::class), $this->createMock(ActivityManager::class), $this->createMock(NotificationHelper::class),
 			$this->createMock(RowVisibilityService::class));
+	}
+
+	private function row(): Row2 {
+		$row = new Row2();
+		$row->setId(13);
+		$row->setTableId(5);
+		$row->setUuid('019f90c5-8576-7f0b-9b14-9bf49b2826cf');
+		$row->setData([['columnId' => 1, 'value' => 'visible'], ['columnId' => 2, 'value' => 'hidden']]);
+		return $row;
 	}
 
 	/** @dataProvider archiveIdentities */
@@ -67,5 +77,14 @@ class RowServiceUuidTest extends TestCase {
 			'empty string' => ['', null],
 			'UUIDv4' => ['019f90c5-8576-4f0b-9b14-9bf49b2826cf', null],
 		];
+	}
+
+	public function testPublicFormatterKeepsUuidAndRemovesPrivateMetadata(): void {
+		$row = $this->row();
+		$result = $this->service->formatRowsForPublicShare([$row])[0];
+		$this->assertSame($row->getUuid(), $result['uuid']);
+		$this->assertArrayNotHasKey('tableId', $result);
+		$this->assertArrayNotHasKey('createdBy', $result);
+		$this->assertArrayNotHasKey('lastEditBy', $result);
 	}
 }
