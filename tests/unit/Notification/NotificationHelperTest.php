@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Notification;
 
 use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Table;
@@ -34,6 +35,7 @@ final class NotificationHelperTest extends TestCase {
 	private View $view;
 	/** @var list<string> */
 	private array $notifiedUsers = [];
+	private array $subjectParams = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -47,6 +49,7 @@ final class NotificationHelperTest extends TestCase {
 		$this->view->setId(7);
 		$this->view->setTitle('View');
 		$this->view->setTableId(self::TABLE_ID);
+		$this->view->setColumns('[3]');
 
 		$tableMapper = $this->createMock(TableMapper::class);
 		$tableMapper->method('find')->willReturn($table);
@@ -65,13 +68,24 @@ final class NotificationHelperTest extends TestCase {
 		);
 
 		$notification = $this->createMock(INotification::class);
-		foreach (['setApp', 'setDateTime', 'setObject', 'setSubject'] as $setter) {
+		$notification->method('setSubject')->willReturnCallback(function (string $subject, array $params) use ($notification): INotification {
+			$this->subjectParams = $params;
+			return $notification;
+		});
+		foreach (['setApp', 'setDateTime', 'setObject'] as $setter) {
 			$notification->method($setter)->willReturnSelf();
 		}
 		$notification->method('setUser')->willReturnCallback(function (string $userId) use ($notification): INotification {
 			$this->notifiedUsers[] = $userId;
 			return $notification;
 		});
+
+		$column = new Column();
+		$column->setId(3);
+		$column->setTitle('Status');
+		$column->setType('text');
+		$columnMapper = $this->createMock(ColumnMapper::class);
+		$columnMapper->method('find')->willReturn($column);
 
 		$notificationManager = $this->createMock(IManager::class);
 		$notificationManager->method('createNotification')->willReturn($notification);
@@ -85,7 +99,7 @@ final class NotificationHelperTest extends TestCase {
 			$tableMapper,
 			$viewMapper,
 			$this->rowVisibility,
-			$this->createMock(ColumnMapper::class),
+			$columnMapper,
 			$activityManager,
 			'author',
 		);
@@ -108,6 +122,18 @@ final class NotificationHelperTest extends TestCase {
 		$this->sendRowCreated();
 
 		$this->assertSame([], $this->notifiedUsers);
+	}
+
+	public function testRowNotificationStoresNoCellValues(): void {
+		$this->rowVisibility->method('usersSeeingRow')->willReturn(['visible']);
+
+		$this->helper->sendNotification(ActivityManager::TABLES_OBJECT_ROW, $this->row(), ActivityManager::SUBJECT_ROW_UPDATE, [
+			'before' => [['columnId' => 3, 'value' => 'secret before']],
+			'after' => [['columnId' => 3, 'value' => 'secret after']],
+		], 'author');
+
+		$this->assertSame([['id' => 3, 'name' => 'Status', 'type' => 'text']], $this->subjectParams['changeCols']);
+		$this->assertSame(['id' => self::ROW_ID], $this->subjectParams['row']);
 	}
 
 	private function sendRowCreated(): void {

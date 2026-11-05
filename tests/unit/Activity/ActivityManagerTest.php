@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Activity;
 
 use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Table;
@@ -36,6 +37,7 @@ final class ActivityManagerTest extends TestCase {
 	private string $currentUser = '';
 	/** @var list<string> */
 	private array $published = [];
+	private array $subjectParams = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -64,7 +66,11 @@ final class ActivityManagerTest extends TestCase {
 		);
 
 		$event = $this->createMock(IEvent::class);
-		foreach (['setApp', 'setAuthor', 'setObject', 'setSubject', 'setTimestamp'] as $setter) {
+		$event->method('setSubject')->willReturnCallback(function (string $subject, array $params) use ($event): IEvent {
+			$this->subjectParams = $params;
+			return $event;
+		});
+		foreach (['setApp', 'setAuthor', 'setObject', 'setTimestamp'] as $setter) {
 			$event->method($setter)->willReturnSelf();
 		}
 		$event->method('setType')->willReturnCallback(function (string $type) use ($event): IEvent {
@@ -77,6 +83,13 @@ final class ActivityManagerTest extends TestCase {
 		});
 		$event->method('getSubject')->willReturn(ActivityManager::SUBJECT_ROW_DELETE);
 		$event->method('getSubjectParameters')->willReturn([]);
+
+		$column = new Column();
+		$column->setId(3);
+		$column->setTitle('Status');
+		$column->setType('text');
+		$columnMapper = $this->createMock(ColumnMapper::class);
+		$columnMapper->method('find')->willReturn($column);
 
 		$manager = $this->createMock(IManager::class);
 		$manager->method('generateEvent')->willReturn($event);
@@ -91,7 +104,7 @@ final class ActivityManagerTest extends TestCase {
 			$this->createMock(IFactory::class),
 			$tableMapper,
 			$viewMapper,
-			$this->createMock(ColumnMapper::class),
+			$columnMapper,
 			$this->rowVisibility,
 			$shareService,
 			new CappedMemoryCache(),
@@ -125,11 +138,26 @@ final class ActivityManagerTest extends TestCase {
 		], $this->published);
 	}
 
+	public function testRowActivityStoresNoCellValues(): void {
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_ROW,
+			object: $this->row(),
+			subject: ActivityManager::SUBJECT_ROW_UPDATE,
+			additionalParams: [
+				'before' => [['columnId' => 3, 'value' => 'secret before']],
+				'after' => [['columnId' => 3, 'value' => 'secret after']],
+			],
+		);
+
+		$this->assertSame(['id' => self::ROW_ID], $this->subjectParams['row']);
+		$this->assertSame([['id' => 3, 'name' => 'Status']], $this->subjectParams['changeCols']);
+	}
+
 	private function row(): Row2 {
 		$row = new Row2();
 		$row->setId(self::ROW_ID);
 		$row->setTableId(self::TABLE_ID);
-		$row->setData([]);
+		$row->setData([['columnId' => 3, 'value' => 'secret']]);
 		return $row;
 	}
 }

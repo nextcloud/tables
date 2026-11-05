@@ -207,7 +207,7 @@ class ActivityManager {
 			case self::SUBJECT_ROW_UPDATE:
 			case self::SUBJECT_ROW_DELETE:
 				$eventType = self::EVENT_TYPE_TABLE_ROW;
-				$subjectParams['row'] = $object;
+				$subjectParams['row'] = ['id' => $object->getId()];
 				break;
 			case self::SUBJECT_COLUMN_CREATE:
 			case self::SUBJECT_COLUMN_UPDATE:
@@ -255,8 +255,6 @@ class ActivityManager {
 					$changeCols[] = [
 						'id' => $column->getId(),
 						'name' => $column->getTitle(),
-						'before' => $colData,
-						'after' => $additionalParams['after'][$index]
 					];
 				} catch (\Exception $e) {
 					Server::get(LoggerInterface::class)->error('Could not find column for activity entry.', [
@@ -492,13 +490,13 @@ class ActivityManager {
 
 	/**
 	 * @param array<string, mixed> $subjectParams
-	 * @return list<array{id: int, name: string, before: mixed, after: mixed}>
+	 * @return list<array{id: int, name: string}>
 	 */
 	private function getVisibleChangeCols(array $subjectParams): array {
 		$changeCols = [];
 		foreach ($subjectParams['changeCols'] ?? [] as $changeCol) {
 			if (!is_array($changeCol)
-				|| !isset($changeCol['id'], $changeCol['name'], $changeCol['before'], $changeCol['after'])
+				|| !isset($changeCol['id'], $changeCol['name'])
 				|| !is_int($changeCol['id'])
 				|| !is_string($changeCol['name'])) {
 				continue;
@@ -507,8 +505,6 @@ class ActivityManager {
 			$changeCols[] = [
 				'id' => $changeCol['id'],
 				'name' => $changeCol['name'],
-				'before' => $changeCol['before'],
-				'after' => $changeCol['after'],
 			];
 		}
 

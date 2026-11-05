@@ -277,8 +277,12 @@ class NotificationHelper {
 			],
 		];
 
+		$changedColumns = $subject === ActivityManager::SUBJECT_ROW_UPDATE ? $this->resolveChangedColumns($additionalParams) : [];
 		if ($subject === ActivityManager::SUBJECT_ROW_UPDATE) {
-			$subjectParams['changeCols'] = $this->resolveChangedColumns($additionalParams);
+			$subjectParams['changeCols'] = array_map(
+				static fn (array $column): array => ['id' => $column['id'], 'name' => $column['name'], 'type' => $column['type']],
+				$changedColumns,
+			);
 		}
 
 		$this->sendNotifiesByElement(
@@ -293,10 +297,10 @@ class NotificationHelper {
 
 		$assignedTargets = $subject === ActivityManager::SUBJECT_ROW_CREATE
 			? $this->extractAssignedTargetsFromRowData($row->getData())
-			: $this->extractAssignedTargetsFromChangedColumns($subjectParams['changeCols'] ?? []);
+			: $this->extractAssignedTargetsFromChangedColumns($changedColumns);
 
 		foreach ($this->viewMapper->findAll($tableId) as $view) {
-			if ($subject === ActivityManager::SUBJECT_ROW_UPDATE && !$this->viewContainsAnyChangedColumn($view, $subjectParams['changeCols'] ?? [])) {
+			if ($subject === ActivityManager::SUBJECT_ROW_UPDATE && !$this->viewContainsAnyChangedColumn($view, $changedColumns)) {
 				continue;
 			}
 
