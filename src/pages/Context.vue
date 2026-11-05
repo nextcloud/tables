@@ -86,6 +86,7 @@ export default {
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
+			reloadPending: false,
 		}
 	},
 
@@ -170,6 +171,7 @@ export default {
 			}
 
 			if (this.isReloading) {
+				this.reloadPending = true
 				return
 			}
 			this.isReloading = true
@@ -267,6 +269,11 @@ export default {
 			} finally {
 				this.loading = false
 				this.isReloading = false
+			}
+
+			if (this.reloadPending) {
+				this.reloadPending = false
+				await this.reload()
 			}
 		},
 		createColumn(isView, element) {
