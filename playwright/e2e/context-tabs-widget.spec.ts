@@ -46,7 +46,7 @@ test.describe('Tabs widget', () => {
 		const tabs = page.locator('[data-cy="tabsWidget"]').getByRole('tab')
 		await expect(tabs).toHaveCount(2, { timeout: 30000 })
 		await expect(page.getByText('In the first tab')).toBeVisible()
-		await expect(page.locator('h1', { hasText: tableTitle })).toHaveCount(0)
+		await expect(page.locator('[data-cy="tabsWidget"] [data-cy="gridWidget"]').getByRole('heading', { name: tableTitle })).toHaveCount(0)
 
 		// The keyboard moves between tabs, Enter opens one
 		await tabs.nth(0).focus()
@@ -54,7 +54,7 @@ test.describe('Tabs widget', () => {
 		await expect(tabs.nth(1)).toBeFocused()
 		await page.keyboard.press('Enter')
 		await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible({ timeout: 30000 })
+		await expect(page.locator('[data-cy="tabsWidget"] [data-cy="gridWidget"]').getByRole('heading', { name: tableTitle })).toBeVisible({ timeout: 30000 })
 		await expect(page.getByText('In the first tab')).toHaveCount(0)
 
 		// A table with a description shows it behind a button
