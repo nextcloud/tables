@@ -21,8 +21,12 @@
 				:tabindex="page.id === focusPageId ? 0 : -1"
 				:data-cy="page.page_type === PAGE_TYPE_START ? 'contextStartPageLink' : 'contextPageLink'"
 				@click="$emit('select', page)">
-				<NamedIcon v-if="page.icon" :name="page.icon" :size="20" />
-				<span>{{ pageTitle(page) }}</span>
+				<span class="context-page-bar__tab-icon" aria-hidden="true">
+					<NamedIcon v-if="page.icon" :name="page.icon" :size="20" />
+					<HomeOutline v-else-if="page.page_type === PAGE_TYPE_START" :size="20" />
+					<ViewDashboardOutline v-else :size="20" />
+				</span>
+				<span class="context-page-bar__tab-title">{{ pageTitle(page) }}</span>
 			</button>
 		</div>
 		<NcButton v-if="canManage" variant="tertiary" data-cy="contextPageAdd" @click="$emit('add-page')">
@@ -36,20 +40,25 @@
 
 <script>
 import { NcButton } from '@nextcloud/vue'
+import HomeOutline from 'vue-material-design-icons/HomeOutline.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
+import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { PAGE_TYPE_START, contextPages, pageTitle } from './gridLayout.js'
 
 /**
- * The pages of an application as tabs: the start page first, then its grid pages. Follows the
+ * The pages of an application as tabs that look like the tabs of NcAppSidebar: the start page
+ * first, then its grid pages. Follows the
  * tabs pattern: one tab stop, the arrow keys, Home and End move between tabs, Enter or Space opens one.
  */
 export default {
 	name: 'ContextPageBar',
 	components: {
+		HomeOutline,
 		NamedIcon,
 		NcButton,
 		Plus,
+		ViewDashboardOutline,
 	},
 	props: {
 		context: {
@@ -145,38 +154,76 @@ export default {
 	&__tabs {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: stretch;
 		gap: var(--default-grid-baseline);
 	}
 
+	&__tab-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 20px;
+		overflow: hidden;
+	}
+
+	// Looks like the tabs of NcAppSidebar
 	&__tab {
-		display: inline-flex;
+		position: relative;
+		display: flex;
+		flex-direction: column;
 		align-items: center;
 		gap: var(--default-grid-baseline);
-		min-height: var(--default-clickable-area);
-		margin: 0;
-		padding: 0 calc(3 * var(--default-grid-baseline));
+		min-width: var(--default-clickable-area);
+		margin: 0 0 var(--default-grid-baseline);
+		padding: var(--default-grid-baseline) calc(4 * var(--default-grid-baseline)) calc(2 * var(--default-grid-baseline));
 		border: none;
-		border-bottom: 2px solid transparent;
-		border-radius: 0;
-		background: none;
-		color: var(--color-text-maxcontrast);
+		border-radius: var(--border-radius-element);
+		background-color: var(--color-main-background);
+		color: var(--color-main-text);
+		font-size: var(--default-font-size);
 		font-weight: normal;
 		cursor: pointer;
+		transition: background-color var(--animation-quick);
 
-		&:hover,
-		&:focus-visible {
-			color: var(--color-main-text);
+		&::after {
+			content: '';
+			position: absolute;
+			inset-block-end: 0;
+			inset-inline: 0;
+			width: 0;
+			margin-inline: auto;
+			height: 4px;
+			border-radius: 999px;
+			background-color: var(--color-primary-element);
+			opacity: 0;
+			transition: width var(--animation-quick), opacity var(--animation-quick);
+		}
+
+		&:hover {
+			background-color: var(--color-background-hover);
 		}
 
 		&:focus-visible {
 			outline: 2px solid var(--color-main-text);
-			outline-offset: -2px;
+			outline-offset: 2px;
 		}
 
 		&--active {
-			border-bottom-color: var(--color-primary-element);
-			color: var(--color-main-text);
-			font-weight: bold;
+			background-color: color-mix(in srgb, var(--color-primary-element) 8%, transparent);
+			cursor: default;
+
+			&:hover {
+				background-color: color-mix(in srgb, var(--color-primary-element) 8%, transparent);
+			}
+
+			&::after {
+				width: 80%;
+				opacity: 1;
+			}
+
+			.context-page-bar__tab-title {
+				font-weight: var(--font-weight-element, bold);
+			}
 		}
 	}
 }
