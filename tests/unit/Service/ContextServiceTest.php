@@ -38,6 +38,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $pageContentMapper;
 	private MockObject $userManager;
 	private MockObject $auditLogService;
+	private MockObject $permissionsService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -47,7 +48,7 @@ final class ContextServiceTest extends TestCase {
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
-		$permissionsService = $this->createMock(PermissionsService::class);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$dbConnection = $this->createMock(IDBConnection::class);
@@ -61,7 +62,7 @@ final class ContextServiceTest extends TestCase {
 			$this->pageMapper,
 			$this->pageContentMapper,
 			$logger,
-			$permissionsService,
+			$this->permissionsService,
 			$this->userManager,
 			$this->auditLogService,
 			$dbConnection,
@@ -187,6 +188,48 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(10, $updatedOrders[502]);
 		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
 		self::assertSame(10, $updatedContext->getPages()[301]['content'][502]['order']);
+	}
+
+	public function testUpdateGivesAnAddedNodeTheShapeOfTheLoadedNodesAndOrdersIt(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([
+			101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1],
+		]);
+		$context->setPages([
+			301 => [
+				'id' => 301,
+				'page_type' => Page::TYPE_STARTPAGE,
+				'content' => [501 => ['order' => 10, 'node_rel_id' => 101]],
+			],
+		]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$this->contextNodeRelMapper->method('insert')->willReturnCallback(static function (ContextNodeRelation $relation): ContextNodeRelation {
+			$relation->id = 102;
+			return $relation;
+		});
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content): PageContent {
+			$content->id = 502;
+			return $content;
+		});
+		$pageContentsById = [
+			501 => $this->buildPageContent(501, 301, 101, 10),
+			502 => $this->buildPageContent(502, 301, 102, 100),
+		];
+		$this->pageContentMapper->method('findById')
+			->willReturnCallback(static fn (int $contentId): PageContent => $pageContentsById[$contentId]);
+		$this->pageContentMapper->method('update')->willReturnArgument(0);
+
+		$updatedContext = $this->service->update(7, 'user-1', null, null, null, [
+			['id' => 12, 'type' => 1, 'permissions' => 3],
+			['id' => 11, 'type' => 0, 'permissions' => 1],
+		]);
+
+		self::assertSame(['id' => 102, 'node_id' => 12, 'node_type' => 1, 'permissions' => 3], $updatedContext->getNodes()[102]);
+		self::assertSame(['order' => 10, 'node_rel_id' => 102], $updatedContext->getPages()[301]['content'][502]);
+		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
 	}
 
 	public function testUpdateLogsRemovedNodes(): void {
