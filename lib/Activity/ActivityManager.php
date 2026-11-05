@@ -13,12 +13,12 @@ use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
-use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
@@ -77,7 +77,7 @@ class ActivityManager {
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
 		private readonly ColumnMapper $columnMapper,
-		private readonly Row2Mapper $row2Mapper,
+		private readonly RowVisibilityService $rowVisibility,
 		private readonly ShareService $shareService,
 		protected readonly CappedMemoryCache $cache,
 		private readonly ?string $userId,
@@ -92,16 +92,15 @@ class ActivityManager {
 	 * @psalm-param self::TABLES_OBJECT_* $objectType
 	 * @psalm-param array<string, mixed>|null|string $additionalParams
 	 * @psalm-param string|null $author
-	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow view id => users seeing the row, resolved before it was deleted
 	 */
-	public function triggerEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null, ?array $viewRecipientsSeeingRow = null) {
+	public function triggerEvent(string $objectType, Row2|Table|View|Column $object, string $subject, array|string|null $additionalParams = [], array|string|null $author = null) {
 		$author ??= $this->userId;
 
 		try {
 			$event = $this->createEvent($objectType, $object, $subject, $additionalParams, $author);
 
 			if ($event !== null) {
-				$this->sendToUsers($event, $object, $viewRecipientsSeeingRow);
+				$this->sendToUsers($event, $object);
 			}
 		} catch (\Exception) {
 			// Ignore exception for undefined activities on update events
@@ -317,10 +316,7 @@ class ActivityManager {
 		];
 	}
 
-	/**
-	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow
-	 */
-	private function sendToUsers(IEvent $event, Row2|Table|View|Column $object, ?array $viewRecipientsSeeingRow = null) {
+	private function sendToUsers(IEvent $event, Row2|Table|View|Column $object) {
 		// Handle share events with restricted recipients
 		$subject = $event->getSubject();
 		if (in_array($subject, [self::SUBJECT_SHARE_CREATE, self::SUBJECT_SHARE_UPDATE, self::SUBJECT_SHARE_DELETE], true)) {
@@ -347,7 +343,7 @@ class ActivityManager {
 		}
 
 		if ($object instanceof Row2) {
-			$this->sendRowEventToViewAccessibleUsers(clone $event, $object, $viewRecipientsSeeingRow);
+			$this->sendRowEventToViewAccessibleUsers(clone $event, $object);
 		}
 
 		if ($object instanceof Column) {
@@ -355,10 +351,7 @@ class ActivityManager {
 		}
 	}
 
-	/**
-	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow
-	 */
-	private function sendRowEventToViewAccessibleUsers(IEvent $event, Row2 $object, ?array $viewRecipientsSeeingRow) {
+	private function sendRowEventToViewAccessibleUsers(IEvent $event, Row2 $object) {
 		$subject = $event->getSubject();
 		$subjectParams = $event->getSubjectParameters();
 		$event->setType(self::EVENT_TYPE_VIEW_ROW);
@@ -382,9 +375,7 @@ class ActivityManager {
 				continue;
 			}
 
-			$uniqueAffectedUser = $viewRecipientsSeeingRow !== null
-				? ($viewRecipientsSeeingRow[$view->getId()] ?? [])
-				: $this->row2Mapper->filterUsersSeeingRow($object->getId(), $view, $this->findRecipientsByElement($view));
+			$uniqueAffectedUser = $this->rowVisibility->usersSeeingRow($object->getId(), $view, $this->findRecipientsByElement($view));
 
 			foreach ($uniqueAffectedUser as $userId) {
 				$subjectParams['view'] = $view;
@@ -816,18 +807,16 @@ class ActivityManager {
 	}
 
 	/**
-	 * @return array<int, list<string>> view id => users of that view who can see the row
+	 * Resolves now which view recipients see the row, for events sent after the row is gone
 	 */
-	public function findViewRecipientsSeeingRow(Row2 $row): array {
-		$recipients = [];
+	public function snapshotRowVisibility(Row2 $row): void {
 		try {
 			foreach ($this->viewMapper->findAll($row->getTableId()) as $view) {
-				$recipients[$view->getId()] = $this->row2Mapper->filterUsersSeeingRow($row->getId(), $view, $this->findRecipientsByElement($view));
+				$this->rowVisibility->usersSeeingRow($row->getId(), $view, $this->findRecipientsByElement($view));
 			}
 		} catch (\Throwable $e) {
 			Server::get(LoggerInterface::class)->warning('Could not resolve view recipients for row ' . $row->getId(), ['exception' => $e]);
 		}
-		return $recipients;
 	}
 
 	public function findRecipientsByElement(Table|View $element): array {

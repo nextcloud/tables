@@ -12,11 +12,11 @@ namespace OCA\Tables\Tests\Unit\Activity;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
-use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
@@ -30,7 +30,7 @@ final class ActivityManagerTest extends TestCase {
 	private const VIEW_ID = 7;
 	private const ROW_ID = 42;
 
-	private Row2Mapper&MockObject $row2Mapper;
+	private RowVisibilityService&MockObject $rowVisibility;
 	private ActivityManager $activityManager;
 	private string $currentType = '';
 	private string $currentUser = '';
@@ -84,7 +84,7 @@ final class ActivityManagerTest extends TestCase {
 			$this->published[] = $this->currentType . ':' . $this->currentUser;
 		});
 
-		$this->row2Mapper = $this->createMock(Row2Mapper::class);
+		$this->rowVisibility = $this->createMock(RowVisibilityService::class);
 
 		$this->activityManager = new ActivityManager(
 			$manager,
@@ -92,30 +92,31 @@ final class ActivityManagerTest extends TestCase {
 			$tableMapper,
 			$viewMapper,
 			$this->createMock(ColumnMapper::class),
-			$this->row2Mapper,
+			$this->rowVisibility,
 			$shareService,
 			new CappedMemoryCache(),
 			'author',
 		);
 	}
 
-	public function testFindViewRecipientsSeeingRowIsKeyedByView(): void {
-		$this->row2Mapper->expects($this->once())
-			->method('filterUsersSeeingRow')
-			->with(self::ROW_ID, $this->isInstanceOf(View::class), ['author', 'visible', 'hidden'])
-			->willReturn(['author', 'visible']);
+	public function testSnapshotResolvesEveryViewOfTheTable(): void {
+		$this->rowVisibility->expects($this->once())
+			->method('usersSeeingRow')
+			->with(self::ROW_ID, $this->isInstanceOf(View::class), ['author', 'visible', 'hidden']);
 
-		$this->assertSame([self::VIEW_ID => ['author', 'visible']], $this->activityManager->findViewRecipientsSeeingRow($this->row()));
+		$this->activityManager->snapshotRowVisibility($this->row());
 	}
 
-	public function testDeleteActivityUsesPrecomputedViewRecipients(): void {
-		$this->row2Mapper->expects($this->never())->method('filterUsersSeeingRow');
+	public function testRowActivityReachesOnlyViewRecipientsSeeingTheRow(): void {
+		$this->rowVisibility->expects($this->once())
+			->method('usersSeeingRow')
+			->with(self::ROW_ID, $this->isInstanceOf(View::class), ['author', 'visible', 'hidden'])
+			->willReturn(['visible']);
 
 		$this->activityManager->triggerEvent(
 			objectType: ActivityManager::TABLES_OBJECT_ROW,
 			object: $this->row(),
 			subject: ActivityManager::SUBJECT_ROW_DELETE,
-			viewRecipientsSeeingRow: [self::VIEW_ID => ['visible']],
 		);
 
 		$this->assertSame([

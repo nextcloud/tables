@@ -12,13 +12,13 @@ namespace OCA\Tables\Tests\Unit\Notification;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
-use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ConfigService;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\Notification\IManager;
 use OCP\Notification\INotification;
@@ -29,7 +29,7 @@ final class NotificationHelperTest extends TestCase {
 	private const TABLE_ID = 1;
 	private const ROW_ID = 42;
 
-	private Row2Mapper&MockObject $row2Mapper;
+	private RowVisibilityService&MockObject $rowVisibility;
 	private NotificationHelper $helper;
 	private View $view;
 	/** @var list<string> */
@@ -76,7 +76,7 @@ final class NotificationHelperTest extends TestCase {
 		$notificationManager = $this->createMock(IManager::class);
 		$notificationManager->method('createNotification')->willReturn($notification);
 
-		$this->row2Mapper = $this->createMock(Row2Mapper::class);
+		$this->rowVisibility = $this->createMock(RowVisibilityService::class);
 
 		$this->helper = new NotificationHelper(
 			$notificationManager,
@@ -84,7 +84,7 @@ final class NotificationHelperTest extends TestCase {
 			$this->createMock(ShareService::class),
 			$tableMapper,
 			$viewMapper,
-			$this->row2Mapper,
+			$this->rowVisibility,
 			$this->createMock(ColumnMapper::class),
 			$activityManager,
 			'author',
@@ -92,8 +92,8 @@ final class NotificationHelperTest extends TestCase {
 	}
 
 	public function testViewNotificationOnlyReachesSubscribersSeeingTheRow(): void {
-		$this->row2Mapper->expects($this->once())
-			->method('filterUsersSeeingRow')
+		$this->rowVisibility->expects($this->once())
+			->method('usersSeeingRow')
 			->with(self::ROW_ID, $this->view, ['visible', 'hidden'])
 			->willReturn(['visible']);
 
@@ -103,26 +103,11 @@ final class NotificationHelperTest extends TestCase {
 	}
 
 	public function testNoViewNotificationWhenRowIsNotInView(): void {
-		$this->row2Mapper->method('filterUsersSeeingRow')->willReturn([]);
+		$this->rowVisibility->method('usersSeeingRow')->willReturn([]);
 
 		$this->sendRowCreated();
 
 		$this->assertSame([], $this->notifiedUsers);
-	}
-
-	public function testDeleteNotificationUsesPrecomputedViewRecipients(): void {
-		$this->row2Mapper->expects($this->never())->method('filterUsersSeeingRow');
-
-		$this->helper->sendNotification(
-			ActivityManager::TABLES_OBJECT_ROW,
-			$this->row(),
-			ActivityManager::SUBJECT_ROW_DELETE,
-			[],
-			'author',
-			[7 => ['visible', 'not-subscribed']],
-		);
-
-		$this->assertSame(['visible'], $this->notifiedUsers);
 	}
 
 	private function sendRowCreated(): void {

@@ -15,12 +15,12 @@ use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
-use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\ConfigService;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Notification\IManager;
@@ -35,7 +35,7 @@ class NotificationHelper {
 		private readonly ShareService $shareService,
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
-		private readonly Row2Mapper $row2Mapper,
+		private readonly RowVisibilityService $rowVisibility,
 		private readonly ColumnMapper $columnMapper,
 		protected readonly ActivityManager $activityManager,
 		protected readonly ?string $userId,
@@ -47,9 +47,8 @@ class NotificationHelper {
 	 * @param string $subject
 	 * @param array<string, mixed> $additionalParams
 	 * @param string|null $author
-	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow view id => users seeing the row, resolved before it was deleted
 	 */
-	public function sendNotification(string $objectType, Table|View|Row2|Column $object, string $subject, array $additionalParams = [], ?string $author = null, ?array $viewRecipientsSeeingRow = null): void {
+	public function sendNotification(string $objectType, Table|View|Row2|Column $object, string $subject, array $additionalParams = [], ?string $author = null): void {
 		try {
 			switch ($objectType) {
 				case ActivityManager::TABLES_OBJECT_TABLE:
@@ -64,7 +63,7 @@ class NotificationHelper {
 					break;
 				case ActivityManager::TABLES_OBJECT_ROW:
 					if ($object instanceof Row2) {
-						$this->sendRowNotification($object, $subject, $additionalParams, $author, $viewRecipientsSeeingRow);
+						$this->sendRowNotification($object, $subject, $additionalParams, $author);
 					}
 					break;
 				case ActivityManager::TABLES_OBJECT_COLUMN:
@@ -248,10 +247,7 @@ class NotificationHelper {
 	 * @param array<string, mixed> $additionalParams
 	 * @param mixed $author
 	 */
-	/**
-	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow
-	 */
-	private function sendRowNotification(Row2 $row, string $subject, array $additionalParams, $author, ?array $viewRecipientsSeeingRow): void {
+	private function sendRowNotification(Row2 $row, string $subject, array $additionalParams, $author): void {
 		if (!in_array($subject, [
 			ActivityManager::SUBJECT_ROW_CREATE,
 			ActivityManager::SUBJECT_ROW_UPDATE,
@@ -313,7 +309,6 @@ class NotificationHelper {
 				authorId: $authorId,
 				configKey: ConfigService::NOTIFY_ROW_KEY,
 				rowId: $rowId,
-				viewRecipientsSeeingRow: $viewRecipientsSeeingRow,
 			);
 
 			if (!empty($assignedTargets)) {
@@ -340,10 +335,7 @@ class NotificationHelper {
 		}
 	}
 
-	/**
-	 * @param array<int, list<string>>|null $viewRecipientsSeeingRow
-	 */
-	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey, ?int $rowId = null, ?array $viewRecipientsSeeingRow = null): void {
+	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey, ?int $rowId = null): void {
 		$recipients = [];
 		foreach ($this->activityManager->findRecipientsByElement($element) as $receiverId) {
 			if (!is_string($receiverId) || $receiverId === '' || $receiverId === $authorId) {
@@ -355,10 +347,8 @@ class NotificationHelper {
 			$recipients[] = $receiverId;
 		}
 
-		if ($element instanceof View && $viewRecipientsSeeingRow !== null) {
-			$recipients = array_values(array_intersect($recipients, $viewRecipientsSeeingRow[$element->getId()] ?? []));
-		} elseif ($element instanceof View && $rowId !== null) {
-			$recipients = $this->row2Mapper->filterUsersSeeingRow($rowId, $element, $recipients);
+		if ($element instanceof View && $rowId !== null) {
+			$recipients = $this->rowVisibility->usersSeeingRow($rowId, $element, $recipients);
 		}
 
 		foreach ($recipients as $receiverId) {
@@ -692,7 +682,7 @@ class NotificationHelper {
 				if (!$this->configService->isNotifyEnabledForScope($receiverId, 'view', $view->getId(), ConfigService::NOTIFY_ASSIGNED_KEY)) {
 					continue;
 				}
-				if (!$this->row2Mapper->isRowInViewPresent($rowId, $view, $receiverId)) {
+				if ($this->rowVisibility->usersSeeingRow($rowId, $view, [$receiverId]) === []) {
 					continue;
 				}
 

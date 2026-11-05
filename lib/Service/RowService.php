@@ -59,6 +59,7 @@ class RowService extends SuperService {
 		private readonly ActivityManager $activityManager,
 		private readonly NotificationHelper $notificationHelper,
 		private readonly IDBConnection $connection,
+		private readonly RowVisibilityService $rowVisibility,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 
@@ -271,6 +272,7 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->userId);
+			$this->rowVisibility->forget($insertedRow->getId());
 			$this->attachAliasPayload($insertedRow, $columns);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
@@ -689,6 +691,7 @@ class RowService extends SuperService {
 		}
 
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
+		$this->rowVisibility->forget($updatedRow->getId());
 		$this->attachAliasPayload($updatedRow, $columns);
 
 		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
@@ -786,7 +789,7 @@ class RowService extends SuperService {
 
 		try {
 			$columns = $this->loadColumnsForData($item->getData() ?? []);
-			$viewRecipients = $this->activityManager->findViewRecipientsSeeingRow($item);
+			$this->activityManager->snapshotRowVisibility($item);
 			$deletedRow = $this->row2Mapper->delete($item);
 			$this->attachAliasPayload($item, $columns);
 
@@ -798,14 +801,12 @@ class RowService extends SuperService {
 				object: $deletedRow,
 				subject: ActivityManager::SUBJECT_ROW_DELETE,
 				author: $userId,
-				viewRecipientsSeeingRow: $viewRecipients,
 			);
 			$this->notificationHelper->sendNotification(
 				objectType: ActivityManager::TABLES_OBJECT_ROW,
 				object: $deletedRow,
 				subject: ActivityManager::SUBJECT_ROW_DELETE,
 				author: $this->userId,
-				viewRecipientsSeeingRow: $viewRecipients,
 			);
 
 			return $this->filterRowResult($view ?? null, $deletedRow);
