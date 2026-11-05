@@ -726,6 +726,7 @@ class Row2Mapper {
 		foreach ($sleeves as $sleeve) {
 			$rows[$sleeve->getId()] = new Row2();
 			$rows[$sleeve->getId()]->setId($sleeve->getId());
+			$rows[$sleeve->getId()]->setUuid($sleeve->getUuid());
 			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
 			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
 			$rows[$sleeve->getId()]->setLastEditBy($sleeve->getLastEditBy());
@@ -794,6 +795,8 @@ class Row2Mapper {
 			$rowSleeve = $this->createNewRowSleeve($row->getTableId());
 			$row->setId($rowSleeve->getId());
 		}
+
+		$row->setUuid($rowSleeve->getUuid());
 
 		// write all cells to its db-table
 		foreach ($row->getData() as $cell) {

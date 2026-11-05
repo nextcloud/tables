@@ -657,6 +657,7 @@
                 "type": "object",
                 "required": [
                     "id",
+                    "uuid",
                     "createdAt",
                     "lastEditAt",
                     "data",
@@ -666,6 +667,10 @@
                     "id": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "createdAt": {
                         "type": "string"
@@ -715,6 +720,7 @@
                 "type": "object",
                 "required": [
                     "id",
+                    "uuid",
                     "tableId",
                     "createdBy",
                     "createdAt",
@@ -727,6 +733,10 @@
                     "id": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "tableId": {
                         "type": "integer",
