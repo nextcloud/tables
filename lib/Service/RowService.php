@@ -293,6 +293,10 @@ class RowService extends SuperService {
 		} catch (InternalError|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		} finally {
+			if (isset($insertedRow)) {
+				$this->rowVisibility->forget($insertedRow->getId());
+			}
 		}
 	}
 
@@ -694,29 +698,33 @@ class RowService extends SuperService {
 		$this->rowVisibility->forget($updatedRow->getId());
 		$this->attachAliasPayload($updatedRow, $columns);
 
-		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
+		try {
+			$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
-		if ($updatedRow->getData() !== $previousData) {
-			$this->activityManager->triggerEvent(
-				objectType: ActivityManager::TABLES_OBJECT_ROW,
-				object: $updatedRow,
-				subject: ActivityManager::SUBJECT_ROW_UPDATE,
-				author: $this->userId,
-				additionalParams: [
-					'before' => $previousData,
-					'after' => $updatedRow->getData(),
-				]
-			);
-			$this->notificationHelper->sendNotification(
-				objectType: ActivityManager::TABLES_OBJECT_ROW,
-				object: $updatedRow,
-				subject: ActivityManager::SUBJECT_ROW_UPDATE,
-				author: $this->userId,
-				additionalParams: [
-					'before' => $previousData,
-					'after' => $updatedRow->getData(),
-				]
-			);
+			if ($updatedRow->getData() !== $previousData) {
+				$this->activityManager->triggerEvent(
+					objectType: ActivityManager::TABLES_OBJECT_ROW,
+					object: $updatedRow,
+					subject: ActivityManager::SUBJECT_ROW_UPDATE,
+					author: $this->userId,
+					additionalParams: [
+						'before' => $previousData,
+						'after' => $updatedRow->getData(),
+					]
+				);
+				$this->notificationHelper->sendNotification(
+					objectType: ActivityManager::TABLES_OBJECT_ROW,
+					object: $updatedRow,
+					subject: ActivityManager::SUBJECT_ROW_UPDATE,
+					author: $this->userId,
+					additionalParams: [
+						'before' => $previousData,
+						'after' => $updatedRow->getData(),
+					]
+				);
+			}
+		} finally {
+			$this->rowVisibility->forget($updatedRow->getId());
 		}
 
 		return $this->filterRowResult($view ?? null, $updatedRow);
@@ -789,6 +797,8 @@ class RowService extends SuperService {
 
 		try {
 			$columns = $this->loadColumnsForData($item->getData() ?? []);
+			// Activity and notification recipients of the delete come from this snapshot, the row is gone when they are sent
+			$this->rowVisibility->forget($id);
 			$this->activityManager->snapshotRowVisibility($item);
 			$deletedRow = $this->row2Mapper->delete($item);
 			$this->attachAliasPayload($item, $columns);
@@ -813,6 +823,8 @@ class RowService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		} finally {
+			$this->rowVisibility->forget($id);
 		}
 	}
 
