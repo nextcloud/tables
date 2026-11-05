@@ -180,11 +180,11 @@ class ActivityManager {
 		$eventType = 'tables';
 		$subjectParams = [
 			'author' => $author ?? $this->userId,
-			'table' => $table,
+			'table' => ['id' => $table->getId(), 'title' => $table->getTitle()],
 			'objectType' => $objectType,
 		];
 		if ($object instanceof View) {
-			$subjectParams['view'] = $object;
+			$subjectParams['view'] = ['id' => $object->getId(), 'title' => $object->getTitle()];
 		}
 		switch ($subject) {
 			// No need to enhance parameters since entity already contains the required data
@@ -374,10 +374,22 @@ class ActivityManager {
 			}
 
 			$uniqueAffectedUser = $this->rowVisibility->usersSeeingRow($object->getId(), $view, $this->findRecipientsByElement($view));
+			if ($uniqueAffectedUser === []) {
+				continue;
+			}
+
+			$viewSubjectParams = $subjectParams;
+			$viewSubjectParams['view'] = ['id' => $view->getId(), 'title' => $view->getTitle()];
+			$viewColumnIds = $view->getColumnIds();
+			if (isset($viewSubjectParams['changeCols']) && $viewColumnIds !== []) {
+				$viewSubjectParams['changeCols'] = array_values(array_filter(
+					$viewSubjectParams['changeCols'],
+					static fn (array $changeCol): bool => in_array($changeCol['id'], $viewColumnIds, true),
+				));
+			}
+			$event->setSubject($subject, $viewSubjectParams);
 
 			foreach ($uniqueAffectedUser as $userId) {
-				$subjectParams['view'] = $view;
-				$event->setSubject($subject, $subjectParams);
 				$event->setAffectedUser($userId);
 				$this->manager->publish($event);
 			}
@@ -395,9 +407,9 @@ class ActivityManager {
 		foreach ($affectedViews as $view) {
 			$uniqueAffectedUser = $this->findRecipientsByElement($view);
 
+			$subjectParams['view'] = ['id' => $view->getId(), 'title' => $view->getTitle()];
+			$event->setSubject($subject, $subjectParams);
 			foreach ($uniqueAffectedUser as $userId) {
-				$subjectParams['view'] = $view;
-				$event->setSubject($subject, $subjectParams);
 				$event->setAffectedUser($userId);
 				$this->manager->publish($event);
 			}

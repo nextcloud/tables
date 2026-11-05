@@ -38,6 +38,7 @@ final class ActivityManagerTest extends TestCase {
 	/** @var list<string> */
 	private array $published = [];
 	private array $subjectParams = [];
+	private array $publishedParams = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -52,7 +53,7 @@ final class ActivityManagerTest extends TestCase {
 		$view->setTitle('View');
 		$view->setTableId(self::TABLE_ID);
 		$view->setOwnership('author');
-		$view->setColumns('[]');
+		$view->setColumns('[3]');
 
 		$tableMapper = $this->createMock(TableMapper::class);
 		$tableMapper->method('find')->willReturn($table);
@@ -82,19 +83,22 @@ final class ActivityManagerTest extends TestCase {
 			return $event;
 		});
 		$event->method('getSubject')->willReturn(ActivityManager::SUBJECT_ROW_DELETE);
-		$event->method('getSubjectParameters')->willReturn([]);
+		$event->method('getSubjectParameters')->willReturnCallback(fn (): array => $this->subjectParams);
 
-		$column = new Column();
-		$column->setId(3);
-		$column->setTitle('Status');
-		$column->setType('text');
 		$columnMapper = $this->createMock(ColumnMapper::class);
-		$columnMapper->method('find')->willReturn($column);
+		$columnMapper->method('find')->willReturnCallback(function (int $id): Column {
+			$column = new Column();
+			$column->setId($id);
+			$column->setTitle($id === 3 ? 'Status' : 'Hidden');
+			$column->setType('text');
+			return $column;
+		});
 
 		$manager = $this->createMock(IManager::class);
 		$manager->method('generateEvent')->willReturn($event);
 		$manager->method('publish')->willReturnCallback(function (): void {
 			$this->published[] = $this->currentType . ':' . $this->currentUser;
+			$this->publishedParams[$this->currentType] = $this->subjectParams;
 		});
 
 		$this->rowVisibility = $this->createMock(RowVisibilityService::class);
@@ -151,6 +155,27 @@ final class ActivityManagerTest extends TestCase {
 
 		$this->assertSame(['id' => self::ROW_ID], $this->subjectParams['row']);
 		$this->assertSame([['id' => 3, 'name' => 'Status']], $this->subjectParams['changeCols']);
+	}
+
+	public function testStoredTableAndViewParamsHoldOnlyIdAndTitle(): void {
+		$this->rowVisibility->method('usersSeeingRow')->willReturn(['visible']);
+
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_ROW,
+			object: $this->row(),
+			subject: ActivityManager::SUBJECT_ROW_UPDATE,
+			additionalParams: [
+				'before' => [['columnId' => 3, 'value' => 'a'], ['columnId' => 9, 'value' => 'x']],
+				'after' => [['columnId' => 3, 'value' => 'b'], ['columnId' => 9, 'value' => 'y']],
+			],
+		);
+
+		$tableEvent = $this->publishedParams[ActivityManager::EVENT_TYPE_TABLE_ROW];
+		$viewEvent = $this->publishedParams[ActivityManager::EVENT_TYPE_VIEW_ROW];
+		$this->assertSame(['id' => self::TABLE_ID, 'title' => 'Table'], $tableEvent['table']);
+		$this->assertSame(['id' => self::VIEW_ID, 'title' => 'View'], $viewEvent['view']);
+		$this->assertSame([3, 9], array_column($tableEvent['changeCols'], 'id'));
+		$this->assertSame([3], array_column($viewEvent['changeCols'], 'id'));
 	}
 
 	private function row(): Row2 {
