@@ -18,6 +18,7 @@ use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
@@ -76,6 +77,7 @@ class ActivityManager {
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
 		private readonly ColumnMapper $columnMapper,
+		private readonly RowVisibilityService $rowVisibility,
 		private readonly ShareService $shareService,
 		protected readonly CappedMemoryCache $cache,
 		private readonly ?string $userId,
@@ -374,7 +376,7 @@ class ActivityManager {
 				continue;
 			}
 
-			$uniqueAffectedUser = $this->findRecipientsByElement($view);
+			$uniqueAffectedUser = $this->rowVisibility->usersSeeingRow($object->getId(), $view, $this->findRecipientsByElement($view));
 
 			foreach ($uniqueAffectedUser as $userId) {
 				$subjectParams['view'] = $view;
@@ -804,6 +806,19 @@ class ActivityManager {
 				return implode("\n", $lines);
 			default:
 				return null;
+		}
+	}
+
+	/**
+	 * Resolves now which view recipients see the row, for events sent after the row is gone
+	 */
+	public function snapshotRowVisibility(Row2 $row): void {
+		try {
+			foreach ($this->viewMapper->findAll($row->getTableId()) as $view) {
+				$this->rowVisibility->usersSeeingRow($row->getId(), $view, $this->findRecipientsByElement($view));
+			}
+		} catch (\Throwable $e) {
+			Server::get(LoggerInterface::class)->warning('Could not resolve view recipients for row ' . $row->getId(), ['exception' => $e]);
 		}
 	}
 

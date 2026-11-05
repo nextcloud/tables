@@ -34,6 +34,27 @@ class ColumnsHelper {
 	) {
 	}
 
+	private const USER_INDEPENDENT_PLACEHOLDERS = [
+		'checked', 'unchecked',
+		'stars-0', 'stars-1', 'stars-2', 'stars-3', 'stars-4', 'stars-5',
+		'datetime-date-today', 'datetime-date-start-of-year', 'datetime-date-start-of-month', 'datetime-date-start-of-week',
+		'datetime-time-now', 'datetime-now', 'datetime-exact-date', 'datetime-days-ahead', 'datetime-days-ago',
+	];
+
+	/**
+	 * Whether resolveSearchValue() may resolve the value differently per user.
+	 * Unknown placeholders count as user dependent, so new ones are evaluated per user until listed here.
+	 */
+	public function isUserDependentPlaceholder(string $value): bool {
+		if (!str_starts_with($value, '@')
+			|| str_starts_with($value, '@selection-id-')
+			|| str_starts_with($value, '@relation-id-')) {
+			return false;
+		}
+		$name = ltrim(explode(':', $value, 2)[0], '@');
+		return !in_array($name, self::USER_INDEPENDENT_PLACEHOLDERS, true);
+	}
+
 	public function resolveSearchValue(string $placeholder, string $userId, ?Column $column = null): string|array {
 		if (str_starts_with($placeholder, '@selection-id-')) {
 			return substr($placeholder, 14);

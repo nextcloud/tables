@@ -805,6 +805,49 @@ class Row2Mapper {
 	}
 
 	/**
+	 * @param array<string> $userIds
+	 * @return list<string>
+	 */
+	public function filterUsersSeeingRow(int $rowId, View $view, array $userIds): array {
+		$userIds = array_values($userIds);
+		if ($userIds === []) {
+			return [];
+		}
+
+		try {
+			$filter = $view->getFilterArray();
+			if ($filter === []) {
+				return $userIds;
+			}
+
+			if (!$this->isFilterUserDependent($filter)) {
+				return $this->isRowInViewPresent($rowId, $view, $userIds[0]) ? $userIds : [];
+			}
+
+			// one query per user, only for filters with user placeholders
+			return array_values(array_filter(
+				$userIds,
+				fn (string $userId): bool => $this->isRowInViewPresent($rowId, $view, $userId),
+			));
+		} catch (\Throwable $e) {
+			$this->logger->error('Could not evaluate visibility of row ' . $rowId . ' in view ' . $view->getId(), ['exception' => $e]);
+			return [];
+		}
+	}
+
+	private function isFilterUserDependent(array $filter): bool {
+		foreach ($filter as $filterGroup) {
+			foreach ($filterGroup as $filterItem) {
+				$value = $filterItem['value'] ?? null;
+				if (is_string($value) && $this->columnsHelper->isUserDependentPlaceholder($value)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * @param Row2 $row
 	 * @param string|null $userId
 	 * @return Row2
