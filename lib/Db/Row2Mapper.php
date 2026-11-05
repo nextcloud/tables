@@ -839,7 +839,7 @@ class Row2Mapper {
 		foreach ($filter as $filterGroup) {
 			foreach ($filterGroup as $filterItem) {
 				$value = $filterItem['value'] ?? null;
-				if (is_string($value) && in_array(explode(':', $value, 2)[0], ['@me', '@my-name'], true)) {
+				if (is_string($value) && $this->columnsHelper->isUserDependentPlaceholder($value)) {
 					return true;
 				}
 			}
