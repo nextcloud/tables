@@ -7,8 +7,10 @@
 		:aria-labelledby="hasHeading ? headingId : undefined"
 		:aria-label="hasHeading ? undefined : label"
 		data-cy="gridWidget">
-		<header v-if="hasHeading" class="grid-widget__header">
-			<h2 :id="headingId" class="grid-widget__title">
+		<header v-if="hasHeading || editable"
+			class="grid-widget__header"
+			:class="{ 'grid-widget__header--floating': !hasHeading }">
+			<h2 v-if="hasHeading" :id="headingId" class="grid-widget__title">
 				<NamedIcon v-if="widget.icon" :name="widget.icon" :size="20" />
 				<span class="grid-widget__title-text">{{ label }}</span>
 			</h2>
@@ -126,16 +128,27 @@ export default {
 	},
 	emits: ['configure', 'remove', 'move'],
 	computed: {
-		...mapState(useTablesStore, ['widgetTypes']),
-		// A widget shows its title when it has one; while editing every card has a heading for its menu
+		...mapState(useTablesStore, ['widgetTypes', 'tables', 'views']),
+		// The same in view and edit mode, so the widgets keep their size; without a title the edit
+		// menu floats over the widget
 		hasHeading() {
-			return !!this.widget.title || this.editable
+			return !!this.widget.title || !!this.sourceTitle
+		},
+		// A data widget without a title of its own takes the title of its table or view
+		sourceTitle() {
+			if (this.widget.type !== WIDGET_TYPE_DATA) {
+				return ''
+			}
+			const target = widgetTarget(this.widget, this.nodes)
+			const elements = target?.type === 'view' ? this.views : this.tables
+			const element = target ? elements.find(element => element.id === target.id) : null
+			return element ? [element.emoji, element.title].filter(Boolean).join(' ') : ''
 		},
 		headingId() {
 			return 'grid-widget-title-' + this.widget.key
 		},
 		label() {
-			return this.widget.title || this.typeLabel
+			return this.widget.title || this.sourceTitle || this.typeLabel
 		},
 		widgetComponent() {
 			return getWidgetComponent(this.widget.type)
@@ -143,7 +156,7 @@ export default {
 		// A data widget shows a table or view of the application, the others their own settings
 		componentProps() {
 			return this.widget.type === WIDGET_TYPE_DATA
-				? { target: widgetTarget(this.widget, this.nodes), editable: this.editable }
+				? { target: widgetTarget(this.widget, this.nodes), editable: this.editable, showTitle: !this.sourceTitle }
 				: { settings: this.widget.settings, editable: this.editable }
 		},
 		// A widget of a type the server does not know is shown, not configured: its schema is unknown
@@ -179,6 +192,7 @@ export default {
 
 <style lang="scss" scoped>
 .grid-widget {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -189,8 +203,20 @@ export default {
 		align-items: center;
 		justify-content: space-between;
 		gap: calc(2 * var(--default-grid-baseline));
-		padding: calc(2 * var(--default-grid-baseline)) calc(3 * var(--default-grid-baseline));
+		// Fits the edit menu button, so the header keeps its height in view and edit mode
+		min-height: calc(var(--default-clickable-area) + 2 * var(--default-grid-baseline));
+		padding: 0 calc(3 * var(--default-grid-baseline));
 		border-bottom: 1px solid var(--color-border);
+
+		&--floating {
+			position: absolute;
+			z-index: 1;
+			inset-block-start: 0;
+			inset-inline-end: 0;
+			min-height: 0;
+			padding: var(--default-grid-baseline);
+			border-bottom: none;
+		}
 	}
 
 	&__title {

@@ -197,7 +197,7 @@ export default {
 }
 
 .grid-canvas__stack--editing .grid-stack-item-content {
-	outline: 2px dashed var(--color-border-maxcontrast);
+	outline: 2px dashed var(--color-border);
 	outline-offset: -2px;
 	cursor: move;
 }
