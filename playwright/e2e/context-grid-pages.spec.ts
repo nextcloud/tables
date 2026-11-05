@@ -148,7 +148,7 @@ test.describe('Grid pages of an application', () => {
 		const startPage = Object.values(application.pages as Record<string, { page_type: string, content: object }>).find(entry => entry.page_type === 'startpage')
 		expect(Object.keys(startPage!.content)).toHaveLength(1)
 		await page.locator('[data-cy="contextStartPageLink"]').click()
-		await expect(page.locator('h1', { hasText: 'grid table in app' })).toBeVisible({ timeout: 30000 })
+		await expect(page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid table in app' })).toBeVisible({ timeout: 30000 })
 		await expect(page.locator('[data-cy="gridPage"]')).toHaveCount(0)
 	})
 
