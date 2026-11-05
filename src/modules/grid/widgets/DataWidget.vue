@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="data-widget">
+	<div class="data-widget" :class="{ 'data-widget--untitled': !showTitle }">
 		<p v-if="!target && editable" class="data-widget__empty" data-cy="dataWidgetPickSource">
 			{{ t('tables', 'Pick a table or view in the widget settings') }}
 		</p>
@@ -21,6 +21,7 @@
 		</p>
 		<template v-else>
 			<CustomView v-if="isView"
+				:show-title="showTitle"
 				:view="element"
 				:columns="columns"
 				:rows="rows"
@@ -29,6 +30,7 @@
 				@import="openImportModal"
 				@update:view-setting="setting => viewSetting = setting" />
 			<TableWrapper v-else
+				:show-title="showTitle"
 				:table="element"
 				:columns="columns"
 				:rows="rows"
@@ -74,6 +76,11 @@ export default {
 		editable: {
 			type: Boolean,
 			default: false,
+		},
+		// False inside a widget card, which shows the title of the table or view itself
+		showTitle: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	setup() {
@@ -203,6 +210,21 @@ export default {
 	:deep(h1) {
 		font-size: unset;
 		font-size: revert;
+	}
+
+	// The sticky parts of the table leave room for the title of the table or view
+	&--untitled {
+		:deep(.options.row) {
+			top: 0;
+		}
+
+		:deep(.sticky) {
+			top: 30px;
+		}
+
+		:deep(thead) {
+			top: 48px;
+		}
 	}
 }
 </style>

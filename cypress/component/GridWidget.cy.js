@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import GridWidget from '../../src/modules/grid/GridWidget.vue'
+import { useTablesStore } from '../../src/store/store.js'
 
 const nodes = { 4: { id: 4, node_type: 0, node_id: 40, permissions: 1 } }
 
@@ -26,11 +27,26 @@ describe('GridWidget', () => {
 		cy.get('.header-widget').should('contain.text', 'Projects').and('contain.text', 'This quarter').and('have.css', 'text-align', 'end')
 	})
 
-	it('shows no heading for a widget without a title outside edit mode', () => {
+	it('shows no heading for a widget without a title, also in edit mode, where its menu floats', () => {
 		mountWidget({ key: 'w2', id: 2, type: 'text', title: '', settings: { text: 'First\n\nSecond' }, nodeRelId: null }, false)
 
 		cy.get('[data-cy="gridWidget"] h2').should('not.exist')
 		cy.get('.text-widget__paragraph').should('have.length', 2)
+
+		mountWidget({ key: 'w2', id: 2, type: 'text', title: '', settings: { text: 'First' }, nodeRelId: null }, true)
+		cy.get('[data-cy="gridWidget"] h2').should('not.exist')
+		cy.get('.grid-widget__header--floating button[aria-label="Widget actions"]').should('be.visible')
+	})
+
+	it('titles a data widget without a title after its table, which then shows no title of its own', () => {
+		cy.intercept('GET', '**/apps/tables/**', { statusCode: 404, body: {} })
+		mountWidget({ key: 'w5', id: 5, type: 'data', title: '', settings: {}, nodeRelId: 4 }, false)
+		cy.then(() => {
+			useTablesStore().tables = [{ id: 40, title: 'Tasks', emoji: '✅' }]
+		})
+
+		cy.get('[data-cy="gridWidget"] h2').should('contain.text', '✅ Tasks')
+		cy.get('[data-cy="gridWidget"] h1').should('not.exist')
 	})
 
 	it('asks editors to pick a table or view for a data widget without one, and shows viewers an empty state', () => {
