@@ -252,10 +252,10 @@ export function isStartPage(page) {
 
 /**
  * @param {object} page a page as the API returns it, or as listed in an application
- * @return {string} its title; the start page is called Start page until it gets one
+ * @return {string} its title; the start page is called Home until it gets one
  */
 export function pageTitle(page) {
-	return page?.title || (isStartPage(page) ? t('tables', 'Start page') : '')
+	return page?.title || (isStartPage(page) ? t('tables', 'Home') : '')
 }
 
 /**
