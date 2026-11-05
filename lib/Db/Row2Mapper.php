@@ -19,6 +19,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\DB\IResult;
+use OCP\DB\QueryBuilder\IParameter;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Server;
@@ -268,14 +269,15 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function addFilterToQuery(IQueryBuilder $qb, array $filters, string $userId): void {
+	private function addFilterToQuery(IQueryBuilder $qb, array $filters, string $userId, ?int $rowId = null): void {
 		// TODO move this into service
 		$this->replacePlaceholderValues($filters, $userId);
 
 		if (count($filters) > 0) {
+			$rowIdParameter = $rowId !== null ? $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT) : null;
 			$qb->andWhere(
 				$qb->expr()->orX(
-					...$this->getFilterGroups($qb, $filters)
+					...$this->getFilterGroups($qb, $filters, $rowIdParameter)
 				)
 			);
 		}
@@ -360,10 +362,10 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getFilterGroups(IQueryBuilder $qb, array $filters): array {
+	private function getFilterGroups(IQueryBuilder $qb, array $filters, ?IParameter $rowIdParameter = null): array {
 		$filterGroups = [];
 		foreach ($filters as $filterGroup) {
-			$filterGroups[] = $qb->expr()->andX(...$this->getFilter($qb, $filterGroup));
+			$filterGroups[] = $qb->expr()->andX(...$this->getFilter($qb, $filterGroup, $rowIdParameter));
 		}
 		return $filterGroups;
 	}
@@ -371,7 +373,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getFilter(IQueryBuilder $qb, array $filterGroup): array {
+	private function getFilter(IQueryBuilder $qb, array $filterGroup, ?IParameter $rowIdParameter = null): array {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
 			$columnId = $filter['columnId'];
@@ -389,14 +391,14 @@ class Row2Mapper {
 			if ($columnId >= 0) {
 				$sql = $qb->expr()->in(
 					'sleeves.id',
-					$qb->createFunction($this->getFilterExpression($qb, $column, $filter['operator'], $filter['value'])->getSQL())
+					$qb->createFunction($this->getFilterExpression($qb, $column, $filter['operator'], $filter['value'], $rowIdParameter)->getSQL())
 				);
 
 				// if is meta data column
 			} elseif ($columnId < 0) {
 				$sql = $qb->expr()->in(
 					'sleeves.id',
-					$qb->createFunction($this->getMetaFilterExpression($qb, $columnId, $filter['operator'], $filter['value'])->getSQL())
+					$qb->createFunction($this->getMetaFilterExpression($qb, $columnId, $filter['operator'], $filter['value'], $rowIdParameter)->getSQL())
 				);
 
 				// if column id is unknown
@@ -413,7 +415,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string|array $value): IQueryBuilder {
+	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string|array $value, ?IParameter $rowIdParameter = null): IQueryBuilder {
 		$paramType = $this->getColumnDbParamType($column);
 		try {
 			$value = $this->getCellMapper($column)->filterValueToQueryParam($column, $value);
@@ -436,6 +438,9 @@ class Row2Mapper {
 		$qb2->where(
 			$qb->expr()->eq('sl.table_id', $qb->createNamedParameter($column->getTableId(), IQueryBuilder::PARAM_INT))
 		);
+		if ($rowIdParameter !== null) {
+			$qb2->andWhere($qb->expr()->eq('sl.id', $rowIdParameter));
+		}
 
 		switch ($operator) {
 			case 'begins-with':
@@ -549,7 +554,7 @@ class Row2Mapper {
 
 					$qb2->andWhere($qb2->expr()->orX(...$filterExpressions));
 
-					return $this->db->getQueryBuilder()
+					$emptyRowsQuery = $this->db->getQueryBuilder()
 						->selectAlias('sl3.id', 'row_id')
 						->from('tables_row_sleeves', 'sl3')
 						->where(
@@ -558,6 +563,10 @@ class Row2Mapper {
 						->andWhere(
 							$qb->expr()->notIn('sl3.id', $qb->createFunction($qb2->getSQL()))
 						);
+					if ($rowIdParameter !== null) {
+						$emptyRowsQuery->andWhere($qb->expr()->eq('sl3.id', $rowIdParameter));
+					}
+					return $emptyRowsQuery;
 				}
 				$includeDefault = !str_contains((string)($defaultValue ?? ''), (string)$value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
@@ -655,7 +664,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string $value): IQueryBuilder {
+	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string $value, ?IParameter $rowIdParameter = null): IQueryBuilder {
 		$qb2 = $this->db->getQueryBuilder();
 		$qb2->select('id');
 		$qb2->from('tables_row_sleeves');
@@ -668,6 +677,9 @@ class Row2Mapper {
 			Column::TYPE_META_UPDATED_AT => $qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE)),
 			default => $qb2,
 		};
+		if ($rowIdParameter !== null) {
+			$qb2->andWhere($qb->expr()->eq('id', $rowIdParameter));
+		}
 		return $qb2;
 	}
 
@@ -768,7 +780,28 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function isRowInViewPresent(int $rowId, View $view, string $userId): bool {
-		return in_array($rowId, $this->getWantedRowIds($userId, $view->getTableId(), $view->getFilterArray()));
+		$filter = $view->getFilterArray();
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('sleeves.id')
+			->from('tables_row_sleeves', 'sleeves')
+			->where($qb->expr()->eq('sleeves.id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('sleeves.table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)))
+			->setMaxResults(1);
+
+		if ($filter) {
+			$this->addFilterToQuery($qb, $filter, $userId, $rowId);
+		}
+
+		try {
+			$result = $qb->executeQuery();
+			$found = $result->fetchOne() !== false;
+			$result->closeCursor();
+			return $found;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
 	}
 
 	/**
