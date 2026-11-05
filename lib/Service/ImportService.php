@@ -691,8 +691,7 @@ class ImportService extends SuperService {
 			}
 
 			if ($rowId) {
-				$this->rowService->updateSet($rowId, $this->viewId, $data, $this->userId, $this->tableId);
-				$this->countUpdatedRows++;
+				$this->updateImportedRow($rowId, $data);
 			} else {
 				$this->rowService->create($this->tableId, $this->viewId, $data, $this->userId);
 				$this->countInsertedRows++;
@@ -709,6 +708,24 @@ class ImportService extends SuperService {
 		} catch (\Throwable $e) {
 			$this->countErrors++;
 			$this->logger->error('Error while creating/updating new row for import.', ['exception' => $e]);
+		}
+	}
+
+	/**
+	 * An ID that matches no row in the destination fails that line, not the whole import.
+	 *
+	 * @param list<array{columnId: int, value: mixed}> $data
+	 * @throws BadRequestError
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
+	private function updateImportedRow(int $rowId, array $data): void {
+		try {
+			$this->rowService->updateSet($rowId, $this->viewId, $data, $this->userId, $this->tableId);
+			$this->countUpdatedRows++;
+		} catch (NotFoundError $e) {
+			$this->logger->warning('Row to update during import was not found: ' . $rowId, ['exception' => $e]);
+			$this->countErrors++;
 		}
 	}
 

@@ -10,6 +10,10 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\Row2;
+use OCA\Tables\Db\View;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Model\RowIdentifier;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -26,6 +30,59 @@ class Row2MapperTest extends DatabaseTestCase {
 		parent::setUp();
 		$this->setupDependencies();
 		$this->setupRealColumnMapper(self::$testTableId);
+	}
+
+	public function testEmptyRowKeepsStoredUuidWithoutVisibleColumns(): void {
+		$this->connectionAdapter->beginTransaction();
+		try {
+			$row = new Row2();
+			$row->setTableId(self::$testTableId);
+			$created = $this->mapper->insert($row, 'alice');
+			$this->assertNotNull($created->getUuid());
+			$loaded = $this->mapper->find($created->getId(), []);
+			$this->assertSame($created->getUuid(), $loaded->jsonSerialize()['uuid']);
+			$this->assertSame([], $loaded->getData());
+			$identifier = RowIdentifier::fromString($created->getUuid());
+			$this->assertSame($created->getId(), $this->mapper->findScopedId($identifier, self::$testTableId, null, 'alice'));
+			$this->assertNull($this->mapper->findScopedId($identifier, self::$testTableId + 1, null, 'alice'));
+		} finally {
+			$this->connectionAdapter->rollBack();
+		}
+	}
+
+	public function testListingWithoutColumnsReturnsNoRows(): void {
+		$this->assertSame([], $this->mapper->findAll([], self::$testTableId, null, null, null, null, 'alice'));
+	}
+
+	/** @dataProvider idsNoRowCanHave */
+	public function testPresenceCheckIsFalseForIdsNoRowCanHave(int $rowId): void {
+		$view = new View();
+		$view->setTableId(self::$testTableId);
+		$this->assertFalse($this->mapper->isRowInViewPresent($rowId, $view, 'alice'));
+	}
+
+	public static function idsNoRowCanHave(): array {
+		return [[0], [-1], [2147483648]];
+	}
+
+	public function testUpdatingRemovedRowIsNotFound(): void {
+		$row = new Row2();
+		$row->setId(2147483647);
+		$row->markAsLoaded();
+		$row->insertOrUpdateCell(['columnId' => 1, 'value' => 'changed']);
+		$this->expectException(NotFoundError::class);
+		$this->mapper->update($row, 'alice');
+	}
+
+	public function testTargetLookupAppliesSavedFiltersAndTableScope(): void {
+		$firstId = self::$testRowIds[0];
+		$identifier = RowIdentifier::fromString((string)$firstId);
+		$this->assertSame($firstId, $this->mapper->findScopedId($identifier, self::$testTableId, null, 'alice'));
+		$filter = [[['columnId' => Column::TYPE_META_ID, 'operator' => 'is-equal', 'value' => (string)($firstId + 1)]]];
+		$this->assertNull($this->mapper->findScopedId($identifier, self::$testTableId, $filter, 'alice'));
+		$filter[0][0]['value'] = (string)$firstId;
+		$this->assertSame($firstId, $this->mapper->findScopedId($identifier, self::$testTableId, $filter, 'alice'));
+		$this->assertNull($this->mapper->findScopedId($identifier, self::$testTableId + 1, null, 'alice'));
 	}
 
 	/**

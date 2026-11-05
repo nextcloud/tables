@@ -8,6 +8,7 @@
 namespace OCA\Tables\Service;
 
 use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
@@ -25,7 +26,9 @@ use OCA\Tables\Event\RowAddedEvent;
 use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\RowUpdatedEvent;
 use OCA\Tables\Helper\ColumnsHelper;
+use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Model\RowDataInput;
+use OCA\Tables\Model\RowIdentifier;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
@@ -190,6 +193,56 @@ class RowService extends SuperService {
 
 		$this->attachAliasPayload($row, $columns);
 		return $row;
+	}
+
+	/**
+	 * Resolve a validated identifier to the stored row ID inside the requested table or view.
+	 *
+	 * @throws PermissionError
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function resolveRowId(RowIdentifier $identifier, int $nodeType, int $nodeId, string $userId): int {
+		if (!$this->permissionsService->canReadRowsByElementId($nodeId, ConversionHelper::constNodeType2String($nodeType), $userId)) {
+			throw new PermissionError('Cannot read rows in the requested node.');
+		}
+		try {
+			$view = $nodeType === Application::NODE_TYPE_VIEW ? $this->viewMapper->find($nodeId) : null;
+		} catch (DoesNotExistException $e) {
+			throw new NotFoundError('Row not found in the requested node.', 0, $e);
+		} catch (Exception|MultipleObjectsReturnedException $e) {
+			throw new InternalError('Cannot load the requested view.', 0, $e);
+		}
+		$rowId = $this->row2Mapper->findScopedId(
+			$identifier,
+			$view !== null ? $view->getTableId() : $nodeId,
+			$view?->getFilterArray(),
+			$view !== null ? $this->resolveFilterUserId($userId, $view) : $userId,
+		);
+		if ($rowId === null) {
+			throw new NotFoundError('Row not found in the requested node.');
+		}
+		return $rowId;
+	}
+
+	/**
+	 * @throws PermissionError
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function findByIdentifier(RowIdentifier $identifier, int $nodeType, int $nodeId, string $userId): Row2 {
+		$rowId = $this->resolveRowId($identifier, $nodeType, $nodeId, $userId);
+		try {
+			$view = $nodeType === Application::NODE_TYPE_VIEW ? $this->viewMapper->find($nodeId) : null;
+			$columns = $view !== null ? $this->columnMapper->findAll($view->getColumnIds()) : $this->columnMapper->findAllByTable($nodeId);
+			$row = $this->row2Mapper->find($rowId, $columns);
+			$this->attachAliasPayload($row, $columns);
+			return $this->filterRowResult($view, $row);
+		} catch (DoesNotExistException $e) {
+			throw new NotFoundError('Row not found in the requested node.', 0, $e);
+		} catch (Exception|MultipleObjectsReturnedException $e) {
+			throw new InternalError('Cannot load the requested row.', 0, $e);
+		}
 	}
 
 	/**
@@ -556,10 +609,10 @@ class RowService extends SuperService {
 			}
 			$row = $this->row2Mapper->find($rowId, $this->columnMapper->findAllByTable($this->row2Mapper->getTableIdForRow($rowId)));
 			$row->markAsLoaded();
-		} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+		} catch (InternalError|MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		} catch (NotFoundError $e) {
+		} catch (NotFoundError|DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
@@ -582,10 +635,29 @@ class RowService extends SuperService {
 	 * @throws PermissionError
 	 * @noinspection DuplicatedCode
 	 */
-	public function updateSet(
+	public function updateSet(int $id, ?int $viewId, array $data, string $userId, ?int $tableId): Row2 {
+		return $this->updateRowData($id, $viewId, RowDataInput::fromArray($data), $userId, $tableId);
+	}
+
+	/**
+	 * Update multiple cells in a row
+	 *
+	 * @param int $id
+	 * @param int|null $viewId
+	 * @param RowDataInput $data
+	 * @param string $userId
+	 * @return Row2
+	 *
+	 * @throws BadRequestError
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @noinspection DuplicatedCode
+	 */
+	public function updateRowData(
 		int $id,
 		?int $viewId,
-		array $data,
+		RowDataInput $data,
 		string $userId,
 		?int $tableId,
 	): Row2 {
@@ -632,10 +704,10 @@ class RowService extends SuperService {
 			}
 
 			// is row in view?
-			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
+			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $this->resolveFilterUserId($userId, $view))) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError('Row not found in the requested view.');
 			}
 
 			// fetch all needed columns
@@ -650,7 +722,7 @@ class RowService extends SuperService {
 			if ($tableId !== $item->getTableId()) {
 				$e = new \Exception('Row does not belong to table with id ' . $tableId);
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError('Row not found in the requested node.');
 			}
 
 			// security
@@ -673,7 +745,6 @@ class RowService extends SuperService {
 		}
 
 		$previousData = $item->getData();
-		$data = RowDataInput::fromArray($data);
 		$data = $this->cleanupAndValidateData($data, $columns, $item->getTableId(), $viewId, $id);
 
 		foreach ($data as $entry) {
@@ -746,7 +817,7 @@ class RowService extends SuperService {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
-			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
+			if (!$this->permissionsService->canDeleteRowsByViewId($viewId, $userId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new PermissionError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -757,16 +828,14 @@ class RowService extends SuperService {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
-			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
-				$e = new \Exception('Update row is not allowed.');
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $this->resolveFilterUserId($userId, $view))) {
+				throw new NotFoundError('Row not found in the requested view.');
 			}
 		} else {
 			if ($tableId !== null && $tableId !== $item->getTableId()) {
 				$e = new \Exception('Row does not belong to table with id ' . $tableId);
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError('Row not found in the requested node.');
 			}
 
 			// security
@@ -920,6 +989,7 @@ class RowService extends SuperService {
 			return $row;
 		}
 
+		$row = clone $row;
 		$columnIds = $view->getColumnIds();
 		$row->filterDataByColumns($columnIds);
 		$row->filterDataByAliasByColumns($columnIds);
