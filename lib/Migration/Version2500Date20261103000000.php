@@ -10,12 +10,19 @@ declare(strict_types=1);
 namespace OCA\Tables\Migration;
 
 use Closure;
+use OCA\Tables\BackgroundJob\BackfillRowUuids;
+use OCP\BackgroundJob\IJobList;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version2500Date20261103000000 extends SimpleMigrationStep {
+	public function __construct(
+		private readonly IJobList $jobList,
+	) {
+	}
+
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
@@ -31,5 +38,9 @@ class Version2500Date20261103000000 extends SimpleMigrationStep {
 			$table->addUniqueIndex(['uuid'], 'tables_row_uuid_uniq');
 		}
 		return $schema;
+	}
+
+	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
+		$this->jobList->add(BackfillRowUuids::class);
 	}
 }
