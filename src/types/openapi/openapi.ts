@@ -1081,7 +1081,8 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        readonly get?: never;
+        /** [api v2] Read a local row in a table or view */
+        readonly get: operations["rowocs-get-row"];
         /** [api v2] Update a row in a table or a view */
         readonly put: operations["rowocs-update-row"];
         readonly post?: never;
@@ -8850,6 +8851,119 @@ export interface operations {
             };
         };
     };
+    readonly "rowocs-get-row": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description The targeted node collection */
+                readonly nodeCollection: "tables" | "views";
+                /** @description The table or view identifier */
+                readonly nodeId: number;
+                /** @description A positive decimal row ID or a hyphenated UUIDv7 */
+                readonly rowId: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Row"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid identifier or unsupported federated operation */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found in the requested node */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
     readonly "rowocs-update-row": {
         readonly parameters: {
             readonly query?: never;
@@ -8862,18 +8976,19 @@ export interface operations {
                 readonly nodeCollection: "tables" | "views";
                 /** @description The identifier of the targeted table or view */
                 readonly nodeId: number;
-                /** @description The identifier of the row to update */
-                readonly rowId: number;
+                /** @description A positive decimal row ID or a hyphenated UUIDv7 */
+                readonly rowId: string;
             };
             readonly cookie?: never;
         };
         readonly requestBody: {
             readonly content: {
                 readonly "application/json": {
-                    /** @description An array containing the column identifiers and their values */
-                    readonly data: string | {
-                        readonly [key: string]: Record<string, never>;
-                    };
+                    /** @description A list of cells containing columnId and value */
+                    readonly data: string | readonly {
+                        readonly columnId: number | string;
+                        readonly value: Record<string, never>;
+                    }[];
                 };
             };
         };
@@ -8984,8 +9099,8 @@ export interface operations {
                 readonly nodeCollection: "tables" | "views";
                 /** @description The identifier of the targeted table or view */
                 readonly nodeId: number;
-                /** @description The identifier of the row to delete */
-                readonly rowId: number;
+                /** @description A positive decimal row ID or a hyphenated UUIDv7 */
+                readonly rowId: string;
             };
             readonly cookie?: never;
         };
@@ -9001,6 +9116,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Row"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid identifier or unsupported federated operation */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };

@@ -15,6 +15,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\RowDataInput;
+use OCA\Tables\Model\RowIdentifier;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\FederationService;
 use OCA\Tables\Service\RowService;
@@ -106,12 +107,48 @@ class RowOCSController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Read a local row in a table or view
+	 *
+	 * @param 'tables'|'views' $nodeCollection The targeted node collection
+	 * @param int $nodeId The table or view identifier
+	 * @param string $rowId A positive decimal row ID or a hyphenated UUIDv7
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Row returned
+	 * 400: Invalid identifier or unsupported federated operation
+	 * 403: No permissions
+	 * 404: Not found in the requested node
+	 * 500: Internal error
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'nodeCollection')]
+	#[ApiRoute(verb: 'GET', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
+	public function getRow(string $nodeCollection, int $nodeId, string $rowId): DataResponse {
+		$iNodeType = ConversionHelper::stringNodeType2Const($nodeCollection);
+		try {
+			$identifier = $this->parseRowIdentifier($rowId);
+			if ($this->federationService->isNodeFederated($nodeId, ConversionHelper::constNodeType2String($iNodeType))) {
+				throw new BadRequestError('Single-row reads are not supported on federated nodes.');
+			}
+			return new DataResponse($this->rowService->findByIdentifier($identifier, $iNodeType, $nodeId, $this->userId)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (\Exception $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
 	 * [api v2] Update a row in a table or a view
 	 *
 	 * @param 'tables'|'views' $nodeCollection Indicates whether to update a row on a table or view
 	 * @param int $nodeId The identifier of the targeted table or view
-	 * @param int $rowId The identifier of the row to update
-	 * @param string|array<string, mixed> $data An array containing the column identifiers and their values
+	 * @param string $rowId A positive decimal row ID or a hyphenated UUIDv7
+	 * @param string|list<array{columnId: int|string, value: mixed}> $data A list of cells containing columnId and value
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row updated
@@ -123,7 +160,7 @@ class RowOCSController extends AOCSController {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_UPDATE, typeParam: 'nodeCollection')]
 	#[ApiRoute(verb: 'PUT', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
-	public function updateRow(string $nodeCollection, int $nodeId, int $rowId, mixed $data): DataResponse {
+	public function updateRow(string $nodeCollection, int $nodeId, string $rowId, mixed $data): DataResponse {
 		if (is_string($data)) {
 			$data = json_decode($data, true);
 		}
@@ -138,15 +175,20 @@ class RowOCSController extends AOCSController {
 			$viewId = $nodeId;
 		}
 		try {
+			$identifier = $this->parseRowIdentifier($rowId);
+			$rowData = $this->parseRowData($data);
 			if ($tableId !== null && $this->federationService->isNodeFederated($tableId, 'table')) {
+				$federatedRowId = $this->requireNumericRowId($identifier);
 				$table = $this->tableService->find($nodeId, true);
-				return new DataResponse($this->federationService->updateRow($table, $rowId, $data) + ['uuid' => null]);
+				return new DataResponse($this->federationService->updateRow($table, $federatedRowId, $data) + ['uuid' => null]);
 			}
 			if ($viewId !== null && $this->federationService->isNodeFederated($viewId, 'view')) {
+				$federatedRowId = $this->requireNumericRowId($identifier);
 				$view = $this->viewService->find($nodeId, false, $this->userId);
-				return new DataResponse($this->federationService->updateRow($view, $rowId, $data) + ['uuid' => null]);
+				return new DataResponse($this->federationService->updateRow($view, $federatedRowId, $data) + ['uuid' => null]);
 			}
-			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $data, $this->userId, $tableId)->jsonSerialize());
+			$localRowId = $this->rowService->resolveRowId($identifier, $iNodeType, $nodeId, $this->userId);
+			return new DataResponse($this->rowService->updateRowData($localRowId, $viewId, $rowData, $this->userId, $tableId)->jsonSerialize());
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (NotFoundError $e) {
@@ -163,10 +205,11 @@ class RowOCSController extends AOCSController {
 	 *
 	 * @param 'tables'|'views' $nodeCollection Indicates whether to delete a row on a table or view
 	 * @param int $nodeId The identifier of the targeted table or view
-	 * @param int $rowId The identifier of the row to delete
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @param string $rowId A positive decimal row ID or a hyphenated UUIDv7
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row deleted
+	 * 400: Invalid identifier or unsupported federated operation
 	 * 403: No permissions
 	 * 404: Not found
 	 * 500: Internal error
@@ -174,7 +217,7 @@ class RowOCSController extends AOCSController {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_DELETE, typeParam: 'nodeCollection')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
-	public function deleteRow(string $nodeCollection, int $nodeId, int $rowId): DataResponse {
+	public function deleteRow(string $nodeCollection, int $nodeId, string $rowId): DataResponse {
 		$iNodeType = ConversionHelper::stringNodeType2Const($nodeCollection);
 		$tableId = $viewId = null;
 		if ($iNodeType === Application::NODE_TYPE_TABLE) {
@@ -183,15 +226,21 @@ class RowOCSController extends AOCSController {
 			$viewId = $nodeId;
 		}
 		try {
+			$identifier = $this->parseRowIdentifier($rowId);
 			if ($tableId !== null && $this->federationService->isNodeFederated($tableId, 'table')) {
+				$federatedRowId = $this->requireNumericRowId($identifier);
 				$table = $this->tableService->find($nodeId, true);
-				return new DataResponse($this->federationService->deleteRow($table, $rowId) + ['uuid' => null]);
+				return new DataResponse($this->federationService->deleteRow($table, $federatedRowId) + ['uuid' => null]);
 			}
 			if ($viewId !== null && $this->federationService->isNodeFederated($viewId, 'view')) {
+				$federatedRowId = $this->requireNumericRowId($identifier);
 				$view = $this->viewService->find($nodeId, false, $this->userId);
-				return new DataResponse($this->federationService->deleteRow($view, $rowId) + ['uuid' => null]);
+				return new DataResponse($this->federationService->deleteRow($view, $federatedRowId) + ['uuid' => null]);
 			}
-			return new DataResponse($this->rowService->delete($rowId, $viewId, $this->userId, $tableId)->jsonSerialize());
+			$localRowId = $this->rowService->resolveRowId($identifier, $iNodeType, $nodeId, $this->userId);
+			return new DataResponse($this->rowService->delete($localRowId, $viewId, $this->userId, $tableId)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (PermissionError $e) {
@@ -199,5 +248,37 @@ class RowOCSController extends AOCSController {
 		} catch (InternalError|\Exception $e) {
 			return $this->handleError($e);
 		}
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function parseRowIdentifier(string $rowId): RowIdentifier {
+		try {
+			return RowIdentifier::fromString($rowId);
+		} catch (\InvalidArgumentException $e) {
+			throw new BadRequestError($e->getMessage(), 0, $e);
+		}
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function parseRowData(array $data): RowDataInput {
+		try {
+			return RowDataInput::createFromInputArray($data);
+		} catch (\InvalidArgumentException $e) {
+			throw new BadRequestError($e->getMessage(), 0, $e);
+		}
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private function requireNumericRowId(RowIdentifier $identifier): int {
+		if (!is_int($identifier->value)) {
+			throw new BadRequestError('Federated rows do not support UUID addressing.');
+		}
+		return $identifier->value;
 	}
 }
