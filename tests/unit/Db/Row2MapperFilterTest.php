@@ -149,6 +149,32 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 				'Filter IT department AND age > 27'
 			],
 
+			// Several conditions, so the row id is bound into more than one subquery
+			'two text conditions in one group' => [
+				[
+					['columnId' => 'department', 'operator' => 'is-equal', 'value' => 'IT'],
+					['columnId' => 'name', 'operator' => 'begins-with', 'value' => 'E'],
+				],
+				['Eve'],
+				'Filter IT department AND names beginning with "E"'
+			],
+			'text and meta condition in one group' => [
+				[
+					['columnId' => 'name', 'operator' => 'contains', 'value' => 'li'],
+					['columnId' => 'created_by', 'operator' => 'is-equal', 'value' => 'user_charlie'],
+				],
+				['Charlie'],
+				'Filter names containing "li" AND created by user_charlie'
+			],
+			'two groups' => [
+				[
+					[['columnId' => 'name', 'operator' => 'is-equal', 'value' => 'Bob']],
+					[['columnId' => 'department', 'operator' => 'is-equal', 'value' => 'Finance']],
+				],
+				['Bob', 'Diana'],
+				'Filter name Bob OR department Finance'
+			],
+
 			// Meta column filters
 			'meta created_by filter' => [
 				[['columnId' => 'created_by', 'operator' => 'is-equal', 'value' => 'user_alice']],
