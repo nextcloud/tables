@@ -27,7 +27,7 @@
 					</NcButton>
 					<NcButton variant="primary" :disabled="saving" data-cy="gridPageSave" @click="save">
 						<template #icon>
-							<ContentSaveOutline :size="20" />
+							<Check :size="20" />
 						</template>
 						{{ t('tables', 'Save') }}
 					</NcButton>
@@ -96,7 +96,7 @@
 <script>
 import { NcActionButton, NcActions, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import { showConfirmation, showSuccess } from '@nextcloud/dialogs'
-import ContentSaveOutline from 'vue-material-design-icons/ContentSaveOutline.vue'
+import Check from 'vue-material-design-icons/Check.vue'
 import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import TextBoxEditOutline from 'vue-material-design-icons/TextBoxEditOutline.vue'
@@ -123,7 +123,7 @@ export default {
 		NcActions,
 		NcButton,
 		NcEmptyContent,
-		ContentSaveOutline,
+		Check,
 		PencilOutline,
 		Plus,
 		TextBoxEditOutline,
@@ -382,7 +382,9 @@ export default {
 <style lang="scss" scoped>
 .grid-page {
 	width: 100%;
-	padding: calc(4 * var(--default-grid-baseline));
+	// With the grid margin the widgets line up with the page tabs, the texts in the header
+	// with the texts in the widgets
+	padding: calc(4 * var(--default-grid-baseline)) calc(6 * var(--default-grid-baseline));
 
 	&__header {
 		display: flex;
@@ -391,6 +393,7 @@ export default {
 		justify-content: space-between;
 		gap: calc(4 * var(--default-grid-baseline));
 		margin-bottom: calc(4 * var(--default-grid-baseline));
+		padding-inline: calc(5 * var(--default-grid-baseline)) var(--default-grid-baseline);
 	}
 
 	&__title {
@@ -413,6 +416,7 @@ export default {
 		align-items: center;
 		gap: calc(2 * var(--default-grid-baseline));
 		flex-shrink: 0;
+		margin-inline-start: auto;
 	}
 
 	&__empty {

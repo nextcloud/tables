@@ -515,7 +515,8 @@ export default {
 	&__description {
 		margin: calc(3 * var(--default-grid-baseline, 4px));
 		max-width: 790px;
-		margin-inline-start: 32px;
+		// Lines up with the page tabs and the widget texts
+		margin-inline-start: calc(32px + 3 * var(--default-grid-baseline));
 	}
 
 	&:deep(.icon-vue) {

@@ -55,8 +55,8 @@ test.describe('Grid pages of an application', () => {
 
 		await openApplication(page, contextId)
 
-		const firstHeading = page.locator('h1', { hasText: 'grid first table' })
-		const secondHeading = page.locator('h1', { hasText: 'grid second table' })
+		const firstHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid first table' })
+		const secondHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid second table' })
 		await expect(firstHeading).toBeVisible()
 		await expect(secondHeading).toBeVisible()
 		expect((await firstHeading.boundingBox())!.y).toBeLessThan((await secondHeading.boundingBox())!.y)
@@ -113,15 +113,17 @@ test.describe('Grid pages of an application', () => {
 		await page.reload()
 		await expect(page.locator('[data-cy="gridPage"]')).toBeVisible({ timeout: 30000 })
 		await expect(page.getByText('Welcome to the overview')).toBeVisible()
-		await expect(page.locator('[data-cy="gridWidget"] h3', { hasText: 'Tasks' })).toBeVisible()
-		await expect(page.locator('h1', { hasText: 'grid table in app' })).toBeVisible({ timeout: 30000 })
+		const tasks = page.locator('[data-cy="gridWidget"]', { has: page.locator('h3', { hasText: 'Tasks' }) })
+		await expect(tasks.getByText('No columns')).toBeVisible({ timeout: 30000 })
+		// The widget has a title of its own, so the table does not repeat its name
+		await expect(page.getByRole('heading', { name: 'grid table in app' })).toHaveCount(0)
 
 		// The start page still lists its table and nothing else
 		const application = await getApplication(page.request, user, contextId)
 		const startPage = Object.values(application.pages as Record<string, { page_type: string, content: object }>).find(entry => entry.page_type === 'startpage')
 		expect(Object.keys(startPage!.content)).toHaveLength(1)
 		await page.locator('[data-cy="contextStartPageLink"]').click()
-		await expect(page.locator('h1', { hasText: 'grid table in app' })).toBeVisible({ timeout: 30000 })
+		await expect(page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid table in app' })).toBeVisible({ timeout: 30000 })
 		await expect(page.locator('[data-cy="gridPage"]')).toHaveCount(0)
 	})
 
@@ -172,8 +174,8 @@ test.describe('Grid pages of an application', () => {
 		await expect(shareePage.locator('[data-cy="contextPageAdd"]')).toHaveCount(0)
 		await shareePage.locator('[data-cy="contextPageLink"]', { hasText: 'Shared overview' }).click()
 
-		await expect(shareePage.locator('[data-cy="gridWidget"] h3', { hasText: 'Shared tasks' })).toBeVisible({ timeout: 30000 })
-		await expect(shareePage.locator('h1', { hasText: 'grid shared table' })).toBeVisible({ timeout: 30000 })
+		const sharedTasks = shareePage.locator('[data-cy="gridWidget"]', { has: shareePage.locator('h3', { hasText: 'Shared tasks' }) })
+		await expect(sharedTasks.getByText('No columns')).toBeVisible({ timeout: 30000 })
 		await expect(shareePage.locator('[data-cy="gridPageEdit"]')).toHaveCount(0)
 		await expect(shareePage.locator('[data-cy="gridPageActions"]')).toHaveCount(0)
 
