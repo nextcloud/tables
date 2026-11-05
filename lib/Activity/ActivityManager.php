@@ -843,7 +843,7 @@ class ActivityManager {
 		}
 
 		$recipients = array_merge($recipients, $this->shareService->findSharedWithUserIds($element->getId(), $elementType));
-		$recipients = array_unique($recipients);
+		$recipients = array_values(array_unique(array_map(strval(...), $recipients)));
 		$this->cache->set($cacheKey, $recipients);
 		return $recipients;
 	}

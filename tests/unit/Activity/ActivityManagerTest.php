@@ -63,7 +63,11 @@ final class ActivityManagerTest extends TestCase {
 
 		$shareService = $this->createMock(ShareService::class);
 		$shareService->method('findSharedWithUserIds')->willReturnCallback(
-			fn (int $id, string $type): array => $type === 'view' ? ['visible', 'hidden'] : [],
+			fn (int $id, string $type): array => match (true) {
+				$type === 'view' => ['visible', 'hidden'],
+				$id === 2 => [123, 456],
+				default => [],
+			},
 		);
 
 		$event = $this->createMock(IEvent::class);
@@ -176,6 +180,14 @@ final class ActivityManagerTest extends TestCase {
 		$this->assertSame(['id' => self::VIEW_ID, 'title' => 'View'], $viewEvent['view']);
 		$this->assertSame([3, 9], array_column($tableEvent['changeCols'], 'id'));
 		$this->assertSame([3], array_column($viewEvent['changeCols'], 'id'));
+	}
+
+	public function testNumericShareReceiversAreReturnedAsStrings(): void {
+		$table = new Table();
+		$table->setId(2);
+		$table->setOwnership('123');
+
+		$this->assertSame(['123', '456'], $this->activityManager->findRecipientsByElement($table));
 	}
 
 	private function row(): Row2 {
