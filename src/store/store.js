@@ -126,6 +126,12 @@ export const useTablesStore = defineStore('store', {
 			if (index !== -1) {
 				this.views[index] = view
 			}
+
+			const tableViews = this.tables.find(t => t.id === view.tableId)?.views
+			const tableIndex = tableViews?.findIndex(v => v.id === view.id) ?? -1
+			if (tableIndex !== -1) {
+				tableViews[tableIndex] = view
+			}
 		},
 		setContext(context) {
 			const index = this.contexts.findIndex(c => c.id === context.id)
@@ -262,6 +268,11 @@ export const useTablesStore = defineStore('store', {
 			const views = this.views
 			const index = views.findIndex(v => v.id === viewId)
 			if (index !== -1) {
+				const tableViews = this.tables.find(t => t.id === views[index].tableId)?.views
+				const tableIndex = tableViews?.findIndex(v => v.id === viewId) ?? -1
+				if (tableIndex !== -1) {
+					tableViews.splice(tableIndex, 1)
+				}
 				views.splice(index, 1)
 			}
 			this.setViews([...views])
