@@ -814,12 +814,12 @@ class Row2Mapper {
 			return [];
 		}
 
-		$filter = $view->getFilterArray();
-		if ($filter === []) {
-			return $userIds;
-		}
-
 		try {
+			$filter = $view->getFilterArray();
+			if ($filter === []) {
+				return $userIds;
+			}
+
 			if (!$this->isFilterUserDependent($filter)) {
 				return $this->isRowInViewPresent($rowId, $view, $userIds[0]) ? $userIds : [];
 			}
@@ -829,8 +829,8 @@ class Row2Mapper {
 				$userIds,
 				fn (string $userId): bool => $this->isRowInViewPresent($rowId, $view, $userId),
 			));
-		} catch (InternalError $e) {
-			$this->logger->warning('Could not evaluate row visibility in view ' . $view->getId(), ['exception' => $e]);
+		} catch (\Throwable $e) {
+			$this->logger->warning('Could not evaluate visibility of row ' . $rowId . ' in view ' . $view->getId(), ['exception' => $e]);
 			return [];
 		}
 	}

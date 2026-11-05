@@ -487,6 +487,17 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 		$this->assertSame(['user_alice'], $this->mapper->filterUsersSeeingRow($aliceRowId, $view, ['user_bob', 'user_alice']));
 	}
 
+	public function testFilterUsersSeeingRowFailsClosedForMissingFilterColumn(): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+
+		$view = new View();
+		$view->setId(99);
+		$view->setTableId(self::$testTableId);
+		$view->setFilterArray([[['columnId' => 999999, 'operator' => 'is-equal', 'value' => '@me']]]);
+
+		$this->assertSame([], $this->mapper->filterUsersSeeingRow(self::$testRowIds[0], $view, ['u1', 'u2']));
+	}
+
 	public function testCountRowsForTables(): void {
 		$this->assertSame([], $this->mapper->countRowsForTables([]), 'Empty input should return an empty map');
 
