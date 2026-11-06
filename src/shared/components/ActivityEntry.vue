@@ -28,10 +28,14 @@ const InternalLink = (props) => {
 	if (!props.href) {
 		return h('strong', { style: { fontWeight: 600 } }, props.name)
 	}
-	return h('a', { href: props.href || '#', style: { fontWeight: 600 } }, props.name)
+	return h('a', { href: props.href || '#', style: { fontWeight: 600 }, target: props.target }, props.name)
 }
 InternalLink.props = {
 	href: {
+		type: String,
+		default: '',
+	},
+	target: {
 		type: String,
 		default: '',
 	},
@@ -79,6 +83,16 @@ export default {
 						props: {
 							user: parameters[key].id,
 							displayName: parameters[key].name,
+						},
+					}
+					break
+				case 'file':
+					parameters[key] = {
+						component: InternalLink,
+						props: {
+							href: parameters[key].link,
+							target: '_blank',
+							name: parameters[key].name,
 						},
 					}
 					break

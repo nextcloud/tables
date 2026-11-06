@@ -8,8 +8,10 @@
 namespace OCA\Tables\BackgroundJob;
 
 use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Model\ImportProblem;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ImportService;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -17,6 +19,7 @@ use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\QueuedJob;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\L10N\IFactory;
 use Psr\Log\LoggerInterface;
 
 class ImportTableJob extends QueuedJob {
@@ -25,11 +28,11 @@ class ImportTableJob extends QueuedJob {
 		private readonly IUserManager $userManager,
 		private readonly IUserSession $userSession,
 		private readonly ImportService $importService,
-		private readonly ActivityManager $activityManager,
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
 		private readonly NotificationHelper $notificationHelper,
 		private readonly LoggerInterface $logger,
+		private readonly IFactory $l10nFactory,
 	) {
 		parent::__construct($time);
 	}
@@ -40,6 +43,7 @@ class ImportTableJob extends QueuedJob {
 	 *     view_id: integer|null,
 	 *     user_file_path: string|null,
 	 *     import_file_name: string|null,
+	 *     original_file_name?: string|null,
 	 *     create_missing_columns: bool,
 	 *     columns_config: array
 	 * } $argument
@@ -64,6 +68,8 @@ class ImportTableJob extends QueuedJob {
 
 		$oldUser = $this->userSession->getUser();
 		$importSuccess = false;
+		$importStats = null;
+		$importErrorMessage = null;
 
 		try {
 			$user = $this->userManager->get($userId);
@@ -80,28 +86,28 @@ class ImportTableJob extends QueuedJob {
 					$tableId,
 					$viewId,
 					$argument['create_missing_columns'],
-					$argument['columns_config']
+					$argument['columns_config'],
+					$argument['original_file_name'] ?? $argument['import_file_name'] ?? null,
+					collectProblemsPreview: false,
 				);
 			$importSuccess = true;
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
+			$l10n = $this->l10nFactory->get(Application::APP_ID, $this->l10nFactory->getUserLanguage($this->userManager->get($userId)));
+			$importErrorMessage = ImportProblem::describeCode($l10n, ImportProblem::codeForException($e));
 			$this->logger->error('Import failed: ' . $e->getMessage(), ['exception' => $e]);
 		} finally {
 			$this->userSession->setUser($oldUser);
 		}
 
 		if ($importSuccess) {
-			$this->activityManager->triggerEvent(
-				objectType: ActivityManager::TABLES_OBJECT_TABLE,
-				object: $table,
-				subject: ActivityManager::SUBJECT_IMPORT_FINISHED,
-				additionalParams: [
-					'importStats' => $importStats,
-				],
-				author: $userId
-			);
 			$notifySubject = ActivityManager::SUBJECT_IMPORT_FINISHED;
+			$notifyParams = [
+				'importStats' => $importStats->withoutProblems(),
+				'importProblemsFile' => $this->importService->getStoredProblemsFile(),
+			];
 		} else {
 			$notifySubject = ActivityManager::SUBJECT_IMPORT_FAILED;
+			$notifyParams = ['errorMessage' => $importErrorMessage];
 		}
 
 		if ($view !== null) {
@@ -109,6 +115,7 @@ class ImportTableJob extends QueuedJob {
 				objectType: ActivityManager::TABLES_OBJECT_VIEW,
 				object: $view,
 				subject: $notifySubject,
+				additionalParams: $notifyParams,
 				author: $userId
 			);
 		} else {
@@ -116,6 +123,7 @@ class ImportTableJob extends QueuedJob {
 				objectType: ActivityManager::TABLES_OBJECT_TABLE,
 				object: $table,
 				subject: $notifySubject,
+				additionalParams: $notifyParams,
 				author: $userId
 			);
 		}
