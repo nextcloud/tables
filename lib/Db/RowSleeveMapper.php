@@ -7,7 +7,9 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -29,6 +31,15 @@ class RowSleeveMapper extends QBMapper {
 	}
 
 	/**
+	 * @param RowSleeve $entity
+	 * @return RowSleeve
+	 */
+	public function insert(Entity $entity): Entity {
+		$entity->assignUuid();
+		return parent::insert($entity);
+	}
+
+	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 * @throws Exception
@@ -41,6 +52,50 @@ class RowSleeveMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
+	public function findByUuid(string $uuid): RowSleeve {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->table)
+			->where($qb->expr()->eq('uuid', $qb->createNamedParameter($uuid)));
+		return $this->findEntity($qb);
+	}
+
+	/**
+	 * Import creates a copy when the archived identity is already in use.
+	 */
+	public function insertImported(RowSleeve $sleeve): RowSleeve {
+		$tableId = $sleeve->getTableId();
+		if ($tableId === null) {
+			throw new \InvalidArgumentException('An imported row requires a destination table.');
+		}
+		$uuid = $sleeve->getUuid() ?? Uuid::v7()->toRfc4122();
+		for ($attempt = 0; ; $attempt++) {
+			$candidate = new RowSleeve();
+			$candidate->setTableId($tableId);
+			$candidate->setCreatedBy($sleeve->getCreatedBy());
+			$candidate->setCreatedAt($sleeve->getCreatedAt());
+			$candidate->setLastEditBy($sleeve->getLastEditBy());
+			$candidate->setLastEditAt($sleeve->getLastEditAt());
+			$candidate->setUuid($uuid);
+			$this->db->beginTransaction();
+			try {
+				$this->insert($candidate);
+				$this->db->commit();
+				return $candidate;
+			} catch (\Throwable $e) {
+				$this->db->rollBack();
+				if (!$e instanceof Exception || $e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION || $attempt >= 3) {
+					throw $e;
+				}
+				try {
+					$this->findByUuid($uuid);
+				} catch (DoesNotExistException) {
+					throw $e;
+				}
+				$uuid = Uuid::v7()->toRfc4122();
+			}
+		}
+	}
+
 	/**
 	 * @param int[] $ids
 	 * @return RowSleeve[]
@@ -51,6 +106,7 @@ class RowSleeveMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select(
 			$sleeveAlias . '.id',
+			$sleeveAlias . '.uuid',
 			$sleeveAlias . '.table_id',
 			$sleeveAlias . '.created_by',
 			$sleeveAlias . '.created_at',

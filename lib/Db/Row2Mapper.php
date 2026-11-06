@@ -14,6 +14,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\RowIdentifier;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -41,6 +42,10 @@ class Row2Mapper {
 		private ColumnsHelper $columnsHelper,
 		protected ColumnMapper $columnMapper,
 	) {
+	}
+
+	public function importSleeve(RowSleeve $sleeve): RowSleeve {
+		return $this->rowSleeveMapper->insertImported($sleeve);
 	}
 
 	/**
@@ -124,12 +129,18 @@ class Row2Mapper {
 	 * @return int[]
 	 * @throws InternalError
 	 */
-	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null): array {
+	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?array $sort = null, ?int $limit = null, ?int $offset = null, ?RowIdentifier $identifier = null): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('sleeves.id')
 			->from('tables_row_sleeves', 'sleeves')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
+
+		if ($identifier !== null) {
+			$column = $identifier->isUuid() ? 'sleeves.uuid' : 'sleeves.id';
+			$type = $identifier->isUuid() ? IQueryBuilder::PARAM_STR : IQueryBuilder::PARAM_INT;
+			$qb->andWhere($qb->expr()->eq($column, $qb->createNamedParameter($identifier->value, $type)));
+		}
 
 		if ($filter) {
 			$this->addFilterToQuery($qb, $filter, $userId);
@@ -171,6 +182,10 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
+		if ($showColumnIds === []) {
+			return [];
+		}
+
 		try {
 			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
@@ -194,7 +209,7 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getRows(array $rowIds, array $columnIds): array {
-		if (empty($rowIds) || empty($columnIds)) {
+		if (empty($rowIds)) {
 			return [];
 		}
 
@@ -212,6 +227,10 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getRowsChunk(array $rowIds, array $columnIds): array {
+		if ($columnIds === []) {
+			return $this->parseEntities(null, $this->rowSleeveMapper->findMultiple($rowIds));
+		}
+
 		$qb = $this->db->getQueryBuilder();
 
 		$qbSqlForColumnTypes = null;
@@ -712,16 +731,17 @@ class Row2Mapper {
 	}
 
 	/**
-	 * @param IResult $result
+	 * @param IResult|null $result
 	 * @param RowSleeve[] $sleeves
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function parseEntities(IResult $result, array $sleeves): array {
+	private function parseEntities(?IResult $result, array $sleeves): array {
 		$rows = [];
 		foreach ($sleeves as $sleeve) {
 			$rows[$sleeve->getId()] = new Row2();
 			$rows[$sleeve->getId()]->setId($sleeve->getId());
+			$rows[$sleeve->getId()]->setUuid($sleeve->getUuid());
 			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
 			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
 			$rows[$sleeve->getId()]->setLastEditBy($sleeve->getLastEditBy());
@@ -734,7 +754,7 @@ class Row2Mapper {
 		$keyToRowId = [];
 		$cellMapperCache = [];
 
-		while ($rowData = $result->fetchAssociative()) {
+		while ($result !== null && ($rowData = $result->fetchAssociative())) {
 			if (!isset($rowData['row_id'], $rows[$rowData['row_id']])) {
 				break;
 			}
@@ -768,7 +788,14 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function isRowInViewPresent(int $rowId, View $view, string $userId): bool {
-		return in_array($rowId, $this->getWantedRowIds($userId, $view->getTableId(), $view->getFilterArray()));
+		$identifier = RowIdentifier::tryFromInt($rowId);
+		return $identifier !== null && $this->findScopedId($identifier, $view->getTableId(), $view->getFilterArray(), $userId) !== null;
+	}
+
+	public function findScopedId(RowIdentifier $identifier, int $tableId, ?array $filter, string $userId): ?int {
+		$this->columnMapper->preloadColumns([], $filter, null);
+		$ids = $this->getWantedRowIds($userId, $tableId, $filter, null, 1, null, $identifier);
+		return $ids === [] ? null : (int)$ids[0];
 	}
 
 	/**
@@ -791,6 +818,8 @@ class Row2Mapper {
 			$row->setId($rowSleeve->getId());
 		}
 
+		$row->setUuid($rowSleeve->getUuid());
+
 		// write all cells to its db-table
 		foreach ($row->getData() as $cell) {
 			$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
@@ -804,6 +833,7 @@ class Row2Mapper {
 	 * @param string|null $userId
 	 * @return Row2
 	 * @throws InternalError
+	 * @throws NotFoundError
 	 */
 	public function update(Row2 $row, ?string $userId = null): Row2 {
 		if ($userId) {
@@ -820,7 +850,10 @@ class Row2Mapper {
 			$sleeve = $this->rowSleeveMapper->find($row->getId());
 			$this->updateMetaData($sleeve);
 			$this->rowSleeveMapper->update($sleeve);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+		} catch (DoesNotExistException $e) {
+			$this->logger->warning($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), 0, $e);
+		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
