@@ -56,13 +56,36 @@ class PageService {
 	 * @throws Exception
 	 */
 	public function find(int $contextId, int $pageId, string $userId): array {
+		return $this->readPage($this->contextMapper->findById($contextId, $userId), $pageId);
+	}
+
+	/**
+	 * @return TablesPage
+	 * @throws NotFoundError
+	 * @throws Exception
+	 */
+	public function findByTechnicalName(int $contextId, string $technicalName, string $userId): array {
 		$context = $this->contextMapper->findById($contextId, $userId);
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			if ($page['technical_name'] === $technicalName) {
+				return $this->readPage($context, (int)$pageId);
+			}
+		}
+		throw new NotFoundError('Application ' . $contextId . ' has no page ' . $technicalName);
+	}
+
+	/**
+	 * @return TablesPage
+	 * @throws NotFoundError
+	 * @throws Exception
+	 */
+	private function readPage(Context $context, int $pageId): array {
 		$page = $this->getPageArray($context, $pageId);
 		$widgets = $this->widgetService->findByPageIds([$pageId]);
 
 		return [
 			'id' => $pageId,
-			'contextId' => $contextId,
+			'contextId' => $context->getId(),
 			'pageType' => (string)$page['page_type'],
 			'technicalName' => (string)$page['technical_name'],
 			'title' => $page['title'] ?? null,

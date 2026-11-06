@@ -69,6 +69,29 @@ class ContextPageController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Get a page of an application by its technical name
+	 *
+	 * @param int $contextId ID of the application
+	 * @param string $technicalName Technical name of the page
+	 * @return DataResponse<Http::STATUS_OK, TablesPage, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Page returned
+	 * 404: Not found, also when the user has no access to the application
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'context', idParam: 'contextId')]
+	#[ApiRoute(verb: 'GET', url: '/api/2/contexts/{contextId}/pages/{technicalName}', requirements: ['contextId' => '\d+', 'technicalName' => '[a-z][a-z0-9_]*'])]
+	public function showByTechnicalName(int $contextId, string $technicalName): DataResponse {
+		try {
+			return new DataResponse($this->pageService->findByTechnicalName($contextId, $technicalName, $this->userId));
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (Exception $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
 	 * [api v2] Add a grid page to an application
 	 *
 	 * @param int $contextId ID of the application

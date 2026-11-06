@@ -91,6 +91,12 @@ class PageServiceTest extends TestCase {
 		], $this->service->find(7, self::GRID_PAGE, 'alice'));
 	}
 
+	public function testFindByTechnicalNameReturnsTheSamePageAsItsId(): void {
+		$this->widgetService->method('findByPageIds')->willReturn([]);
+
+		$this->assertSame($this->service->find(7, self::GRID_PAGE, 'alice'), $this->service->findByTechnicalName(7, 'overview', 'alice'));
+	}
+
 	public function testAnApplicationOrPageOutsideTheUsersReachIsNotFound(): void {
 		$this->permissionsService->method('canManageContext')->willReturn(true);
 		$this->pageMapper->expects($this->never())->method('insert');
@@ -103,7 +109,9 @@ class PageServiceTest extends TestCase {
 			'create in it' => fn () => $this->service->create(8, 'Overview', null, null, null, 'mallory'),
 			'update in it' => fn () => $this->service->update(8, self::GRID_PAGE, 'Mine', null, null, null, [], 'mallory'),
 			'delete in it' => fn () => $this->service->delete(8, self::GRID_PAGE, 'mallory'),
+			'application of no access by name' => fn () => $this->service->findByTechnicalName(8, 'overview', 'mallory'),
 			'page of another application' => fn () => $this->service->find(7, 99, 'alice'),
+			'unknown name' => fn () => $this->service->findByTechnicalName(7, 'missing', 'alice'),
 			'update it' => fn () => $this->service->update(7, 99, 'Taken over', null, null, null, [], 'alice'),
 			'delete it' => fn () => $this->service->delete(7, 99, 'alice'),
 		] as $case => $call) {
