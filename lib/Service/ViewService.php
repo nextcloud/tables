@@ -71,31 +71,58 @@ class ViewService extends SuperService {
 	/**
 	 * @param Table $table
 	 * @param string|null $userId
+	 * @param int|null $tableRowsCount
 	 * @return array
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAll(Table $table, ?string $userId = null): array {
+	public function findAll(Table $table, ?string $userId = null, ?int $tableRowsCount = null): array {
+		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
-		try {
-			// security
+		$viewsByTable = $this->findForTables([$table], $userId, [$table->getId() => $tableRowsCount]);
+		return $viewsByTable[$table->getId()] ?? [];
+	}
+
+	/**
+	 * @param Table[] $tables
+	 * @param string|null $userId
+	 * @param array<int, int|null> $tableRowsCounts
+	 * @return array<int, View[]>
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
+	public function findForTables(array $tables, ?string $userId = null, array $tableRowsCounts = []): array {
+		/** @var string $userId */
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+
+		if (empty($tables)) {
+			return [];
+		}
+
+		// security
+		foreach ($tables as $table) {
 			if (!$this->permissionsService->canManageTable($table, $userId)) {
 				throw new PermissionError('PermissionError: can not read views for tableId ' . $table->getId());
 			}
+		}
 
-			$allViews = $this->mapper->findAll($table->getId());
-			foreach ($allViews as $view) {
-				$this->enhanceView($view, $userId);
-			}
-			return $allViews;
+		$tableIds = array_map(static fn (Table $table) => $table->getId(), $tables);
+
+		try {
+			$allViews = $this->mapper->findAllByTableIds($tableIds);
 		} catch (\OCP\DB\Exception|InternalError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
-		} catch (PermissionError $e) {
-			$this->logger->debug('permission error during looking for views', ['exception' => $e]);
-			throw new PermissionError($e->getMessage());
 		}
+
+		$this->enhanceViews($allViews, $userId, $tableRowsCounts);
+
+		$viewsByTable = [];
+		foreach ($allViews as $view) {
+			$viewsByTable[$view->getTableId()][] = $view;
+		}
+		return $viewsByTable;
 	}
 
 	/**
@@ -166,9 +193,7 @@ class ViewService extends SuperService {
 			}
 		}
 
-		foreach ($sharedViews as $view) {
-			$this->enhanceView($view, $userId);
-		}
+		$this->enhanceViews($sharedViews, $userId, []);
 		return array_values($sharedViews);
 	}
 
@@ -522,34 +547,98 @@ class ViewService extends SuperService {
 	 * add some basic values related to this view in context
 	 *
 	 * $userId can be set or ''
+	 *
+	 * @param int|null $tableRowsCount
 	 */
-	private function enhanceView(View $view, string $userId): void {
-		if ($view->isFederated()) {
-			$this->enhanceFederatedView($view, $userId);
+	private function enhanceView(View $view, string $userId, ?int $tableRowsCount = null): void {
+		$this->enhanceViews([$view], $userId, [$view->getTableId() => $tableRowsCount]);
+	}
+
+	/**
+	 * add some basic values related to a list of views in context
+	 *
+	 * $userId can be set or ''
+	 *
+	 * @param View[] $views
+	 * @param array<int, int|null> $tableRowsCounts
+	 */
+	private function enhanceViews(array $views, string $userId, array $tableRowsCounts = []): void {
+		$localViews = [];
+		foreach ($views as $view) {
+			if ($view->isFederated()) {
+				$this->enhanceFederatedView($view, $userId);
+			} else {
+				$localViews[] = $view;
+			}
+		}
+		$views = $localViews;
+
+		if (empty($views)) {
 			return;
 		}
 
-		// add owner display name for UI
-		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
-
-		$this->setIsSharedState($view, $userId);
-
-		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
-			return;
-		}
-		// add the rows count
-		try {
-			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
-		} catch (InternalError|PermissionError) {
+		// add owner display names for UI in one batch
+		$ownerIds = array_values(array_filter(
+			array_unique(array_map(static fn (View $view) => $view->getOwnership(), $views))
+		));
+		$ownerDisplayNames = $this->userHelper->getUsersDisplayNames($ownerIds);
+		foreach ($views as $view) {
+			$ownerId = $view->getOwnership() ?? '';
+			$view->setOwnerDisplayName($ownerDisplayNames[$ownerId] ?? $ownerId);
 		}
 
 		// Filter and sort details are withheld from share recipients by
 		// View::jsonSerialize(). They must not be stripped from the entity here:
 		// ViewMapper caches it for the whole request, so the row queries built
 		// from it would lose the filter and return excluded rows.
+		$rowsCountCache = [];
 
-		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_VIEW, $view->getId())) {
-			$view->setFavorite(true);
+		$sharesCounts = [];
+		if ($userId !== '') {
+			$ownedViewIds = [];
+			foreach ($views as $view) {
+				if ($userId === $view->getOwnership()) {
+					$ownedViewIds[] = $view->getId();
+				}
+			}
+
+			if (!empty($ownedViewIds)) {
+				try {
+					$sharesCounts = $this->shareService->countSharesForNodes('view', $ownedViewIds);
+				} catch (InternalError $e) {
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+				}
+			}
+		}
+
+		foreach ($views as $view) {
+			$this->setIsSharedState($view, $userId, $sharesCounts[$view->getId()] ?? null);
+
+			if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
+				continue;
+			}
+
+			// add the rows count
+			$tableRowsCount = $tableRowsCounts[$view->getTableId()] ?? null;
+			if ($tableRowsCount !== null && $view->getFilterArray() === []) {
+				$view->setRowsCount($tableRowsCount);
+			} else {
+				$cacheKey = $view->getTableId() . ':' . json_encode($view->getFilterArray()) . ':' . $userId;
+				if (isset($rowsCountCache[$cacheKey])) {
+					$view->setRowsCount($rowsCountCache[$cacheKey]);
+				} else {
+					try {
+						$count = $this->rowService->getViewRowsCount($view, $userId);
+						$view->setRowsCount($count);
+						$rowsCountCache[$cacheKey] = $count;
+					} catch (InternalError|PermissionError) {
+					}
+				}
+			}
+
+			if ($this->favoritesService->isFavorite(Application::NODE_TYPE_VIEW, $view->getId())) {
+				$view->setFavorite(true);
+			}
 		}
 	}
 
@@ -568,7 +657,7 @@ class ViewService extends SuperService {
 		));
 	}
 
-	private function setIsSharedState(View $view, string $userId): void {
+	private function setIsSharedState(View $view, string $userId, ?int $sharesCount = null): void {
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
@@ -608,10 +697,14 @@ class ViewService extends SuperService {
 			} else {
 				// set hasShares if this table is shared by you (you share it with somebody else)
 				// (senseless if we have no user in context)
-				try {
-					$allShares = $this->shareService->findAll('view', $view->getId());
-					$view->setHasShares(count($allShares) !== 0);
-				} catch (InternalError) {
+				if ($sharesCount !== null) {
+					$view->setHasShares($sharesCount > 0);
+				} else {
+					try {
+						$counts = $this->shareService->countSharesForNodes('view', [$view->getId()]);
+						$view->setHasShares(($counts[$view->getId()] ?? 0) > 0);
+					} catch (InternalError) {
+					}
 				}
 			}
 		} else {
@@ -715,9 +808,7 @@ class ViewService extends SuperService {
 			/** @var string $userId */
 			$userId = $this->permissionsService->preCheckUserId($userId);
 			$views = $this->mapper->search($term, $userId, $limit, $offset);
-			foreach ($views as $view) {
-				$this->enhanceView($view, $userId);
-			}
+			$this->enhanceViews($views, $userId, []);
 			return $views;
 		} catch (InternalError|\OCP\DB\Exception) {
 			return [];
