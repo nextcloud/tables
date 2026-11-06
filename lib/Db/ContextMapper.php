@@ -10,6 +10,7 @@ namespace OCA\Tables\Db;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\QBMapper;
@@ -27,6 +28,7 @@ class ContextMapper extends QBMapper {
 		IDBConnection $db,
 		protected UserHelper $userHelper,
 		protected GroupHelper $groupHelper,
+		protected CircleHelper $circleHelper,
 	) {
 		parent::__construct($db, $this->table, Context::class);
 	}
@@ -326,6 +328,16 @@ class ContextMapper extends QBMapper {
 				$qb->expr()->in('s.receiver', $qb->createNamedParameter($groupIDs, IQueryBuilder::PARAM_STR_ARRAY)),
 			);
 			$sharedToConditions->add($groupShares);
+		}
+
+		// shared to circle (team) clause
+		$circleIDs = $this->circleHelper->getCircleIdsForUser($userId);
+		if (!empty($circleIDs)) {
+			$circleShares = $qb->expr()->andX(
+				$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter('circle')),
+				$qb->expr()->in('s.receiver', $qb->createNamedParameter($circleIDs, IQueryBuilder::PARAM_STR_ARRAY)),
+			);
+			$sharedToConditions->add($circleShares);
 		}
 
 		// owned contexts + apply share conditions
