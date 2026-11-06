@@ -28,36 +28,16 @@
 			<div :id="pagePanelId"
 				role="tabpanel"
 				:aria-labelledby="selectedPageId !== null ? 'context-page-tab-' + selectedPageId : undefined">
-				<template v-if="activePageId !== null">
-					<GridPage v-if="activePage"
-						:key="activePage.id"
-						:context="activeContext"
-						:page="activePage"
-						:can-edit="canManage"
-						@saved="page => activePage = page"
-						@edit-details="openPageForm"
-						@delete="deletePage" />
-					<div v-else-if="pageLoading" class="icon-loading" />
-					<ErrorMessage v-else :message="t('tables', 'This page could not be found')" />
-				</template>
-
-				<div v-else class="resources">
-					<div v-for="resource in contextResources" :key="resource.key">
-						<div v-if="!resource.isView" class="resource">
-							<TableWrapper v-model:view-setting="resourceViewSettings[resource.key]" :table="resource" :columns="columns[resource.key]"
-								:rows="rows[resource.key]" @create-column="createColumn(false, resource)"
-								@import-scheme="openImportSchemeModal(resource)"
-								@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
-								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
-						</div>
-						<div v-else-if="resource.isView" class="resource">
-							<CustomView v-model:view-setting="resourceViewSettings[resource.key]" :view="resource" :columns="columns[resource.key]"
-								:rows="rows[resource.key]" @create-column="createColumn(true, resource)"
-								@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
-								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
-						</div>
-					</div>
-				</div>
+				<GridPage v-if="activePage"
+					:key="activePage.id"
+					:context="activeContext"
+					:page="activePage"
+					:can-edit="canManage"
+					@saved="page => activePage = page"
+					@edit-details="openPageForm"
+					@delete="deletePage" />
+				<div v-else-if="pageLoading" class="icon-loading" />
+				<ErrorMessage v-else :message="t('tables', 'This page could not be found')" />
 			</div>
 		</div>
 
@@ -73,16 +53,12 @@
 
 <script>
 import MainModals from '../modules/modals/Modals.vue'
-import { mapState, mapActions, storeToRefs } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import { NcIconSvgWrapper } from '@nextcloud/vue'
-import TableWrapper from '../modules/main/sections/TableWrapper.vue'
-import CustomView from '../modules/main/sections/View.vue'
 import { emit } from '@nextcloud/event-bus'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
-import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMixin.js'
 import svgHelper from '../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { useTablesStore } from '../store/store.js'
-import { useDataStore } from '../store/data.js'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import ContextPageBar from '../modules/grid/ContextPageBar.vue'
 import GridPage from '../modules/grid/GridPage.vue'
@@ -90,34 +66,25 @@ import ContextPageForm from '../modules/modals/ContextPageForm.vue'
 import { contextPages, isStartPage } from '../modules/grid/gridLayout.js'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
-import { showConfirmation, showError } from '@nextcloud/dialogs'
+import { showConfirmation } from '@nextcloud/dialogs'
 
 export default {
 	components: {
 		MainModals,
 		NcIconSvgWrapper,
 		ErrorMessage,
-		TableWrapper,
-		CustomView,
 		ContextPageBar,
 		GridPage,
 		ContextPageForm,
 	},
 
-	mixins: [exportTableMixin, svgHelper, permissionsMixin],
-	setup() {
-		const store = useDataStore()
-		const { getColumns, getRows } = storeToRefs(store)
-		return { getColumns, getRows }
-	},
+	mixins: [svgHelper, permissionsMixin],
 
 	data() {
 		return {
 			loading: true,
 			icon: null,
-			resourceViewSettings: {},
 			context: null,
-			contextResources: [],
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
@@ -129,15 +96,11 @@ export default {
 	},
 
 	computed: {
-		...mapState(useTablesStore, ['tables', 'contexts', 'activeContextId', 'views', 'activeContext']),
-		// The grid page in the route; null on the start page
-		activePageId() {
-			return this.$route.params.pageId ? parseInt(this.$route.params.pageId) : null
-		},
+		...mapState(useTablesStore, ['contexts', 'activeContextId', 'activeContext']),
 		// The page shown: the grid page in the route, else the start page
 		selectedPageId() {
-			if (this.activePageId !== null) {
-				return this.activePageId
+			if (this.$route.params.pageId) {
+				return parseInt(this.$route.params.pageId)
 			}
 			return contextPages(this.activeContext).find(isStartPage)?.id ?? null
 		},
@@ -146,39 +109,6 @@ export default {
 		},
 		canManage() {
 			return this.ownsContext(this.activeContext)
-		},
-		rows() {
-			const rows = {}
-			if (this.context && this.context.nodes) {
-				for (const [, node] of Object.entries(this.context.nodes)) {
-					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
-						const rowId = this.getKey(false, node.node_id)
-						rows[rowId] = this.getRows(false, node.node_id)
-					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
-						const rowId = this.getKey(true, node.node_id)
-						rows[rowId] = this.getRows(true, node.node_id)
-					}
-				}
-			}
-			return rows
-
-		},
-
-		columns() {
-			const columns = {}
-			if (this.context && this.context.nodes) {
-				for (const [, node] of Object.entries(this.context.nodes)) {
-					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
-						const columnId = this.getKey(false, node.node_id)
-						columns[columnId] = this.getColumns(false, node.node_id)
-					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
-						const columnId = this.getKey(true, node.node_id)
-						columns[columnId] = this.getColumns(true, node.node_id)
-					}
-
-				}
-			}
-			return columns
 		},
 	},
 
@@ -198,13 +128,8 @@ export default {
 				this.reload()
 			},
 		},
-		activePageId(pageId, previousPageId) {
-			if (pageId !== null) {
-				this.loadActivePage()
-			} else if (previousPageId !== null) {
-				// The start page resources are only loaded while the start page is shown
-				this.reload()
-			}
+		'$route.params.pageId'() {
+			this.loadActivePage()
 		},
 		'context.iconName': {
 			async handler(value) {
@@ -222,8 +147,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView', 'loadContextPage', 'createContextPage', 'updateContextPage', 'deleteContextPage']),
-		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
+		...mapActions(useTablesStore, ['loadContext', 'loadContextTable', 'loadContextView', 'loadContextPage', 'createContextPage', 'updateContextPage', 'deleteContextPage']),
 		contextSignature() {
 			const ctx = this.activeContext
 			return ctx ? `${ctx.id}:${Object.keys(ctx.nodes || {}).sort().join(',')}` : null
@@ -238,8 +162,6 @@ export default {
 			}
 			this.isReloading = true
 			this.loading = true
-			this.contextResources = []
-			this.resourceViewSettings = {}
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -255,74 +177,7 @@ export default {
 
 				this.icon = await this.getContextIcon(this.activeContext.iconName)
 
-				if (this.activePageId !== null) {
-					await this.loadActivePage()
-				} else if (this.context && this.context.pages) {
-					const pages = Object.values(this.context.pages)
-					const startPage = pages.find(p => p.page_type === 'startpage')
-
-					if (startPage && startPage.content) {
-						const sortedContent = Object.values(startPage.content).sort((a, b) => a.order - b.order)
-
-						for (const content of sortedContent) {
-							const node = this.context.nodes[content.node_rel_id]
-							if (!node) continue
-
-							try {
-								const nodeType = parseInt(node.node_type)
-								if (nodeType === NODE_TYPE_TABLE) {
-
-									await this.loadContextTable({ id: node.node_id })
-									const table = this.tables.find(table => table.id === node.node_id)
-									if (table) {
-										await this.loadColumnsFromBE({
-											view: null,
-											tableId: table.id,
-										})
-										await this.loadRowsFromBE({
-											viewId: null,
-											tableId: table.id,
-										})
-										await this.loadRelationsFromBE({
-											tableId: table.id,
-										})
-										table.key = (table.id).toString()
-										table.isView = false
-										this.resourceViewSettings[table.key] = this.createViewSetting(table)
-										this.contextResources.push(table)
-									}
-
-								} else if (nodeType === NODE_TYPE_VIEW) {
-									await this.loadContextView({ id: node.node_id })
-									const view = this.views.find(view => view.id === node.node_id)
-									if (view) {
-										await this.loadColumnsFromBE({
-											view,
-										})
-										await this.loadRowsFromBE({
-											viewId: view.id,
-											tableId: view.tableId,
-										})
-										await this.loadRelationsFromBE({
-											viewId: view.id,
-										})
-										view.key = 'view-' + (view.id).toString()
-										view.isView = true
-										this.resourceViewSettings[view.key] = this.createViewSetting(view)
-										this.contextResources.push(view)
-									}
-								}
-							} catch (err) {
-								console.error(`Failed to load resource ${node.node_id}:`, err)
-								this.errorMessage = t('tables', 'Some resources in this application could not be loaded')
-							}
-						}
-					}
-					// TODO: check this
-					// Fallback if no startpage or content (though unexpected for valid contexts with nodes)
-					// If nodes exist but not in startpage content, they won't be shown.
-					// This matches backend logic where nodes are added to startpage.
-				}
+				await this.loadActivePage()
 			} catch (e) {
 				if (e.message === 'NOT_FOUND') {
 					this.errorMessage = getNotFoundError('application')
@@ -336,16 +191,19 @@ export default {
 			}
 		},
 		/**
-		 * Loads the grid page in the route with its widgets, and the tables and views of the
-		 * application so data widgets can show their titles.
+		 * Loads the page shown with its widgets, and the tables and views of the application
+		 * so data widgets can show their titles.
 		 */
 		async loadActivePage() {
-			const pageId = this.activePageId
+			const pageId = this.selectedPageId
+			if (pageId === null) {
+				return
+			}
 			this.pageLoading = true
 			this.activePage = null
 			try {
 				const page = await this.loadContextPage({ contextId: this.activeContextId, pageId })
-				if (pageId === this.activePageId) {
+				if (pageId === this.selectedPageId) {
 					this.activePage = page
 				}
 			} catch (e) {
@@ -438,60 +296,6 @@ export default {
 				await this.$router.push({ name: 'context', params: { contextId: this.activeContextId } })
 			}
 		},
-		createColumn(isView, element) {
-			emit('tables:column:create', { isView, element })
-		},
-		createViewSetting(element) {
-			const viewSetting = {}
-
-			if (element?.sort?.length) {
-				viewSetting.presetSorting = [...element.sort]
-			}
-
-			return viewSetting
-		},
-		async downloadCSV(element, isView) {
-			const access = await this.validateExportAccess({
-				id: element.id,
-				isView,
-			})
-
-			if (!access?.ok) {
-				if (access?.reason === 'NO_ACCESS') {
-					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
-				}
-				return
-			}
-
-			const rowId = this.getKey(isView, element.id)
-			const colId = this.getKey(isView, element.id)
-			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)
-		},
-		async downloadFilteredCSV(rows, element, isView) {
-			const access = await this.validateExportAccess({
-				id: element.id,
-				isView,
-			})
-
-			if (!access?.ok) {
-				if (access?.reason === 'NO_ACCESS') {
-					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
-				}
-				return
-			}
-
-			const colId = this.getKey(isView, element.id)
-			this.downloadCsv(rows, this.columns[colId], element.title)
-		},
-		getKey(isView, id) {
-			return isView ? 'view-' + id : id
-		},
-		openImportModal(element, isView) {
-			emit('tables:modal:import', { element, isView })
-		},
-		openImportSchemeModal(table) {
-			emit('tables:modal:table-scheme-import', { table })
-		},
 	},
 }
 
@@ -528,17 +332,6 @@ export default {
 .main-context-view {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
-}
-
-.resource {
-	margin: 40px 0;
-	width: max-content;
-	min-width: var(--app-content-width, 100%);
-
-	&:deep(.row.first-row) {
-		margin-inline-start: 0;
-		padding-inline-start: 20px;
-	}
 }
 
 :deep(h1) {

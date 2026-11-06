@@ -28,6 +28,8 @@
 				:view-setting="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
+				@download-csv="downloadCSV(rows)"
+				@download-filtered-csv="downloadCSV"
 				@update:view-setting="setting => viewSetting = setting" />
 			<TableWrapper v-else
 				:show-title="showTitle"
@@ -37,6 +39,9 @@
 				:view-setting="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
+				@import-scheme="openImportSchemeModal"
+				@download-csv="downloadCSV(rows)"
+				@download-filtered-csv="downloadCSV"
 				@update:view-setting="setting => viewSetting = setting" />
 		</template>
 	</div>
@@ -47,10 +52,12 @@ import { NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
 import TableOff from 'vue-material-design-icons/TableOff.vue'
 import { mapActions, mapState, storeToRefs } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
+import { showError } from '@nextcloud/dialogs'
 import TableWrapper from '../../main/sections/TableWrapper.vue'
 import CustomView from '../../main/sections/View.vue'
 import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
+import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 
 /**
  * Shows the rows of one table or view of the application on a grid page, with the
@@ -65,6 +72,7 @@ export default {
 		TableWrapper,
 		CustomView,
 	},
+	mixins: [exportTableMixin],
 	props: {
 		// The table or view to show, as {type: 'table'|'view', id}; null when the widget has none,
 		// also when its table or view left the application
@@ -134,7 +142,7 @@ export default {
 		this.load()
 	},
 	methods: {
-		...mapActions(useTablesStore, ['loadContextTable', 'loadContextView']),
+		...mapActions(useTablesStore, ['loadContextTable', 'loadContextView', 'validateExportAccess']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		/**
 		 * Loads the table or view with its columns, rows and relations.
@@ -162,6 +170,10 @@ export default {
 					await this.loadRowsFromBE({ viewId: null, tableId: this.targetId })
 					await this.loadRelationsFromBE({ tableId: this.targetId })
 				}
+				if (request === this.loadRequest) {
+					// The rows start in the sorting the table or view was saved with
+					this.viewSetting = this.element?.sort?.length ? { presetSorting: [...this.element.sort] } : {}
+				}
 			} catch {
 				// The store already reported the error
 				if (request === this.loadRequest) {
@@ -184,6 +196,27 @@ export default {
 		 */
 		openImportModal() {
 			emit('tables:modal:import', { element: this.element, isView: this.isView })
+		},
+		/**
+		 * Asks the app to open the scheme import dialog for the shown table.
+		 */
+		openImportSchemeModal() {
+			emit('tables:modal:table-scheme-import', { table: this.element })
+		},
+		/**
+		 * Downloads rows of the shown table or view as CSV, after checking the user may still read it.
+		 *
+		 * @param {Array} rows the rows to download
+		 */
+		async downloadCSV(rows) {
+			const access = await this.validateExportAccess({ id: this.element.id, isView: this.isView })
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+			this.downloadCsv(rows, this.columns, this.element.title)
 		},
 	},
 }

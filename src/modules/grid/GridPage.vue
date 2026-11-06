@@ -3,9 +3,9 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="grid-page" data-cy="gridPage">
-		<div class="grid-page__header">
-			<div class="grid-page__heading">
+	<div class="grid-page" :data-cy="isStartPage ? 'startPageGrid' : 'gridPage'">
+		<div v-if="showHeading || canEdit" class="grid-page__header">
+			<div v-if="showHeading" class="grid-page__heading">
 				<h2 class="grid-page__title" data-cy="gridPageTitle">
 					<NamedIcon v-if="page.icon" :name="page.icon" :size="20" />
 					{{ title }}
@@ -46,7 +46,10 @@
 							</template>
 							{{ t('tables', 'Edit page details') }}
 						</NcActionButton>
-						<NcActionButton :close-after-click="true" data-cy="gridPageDelete" @click="$emit('delete', page)">
+						<NcActionButton v-if="!isStartPage"
+							:close-after-click="true"
+							data-cy="gridPageDelete"
+							@click="$emit('delete', page)">
 							<template #icon>
 								<TrashCanOutline :size="20" />
 							</template>
@@ -110,7 +113,7 @@ import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, nextFreeRow, pageTitle, pageToGrid } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid } from './gridLayout.js'
 
 /**
  * A grid page of an application: its widgets on a grid, with an edit mode that saves the
@@ -134,9 +137,11 @@ export default {
 		AddWidget,
 		NamedIcon,
 	},
-	provide: {
-		// Widget titles sit below the title of the page
-		gridHeadingLevel: 3,
+	provide() {
+		return {
+			// Widget titles sit below the title of the page, or of the application on a start page without one
+			gridHeadingLevel: computed(() => this.showHeading ? 3 : 2),
+		}
 	},
 	props: {
 		// The application, for its id and its nodes
@@ -200,6 +205,13 @@ export default {
 		...mapState(useTablesStore, ['widgetTypes']),
 		title() {
 			return pageTitle(this.page)
+		},
+		isStartPage() {
+			return isStartPage(this.page)
+		},
+		// The start page sits under the title of its application, so it only has a heading of its own once it gets a title
+		showHeading() {
+			return !this.isStartPage || !!this.page.title || !!this.page.description
 		},
 		activeGrid() {
 			return this.draftGrid ?? this.storedGrid
