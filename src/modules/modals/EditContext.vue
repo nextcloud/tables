@@ -216,7 +216,7 @@ export default {
 			return false
 		},
 		getContextReceivers(context) {
-			let sharing = Object.values(context.sharing)
+			let sharing = Object.values(context.sharing ?? {})
 			sharing = sharing.filter((share) => !(getCurrentUser().uid === share.receiver && share.receiver_type === 'user'))
 			const receivers = sharing.map((share) => {
 				return {
@@ -242,7 +242,7 @@ export default {
 					const sortedContent = Object.values(startPage.content).sort((a, b) => a.order - b.order)
 
 					for (const content of sortedContent) {
-						const node = context.nodes[content.node_rel_id]
+						const node = context.nodes?.[content.node_rel_id]
 						if (!node) continue
 
 						if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
