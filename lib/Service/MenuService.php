@@ -115,9 +115,9 @@ class MenuService {
 	 * @throws PermissionError
 	 * @throws Exception
 	 */
-	public function update(int $itemId, ?string $title, ?string $icon, ?string $description, ?array $target, string $userId): array {
-		return $this->atomic(function () use ($itemId, $title, $icon, $description, $target, $userId): array {
-			[$item, $context] = $this->getManageableItem($itemId, $userId);
+	public function update(int $contextId, int $itemId, ?string $title, ?string $icon, ?string $description, ?array $target, string $userId): array {
+		return $this->atomic(function () use ($contextId, $itemId, $title, $icon, $description, $target, $userId): array {
+			[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
 
 			if ($title !== null) {
 				$item->setTitle($this->validateTitle($title));
@@ -153,8 +153,8 @@ class MenuService {
 	 * @throws PermissionError
 	 * @throws Exception
 	 */
-	public function delete(int $itemId, string $userId): array {
-		[$item, $context] = $this->getManageableItem($itemId, $userId);
+	public function delete(int $contextId, int $itemId, string $userId): array {
+		[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
 		$deleted = $this->serializeOne($context, $item);
 
 		$this->atomic(function () use ($item): void {
@@ -249,13 +249,16 @@ class MenuService {
 	 * @throws PermissionError
 	 * @throws Exception
 	 */
-	private function getManageableItem(int $itemId, string $userId): array {
+	private function getManageableItem(int $contextId, int $itemId, string $userId): array {
 		try {
 			$item = $this->menuItemMapper->findById($itemId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException $e) {
 			throw new NotFoundError('Menu item ' . $itemId . ' does not exist', 0, $e);
 		}
-		$context = $this->getManageableContext($item->getContextId(), $userId);
+		if ($item->getContextId() !== $contextId) {
+			throw new NotFoundError('Menu item ' . $itemId . ' does not exist');
+		}
+		$context = $this->getManageableContext($contextId, $userId);
 		if ($this->visibleItems($context, [$item]) === []) {
 			throw new NotFoundError('Menu item ' . $itemId . ' does not exist');
 		}
