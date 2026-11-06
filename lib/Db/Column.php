@@ -118,10 +118,6 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public const META_ID_TITLE = 'id';
 
-	public const RELATION_TYPE = 'relationType';
-	public const RELATION_TARGET_ID = 'targetId';
-	public const RELATION_LABEL_COLUMN = 'labelColumn';
-	public const RELATION_TARGET_SET_BY = 'targetSetBy';
 	public const RELATION_TYPE_TABLE = 'table';
 	public const RELATION_TYPE_VIEW = 'view';
 
@@ -355,6 +351,20 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public function getCustomSettingsArray(): array {
 		return json_decode((string)$this->customSettings, true) ?: [];
+	}
+
+	/**
+	 * @template T
+	 * @param class-string<T> $className
+	 * @return T
+	 * @throws \InvalidArgumentException
+	 */
+	public function getCustomSettingsObject(string $className): mixed {
+		$array = $this->getCustomSettingsArray();
+		if (method_exists($className, 'fromArray')) {
+			return $className::fromArray($array);
+		}
+		throw new \InvalidArgumentException("Class $className must have a fromArray method");
 	}
 
 	/**
