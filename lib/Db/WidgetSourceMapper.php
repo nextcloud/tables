@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\QBMapper;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
@@ -21,6 +22,8 @@ use OCP\IDBConnection;
  * @template-extends QBMapper<WidgetSource>
  */
 class WidgetSourceMapper extends QBMapper {
+	use TTransactional;
+
 	protected string $table = 'tables_contexts_widget_source';
 
 	public function __construct(IDBConnection $db) {
@@ -56,17 +59,19 @@ class WidgetSourceMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function setSource(int $widgetId, ?int $nodeRelId): void {
-		$this->deleteByWidgetIds([$widgetId]);
-		if ($nodeRelId === null) {
-			return;
-		}
-		$qb = $this->db->getQueryBuilder();
-		$qb->insert($this->table)
-			->values([
-				'widget_id' => $qb->createNamedParameter($widgetId, IQueryBuilder::PARAM_INT),
-				'node_rel_id' => $qb->createNamedParameter($nodeRelId, IQueryBuilder::PARAM_INT),
-			])
-			->executeStatement();
+		$this->atomic(function () use ($widgetId, $nodeRelId): void {
+			$this->deleteByWidgetIds([$widgetId]);
+			if ($nodeRelId === null) {
+				return;
+			}
+			$qb = $this->db->getQueryBuilder();
+			$qb->insert($this->table)
+				->values([
+					'widget_id' => $qb->createNamedParameter($widgetId, IQueryBuilder::PARAM_INT),
+					'node_rel_id' => $qb->createNamedParameter($nodeRelId, IQueryBuilder::PARAM_INT),
+				])
+				->executeStatement();
+		}, $this->db);
 	}
 
 	/**

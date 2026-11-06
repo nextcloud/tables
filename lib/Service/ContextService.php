@@ -616,7 +616,7 @@ class ContextService {
 		$importable = [];
 		$hasStartPage = false;
 		foreach ($pages as $key => $pageArr) {
-			$type = is_array($pageArr) ? ($pageArr['page_type'] ?? $pageArr['pageType'] ?? null) : null;
+			$type = is_array($pageArr) ? ($pageArr['page_type'] ?? null) : null;
 			if ($type !== Page::TYPE_STARTPAGE && $type !== Page::TYPE_GRID) {
 				$this->logger->warning('Skipping an imported page: its type is not ' . Page::TYPE_STARTPAGE . ' or ' . Page::TYPE_GRID . '.');
 				continue;
@@ -686,7 +686,7 @@ class ContextService {
 			foreach ($pages as $pageKey => $pageArr) {
 				$page = new Page();
 				$page->setContextId($newContext->getId());
-				$page->setPageType($pageArr['page_type'] ?? $pageArr['pageType'] ?? '');
+				$page->setPageType($pageArr['page_type'] ?? '');
 				if ($technicalNames[$pageKey] === null) {
 					$page = $this->pageMapper->insertWithDefaultName($page);
 				} else {
@@ -726,7 +726,7 @@ class ContextService {
 		$names = [];
 		$taken = [];
 		foreach ($pages as $key => $pageArr) {
-			$name = is_array($pageArr) ? ($pageArr['technical_name'] ?? $pageArr['technicalName'] ?? null) : null;
+			$name = is_array($pageArr) ? ($pageArr['technical_name'] ?? null) : null;
 			$names[$key] = null;
 			if (is_string($name) && TechnicalNameValidator::isValid($name) && !Page::isDefaultName($name) && !isset($taken[$name])) {
 				$names[$key] = $name;
@@ -734,7 +734,7 @@ class ContextService {
 			}
 		}
 		foreach ($pages as $key => $pageArr) {
-			$isStartPage = is_array($pageArr) && ($pageArr['page_type'] ?? $pageArr['pageType'] ?? '') === Page::TYPE_STARTPAGE;
+			$isStartPage = is_array($pageArr) && ($pageArr['page_type'] ?? '') === Page::TYPE_STARTPAGE;
 			if ($names[$key] === null && $isStartPage && !isset($taken[Page::START_PAGE_NAME])) {
 				$names[$key] = Page::START_PAGE_NAME;
 				$taken[Page::START_PAGE_NAME] = true;

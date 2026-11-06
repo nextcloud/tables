@@ -158,7 +158,7 @@ class Version2500Date20261022000000 extends SimpleMigrationStep {
 		$table->addColumn('grid_y', Types::INTEGER, ['notnull' => true, 'default' => 0]);
 		$table->addColumn('grid_width', Types::SMALLINT, ['notnull' => true, 'default' => 1]);
 		$table->addColumn('grid_height', Types::SMALLINT, ['notnull' => true, 'default' => 1]);
-		$table->addColumn('settings', Types::JSON, ['notnull' => false]);
+		$table->addColumn('settings', Types::TEXT, ['notnull' => false]);
 		$table->setPrimaryKey(['id']);
 		$table->addIndex(['page_id'], 'tables_ctx_widget_page_idx');
 	}

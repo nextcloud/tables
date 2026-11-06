@@ -325,7 +325,7 @@ final class ContextServiceTest extends TestCase {
 			],
 			'only one start page and grid pages are imported' => [
 				[
-					['id' => 1, 'pageType' => $start, 'technicalName' => 'home'],
+					['id' => 1, 'page_type' => $start, 'technical_name' => 'home'],
 					['id' => 2, 'page_type' => $start],
 					['id' => 3, 'page_type' => 'chart'],
 					['id' => 4],
