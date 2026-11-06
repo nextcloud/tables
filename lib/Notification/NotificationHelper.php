@@ -15,12 +15,12 @@ use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
-use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\ConfigService;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Notification\IManager;
@@ -35,7 +35,7 @@ class NotificationHelper {
 		private readonly ShareService $shareService,
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
-		private readonly Row2Mapper $row2Mapper,
+		private readonly RowVisibilityService $rowVisibility,
 		private readonly ColumnMapper $columnMapper,
 		protected readonly ActivityManager $activityManager,
 		protected readonly ?string $userId,
@@ -277,8 +277,12 @@ class NotificationHelper {
 			],
 		];
 
+		$changedColumns = $subject === ActivityManager::SUBJECT_ROW_UPDATE ? $this->resolveChangedColumns($additionalParams) : [];
 		if ($subject === ActivityManager::SUBJECT_ROW_UPDATE) {
-			$subjectParams['changeCols'] = $this->resolveChangedColumns($additionalParams);
+			$subjectParams['changeCols'] = array_map(
+				static fn (array $column): array => ['id' => $column['id'], 'name' => $column['name'], 'type' => $column['type']],
+				$changedColumns,
+			);
 		}
 
 		$this->sendNotifiesByElement(
@@ -293,10 +297,10 @@ class NotificationHelper {
 
 		$assignedTargets = $subject === ActivityManager::SUBJECT_ROW_CREATE
 			? $this->extractAssignedTargetsFromRowData($row->getData())
-			: $this->extractAssignedTargetsFromChangedColumns($subjectParams['changeCols'] ?? []);
+			: $this->extractAssignedTargetsFromChangedColumns($changedColumns);
 
 		foreach ($this->viewMapper->findAll($tableId) as $view) {
-			if ($subject === ActivityManager::SUBJECT_ROW_UPDATE && !$this->viewContainsAnyChangedColumn($view, $subjectParams['changeCols'] ?? [])) {
+			if ($subject === ActivityManager::SUBJECT_ROW_UPDATE && !$this->viewContainsAnyChangedColumn($view, $changedColumns)) {
 				continue;
 			}
 
@@ -308,6 +312,7 @@ class NotificationHelper {
 				objectId: (string)$rowId,
 				authorId: $authorId,
 				configKey: ConfigService::NOTIFY_ROW_KEY,
+				rowId: $rowId,
 			);
 
 			if (!empty($assignedTargets)) {
@@ -334,17 +339,23 @@ class NotificationHelper {
 		}
 	}
 
-	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey): void {
-		$recipients = $this->activityManager->findRecipientsByElement($element);
-
-		foreach ($recipients as $receiverId) {
+	private function sendNotifiesByElement(Table|View $element, string $subject, array $subjectParams, string $objectType, string $objectId, ?string $authorId, ?string $configKey, ?int $rowId = null): void {
+		$recipients = [];
+		foreach ($this->activityManager->findRecipientsByElement($element) as $receiverId) {
 			if (!is_string($receiverId) || $receiverId === '' || $receiverId === $authorId) {
 				continue;
 			}
 			if ($configKey !== null && !$this->configService->isNotifyEnabledForScope($receiverId, $element instanceof Table ? 'table' : 'view', $element->getId(), $configKey)) {
 				continue;
 			}
+			$recipients[] = $receiverId;
+		}
 
+		if ($element instanceof View && $rowId !== null) {
+			$recipients = $this->rowVisibility->usersSeeingRow($rowId, $element, $recipients);
+		}
+
+		foreach ($recipients as $receiverId) {
 			$params = array_merge($subjectParams, ['isViewContext' => $element instanceof View]);
 			if ($element instanceof View) {
 				$params['view'] = [
@@ -675,7 +686,7 @@ class NotificationHelper {
 				if (!$this->configService->isNotifyEnabledForScope($receiverId, 'view', $view->getId(), ConfigService::NOTIFY_ASSIGNED_KEY)) {
 					continue;
 				}
-				if (!$this->row2Mapper->isRowInViewPresent($rowId, $view, $receiverId)) {
+				if ($this->rowVisibility->usersSeeingRow($rowId, $view, [$receiverId]) === []) {
 					continue;
 				}
 
