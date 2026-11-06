@@ -198,7 +198,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		[$contextId, , $pageId] = $this->createApplication();
 		$item = $this->menuService->create($contextId, 'Site', 'star', 'Ours', ['url' => 'https://nextcloud.com'], self::OWNER);
 
-		$updated = $this->menuService->update($item['id'], '', null, '', ['pageId' => $pageId], self::OWNER);
+		$updated = $this->menuService->update($contextId, $item['id'], '', null, '', ['pageId' => $pageId], self::OWNER);
 
 		$this->assertSame([null, 'Overview', 'star', null, ['pageId' => $pageId]], [$updated['title'], $updated['displayTitle'], $updated['icon'], $updated['description'], $updated['target']]);
 		$this->assertSame($updated, $this->menuService->findAll($contextId, self::OWNER)[1]);
@@ -212,7 +212,7 @@ class MenuServiceTest extends DatabaseTestCase {
 
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('Move its items out first');
-		$this->menuService->update($group['id'], null, null, null, ['url' => 'https://nextcloud.com'], self::OWNER);
+		$this->menuService->update($contextId, $group['id'], null, null, null, ['url' => 'https://nextcloud.com'], self::OWNER);
 	}
 
 	public function testTheOrderSavesPositionAndGroupsAndDeletingAGroupMovesItsItemsUp(): void {
@@ -228,7 +228,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		], self::OWNER);
 		$this->assertSame([[$group['id'], null], [$site['id'], $group['id']], [$start['id'], null]], array_map(static fn (array $item): array => [$item['id'], $item['parentId']], $saved));
 
-		$this->menuService->delete($group['id'], self::OWNER);
+		$this->menuService->delete($contextId, $group['id'], self::OWNER);
 		$this->assertSame([[$site['id'], null], [$start['id'], null]], array_map(static fn (array $item): array => [$item['id'], $item['parentId']], $this->menuService->findAll($contextId, self::OWNER)));
 	}
 
@@ -288,8 +288,8 @@ class MenuServiceTest extends DatabaseTestCase {
 	public static function changes(): array {
 		return [
 			'create' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->create($contextId, 'Reports', null, null, null, self::OWNER)],
-			'update' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->update($itemId, 'Home', null, null, null, self::OWNER)],
-			'delete' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->delete($itemId, self::OWNER)],
+			'update' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->update($contextId, $itemId, 'Home', null, null, null, self::OWNER)],
+			'delete' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->delete($contextId, $itemId, self::OWNER)],
 			'order' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->saveOrder($contextId, [['id' => $itemId, 'parentId' => null]], self::OWNER)],
 		];
 	}
@@ -304,6 +304,24 @@ class MenuServiceTest extends DatabaseTestCase {
 
 		$this->expectException(PermissionError::class);
 		$change($this->menuService, $contextId, $itemId);
+	}
+
+	public function testAnItemIsNotFoundThroughAnotherApplication(): void {
+		[$contextId] = $this->createApplication();
+		[$otherContextId] = $this->createApplication();
+		$itemId = $this->menuService->findAll($contextId, self::OWNER)[0]['id'];
+
+		foreach ([
+			'update' => fn () => $this->menuService->update($otherContextId, $itemId, 'Home', null, null, null, self::OWNER),
+			'delete' => fn () => $this->menuService->delete($otherContextId, $itemId, self::OWNER),
+		] as $case => $change) {
+			try {
+				$change();
+				$this->fail($case . ' reached an item of another application.');
+			} catch (NotFoundError) {
+				$this->addToAssertionCount(1);
+			}
+		}
 	}
 
 	/**

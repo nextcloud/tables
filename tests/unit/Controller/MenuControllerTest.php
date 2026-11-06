@@ -44,8 +44,8 @@ class MenuControllerTest extends TestCase {
 			'index' => ['findAll', [7, 'alice'], static fn (MenuController $controller) => $controller->index(7)],
 			'create' => ['create', [7, 'Site', 'star', 'Ours', $target, 'alice'], static fn (MenuController $controller) => $controller->create(7, 'Site', 'star', 'Ours', $target)],
 			'order' => ['saveOrder', [7, $order, 'alice'], static fn (MenuController $controller) => $controller->order(7, $order)],
-			'update' => ['update', [3, '', null, null, $target, 'alice'], static fn (MenuController $controller) => $controller->update(3, '', null, null, $target)],
-			'destroy' => ['delete', [3, 'alice'], static fn (MenuController $controller) => $controller->destroy(3)],
+			'update' => ['update', [7, 3, '', null, null, $target, 'alice'], static fn (MenuController $controller) => $controller->update(7, 3, '', null, null, $target)],
+			'destroy' => ['delete', [7, 3, 'alice'], static fn (MenuController $controller) => $controller->destroy(7, 3)],
 		];
 	}
 

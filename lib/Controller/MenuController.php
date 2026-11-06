@@ -55,7 +55,7 @@ class MenuController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'context', idParam: 'contextId')]
-	#[ApiRoute(verb: 'GET', url: '/api/2/menu')]
+	#[ApiRoute(verb: 'GET', url: '/api/2/contexts/{contextId}/menu', requirements: ['contextId' => '\d+'])]
 	public function index(int $contextId): DataResponse {
 		try {
 			return new DataResponse($this->menuService->findAll($contextId, $this->userId));
@@ -88,7 +88,7 @@ class MenuController extends AOCSController {
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
-	#[ApiRoute(verb: 'POST', url: '/api/2/menu')]
+	#[ApiRoute(verb: 'POST', url: '/api/2/contexts/{contextId}/menu', requirements: ['contextId' => '\d+'])]
 	public function create(int $contextId, ?string $title = null, ?string $icon = null, ?string $description = null, ?array $target = null): DataResponse {
 		try {
 			return new DataResponse($this->menuService->create($contextId, $title, $icon, $description, $target, $this->userId));
@@ -122,7 +122,7 @@ class MenuController extends AOCSController {
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 60, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
-	#[ApiRoute(verb: 'PUT', url: '/api/2/menu/order')]
+	#[ApiRoute(verb: 'PUT', url: '/api/2/contexts/{contextId}/menu/order', requirements: ['contextId' => '\d+'])]
 	public function order(int $contextId, array $items): DataResponse {
 		try {
 			return new DataResponse($this->menuService->saveOrder($contextId, $items, $this->userId));
@@ -143,6 +143,7 @@ class MenuController extends AOCSController {
 	 * Fields left out keep their value; an empty title, icon or description removes it.
 	 * A target replaces the previous one. Position and group change only through the order.
 	 *
+	 * @param int $contextId ID of the application
 	 * @param int $itemId ID of the item
 	 * @param string|null $title New title, empty to show the title of what the item opens
 	 * @param string|null $icon New icon name, empty to remove it
@@ -157,10 +158,11 @@ class MenuController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 60, period: 60)]
-	#[ApiRoute(verb: 'PATCH', url: '/api/2/menu/{itemId}', requirements: ['itemId' => '\d+'])]
-	public function update(int $itemId, ?string $title = null, ?string $icon = null, ?string $description = null, ?array $target = null): DataResponse {
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
+	#[ApiRoute(verb: 'PATCH', url: '/api/2/contexts/{contextId}/menu/{itemId}', requirements: ['contextId' => '\d+', 'itemId' => '\d+'])]
+	public function update(int $contextId, int $itemId, ?string $title = null, ?string $icon = null, ?string $description = null, ?array $target = null): DataResponse {
 		try {
-			return new DataResponse($this->menuService->update($itemId, $title, $icon, $description, $target, $this->userId));
+			return new DataResponse($this->menuService->update($contextId, $itemId, $title, $icon, $description, $target, $this->userId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (PermissionError $e) {
@@ -177,6 +179,7 @@ class MenuController extends AOCSController {
 	 *
 	 * The items of a deleted group move to the top level.
 	 *
+	 * @param int $contextId ID of the application
 	 * @param int $itemId ID of the item
 	 * @return DataResponse<Http::STATUS_OK, TablesMenuItem, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
@@ -185,10 +188,11 @@ class MenuController extends AOCSController {
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
-	#[ApiRoute(verb: 'DELETE', url: '/api/2/menu/{itemId}', requirements: ['itemId' => '\d+'])]
-	public function destroy(int $itemId): DataResponse {
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
+	#[ApiRoute(verb: 'DELETE', url: '/api/2/contexts/{contextId}/menu/{itemId}', requirements: ['contextId' => '\d+', 'itemId' => '\d+'])]
+	public function destroy(int $contextId, int $itemId): DataResponse {
 		try {
-			return new DataResponse($this->menuService->delete($itemId, $this->userId));
+			return new DataResponse($this->menuService->delete($contextId, $itemId, $this->userId));
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
