@@ -1385,7 +1385,7 @@ class ContextService {
 	 * replace its widgets. A new page without a free technical name gets the default name.
 	 *
 	 * @param list<array{exportedId: ?int, pageId: ?int, technicalName: ?string, isGrid: bool, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: array{type: string, hasSource: bool, title: ?string, icon: ?string, description: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, mixed>, source: mixed}, source: ?array{0: int, 1: ?int}}>, ...<array-key, mixed>}> $pages
-	 * @return array<string, int> ids of the pages by the technical name the scheme gives them
+	 * @return array<int, int> ids of the pages by the id the scheme gives them
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
