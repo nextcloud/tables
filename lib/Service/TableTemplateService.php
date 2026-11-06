@@ -28,6 +28,12 @@ class TableTemplateService {
 
 	private string $textRichColumnTypeName = 'rich';
 
+	/**
+	 * The user the template content is created as. Set from the table owner,
+	 * because the command line has no session user.
+	 */
+	private ?string $templateUserId = null;
+
 	public function __construct(
 		protected LoggerInterface $logger,
 		private readonly IL10N $l,
@@ -88,6 +94,8 @@ class TableTemplateService {
 	 * @throws PermissionError
 	 */
 	public function makeTemplate(Table $table, string $template): Table {
+		$this->templateUserId = $this->userId ?? $table->getOwnership();
+
 		if ($template === 'todo') {
 			$this->makeTodo($table);
 		} elseif ($template === 'members') {
@@ -777,12 +785,12 @@ class TableTemplateService {
 	 * @throws PermissionError
 	 */
 	private function createColumn(int $tableId, array $parameters): ?Column {
-		if ($this->userId === null) {
+		if ($this->templateUserId === null) {
 			return null;
 		}
 
 		return $this->columnService->create(
-			$this->userId,
+			$this->templateUserId,
 			$tableId,
 			null,
 			ColumnDto::createFromArray($parameters)
@@ -802,7 +810,7 @@ class TableTemplateService {
 			];
 		}
 		try {
-			$this->rowService->create($table->getId(), null, $data);
+			$this->rowService->create($table->getId(), null, $data, $this->templateUserId);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create row, permission denied: ' . $e->getMessage());
 		} catch (BadRequestError|InternalError $e) {
@@ -822,8 +830,8 @@ class TableTemplateService {
 	private function createView(Table $table, array $data): void {
 		try {
 			$inputData = ViewUpdateInput::fromInputArray($data);
-			$view = $this->viewService->create($data['title'], $data['emoji'], $table, layout: $data['layout'] ?? null);
-			$this->viewService->update($view->getId(), $inputData);
+			$view = $this->viewService->create($data['title'], $data['emoji'], $table, $this->templateUserId, layout: $data['layout'] ?? null);
+			$this->viewService->update($view->getId(), $inputData, $this->templateUserId);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create view, permission denied: ' . $e->getMessage());
 		}
