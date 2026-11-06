@@ -27,9 +27,17 @@ final class AddMissingIndicesListener implements IEventListener {
 	];
 
 	/**
-	 * Covers selection option ids, dates and user, group and team ids entirely.
+	 * Covers single selection option ids, dates and user, group and team ids entirely; a
+	 * multi-selection is indexed by its first option ids only.
 	 */
 	public const TEXT_VALUE_PREFIX_LENGTH = 64;
+
+	/**
+	 * Cell tables whose text values have no length limit, as a multi-selection keeps all its option
+	 * ids in one value. PostgreSQL indexes the whole value and rejects index entries above 2704
+	 * bytes, so these indices are left out there.
+	 */
+	public const UNBOUNDED_TEXT_VALUE_TABLES = ['tables_row_cells_selection'];
 
 	public function __construct(
 		private readonly IDBConnection $connection,
@@ -46,10 +54,14 @@ final class AddMissingIndicesListener implements IEventListener {
 		$event->addMissingIndex('tables_tables', 'tables_tables_ownership', ['ownership']);
 		$event->addMissingIndex('tables_row_cells_number', 'tables_row_cells_number_cv', ['column_id', 'value']);
 
-		if ($this->connection->getDatabaseProvider() === IDBConnection::PLATFORM_ORACLE) {
+		$platform = $this->connection->getDatabaseProvider();
+		if ($platform === IDBConnection::PLATFORM_ORACLE) {
 			return;
 		}
 		foreach (self::TEXT_VALUE_INDICES as $tableName => $indexName) {
+			if ($platform === IDBConnection::PLATFORM_POSTGRES && in_array($tableName, self::UNBOUNDED_TEXT_VALUE_TABLES, true)) {
+				continue;
+			}
 			$event->addMissingIndex($tableName, $indexName, ['column_id', 'value'], ['lengths' => [null, self::TEXT_VALUE_PREFIX_LENGTH]]);
 		}
 	}

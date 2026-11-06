@@ -32,14 +32,26 @@ class AddMissingIndicesListenerTest extends TestCase {
 	public function testIndexesTheValuesOfEveryCellTableButText(string $platform): void {
 		$indices = $this->missingIndicesOn($platform);
 
+		$this->assertSame('tables_row_cells_number', $indices['tables_row_cells_number_cv']['tableName']);
 		$this->assertSame(['column_id', 'value'], $indices['tables_row_cells_number_cv']['columns']);
 		$this->assertSame([], $indices['tables_row_cells_number_cv']['options']);
 		foreach (AddMissingIndicesListener::TEXT_VALUE_INDICES as $tableName => $indexName) {
+			if ($platform === IDBConnection::PLATFORM_POSTGRES && in_array($tableName, AddMissingIndicesListener::UNBOUNDED_TEXT_VALUE_TABLES, true)) {
+				continue;
+			}
 			$this->assertSame($tableName, $indices[$indexName]['tableName']);
 			$this->assertSame(['column_id', 'value'], $indices[$indexName]['columns']);
 			$this->assertSame(['lengths' => [null, AddMissingIndicesListener::TEXT_VALUE_PREFIX_LENGTH]], $indices[$indexName]['options']);
 		}
 		$this->assertNotContains('tables_row_cells_text', array_column($indices, 'tableName'));
+	}
+
+	public function testLeavesOutTheSelectionValueIndexOnPostgreSql(): void {
+		$indices = $this->missingIndicesOn(IDBConnection::PLATFORM_POSTGRES);
+
+		$this->assertArrayNotHasKey('tables_row_cells_selection_cv', $indices);
+		$this->assertArrayHasKey('tables_row_cells_datetime_cv', $indices);
+		$this->assertArrayHasKey('tables_row_cells_usergroup_cv', $indices);
 	}
 
 	public function testLeavesOutTheTextValueIndicesOnOracle(): void {

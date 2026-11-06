@@ -32,6 +32,13 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 	];
 	private const TEXT_VALUE_PREFIX_LENGTH = 64;
 
+	/**
+	 * Cell types whose text values have no length limit, as a multi-selection keeps all its option
+	 * ids in one value. PostgreSQL indexes the whole value and rejects index entries above 2704
+	 * bytes, so their index is left out there.
+	 */
+	private const UNBOUNDED_TEXT_VALUE_TYPES = ['selection'];
+
 	public function __construct(
 		private readonly IDBConnection $connection,
 	) {
@@ -112,9 +119,14 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			$table->addIndex(['column_id', 'value'], $indexName);
 			return;
 		}
-		if ($this->connection->getDatabaseProvider() !== IDBConnection::PLATFORM_ORACLE) {
-			$table->addIndex(['column_id', 'value'], $indexName, [], ['lengths' => [null, self::TEXT_VALUE_PREFIX_LENGTH]]);
+		$platform = $this->connection->getDatabaseProvider();
+		if ($platform === IDBConnection::PLATFORM_ORACLE) {
+			return;
 		}
+		if ($platform === IDBConnection::PLATFORM_POSTGRES && in_array($name, self::UNBOUNDED_TEXT_VALUE_TYPES, true)) {
+			return;
+		}
+		$table->addIndex(['column_id', 'value'], $indexName, [], ['lengths' => [null, self::TEXT_VALUE_PREFIX_LENGTH]]);
 	}
 
 	private function createRowSleevesTable(ISchemaWrapper $schema) {
