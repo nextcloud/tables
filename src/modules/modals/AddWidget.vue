@@ -76,7 +76,7 @@ import SchemaForm from '../grid/SchemaForm.vue'
 import IconField from '../../shared/components/ncIconPicker/IconField.vue'
 import { useTablesStore } from '../../store/store.js'
 import { applicationNodeOptions, defaultSettings, findWidgetType } from '../grid/gridLayout.js'
-import { getWidgetComponent } from '../grid/widgetRegistry.js'
+import { WIDGET_TYPE_TABS, getWidgetComponent } from '../grid/widgetRegistry.js'
 
 /**
  * Collects the type, title, icon, description and settings of a widget; the settings form comes from the
@@ -108,6 +108,11 @@ export default {
 			type: Object,
 			default: () => ({}),
 		},
+		// False for a widget in a tab: tabs go one level deep
+		allowTabs: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	emits: ['close', 'submit'],
 	data() {
@@ -126,6 +131,7 @@ export default {
 		typeOptions() {
 			return this.widgetTypes
 				.filter(widgetType => getWidgetComponent(widgetType.type) !== null)
+				.filter(widgetType => this.allowTabs || widgetType.type !== WIDGET_TYPE_TABS || widgetType.type === this.editingWidget?.type)
 				.map(widgetType => ({ id: widgetType.type, label: widgetType.title }))
 		},
 		widgetType() {
