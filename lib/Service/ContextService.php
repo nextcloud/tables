@@ -816,6 +816,7 @@ class ContextService {
 				$this->contextMapper->findById($newContext->getId()),
 				$context['menu'],
 				static fn (string $kind, string $uuid): ?int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false ? $tableRelation->getId() : null,
+				static fn (int $pageId): ?int => ($pageMap[$pageId] ?? null)?->getId(),
 			));
 		}
 
@@ -1130,14 +1131,16 @@ class ContextService {
 				$kind = ($node['node_type'] ?? null) === Application::NODE_TYPE_VIEW ? 'view' : 'table';
 				$schemeUuids[$kind][(string)($node['node_uuid'] ?? '')] = true;
 			}
+			$pageIds = $this->menuService->schemePageIds($context, is_array($updateScheme['pages'] ?? null) ? $updateScheme['pages'] : []);
 			['items' => $items, 'skipped' => $skipped] = $this->menuService->readExported(
 				$context,
 				$updateScheme['menu'],
 				static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
+				static fn (int $pageId): ?int => $pageIds[$pageId] ?? null,
 			);
 			$changes['menu'] = [
 				'from' => $currentScheme->getMenu(),
-				'to' => array_column($items, 'entry'),
+				'to' => $this->menuService->withLocalPages(array_column($items, 'entry'), $pageIds),
 				'skipped' => $skipped,
 			];
 		}
@@ -1233,6 +1236,7 @@ class ContextService {
 				$withNodes,
 				$menu,
 				fn (string $kind, string $uuid): ?int => $this->nodeRelIdByUuid($withNodes, $kind, $uuid),
+				static fn (int $pageId): ?int => null,
 			));
 		}
 

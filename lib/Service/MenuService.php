@@ -40,7 +40,7 @@ use OCP\IDBConnection;
  * permissions on it before a write; this class checks that an item belongs to it.
  *
  * @psalm-import-type TablesMenuItem from ResponseDefinitions
- * @psalm-type TablesMenuExportItem = array{parent: ?int, title: ?string, displayTitle: string, icon: ?string, description: ?string, target: array{page: string}|array{table: string}|array{view: string}|array{url: string}|null}
+ * @psalm-type TablesMenuExportItem = array{parent: ?int, title: ?string, displayTitle: string, icon: ?string, description: ?string, target: array{page: int}|array{table: string}|array{view: string}|array{url: string}|null}
  */
 class MenuService {
 	use TTransactional;
@@ -255,7 +255,6 @@ class MenuService {
 	 */
 	public function export(Context $context): array {
 		$menu = $this->serialize($context, $this->menuItemMapper->findByContextId($context->getId()));
-		$pages = $context->getPages() ?? [];
 		$nodes = $context->getNodes() ?? [];
 		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
 		foreach ($menu as $item) {
@@ -273,7 +272,7 @@ class MenuService {
 		foreach ($menu as $item) {
 			$target = $item['target'];
 			if (isset($target['pageId'])) {
-				$target = ['page' => (string)$pages[$target['pageId']]['slug']];
+				$target = ['page' => (int)$target['pageId']];
 			} elseif (isset($target['nodeRelId'])) {
 				$node = $nodes[$target['nodeRelId']];
 				$entity = $nodesById[$node['node_type']][$node['node_id']] ?? null;
@@ -301,11 +300,12 @@ class MenuService {
 	 *
 	 * @param list<mixed> $exported
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @param \Closure(int): ?int $pageIdOf
 	 * @return list<array{index: int, title: ?string, reason: string}>
 	 * @throws Exception
 	 */
-	public function import(Context $context, array $exported, \Closure $nodeRelIdOf): array {
-		['items' => $items, 'skipped' => $skipped] = $this->readExported($context, $exported, $nodeRelIdOf);
+	public function import(Context $context, array $exported, \Closure $nodeRelIdOf, \Closure $pageIdOf): array {
+		['items' => $items, 'skipped' => $skipped] = $this->readExported($context, $exported, $nodeRelIdOf, $pageIdOf);
 
 		$this->atomic(function () use ($context, $items): void {
 			$this->menuItemMapper->deleteByContextId($context->getId());
@@ -323,22 +323,19 @@ class MenuService {
 	/**
 	 * Reads an exported menu for an application. Every item is checked like the API
 	 * checks it, and skipped, with the reason, when it fails, when its target did not
-	 * come along, or past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th item. A page is
-	 * found by its slug, a table or view by `$nodeRelIdOf`, which gives the node
-	 * relation of the application for the kind (`table` or `view`) and uuid, or null.
+	 * come along, or past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th item. `$pageIdOf`
+	 * gives the page of the application for an exported page id, or null; `{pageId}` is a
+	 * page of the application itself, see {@see self::withLocalPages()}. `$nodeRelIdOf`
+	 * gives the node relation for the kind (`table` or `view`) and uuid, or null.
 	 * An item sits in the group at the position it names when that group came before it
 	 * and was kept; otherwise it moves to the top.
 	 *
 	 * @param list<mixed> $exported
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @param \Closure(int): ?int $pageIdOf
 	 * @return array{items: list<array{item: MenuItem, entry: array<array-key, mixed>, index: int, parent: ?int}>, skipped: list<array{index: int, title: ?string, reason: string}>}
 	 */
-	public function readExported(Context $context, array $exported, \Closure $nodeRelIdOf): array {
-		$pageIds = [];
-		foreach ($context->getPages() ?? [] as $pageId => $page) {
-			$pageIds[(string)$page['slug']] = (int)$pageId;
-		}
-
+	public function readExported(Context $context, array $exported, \Closure $nodeRelIdOf, \Closure $pageIdOf): array {
 		$items = [];
 		$skipped = [];
 		$groups = [];
@@ -356,7 +353,7 @@ class MenuService {
 				$item->setIcon(IconHelper::optional(self::importedText($entry, 'icon'), self::ITEM));
 				$item->setDescription(TextHelper::description(self::importedText($entry, 'description'), self::ITEM));
 				if (($entry['target'] ?? null) !== null) {
-					$item->setTarget($this->importedTarget($entry['target'], $pageIds, $nodeRelIdOf));
+					$item->setTarget($this->importedTarget($entry['target'], $context, $pageIdOf, $nodeRelIdOf));
 				}
 				$this->assertValid($item);
 			} catch (BadRequestError $e) {
@@ -374,20 +371,73 @@ class MenuService {
 	}
 
 	/**
+	 * The pages of an application that the pages of a scheme stand for, by exported id. A
+	 * scheme imported into an existing application has no other link between the two: its
+	 * start page is the start page of the application, and any other page is the page with
+	 * its slug.
+	 *
+	 * @param array<array-key, mixed> $schemePages
+	 * @return array<int, int>
+	 */
+	public function schemePageIds(Context $context, array $schemePages): array {
+		$startPageId = null;
+		$pageIdsByName = [];
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			if ($page['page_type'] === Page::TYPE_STARTPAGE) {
+				$startPageId ??= (int)$pageId;
+			}
+			$pageIdsByName[(string)($page['slug'] ?? '')] = (int)$pageId;
+		}
+
+		$pageIds = [];
+		foreach ($schemePages as $page) {
+			if (!is_array($page) || !is_int($page['id'] ?? null)) {
+				continue;
+			}
+			$pageId = ($page['page_type'] ?? null) === Page::TYPE_STARTPAGE ? $startPageId : ($pageIdsByName[(string)($page['slug'] ?? '')] ?? null);
+			if ($pageId !== null) {
+				$pageIds[$page['id']] = $pageId;
+			}
+		}
+		return $pageIds;
+	}
+
+	/**
+	 * Points the page targets of exported items at pages of this application, so that they
+	 * no longer depend on the scheme they came from.
+	 *
+	 * @param list<array<array-key, mixed>> $entries
+	 * @param array<int, int> $pageIds pages of the application by exported id
+	 * @return list<array<array-key, mixed>>
+	 */
+	public function withLocalPages(array $entries, array $pageIds): array {
+		return array_map(static function (array $entry) use ($pageIds): array {
+			$exportedId = $entry['target']['page'] ?? null;
+			if (is_int($exportedId) && isset($pageIds[$exportedId])) {
+				$entry['target'] = ['pageId' => $pageIds[$exportedId]];
+			}
+			return $entry;
+		}, $entries);
+	}
+
+	/**
+	 * @param \Closure(int): ?int $pageIdOf
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
-	 * @param array<string, int> $pageIds the pages of the application by slug
 	 * @return array{pageId: int}|array{nodeRelId: int}|array{url: string}
 	 * @throws BadRequestError
 	 */
-	private function importedTarget(mixed $target, array $pageIds, \Closure $nodeRelIdOf): array {
+	private function importedTarget(mixed $target, Context $context, \Closure $pageIdOf, \Closure $nodeRelIdOf): array {
 		if (is_array($target) && count($target) === 1) {
 			$kind = (string)array_key_first($target);
 			$value = $target[$kind];
 			if ($kind === 'url' && is_string($value)) {
 				return MenuTarget::fromArray(['url' => $value])->toArray();
 			}
-			if ($kind === 'page' && is_string($value)) {
-				return isset($pageIds[$value]) ? ['pageId' => $pageIds[$value]] : throw new BadRequestError('The application has no page ' . $value . '.');
+			if ($kind === 'page' && is_int($value)) {
+				return ['pageId' => $pageIdOf($value) ?? throw new BadRequestError('The application has no page ' . $value . '.')];
+			}
+			if ($kind === 'pageId' && is_int($value)) {
+				return isset($context->getPages()[$value]) ? ['pageId' => $value] : throw new BadRequestError('The application has no page ' . $value . '.');
 			}
 			if (($kind === 'table' || $kind === 'view') && is_string($value)) {
 				return ['nodeRelId' => $nodeRelIdOf($kind, $value) ?? throw new BadRequestError('Its ' . $kind . ' ' . $value . ' is not part of the application.')];
