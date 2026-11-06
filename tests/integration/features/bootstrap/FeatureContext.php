@@ -2665,6 +2665,106 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @Then lookup column :title exists on table :tableName for relation column :relationColumnName using target column :targetColumnName
+	 */
+	public function createLookupColumn(string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
+		$this->sendCreateLookupColumnRequest($title, $tableName, $relationColumnName, $targetColumnName);
+
+		$newColumn = $this->getDataFromResponse($this->response);
+		$this->columnId = $newColumn['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($title, $newColumn['title']);
+		Assert::assertEquals('lookup', $newColumn['type']);
+
+		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+	}
+
+	#[When('user :user attempts to create lookup column :title on table :tableName for relation column :relationColumnName using target column :targetColumnName')]
+	public function userAttemptsToCreateLookupColumn(string $user, string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
+		$this->setCurrentUser($user);
+		$this->sendCreateLookupColumnRequest($title, $tableName, $relationColumnName, $targetColumnName);
+		if ($this->response->getStatusCode() === 200) {
+			$column = $this->getDataFromResponse($this->response);
+			Assert::assertEquals($title, $column['title']);
+			Assert::assertEquals('lookup', $column['type']);
+			Assert::assertEquals($this->collectionManager->getByAlias('column', $relationColumnName)['id'], $column['customSettings']['relationColumnId']);
+			Assert::assertEquals($this->collectionManager->getByAlias('column', $targetColumnName)['id'], $column['customSettings']['targetColumnId']);
+		}
+	}
+
+	private function sendCreateLookupColumnRequest(string $title, string $tableName, string $relationColumnName, string $targetColumnName): void {
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
+			[
+				'title' => $title,
+				'type' => 'lookup',
+				'mandatory' => 0,
+				'customSettings' => [
+					'relationColumnId' => (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'],
+					'targetColumnId' => (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'],
+				],
+			]
+		);
+	}
+
+	#[When('user :user attempts to update lookup column :columnName for relation column :relationColumnName using target column :targetColumnName')]
+	public function userAttemptsToUpdateLookupColumn(string $user, string $columnName, string $relationColumnName, string $targetColumnName, ?TableNode $properties = null): void {
+		$this->setCurrentUser($user);
+		$column = $this->collectionManager->getByAlias('column', $columnName);
+		$settings = array_merge($properties?->getRowsHash() ?? [], [
+			'relationColumnId' => (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'],
+			'targetColumnId' => (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'],
+		]);
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/columns/' . $column['id'],
+			['customSettings' => $settings]
+		);
+		if ($this->response->getStatusCode() === 200) {
+			$updated = $this->getDataFromResponse($this->response);
+			Assert::assertEquals($column['id'], $updated['id']);
+			Assert::assertEquals($settings, $updated['customSettings']);
+		}
+	}
+
+	/**
+	 * @Then lookup column :title exists on table :tableName for relation column :relationColumnName using target column :targetColumnName added to view :viewName
+	 */
+	public function createLookupColumnAddedToView(string $title, string $tableName, string $relationColumnName, string $targetColumnName, string $viewName): void {
+		$relationColumnId = (int)$this->collectionManager->getByAlias('column', $relationColumnName)['id'];
+		$targetColumnId = (int)$this->collectionManager->getByAlias('column', $targetColumnName)['id'];
+		$viewId = $this->viewIds[$viewName];
+
+		$props = [
+			'title' => $title,
+			'type' => 'lookup',
+			'mandatory' => 0,
+			'selectedViewIds' => [$viewId],
+			'customSettings' => [
+				'relationColumnId' => $relationColumnId,
+				'targetColumnId' => $targetColumnId,
+			],
+		];
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/columns',
+			$props
+		);
+
+		$newColumn = $this->getDataFromResponse($this->response);
+		$this->columnId = $newColumn['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($title, $newColumn['title']);
+		Assert::assertEquals('lookup', $newColumn['type']);
+
+		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
+	}
+
+	/**
 	 * @When user :user fetches relations for table :tableName
 	 */
 	public function userFetchesRelationsForTable(string $user, string $tableName): void {
@@ -2699,7 +2799,7 @@ class FeatureContext implements Context {
 		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
 		$columnId = (int)$this->collectionManager->getByAlias('column', $columnName)['id'];
 		Assert::assertArrayHasKey($columnId, $this->relationsData, 'Column "' . $columnName . '" (id=' . $columnId . ') not found in relations response');
-		Assert::assertCount($count, $this->relationsData[$columnId], 'Expected ' . $count . ' entries for column "' . $columnName . '"');
+		Assert::assertCount($count, $this->relationsData[$columnId]['values'], 'Expected ' . $count . ' entries for column "' . $columnName . '"');
 	}
 
 	/**
@@ -2709,8 +2809,19 @@ class FeatureContext implements Context {
 		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
 		$columnId = (int)$this->collectionManager->getByAlias('column', $columnName)['id'];
 		Assert::assertArrayHasKey($columnId, $this->relationsData, 'Column "' . $columnName . '" not found in relations response');
-		$labels = array_column($this->relationsData[$columnId], 'label');
+		$labels = array_column($this->relationsData[$columnId]['values'], 'value');
 		Assert::assertContains($label, $labels, 'Label "' . $label . '" not found in relations for column "' . $columnName . '"');
+	}
+
+	/**
+	 * @Then the relations response for column :columnName has an entry with value :value
+	 */
+	public function theRelationsResponseForColumnHasEntryWithValue(string $columnName, string $value): void {
+		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
+		$columnId = (int)$this->collectionManager->getByAlias('column', $columnName)['id'];
+		Assert::assertArrayHasKey($columnId, $this->relationsData, 'Column "' . $columnName . '" not found in relations response');
+		$values = array_column($this->relationsData[$columnId]['values'], 'value');
+		Assert::assertContains($value, $values, 'Value "' . $value . '" not found in relations for column "' . $columnName . '"');
 	}
 
 	/**

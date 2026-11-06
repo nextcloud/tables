@@ -175,6 +175,8 @@ namespace OCA\Tables;
  *     relationType?: 'table'|'view',
  *     targetId?: int,
  *     labelColumn?: int,
+ *     relationColumnId?: int,
+ *     targetColumnId?: int,
  *  },
  * }
  *
@@ -221,6 +223,8 @@ namespace OCA\Tables;
  *      relationType?: 'table'|'view',
  *      targetId?: int,
  *      labelColumn?: int,
+ *      relationColumnId?: int,
+ *      targetColumnId?: int,
  *   },
  *  }
  *
@@ -255,6 +259,9 @@ namespace OCA\Tables;
  *     notify-column: bool,
  *     notify-row: bool,
  * }
+ *
+ * @psalm-type TablesRelationValue = string|int|float|bool|null|list<int|string>|list<array{id: string, type: int, displayName: string}>
+ * @psalm-type TablesRelationData = array<string, array{column: ?TablesColumn, values: array<string, array{id: int, value: TablesRelationValue}>|list<empty>}>|list<empty>
  */
 class ResponseDefinitions {
 }

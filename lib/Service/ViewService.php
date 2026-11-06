@@ -275,7 +275,7 @@ class ViewService extends SuperService {
 			$cardSourcesRequested = false;
 			// Resolved at most once: the column check and the card source rules both need it,
 			// and it costs a query.
-			$managedColumnIds = null;
+			$managedColumns = null;
 			$columnSelectionChanged = false;
 			$changedDataScope = [];
 			foreach ($data->updateDetail() as $parameter => $value) {
@@ -286,13 +286,17 @@ class ViewService extends SuperService {
 				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
 					&& $value instanceof ColumnSettings
 				) {
-					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
-					$this->assertInputColumnsAreValid($value, $managedColumnIds);
+					$managedColumns ??= $this->findManagedColumnIds($view, $userId);
+					$this->assertInputColumnsAreValid($value, $managedColumns['columnIds'], $managedColumns['lookupColumnIds']);
 					$columnSelectionChanged = true;
 				}
 
 				if ($parameter === ViewUpdatableParameters::VIEW_SETTINGS) {
 					$cardSourcesRequested = true;
+				}
+
+				if ($value instanceof SortRuleSet) {
+					\OCP\Server::get(ColumnService::class)->validateSortRules($value);
 				}
 
 				if ($parameter === ViewUpdatableParameters::TECHNICAL_NAME) {
@@ -310,8 +314,8 @@ class ViewService extends SuperService {
 			if ($cardSourcesRequested || $columnSelectionChanged) {
 				$candidateIds = $view->getColumnIds();
 				if (empty($candidateIds)) {
-					$managedColumnIds ??= $this->findManagedColumnIds($view, $userId);
-					$candidateIds = $managedColumnIds;
+					$managedColumns ??= $this->findManagedColumnIds($view, $userId);
+					$candidateIds = $managedColumns['columnIds'];
 				}
 
 				if ($cardSourcesRequested) {
@@ -357,23 +361,38 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * The ids of the columns the view may use.
+	 * The ids of the columns the view may use, split into all columns and lookup columns.
 	 *
 	 * ColumnService depends on this service, so it is looked up rather than injected.
 	 *
-	 * @return list<int>
+	 * @return array{columnIds: list<int>, lookupColumnIds: list<int>}
 	 */
 	private function findManagedColumnIds(View $view, string $userId): array {
-		$columnService = \OCP\Server::get(ColumnService::class);
+		$availableColumns = \OCP\Server::get(ColumnService::class)->findAllByManagedView($view, $userId);
+		$columnIds = [];
+		$lookupColumnIds = [];
+		foreach ($availableColumns as $column) {
+			$columnIds[] = $column->getId();
+			if ($column->getType() === Column::TYPE_LOOKUP) {
+				$lookupColumnIds[] = $column->getId();
+			}
+		}
 
-		return array_map(static fn (Column $column) => $column->getId(), $columnService->findAllByManagedView($view, $userId));
+		return ['columnIds' => $columnIds, 'lookupColumnIds' => $lookupColumnIds];
 	}
 
 	/**
 	 * @param list<int> $availableColumnIds
+	 * @param list<int> $lookupColumnIds
 	 */
-	protected function assertInputColumnsAreValid(ColumnSettings $columnSettings, array $availableColumnIds): void {
+	protected function assertInputColumnsAreValid(ColumnSettings $columnSettings, array $availableColumnIds, array $lookupColumnIds): void {
 		foreach ($columnSettings->columnInformation() as $columnInfo) {
+			if ($columnInfo instanceof ViewColumnInformation
+				&& $columnInfo->isMandatory()
+				&& in_array($columnInfo->getId(), $lookupColumnIds, true)
+			) {
+				throw new InvalidArgumentException('Lookup columns cannot be mandatory.');
+			}
 			if (!in_array($columnInfo->getId(), $availableColumnIds, true)
 				&& !Column::isValidMetaTypeId($columnInfo->getId())
 			) {
@@ -778,6 +797,7 @@ class ViewService extends SuperService {
 		$item->setLastEditAt($view['lastEditAt']);
 		$item->setDescription($view['description']);
 		$item->setColumns(json_encode($view['columnSettings']));
+		\OCP\Server::get(ColumnService::class)->validateSortRules(SortRuleSet::createFromInputArray($view['sort']));
 		$item->setSort(json_encode($view['sort']));
 		$item->setFilter(json_encode($view['filter']));
 		// A scheme may carry a layout this version does not know, which is dropped rather

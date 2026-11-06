@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { ColumnTypes } from './columnHandler.js'
+import { isVirtualColumn } from '../../../utils/columnUtils.js'
 import { ALLOWED_PROTOCOLS } from '../../../constants.ts'
 import Moment from '@nextcloud/moment'
 
@@ -10,7 +11,7 @@ export default {
 	methods: {
 		isMandatory(column) {
 			const viewInfo = column?.viewColumnInformation ?? {}
-			return viewInfo.mandatory ?? column?.mandatory ?? false
+			return !isVirtualColumn(column) && (viewInfo.mandatory ?? column?.mandatory ?? false)
 		},
 		isValueValidForColumn(value, column) {
 			switch (column.type) {
@@ -100,7 +101,7 @@ export default {
 			if (!this.columns) return false
 			this.columns.forEach(col => {
 				if (this.isMandatory(col)) {
-					const validValue = this.isValueValidForColumn(row[col.id], col)
+					const validValue = this.isValueValidForColumn(row[col.getValueColumnId()], col)
 					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
 				}
 			})

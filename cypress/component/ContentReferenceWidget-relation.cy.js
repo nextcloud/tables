@@ -100,7 +100,10 @@ describe('ContentReferenceWidget - relation', () => {
 		// Mock relation data so the relation cell can resolve its label
 		cy.reply('**/apps/tables/api/1/tables/42/relations', {
 			2: {
-				100: { id: '100', label: 'Alice' },
+				column: null,
+				values: {
+					100: { id: 100, value: 'Alice' },
+				},
 			},
 		})
 

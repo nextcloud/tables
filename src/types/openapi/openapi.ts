@@ -1187,6 +1187,10 @@ export type components = {
                 readonly targetId?: number;
                 /** Format: int64 */
                 readonly labelColumn?: number;
+                /** Format: int64 */
+                readonly relationColumnId?: number;
+                /** Format: int64 */
+                readonly targetColumnId?: number;
             } | null;
         };
         readonly Context: {
@@ -1301,6 +1305,10 @@ export type components = {
                 readonly targetId?: number;
                 /** Format: int64 */
                 readonly labelColumn?: number;
+                /** Format: int64 */
+                readonly relationColumnId?: number;
+                /** Format: int64 */
+                readonly targetColumnId?: number;
             } | null;
         };
         readonly PublicRow: {
@@ -1321,6 +1329,24 @@ export type components = {
                 };
             };
         };
+        readonly RelationData: {
+            readonly [key: string]: {
+                readonly column: components["schemas"]["Column"] | null;
+                readonly values: {
+                    readonly [key: string]: {
+                        /** Format: int64 */
+                        readonly id: number;
+                        readonly value: components["schemas"]["RelationValue"];
+                    };
+                } | readonly unknown[];
+            };
+        } | readonly unknown[];
+        readonly RelationValue: (string | number | boolean | readonly (number | string)[] | readonly {
+            readonly id: string;
+            /** Format: int64 */
+            readonly type: number;
+            readonly displayName: string;
+        }[]) | null;
         readonly Row: {
             /** Format: int64 */
             readonly id: number;
@@ -3022,7 +3048,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation" | "lookup";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -3284,7 +3310,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation" | "lookup";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -3599,11 +3625,11 @@ export interface operations {
                     readonly usergroupShowUserStatus?: boolean | null;
                     /**
                      * @description Custom settings for the column
-                     * @default {}
+                     * @default null
                      */
                     readonly customSettings?: {
                         readonly [key: string]: Record<string, never>;
-                    };
+                    } | null;
                 };
             };
         };
@@ -3736,15 +3762,7 @@ export interface operations {
                     readonly [name: string]: unknown;
                 };
                 content: {
-                    readonly "application/json": {
-                        readonly [key: string]: {
-                            readonly [key: string]: {
-                                /** Format: int64 */
-                                readonly id: number;
-                                readonly label: string;
-                            };
-                        };
-                    };
+                    readonly "application/json": components["schemas"]["RelationData"];
                 };
             };
             /** @description Current user is not logged in */
@@ -3810,15 +3828,7 @@ export interface operations {
                     readonly [name: string]: unknown;
                 };
                 content: {
-                    readonly "application/json": {
-                        readonly [key: string]: {
-                            readonly [key: string]: {
-                                /** Format: int64 */
-                                readonly id: number;
-                                readonly label: string;
-                            };
-                        };
-                    };
+                    readonly "application/json": components["schemas"]["RelationData"];
                 };
             };
             /** @description Current user is not logged in */

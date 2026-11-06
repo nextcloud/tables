@@ -12,7 +12,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Service\RelationService;
 use Psr\Log\LoggerInterface;
 
-class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class RelationBusiness extends SuperBusiness {
 
 	public function __construct(
 		LoggerInterface $logger,
@@ -33,15 +33,15 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			return '';
 		}
 
-		$relationData = $this->relationService->getRelationData($column);
+		$relationLabels = $this->relationService->getRelationLabels($column);
 		// try to find value by label
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
+		$matchingRelation = array_filter($relationLabels, fn (array $relation) => $relation['value'] === $value);
 		if (!empty($matchingRelation)) {
 			return json_encode(reset($matchingRelation)['id']);
 		}
 
 		// if not found, try to find by id
-		if (is_numeric($value) && isset($relationData[(int)$value])) {
+		if (is_numeric($value) && isset($relationLabels[(int)$value])) {
 			return json_encode($value);
 		}
 
@@ -62,14 +62,14 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			return true;
 		}
 
-		$relationData = $this->relationService->getRelationData($column);
+		$relationLabels = $this->relationService->getRelationLabels($column);
 		// try to find value by label
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
+		$matchingRelation = array_filter($relationLabels, fn (array $relation) => $relation['value'] === $value);
 		if (!empty($matchingRelation)) {
 			return true;
 		}
 		// if not found, try to find by id
-		if (is_numeric($value) && isset($relationData[(int)$value])) {
+		if (is_numeric($value) && isset($relationLabels[(int)$value])) {
 			return true;
 		}
 
@@ -81,16 +81,16 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			return;
 		}
 		// Validate that the value exists in the target table/view
-		$relationData = $this->relationService->getRelationData($column);
+		$relationLabels = $this->relationService->getRelationLabels($column);
 
 		// Try to find value by label first
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
+		$matchingRelation = array_filter($relationLabels, fn (array $relation) => $relation['value'] === $value);
 		if (!empty($matchingRelation)) {
 			return;
 		}
 
 		// If not found by label, try to find by id
-		if (is_numeric($value) && isset($relationData[(int)$value])) {
+		if (is_numeric($value) && isset($relationLabels[(int)$value])) {
 			return;
 		}
 
