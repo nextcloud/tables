@@ -12,6 +12,8 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Db\WidgetSourceMapper;
+use OCA\Tables\ResponseDefinitions;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
 
@@ -19,11 +21,11 @@ use OCP\IDBConnection;
  * Stores the widgets of grid pages, settings included, and the node a data widget
  * shows. Callers check permissions and run writes in a transaction.
  *
- * @psalm-import-type TablesWidgetSettingValue from Widget
- * @psalm-type TablesWidgetRecord = array{id: int, type: string, title: ?string, icon: ?string, description: ?string, gridX: int, gridY: int, gridWidth: int, gridHeight: int, settings: \stdClass, source: ?array{nodeRelId: int}}
+ * @psalm-import-type TablesWidget from ResponseDefinitions
+ * @psalm-import-type TablesWidgetValue from ResponseDefinitions
  */
 class WidgetService {
-	use \OCP\AppFramework\Db\TTransactional;
+	use TTransactional;
 
 	public function __construct(
 		private readonly WidgetMapper $widgetMapper,
@@ -34,7 +36,7 @@ class WidgetService {
 
 	/**
 	 * @param int[] $pageIds
-	 * @return array<int, list<TablesWidgetRecord>> widgets by page id, in grid order
+	 * @return array<int, list<TablesWidget>> widgets by page id, in grid order
 	 * @throws Exception
 	 */
 	public function findByPageIds(array $pageIds): array {
@@ -64,10 +66,9 @@ class WidgetService {
 
 	/**
 	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
+	 * @param array<string, TablesWidgetValue> $settings
 	 * @throws \InvalidArgumentException when the source is not a node of the application of the page
 	 * @throws Exception
-	 * @throws \JsonException
 	 */
 	public function insert(int $pageId, string $type, ?string $title, array $position, array $settings, ?int $nodeRelId, ?string $icon = null, ?string $description = null): Widget {
 		$this->assertSourcesOfPage($pageId, [$nodeRelId]);
@@ -76,9 +77,8 @@ class WidgetService {
 
 	/**
 	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
+	 * @param array<string, TablesWidgetValue> $settings
 	 * @throws Exception
-	 * @throws \JsonException
 	 */
 	private function insertWidget(int $pageId, string $type, ?string $title, array $position, array $settings, ?int $nodeRelId, ?string $icon, ?string $description): Widget {
 		$widget = new Widget();
@@ -91,15 +91,22 @@ class WidgetService {
 	}
 
 	/**
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function findIdsByPageId(int $pageId): array {
+		return $this->widgetMapper->findIdsByPageId($pageId);
+	}
+
+	/**
 	 * Makes the widgets of a page match the given list: widgets with an id are updated,
 	 * widgets without one are inserted and widgets of the page that are not listed are
 	 * deleted, in one transaction. A widget listed without an icon or description has none.
 	 *
-	 * @param list<array{id: ?int, type: string, title: ?string, icon?: ?string, description?: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetSettingValue>, nodeRelId: ?int}> $widgets
+	 * @param list<array{id: ?int, type: string, title: ?string, icon?: ?string, description?: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetValue>, nodeRelId: ?int}> $widgets
 	 * @throws \InvalidArgumentException when an id is not one of a widget of the page, or a
 	 *                                   source is not a node of the application of the page
 	 * @throws Exception
-	 * @throws \JsonException
 	 */
 	public function syncPage(int $pageId, array $widgets): void {
 		$this->atomic(function () use ($pageId, $widgets): void {
@@ -184,8 +191,7 @@ class WidgetService {
 
 	/**
 	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
-	 * @throws \JsonException
+	 * @param array<string, TablesWidgetValue> $settings
 	 */
 	private function applyFields(Widget $widget, string $type, ?string $title, array $position, array $settings, ?string $icon, ?string $description): void {
 		$widget->setType($type);
@@ -196,6 +202,6 @@ class WidgetService {
 		$widget->setGridY($position['gridY']);
 		$widget->setGridWidth($position['gridWidth']);
 		$widget->setGridHeight($position['gridHeight']);
-		$widget->setSettingsArray($settings);
+		$widget->setSettings($settings);
 	}
 }

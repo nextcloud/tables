@@ -798,7 +798,6 @@ class ContextService {
 	 *
 	 * @param array<array-key, ContextNodeRelation> $nodeRelMap imported node relations of the table by their exported id
 	 * @throws Exception
-	 * @throws \JsonException
 	 */
 	private function importWidget(int $pageId, int $index, mixed $widgetArr, array $nodeRelMap): void {
 		if (!is_array($widgetArr) || !is_string($widgetArr['type'] ?? null)) {

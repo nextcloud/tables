@@ -117,7 +117,7 @@ class WidgetMapperTest extends DatabaseTestCase {
 		$widget->setGridY($y);
 		$widget->setGridWidth($width);
 		$widget->setGridHeight($height);
-		$widget->setSettingsArray($settings);
+		$widget->setSettings($settings);
 		return $widget;
 	}
 }

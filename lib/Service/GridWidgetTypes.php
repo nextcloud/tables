@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
-use OCA\Tables\Db\Widget;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\ResponseDefinitions;
 use OCP\IL10N;
 
 /**
@@ -18,22 +18,9 @@ use OCP\IL10N;
  * the frontend renders its form from it and saved widgets are validated against it.
  * A type with a source shows a table or view of the application.
  *
- * @psalm-import-type TablesWidgetSettingValue from Widget
- * @psalm-type TablesWidgetSettingSchema = array{
- *   type: 'string'|'text'|'color'|'boolean'|'enum',
- *   title: string,
- *   default: TablesWidgetSettingValue,
- *   options?: list<array{value: string, label: string}>,
- *   required?: bool,
- * }
- * @psalm-type TablesWidgetType = array{
- *   type: string,
- *   title: string,
- *   defaultWidth: int,
- *   defaultHeight: int,
- *   hasSource: bool,
- *   settings: array<string, TablesWidgetSettingSchema>,
- * }
+ * @psalm-import-type TablesWidgetValue from ResponseDefinitions
+ * @psalm-import-type TablesWidgetSettingSchema from ResponseDefinitions
+ * @psalm-import-type TablesWidgetType from ResponseDefinitions
  */
 class GridWidgetTypes {
 	public const TYPE_HEADER = 'header';
@@ -117,7 +104,7 @@ class GridWidgetTypes {
 	 * with defaults filled in and unknown settings dropped. Stored as JSON they take at
 	 * most {@see self::SETTINGS_MAX_BYTES} bytes.
 	 *
-	 * @return array<string, TablesWidgetSettingValue>
+	 * @return array<string, TablesWidgetValue>
 	 * @throws BadRequestError
 	 */
 	public function sanitizeSettings(string $type, mixed $settings): array {
@@ -143,7 +130,7 @@ class GridWidgetTypes {
 
 	/**
 	 * @param TablesWidgetSettingSchema $property
-	 * @return TablesWidgetSettingValue
+	 * @return TablesWidgetValue
 	 * @throws BadRequestError
 	 */
 	private function sanitizeValue(string $label, array $property, mixed $value): string|bool|int|null {

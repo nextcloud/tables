@@ -10,12 +10,11 @@ declare(strict_types=1);
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\Entity;
+use OCP\DB\Types;
 
 /**
  * A widget on a grid page: its type, optional title, icon and description, its place
  * on the grid and its settings, stored as one JSON object.
- *
- * @psalm-type TablesWidgetSettingValue = string|int|float|bool|null
  *
  * @method getPageId(): int
  * @method setPageId(int $value): void
@@ -35,8 +34,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setGridWidth(int $value): void
  * @method getGridHeight(): int
  * @method setGridHeight(int $value): void
- * @method getSettings(): ?string
- * @method setSettings(?string $value): void
+ * @method getSettings(): ?array
+ * @method setSettings(array $value): void
  */
 class Widget extends Entity implements \JsonSerializable {
 	protected ?int $pageId = null;
@@ -48,7 +47,7 @@ class Widget extends Entity implements \JsonSerializable {
 	protected ?int $gridY = null;
 	protected ?int $gridWidth = null;
 	protected ?int $gridHeight = null;
-	protected ?string $settings = null;
+	protected ?array $settings = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -57,29 +56,7 @@ class Widget extends Entity implements \JsonSerializable {
 		$this->addType('gridY', 'integer');
 		$this->addType('gridWidth', 'integer');
 		$this->addType('gridHeight', 'integer');
-	}
-
-	/**
-	 * @return array<string, TablesWidgetSettingValue>
-	 */
-	public function getSettingsArray(): array {
-		$settings = $this->getSettings();
-		if ($settings === null || $settings === '') {
-			return [];
-		}
-		$decoded = json_decode($settings, true);
-		/** @var array<string, TablesWidgetSettingValue> */
-		return is_array($decoded) ? $decoded : [];
-	}
-
-	/**
-	 * Stores the settings as one JSON object, `{}` when there are none.
-	 *
-	 * @param array<string, TablesWidgetSettingValue> $settings
-	 * @throws \JsonException
-	 */
-	public function setSettingsArray(array $settings): void {
-		$this->setSettings(json_encode((object)$settings, JSON_THROW_ON_ERROR));
+		$this->addType('settings', Types::JSON);
 	}
 
 	/**
@@ -87,7 +64,7 @@ class Widget extends Entity implements \JsonSerializable {
 	 * ordered by name: a JSON column does not keep the stored order on every database.
 	 */
 	public function getSettingsObject(): \stdClass {
-		$settings = $this->getSettingsArray();
+		$settings = $this->getSettings() ?? [];
 		ksort($settings);
 		return (object)$settings;
 	}

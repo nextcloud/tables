@@ -13,22 +13,14 @@ use OCA\Tables\Db\Widget;
 use PHPUnit\Framework\TestCase;
 
 class WidgetTest extends TestCase {
-	public static function storedSettings(): array {
-		return [
-			'an object, ordered by name' => ['{"text":"Projects","showTitle":false,"level":2}', '{"level":2,"showTitle":false,"text":"Projects"}'],
-			'no settings' => [null, '{}'],
-			'not an object' => ['"text"', '{}'],
-			'broken' => ['{broken', '{}'],
-		];
-	}
-
-	/**
-	 * @dataProvider storedSettings
-	 */
-	public function testSettingsSerialiseAsAJsonObject(?string $stored, string $serialised): void {
+	public function testSettingsSerialiseAsAJsonObjectAlsoWhenEmpty(): void {
 		$widget = new Widget();
-		$widget->setSettings($stored);
+		$this->assertSame('{}', json_encode($widget->jsonSerialize()['settings']));
 
-		$this->assertSame($serialised, json_encode($widget->jsonSerialize()['settings']));
+		$widget->setSettings([]);
+		$this->assertSame('{}', json_encode($widget->jsonSerialize()['settings']));
+
+		$widget->setSettings(['text' => 'Projects', 'showTitle' => false]);
+		$this->assertSame('{"showTitle":false,"text":"Projects"}', json_encode($widget->jsonSerialize()['settings']));
 	}
 }
