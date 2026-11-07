@@ -34,6 +34,7 @@ use OCP\IDBConnection;
  * Reads need access to the application, writes need manage permissions on it.
  *
  * @psalm-import-type TablesMenuItem from ResponseDefinitions
+ * @psalm-type TablesMenuExportItem = array{parent: ?int, title: ?string, displayTitle: string, icon: ?string, description: ?string, target: array{page: string}|array{table: string}|array{view: string}|array{url: string}|null}
  */
 class MenuService {
 	use TTransactional;
@@ -225,6 +226,179 @@ class MenuService {
 		}, $this->dbc);
 
 		return $this->findAll($contextId, $userId);
+	}
+
+	/**
+	 * The menu as an export carries it: a page by its technical name, a table or view by
+	 * uuid, and the group of an item by the group's position in the exported menu. Each
+	 * item keeps the title it shows, for a preview; an import reads only its own title.
+	 *
+	 * @return list<TablesMenuExportItem>
+	 * @throws Exception
+	 */
+	public function export(Context $context): array {
+		$menu = $this->serialize($context, $this->menuItemMapper->findByContextId($context->getId()));
+		$pages = $context->getPages() ?? [];
+		$nodes = $context->getNodes() ?? [];
+		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
+		foreach ($menu as $item) {
+			$node = isset($item['target']['nodeRelId']) ? $nodes[$item['target']['nodeRelId']] : null;
+			if ($node !== null) {
+				$nodeIds[$node['node_type']][] = $node['node_id'];
+			}
+		}
+		$nodesById = [
+			Application::NODE_TYPE_TABLE => $this->tableMapper->findMany($nodeIds[Application::NODE_TYPE_TABLE]),
+			Application::NODE_TYPE_VIEW => $this->viewMapper->findMany($nodeIds[Application::NODE_TYPE_VIEW]),
+		];
+		$positions = [];
+		$exported = [];
+		foreach ($menu as $item) {
+			$target = $item['target'];
+			if (isset($target['pageId'])) {
+				$target = ['page' => (string)$pages[$target['pageId']]['technical_name']];
+			} elseif (isset($target['nodeRelId'])) {
+				$node = $nodes[$target['nodeRelId']];
+				$entity = $nodesById[$node['node_type']][$node['node_id']] ?? null;
+				if ($entity === null) {
+					continue;
+				}
+				$target = [$node['node_type'] === Application::NODE_TYPE_TABLE ? 'table' : 'view' => (string)$entity->getUuid()];
+			}
+			$positions[$item['id']] = count($exported);
+			$exported[] = [
+				'parent' => $item['parentId'] === null ? null : ($positions[$item['parentId']] ?? null),
+				'title' => $item['title'],
+				'displayTitle' => $item['displayTitle'],
+				'icon' => $item['icon'],
+				'description' => $item['description'],
+				'target' => $target,
+			];
+		}
+		return $exported;
+	}
+
+	/**
+	 * Replaces the menu of an application with an exported one, as {@see self::readExported()}
+	 * reads it, and returns the items it skipped. Callers check permissions.
+	 *
+	 * @param list<mixed> $exported
+	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @return list<array{index: int, title: ?string, reason: string}>
+	 * @throws Exception
+	 */
+	public function import(Context $context, array $exported, \Closure $nodeRelIdOf): array {
+		['items' => $items, 'skipped' => $skipped] = $this->readExported($context, $exported, $nodeRelIdOf);
+
+		$this->atomic(function () use ($context, $items): void {
+			$this->menuItemMapper->deleteByContextId($context->getId());
+			$idsByIndex = [];
+			foreach ($items as $position => ['item' => $item, 'index' => $index, 'parent' => $parent]) {
+				$item->setOrder($position);
+				$item->setParentId($parent === null ? null : $idsByIndex[$parent]);
+				$idsByIndex[$index] = $this->menuItemMapper->insert($item)->getId();
+			}
+		}, $this->dbc);
+
+		return $skipped;
+	}
+
+	/**
+	 * Reads an exported menu for an application. Every item is checked like the API
+	 * checks it, and skipped, with the reason, when it fails, when its target did not
+	 * come along, or past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th item. A page is
+	 * found by its technical name, a table or view by `$nodeRelIdOf`, which gives the node
+	 * relation of the application for the kind (`table` or `view`) and uuid, or null.
+	 * An item sits in the group at the position it names when that group came before it
+	 * and was kept; otherwise it moves to the top.
+	 *
+	 * @param list<mixed> $exported
+	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @return array{items: list<array{item: MenuItem, entry: array<array-key, mixed>, index: int, parent: ?int}>, skipped: list<array{index: int, title: ?string, reason: string}>}
+	 */
+	public function readExported(Context $context, array $exported, \Closure $nodeRelIdOf): array {
+		$pageIds = [];
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			$pageIds[(string)$page['technical_name']] = (int)$pageId;
+		}
+
+		$items = [];
+		$skipped = [];
+		$groups = [];
+		foreach (array_values($exported) as $index => $entry) {
+			try {
+				if (!is_array($entry)) {
+					throw new BadRequestError('It is not an object.');
+				}
+				if (count($items) >= MenuItem::MAX_ITEMS_PER_APPLICATION) {
+					throw new BadRequestError('A menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items.');
+				}
+				$item = new MenuItem();
+				$item->setContextId($context->getId());
+				$item->setTitle($this->validateTitle(self::importedText($entry, 'title')));
+				$item->setIcon($this->validateIcon(self::importedText($entry, 'icon')));
+				$item->setDescription($this->validateDescription(self::importedText($entry, 'description')));
+				if (($entry['target'] ?? null) !== null) {
+					$item->setTarget($this->importedTarget($entry['target'], $pageIds, $nodeRelIdOf));
+				}
+				$this->assertValid($item);
+			} catch (BadRequestError $e) {
+				$skipped[] = ['index' => $index, 'title' => is_array($entry) ? self::importedTitle($entry) : null, 'reason' => $e->getMessage()];
+				continue;
+			}
+			$parent = $entry['parent'] ?? null;
+			$parent = !$item->isGroup() && is_int($parent) && isset($groups[$parent]) ? $parent : null;
+			if ($item->isGroup()) {
+				$groups[$index] = true;
+			}
+			$items[] = ['item' => $item, 'entry' => $entry, 'index' => $index, 'parent' => $parent];
+		}
+		return ['items' => $items, 'skipped' => $skipped];
+	}
+
+	/**
+	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @param array<string, int> $pageIds the pages of the application by technical name
+	 * @return array{pageId: int}|array{nodeRelId: int}|array{url: string}
+	 * @throws BadRequestError
+	 */
+	private function importedTarget(mixed $target, array $pageIds, \Closure $nodeRelIdOf): array {
+		if (is_array($target) && count($target) === 1) {
+			$kind = (string)array_key_first($target);
+			$value = $target[$kind];
+			if ($kind === 'url' && is_string($value)) {
+				return ['url' => $this->validateUrl($value)];
+			}
+			if ($kind === 'page' && is_string($value)) {
+				return isset($pageIds[$value]) ? ['pageId' => $pageIds[$value]] : throw new BadRequestError('The application has no page ' . $value . '.');
+			}
+			if (($kind === 'table' || $kind === 'view') && is_string($value)) {
+				return ['nodeRelId' => $nodeRelIdOf($kind, $value) ?? throw new BadRequestError('Its ' . $kind . ' ' . $value . ' is not part of the application.')];
+			}
+		}
+		throw new BadRequestError('Its target is not {page}, {table}, {view} or {url}.');
+	}
+
+	/**
+	 * A text field of an exported item, or null when it is left out.
+	 *
+	 * @param array<array-key, mixed> $entry
+	 * @throws BadRequestError
+	 */
+	private static function importedText(array $entry, string $field): ?string {
+		$value = $entry[$field] ?? null;
+		if ($value !== null && !is_string($value)) {
+			throw new BadRequestError('Its ' . $field . ' is not a text.');
+		}
+		return $value;
+	}
+
+	/**
+	 * @param array<array-key, mixed> $entry
+	 */
+	private static function importedTitle(array $entry): ?string {
+		$title = $entry['displayTitle'] ?? $entry['title'] ?? null;
+		return is_string($title) ? $title : null;
 	}
 
 	/**

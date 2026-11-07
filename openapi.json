@@ -13703,6 +13703,7 @@
             "post": {
                 "operationId": "context-preview-scheme-changes",
                 "summary": "[api v2] Preview the changes that would be applied to a context scheme",
+                "description": "When the scheme carries a `menu`, the changes hold `menu` with the current menu under `from`, the items an import would save under `to` and the items it would skip, with the reason, under `skipped`.",
                 "tags": [
                     "context"
                 ],
@@ -14057,6 +14058,18 @@
                                                 "items": {
                                                     "$ref": "#/components/schemas/Table"
                                                 }
+                                            }
+                                        }
+                                    },
+                                    "menu": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Menu of the scheme, replacing the menu of the context: pages by technical name, tables and views by uuid, the group of an item by its position in the list; items that cannot be used here are skipped. Left out, the menu stays as it is",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "object"
                                             }
                                         }
                                     }
