@@ -1068,6 +1068,74 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/ocs/v2.php/apps/tables/api/2/menu": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * [api v2] Get the menu of an application
+         * @description A flat list in display order; the items of a group carry its id as `parentId`. An application without items opens its start page. Readers who cannot manage the application do not get empty groups.
+         */
+        readonly get: operations["menu-index"];
+        readonly put?: never;
+        /**
+         * [api v2] Add an item to the end of the menu of an application
+         * @description The `target` is `{pageId}` of a page or `{nodeRelId}` of a table or view of the application, or `{url}` of an http or https link. Without a target the item is a group, which needs a title. Without a title an item shows the title of what it opens.
+         */
+        readonly post: operations["menu-create"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/menu/order": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /**
+         * [api v2] Save the order and grouping of the menu of an application
+         * @description `items` lists every item of the menu exactly once, in display order, as `{id, parentId}`; `parentId` is a group at the top level listed earlier, or null. Either all of it is saved or nothing.
+         */
+        readonly put: operations["menu-order"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/menu/{itemId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        readonly post?: never;
+        /**
+         * [api v2] Delete an item of a menu
+         * @description The items of a deleted group move to the top level.
+         */
+        readonly delete: operations["menu-destroy"];
+        readonly options?: never;
+        readonly head?: never;
+        /**
+         * [api v2] Change an item of a menu
+         * @description Fields left out keep their value; an empty title, icon or description removes it. A target replaces the previous one. Position and group change only through the order.
+         */
+        readonly patch: operations["menu-update"];
+        readonly trace?: never;
+    };
     readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/rows": {
         readonly parameters: {
             readonly query?: never;
@@ -1278,6 +1346,27 @@ export type components = {
         readonly LinkShare: {
             readonly shareToken: string;
             readonly url: string;
+        };
+        readonly MenuItem: {
+            /** Format: int64 */
+            readonly id: number;
+            /** Format: int64 */
+            readonly contextId: number;
+            /** Format: int64 */
+            readonly parentId: number | null;
+            readonly title: string | null;
+            readonly displayTitle: string;
+            readonly icon: string | null;
+            readonly description: string | null;
+            readonly target: ({
+                /** Format: int64 */
+                readonly pageId: number;
+            } | {
+                /** Format: int64 */
+                readonly nodeRelId: number;
+            } | {
+                readonly url: string;
+            }) | null;
         };
         readonly NotifyConfig: {
             readonly "notify-assigned": boolean;
@@ -8939,6 +9028,568 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "menu-index": {
+        readonly parameters: {
+            readonly query: {
+                /** @description ID of the application */
+                readonly contextId: number;
+            };
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Menu returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["MenuItem"][];
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Not found, also when the user has no access to the application */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "menu-create": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description ID of the application
+                     */
+                    readonly contextId: number;
+                    /**
+                     * @description Title of the item
+                     * @default null
+                     */
+                    readonly title?: string | null;
+                    /**
+                     * @description Name of the icon shown with the title
+                     * @default null
+                     */
+                    readonly icon?: string | null;
+                    /**
+                     * @description Description of the item
+                     * @default null
+                     */
+                    readonly description?: string | null;
+                    /**
+                     * @description What the item opens
+                     * @default null
+                     */
+                    readonly target?: {
+                        readonly [key: string]: Record<string, never>;
+                    } | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Item created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["MenuItem"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid field, a target outside the application, or a full menu */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "menu-order": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description ID of the application
+                     */
+                    readonly contextId: number;
+                    /** @description Every item of the menu */
+                    readonly items: readonly {
+                        /** Format: int64 */
+                        readonly id: number;
+                        /** Format: int64 */
+                        readonly parentId: number | null;
+                    }[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Menu saved */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["MenuItem"][];
+                        };
+                    };
+                };
+            };
+            /** @description An item missing or listed twice, a parent that is not a group, or the menu changed in between */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found, also for an item of another application */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "menu-destroy": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description ID of the item */
+                readonly itemId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Item deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["MenuItem"];
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "menu-update": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description ID of the item */
+                readonly itemId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description New title, empty to show the title of what the item opens
+                     * @default null
+                     */
+                    readonly title?: string | null;
+                    /**
+                     * @description New icon name, empty to remove it
+                     * @default null
+                     */
+                    readonly icon?: string | null;
+                    /**
+                     * @description New description, empty to remove it
+                     * @default null
+                     */
+                    readonly description?: string | null;
+                    /**
+                     * @description New target
+                     * @default null
+                     */
+                    readonly target?: {
+                        readonly [key: string]: Record<string, never>;
+                    } | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Item updated */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["MenuItem"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid field or a target outside the application */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };
