@@ -925,8 +925,7 @@
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
                 "source": "https://github.com/nextcloud-deps/ocp/tree/stable33"
             },
-            "time": "2026-10-29T03:21:51+00:00",
-            "published-time": "2026-10-29T03:21:58+00:00"
+            "time": "2026-10-29T03:21:51+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -1603,8 +1602,7 @@
                 "issues": "https://github.com/psalm/phar/issues",
                 "source": "https://github.com/psalm/phar/tree/6.20.1"
             },
-            "time": "2026-10-20T12:37:30+00:00",
-            "published-time": "2026-10-20T12:37:45+00:00"
+            "time": "2026-10-20T12:37:30+00:00"
         },
         {
             "name": "psr/clock",
@@ -2935,5 +2933,5 @@
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.11.0"
+    "plugin-api-version": "2.9.0"
 }
