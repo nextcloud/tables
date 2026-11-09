@@ -20,24 +20,24 @@ final class AddMissingIndicesListener implements IEventListener {
 	 * Indices on the values of cell tables that store them as text, by table. Oracle stores these
 	 * values as CLOB, which it cannot index, and MySQL indexes only a prefix of them.
 	 */
-	public const TEXT_VALUE_INDICES = [
+	private const TEXT_VALUE_INDICES = [
 		'tables_row_cells_selection' => 'tables_row_cells_selection_cv',
 		'tables_row_cells_datetime' => 'tables_row_cells_datetime_cv',
 		'tables_row_cells_usergroup' => 'tables_row_cells_usergroup_cv',
 	];
 
 	/**
-	 * Covers single selection option ids, dates and user, group and team ids entirely; a
-	 * multi-selection is indexed by its first option ids only.
+	 * Covers single selection option ids, dates and the ids of existing users, groups and teams
+	 * entirely; longer values, such as a multi-selection, are indexed by their prefix only.
 	 */
-	public const TEXT_VALUE_PREFIX_LENGTH = 64;
+	private const TEXT_VALUE_PREFIX_LENGTH = 64;
 
 	/**
 	 * Cell tables whose text values have no length limit: a multi-selection keeps all its option ids
 	 * in one value, and usergroup ids are not limited in length. PostgreSQL indexes the whole value
 	 * and rejects index entries above 2704 bytes, so these indices are left out there.
 	 */
-	public const UNBOUNDED_TEXT_VALUE_TABLES = ['tables_row_cells_selection', 'tables_row_cells_usergroup'];
+	private const UNBOUNDED_TEXT_VALUE_TABLES = ['tables_row_cells_selection', 'tables_row_cells_usergroup'];
 
 	public function __construct(
 		private readonly IDBConnection $connection,
