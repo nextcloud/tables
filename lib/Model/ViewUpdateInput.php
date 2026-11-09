@@ -18,7 +18,6 @@ use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\Server;
 use Psr\Log\LoggerInterface;
-use function json_encode;
 
 class ViewUpdateInput {
 	protected ?array $sort = null;
@@ -87,19 +86,23 @@ class ViewUpdateInput {
 	 * @param array $columnsMap
 	 */
 	public static function fromInputArray(array $data, array $columnsMap = []): self {
-		$data = self::transformJsonToArrayInPayload($data, ['columnSettings', 'filter', 'sort', 'viewSettings']);
+		$data = self::transformJsonToArrayInPayload($data, ['columns', 'columnSettings', 'filter', 'sort', 'viewSettings']);
 
 		if (isset($data['columns']) && !isset($data['columnSettings'])) {
 			$logger = Server::get(LoggerInterface::class);
 			$logger->info('The old columns format is deprecated. Please use the new format with columnId and order properties.', ['app' => Application::APP_ID]);
 
-			$value = [];
-			foreach ($data['columns'] as $order => $columnId) {
-				$value[] = new ViewColumnInformation($columnId, order: $order);
+			if (!is_array($data['columns'])) {
+				throw new \InvalidArgumentException('Invalid columns value.');
 			}
-			$value = json_encode($value);
 
-			$data['columnSettings'] = $value;
+			$data['columnSettings'] = [];
+			foreach (array_values($data['columns']) as $order => $columnId) {
+				$data['columnSettings'][] = [
+					ViewColumnInformation::KEY_ID => $columnId,
+					ViewColumnInformation::KEY_ORDER => $order,
+				];
+			}
 		}
 
 		$layout = self::normalizeLayout($data['layout'] ?? null);
