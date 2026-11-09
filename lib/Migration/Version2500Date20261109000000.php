@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace OCA\Tables\Migration;
 
 use Closure;
-use OCA\Tables\Db\Page;
-use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
@@ -27,7 +25,7 @@ use Override;
  * Every existing page gets a technical name: the start page of an application
  * `dashboard`, every other page `page_<id>`.
  */
-class Version2500Date20261022000000 extends SimpleMigrationStep {
+class Version2500Date20261109000000 extends SimpleMigrationStep {
 	private const PREFIX = 'tables_contexts_';
 	private const PAGE_TABLE = self::PREFIX . 'page';
 	private const PAGE_NAME_INDEX = 'tables_ctx_page_name_uq';
@@ -64,8 +62,12 @@ class Version2500Date20261022000000 extends SimpleMigrationStep {
 		if (!$table->hasColumn('description')) {
 			$table->addColumn('description', Types::TEXT, ['notnull' => false]);
 		}
+		// raised by every save, so a save based on an older version is refused
+		if (!$table->hasColumn('version')) {
+			$table->addColumn('version', Types::INTEGER, ['notnull' => true, 'default' => 0]);
+		}
 		if (!$table->hasColumn('technical_name')) {
-			$table->addColumn('technical_name', Types::STRING, ['notnull' => false, 'length' => TechnicalNameValidator::MAX_LENGTH]);
+			$table->addColumn('technical_name', Types::STRING, ['notnull' => false, 'length' => 200]);
 		}
 		// Also serves lookups by context_id. Safe while existing pages have no name yet:
 		// pgsql, mysql and sqlite, the databases Tables supports, treat NULLs in a unique
@@ -134,7 +136,7 @@ class Version2500Date20261022000000 extends SimpleMigrationStep {
 				continue;
 			}
 			$contextId = (int)$row['context_id'];
-			$technicalName = $row['page_type'] === Page::TYPE_STARTPAGE && !isset($taken[$contextId][self::START_PAGE_NAME])
+			$technicalName = $row['page_type'] === 'startpage' && !isset($taken[$contextId][self::START_PAGE_NAME])
 				? self::START_PAGE_NAME
 				: 'page_' . (int)$row['id'];
 			$taken[$contextId][$technicalName] = true;

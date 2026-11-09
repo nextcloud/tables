@@ -20,7 +20,6 @@ if ($envMode !== 'local') {
 require_once __DIR__ . '/../../../../tests/autoload.php';
 
 require_once __DIR__ . '/Database/DatabaseTestCase.php';
-require_once __DIR__ . '/Database/DbErrorStub.php';
 
 require_once __DIR__ . '/Db/Row2MapperTestDependencies.php';
 

@@ -680,37 +680,74 @@ class ContextService {
 
 		// insert pages
 		$pageMap = [];
-		if (!empty($context['pages'])) {
-			$pages = $this->importablePages($context['pages']);
-			$technicalNames = $this->importedPageNames($pages);
-			foreach ($pages as $pageKey => $pageArr) {
-				$page = new Page();
-				$page->setContextId($newContext->getId());
-				$page->setPageType($pageArr['page_type'] ?? '');
-				if ($technicalNames[$pageKey] === null) {
-					$page = $this->pageMapper->insertWithDefaultName($page);
-				} else {
-					$page->setTechnicalName($technicalNames[$pageKey]);
-					$page = $this->pageMapper->insert($page);
-				}
-				$pageMap[$pageArr['id'] ?? null] = $page;
+		$pages = $this->importablePages(is_array($context['pages'] ?? null) ? $context['pages'] : []);
+		$technicalNames = $this->importedPageNames($pages);
+		$hasStartPage = false;
+		foreach ($pages as $pageKey => $pageArr) {
+			$page = new Page();
+			$page->setContextId($newContext->getId());
+			$page->setPageType($pageArr['page_type'] ?? '');
+			if ($technicalNames[$pageKey] === null) {
+				$page = $this->pageMapper->insertWithDefaultName($page);
+			} else {
+				$page->setTechnicalName($technicalNames[$pageKey]);
+				$page = $this->pageMapper->insert($page);
+			}
+			$hasStartPage = $hasStartPage || $page->getPageType() === Page::TYPE_STARTPAGE;
+			if ($page->getPageType() === Page::TYPE_GRID && trim((string)$page->getTitle()) === '') {
+				// a grid page is named by its title, so it never stays without one
+				$page->resetUpdatedFields();
+				$page->setTitle((string)$page->getTechnicalName());
+				$page = $this->pageMapper->update($page);
+			}
+			$pageMap[$pageArr['id'] ?? null] = $page;
 
-				// insert page conten
-				if (!empty($pageArr['content'])) {
-					foreach ($pageArr['content'] as $contentArr) {
-						$pageContent = new PageContent();
-						$pageContent->setPageId($page->getId());
-						$oldNodeRelId = $contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null;
-						$newNodeRel = $nodeRelMap[$oldNodeRelId] ?? null;
-						$pageContent->setNodeRelId($newNodeRel ? $newNodeRel->getId() : null);
-						$pageContent->setOrder($contentArr['order'] ?? 100);
-						$this->pageContentMapper->insert($pageContent);
-					}
+			// insert page conten
+			if (!empty($pageArr['content'])) {
+				foreach ($pageArr['content'] as $contentArr) {
+					$pageContent = new PageContent();
+					$pageContent->setPageId($page->getId());
+					$oldNodeRelId = $contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null;
+					$newNodeRel = $nodeRelMap[$oldNodeRelId] ?? null;
+					$pageContent->setNodeRelId($newNodeRel ? $newNodeRel->getId() : null);
+					$pageContent->setOrder($contentArr['order'] ?? 100);
+					$this->pageContentMapper->insert($pageContent);
 				}
 			}
 		}
 
+		if (!$hasStartPage) {
+			$this->logger->warning('An imported application had no start page; it gets a new one.');
+			$this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_NAME, $technicalNames, true), array_values($nodeRelMap));
+		}
+
 		return $newContext;
+	}
+
+	/**
+	 * A start page for an imported application that came without one, holding all of its
+	 * tables and views. It is named `dashboard` unless an imported page took that name.
+	 *
+	 * @param list<ContextNodeRelation> $nodeRelations
+	 * @throws Exception
+	 */
+	private function insertImportedStartPage(int $contextId, bool $startPageNameTaken, array $nodeRelations): void {
+		$page = new Page();
+		$page->setContextId($contextId);
+		$page->setPageType(Page::TYPE_STARTPAGE);
+		if ($startPageNameTaken) {
+			$page = $this->pageMapper->insertWithDefaultName($page);
+		} else {
+			$page->setTechnicalName(Page::START_PAGE_NAME);
+			$page = $this->pageMapper->insert($page);
+		}
+		foreach ($nodeRelations as $i => $nodeRelation) {
+			$pageContent = new PageContent();
+			$pageContent->setPageId($page->getId());
+			$pageContent->setNodeRelId($nodeRelation->getId());
+			$pageContent->setOrder(10 * ($i + 1));
+			$this->pageContentMapper->insert($pageContent);
+		}
 	}
 
 	/**

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\AppFramework\Db\Entity;
 
 /**
@@ -23,6 +24,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setIcon(?string $value): void
  * @method getDescription(): ?string
  * @method setDescription(?string $value): void
+ * @method getVersion(): int
+ * @method setVersion(int $value): void
  */
 class Page extends Entity implements \JsonSerializable {
 	public const TYPE_STARTPAGE = 'startpage';
@@ -36,17 +39,18 @@ class Page extends Entity implements \JsonSerializable {
 	protected ?string $title = null;
 	protected ?string $icon = null;
 	protected ?string $description = null;
+	protected ?int $version = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('version', 'integer');
 	}
 
 	/**
-	 * Whether a technical name has the form of the automatic `page_<id>`. Such names are
-	 * reserved, so a given name never collides with the name a later page gets.
+	 * Whether a technical name has the reserved form of the automatic `page_<id>`.
 	 */
 	public static function isDefaultName(string $technicalName): bool {
-		return preg_match('/^' . self::DEFAULT_NAME_PREFIX . '[0-9]+$/', $technicalName) === 1;
+		return TechnicalNameValidator::isDefaultName($technicalName, self::DEFAULT_NAME_PREFIX);
 	}
 
 	public function jsonSerialize(): array {
