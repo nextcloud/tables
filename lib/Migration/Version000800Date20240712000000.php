@@ -19,7 +19,8 @@ use OCP\Migration\SimpleMigrationStep;
 class Version000800Date20240712000000 extends SimpleMigrationStep {
 	/**
 	 * As AddMissingIndicesListener adds it to existing installations. Text values cannot be indexed
-	 * on Oracle, and only by prefix on MySQL.
+	 * on Oracle, and only by prefix on MySQL. Usergroup ids are not limited in length, and PostgreSQL
+	 * indexes the whole value and rejects index entries above 2704 bytes, so it is left out there.
 	 */
 	private const VALUE_INDEX = 'tables_row_cells_usergroup_cv';
 	private const TEXT_VALUE_PREFIX_LENGTH = 64;
@@ -53,7 +54,8 @@ class Version000800Date20240712000000 extends SimpleMigrationStep {
 			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
 			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);
 			$table->addIndex(['column_id', 'row_id']);
-			if ($this->connection->getDatabaseProvider() !== IDBConnection::PLATFORM_ORACLE) {
+			$platform = $this->connection->getDatabaseProvider();
+			if ($platform !== IDBConnection::PLATFORM_ORACLE && $platform !== IDBConnection::PLATFORM_POSTGRES) {
 				$table->addIndex(['column_id', 'value'], self::VALUE_INDEX, [], ['lengths' => [null, self::TEXT_VALUE_PREFIX_LENGTH]]);
 			}
 			$table->setPrimaryKey(['id']);

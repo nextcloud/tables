@@ -16,57 +16,45 @@ use PHPUnit\Framework\TestCase;
 
 class AddMissingIndicesListenerTest extends TestCase {
 	/**
-	 * @return array<string, array{string}>
+	 * @return array<string, array{string, array<string, array{tableName: string, columns: string[], options: array}>}>
 	 */
-	public static function platformsWithTextIndicesProvider(): array {
+	public static function valueIndicesPerPlatformProvider(): array {
+		$number = ['tableName' => 'tables_row_cells_number', 'columns' => ['column_id', 'value'], 'options' => []];
+		$datetime = ['tableName' => 'tables_row_cells_datetime', 'columns' => ['column_id', 'value'], 'options' => ['lengths' => [null, 64]]];
+		$selection = ['tableName' => 'tables_row_cells_selection', 'columns' => ['column_id', 'value'], 'options' => ['lengths' => [null, 64]]];
+		$usergroup = ['tableName' => 'tables_row_cells_usergroup', 'columns' => ['column_id', 'value'], 'options' => ['lengths' => [null, 64]]];
+		$allFour = [
+			'tables_row_cells_datetime_cv' => $datetime,
+			'tables_row_cells_number_cv' => $number,
+			'tables_row_cells_selection_cv' => $selection,
+			'tables_row_cells_usergroup_cv' => $usergroup,
+		];
+
 		return [
-			'MySQL' => [IDBConnection::PLATFORM_MYSQL],
-			'PostgreSQL' => [IDBConnection::PLATFORM_POSTGRES],
-			'SQLite' => [IDBConnection::PLATFORM_SQLITE],
+			'MySQL' => [IDBConnection::PLATFORM_MYSQL, $allFour],
+			'SQLite' => [IDBConnection::PLATFORM_SQLITE, $allFour],
+			'PostgreSQL' => [IDBConnection::PLATFORM_POSTGRES, [
+				'tables_row_cells_datetime_cv' => $datetime,
+				'tables_row_cells_number_cv' => $number,
+			]],
+			'Oracle' => [IDBConnection::PLATFORM_ORACLE, [
+				'tables_row_cells_number_cv' => $number,
+			]],
 		];
 	}
 
 	/**
-	 * @dataProvider platformsWithTextIndicesProvider
+	 * @dataProvider valueIndicesPerPlatformProvider
+	 * @param array<string, array{tableName: string, columns: string[], options: array}> $expected
 	 */
-	public function testIndexesTheValuesOfEveryCellTableButText(string $platform): void {
-		$indices = $this->missingIndicesOn($platform);
-
-		$this->assertSame('tables_row_cells_number', $indices['tables_row_cells_number_cv']['tableName']);
-		$this->assertSame(['column_id', 'value'], $indices['tables_row_cells_number_cv']['columns']);
-		$this->assertSame([], $indices['tables_row_cells_number_cv']['options']);
-		foreach (AddMissingIndicesListener::TEXT_VALUE_INDICES as $tableName => $indexName) {
-			if ($platform === IDBConnection::PLATFORM_POSTGRES && in_array($tableName, AddMissingIndicesListener::UNBOUNDED_TEXT_VALUE_TABLES, true)) {
-				continue;
-			}
-			$this->assertSame($tableName, $indices[$indexName]['tableName']);
-			$this->assertSame(['column_id', 'value'], $indices[$indexName]['columns']);
-			$this->assertSame(['lengths' => [null, AddMissingIndicesListener::TEXT_VALUE_PREFIX_LENGTH]], $indices[$indexName]['options']);
-		}
-		$this->assertNotContains('tables_row_cells_text', array_column($indices, 'tableName'));
-	}
-
-	public function testLeavesOutTheSelectionValueIndexOnPostgreSql(): void {
-		$indices = $this->missingIndicesOn(IDBConnection::PLATFORM_POSTGRES);
-
-		$this->assertArrayNotHasKey('tables_row_cells_selection_cv', $indices);
-		$this->assertArrayHasKey('tables_row_cells_datetime_cv', $indices);
-		$this->assertArrayHasKey('tables_row_cells_usergroup_cv', $indices);
-	}
-
-	public function testLeavesOutTheTextValueIndicesOnOracle(): void {
-		$indices = $this->missingIndicesOn(IDBConnection::PLATFORM_ORACLE);
-
-		$this->assertArrayHasKey('tables_row_cells_number_cv', $indices);
-		foreach (AddMissingIndicesListener::TEXT_VALUE_INDICES as $indexName) {
-			$this->assertArrayNotHasKey($indexName, $indices);
-		}
+	public function testAddsExactlyTheValueIndicesOfThePlatform(string $platform, array $expected): void {
+		$this->assertSame($expected, $this->valueIndicesOn($platform));
 	}
 
 	/**
 	 * @return array<string, array{tableName: string, columns: string[], options: array}>
 	 */
-	private function missingIndicesOn(string $platform): array {
+	private function valueIndicesOn(string $platform): array {
 		$connection = $this->createMock(IDBConnection::class);
 		$connection->method('getDatabaseProvider')->willReturn($platform);
 		$event = new AddMissingIndicesEvent();
@@ -75,8 +63,11 @@ class AddMissingIndicesListenerTest extends TestCase {
 
 		$indices = [];
 		foreach ($event->getMissingIndices() as $index) {
-			$indices[$index['indexName']] = ['tableName' => $index['tableName'], 'columns' => $index['columns'], 'options' => $index['options']];
+			if (str_ends_with($index['indexName'], '_cv')) {
+				$indices[$index['indexName']] = ['tableName' => $index['tableName'], 'columns' => $index['columns'], 'options' => $index['options']];
+			}
 		}
+		ksort($indices);
 		return $indices;
 	}
 }
