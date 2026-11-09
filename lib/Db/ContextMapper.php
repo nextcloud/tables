@@ -58,7 +58,7 @@ class ContextMapper extends QBMapper {
 			));
 		}
 
-		// only the start page: other pages are loaded by withOtherPages()
+		// only the start page; findById() and findAll() add the others with withOtherPages()
 		$qb->leftJoin('c', 'tables_contexts_page', 'p', $qb->expr()->andX(
 			$qb->expr()->eq('c.id', 'p.context_id'),
 			$qb->expr()->eq('p.page_type', $qb->createNamedParameter(Page::TYPE_STARTPAGE)),
@@ -154,14 +154,18 @@ class ContextMapper extends QBMapper {
 	}
 
 	/**
+	 * @param bool $withAllPages false loads the start page only, for callers that read no other page
 	 * @return Context[]
 	 * @throws Exception
 	 */
-	public function findAll(?string $userId = null): array {
+	public function findAll(?string $userId = null, bool $withAllPages = true): array {
 		$qb = $this->getFindContextBaseQuery($userId);
 
 		$result = $qb->executeQuery();
-		$r = $this->withOtherPages($result->fetchAllAssociative());
+		$r = $result->fetchAllAssociative();
+		if ($withAllPages) {
+			$r = $this->withOtherPages($r);
+		}
 
 		$contextIds = [];
 		foreach ($r as $row) {
@@ -235,15 +239,19 @@ class ContextMapper extends QBMapper {
 	}
 
 	/**
+	 * @param bool $withAllPages false loads the start page only, for callers that read no other page
 	 * @throws Exception
 	 * @throws NotFoundError
 	 */
-	public function findById(int $contextId, ?string $userId = null): Context {
+	public function findById(int $contextId, ?string $userId = null, bool $withAllPages = true): Context {
 		$qb = $this->getFindContextBaseQuery($userId);
 		$qb->andWhere($qb->expr()->eq('c.id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
 
 		$result = $qb->executeQuery();
-		$r = $this->withOtherPages($result->fetchAllAssociative());
+		$r = $result->fetchAllAssociative();
+		if ($withAllPages) {
+			$r = $this->withOtherPages($r);
+		}
 
 		if (empty($r)) {
 			throw new NotFoundError('Context does not exist');
@@ -327,25 +335,28 @@ class ContextMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id', 'context_id', 'page_type', 'technical_name', 'title', 'icon', 'description')
 			->from('tables_contexts_page')
-			->where($qb->expr()->in('context_id', $qb->createNamedParameter($contextIds, IQueryBuilder::PARAM_INT_ARRAY)))
+			->where($qb->expr()->in('context_id', $qb->createParameter('contextIds')))
 			->andWhere($qb->expr()->neq('page_type', $qb->createNamedParameter(Page::TYPE_STARTPAGE)))
 			->orderBy('id');
-		$result = $qb->executeQuery();
-		while ($page = $result->fetchAssociative()) {
-			$rows[] = [
-				'id' => $page['context_id'],
-				'share_id' => null,
-				'node_rel_id' => null,
-				'content_id' => null,
-				'page_id' => $page['id'],
-				'page_type' => $page['page_type'],
-				'page_technical_name' => $page['technical_name'],
-				'page_title' => $page['title'],
-				'page_icon' => $page['icon'],
-				'page_description' => $page['description'],
-			];
+		foreach (array_chunk($contextIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('contextIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$result = $qb->executeQuery();
+			while ($page = $result->fetchAssociative()) {
+				$rows[] = [
+					'id' => $page['context_id'],
+					'share_id' => null,
+					'node_rel_id' => null,
+					'content_id' => null,
+					'page_id' => $page['id'],
+					'page_type' => $page['page_type'],
+					'page_technical_name' => $page['technical_name'],
+					'page_title' => $page['title'],
+					'page_icon' => $page['icon'],
+					'page_description' => $page['description'],
+				];
+			}
+			$result->closeCursor();
 		}
-		$result->closeCursor();
 		return $rows;
 	}
 

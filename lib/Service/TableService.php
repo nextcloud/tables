@@ -128,7 +128,7 @@ class TableService extends SuperService {
 			}
 		}
 
-		$contexts = $this->contextService->findAll($userId);
+		$contexts = $this->contextService->findAll($userId, false);
 		foreach ($contexts as $context) {
 			$nodes = $context->getNodes();
 			foreach ($nodes as $node) {

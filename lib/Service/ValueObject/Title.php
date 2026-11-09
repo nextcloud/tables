@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service\ValueObject;
 
+use OCA\Tables\Helper\TextHelper;
 use Stringable;
 
 class Title implements Stringable {
@@ -31,7 +32,6 @@ class Title implements Stringable {
 	}
 
 	private function normalize(string $title): string {
-		$normalizedTitle = preg_replace('/^[\s\p{Z}]+|[\s\p{Z}]+$/u', '', $title);
-		return $normalizedTitle ?? trim($title);
+		return TextHelper::trim($title);
 	}
 }

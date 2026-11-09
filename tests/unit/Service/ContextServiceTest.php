@@ -22,6 +22,8 @@ use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -35,6 +37,7 @@ use Psr\Log\LoggerInterface;
 final class ContextServiceTest extends TestCase {
 	private ContextService $service;
 	private MockObject $contextMapper;
+	private MockObject $permissionsService;
 	private MockObject $contextNodeRelMapper;
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
@@ -51,7 +54,7 @@ final class ContextServiceTest extends TestCase {
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
-		$permissionsService = $this->createMock(PermissionsService::class);
+		$this->permissionsService = $permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$this->dbConnection = $this->createMock(IDBConnection::class);
@@ -224,6 +227,21 @@ final class ContextServiceTest extends TestCase {
 		$this->service->update(7, 'user-1', null, null, null, []);
 	}
 
+	public function testAnUpdateRefusedForAnAddedNodeRemovesNothing(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1]]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->permissionsService->method('canManageNodeById')->willReturn(false);
+		$this->widgetService->expects($this->never())->method('deleteSourcesByNodeRelIds');
+		$this->contextNodeRelMapper->expects($this->never())->method('delete');
+		$this->contextMapper->expects($this->never())->method('update');
+
+		$this->expectException(PermissionError::class);
+		$this->service->update(7, 'user-1', 'Renamed', null, null, [['id' => 12, 'type' => 0, 'permissions' => 1]]);
+	}
+
 	public function testUpdateLogsNodePermissionChanges(): void {
 		$context = new Context();
 		$context->id = 7;
@@ -350,9 +368,9 @@ final class ContextServiceTest extends TestCase {
 		});
 
 		$inserted = [];
-		$this->widgetService->method('insert')->willReturnCallback(function (...$args) use (&$inserted) {
-			$inserted[] = $args;
-			return new \OCA\Tables\Db\Widget();
+		$this->widgetService->method('insertAll')->willReturnCallback(function (int $pageId, array $widgets) use (&$inserted): array {
+			$inserted = [...$inserted, ...self::widgetArgs($pageId, $widgets)];
+			return [];
 		});
 
 		$this->service->importContext($table, [
@@ -528,11 +546,22 @@ final class ContextServiceTest extends TestCase {
 			$record['pages'] = [...$record['pages'], $page];
 			return $page;
 		});
-		$this->widgetService->method('insert')->willReturnCallback(static function (...$args) use ($record): \OCA\Tables\Db\Widget {
-			$record['widgets'] = [...$record['widgets'], $args];
-			return new \OCA\Tables\Db\Widget();
+		$this->widgetService->method('insertAll')->willReturnCallback(static function (int $pageId, array $widgets) use ($record): array {
+			$record['widgets'] = [...$record['widgets'], ...self::widgetArgs($pageId, $widgets)];
+			return [];
 		});
 		return $record;
+	}
+
+	/**
+	 * The widgets handed to insertAll(), each as page id, type, title, position, settings,
+	 * source, icon and description.
+	 *
+	 * @param list<WidgetInput> $widgets
+	 * @return list<list<mixed>>
+	 */
+	private static function widgetArgs(int $pageId, array $widgets): array {
+		return array_map(static fn (WidgetInput $w): array => [$pageId, $w->type, $w->title, ['gridX' => $w->gridX, 'gridY' => $w->gridY, 'gridWidth' => $w->gridWidth, 'gridHeight' => $w->gridHeight], $w->settings, $w->nodeRelId, $w->icon, $w->description], $widgets);
 	}
 
 	/**

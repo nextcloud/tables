@@ -24,6 +24,7 @@ use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PermissionsService;
@@ -88,11 +89,9 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 	}
 
 	protected function tearDown(): void {
-		foreach ($this->contextIds as $contextId) {
-			try {
-				$this->service->delete($contextId, self::OWNER);
-			} catch (\Throwable) {
-			}
+		// every application of the test owner, also one an import left behind when it failed
+		foreach ($this->contextMapper->findAll(self::OWNER) as $context) {
+			$this->service->delete($context->getId(), self::OWNER);
 		}
 		parent::tearDown();
 	}
@@ -191,8 +190,10 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$page->setDescription('At a glance');
 		$page = $this->pageMapper->insert($page);
 
-		$this->widgetService->insert($page->getId(), 'header', 'Welcome', ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2], ['heading' => 'Projects', 'subheading' => '', 'textAlign' => 'center', 'backgroundColor' => '#123456', 'textColor' => ''], null, 'home', 'Where to start');
-		$this->widgetService->insert($page->getId(), 'data', null, ['gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5], [], $relation->getId());
+		$this->widgetService->insertAll($page->getId(), [
+			new WidgetInput(null, 'header', 'Welcome', 'home', 'Where to start', 0, 0, 12, 2, ['heading' => 'Projects', 'subheading' => '', 'textAlign' => 'center', 'backgroundColor' => '#123456', 'textColor' => ''], null),
+			new WidgetInput(null, 'data', null, null, null, 0, 2, 12, 5, [], $relation->getId()),
+		]);
 
 		return [$context, $relation, $page->getId()];
 	}

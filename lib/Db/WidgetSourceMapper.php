@@ -74,15 +74,59 @@ class WidgetSourceMapper extends QBMapper {
 			->from('tables_contexts_rel_context_node', 'r')
 			->innerJoin('r', 'tables_contexts_page', 'p', $qb->expr()->eq('p.context_id', 'r.context_id'))
 			->where($qb->expr()->eq('p.id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)))
-			->andWhere($qb->expr()->in('r.id', $qb->createNamedParameter($nodeRelIds, IQueryBuilder::PARAM_INT_ARRAY)));
+			->andWhere($qb->expr()->in('r.id', $qb->createParameter('ids')))
+			->orderBy('r.id')
+			->forUpdate();
 
-		$result = $qb->executeQuery();
 		$ids = [];
-		while ($row = $result->fetchAssociative()) {
-			$ids[] = (int)$row['id'];
+		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$result = $qb->executeQuery();
+			while ($row = $result->fetchAssociative()) {
+				$ids[] = (int)$row['id'];
+			}
+			$result->closeCursor();
 		}
-		$result->closeCursor();
 		return $ids;
+	}
+
+	/**
+	 * Points a new widget, which has no source yet, at a node relation.
+	 *
+	 * @throws Exception
+	 */
+	public function insertSource(int $widgetId, int $nodeRelId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->insert($this->table)
+			->values([
+				'widget_id' => $qb->createNamedParameter($widgetId, IQueryBuilder::PARAM_INT),
+				'node_rel_id' => $qb->createNamedParameter($nodeRelId, IQueryBuilder::PARAM_INT),
+			])
+			->executeStatement();
+	}
+
+	/**
+	 * Locks node relations until the transaction ends. A path that removes relations
+	 * locks them before it deletes their sources, the way {@see self::filterNodeRelIdsOfPageContext()}
+	 * locks the ones a save points widgets at, so the two never interleave.
+	 *
+	 * @param int[] $nodeRelIds
+	 * @throws Exception
+	 */
+	public function lockNodeRelations(array $nodeRelIds): void {
+		if ($nodeRelIds === []) {
+			return;
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from('tables_contexts_rel_context_node')
+			->where($qb->expr()->in('id', $qb->createParameter('ids')))
+			->orderBy('id')
+			->forUpdate();
+		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$qb->executeQuery()->closeCursor();
+		}
 	}
 
 	/**

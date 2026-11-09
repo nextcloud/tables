@@ -40,11 +40,17 @@ class GridWidgetTypesTest extends TestCase {
 		$this->assertSame(['text' => $text], $this->types->sanitizeSettings('text', ['text' => $text]));
 	}
 
+	public function testTheSettingsLimitCountsNonLatinTextAsWritten(): void {
+		$text = str_repeat('я', 10000) . '/';
+		$this->assertSame(['text' => $text], $this->types->sanitizeSettings('text', ['text' => $text]));
+	}
+
 	public static function invalidSettings(): array {
 		return [
 			'unknown type' => ['chart', [], 'Unknown widget type "chart"'],
 			'settings not an object' => ['text', 'x', 'settings of a text widget must be an object'],
 			'required heading missing' => ['header', ['heading' => '  '], 'header.heading is required'],
+			'required heading of a no-break space' => ['header', ['heading' => "\u{00A0}\u{200B}"], 'header.heading is required'],
 			'text not a string' => ['text', ['text' => 3], 'text.text must be a string'],
 			'color not hex' => ['header', ['heading' => 'A', 'textColor' => 'red'], 'header.textColor must be a hex color'],
 			'color of four digits' => ['header', ['heading' => 'A', 'textColor' => '#abcd'], 'header.textColor must be a hex color'],
@@ -98,6 +104,7 @@ class GridWidgetTypesTest extends TestCase {
 			'title trimmed' => ['validateTitle', '  Notes ', 'Notes'],
 			'title of the maximum length' => ['validateTitle', str_repeat('a', 200), str_repeat('a', 200)],
 			'empty title' => ['validateTitle', '  ', null],
+			'title of invisible spaces' => ['validateTitle', "\u{00A0}\u{3000}\u{200B}", null],
 			'no title' => ['validateTitle', null, null],
 			'title too long' => ['validateTitle', str_repeat('a', 201), 'The title of widget 2'],
 			'title not text' => ['validateTitle', 5, 'The title of widget 2'],
@@ -120,5 +127,39 @@ class GridWidgetTypesTest extends TestCase {
 			$this->expectExceptionMessage($expected);
 		}
 		$this->assertSame($expected, $this->types->$method(2, $text));
+	}
+
+	public function testAWidgetIsReadWithEveryField(): void {
+		$widget = $this->types->readWidget(0, [
+			'id' => 31, 'type' => 'data', 'title' => ' Tasks ', 'icon' => 'star', 'description' => 'Open',
+			'gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => ['unknown' => 1], 'source' => ['nodeRelId' => 7],
+		]);
+
+		$this->assertSame([31, 'data', 'Tasks', 'star', 'Open', 0, 2, 12, 5, [], 7], [
+			$widget->id, $widget->type, $widget->title, $widget->icon, $widget->description,
+			$widget->gridX, $widget->gridY, $widget->gridWidth, $widget->gridHeight, $widget->settings, $widget->nodeRelId,
+		]);
+	}
+
+	public static function unreadableWidgets(): array {
+		$widget = ['type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2];
+		return [
+			'not an object' => ['text', 'Widget 1 must be an object'],
+			'no type' => [['gridX' => 0], 'Widget 1 needs a type'],
+			'unknown type' => [['type' => 'chart'] + $widget, 'Unknown widget type'],
+			'id not a number' => [['id' => '3'] + $widget, 'The id of widget 1 must be a number'],
+			'unknown icon' => [['icon' => 'no-such-icon'] + $widget, 'The icon of widget 1'],
+			'source on a type without one' => [['source' => ['nodeRelId' => 7]] + $widget, 'Widget 1 is a text widget'],
+			'source without a number' => [['type' => 'data', 'source' => ['nodeRelId' => '7']] + $widget, 'The source of widget 1'],
+		];
+	}
+
+	/**
+	 * @dataProvider unreadableWidgets
+	 */
+	public function testAWidgetThatBreaksARuleIsRefused(mixed $widget, string $message): void {
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage($message);
+		$this->types->readWidget(1, $widget);
 	}
 }
