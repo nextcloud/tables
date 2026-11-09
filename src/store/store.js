@@ -578,7 +578,11 @@ export const useTablesStore = defineStore('store', {
 			try {
 				page = (await axios.patch(generateOcsUrl('/apps/tables/api/2/contexts/{contextId}/pages/{pageId}', { contextId, pageId }), data)).data.ocs.data
 			} catch (e) {
-				displayError(e, t('tables', 'Could not save the page.'))
+				if (e.response?.status === 409) {
+					showError(t('tables', 'Someone else saved this page in the meantime. Reload it to see their changes, then make yours again.'))
+				} else {
+					displayError(e, t('tables', 'Could not save the page.'))
+				}
 				return null
 			}
 			await this.reloadContextQuietly(contextId)
