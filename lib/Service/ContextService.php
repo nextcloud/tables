@@ -36,6 +36,7 @@ use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -1274,7 +1275,7 @@ class ContextService {
 	 *
 	 * @param list<mixed> $schemePages
 	 * @param array<string, ?int> $nodes the nodes of the application after the import, by node type and uuid (`<type>:<uuid>`), with their id when it is known
-	 * @return array{pages: list<array{entry: array<array-key, mixed>, exportedId: ?int, pageId: ?int, technicalName: ?string, isGrid: bool, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: array{type: string, hasSource: bool, title: ?string, icon: ?string, description: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, mixed>, source: mixed}, source: ?array{0: int, 1: ?int}}>}>, skipped: list<array{pageIndex: int, page: mixed, widgetIndex: ?int, widget: mixed, reason: string}>}
+	 * @return array{pages: list<array{entry: array<array-key, mixed>, exportedId: ?int, pageId: ?int, technicalName: ?string, isGrid: bool, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>}>, skipped: list<array{pageIndex: int, page: mixed, widgetIndex: ?int, widget: mixed, reason: string}>}
 	 */
 	private function resolveSchemePages(Context $context, array $schemePages, array $nodes): array {
 		$startPageId = null;
@@ -1384,7 +1385,7 @@ class ContextService {
 	 * takes the title, icon and description of the scheme, and the widgets of a grid page
 	 * replace its widgets. A new page without a free technical name gets the default name.
 	 *
-	 * @param list<array{exportedId: ?int, pageId: ?int, technicalName: ?string, isGrid: bool, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: array{type: string, hasSource: bool, title: ?string, icon: ?string, description: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, mixed>, source: mixed}, source: ?array{0: int, 1: ?int}}>, ...<array-key, mixed>}> $pages
+	 * @param list<array{exportedId: ?int, pageId: ?int, technicalName: ?string, isGrid: bool, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>, ...<array-key, mixed>}> $pages
 	 * @return array<int, int> ids of the pages by the id the scheme gives them
 	 * @throws DoesNotExistException
 	 * @throws Exception

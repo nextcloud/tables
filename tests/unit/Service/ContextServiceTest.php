@@ -688,8 +688,9 @@ final class ContextServiceTest extends TestCase {
 			return $page;
 		});
 		$synced = [];
-		$this->widgetService->method('syncPage')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced): void {
-			$synced[$pageId] = array_map(static fn (array $widget): array => [$widget['type'], $widget['title'], $widget['nodeRelId']], $widgets);
+		$this->widgetService->method('syncPage')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced): array {
+			$synced[$pageId] = array_map(static fn (WidgetInput $widget): array => [$widget->type, $widget->title, $widget->nodeRelId], $widgets);
+			return [];
 		});
 		$warnings = [];
 		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {

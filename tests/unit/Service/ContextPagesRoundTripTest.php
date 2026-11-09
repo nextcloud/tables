@@ -226,9 +226,11 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->contextIds[] = $source->getId();
 		$relationIds = array_column($this->contextMapper->findById($source->getId(), self::OWNER)->getNodes(), 'id', 'node_id');
 		$overview = $this->insertGridPage($source->getId(), 'overview', 'Overview');
-		$this->widgetService->insert($overview->getId(), 'header', null, ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2], ['heading' => 'Source'], null);
-		$this->widgetService->insert($overview->getId(), 'data', 'Tasks', ['gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5], [], $relationIds[4181]);
-		$this->widgetService->insert($overview->getId(), 'data', 'Open tasks', ['gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5], [], $relationIds[4182]);
+		$this->widgetService->insertAll($overview->getId(), [
+			new WidgetInput(null, 'header', null, null, null, 0, 0, 12, 2, ['heading' => 'Source'], null),
+			new WidgetInput(null, 'data', 'Tasks', null, null, 0, 2, 12, 5, [], $relationIds[4181]),
+			new WidgetInput(null, 'data', 'Open tasks', null, null, 0, 7, 12, 5, [], $relationIds[4182]),
+		]);
 		$notes = $this->insertGridPage($source->getId(), null, 'Notes');
 		$this->menuService->create($source->getId(), 'Notes', null, null, ['pageId' => $notes->getId()], self::OWNER);
 
