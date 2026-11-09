@@ -308,7 +308,7 @@ class RowService extends SuperService {
 	private function findViewOrFail(int $viewId): View {
 		try {
 			return $this->viewMapper->find($viewId);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			throw new NotFoundError('View not found.');
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);

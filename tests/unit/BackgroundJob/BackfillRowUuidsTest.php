@@ -83,7 +83,7 @@ class BackfillRowUuidsTest extends DatabaseTestCase {
 		$this->assertGreaterThan(1, $runs, 'More rows than one batch should make the job queue itself again');
 		$this->assertSame($runs - 1, $this->queuedAgain, 'The last run should not queue the job again');
 		$this->assertSame($existingUuid, $this->uuidOf($rowWithUuid));
-		$assignedUuids = array_map(fn (int $rowId): ?string => $this->uuidOf($rowId), $rowsWithoutUuid);
+		$assignedUuids = array_map($this->uuidOf(...), $rowsWithoutUuid);
 		foreach ($assignedUuids as $uuid) {
 			$this->assertNotNull($uuid);
 			$this->assertTrue(Uuid::isValid($uuid));
