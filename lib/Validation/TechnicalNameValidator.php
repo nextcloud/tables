@@ -24,6 +24,14 @@ class TechnicalNameValidator {
 		return strlen($technicalName) > self::MAX_LENGTH;
 	}
 
+	/**
+	 * Whether a name has the form of an automatic name, the prefix followed by a row id.
+	 * Such names are reserved, so a given name never collides with one a later row gets.
+	 */
+	public static function isDefaultName(string $technicalName, string $prefix): bool {
+		return preg_match('/^' . preg_quote($prefix, '/') . '[0-9]+$/D', $technicalName) === 1;
+	}
+
 	public static function hasValidCharacters(string $technicalName): bool {
 		return preg_match(self::PATTERN, $technicalName) === 1;
 	}

@@ -16,6 +16,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Widget> */
 class WidgetMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_contexts_widget';
 
 	public function __construct(IDBConnection $db) {
@@ -34,13 +36,18 @@ class WidgetMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
-			->where($qb->expr()->in('page_id', $qb->createNamedParameter($pageIds, IQueryBuilder::PARAM_INT_ARRAY)))
+			->where($qb->expr()->in('page_id', $qb->createParameter('pageIds')))
 			->orderBy('page_id', 'ASC')
 			->addOrderBy('grid_y', 'ASC')
 			->addOrderBy('grid_x', 'ASC')
 			->addOrderBy('id', 'ASC');
 
-		return $this->findEntities($qb);
+		$widgets = [];
+		foreach (array_chunk($pageIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('pageIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			array_push($widgets, ...$this->findEntities($qb));
+		}
+		return $widgets;
 	}
 
 	/**
@@ -72,7 +79,10 @@ class WidgetMapper extends QBMapper {
 		}
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
-			->where($qb->expr()->in('id', $qb->createNamedParameter($widgetIds, IQueryBuilder::PARAM_INT_ARRAY)))
-			->executeStatement();
+			->where($qb->expr()->in('id', $qb->createParameter('ids')));
+		foreach (array_chunk($widgetIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$qb->executeStatement();
+		}
 	}
 }

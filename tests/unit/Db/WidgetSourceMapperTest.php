@@ -32,36 +32,36 @@ class WidgetSourceMapperTest extends DatabaseTestCase {
 
 	public function testSettingASourceReplacesTheOldOneAndNullRemovesIt(): void {
 		[$first, $second, $third] = self::WIDGETS;
-		$this->mapper->setSource($first, 21);
-		$this->mapper->setSource($second, 22);
+		$this->mapper->setSource($first, 990221);
+		$this->mapper->setSource($second, 990222);
 
-		$this->mapper->setSource($first, 23);
+		$this->mapper->setSource($first, 990223);
 		$this->mapper->setSource($second, null);
 
-		$this->assertSame([$first => 23], $this->mapper->findNodeRelIdsByWidgetIds(self::WIDGETS));
+		$this->assertSame([$first => 990223], $this->mapper->findNodeRelIdsByWidgetIds(self::WIDGETS));
 		$this->assertSame([], $this->mapper->findNodeRelIdsByWidgetIds([$third]));
 		$this->assertSame([], $this->mapper->findNodeRelIdsByWidgetIds([]));
 	}
 
 	public function testDeletingByWidgetKeepsOtherWidgetsSources(): void {
 		[$first, $second] = self::WIDGETS;
-		$this->mapper->setSource($first, 31);
-		$this->mapper->setSource($second, 32);
+		$this->mapper->setSource($first, 990231);
+		$this->mapper->setSource($second, 990232);
 
 		$this->mapper->deleteByWidgetIds([$first]);
 
-		$this->assertSame([$second => 32], $this->mapper->findNodeRelIdsByWidgetIds(self::WIDGETS));
+		$this->assertSame([$second => 990232], $this->mapper->findNodeRelIdsByWidgetIds(self::WIDGETS));
 	}
 
 	public function testDeletingByNodeRelationRemovesEverySourceShowingIt(): void {
 		[$first, $second, $third] = self::WIDGETS;
-		$this->mapper->setSource($first, 41);
-		$this->mapper->setSource($second, 41);
-		$this->mapper->setSource($third, 42);
+		$this->mapper->setSource($first, 990241);
+		$this->mapper->setSource($second, 990241);
+		$this->mapper->setSource($third, 990242);
 
-		$this->mapper->deleteByNodeRelIds([41]);
+		$this->mapper->deleteByNodeRelIds([990241]);
 		$this->mapper->deleteByNodeRelIds([]);
 
-		$this->assertSame([$third => 42], $this->mapper->findNodeRelIdsByWidgetIds(self::WIDGETS));
+		$this->assertSame([$third => 990242], $this->mapper->findNodeRelIdsByWidgetIds(self::WIDGETS));
 	}
 }

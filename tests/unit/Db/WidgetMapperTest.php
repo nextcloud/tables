@@ -44,21 +44,13 @@ class WidgetMapperTest extends DatabaseTestCase {
 		$found = $this->mapper->findByPageIds([self::PAGE]);
 
 		$this->assertCount(1, $found);
-		$serialized = $found[0]->jsonSerialize();
-		$serialized['settings'] = json_encode($serialized['settings']);
+		$widget = $found[0];
 		$this->assertSame([
-			'id' => $inserted->getId(),
-			'pageId' => self::PAGE,
-			'type' => 'header',
-			'title' => 'Welcome',
-			'icon' => 'star',
-			'description' => 'What the team works on',
-			'gridX' => 2,
-			'gridY' => 3,
-			'gridWidth' => 8,
-			'gridHeight' => 4,
-			'settings' => '{"heading":"Projects","showTitle":false}',
-		], $serialized);
+			$inserted->getId(), self::PAGE, 'header', 'Welcome', 'star', 'What the team works on', 2, 3, 8, 4, '{"heading":"Projects","showTitle":false}',
+		], [
+			$widget->getId(), $widget->getPageId(), $widget->getType(), $widget->getTitle(), $widget->getIcon(), $widget->getDescription(),
+			$widget->getGridX(), $widget->getGridY(), $widget->getGridWidth(), $widget->getGridHeight(), json_encode($widget->getSettingsObject()),
+		]);
 	}
 
 	public function testWidgetsAreFoundByPageInGridOrder(): void {

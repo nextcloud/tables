@@ -11,22 +11,22 @@ namespace OCA\Tables\Tests\Unit\Migration;
 
 use OC\DB\SchemaWrapper;
 use OC\Migration\NullOutput;
-use OCA\Tables\Migration\Version2500Date20261022000000;
+use OCA\Tables\Migration\Version2500Date20261109000000;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
 /**
  * The upgrade parts run against the database.
  */
-class Version2500Date20261022000000Test extends DatabaseTestCase {
+class Version2500Date20261109000000Test extends DatabaseTestCase {
 	private const CONTEXT = 990401;
 	private const OTHER_CONTEXT = 990402;
 
-	private Version2500Date20261022000000 $migration;
+	private Version2500Date20261109000000 $migration;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->migration = new Version2500Date20261022000000($this->connectionAdapter);
+		$this->migration = new Version2500Date20261109000000($this->connectionAdapter);
 	}
 
 	protected function tearDown(): void {
@@ -101,7 +101,7 @@ class Version2500Date20261022000000Test extends DatabaseTestCase {
 	public function testBackfillNames(array $pages, array $expected): void {
 		$rows = array_map(static fn (array $page): array => ['id' => $page[0], 'context_id' => 10, 'page_type' => $page[1], 'technical_name' => $page[2]], $pages);
 
-		$this->assertSame($expected, Version2500Date20261022000000::backfillNames($rows));
+		$this->assertSame($expected, Version2500Date20261109000000::backfillNames($rows));
 	}
 
 	private function insertPage(int $contextId, string $pageType, ?string $title, ?string $technicalName): int {

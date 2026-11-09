@@ -24,6 +24,8 @@ use OCP\IDBConnection;
 class WidgetSourceMapper extends QBMapper {
 	use TTransactional;
 
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_contexts_widget_source';
 
 	public function __construct(IDBConnection $db) {
@@ -42,14 +44,17 @@ class WidgetSourceMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('widget_id', 'node_rel_id')
 			->from($this->table)
-			->where($qb->expr()->in('widget_id', $qb->createNamedParameter($widgetIds, IQueryBuilder::PARAM_INT_ARRAY)));
+			->where($qb->expr()->in('widget_id', $qb->createParameter('widgetIds')));
 
-		$result = $qb->executeQuery();
 		$sources = [];
-		while ($row = $result->fetchAssociative()) {
-			$sources[(int)$row['widget_id']] = (int)$row['node_rel_id'];
+		foreach (array_chunk($widgetIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('widgetIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$result = $qb->executeQuery();
+			while ($row = $result->fetchAssociative()) {
+				$sources[(int)$row['widget_id']] = (int)$row['node_rel_id'];
+			}
+			$result->closeCursor();
 		}
-		$result->closeCursor();
 		return $sources;
 	}
 
@@ -84,8 +89,11 @@ class WidgetSourceMapper extends QBMapper {
 		}
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
-			->where($qb->expr()->in('widget_id', $qb->createNamedParameter($widgetIds, IQueryBuilder::PARAM_INT_ARRAY)))
-			->executeStatement();
+			->where($qb->expr()->in('widget_id', $qb->createParameter('widgetIds')));
+		foreach (array_chunk($widgetIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('widgetIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$qb->executeStatement();
+		}
 	}
 
 	/**
@@ -98,7 +106,10 @@ class WidgetSourceMapper extends QBMapper {
 		}
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
-			->where($qb->expr()->in('node_rel_id', $qb->createNamedParameter($nodeRelIds, IQueryBuilder::PARAM_INT_ARRAY)))
-			->executeStatement();
+			->where($qb->expr()->in('node_rel_id', $qb->createParameter('nodeRelIds')));
+		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('nodeRelIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$qb->executeStatement();
+		}
 	}
 }

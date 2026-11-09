@@ -31,6 +31,7 @@ class PageMapper extends QBMapper {
 	public function insertWithDefaultName(Page $page): Page {
 		return $this->atomic(function () use ($page): Page {
 			$page = $this->insert($page);
+			$page->resetUpdatedFields();
 			$page->setTechnicalName(Page::DEFAULT_NAME_PREFIX . $page->getId());
 			return $this->update($page);
 		}, $this->db);

@@ -111,7 +111,7 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
-			if (!$this->isValidIcon($iconName)) {
+			if (!IconHelper::isValid($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
 			return new DataResponse($this->contextService->create(
@@ -152,7 +152,7 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
-			if ($iconName !== null && !$this->isValidIcon($iconName)) {
+			if ($iconName !== null && !IconHelper::isValid($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
 			$nodes = $nodes !== null ? $this->sanitizeInputNodes($nodes) : null;
@@ -384,10 +384,6 @@ class ContextController extends AOCSController {
 			$this->db->rollBack();
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
-	}
-
-	protected function isValidIcon(string $iconName): bool {
-		return IconHelper::isValid($iconName);
 	}
 
 	/**

@@ -334,6 +334,18 @@ final class ContextServiceTest extends TestCase {
 				],
 				[80 => [$start, 'home'], 81 => [$grid, 'page_81']],
 			],
+			'an application without a start page gets one' => [
+				[['id' => 2, 'page_type' => $grid, 'technical_name' => 'sales', 'title' => 'Sales']],
+				[80 => [$grid, 'sales'], 81 => [$start, 'dashboard']],
+			],
+			'the new start page leaves dashboard to an imported page' => [
+				[['id' => 2, 'page_type' => $grid, 'technical_name' => 'dashboard']],
+				[80 => [$grid, 'dashboard'], 81 => [$start, 'page_81']],
+			],
+			'no pages at all' => [
+				[],
+				[80 => [$start, 'dashboard']],
+			],
 		];
 	}
 
@@ -359,13 +371,21 @@ final class ContextServiceTest extends TestCase {
 		});
 		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$inserted, &$pageId): Page {
 			$page->id = $pageId++;
-			$inserted[$page->getId()] = [$page->getPageType(), 'page_' . $page->getId()];
+			$page->setTechnicalName('page_' . $page->getId());
+			$inserted[$page->getId()] = [$page->getPageType(), $page->getTechnicalName()];
+			return $page;
+		});
+		$titles = [];
+		$this->pageMapper->method('update')->willReturnCallback(static function (Page $page) use (&$titles): Page {
+			$titles[$page->getId()] = $page->getTitle();
 			return $page;
 		});
 
 		$this->service->importContext($table, ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
 
 		self::assertSame($expected, $inserted);
+		$untitledGridPages = array_keys(array_filter($inserted, static fn (array $page): bool => $page[0] === Page::TYPE_GRID));
+		self::assertSame(array_map(static fn (int $id): string => $inserted[$id][1], $untitledGridPages), array_values($titles), 'every grid page without a title is named after its technical name');
 	}
 
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {

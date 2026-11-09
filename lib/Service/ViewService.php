@@ -769,6 +769,8 @@ class ViewService extends SuperService {
 		$item->setEmoji($view['emoji']);
 		$technicalName = $view['technicalName'] ?? null;
 		if ($technicalName !== null) {
+			// names stored before 2.5 could end in one newline, which the rule now refuses
+			$technicalName = str_ends_with($technicalName, "\n") ? substr($technicalName, 0, -1) : $technicalName;
 			$this->assertTechnicalNameValid($technicalName);
 			$item->setTechnicalName($technicalName);
 		}

@@ -38,7 +38,7 @@ use OCP\AppFramework\Db\Entity;
  * @method getSettings(): ?string
  * @method setSettings(?string $value): void
  */
-class Widget extends Entity implements \JsonSerializable {
+class Widget extends Entity {
 	protected ?int $pageId = null;
 	protected ?string $type = null;
 	protected ?string $title = null;
@@ -90,21 +90,5 @@ class Widget extends Entity implements \JsonSerializable {
 		$settings = $this->getSettingsArray();
 		ksort($settings);
 		return (object)$settings;
-	}
-
-	public function jsonSerialize(): array {
-		return [
-			'id' => $this->getId(),
-			'pageId' => $this->getPageId(),
-			'type' => $this->getType(),
-			'title' => $this->getTitle(),
-			'icon' => $this->getIcon(),
-			'description' => $this->getDescription(),
-			'gridX' => $this->getGridX(),
-			'gridY' => $this->getGridY(),
-			'gridWidth' => $this->getGridWidth(),
-			'gridHeight' => $this->getGridHeight(),
-			'settings' => $this->getSettingsObject(),
-		];
 	}
 }
