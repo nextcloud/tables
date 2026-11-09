@@ -365,7 +365,8 @@ export default {
 			const page = await this.updateContextPage({
 				contextId: this.context.id,
 				pageId: this.page.id,
-				data: { widgets: gridToWidgets(this.draftGrid, this.widgetTypes) },
+				// the version this edit started from, so a save by someone else in between is not undone
+				data: { widgets: gridToWidgets(this.draftGrid, this.widgetTypes), version: this.page.version },
 			})
 			this.saving = false
 			// A failed save is already reported by the store
