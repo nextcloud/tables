@@ -946,7 +946,7 @@ export type paths = {
         readonly put: operations["context-update-content-order"];
         readonly post?: never;
         /**
-         * [api v2] Delete a grid page with its widgets
+         * [api v2] Delete a page with its widgets
          * @description The start page of an application cannot be deleted.
          */
         readonly delete: operations["context_page-destroy"];
@@ -1073,7 +1073,7 @@ export type paths = {
             readonly cookie?: never;
         };
         /**
-         * [api v2] Get the widget types a grid page can hold
+         * [api v2] Get the widget types a page can hold
          * @description Every type carries the schema of its settings and whether it shows a table or view.
          */
         readonly get: operations["context_page-widget-types"];

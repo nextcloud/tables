@@ -15378,7 +15378,7 @@
             },
             "delete": {
                 "operationId": "context_page-destroy",
-                "summary": "[api v2] Delete a grid page with its widgets",
+                "summary": "[api v2] Delete a page with its widgets",
                 "description": "The start page of an application cannot be deleted.",
                 "tags": [
                     "context_page"
@@ -16732,7 +16732,7 @@
         "/ocs/v2.php/apps/tables/api/2/widget-types": {
             "get": {
                 "operationId": "context_page-widget-types",
-                "summary": "[api v2] Get the widget types a grid page can hold",
+                "summary": "[api v2] Get the widget types a page can hold",
                 "description": "Every type carries the schema of its settings and whether it shows a table or view.",
                 "tags": [
                     "context_page"
