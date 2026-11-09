@@ -26,10 +26,11 @@ class WidgetMapper extends QBMapper {
 
 	/**
 	 * @param int[] $pageIds
+	 * @param bool $forUpdate lock the rows until the transaction ends
 	 * @return Widget[] ordered by page and grid position
 	 * @throws Exception
 	 */
-	public function findByPageIds(array $pageIds): array {
+	public function findByPageIds(array $pageIds, bool $forUpdate = false): array {
 		if ($pageIds === []) {
 			return [];
 		}
@@ -41,6 +42,9 @@ class WidgetMapper extends QBMapper {
 			->addOrderBy('grid_y', 'ASC')
 			->addOrderBy('grid_x', 'ASC')
 			->addOrderBy('id', 'ASC');
+		if ($forUpdate) {
+			$qb->forUpdate();
+		}
 
 		$widgets = [];
 		foreach (array_chunk($pageIds, self::DB_CHUNK_SIZE) as $chunk) {

@@ -12,12 +12,14 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Db\WidgetSourceMapper;
+use OCA\Tables\Model\WidgetInput;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
 
 /**
- * Stores the widgets of grid pages, settings included, and the node a data widget
- * shows. Callers check permissions and run writes in a transaction.
+ * Stores the widgets of pages, settings included, and the node a data widget shows.
+ * Callers check permissions; {@see self::insertAll()} and {@see self::syncPage()} run
+ * in their own transaction.
  *
  * @psalm-import-type TablesWidgetSettingValue from Widget
  * @psalm-type TablesWidgetRecord = array{id: int, type: string, title: ?string, icon: ?string, description: ?string, gridX: int, gridY: int, gridWidth: int, gridHeight: int, settings: \stdClass, source: ?array{nodeRelId: int}}
@@ -63,39 +65,43 @@ class WidgetService {
 	}
 
 	/**
-	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
-	 * @throws \InvalidArgumentException when the source is not a node of the application of the page
+	 * Adds widgets to a page, in one transaction. Their ids are ignored.
+	 *
+	 * @param list<WidgetInput> $widgets
+	 * @return list<Widget>
+	 * @throws \InvalidArgumentException when a source is not a node of the application of the page
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
-	public function insert(int $pageId, string $type, ?string $title, array $position, array $settings, ?int $nodeRelId, ?string $icon = null, ?string $description = null): Widget {
-		$this->assertSourcesOfPage($pageId, [$nodeRelId]);
-		return $this->insertWidget($pageId, $type, $title, $position, $settings, $nodeRelId, $icon, $description);
+	public function insertAll(int $pageId, array $widgets): array {
+		return $this->atomic(function () use ($pageId, $widgets): array {
+			$this->assertSourcesOfPage($pageId, $widgets);
+			return array_map(fn (WidgetInput $widget): Widget => $this->insertWidget($pageId, $widget), $widgets);
+		}, $this->db);
 	}
 
 	/**
-	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
-	private function insertWidget(int $pageId, string $type, ?string $title, array $position, array $settings, ?int $nodeRelId, ?string $icon, ?string $description): Widget {
+	private function insertWidget(int $pageId, WidgetInput $input): Widget {
 		$widget = new Widget();
 		$widget->setPageId($pageId);
-		$this->applyFields($widget, $type, $title, $position, $settings, $icon, $description);
+		$this->applyFields($widget, $input);
 		$widget = $this->widgetMapper->insert($widget);
-
-		$this->widgetSourceMapper->setSource($widget->getId(), $nodeRelId);
+		if ($input->nodeRelId !== null) {
+			$this->widgetSourceMapper->insertSource($widget->getId(), $input->nodeRelId);
+		}
 		return $widget;
 	}
 
 	/**
 	 * Makes the widgets of a page match the given list: widgets with an id are updated,
 	 * widgets without one are inserted and widgets of the page that are not listed are
-	 * deleted, in one transaction. A widget listed without an icon or description has none.
+	 * deleted, in one transaction. The widgets of the page and the node relations shown
+	 * are locked first, so the checks still hold when the writes run.
 	 *
-	 * @param list<array{id: ?int, type: string, title: ?string, icon?: ?string, description?: ?string, position: array{gridX: int, gridY: int, gridWidth: int, gridHeight: int}, settings: array<string, TablesWidgetSettingValue>, nodeRelId: ?int}> $widgets
+	 * @param list<WidgetInput> $widgets
 	 * @throws \InvalidArgumentException when an id is not one of a widget of the page, or a
 	 *                                   source is not a node of the application of the page
 	 * @throws Exception
@@ -103,35 +109,36 @@ class WidgetService {
 	 */
 	public function syncPage(int $pageId, array $widgets): void {
 		$this->atomic(function () use ($pageId, $widgets): void {
-			$this->assertSourcesOfPage($pageId, array_column($widgets, 'nodeRelId'));
 			$existing = [];
-			foreach ($this->widgetMapper->findByPageIds([$pageId]) as $widget) {
+			foreach ($this->widgetMapper->findByPageIds([$pageId], true) as $widget) {
 				$existing[$widget->getId()] = $widget;
 			}
+			$this->assertSourcesOfPage($pageId, $widgets);
 			$listedIds = [];
-			foreach ($widgets as $data) {
-				if ($data['id'] === null) {
+			foreach ($widgets as $input) {
+				if ($input->id === null) {
 					continue;
 				}
-				if (!isset($existing[$data['id']])) {
-					throw new \InvalidArgumentException('Widget ' . $data['id'] . ' is not on page ' . $pageId);
+				if (!isset($existing[$input->id])) {
+					throw new \InvalidArgumentException('Widget ' . $input->id . ' is not on page ' . $pageId);
 				}
-				$listedIds[] = $data['id'];
+				$listedIds[] = $input->id;
 			}
 			$this->deleteByIds(array_values(array_diff(array_keys($existing), $listedIds)));
+			$sources = $this->widgetSourceMapper->findNodeRelIdsByWidgetIds($listedIds);
 
-			foreach ($widgets as $data) {
-				if ($data['id'] === null) {
-					$this->insertWidget($pageId, $data['type'], $data['title'], $data['position'], $data['settings'], $data['nodeRelId'], $data['icon'] ?? null, $data['description'] ?? null);
+			foreach ($widgets as $input) {
+				if ($input->id === null) {
+					$this->insertWidget($pageId, $input);
 					continue;
 				}
 				// A new entity would not mark a field set to its default, such as a null title, as changed.
-				$widget = $existing[$data['id']];
-				$this->applyFields($widget, $data['type'], $data['title'], $data['position'], $data['settings'], $data['icon'] ?? null, $data['description'] ?? null);
-				if ($widget->getUpdatedFields() !== []) {
-					$this->widgetMapper->update($widget);
+				$widget = $existing[$input->id];
+				$this->applyFields($widget, $input);
+				$this->widgetMapper->update($widget);
+				if (($sources[$input->id] ?? null) !== $input->nodeRelId) {
+					$this->widgetSourceMapper->setSource($input->id, $input->nodeRelId);
 				}
-				$this->widgetSourceMapper->setSource($data['id'], $data['nodeRelId']);
 			}
 		}, $this->db);
 	}
@@ -143,11 +150,7 @@ class WidgetService {
 	 * @throws Exception
 	 */
 	public function deleteByPageIds(array $pageIds): void {
-		$widgetIds = [];
-		foreach ($pageIds as $pageId) {
-			$widgetIds = array_merge($widgetIds, $this->widgetMapper->findIdsByPageId($pageId));
-		}
-		$this->deleteByIds($widgetIds);
+		$this->deleteByIds(array_map(static fn (Widget $widget): int => $widget->getId(), $this->widgetMapper->findByPageIds($pageIds)));
 	}
 
 	/**
@@ -161,21 +164,24 @@ class WidgetService {
 
 	/**
 	 * Unlinks every widget that shows one of the given node relations. The widgets stay.
+	 * The relations stay locked until the caller's transaction ends, so a save can't
+	 * point a widget at one of them in between.
 	 *
 	 * @param int[] $nodeRelIds
 	 * @throws Exception
 	 */
 	public function deleteSourcesByNodeRelIds(array $nodeRelIds): void {
+		$this->widgetSourceMapper->lockNodeRelations($nodeRelIds);
 		$this->widgetSourceMapper->deleteByNodeRelIds($nodeRelIds);
 	}
 
 	/**
-	 * @param list<?int> $nodeRelIds
+	 * @param list<WidgetInput> $widgets
 	 * @throws \InvalidArgumentException when one is not a node of the application of the page
 	 * @throws Exception
 	 */
-	private function assertSourcesOfPage(int $pageId, array $nodeRelIds): void {
-		$nodeRelIds = array_values(array_unique(array_filter($nodeRelIds, static fn (?int $id): bool => $id !== null)));
+	private function assertSourcesOfPage(int $pageId, array $widgets): void {
+		$nodeRelIds = array_values(array_unique(array_filter(array_map(static fn (WidgetInput $widget): ?int => $widget->nodeRelId, $widgets), static fn (?int $id): bool => $id !== null)));
 		$foreign = array_diff($nodeRelIds, $this->widgetSourceMapper->filterNodeRelIdsOfPageContext($pageId, $nodeRelIds));
 		if ($foreign !== []) {
 			throw new \InvalidArgumentException('Node relation ' . implode(', ', $foreign) . ' is not part of the application of page ' . $pageId);
@@ -183,19 +189,17 @@ class WidgetService {
 	}
 
 	/**
-	 * @param array{gridX: int, gridY: int, gridWidth: int, gridHeight: int} $position
-	 * @param array<string, TablesWidgetSettingValue> $settings
 	 * @throws \JsonException
 	 */
-	private function applyFields(Widget $widget, string $type, ?string $title, array $position, array $settings, ?string $icon, ?string $description): void {
-		$widget->setType($type);
-		$widget->setTitle($title);
-		$widget->setIcon($icon);
-		$widget->setDescription($description);
-		$widget->setGridX($position['gridX']);
-		$widget->setGridY($position['gridY']);
-		$widget->setGridWidth($position['gridWidth']);
-		$widget->setGridHeight($position['gridHeight']);
-		$widget->setSettingsArray($settings);
+	private function applyFields(Widget $widget, WidgetInput $input): void {
+		$widget->setType($input->type);
+		$widget->setTitle($input->title);
+		$widget->setIcon($input->icon);
+		$widget->setDescription($input->description);
+		$widget->setGridX($input->gridX);
+		$widget->setGridY($input->gridY);
+		$widget->setGridWidth($input->gridWidth);
+		$widget->setGridHeight($input->gridHeight);
+		$widget->setSettingsArray($input->settings);
 	}
 }

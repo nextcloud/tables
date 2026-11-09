@@ -53,6 +53,16 @@ class WidgetMapperTest extends DatabaseTestCase {
 		]);
 	}
 
+	public function testMoreThanAThousandPagesAreLookedUpInChunks(): void {
+		$inserted = $this->insert(self::PAGE, 'text', null, 0, 0);
+
+		$found = $this->mapper->findByPageIds([...range(-1500, -1), self::PAGE]);
+
+		$this->assertSame([$inserted->getId()], array_map(static fn (Widget $widget): int => $widget->getId(), $found));
+		$this->mapper->deleteByIds([...range(-1500, -1), $inserted->getId()]);
+		$this->assertSame([], $this->mapper->findByPageIds([self::PAGE]));
+	}
+
 	public function testWidgetsAreFoundByPageInGridOrder(): void {
 		$bottom = $this->insert(self::PAGE, 'data', null, 0, 5);
 		$topRight = $this->insert(self::PAGE, 'text', null, 6, 0);

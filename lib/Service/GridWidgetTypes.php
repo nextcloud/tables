@@ -11,6 +11,9 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Helper\IconHelper;
+use OCA\Tables\Helper\TextHelper;
+use OCA\Tables\Model\WidgetInput;
 use OCP\IL10N;
 
 /**
@@ -20,7 +23,7 @@ use OCP\IL10N;
  *
  * @psalm-import-type TablesWidgetSettingValue from Widget
  * @psalm-type TablesWidgetSettingSchema = array{
- *   type: 'string'|'text'|'color'|'boolean'|'enum',
+ *   type: 'string'|'text'|'color'|'enum',
  *   title: string,
  *   default: TablesWidgetSettingValue,
  *   options?: list<array{value: string, label: string}>,
@@ -43,8 +46,6 @@ class GridWidgetTypes {
 	public const GRID_COLUMNS = 12;
 	public const GRID_MAX_HEIGHT = 100;
 	public const GRID_MAX_Y = 10000;
-	public const TITLE_MAX_LENGTH = 200;
-	public const DESCRIPTION_MAX_LENGTH = 2000;
 	public const MAX_WIDGETS_PER_PAGE = 100;
 	/** Bytes of the settings as stored JSON. */
 	public const SETTINGS_MAX_BYTES = 60000;
@@ -131,7 +132,7 @@ class GridWidgetTypes {
 			$value = array_key_exists($name, $settings) ? $settings[$name] : $property['default'];
 			$sanitized[$name] = $this->sanitizeValue($type . '.' . $name, $property, $value);
 		}
-		$json = json_encode((object)$sanitized);
+		$json = json_encode((object)$sanitized, Widget::SETTINGS_JSON_FLAGS);
 		if ($json === false) {
 			throw new BadRequestError('The settings of a ' . $type . ' widget must be valid UTF-8 text.');
 		}
@@ -146,11 +147,10 @@ class GridWidgetTypes {
 	 * @return TablesWidgetSettingValue
 	 * @throws BadRequestError
 	 */
-	private function sanitizeValue(string $label, array $property, mixed $value): string|bool|int|null {
+	private function sanitizeValue(string $label, array $property, mixed $value): string {
 		return match ($property['type']) {
 			'string', 'text' => $this->sanitizeText($label, $value, $property['required'] ?? false),
 			'color' => $this->sanitizeColor($label, $value),
-			'boolean' => is_bool($value) ? $value : throw new BadRequestError('Widget setting ' . $label . ' must be true or false.'),
 			'enum' => $this->sanitizeEnum($label, $value, array_column($property['options'] ?? [], 'value')),
 		};
 	}
@@ -163,7 +163,7 @@ class GridWidgetTypes {
 		if (!is_string($value)) {
 			throw new BadRequestError('Widget setting ' . $label . ' must be a string.');
 		}
-		if ($isRequired && trim($value) === '') {
+		if ($isRequired && TextHelper::trim($value) === '') {
 			throw new BadRequestError('Widget setting ' . $label . ' is required.');
 		}
 		return $value;
@@ -199,14 +199,11 @@ class GridWidgetTypes {
 	 * @throws BadRequestError
 	 */
 	public function validateTitle(int $index, mixed $title): ?string {
-		if ($title === null) {
-			return null;
+		try {
+			return TextHelper::optional($title, TextHelper::TITLE_MAX_LENGTH);
+		} catch (\InvalidArgumentException) {
+			throw new BadRequestError('The title of widget ' . $index . ' must be a text of at most ' . TextHelper::TITLE_MAX_LENGTH . ' characters.');
 		}
-		if (!is_string($title) || mb_strlen(trim($title)) > self::TITLE_MAX_LENGTH) {
-			throw new BadRequestError('The title of widget ' . $index . ' must be a text of at most ' . self::TITLE_MAX_LENGTH . ' characters.');
-		}
-		$title = trim($title);
-		return $title === '' ? null : $title;
 	}
 
 	/**
@@ -215,14 +212,60 @@ class GridWidgetTypes {
 	 * @throws BadRequestError
 	 */
 	public function validateDescription(int $index, mixed $description): ?string {
-		if ($description === null) {
-			return null;
+		try {
+			return TextHelper::optional($description, TextHelper::DESCRIPTION_MAX_LENGTH);
+		} catch (\InvalidArgumentException) {
+			throw new BadRequestError('The description of widget ' . $index . ' must be a text of at most ' . TextHelper::DESCRIPTION_MAX_LENGTH . ' characters.');
 		}
-		if (!is_string($description) || mb_strlen(trim($description)) > self::DESCRIPTION_MAX_LENGTH) {
-			throw new BadRequestError('The description of widget ' . $index . ' must be a text of at most ' . self::DESCRIPTION_MAX_LENGTH . ' characters.');
+	}
+
+	/**
+	 * Reads one widget as the API and the import receive it, with every rule its type
+	 * sets. `source` is `{nodeRelId}` as given; whether that node belongs to the
+	 * application is for the caller to check.
+	 *
+	 * @throws BadRequestError
+	 */
+	public function readWidget(int $index, mixed $widget): WidgetInput {
+		if (!is_array($widget)) {
+			throw new BadRequestError('Widget ' . $index . ' must be an object.');
 		}
-		$description = trim($description);
-		return $description === '' ? null : $description;
+		$type = $widget['type'] ?? null;
+		if (!is_string($type)) {
+			throw new BadRequestError('Widget ' . $index . ' needs a type.');
+		}
+		$typeSchema = $this->get($type);
+		$id = $widget['id'] ?? null;
+		if ($id !== null && !is_int($id)) {
+			throw new BadRequestError('The id of widget ' . $index . ' must be a number.');
+		}
+		$icon = $widget['icon'] ?? null;
+		if ($icon !== null && (!is_string($icon) || ($icon !== '' && !IconHelper::isValid($icon)))) {
+			throw new BadRequestError('The icon of widget ' . $index . ' must be the name of an icon.');
+		}
+		$source = $widget['source'] ?? null;
+		if ($source !== null && !$typeSchema['hasSource']) {
+			throw new BadRequestError('Widget ' . $index . ' is a ' . $type . ' widget, which shows no table or view.');
+		}
+		$nodeRelId = is_array($source) ? ($source['nodeRelId'] ?? null) : null;
+		if ($source !== null && !is_int($nodeRelId)) {
+			throw new BadRequestError('The source of widget ' . $index . ' must be an object with a numeric nodeRelId.');
+		}
+		$position = $this->validatePosition($index, $widget);
+
+		return new WidgetInput(
+			$id,
+			$type,
+			$this->validateTitle($index, $widget['title'] ?? null),
+			$icon === '' ? null : $icon,
+			$this->validateDescription($index, $widget['description'] ?? null),
+			$position['gridX'],
+			$position['gridY'],
+			$position['gridWidth'],
+			$position['gridHeight'],
+			$this->sanitizeSettings($type, $widget['settings'] ?? null),
+			$nodeRelId,
+		);
 	}
 
 	/**

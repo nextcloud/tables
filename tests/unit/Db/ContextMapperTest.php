@@ -86,6 +86,16 @@ class ContextMapperTest extends DatabaseTestCase {
 		$this->assertSame([$first->getId(), $second->getId()], array_keys($this->mapper->findById($context->getId(), self::OWNER)->getNodes()));
 	}
 
+	public function testOnlyTheStartPageIsLoadedWhenTheOtherPagesAreNotAsked(): void {
+		$context = $this->createContext();
+		$startPage = $this->addPage($context, Page::TYPE_STARTPAGE, 'dashboard', null, null, null);
+		$this->addPage($context, Page::TYPE_GRID, 'overview', 'Overview', null, null);
+
+		$this->assertSame([$startPage->getId()], array_keys($this->mapper->findById($context->getId(), self::OWNER, false)->getPages()));
+		$found = array_values(array_filter($this->mapper->findAll(self::OWNER, false), static fn (Context $found): bool => $found->getId() === $context->getId()));
+		$this->assertSame([$startPage->getId()], array_keys($found[0]->getPages()));
+	}
+
 	private function createContext(): Context {
 		$context = new Context();
 		$context->setName('Mapper test');

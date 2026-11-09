@@ -166,8 +166,10 @@ class TablesMigratorTest extends TestCase {
 		$context->setPages([5 => ['id' => 5, 'page_type' => 'grid', 'content' => []]]);
 		$this->contextMapper->method('findAll')->willReturn([$context]);
 		$widget = ['id' => 9, 'type' => 'text', 'settings' => ['text' => 'Hi'], 'source' => null];
-		$this->contextService->method('getPagesWithWidgets')->with($context)
-			->willReturn([5 => ['id' => 5, 'page_type' => 'grid', 'content' => [], 'widgets' => [$widget]]]);
+		$this->contextService->expects($this->once())->method('addWidgetsToPages')->with([$context])
+			->willReturnCallback(static function (array $contexts) use ($widget): void {
+				$contexts[0]->setPages([5 => ['id' => 5, 'page_type' => 'grid', 'content' => [], 'widgets' => [$widget]]]);
+			});
 
 		$files = [];
 		$exportDestination->method('addFileContents')->willReturnCallback(static function (string $path, string $content) use (&$files): void {
