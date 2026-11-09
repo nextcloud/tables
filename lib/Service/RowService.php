@@ -196,19 +196,6 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param int|null $tableId
-	 * @param int|null $viewId
-	 * @param RowDataInput|list<array{columnId: int, value: mixed}> $data
-	 * @param string|null $userId
-	 * @return Row2
-	 *
-	 * @throws BadRequestError
-	 * @throws NotFoundError
-	 * @throws PermissionError
-	 * @throws Exception
-	 * @throws InternalError
-	 */
-	/**
 	 * Resolves a row identifier from a route, an integer id or a uuid, to the integer row id.
 	 * A uuid is only looked up within the table, or the table of the view, so a uuid of a
 	 * row in another table is not found.
@@ -316,6 +303,19 @@ class RowService extends SuperService {
 		}
 	}
 
+	/**
+	 * @param int|null $tableId
+	 * @param int|null $viewId
+	 * @param RowDataInput|list<array{columnId: int, value: mixed}> $data
+	 * @param string|null $userId
+	 * @return Row2
+	 *
+	 * @throws BadRequestError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws Exception
+	 * @throws InternalError
+	 */
 	public function create(?int $tableId, ?int $viewId, RowDataInput|array $data, ?string $userId = null): Row2 {
 		if ($userId) {
 			$this->userId = $userId;
