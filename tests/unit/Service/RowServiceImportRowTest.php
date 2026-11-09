@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
@@ -29,6 +30,8 @@ class RowServiceImportRowTest extends DatabaseTestCase {
 	private Row2Mapper&MockObject $row2Mapper;
 	private RowService $rowService;
 	private Table $table;
+	/** @var list<int> */
+	private array $otherTableIds = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -53,11 +56,13 @@ class RowServiceImportRowTest extends DatabaseTestCase {
 	}
 
 	protected function tearDown(): void {
-		foreach (['tables_row_sleeves' => 'table_id', 'tables_tables' => 'id'] as $tableName => $column) {
-			$qb = $this->connection->getQueryBuilder();
-			$qb->delete($tableName)
-				->where($qb->expr()->eq($column, $qb->createNamedParameter($this->table->getId())))
-				->executeStatement();
+		foreach ([$this->table->getId(), ...$this->otherTableIds] as $tableId) {
+			foreach (['tables_row_sleeves' => 'table_id', 'tables_tables' => 'id'] as $tableName => $column) {
+				$qb = $this->connection->getQueryBuilder();
+				$qb->delete($tableName)
+					->where($qb->expr()->eq($column, $qb->createNamedParameter($tableId)))
+					->executeStatement();
+			}
 		}
 		parent::tearDown();
 	}
@@ -77,14 +82,30 @@ class RowServiceImportRowTest extends DatabaseTestCase {
 
 	public function testKeepsTheExportedUuidWhenItIsUnused(): void {
 		$exportedUuid = Uuid::v7()->toRfc4122();
-		$this->row2Mapper->method('findIdByUuid')->with($exportedUuid)->willReturn(null);
+		$this->row2Mapper->method('findIdByUuid')->with($exportedUuid, null)->willReturn(null);
 
 		$this->assertSame($exportedUuid, $this->importRow(['uuid' => $exportedUuid]));
 	}
 
 	public function testGeneratesANewUuidWhenTheExportedOneIsUsed(): void {
 		$exportedUuid = Uuid::v7()->toRfc4122();
-		$this->row2Mapper->method('findIdByUuid')->with($exportedUuid)->willReturn(99);
+		$this->row2Mapper->method('findIdByUuid')->with($exportedUuid, null)->willReturn(99);
+
+		$uuid = $this->importRow(['uuid' => $exportedUuid]);
+
+		$this->assertNotSame($exportedUuid, $uuid);
+		$this->assertTrue(Uuid::isValid($uuid));
+	}
+
+	public function testGeneratesANewUuidWhenTheExportedOneIsUsedInAnotherTable(): void {
+		$exportedUuid = Uuid::v7()->toRfc4122();
+		$otherTableId = $this->createTestTable()['id'];
+		$this->otherTableIds[] = $otherTableId;
+		$this->createTestRow($otherTableId, ['uuid' => $exportedUuid]);
+		$rowSleeveMapper = new RowSleeveMapper($this->connectionAdapter, $this->createMock(LoggerInterface::class));
+		$this->row2Mapper->method('findIdByUuid')->willReturnCallback(
+			fn (string $uuid, ?int $tableId = null): ?int => $rowSleeveMapper->findIdByUuid($uuid, $tableId),
+		);
 
 		$uuid = $this->importRow(['uuid' => $exportedUuid]);
 
