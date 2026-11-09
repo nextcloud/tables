@@ -159,7 +159,7 @@ test.describe('Grid pages of an application', () => {
 		await ocsRequest(page.request, user, {
 			method: 'PATCH',
 			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
-			data: { widgets: [{ type: 'data', title: 'Shared tasks', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 5, source: { nodeRelId } }] },
+			data: { version: 0, widgets: [{ type: 'data', title: 'Shared tasks', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 5, source: { nodeRelId } }] },
 		})
 		await ocsRequest(page.request, user, {
 			method: 'POST',
@@ -197,7 +197,7 @@ test.describe('Grid pages of an application', () => {
 		await ocsRequest(page.request, user, {
 			method: 'PATCH',
 			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
-			data: { widgets: [{ type: 'data', title: 'Gone soon', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 5, source: { nodeRelId } }] },
+			data: { version: 0, widgets: [{ type: 'data', title: 'Gone soon', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 5, source: { nodeRelId } }] },
 		})
 		await ocsRequest(page.request, user, {
 			method: 'PUT',
@@ -220,7 +220,7 @@ test.describe('Grid pages of an application', () => {
 		await ocsRequest(page.request, user, {
 			method: 'PATCH',
 			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
-			data: { widgets: [{ type: 'text', title: 'Notes', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Hello' } }] },
+			data: { version: 0, widgets: [{ type: 'text', title: 'Notes', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Hello' } }] },
 		})
 		await openApplication(page, contextId, `/page/${pageId}`)
 
