@@ -7,7 +7,7 @@
   "rangeStrategy": "bump",
   "minimumReleaseAge": "7 days",
   "rebaseWhen": "conflicted",
-  "ignoreUnstable": false,
+  "ignoreUnstable": true,
   "baseBranches": ["main", "stable1.0"],
   "useBaseBranchConfig": "merge",
   "enabledManagers": ["npm", "composer", "github-actions"],
