@@ -49,7 +49,6 @@ final class ContextServiceTest extends TestCase {
 	/** @var list<string> the writes of a test in the order they ran */
 	private array $calls = [];
 	private MockObject $widgetService;
-	private MockObject $permissionsService;
 	private MockObject $dbConnection;
 
 	protected function setUp(): void {
@@ -386,6 +385,22 @@ final class ContextServiceTest extends TestCase {
 		$this->service->update(7, 'user-1', null, null, null, []);
 	}
 
+	public function testATableAddedToTheStartPageLaterGetsAWidget(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setPages([3 => ['id' => 3, 'page_type' => Page::TYPE_STARTPAGE, 'content' => []], 4 => ['id' => 4, 'page_type' => Page::TYPE_GRID, 'content' => []]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->pageContentMapper->method('findByPageAndNodeRelation')->willReturn(null);
+		$this->pageContentMapper->method('insert')->willReturnArgument(0);
+		$relation = new ContextNodeRelation();
+		$relation->id = 55;
+		$relation->setContextId(7);
+		$this->widgetService->expects($this->once())->method('appendDataWidget')->with(3, 55);
+
+		$this->service->addNodeRelToPage($relation);
+		$this->service->addNodeRelToPage($relation, null, 4);
+	}
+
 	public function testAnUpdateRefusedForAnAddedNodeRemovesNothing(): void {
 		$context = new Context();
 		$context->id = 7;
@@ -674,7 +689,9 @@ final class ContextServiceTest extends TestCase {
 
 		$inserted = [];
 		$this->widgetService->method('insertAll')->willReturnCallback(function (int $pageId, array $widgets) use (&$inserted): array {
-			$inserted = [...$inserted, ...self::widgetArgs($pageId, $widgets)];
+			if ($pageId === 600) {
+				$inserted = [...$inserted, ...self::widgetArgs($pageId, $widgets)];
+			}
 			return [];
 		});
 
@@ -835,7 +852,10 @@ final class ContextServiceTest extends TestCase {
 			$context->id = 8;
 			return $context;
 		});
-		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$this->contextNodeRelMapper->method('insert')->willReturnCallback(static function (ContextNodeRelation $relation): ContextNodeRelation {
+			$relation->id = 501;
+			return $relation;
+		});
 		$inserted = [];
 		$pageId = 80;
 		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$inserted, &$pageId): Page {
@@ -943,7 +963,10 @@ final class ContextServiceTest extends TestCase {
 			return $page;
 		});
 		$this->widgetService->method('insertAll')->willReturnCallback(static function (int $pageId, array $widgets) use ($record): array {
-			$record['widgets'] = [...$record['widgets'], ...self::widgetArgs($pageId, $widgets)];
+			// the first imported page; a start page the archive lacked comes later and is filled on its own
+			if ($pageId === 600) {
+				$record['widgets'] = [...$record['widgets'], ...self::widgetArgs($pageId, $widgets)];
+			}
 			return [];
 		});
 		return $record;
