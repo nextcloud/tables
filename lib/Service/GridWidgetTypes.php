@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Db\Widget;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Helper\TextHelper;

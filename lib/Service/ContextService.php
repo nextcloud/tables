@@ -356,7 +356,8 @@ class ContextService {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		$this->atomic(function () use ($context): void {
-			// a delete that waited for another one finds the application gone
+			// a page added in the meantime waits for this and then finds no application,
+			// and a delete that waited for another one finds it gone
 			if (!$this->contextMapper->lock($context->getId())) {
 				throw new NotFoundError('Application ' . $context->getId() . ' does not exist');
 			}
