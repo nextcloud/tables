@@ -14,6 +14,7 @@ use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\IJobList;
+use OCP\IDBConnection;
 
 class SmallBatchBackfillRowUuids extends BackfillRowUuids {
 	public const BATCH_SIZE = 2;
@@ -89,6 +90,18 @@ class BackfillRowUuidsTest extends DatabaseTestCase {
 			$this->assertTrue(Uuid::isValid($uuid));
 		}
 		$this->assertCount(3, array_unique($assignedUuids));
+	}
+
+	public function testQueuesAgainAndRethrowsWhenTheBackfillFails(): void {
+		$failure = new \RuntimeException('Database unavailable');
+		$connection = $this->createMock(IDBConnection::class);
+		$connection->method('getQueryBuilder')->willThrowException($failure);
+		$jobList = $this->createMock(IJobList::class);
+		$jobList->expects($this->once())->method('add')->with(BackfillRowUuids::class);
+		$job = new BackfillRowUuids($this->createMock(ITimeFactory::class), $connection, $jobList);
+
+		$this->expectExceptionObject($failure);
+		$this->runJob($job);
 	}
 
 	public function testDoesNotQueueAgainWhenNothingIsLeft(): void {
