@@ -18,12 +18,6 @@
 				resize="vertical"
 				rows="6"
 				@update:model-value="text => set(name, text)" />
-			<NcCheckboxRadioSwitch v-else-if="property.type === 'boolean'"
-				type="switch"
-				:model-value="!!value(name)"
-				@update:model-value="checked => set(name, checked)">
-				{{ property.title }}
-			</NcCheckboxRadioSwitch>
 			<NcSelect v-else-if="property.type === 'enum'"
 				class="schema-form__input"
 				:model-value="enumOption(property, value(name))"
@@ -51,7 +45,7 @@
 </template>
 
 <script>
-import { NcButton, NcCheckboxRadioSwitch, NcColorPicker, NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
+import { NcButton, NcColorPicker, NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
 import { isHexColor } from '../../shared/utils/gridColors.js'
 
 /**
@@ -62,7 +56,6 @@ export default {
 	name: 'SchemaForm',
 	components: {
 		NcButton,
-		NcCheckboxRadioSwitch,
 		NcColorPicker,
 		NcSelect,
 		NcTextArea,
@@ -89,14 +82,14 @@ export default {
 		},
 		/**
 		 * @param {string} name property name
-		 * @return {string|number|boolean|object|null} the current value of the property
+		 * @return {string|null} the current value of the property
 		 */
 		value(name) {
 			return this.modelValue[name]
 		},
 		/**
 		 * @param {string} name property name
-		 * @param {string|number|boolean|object|null} value the new value of the property
+		 * @param {string|null} value the new value of the property
 		 */
 		set(name, value) {
 			this.$emit('update:modelValue', { ...this.modelValue, [name]: value })
