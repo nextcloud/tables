@@ -1580,11 +1580,11 @@ export type components = {
         };
         readonly WidgetInput: {
             /** Format: int64 */
-            readonly id?: number | null;
+            readonly id?: number;
             readonly type: string;
-            readonly title?: string | null;
-            readonly icon?: string | null;
-            readonly description?: string | null;
+            readonly title?: string;
+            readonly icon?: string;
+            readonly description?: string;
             /** Format: int64 */
             readonly gridX: number;
             /** Format: int64 */
@@ -1595,11 +1595,11 @@ export type components = {
             readonly gridHeight: number;
             readonly settings?: {
                 readonly [key: string]: components["schemas"]["WidgetValue"];
-            } | null;
+            };
             readonly source?: {
                 /** Format: int64 */
                 readonly nodeRelId: number;
-            } | null;
+            };
         };
         readonly WidgetSettingSchema: {
             /** @enum {string} */

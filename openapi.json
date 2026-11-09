@@ -1449,23 +1449,19 @@
                 "properties": {
                     "id": {
                         "type": "integer",
-                        "format": "int64",
-                        "nullable": true
+                        "format": "int64"
                     },
                     "type": {
                         "type": "string"
                     },
                     "title": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "icon": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "gridX": {
                         "type": "integer",
@@ -1485,14 +1481,12 @@
                     },
                     "settings": {
                         "type": "object",
-                        "nullable": true,
                         "additionalProperties": {
                             "$ref": "#/components/schemas/WidgetValue"
                         }
                     },
                     "source": {
                         "type": "object",
-                        "nullable": true,
                         "required": [
                             "nodeRelId"
                         ],
