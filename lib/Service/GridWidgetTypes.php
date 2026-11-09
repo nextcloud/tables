@@ -18,7 +18,7 @@ use OCA\Tables\ResponseDefinitions;
 use OCP\IL10N;
 
 /**
- * The widget types a grid page can hold. Every type has a schema for its settings;
+ * The widget types a page can hold. Every type has a schema for its settings;
  * the frontend renders its form from it and saved widgets are validated against it.
  * A type with a source shows a table or view of the application.
  *

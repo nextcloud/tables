@@ -105,6 +105,26 @@ class WidgetService {
 	}
 
 	/**
+	 * Adds a full width table or view widget below the lowest widget of a page, unless the
+	 * page already holds {@see GridWidgetTypes::MAX_WIDGETS_PER_PAGE} widgets.
+	 *
+	 * @return bool whether the widget was added
+	 * @throws Exception
+	 * @throws \JsonException
+	 */
+	public function appendDataWidget(int $pageId, int $nodeRelId): bool {
+		return $this->atomic(function () use ($pageId, $nodeRelId): bool {
+			$widgets = $this->widgetMapper->findByPageIds([$pageId], true);
+			if (count($widgets) >= GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
+				return false;
+			}
+			$gridY = array_reduce($widgets, static fn (int $bottom, Widget $widget): int => max($bottom, $widget->getGridY() + $widget->getGridHeight()), 0);
+			$this->insertAll($pageId, [new WidgetInput(null, GridWidgetTypes::TYPE_DATA, null, null, null, 0, $gridY, GridWidgetTypes::GRID_COLUMNS, GridWidgetTypes::DATA_HEIGHT, [], $nodeRelId)]);
+			return true;
+		}, $this->db);
+	}
+
+	/**
 	 * Makes the widgets of a page match the given list: widgets with an id are updated,
 	 * widgets without one are inserted and widgets of the page that are not listed are
 	 * deleted, in one transaction. The widgets of the page and the node relations shown

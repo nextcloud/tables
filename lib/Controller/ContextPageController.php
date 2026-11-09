@@ -169,7 +169,7 @@ class ContextPageController extends AOCSController {
 	}
 
 	/**
-	 * [api v2] Delete a grid page with its widgets
+	 * [api v2] Delete a page with its widgets
 	 *
 	 * The start page of an application cannot be deleted.
 	 *
@@ -199,7 +199,7 @@ class ContextPageController extends AOCSController {
 	}
 
 	/**
-	 * [api v2] Get the widget types a grid page can hold
+	 * [api v2] Get the widget types a page can hold
 	 *
 	 * Every type carries the schema of its settings and whether it shows a table or view.
 	 *

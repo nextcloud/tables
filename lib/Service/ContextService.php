@@ -28,12 +28,12 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Helper\TextHelper;
-use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -498,6 +498,7 @@ class ContextService {
 	}
 
 	public function addNodeRelToPage(ContextNodeRelation $nodeRel, ?int $order = null, ?int $pageId = null): PageContent {
+		$isStartPage = $pageId === null;
 		if ($pageId === null) {
 			// when no page is given, find the startpage to add it to
 			$context = $this->contextMapper->findById($nodeRel->getContextId(), null, false);
@@ -519,6 +520,10 @@ class ContextService {
 			$pageContent->setOrder($order ?? 100); //FIXME: demand or calc order
 
 			$pageContent = $this->pageContentMapper->insert($pageContent);
+			if ($isStartPage) {
+				// the start page shows every table and view added later, below what it has
+				$this->widgetService->appendDataWidget($pageId, $nodeRel->getId());
+			}
 		}
 		return $pageContent;
 	}

@@ -232,6 +232,24 @@ class WidgetServiceTest extends DatabaseTestCase {
 		$this->assertSame([$kept->getId()], array_column($this->service->findByPageIds([$this->page])[$this->page], 'id'));
 	}
 
+	public function testADataWidgetIsAppendedBelowTheLowestWidget(): void {
+		$this->insert($this->page, 'header', null, $this->position(0, 0, 12, 2), ['heading' => 'Top'], null);
+		$this->insert($this->page, 'text', null, $this->position(6, 2, 6, 7), ['text' => 'Tall'], null);
+
+		$this->assertTrue($this->service->appendDataWidget($this->page, $this->rel(81)));
+
+		$widgets = $this->service->findByPageIds([$this->page])[$this->page];
+		$added = end($widgets);
+		$this->assertSame(['data', 0, 9, 12, 5, ['nodeRelId' => $this->rel(81)]], [$added['type'], $added['gridX'], $added['gridY'], $added['gridWidth'], $added['gridHeight'], $added['source']]);
+	}
+
+	public function testAFullPageGetsNoAppendedWidget(): void {
+		$this->service->insertAll($this->page, array_map(fn (int $row): WidgetInput => new WidgetInput(null, 'text', null, null, null, 0, $row, 6, 1, ['text' => 'x'], null), range(0, 99)));
+
+		$this->assertFalse($this->service->appendDataWidget($this->page, $this->rel(82)));
+		$this->assertCount(100, $this->service->findByPageIds([$this->page])[$this->page]);
+	}
+
 	public function testSyncRejectsTheIdOfAWidgetOnAnotherPage(): void {
 		$own = $this->insert($this->page, 'text', null, $this->position(0, 0, 6, 2), ['text' => 'Own'], null);
 		$other = $this->insert($this->otherPage, 'text', null, $this->position(0, 0, 6, 2), ['text' => 'Other'], null);
