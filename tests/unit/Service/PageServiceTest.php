@@ -16,13 +16,14 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\ConflictError;
 use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PageService;
-use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\WidgetService;
 use OCA\Tables\Tests\Unit\Database\DbErrorStub;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
 use OCP\IL10N;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -34,33 +35,34 @@ class PageServiceTest extends TestCase {
 	private const NODE_REL = 20;
 
 	private PageService $service;
-	private Context $context;
+	/** @var array<int, Page> stored pages by id */
+	private array $pages = [];
 	private PageMapper&MockObject $pageMapper;
 	private PageContentMapper&MockObject $pageContentMapper;
 	private WidgetService&MockObject $widgetService;
-	private PermissionsService&MockObject $permissionsService;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->context = new Context();
-		$this->context->id = 7;
-		$this->context->setNodes([self::NODE_REL => ['id' => self::NODE_REL, 'node_id' => 3, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]]);
-		$this->context->setPages([
-			self::START_PAGE => ['id' => self::START_PAGE, 'page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'dashboard', 'title' => null, 'icon' => null, 'description' => null, 'content' => []],
-			self::GRID_PAGE => ['id' => self::GRID_PAGE, 'page_type' => Page::TYPE_GRID, 'technical_name' => 'overview', 'title' => 'Overview', 'icon' => 'star', 'description' => null, 'content' => []],
-		]);
+		$this->pages = [
+			self::START_PAGE => $this->page(self::START_PAGE, Page::TYPE_STARTPAGE, 'dashboard', null),
+			self::GRID_PAGE => $this->page(self::GRID_PAGE, Page::TYPE_GRID, 'overview', 'Overview'),
+		];
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([self::NODE_REL => ['id' => self::NODE_REL, 'node_id' => 3, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]]);
 		$contextMapper = $this->createMock(ContextMapper::class);
-		$contextMapper->method('findById')->willReturnCallback(function (int $contextId): Context {
-			if ($contextId !== 7) {
-				throw new NotFoundError('Context does not exist');
-			}
-			return $this->context;
-		});
+		$contextMapper->method('findById')->willReturn($context);
+
 		$this->pageMapper = $this->createMock(PageMapper::class);
+		$this->pageMapper->method('findById')->willReturnCallback(function (int $pageId): Page {
+			if (!isset($this->pages[$pageId])) {
+				throw new DoesNotExistException('Page does not exist');
+			}
+			return clone $this->pages[$pageId];
+		});
+		$this->pageMapper->method('lockContext')->willReturn(true);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$this->widgetService = $this->createMock(WidgetService::class);
-		$this->widgetService->method('findIdsByPageId')->willReturnMap([[self::GRID_PAGE, [31, 32]], [self::START_PAGE, []]]);
-		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
 
@@ -69,345 +71,309 @@ class PageServiceTest extends TestCase {
 			$this->pageMapper,
 			$this->pageContentMapper,
 			$this->widgetService,
-			$this->permissionsService,
 			new GridWidgetTypes($l10n),
 			$this->createMock(IDBConnection::class),
 		);
 	}
 
-	public function testFindReturnsThePageWithItsWidgets(): void {
-		$widget = ['id' => 31, 'type' => 'text', 'title' => null, 'icon' => null, 'description' => null, 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hi'], 'source' => null];
+	private function page(int $id, string $type, string $technicalName, ?string $title): Page {
+		$page = new Page();
+		$page->id = $id;
+		$page->setContextId(7);
+		$page->setPageType($type);
+		$page->setTechnicalName($technicalName);
+		$page->setTitle($title);
+		$page->setVersion(4);
+		$page->resetUpdatedFields();
+		return $page;
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	private static function widget(array $fields = []): array {
+		return $fields + ['type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hi']];
+	}
+
+	public function testFindReturnsThePageWithItsWidgetsAndVersion(): void {
+		$widget = ['id' => 31, 'type' => 'text'];
 		$this->widgetService->method('findByPageIds')->with([self::GRID_PAGE])->willReturn([self::GRID_PAGE => [$widget]]);
 
-		$this->assertSame([
-			'id' => self::GRID_PAGE,
-			'contextId' => 7,
-			'pageType' => Page::TYPE_GRID,
-			'technicalName' => 'overview',
-			'title' => 'Overview',
-			'icon' => 'star',
-			'description' => null,
-			'widgets' => [$widget],
-		], $this->service->find(7, self::GRID_PAGE, 'alice'));
+		$page = $this->service->find(7, self::GRID_PAGE);
+
+		$this->assertSame([self::GRID_PAGE, 7, Page::TYPE_GRID, 'overview', 'Overview', 4, [$widget]], [
+			$page['id'], $page['contextId'], $page['pageType'], $page['technicalName'], $page['title'], $page['version'], $page['widgets'],
+		]);
 	}
 
-	public function testFindByTechnicalNameReturnsTheSamePageAsItsId(): void {
+	public function testFindByTechnicalNameAsksTheMapperAndAnUnknownNameIsNotFound(): void {
+		$this->pageMapper->method('findByTechnicalName')->willReturnCallback(function (int $contextId, string $name): Page {
+			return $name === 'overview' ? $this->pages[self::GRID_PAGE] : throw new DoesNotExistException('none');
+		});
 		$this->widgetService->method('findByPageIds')->willReturn([]);
 
-		$this->assertSame($this->service->find(7, self::GRID_PAGE, 'alice'), $this->service->findByTechnicalName(7, 'overview', 'alice'));
+		$this->assertSame(self::GRID_PAGE, $this->service->findByTechnicalName(7, 'overview')['id']);
+		$this->expectException(NotFoundError::class);
+		$this->service->findByTechnicalName(7, 'missing');
 	}
 
-	public function testAnApplicationOrPageOutsideTheUsersReachIsNotFound(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->expects($this->never())->method('insert');
-		$this->pageMapper->expects($this->never())->method('update');
-		$this->pageMapper->expects($this->never())->method('deleteByPageId');
-		$this->widgetService->expects($this->never())->method('syncPage');
-
+	public function testAPageOfAnotherApplicationIsNotFound(): void {
+		$this->pageMapper->expects($this->never())->method('raiseVersion');
 		foreach ([
-			'application of no access' => fn () => $this->service->find(8, self::GRID_PAGE, 'mallory'),
-			'create in it' => fn () => $this->service->create(8, 'Overview', null, null, null, 'mallory'),
-			'update in it' => fn () => $this->service->update(8, self::GRID_PAGE, 'Mine', null, null, null, [], 'mallory'),
-			'delete in it' => fn () => $this->service->delete(8, self::GRID_PAGE, 'mallory'),
-			'application of no access by name' => fn () => $this->service->findByTechnicalName(8, 'overview', 'mallory'),
-			'page of another application' => fn () => $this->service->find(7, 99, 'alice'),
-			'unknown name' => fn () => $this->service->findByTechnicalName(7, 'missing', 'alice'),
-			'update it' => fn () => $this->service->update(7, 99, 'Taken over', null, null, null, [], 'alice'),
-			'delete it' => fn () => $this->service->delete(7, 99, 'alice'),
+			'find' => fn () => $this->service->find(8, self::GRID_PAGE),
+			'update' => fn () => $this->service->update(8, self::GRID_PAGE, 'Mine', null, null, null, null, null),
+			'delete' => fn () => $this->service->delete(8, self::GRID_PAGE),
+			'unknown page' => fn () => $this->service->find(7, 99),
 		] as $case => $call) {
 			try {
 				$call();
 				$this->fail($case . ' was found.');
 			} catch (NotFoundError) {
+				$this->addToAssertionCount(1);
 			}
 		}
 	}
 
 	public function testCreateInsertsAGridPageNamedByItsId(): void {
-		$this->permissionsService->method('canManageContext')->with($this->context, 'alice')->willReturn(true);
-		$inserted = null;
-		$this->pageMapper->expects($this->never())->method('insert');
-		$this->pageMapper->expects($this->once())->method('insertWithDefaultName')->willReturnCallback(function (Page $page) use (&$inserted): Page {
-			$page->id = self::GRID_PAGE;
-			$page->setTechnicalName('page_' . self::GRID_PAGE);
-			$inserted = $page;
+		$this->pageMapper->expects($this->once())->method('insertWithDefaultName')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 9;
+			$page->setTechnicalName('page_9');
 			return $page;
 		});
 
-		$this->service->create(7, '  Team Overview ', null, ' home ', '', 'alice');
+		$page = $this->service->create(7, ' Planning ', null, 'star', ' Next steps ');
 
-		$this->assertSame([7, Page::TYPE_GRID, 'Team Overview', 'home', null], [$inserted->getContextId(), $inserted->getPageType(), $inserted->getTitle(), $inserted->getIcon(), $inserted->getDescription()]);
+		$this->assertSame([9, Page::TYPE_GRID, 'page_9', 'Planning', 'star', 'Next steps', []], [
+			$page['id'], $page['pageType'], $page['technicalName'], $page['title'], $page['icon'], $page['description'], $page['widgets'],
+		]);
 	}
 
-	public function testCreateKeepsAGivenTechnicalName(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->expects($this->never())->method('insertWithDefaultName');
-		$inserted = null;
-		$this->pageMapper->expects($this->once())->method('insert')->willReturnCallback(function (Page $page) use (&$inserted): Page {
-			$page->id = self::GRID_PAGE;
-			$inserted = $page;
-			return $page;
-		});
-
-		$this->service->create(7, 'Overview', 'team_board', null, null, 'alice');
-
-		$this->assertSame('team_board', $inserted->getTechnicalName());
-	}
-
-	public function testCreateRefusesAGivenNameAConcurrentSaveTook(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->expects($this->once())->method('insert')
-			->willThrowException(DbErrorStub::uniqueViolation());
-
-		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('already used');
-		$this->service->create(7, 'Overview', 'team_board', null, null, 'alice');
-	}
-
-	public function testCreateNeedsATitle(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->expects($this->never())->method('insert');
-
-		$this->expectException(BadRequestError::class);
-		$this->service->create(7, '   ', null, null, null, 'alice');
-	}
-
-	public function testUpdateSyncsWidgetsById(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$synced = null;
-		$this->widgetService->expects($this->once())->method('syncPage')->willReturnCallback(function (int $pageId, array $rows) use (&$synced): void {
-			$this->assertSame(self::GRID_PAGE, $pageId);
-			$synced = $rows;
-		});
-		$this->pageMapper->expects($this->never())->method('update');
-
-		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [
-			['id' => 31, 'type' => 'header', 'title' => ' Intro ', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2, 'settings' => ['heading' => 'Welcome']],
-			['type' => 'data', 'icon' => 'star', 'description' => ' Open tasks ', 'gridX' => 0, 'gridY' => 2, 'gridWidth' => 6, 'gridHeight' => 5, 'source' => ['nodeRelId' => self::NODE_REL]],
-			['type' => 'data', 'icon' => '', 'description' => '', 'gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5, 'source' => null],
-		], 'alice');
-
-		$this->assertSame([
-			['id' => 31, 'type' => 'header', 'title' => 'Intro', 'icon' => null, 'description' => null, 'position' => ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2], 'settings' => ['heading' => 'Welcome', 'subheading' => '', 'textAlign' => 'start', 'backgroundColor' => '', 'textColor' => ''], 'nodeRelId' => null],
-			['id' => null, 'type' => 'data', 'title' => null, 'icon' => 'star', 'description' => 'Open tasks', 'position' => ['gridX' => 0, 'gridY' => 2, 'gridWidth' => 6, 'gridHeight' => 5], 'settings' => [], 'nodeRelId' => self::NODE_REL],
-			['id' => null, 'type' => 'data', 'title' => null, 'icon' => null, 'description' => null, 'position' => ['gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5], 'settings' => [], 'nodeRelId' => null],
-		], $synced);
-	}
-
-	public function testChangesNeedManagePermission(): void {
-		$this->permissionsService->method('canManageContext')->with($this->context, 'bob')->willReturn(false);
-		$this->pageMapper->expects($this->never())->method('insert');
-		$this->pageMapper->expects($this->never())->method('update');
-		$this->pageMapper->expects($this->never())->method('deleteByPageId');
-		$this->widgetService->expects($this->never())->method('syncPage');
-
-		foreach ([
-			'create' => fn () => $this->service->create(7, 'Overview', null, null, null, 'bob'),
-			'update' => fn () => $this->service->update(7, self::GRID_PAGE, 'New', null, null, null, [], 'bob'),
-			'delete' => fn () => $this->service->delete(7, self::GRID_PAGE, 'bob'),
-		] as $case => $call) {
-			try {
-				$call();
-				$this->fail($case . ' was allowed.');
-			} catch (PermissionError) {
+	public function testCreateKeepsAGivenTechnicalNameAndReportsATakenOne(): void {
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			if ($page->getTechnicalName() === 'taken') {
+				throw DbErrorStub::uniqueViolation();
 			}
-		}
+			$page->id = 9;
+			return $page;
+		});
+
+		$this->assertSame('planning', $this->service->create(7, 'Planning', 'planning', null, null)['technicalName']);
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('The technical name taken is already used');
+		$this->service->create(7, 'Planning', 'taken', null, null);
 	}
 
-	public function testUpdateChangesPageFields(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$stored = new Page();
-		$stored->id = self::GRID_PAGE;
-		$stored->setTechnicalName('overview');
-		$stored->setTitle('Overview');
-		$stored->setIcon('star');
-		$stored->resetUpdatedFields();
-		$this->pageMapper->method('findById')->with(self::GRID_PAGE)->willReturn($stored);
-		$updated = null;
-		$this->pageMapper->expects($this->once())->method('update')->willReturnCallback(function (Page $page) use (&$updated): Page {
-			$updated = $page;
+	public function testCreateInAnApplicationThatIsGoneIsNotFound(): void {
+		$this->pageMapper = $this->createMock(PageMapper::class);
+		$this->pageMapper->method('lockContext')->willReturn(false);
+		$this->pageMapper->expects($this->never())->method('insertWithDefaultName');
+		$service = new PageService($this->createMock(ContextMapper::class), $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
+
+		$this->expectException(NotFoundError::class);
+		$service->create(7, 'Planning', null, null, null);
+	}
+
+	public static function blankTitles(): array {
+		return [
+			'empty' => [''],
+			'spaces' => ['   '],
+			'no-break and zero width spaces' => ["\u{00A0}\u{200B}"],
+			'too long' => [str_repeat('a', 201)],
+		];
+	}
+
+	/**
+	 * @dataProvider blankTitles
+	 */
+	public function testAGridPageNeedsATitle(string $title): void {
+		$this->pageMapper->expects($this->never())->method('raiseVersion');
+		try {
+			$this->service->create(7, $title, null, null, null);
+			$this->fail('A page was created without a title.');
+		} catch (BadRequestError $e) {
+			$this->assertStringContainsString('A page title needs 1 to 200 characters', $e->getMessage());
+		}
+		$this->expectException(BadRequestError::class);
+		$this->service->update(7, self::GRID_PAGE, $title, null, null, null, null, null);
+	}
+
+	public function testTheStartPageCanLoseItsTitleAgain(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->widgetService->method('findByPageIds')->willReturn([]);
+		$saved = [];
+		$this->pageMapper->method('update')->willReturnCallback(static function (Page $page) use (&$saved): Page {
+			$saved[] = $page->getTitle();
 			return $page;
+		});
+
+		$this->service->update(7, self::START_PAGE, 'Start', null, null, null, null, null);
+		$page = $this->service->update(7, self::START_PAGE, '', null, null, null, null, null);
+
+		$this->assertSame(['Start', null], $saved);
+		$this->assertNull($page['title']);
+	}
+
+	public function testUpdateSyncsWidgetsAndAnswersWithWhatWasStored(): void {
+		$this->pageMapper->expects($this->once())->method('raiseVersion')->with(self::GRID_PAGE, 4)->willReturn(true);
+		$stored = [['id' => 31, 'type' => 'text'], ['id' => 32, 'type' => 'data']];
+		$synced = null;
+		$this->widgetService->expects($this->once())->method('syncPage')->willReturnCallback(function (int $pageId, array $widgets) use (&$synced, $stored): array {
+			$synced = $widgets;
+			return $stored;
+		});
+		$this->widgetService->expects($this->never())->method('findByPageIds');
+
+		$page = $this->service->update(7, self::GRID_PAGE, null, null, null, null, [
+			self::widget(['id' => 31]),
+			self::widget(['type' => 'data', 'settings' => [], 'source' => ['nodeRelId' => self::NODE_REL]]),
+		], 4);
+
+		$this->assertSame([[31, 'text', null], [null, 'data', self::NODE_REL]], array_map(static fn (WidgetInput $w): array => [$w->id, $w->type, $w->nodeRelId], $synced));
+		$this->assertSame([$stored, 5], [$page['widgets'], $page['version']]);
+	}
+
+	public function testTheStartPageHoldsWidgets(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->widgetService->expects($this->once())->method('syncPage')->with(self::START_PAGE)->willReturn([]);
+
+		$this->service->update(7, self::START_PAGE, null, null, null, null, [self::widget()], 4);
+	}
+
+	public function testASaveOfWidgetsNamesTheVersionItIsBasedOn(): void {
+		$this->widgetService->expects($this->never())->method('syncPage');
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('names the version of the page');
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget()], null);
+	}
+
+	public function testASaveBasedOnAnOlderVersionIsAConflict(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(false);
+		$this->widgetService->expects($this->never())->method('syncPage');
+
+		$this->expectException(ConflictError::class);
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget()], 3);
+	}
+
+	public function testASaveOfAPageDeletedInTheMeantimeIsNotFound(): void {
+		$this->pageMapper->method('raiseVersion')->willReturnCallback(function (): bool {
+			unset($this->pages[self::GRID_PAGE]);
+			return false;
 		});
 		$this->widgetService->expects($this->never())->method('syncPage');
 
-		$this->service->update(7, self::GRID_PAGE, 'Planning', 'planning', '', 'What is next', null, 'alice');
-
-		$this->assertSame([self::GRID_PAGE, 'planning', 'Planning', null, 'What is next'], [$updated->getId(), $updated->getTechnicalName(), $updated->getTitle(), $updated->getIcon(), $updated->getDescription()]);
-		$this->assertSame(['title', 'technicalName', 'icon', 'description'], array_keys($updated->getUpdatedFields()));
+		$this->expectException(NotFoundError::class);
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget()], 4);
 	}
 
-	public function testUpdateKeepsTheTechnicalNameWhenTheTitleChanges(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$stored = $this->storedGridPage();
-		$this->pageMapper->method('findById')->willReturn($stored);
-		$this->pageMapper->expects($this->once())->method('update')->willReturnArgument(0);
+	public function testAWidgetRemovedByAConcurrentSaveIsAConflict(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->widgetService->method('syncPage')->willThrowException(new \InvalidArgumentException('Widget 31 is not on page 2'));
 
-		$this->service->update(7, self::GRID_PAGE, 'Planning', null, null, null, null, 'alice');
-
-		$this->assertSame('overview', $stored->getTechnicalName());
+		$this->expectException(ConflictError::class);
+		$this->expectExceptionMessage('Load it again and retry');
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget(['id' => 31])], 4);
 	}
 
-	public function testAPageKeepsOrTakesItsOwnNames(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$stored = $this->storedGridPage();
-		$this->pageMapper->method('findById')->willReturn($stored);
-		$this->pageMapper->expects($this->once())->method('update')->willReturnArgument(0);
+	public function testUpdateChangesThePageFields(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->widgetService->method('findByPageIds')->willReturn([]);
+		$updated = null;
+		$this->pageMapper->expects($this->once())->method('update')->willReturnCallback(static function (Page $page) use (&$updated): Page {
+			$updated = [$page->getTitle(), $page->getTechnicalName(), $page->getIcon(), $page->getDescription()];
+			return $page;
+		});
 
-		$this->service->update(7, self::GRID_PAGE, null, 'overview', null, null, null, 'alice');
-		$this->service->update(7, self::GRID_PAGE, null, 'page_' . self::GRID_PAGE, null, null, null, 'alice');
+		$this->service->update(7, self::GRID_PAGE, 'Planning', 'planning', 'star', 'Next steps', null, null);
 
-		$this->assertSame('page_' . self::GRID_PAGE, $stored->getTechnicalName());
+		$this->assertSame(['Planning', 'planning', 'star', 'Next steps'], $updated);
+	}
+
+	public function testARenameToANameAConcurrentSaveTookIsReported(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->pageMapper->method('update')->willThrowException(DbErrorStub::uniqueViolation());
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('The technical name planning is already used');
+		$this->service->update(7, self::GRID_PAGE, null, 'planning', null, null, null, null);
+	}
+
+	public function testAUniqueViolationWithoutARenameIsNotTakenForOne(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->widgetService->method('syncPage')->willThrowException(DbErrorStub::uniqueViolation());
+
+		$this->expectException(DbErrorStub::class);
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget()], 4);
 	}
 
 	public static function refusedTechnicalNames(): array {
 		return [
-			'upper case' => ['Board', 'lower case letters'],
-			'leading digit' => ['2026_plan', 'lower case letters'],
-			'empty' => ['', 'lower case letters'],
-			'too long' => [str_repeat('a', 201), 'lower case letters'],
-			'taken' => ['dashboard', 'already used'],
-			'reserved' => ['page_9', 'reserved for automatic names'],
+			'upper case' => ['Planning', 'A technical name has 1 to 200 lower case letters'],
+			'reserved for another page' => ['page_5', 'The technical name page_5 is reserved'],
 		];
 	}
 
 	/**
 	 * @dataProvider refusedTechnicalNames
 	 */
-	public function testUpdateRefusesAnInvalidOrTakenTechnicalName(string $technicalName, string $message): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->method('findById')->willReturn($this->storedGridPage());
-		$this->pageMapper->expects($this->never())->method('update');
-
+	public function testAnInvalidTechnicalNameIsRefused(string $technicalName, string $message): void {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage($message);
-		$this->service->update(7, self::GRID_PAGE, null, $technicalName, null, null, null, 'alice');
+		$this->service->update(7, self::GRID_PAGE, null, $technicalName, null, null, null, null);
 	}
 
-	public function testUpdateRefusesANameAConcurrentSaveTook(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->method('findById')->willReturn($this->storedGridPage());
-		$this->pageMapper->method('update')
-			->willThrowException(DbErrorStub::uniqueViolation());
+	public function testAPageKeepsItsOwnAutomaticName(): void {
+		$this->pages[self::GRID_PAGE]->setTechnicalName('page_2');
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->widgetService->method('findByPageIds')->willReturn([]);
 
+		$this->assertSame('page_2', $this->service->update(7, self::GRID_PAGE, null, 'page_2', null, null, null, null)['technicalName']);
+	}
+
+	public function testAnUnknownIconIsRefused(): void {
 		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('already used');
-		$this->service->update(7, self::GRID_PAGE, null, 'planning', null, null, null, 'alice');
-	}
-
-	public function testUpdateRefusesAnUnknownIcon(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->method('findById')->willReturn($this->storedGridPage());
-		$this->pageMapper->expects($this->never())->method('update');
-
-		$this->expectException(BadRequestError::class);
-		$this->service->update(7, self::GRID_PAGE, null, null, 'no-such-icon', null, null, 'alice');
-	}
-
-	private function storedGridPage(): Page {
-		$stored = new Page();
-		$stored->id = self::GRID_PAGE;
-		$stored->setContextId(7);
-		$stored->setTechnicalName('overview');
-		$stored->setTitle('Overview');
-		$stored->resetUpdatedFields();
-		return $stored;
+		$this->expectExceptionMessage('unknown icon');
+		$this->service->update(7, self::GRID_PAGE, null, null, 'no-such-icon', null, null, null);
 	}
 
 	public static function invalidWidgets(): array {
-		$at = ['gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2];
-		$foreignSource = 'must be {nodeRelId} of a table or view of this application';
 		return [
 			'not an object' => [['x'], 'Widget 0 must be an object'],
-			'no type' => [[$at], 'Widget 0 needs a type'],
-			'unknown type' => [[['type' => 'chart'] + $at], 'Unknown widget type'],
-			'id of another page' => [[['id' => 99, 'type' => 'text'] + $at], 'Widget 0 has the id of no other widget on this page'],
-			'id twice' => [[['id' => 31, 'type' => 'text'] + $at, ['id' => 31, 'type' => 'text'] + $at], 'Widget 1 has the id'],
-			'invalid setting' => [[['type' => 'header', 'settings' => ['heading' => '']] + $at], 'header.heading is required'],
-			'outside the grid' => [[['type' => 'text', 'gridX' => 8, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]], 'does not fit in 12 columns'],
-			'invalid title' => [[['type' => 'text', 'title' => 5] + $at], 'The title of widget 0'],
-			'unknown icon' => [[['type' => 'text', 'icon' => 'no-such-icon'] + $at], 'Widget 0 has an unknown icon'],
-			'icon not text' => [[['type' => 'text', 'icon' => 5] + $at], 'The icon of widget 0'],
-			'source on a header' => [[['type' => 'header', 'settings' => ['heading' => 'A'], 'source' => ['nodeRelId' => self::NODE_REL]] + $at], 'shows no table or view'],
-			'node of another application' => [[['type' => 'data', 'source' => ['nodeRelId' => 21]] + $at], $foreignSource],
-			'table outside the application' => [[['type' => 'data', 'source' => ['nodeType' => Application::NODE_TYPE_TABLE, 'nodeId' => 3]] + $at], $foreignSource],
-			'source not an object' => [[['type' => 'data', 'source' => self::NODE_REL] + $at], $foreignSource],
+			'unknown type' => [[self::widget(['type' => 'chart'])], 'Unknown widget type'],
+			'source of another application' => [[self::widget(['type' => 'data', 'settings' => [], 'source' => ['nodeRelId' => 99]])], 'The source of widget 0'],
+			'the same id twice' => [[self::widget(['id' => 31]), self::widget(['id' => 31])], 'Widget 1 has the id of another widget'],
+			'too many' => [array_fill(0, 101, self::widget()), 'A page holds at most 100 widgets'],
 		];
 	}
 
 	/**
 	 * @dataProvider invalidWidgets
 	 */
-	public function testUpdateRejectsInvalidWidgets(array $widgets, string $message): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->widgetService->expects($this->never())->method('syncPage');
-
+	public function testInvalidWidgetsAreRefusedBeforeAnyWrite(array $widgets, string $message): void {
+		$this->pageMapper->expects($this->never())->method('raiseVersion');
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage($message);
-		$this->service->update(7, self::GRID_PAGE, null, null, null, null, $widgets, 'alice');
-	}
-
-	public function testTheStartPageHoldsNoWidgets(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-
-		$this->expectException(BadRequestError::class);
-		$this->service->update(7, self::START_PAGE, null, null, null, null, [], 'alice');
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, $widgets, 4);
 	}
 
 	public function testDeleteRemovesAGridPageWithItsWidgets(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->widgetService->method('findByPageIds')->willReturn([]);
+		$this->pageMapper->expects($this->once())->method('raiseVersion')->with(self::GRID_PAGE, null)->willReturn(true);
+		$this->widgetService->method('findByPageIds')->willReturn([self::GRID_PAGE => [['id' => 31]]]);
 		$this->widgetService->expects($this->once())->method('deleteByPageIds')->with([self::GRID_PAGE]);
 		$this->pageMapper->expects($this->once())->method('deleteByPageId')->with(self::GRID_PAGE);
 
-		$this->assertSame('Overview', $this->service->delete(7, self::GRID_PAGE, 'alice')['title']);
+		$this->assertSame([['id' => 31]], $this->service->delete(7, self::GRID_PAGE)['widgets']);
 	}
 
 	public function testTheStartPageCannotBeDeleted(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
 		$this->pageMapper->expects($this->never())->method('deleteByPageId');
-
 		$this->expectException(BadRequestError::class);
-		$this->service->delete(7, self::START_PAGE, 'alice');
+		$this->service->delete(7, self::START_PAGE);
 	}
 
-	public function testAPageHoldsAtMostTheMaximumNumberOfWidgets(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->widgetService->expects($this->once())->method('syncPage');
-		$widgets = [];
-		for ($i = 0; $i < GridWidgetTypes::MAX_WIDGETS_PER_PAGE; $i++) {
-			$widgets[] = ['type' => 'text', 'gridX' => 0, 'gridY' => $i * 2, 'gridWidth' => 6, 'gridHeight' => 2];
-		}
-		$this->service->update(7, self::GRID_PAGE, null, null, null, null, $widgets, 'alice');
-
-		$widgets[] = ['type' => 'text', 'gridX' => 6, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2];
-		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('at most 100 widgets');
-		$this->service->update(7, self::GRID_PAGE, null, null, null, null, $widgets, 'alice');
-	}
-
-	/**
-	 * A concurrent save removed a listed widget between the check and the sync.
-	 */
-	public function testAWidgetRemovedByAConcurrentSaveAsksForARetry(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->widgetService->method('syncPage')->willThrowException(new \InvalidArgumentException('Widget 31 is not on page 2'));
-
-		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('changed by another save');
-		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [['id' => 31, 'type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]], 'alice');
-	}
-
-	/**
-	 * Two saves adding a source to the same widget at once collide on the source key; that
-	 * is no taken technical name.
-	 */
-	public function testAConcurrentCollisionWithoutARenameAsksForARetry(): void {
-		$this->permissionsService->method('canManageContext')->willReturn(true);
-		$this->pageMapper->method('findById')->willReturn($this->storedGridPage());
-		$this->widgetService->method('syncPage')->willThrowException(DbErrorStub::uniqueViolation());
-
-		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('changed by another save');
-		$this->service->update(7, self::GRID_PAGE, 'Renamed title', 'overview', null, null, [['id' => 31, 'type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]], 'alice');
+	public function testADeleteOfAPageDeletedInTheMeantimeIsNotFound(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(false);
+		$this->pageMapper->expects($this->never())->method('deleteByPageId');
+		$this->expectException(NotFoundError::class);
+		$this->service->delete(7, self::GRID_PAGE);
 	}
 }

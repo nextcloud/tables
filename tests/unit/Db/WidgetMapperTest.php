@@ -49,7 +49,7 @@ class WidgetMapperTest extends DatabaseTestCase {
 			$inserted->getId(), self::PAGE, 'header', 'Welcome', 'star', 'What the team works on', 2, 3, 8, 4, '{"heading":"Projects","showTitle":false}',
 		], [
 			$widget->getId(), $widget->getPageId(), $widget->getType(), $widget->getTitle(), $widget->getIcon(), $widget->getDescription(),
-			$widget->getGridX(), $widget->getGridY(), $widget->getGridWidth(), $widget->getGridHeight(), json_encode($widget->getSettingsObject()),
+			$widget->getGridX(), $widget->getGridY(), $widget->getGridWidth(), $widget->getGridHeight(), json_encode($widget->getSettingsForResponse()),
 		]);
 	}
 
@@ -119,7 +119,7 @@ class WidgetMapperTest extends DatabaseTestCase {
 		$widget->setGridY($y);
 		$widget->setGridWidth($width);
 		$widget->setGridHeight($height);
-		$widget->setSettings($settings);
+		$widget->setSettingsArray($settings);
 		return $widget;
 	}
 }

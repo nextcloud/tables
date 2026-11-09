@@ -11,14 +11,12 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\ConflictError;
 use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PageService;
-use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -32,6 +30,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesPage from ResponseDefinitions
  * @psalm-import-type TablesWidgetType from ResponseDefinitions
+ * @psalm-import-type TablesWidgetInput from ResponseDefinitions
  */
 class ContextPageController extends AOCSController {
 	public function __construct(
@@ -60,7 +59,7 @@ class ContextPageController extends AOCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/2/contexts/{contextId}/pages/{pageId}', requirements: ['contextId' => '\d+', 'pageId' => '\d+'])]
 	public function show(int $contextId, int $pageId): DataResponse {
 		try {
-			return new DataResponse($this->pageService->find($contextId, $pageId, $this->userId));
+			return new DataResponse($this->pageService->find($contextId, $pageId));
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -83,7 +82,7 @@ class ContextPageController extends AOCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/2/contexts/{contextId}/pages/{technicalName}', requirements: ['contextId' => '\d+', 'technicalName' => '[a-z][a-z0-9_]*'])]
 	public function showByTechnicalName(int $contextId, string $technicalName): DataResponse {
 		try {
-			return new DataResponse($this->pageService->findByTechnicalName($contextId, $technicalName, $this->userId));
+			return new DataResponse($this->pageService->findByTechnicalName($contextId, $technicalName));
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -112,11 +111,9 @@ class ContextPageController extends AOCSController {
 	#[ApiRoute(verb: 'POST', url: '/api/2/contexts/{contextId}/pages', requirements: ['contextId' => '\d+'])]
 	public function create(int $contextId, string $title, ?string $technicalName = null, ?string $icon = null, ?string $description = null): DataResponse {
 		try {
-			return new DataResponse($this->pageService->create($contextId, $title, $technicalName, $icon, $description, $this->userId));
+			return new DataResponse($this->pageService->create($contextId, $title, $technicalName, $icon, $description));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -142,29 +139,29 @@ class ContextPageController extends AOCSController {
 	 * @param string|null $technicalName New technical name
 	 * @param string|null $icon New icon name, empty to remove it
 	 * @param string|null $description New description, empty to remove it
-	 * @param list<array<string, mixed>>|null $widgets All widgets of the page
-	 * @return DataResponse<Http::STATUS_OK, TablesPage, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @param list<TablesWidgetInput>|null $widgets All widgets of the page
+	 * @param int|null $version The version of the page the widgets were edited from, needed with widgets
+	 * @return DataResponse<Http::STATUS_OK, TablesPage, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_CONFLICT|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Page updated
-	 * 400: Invalid page field or widget, too many widgets, or the page changed in between
+	 * 400: Invalid page field or widget, or too many widgets
 	 * 403: No permissions
 	 * 404: Not found
+	 * 409: The page was saved by someone else since the given version
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 60, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/2/contexts/{contextId}/pages/{pageId}', requirements: ['contextId' => '\d+', 'pageId' => '\d+'])]
-	public function update(int $contextId, int $pageId, ?string $title = null, ?string $technicalName = null, ?string $icon = null, ?string $description = null, ?array $widgets = null): DataResponse {
+	public function update(int $contextId, int $pageId, ?string $title = null, ?string $technicalName = null, ?string $icon = null, ?string $description = null, ?array $widgets = null, ?int $version = null): DataResponse {
 		try {
-			return new DataResponse($this->pageService->update($contextId, $pageId, $title, $technicalName, $icon, $description, $widgets, $this->userId));
+			return new DataResponse($this->pageService->update($contextId, $pageId, $title, $technicalName, $icon, $description, $widgets, $version));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
+		} catch (ConflictError $e) {
+			return $this->handleConflictError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException $e) {
-			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		} catch (Exception $e) {
 			return $this->handleError($e);
 		}
@@ -185,15 +182,14 @@ class ContextPageController extends AOCSController {
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/2/contexts/{contextId}/pages/{pageId}', requirements: ['contextId' => '\d+', 'pageId' => '\d+'])]
 	public function destroy(int $contextId, int $pageId): DataResponse {
 		try {
-			return new DataResponse($this->pageService->delete($contextId, $pageId, $this->userId));
+			return new DataResponse($this->pageService->delete($contextId, $pageId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -213,6 +209,10 @@ class ContextPageController extends AOCSController {
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/api/2/widget-types')]
 	public function widgetTypes(): DataResponse {
-		return new DataResponse(array_values($this->gridWidgetTypes->all()));
+		// a type without settings shows them as {}, the object the schema promises
+		return new DataResponse(array_values(array_map(
+			static fn (array $type): array => $type['settings'] === [] ? ['settings' => new \stdClass()] + $type : $type,
+			$this->gridWidgetTypes->all(),
+		)));
 	}
 }

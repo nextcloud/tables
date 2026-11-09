@@ -259,7 +259,21 @@ namespace OCA\Tables;
  *   defaultWidth: int,
  *   defaultHeight: int,
  *   hasSource: bool,
- *   settings: array<string, TablesWidgetSettingSchema>,
+ *   settings: array<string, TablesWidgetSettingSchema>|\stdClass,
+ * }
+ *
+ * @psalm-type TablesWidgetInput = array{
+ *   id?: int,
+ *   type: string,
+ *   title?: string,
+ *   icon?: string,
+ *   description?: string,
+ *   gridX: int,
+ *   gridY: int,
+ *   gridWidth: int,
+ *   gridHeight: int,
+ *   settings?: array<string, TablesWidgetValue>,
+ *   source?: array{nodeRelId: int},
  * }
  *
  * @psalm-type TablesWidget = array{
@@ -284,6 +298,7 @@ namespace OCA\Tables;
  *   title: ?string,
  *   icon: ?string,
  *   description: ?string,
+ *   version: int,
  *   widgets: list<TablesWidget>,
  * }
  *

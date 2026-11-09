@@ -473,6 +473,7 @@
                     "title",
                     "icon",
                     "description",
+                    "version",
                     "widgets"
                 ],
                 "properties": {
@@ -501,6 +502,10 @@
                     "description": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "version": {
+                        "type": "integer",
+                        "format": "int64"
                     },
                     "widgets": {
                         "type": "array",
@@ -1432,6 +1437,74 @@
                     }
                 }
             },
+            "WidgetInput": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "gridX",
+                    "gridY",
+                    "gridWidth",
+                    "gridHeight"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "icon": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "gridX": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "gridY": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "gridWidth": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "gridHeight": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "settings": {
+                        "type": "object",
+                        "nullable": true,
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/WidgetValue"
+                        }
+                    },
+                    "source": {
+                        "type": "object",
+                        "nullable": true,
+                        "required": [
+                            "nodeRelId"
+                        ],
+                        "properties": {
+                            "nodeRelId": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                }
+            },
             "WidgetSettingSchema": {
                 "type": "object",
                 "required": [
@@ -1446,7 +1519,6 @@
                             "string",
                             "text",
                             "color",
-                            "boolean",
                             "enum"
                         ]
                     },
@@ -1516,23 +1588,7 @@
                 }
             },
             "WidgetValue": {
-                "nullable": true,
-                "anyOf": [
-                    {
-                        "type": "string"
-                    },
-                    {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    {
-                        "type": "boolean"
-                    }
-                ]
+                "type": "string"
             }
         }
     },
@@ -15028,11 +15084,15 @@
                                         "default": null,
                                         "description": "All widgets of the page",
                                         "items": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                                "type": "object"
-                                            }
+                                            "$ref": "#/components/schemas/WidgetInput"
                                         }
+                                    },
+                                    "version": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "The version of the page the widgets were edited from, needed with widgets"
                                     }
                                 }
                             }
@@ -15103,7 +15163,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid page field or widget, too many widgets, or the page changed in between",
+                        "description": "Invalid page field or widget, or too many widgets",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -15180,6 +15240,44 @@
                     },
                     "404": {
                         "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The page was saved by someone else since the given version",
                         "content": {
                             "application/json": {
                                 "schema": {

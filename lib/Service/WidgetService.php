@@ -58,7 +58,7 @@ class WidgetService {
 				'gridY' => $widget->getGridY(),
 				'gridWidth' => $widget->getGridWidth(),
 				'gridHeight' => $widget->getGridHeight(),
-				'settings' => $widget->getSettingsObject(),
+				'settings' => $widget->getSettingsForResponse(),
 				'source' => isset($sources[$id]) ? ['nodeRelId' => $sources[$id]] : null,
 			];
 		}
@@ -111,13 +111,14 @@ class WidgetService {
 	 * are locked first, so the checks still hold when the writes run.
 	 *
 	 * @param list<WidgetInput> $widgets
+	 * @return list<TablesWidget> the widgets of the page as stored, in grid order
 	 * @throws \InvalidArgumentException when an id is not one of a widget of the page, or a
 	 *                                   source is not a node of the application of the page
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
-	public function syncPage(int $pageId, array $widgets): void {
-		$this->atomic(function () use ($pageId, $widgets): void {
+	public function syncPage(int $pageId, array $widgets): array {
+		return $this->atomic(function () use ($pageId, $widgets): array {
 			$existing = [];
 			foreach ($this->widgetMapper->findByPageIds([$pageId], true) as $widget) {
 				$existing[$widget->getId()] = $widget;
@@ -149,6 +150,7 @@ class WidgetService {
 					$this->widgetSourceMapper->setSource($input->id, $input->nodeRelId);
 				}
 			}
+			return $this->findByPageIds([$pageId])[$pageId] ?? [];
 		}, $this->db);
 	}
 

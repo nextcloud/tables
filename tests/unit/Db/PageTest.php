@@ -56,6 +56,7 @@ class PageTest extends DatabaseTestCase {
 			'title' => 'Overview',
 			'icon' => 'star',
 			'description' => 'Open tasks by team',
+			'version' => 0,
 		], $this->load($page->getId())->jsonSerialize());
 	}
 

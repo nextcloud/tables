@@ -1318,6 +1318,8 @@ export type components = {
             readonly title: string | null;
             readonly icon: string | null;
             readonly description: string | null;
+            /** Format: int64 */
+            readonly version: number;
             readonly widgets: readonly components["schemas"]["Widget"][];
         };
         readonly PublicColumn: {
@@ -1576,9 +1578,32 @@ export type components = {
                 readonly nodeRelId: number;
             } | null;
         };
+        readonly WidgetInput: {
+            /** Format: int64 */
+            readonly id?: number | null;
+            readonly type: string;
+            readonly title?: string | null;
+            readonly icon?: string | null;
+            readonly description?: string | null;
+            /** Format: int64 */
+            readonly gridX: number;
+            /** Format: int64 */
+            readonly gridY: number;
+            /** Format: int64 */
+            readonly gridWidth: number;
+            /** Format: int64 */
+            readonly gridHeight: number;
+            readonly settings?: {
+                readonly [key: string]: components["schemas"]["WidgetValue"];
+            } | null;
+            readonly source?: {
+                /** Format: int64 */
+                readonly nodeRelId: number;
+            } | null;
+        };
         readonly WidgetSettingSchema: {
             /** @enum {string} */
-            readonly type: "string" | "text" | "color" | "boolean" | "enum";
+            readonly type: "string" | "text" | "color" | "enum";
             readonly title: string;
             readonly default: components["schemas"]["WidgetValue"];
             readonly options?: readonly {
@@ -1599,7 +1624,7 @@ export type components = {
                 readonly [key: string]: components["schemas"]["WidgetSettingSchema"];
             };
         };
-        readonly WidgetValue: (string | number | boolean) | null;
+        readonly WidgetValue: string;
     };
     responses: never;
     parameters: never;
@@ -8421,9 +8446,13 @@ export interface operations {
                      * @description All widgets of the page
                      * @default null
                      */
-                    readonly widgets?: readonly {
-                        readonly [key: string]: Record<string, never>;
-                    }[] | null;
+                    readonly widgets?: readonly components["schemas"]["WidgetInput"][] | null;
+                    /**
+                     * Format: int64
+                     * @description The version of the page the widgets were edited from, needed with widgets
+                     * @default null
+                     */
+                    readonly version?: number | null;
                 };
             };
         };
@@ -8442,7 +8471,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Invalid page field or widget, too many widgets, or the page changed in between */
+            /** @description Invalid page field or widget, or too many widgets */
             readonly 400: {
                 headers: {
                     readonly [name: string]: unknown;
@@ -8490,6 +8519,22 @@ export interface operations {
             };
             /** @description Not found */
             readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description The page was saved by someone else since the given version */
+            readonly 409: {
                 headers: {
                     readonly [name: string]: unknown;
                 };

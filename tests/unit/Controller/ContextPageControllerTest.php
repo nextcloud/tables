@@ -11,11 +11,10 @@ namespace OCA\Tables\Tests\Unit\Controller;
 
 use OCA\Tables\Controller\ContextPageController;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\ConflictError;
 use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PageService;
-use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
@@ -49,11 +48,11 @@ class ContextPageControllerTest extends TestCase {
 	public static function endpoints(): array {
 		$widgets = [['type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2]];
 		return [
-			'show' => ['find', [7, 2, 'alice'], static fn (ContextPageController $controller) => $controller->show(7, 2)],
-			'show by name' => ['findByTechnicalName', [7, 'overview', 'alice'], static fn (ContextPageController $controller) => $controller->showByTechnicalName(7, 'overview')],
-			'create' => ['create', [7, 'Overview', 'overview', 'star', 'At a glance', 'alice'], static fn (ContextPageController $controller) => $controller->create(7, 'Overview', 'overview', 'star', 'At a glance')],
-			'update' => ['update', [7, 2, null, 'planning', '', null, $widgets, 'alice'], static fn (ContextPageController $controller) => $controller->update(7, 2, null, 'planning', '', null, $widgets)],
-			'destroy' => ['delete', [7, 2, 'alice'], static fn (ContextPageController $controller) => $controller->destroy(7, 2)],
+			'show' => ['find', [7, 2], static fn (ContextPageController $controller) => $controller->show(7, 2)],
+			'show by name' => ['findByTechnicalName', [7, 'overview'], static fn (ContextPageController $controller) => $controller->showByTechnicalName(7, 'overview')],
+			'create' => ['create', [7, 'Overview', 'overview', 'star', 'At a glance'], static fn (ContextPageController $controller) => $controller->create(7, 'Overview', 'overview', 'star', 'At a glance')],
+			'update' => ['update', [7, 2, null, 'planning', '', null, $widgets, 4], static fn (ContextPageController $controller) => $controller->update(7, 2, null, 'planning', '', null, $widgets, 4)],
+			'destroy' => ['delete', [7, 2], static fn (ContextPageController $controller) => $controller->destroy(7, 2)],
 		];
 	}
 
@@ -76,10 +75,9 @@ class ContextPageControllerTest extends TestCase {
 		];
 		foreach (['create', 'update', 'destroy'] as $endpoint) {
 			$cases[$endpoint . ', bad request'] = [new BadRequestError('Widget 0 needs a type.'), Http::STATUS_BAD_REQUEST];
-			$cases[$endpoint . ', no permission'] = [new PermissionError('User bob cannot manage application 7'), Http::STATUS_FORBIDDEN];
 			$cases[$endpoint . ', not found'] = [new NotFoundError('Context does not exist'), Http::STATUS_NOT_FOUND];
 		}
-		$cases['update, page gone'] = [new DoesNotExistException('Page does not exist'), Http::STATUS_NOT_FOUND];
+		$cases['update, saved by someone else'] = [new ConflictError('The page was changed by another save in the meantime.'), Http::STATUS_CONFLICT];
 		$errors = [];
 		foreach ($cases as $case => [$error, $status]) {
 			[$method, , $call] = $endpoints[explode(',', $case)[0]];
@@ -110,5 +108,7 @@ class ContextPageControllerTest extends TestCase {
 		$response = $this->controller->widgetTypes();
 
 		$this->assertSame(['header', 'text', 'data'], array_column($response->getData(), 'type'));
+		$this->assertSame('{}', json_encode($response->getData()[2]['settings']), 'a type without settings has an empty object');
+		$this->assertIsArray($response->getData()[0]['settings']);
 	}
 }

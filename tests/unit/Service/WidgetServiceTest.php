@@ -226,7 +226,7 @@ class WidgetServiceTest extends DatabaseTestCase {
 				['id' => null, 'type' => 'text', 'title' => null, 'position' => $this->position(0, 0, 6, 2), 'settings' => ['text' => NAN], 'nodeRelId' => null],
 			]);
 			$this->fail('Settings that are no JSON were saved.');
-		} catch (\OCP\DB\Exception) {
+		} catch (\JsonException) {
 		}
 
 		$this->assertSame([$kept->getId()], array_column($this->service->findByPageIds([$this->page])[$this->page], 'id'));
