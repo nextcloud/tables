@@ -17,6 +17,7 @@ use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Notification\NotificationHelper;
@@ -110,6 +111,12 @@ class RowServiceRowIdentifierTest extends TestCase {
 
 		$this->expectException(NotFoundError::class);
 		$this->rowService->resolveRowId(self::UUID, null, 5);
+	}
+
+	public function testResolveRowIdDoesNotLookUpAUuidWithoutATableOrView(): void {
+		$this->row2Mapper->expects($this->never())->method('findIdByUuid');
+		$this->expectException(InternalError::class);
+		$this->rowService->resolveRowId(self::UUID, null, null);
 	}
 
 	public function testResolveRowIdRejectsAnythingElse(): void {

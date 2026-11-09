@@ -215,6 +215,9 @@ class RowService extends SuperService {
 		if ($tableId === null && $viewId !== null) {
 			$tableId = $this->findViewOrFail($viewId)->getTableId();
 		}
+		if ($tableId === null) {
+			throw new InternalError('A row is requested without a table or view.');
+		}
 		$rowId = $this->row2Mapper->findIdByUuid(strtolower($rowIdentifier), $tableId);
 		if ($rowId === null) {
 			throw new NotFoundError('Row not found.');
