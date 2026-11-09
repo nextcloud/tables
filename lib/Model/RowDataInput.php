@@ -84,6 +84,33 @@ class RowDataInput implements ArrayAccess, Iterator {
 		reset($this->data);
 	}
 
+	public static function createFromInputArray(array $cells): self {
+		if (!array_is_list($cells)) {
+			throw new \InvalidArgumentException('Row data must be a list of cells.');
+		}
+		$input = new self();
+		foreach ($cells as $cell) {
+			if (!is_array($cell) || !array_key_exists('columnId', $cell) || !array_key_exists('value', $cell)) {
+				throw new \InvalidArgumentException('Each cell requires columnId and value.');
+			}
+			$columnId = $cell['columnId'];
+			if (is_string($columnId) && preg_match('/^-?[0-9]+$/D', $columnId)) {
+				$digits = ltrim(ltrim($columnId, '-'), '0');
+				$canonical = ($digits !== '' && str_starts_with($columnId, '-') ? '-' : '') . ($digits === '' ? '0' : $digits);
+				$columnId = filter_var($canonical, FILTER_VALIDATE_INT);
+			}
+			if (!is_int($columnId)) {
+				throw new \InvalidArgumentException('Cell columnId must be an integer within the supported range.');
+			}
+			$value = $cell['value'];
+			if ($value !== null && !is_scalar($value) && !is_array($value)) {
+				throw new \InvalidArgumentException('Cell values must be JSON values.');
+			}
+			$input->add($columnId, is_bool($value) ? (int)$value : $value);
+		}
+		return $input;
+	}
+
 	public static function fromArray(array $data): self {
 		$newRowData = new RowDataInput();
 		foreach ($data as $value) {
