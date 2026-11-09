@@ -20,7 +20,7 @@ use Override;
  * The menu of an application. An item opens a page, a table or view of the
  * application, or a link; an item that opens nothing is a group holding other items.
  */
-class Version2500Date20261103000000 extends SimpleMigrationStep {
+class Version2500Date20261109030000 extends SimpleMigrationStep {
 	private const TABLE = 'tables_contexts_menu_item';
 
 	#[Override]

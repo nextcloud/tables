@@ -38,8 +38,6 @@ use OCP\AppFramework\Db\Entity;
  */
 class MenuItem extends Entity {
 	public const MAX_ITEMS_PER_APPLICATION = 200;
-	public const TITLE_MAX_LENGTH = 200;
-	public const DESCRIPTION_MAX_LENGTH = 2000;
 	public const URL_MAX_LENGTH = 2000;
 
 	protected ?int $contextId = null;

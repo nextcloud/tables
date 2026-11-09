@@ -95,7 +95,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			new GridWidgetTypes($l10n),
 			$this->menuItemMapper,
 		);
-		$this->pageService = new PageService($contextMapper, $pageMapper, $pageContentMapper, $widgetService, $this->permissionsService, new GridWidgetTypes($l10n), $this->connectionAdapter, $this->menuItemMapper);
+		$this->pageService = new PageService($contextMapper, $pageMapper, $pageContentMapper, $widgetService, new GridWidgetTypes($l10n), $this->connectionAdapter, $this->menuItemMapper);
 		$this->menuService = new MenuService($contextMapper, $this->menuItemMapper, $this->permissionsService, $tableMapper, $this->createMock(ViewMapper::class), $this->connectionAdapter);
 	}
 
@@ -275,7 +275,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$dangling->setPageId(-1);
 		$this->menuItemMapper->insert($dangling);
 
-		$this->pageService->delete($contextId, $pageId, self::OWNER);
+		$this->pageService->delete($contextId, $pageId);
 		$this->contextService->removeNodeFromContextAndPages($nodeRelId);
 
 		$this->assertSame([['pageId' => $startPageId]], array_column($this->menuService->findAll($contextId, self::OWNER), 'target'));
@@ -332,7 +332,7 @@ class MenuServiceTest extends DatabaseTestCase {
 	private function createApplication(): array {
 		$context = $this->contextService->create('Sales', 'tables', '', [['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE]], self::OWNER, Application::OWNER_TYPE_USER);
 		$this->contextIds[] = $context->getId();
-		$page = $this->pageService->create($context->getId(), 'Overview', null, null, null, self::OWNER);
+		$page = $this->pageService->create($context->getId(), 'Overview', null, null, null);
 		$context = $this->contextService->findById($context->getId(), self::OWNER);
 		$startPages = array_filter($context->getPages(), static fn (array $page): bool => $page['page_type'] === Page::TYPE_STARTPAGE);
 		return [$context->getId(), (int)array_key_first($startPages), $page['id'], (int)array_key_first($context->getNodes())];

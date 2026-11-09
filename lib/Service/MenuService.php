@@ -20,6 +20,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\IconHelper;
+use OCA\Tables\Helper\TextHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -401,11 +402,11 @@ class MenuService {
 	 * @throws BadRequestError
 	 */
 	private function validateTitle(?string $title): ?string {
-		$title = trim((string)$title);
-		if (mb_strlen($title) > MenuItem::TITLE_MAX_LENGTH) {
-			throw new BadRequestError('A menu item title has at most ' . MenuItem::TITLE_MAX_LENGTH . ' characters.');
+		try {
+			return TextHelper::optional($title, TextHelper::TITLE_MAX_LENGTH);
+		} catch (\InvalidArgumentException) {
+			throw new BadRequestError('A menu item title has at most ' . TextHelper::TITLE_MAX_LENGTH . ' characters.');
 		}
-		return $title === '' ? null : $title;
 	}
 
 	/**
@@ -425,10 +426,10 @@ class MenuService {
 	 * @throws BadRequestError
 	 */
 	private function validateDescription(?string $description): ?string {
-		$description = trim((string)$description);
-		if (mb_strlen($description) > MenuItem::DESCRIPTION_MAX_LENGTH) {
-			throw new BadRequestError('A menu item description has at most ' . MenuItem::DESCRIPTION_MAX_LENGTH . ' characters.');
+		try {
+			return TextHelper::optional($description, TextHelper::DESCRIPTION_MAX_LENGTH);
+		} catch (\InvalidArgumentException) {
+			throw new BadRequestError('A menu item description has at most ' . TextHelper::DESCRIPTION_MAX_LENGTH . ' characters.');
 		}
-		return $description === '' ? null : $description;
 	}
 }
