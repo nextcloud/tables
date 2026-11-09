@@ -604,7 +604,8 @@ final class ContextServiceTest extends TestCase {
 			[[Application::NODE_TYPE_TABLE, 77, 1], [Application::NODE_TYPE_TABLE, 78, 3], [Application::NODE_TYPE_VIEW, 90, 1]],
 			array_map(static fn (ContextNodeRelation $relation): array => [$relation->getNodeType(), $relation->getNodeId(), $relation->getPermissions()], $record['relations']),
 		);
-		self::assertSame([501, 503], $contents);
+		// the grid page's own contents, then the start page the archive lacked, holding every node
+		self::assertSame([501, 503, 501, 502, 503], $contents);
 		self::assertSame([501, 502, 503, null], array_column($record['widgets'], 5));
 	}
 

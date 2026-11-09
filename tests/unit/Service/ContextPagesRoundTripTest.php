@@ -193,7 +193,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$page->setTechnicalName('overview');
 		$page = $this->pageMapper->insert($page);
 		foreach ([4151, 4152, 4153] as $y => $nodeId) {
-			$this->widgetService->insert($page->getId(), 'data', 'Node ' . $nodeId, ['gridX' => 0, 'gridY' => $y * 5, 'gridWidth' => 12, 'gridHeight' => 5], [], $relationIds[$nodeId]);
+			$this->widgetService->insertAll($page->getId(), [new WidgetInput(null, 'data', 'Node ' . $nodeId, null, null, 0, $y * 5, 12, 5, [], $relationIds[$nodeId])]);
 		}
 		$stored = $this->contextMapper->findById($context->getId(), self::OWNER);
 		$exported = json_decode(json_encode(array_merge($stored->jsonSerialize(), ['pages' => $this->service->getPagesWithWidgets($stored)])), true);
