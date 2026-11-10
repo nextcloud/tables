@@ -56,7 +56,6 @@ class BackfillRowUuids extends QueuedJob {
 		$selectQuery->select('id')
 			->from(self::TABLE)
 			->where($selectQuery->expr()->isNull('uuid'))
-			->orderBy('id', 'ASC')
 			->setMaxResults(static::BATCH_SIZE);
 
 		$updateQuery = $this->connection->getQueryBuilder();
