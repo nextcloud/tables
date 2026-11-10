@@ -178,11 +178,11 @@ class ActivityManager {
 		$eventType = 'tables';
 		$subjectParams = [
 			'author' => $author ?? $this->userId,
-			'table' => $table,
+			'table' => ['id' => $table->getId(), 'title' => $table->getTitle()],
 			'objectType' => $objectType,
 		];
 		if ($object instanceof View) {
-			$subjectParams['view'] = $object;
+			$subjectParams['view'] = ['id' => $object->getId(), 'title' => $object->getTitle()];
 		}
 		switch ($subject) {
 			// No need to enhance parameters since entity already contains the required data
@@ -205,7 +205,7 @@ class ActivityManager {
 			case self::SUBJECT_ROW_UPDATE:
 			case self::SUBJECT_ROW_DELETE:
 				$eventType = self::EVENT_TYPE_TABLE_ROW;
-				$subjectParams['row'] = $object;
+				$subjectParams['row'] = ['id' => $object->getId()];
 				break;
 			case self::SUBJECT_COLUMN_CREATE:
 			case self::SUBJECT_COLUMN_UPDATE:
@@ -253,8 +253,6 @@ class ActivityManager {
 					$changeCols[] = [
 						'id' => $column->getId(),
 						'name' => $column->getTitle(),
-						'before' => $colData,
-						'after' => $additionalParams['after'][$index]
 					];
 				} catch (\Exception $e) {
 					Server::get(LoggerInterface::class)->error('Could not find column for activity entry.', [
@@ -376,9 +374,18 @@ class ActivityManager {
 
 			$uniqueAffectedUser = $this->findRecipientsByElement($view);
 
+			$viewSubjectParams = $subjectParams;
+			$viewSubjectParams['view'] = ['id' => $view->getId(), 'title' => $view->getTitle()];
+			$viewColumnIds = $view->getColumnIds();
+			if (isset($viewSubjectParams['changeCols']) && $viewColumnIds !== []) {
+				$viewSubjectParams['changeCols'] = array_values(array_filter(
+					$viewSubjectParams['changeCols'],
+					static fn (array $changeCol): bool => in_array($changeCol['id'], $viewColumnIds, true),
+				));
+			}
+			$event->setSubject($subject, $viewSubjectParams);
+
 			foreach ($uniqueAffectedUser as $userId) {
-				$subjectParams['view'] = $view;
-				$event->setSubject($subject, $subjectParams);
 				$event->setAffectedUser($userId);
 				$this->manager->publish($event);
 			}
@@ -398,9 +405,9 @@ class ActivityManager {
 		foreach ($affectedViews as $view) {
 			$uniqueAffectedUser = $this->findRecipientsByElement($view);
 
+			$subjectParams['view'] = ['id' => $view->getId(), 'title' => $view->getTitle()];
+			$event->setSubject($subject, $subjectParams);
 			foreach ($uniqueAffectedUser as $userId) {
-				$subjectParams['view'] = $view;
-				$event->setSubject($subject, $subjectParams);
 				$event->setAffectedUser($userId);
 				$this->manager->publish($event);
 			}
@@ -493,13 +500,13 @@ class ActivityManager {
 
 	/**
 	 * @param array<string, mixed> $subjectParams
-	 * @return list<array{id: int, name: string, before: mixed, after: mixed}>
+	 * @return list<array{id: int, name: string}>
 	 */
 	private function getVisibleChangeCols(array $subjectParams): array {
 		$changeCols = [];
 		foreach ($subjectParams['changeCols'] ?? [] as $changeCol) {
 			if (!is_array($changeCol)
-				|| !isset($changeCol['id'], $changeCol['name'], $changeCol['before'], $changeCol['after'])
+				|| !isset($changeCol['id'], $changeCol['name'])
 				|| !is_int($changeCol['id'])
 				|| !is_string($changeCol['name'])) {
 				continue;
@@ -508,8 +515,6 @@ class ActivityManager {
 			$changeCols[] = [
 				'id' => $changeCol['id'],
 				'name' => $changeCol['name'],
-				'before' => $changeCol['before'],
-				'after' => $changeCol['after'],
 			];
 		}
 
