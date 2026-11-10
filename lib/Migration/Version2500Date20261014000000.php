@@ -20,7 +20,7 @@ use Override;
 
 /**
  * Adds a uuid to rows. Existing rows get theirs from a background job, so the column
- * stays nullable until that backfill has finished.
+ * is nullable.
  */
 class Version2500Date20261014000000 extends SimpleMigrationStep {
 	private const TABLE = 'tables_row_sleeves';
