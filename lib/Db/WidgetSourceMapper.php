@@ -75,8 +75,8 @@ class WidgetSourceMapper extends QBMapper {
 			->innerJoin('r', 'tables_contexts_page', 'p', $qb->expr()->eq('p.context_id', 'r.context_id'))
 			->where($qb->expr()->eq('p.id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->in('r.id', $qb->createParameter('ids')))
-			->orderBy('r.id')
-			->forUpdate();
+			->orderBy('r.id');
+		$this->lockRows($qb);
 
 		$ids = [];
 		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
@@ -121,8 +121,8 @@ class WidgetSourceMapper extends QBMapper {
 		$qb->select('id')
 			->from('tables_contexts_rel_context_node')
 			->where($qb->expr()->in('id', $qb->createParameter('ids')))
-			->orderBy('id')
-			->forUpdate();
+			->orderBy('id');
+		$this->lockRows($qb);
 		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeQuery()->closeCursor();
@@ -181,6 +181,16 @@ class WidgetSourceMapper extends QBMapper {
 		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
 			$qb->setParameter('nodeRelIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeStatement();
+		}
+	}
+
+	/**
+	 * Locks the rows a query reads until the transaction ends. SQLite has no row locks and
+	 * runs one write transaction at a time anyway.
+	 */
+	private function lockRows(IQueryBuilder $qb): void {
+		if ($this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
+			$qb->forUpdate();
 		}
 	}
 }

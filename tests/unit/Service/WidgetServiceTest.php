@@ -58,7 +58,7 @@ class WidgetServiceTest extends DatabaseTestCase {
 			->from('tables_contexts_page')
 			->where($qb->expr()->in('context_id', $qb->createNamedParameter([self::CONTEXT, self::OTHER_CONTEXT], IQueryBuilder::PARAM_INT_ARRAY)));
 		$result = $qb->executeQuery();
-		$pageIds = array_map('intval', $result->fetchFirstColumn());
+		$pageIds = array_map(intval(...), $result->fetchFirstColumn());
 		$result->closeCursor();
 		$this->service->deleteByPageIds($pageIds);
 		foreach (['tables_contexts_page', 'tables_contexts_rel_context_node'] as $table) {
