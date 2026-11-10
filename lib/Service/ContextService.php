@@ -940,7 +940,7 @@ class ContextService {
 			try {
 				$this->gridWidgetTypes->validateParent($position, $inputs);
 				$kept[] = $position;
-			} catch (BadRequestError $e) {
+			} catch (BadRequestError) {
 				$this->logger->warning('Skipping an imported widget: its tabs widget or tab did not come along.');
 			}
 		}
