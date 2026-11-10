@@ -37,7 +37,7 @@ class Version2500Date20261014000000 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 		if (!$schema->hasTable(self::TABLE)) {
-			return null;
+			return $schema;
 		}
 
 		$table = $schema->getTable(self::TABLE);
