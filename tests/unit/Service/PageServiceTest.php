@@ -107,9 +107,7 @@ class PageServiceTest extends TestCase {
 	}
 
 	public function testFindByTechnicalNameAsksTheMapperAndAnUnknownNameIsNotFound(): void {
-		$this->pageMapper->method('findByTechnicalName')->willReturnCallback(function (int $contextId, string $name): Page {
-			return $name === 'overview' ? $this->pages[self::GRID_PAGE] : throw new DoesNotExistException('none');
-		});
+		$this->pageMapper->method('findByTechnicalName')->willReturnCallback(fn (int $contextId, string $name): Page => $name === 'overview' ? $this->pages[self::GRID_PAGE] : throw new DoesNotExistException('none'));
 		$this->widgetService->method('findByPageIds')->willReturn([]);
 
 		$this->assertSame(self::GRID_PAGE, $this->service->findByTechnicalName(7, 'overview')['id']);
