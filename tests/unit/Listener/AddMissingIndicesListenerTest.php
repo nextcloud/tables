@@ -36,6 +36,7 @@ class AddMissingIndicesListenerTest extends TestCase {
 			'PostgreSQL' => [IDBConnection::PLATFORM_POSTGRES, [
 				'tables_row_cells_datetime_cv' => $datetime,
 				'tables_row_cells_number_cv' => $number,
+				'tables_row_cells_usergroup_cv' => $usergroup,
 			]],
 			'Oracle' => [IDBConnection::PLATFORM_ORACLE, [
 				'tables_row_cells_number_cv' => $number,

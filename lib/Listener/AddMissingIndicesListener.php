@@ -33,11 +33,11 @@ final class AddMissingIndicesListener implements IEventListener {
 	private const TEXT_VALUE_PREFIX_LENGTH = 64;
 
 	/**
-	 * Cell tables whose text values have no length limit: a multi-selection keeps all its option ids
-	 * in one value, and usergroup ids are not limited in length. PostgreSQL indexes the whole value
-	 * and rejects index entries above 2704 bytes, so these indices are left out there.
+	 * Cell tables whose text values have no length limit, as a multi-selection keeps all its option
+	 * ids in one value. PostgreSQL indexes the whole value and rejects index entries above 2704
+	 * bytes, so these indices are left out there.
 	 */
-	private const UNBOUNDED_TEXT_VALUE_TABLES = ['tables_row_cells_selection', 'tables_row_cells_usergroup'];
+	private const UNBOUNDED_TEXT_VALUE_TABLES = ['tables_row_cells_selection'];
 
 	public function __construct(
 		private readonly IDBConnection $connection,
