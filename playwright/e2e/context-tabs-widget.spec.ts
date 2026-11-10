@@ -33,6 +33,7 @@ test.describe('Tabs widget', () => {
 			method: 'PATCH',
 			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
 			data: {
+				version: 0,
 				widgets: [
 					{ type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 10, settings: { tabs: 'Notes\nData' } },
 					{ type: 'text', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'In the first tab' }, parentIndex: 0, parentTab: 0 },
