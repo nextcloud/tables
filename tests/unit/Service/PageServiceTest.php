@@ -107,9 +107,7 @@ class PageServiceTest extends TestCase {
 	}
 
 	public function testFindBySlugAsksTheMapperAndAnUnknownNameIsNotFound(): void {
-		$this->pageMapper->method('findBySlug')->willReturnCallback(function (int $contextId, string $name): Page {
-			return $name === 'overview' ? $this->pages[self::GRID_PAGE] : throw new DoesNotExistException('none');
-		});
+		$this->pageMapper->method('findBySlug')->willReturnCallback(fn (int $contextId, string $name): Page => $name === 'overview' ? $this->pages[self::GRID_PAGE] : throw new DoesNotExistException('none'));
 		$this->widgetService->method('findByPageIds')->willReturn([]);
 
 		$this->assertSame(self::GRID_PAGE, $this->service->findBySlug(7, 'overview')['id']);
