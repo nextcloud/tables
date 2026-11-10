@@ -416,8 +416,8 @@ class MenuServiceTest extends DatabaseTestCase {
 		$link = ['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']];
 		return [
 			'not an object' => [['Reports'], 'It is not an object.'],
-			'a page that did not come along' => [[['target' => ['page' => 99]]], 'The application has no page 99.'],
-			'a page of another application' => [[['target' => ['pageId' => 99]]], 'The application has no page 99.'],
+			'a page that did not come along' => [[['target' => ['page' => 999999999]]], 'The application has no page 999999999.'],
+			'a page the application does not have' => [[['target' => ['pageId' => 999999999]]], 'The application has no page 999999999.'],
 			'a page by name' => [[['target' => ['page' => 'dashboard']]], 'Its target is not'],
 			'a table that did not come along' => [[['target' => ['table' => 'f0000000-0000-4000-8000-000000000000']]], 'is not part of the application'],
 			'an unknown kind of target' => [[['title' => 'Row', 'target' => ['row' => 'x']]], 'Its target is not'],
