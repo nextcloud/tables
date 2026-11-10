@@ -42,7 +42,8 @@ class WidgetMapper extends QBMapper {
 			->addOrderBy('grid_y', 'ASC')
 			->addOrderBy('grid_x', 'ASC')
 			->addOrderBy('id', 'ASC');
-		if ($forUpdate) {
+		// SQLite has no row locks and runs one write transaction at a time anyway
+		if ($forUpdate && $this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
 			$qb->forUpdate();
 		}
 
