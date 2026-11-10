@@ -98,8 +98,11 @@ class PageMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')
 			->from('tables_contexts_context')
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)))
-			->forUpdate();
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
+		// SQLite has no row locks and runs one write transaction at a time anyway
+		if ($this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
+			$qb->forUpdate();
+		}
 		$result = $qb->executeQuery();
 		$found = $result->fetchOne() !== false;
 		$result->closeCursor();
