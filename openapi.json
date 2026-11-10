@@ -657,6 +657,7 @@
                 "type": "object",
                 "required": [
                     "id",
+                    "uuid",
                     "createdAt",
                     "lastEditAt",
                     "data",
@@ -666,6 +667,10 @@
                     "id": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "createdAt": {
                         "type": "string"
@@ -15754,11 +15759,10 @@
                     {
                         "name": "rowId",
                         "in": "path",
-                        "description": "The row identifier",
+                        "description": "The identifier of the row to update, either its integer id or its uuid",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "format": "int64"
+                            "type": "string"
                         }
                     },
                     {
@@ -15986,11 +15990,10 @@
                     {
                         "name": "rowId",
                         "in": "path",
-                        "description": "The row identifier",
+                        "description": "The identifier of the row to delete, either its integer id or its uuid",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "format": "int64"
+                            "type": "string"
                         }
                     },
                     {
@@ -16037,6 +16040,44 @@
                     },
                     "403": {
                         "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid row identifier",
                         "content": {
                             "application/json": {
                                 "schema": {

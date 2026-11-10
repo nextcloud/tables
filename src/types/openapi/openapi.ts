@@ -1307,6 +1307,7 @@ export type components = {
         readonly PublicRow: {
             /** Format: int64 */
             readonly id: number;
+            readonly uuid: string | null;
             readonly createdAt: string;
             readonly lastEditAt: string;
             readonly data: {
@@ -8553,8 +8554,8 @@ export interface operations {
             readonly path: {
                 /** @description The share token */
                 readonly token: string;
-                /** @description The row identifier */
-                readonly rowId: number;
+                /** @description The identifier of the row to update, either its integer id or its uuid */
+                readonly rowId: string;
             };
             readonly cookie?: never;
         };
@@ -8659,8 +8660,8 @@ export interface operations {
             readonly path: {
                 /** @description The share token */
                 readonly token: string;
-                /** @description The row identifier */
-                readonly rowId: number;
+                /** @description The identifier of the row to delete, either its integer id or its uuid */
+                readonly rowId: string;
             };
             readonly cookie?: never;
         };
@@ -8676,6 +8677,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["PublicRow"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid row identifier */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };

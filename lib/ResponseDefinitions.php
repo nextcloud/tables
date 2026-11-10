@@ -99,6 +99,7 @@ namespace OCA\Tables;
  *
  * @psalm-type TablesPublicRow = array{
  *    id: int,
+ *    uuid: ?string,
  *    createdAt: string,
  *    lastEditAt: string,
  *    data: ?array{columnId: int, value: mixed},
