@@ -52,7 +52,7 @@ class UsergroupBusiness extends SuperBusiness {
 			if (!isset($userGroupEntry['id']) || !is_string($userGroupEntry['id'])) {
 				throw new BadRequestError('Invalid value for usergroup id');
 			}
-			if (!isset($userGroupEntry['type']) || !is_int($userGroupEntry['type'])) {
+			if (!isset($userGroupEntry['type']) || !in_array($userGroupEntry['type'], UsergroupType::ALL, true)) {
 				throw new BadRequestError('Invalid usergroup type');
 			}
 			if ($userGroupEntry['type'] === UsergroupType::USER) {
