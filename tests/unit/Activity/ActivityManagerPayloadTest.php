@@ -17,6 +17,7 @@ use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
@@ -98,6 +99,7 @@ final class ActivityManagerPayloadTest extends TestCase {
 			$tableMapper,
 			$viewMapper,
 			$columnMapper,
+			$this->createConfiguredMock(RowVisibilityService::class, ['usersSeeingRow' => ['follower']]),
 			$shareService,
 			new CappedMemoryCache(),
 			'author',
