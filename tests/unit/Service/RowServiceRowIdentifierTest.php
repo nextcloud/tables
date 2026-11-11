@@ -23,6 +23,7 @@ use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\RowService;
+use OCA\Tables\Service\RowVisibilityService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
@@ -57,6 +58,7 @@ class RowServiceRowIdentifierTest extends TestCase {
 			$this->createMock(ActivityManager::class),
 			$this->createMock(NotificationHelper::class),
 			$this->createMock(IDBConnection::class),
+			$this->createMock(RowVisibilityService::class),
 		);
 	}
 

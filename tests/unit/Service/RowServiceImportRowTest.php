@@ -20,6 +20,7 @@ use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\RowService;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -49,6 +50,7 @@ class RowServiceImportRowTest extends DatabaseTestCase {
 			$this->createMock(ActivityManager::class),
 			$this->createMock(NotificationHelper::class),
 			$this->connectionAdapter,
+			$this->createMock(RowVisibilityService::class),
 		);
 		$this->table = new Table();
 		$this->table->setId($this->createTestTable()['id']);
