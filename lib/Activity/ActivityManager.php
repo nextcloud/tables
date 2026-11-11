@@ -18,6 +18,7 @@ use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
@@ -76,6 +77,7 @@ class ActivityManager {
 		private readonly TableMapper $tableMapper,
 		private readonly ViewMapper $viewMapper,
 		private readonly ColumnMapper $columnMapper,
+		private readonly RowVisibilityService $rowVisibility,
 		private readonly ShareService $shareService,
 		protected readonly CappedMemoryCache $cache,
 		private readonly ?string $userId,
@@ -178,11 +180,11 @@ class ActivityManager {
 		$eventType = 'tables';
 		$subjectParams = [
 			'author' => $author ?? $this->userId,
-			'table' => $table,
+			'table' => ['id' => $table->getId(), 'title' => $table->getTitle()],
 			'objectType' => $objectType,
 		];
 		if ($object instanceof View) {
-			$subjectParams['view'] = $object;
+			$subjectParams['view'] = ['id' => $object->getId(), 'title' => $object->getTitle()];
 		}
 		switch ($subject) {
 			// No need to enhance parameters since entity already contains the required data
@@ -205,7 +207,7 @@ class ActivityManager {
 			case self::SUBJECT_ROW_UPDATE:
 			case self::SUBJECT_ROW_DELETE:
 				$eventType = self::EVENT_TYPE_TABLE_ROW;
-				$subjectParams['row'] = $object;
+				$subjectParams['row'] = ['id' => $object->getId()];
 				break;
 			case self::SUBJECT_COLUMN_CREATE:
 			case self::SUBJECT_COLUMN_UPDATE:
@@ -253,8 +255,6 @@ class ActivityManager {
 					$changeCols[] = [
 						'id' => $column->getId(),
 						'name' => $column->getTitle(),
-						'before' => $colData,
-						'after' => $additionalParams['after'][$index]
 					];
 				} catch (\Exception $e) {
 					Server::get(LoggerInterface::class)->error('Could not find column for activity entry.', [
@@ -357,7 +357,6 @@ class ActivityManager {
 
 		$changedColumnIds = [];
 		$tableId = $object->getTableId();
-		$owner = $this->tableMapper->find($tableId)->getOwnership();
 
 		if ($event->getSubject() === self::SUBJECT_ROW_UPDATE) {
 			foreach ($event->getSubjectParameters()['changeCols'] ?? [] as $changeCol) {
@@ -374,11 +373,20 @@ class ActivityManager {
 				continue;
 			}
 
-			$uniqueAffectedUser = $this->findRecipientsByElement($view);
+			$uniqueAffectedUser = $this->rowVisibility->usersSeeingRow($object->getId(), $view, $this->findRecipientsByElement($view));
+
+			$viewSubjectParams = $subjectParams;
+			$viewSubjectParams['view'] = ['id' => $view->getId(), 'title' => $view->getTitle()];
+			$viewColumnIds = $view->getColumnIds();
+			if (isset($viewSubjectParams['changeCols']) && $viewColumnIds !== []) {
+				$viewSubjectParams['changeCols'] = array_values(array_filter(
+					$viewSubjectParams['changeCols'],
+					static fn (array $changeCol): bool => in_array($changeCol['id'], $viewColumnIds, true),
+				));
+			}
+			$event->setSubject($subject, $viewSubjectParams);
 
 			foreach ($uniqueAffectedUser as $userId) {
-				$subjectParams['view'] = $view;
-				$event->setSubject($subject, $subjectParams);
 				$event->setAffectedUser($userId);
 				$this->manager->publish($event);
 			}
@@ -391,16 +399,14 @@ class ActivityManager {
 		$event->setType(self::EVENT_TYPE_VIEW_COLUMN);
 		$subjectParams['isViewContext'] = true;
 
-		$tableId = $object->getTableId();
-		$owner = $this->tableMapper->find($tableId)->getOwnership();
 		$affectedViews = $this->getAffectedViewsForColumn($object);
 
 		foreach ($affectedViews as $view) {
 			$uniqueAffectedUser = $this->findRecipientsByElement($view);
 
+			$subjectParams['view'] = ['id' => $view->getId(), 'title' => $view->getTitle()];
+			$event->setSubject($subject, $subjectParams);
 			foreach ($uniqueAffectedUser as $userId) {
-				$subjectParams['view'] = $view;
-				$event->setSubject($subject, $subjectParams);
 				$event->setAffectedUser($userId);
 				$this->manager->publish($event);
 			}
@@ -493,13 +499,13 @@ class ActivityManager {
 
 	/**
 	 * @param array<string, mixed> $subjectParams
-	 * @return list<array{id: int, name: string, before: mixed, after: mixed}>
+	 * @return list<array{id: int, name: string}>
 	 */
 	private function getVisibleChangeCols(array $subjectParams): array {
 		$changeCols = [];
 		foreach ($subjectParams['changeCols'] ?? [] as $changeCol) {
 			if (!is_array($changeCol)
-				|| !isset($changeCol['id'], $changeCol['name'], $changeCol['before'], $changeCol['after'])
+				|| !isset($changeCol['id'], $changeCol['name'])
 				|| !is_int($changeCol['id'])
 				|| !is_string($changeCol['name'])) {
 				continue;
@@ -508,8 +514,6 @@ class ActivityManager {
 			$changeCols[] = [
 				'id' => $changeCol['id'],
 				'name' => $changeCol['name'],
-				'before' => $changeCol['before'],
-				'after' => $changeCol['after'],
 			];
 		}
 
@@ -807,6 +811,19 @@ class ActivityManager {
 		}
 	}
 
+	/**
+	 * Resolves now which view recipients see the row, for events sent after the row is gone
+	 */
+	public function snapshotRowVisibility(Row2 $row): void {
+		try {
+			foreach ($this->viewMapper->findAll($row->getTableId()) as $view) {
+				$this->rowVisibility->usersSeeingRow($row->getId(), $view, $this->findRecipientsByElement($view));
+			}
+		} catch (\Throwable $e) {
+			Server::get(LoggerInterface::class)->warning('Could not resolve view recipients for row ' . $row->getId(), ['exception' => $e]);
+		}
+	}
+
 	public function findRecipientsByElement(Table|View $element): array {
 		$elementType = $element instanceof Table ? 'table' : 'view';
 		$cacheKey = 'element_recipients_' . $elementType . '_' . $element->getId();
@@ -823,7 +840,7 @@ class ActivityManager {
 		}
 
 		$recipients = array_merge($recipients, $this->shareService->findSharedWithUserIds($element->getId(), $elementType));
-		$recipients = array_unique($recipients);
+		$recipients = array_values(array_unique(array_map(strval(...), $recipients)));
 		$this->cache->set($cacheKey, $recipients);
 		return $recipients;
 	}

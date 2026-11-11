@@ -7,15 +7,24 @@
   "rangeStrategy": "bump",
   "minimumReleaseAge": "7 days",
   "rebaseWhen": "conflicted",
-  "ignoreUnstable": false,
+  "ignoreUnstable": true,
   "baseBranches": ["main", "stable1.0"],
   "useBaseBranchConfig": "merge",
   "enabledManagers": ["npm", "composer", "github-actions"],
   "ignoreDeps": ["node", "npm"],
   "packageRules": [
     {
-      "matchUpdateTypes": ["major", "minor"],
-      "matchBaseBranches": ["/^stable0\\.[3-9]$/"],
+      "description": "Stable branches: no major updates",
+      "matchBaseBranches": ["/^stable/"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Stable branches: dev dependencies get patch updates only",
+      "matchBaseBranches": ["/^stable/"],
+      "matchDepTypes": ["devDependencies", "require-dev"],
+      "matchUpdateTypes": ["minor"],
+      "matchJsonata": ["$not($exists(vulnerabilityFixVersion))"],
       "enabled": false
     },
     {

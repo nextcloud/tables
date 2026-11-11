@@ -461,7 +461,7 @@
     "Preview imported table" : "預覽已導入數據庫表",
     "The selected file is not supported." : "不支援所選檔案。",
     "Please select a file." : "請選擇一個檔案。",
-    "Please select column for mapping." : "請選擇映射直欄",
+    "Please select column for mapping." : "請選擇對應直欄",
     "Cannot map same exist column for multiple columns." : "無法將相同的現有列映射到多個列。",
     "Select file for the import" : "選取要匯入的檔案",
     "Could not import, not authorized. Are you logged in?" : "未驗證，無法匯入。您登入了嗎？",

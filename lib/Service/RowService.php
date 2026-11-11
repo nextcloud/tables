@@ -60,6 +60,7 @@ class RowService extends SuperService {
 		private readonly ActivityManager $activityManager,
 		private readonly NotificationHelper $notificationHelper,
 		private readonly IDBConnection $connection,
+		private readonly RowVisibilityService $rowVisibility,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 
@@ -403,6 +404,10 @@ class RowService extends SuperService {
 		} catch (InternalError|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		} finally {
+			if (isset($insertedRow)) {
+				$this->rowVisibility->forget($insertedRow->getId());
+			}
 		}
 	}
 
@@ -803,29 +808,33 @@ class RowService extends SuperService {
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
 		$this->attachAliasPayload($updatedRow, $columns);
 
-		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
+		try {
+			$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
-		if ($updatedRow->getData() !== $previousData) {
-			$this->activityManager->triggerEvent(
-				objectType: ActivityManager::TABLES_OBJECT_ROW,
-				object: $updatedRow,
-				subject: ActivityManager::SUBJECT_ROW_UPDATE,
-				author: $this->userId,
-				additionalParams: [
-					'before' => $previousData,
-					'after' => $updatedRow->getData(),
-				]
-			);
-			$this->notificationHelper->sendNotification(
-				objectType: ActivityManager::TABLES_OBJECT_ROW,
-				object: $updatedRow,
-				subject: ActivityManager::SUBJECT_ROW_UPDATE,
-				author: $this->userId,
-				additionalParams: [
-					'before' => $previousData,
-					'after' => $updatedRow->getData(),
-				]
-			);
+			if ($updatedRow->getData() !== $previousData) {
+				$this->activityManager->triggerEvent(
+					objectType: ActivityManager::TABLES_OBJECT_ROW,
+					object: $updatedRow,
+					subject: ActivityManager::SUBJECT_ROW_UPDATE,
+					additionalParams: [
+						'before' => $previousData,
+						'after' => $updatedRow->getData(),
+					],
+					author: $this->userId
+				);
+				$this->notificationHelper->sendNotification(
+					objectType: ActivityManager::TABLES_OBJECT_ROW,
+					object: $updatedRow,
+					subject: ActivityManager::SUBJECT_ROW_UPDATE,
+					additionalParams: [
+						'before' => $previousData,
+						'after' => $updatedRow->getData(),
+					],
+					author: $this->userId
+				);
+			}
+		} finally {
+			$this->rowVisibility->forget($updatedRow->getId());
 		}
 
 		return $this->filterRowResult($view ?? null, $updatedRow);
@@ -898,6 +907,9 @@ class RowService extends SuperService {
 
 		try {
 			$columns = $this->loadColumnsForData($item->getData() ?? []);
+			// Delete activities and notifications only learn their view recipients from this snapshot, because the
+			// row is gone when they are sent. Any other code path deleting rows has to take the snapshot first.
+			$this->activityManager->snapshotRowVisibility($item);
 			$deletedRow = $this->row2Mapper->delete($item);
 			$this->attachAliasPayload($item, $columns);
 
@@ -921,6 +933,8 @@ class RowService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		} finally {
+			$this->rowVisibility->forget($id);
 		}
 	}
 

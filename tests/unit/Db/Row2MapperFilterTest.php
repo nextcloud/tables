@@ -149,6 +149,32 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 				'Filter IT department AND age > 27'
 			],
 
+			// Several conditions, so the row id is bound into more than one subquery
+			'two text conditions in one group' => [
+				[
+					['columnId' => 'department', 'operator' => 'is-equal', 'value' => 'IT'],
+					['columnId' => 'name', 'operator' => 'begins-with', 'value' => 'E'],
+				],
+				['Eve'],
+				'Filter IT department AND names beginning with "E"'
+			],
+			'text and meta condition in one group' => [
+				[
+					['columnId' => 'name', 'operator' => 'contains', 'value' => 'li'],
+					['columnId' => 'created_by', 'operator' => 'is-equal', 'value' => 'user_charlie'],
+				],
+				['Charlie'],
+				'Filter names containing "li" AND created by user_charlie'
+			],
+			'two groups' => [
+				[
+					[['columnId' => 'name', 'operator' => 'is-equal', 'value' => 'Bob']],
+					[['columnId' => 'department', 'operator' => 'is-equal', 'value' => 'Finance']],
+				],
+				['Bob', 'Diana'],
+				'Filter name Bob OR department Finance'
+			],
+
 			// Meta column filters
 			'meta created_by filter' => [
 				[['columnId' => 'created_by', 'operator' => 'is-equal', 'value' => 'user_alice']],
@@ -424,6 +450,78 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 		$view->setFilterArray([]);
 
 		$this->assertSame(5, $this->mapper->countRowsForView($view, 'test_user'), 'View without filters should count all table rows');
+	}
+
+	/**
+	 * @dataProvider filterDataProvider
+	 */
+	public function testIsRowInViewPresentMatchesFilteredRows($filter, array $expectedNameOrder, string $description): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+		$nameColumnId = $this->extractTestIdentMapping(self::$testDataResult['columns'])['name'];
+
+		$view = new View();
+		$view->setTableId(self::$testTableId);
+		$view->setFilterArray($this->buildConvertedFilter($filter));
+
+		$allRows = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, null, null, [], null, 'test_user');
+		$visibleNames = [];
+		foreach ($allRows as $row) {
+			if ($this->mapper->isRowInViewPresent($row->getId(), $view, 'test_user')) {
+				$visibleNames[] = $this->getCellValue($row, $nameColumnId);
+			}
+		}
+
+		$this->assertEqualsCanonicalizing($expectedNameOrder, $visibleNames, "isRowInViewPresent mismatch for: $description");
+	}
+
+	public function testIsRowInViewPresentRejectsRowOfOtherTable(): void {
+		$view = new View();
+		$view->setTableId(self::$testTableId + 1);
+		$view->setFilterArray([]);
+
+		$this->assertFalse($this->mapper->isRowInViewPresent(self::$testRowIds[0], $view, 'test_user'));
+	}
+
+	public function testFilterUsersSeeingRowWithoutUserPlaceholder(): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+
+		$view = new View();
+		$view->setTableId(self::$testTableId);
+		$view->setFilterArray($this->buildConvertedFilter([['columnId' => 'name', 'operator' => 'is-equal', 'value' => 'Alice']]));
+
+		$aliceRowId = self::$testRowIds[0];
+		$bobRowId = self::$testRowIds[1];
+
+		$this->assertSame(['u1', 'u2'], $this->mapper->filterUsersSeeingRow($aliceRowId, $view, ['u1', 'u2']));
+		$this->assertSame([], $this->mapper->filterUsersSeeingRow($bobRowId, $view, ['u1', 'u2']));
+		$this->assertSame([], $this->mapper->filterUsersSeeingRow($aliceRowId, $view, []));
+	}
+
+	public function testFilterUsersSeeingRowResolvesUserPlaceholderPerUser(): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+		$this->userHelper->method('getUserDisplayName')->willReturnMap([
+			['user_alice', 'Alice'],
+			['user_bob', 'Bob'],
+		]);
+
+		$view = new View();
+		$view->setTableId(self::$testTableId);
+		$view->setFilterArray($this->buildConvertedFilter([['columnId' => 'name', 'operator' => 'is-equal', 'value' => '@my-name']]));
+
+		$aliceRowId = self::$testRowIds[0];
+
+		$this->assertSame(['user_alice'], $this->mapper->filterUsersSeeingRow($aliceRowId, $view, ['user_bob', 'user_alice']));
+	}
+
+	public function testFilterUsersSeeingRowFailsClosedForMissingFilterColumn(): void {
+		$this->setupRealColumnMapper(self::$testTableId);
+
+		$view = new View();
+		$view->setId(99);
+		$view->setTableId(self::$testTableId);
+		$view->setFilterArray([[['columnId' => 999999, 'operator' => 'is-equal', 'value' => '@me']]]);
+
+		$this->assertSame([], $this->mapper->filterUsersSeeingRow(self::$testRowIds[0], $view, ['u1', 'u2']));
 	}
 
 	public function testCountRowsForTables(): void {
