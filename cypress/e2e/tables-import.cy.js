@@ -60,6 +60,38 @@ describe('Import csv', () => {
 		cy.intercept({ method: 'POST', url: '**/apps/tables/v2/import/table/*' }).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
 		cy.wait('@importUploadReq').its('response.statusCode').should('equal', 200)
+
+		// The import runs as a queued background job — execute it via cron.php CLI
+		let cronResult
+		cy.task('exec', { command: 'php ../../cron.php -v "OCA\\Tables\\BackgroundJob\\ImportTableJob"', timeout: 120000 }, { timeout: 130000 })
+			.then(result => {
+				cronResult = result
+				cy.task('log', `[cron.php] code=${result.code}\nstdout: ${result.stdout}\nstderr: ${result.stderr}`)
+			})
+
+		const waitForProblemsFile = (retries = 15) => {
+			cy.task('exec', { command: 'find ../../data -name "*import-problems*" -print -quit' })
+				.then(result => {
+					if (result.stdout.trim() !== '') {
+						cy.visit('apps/files/files?dir=/Tables/Imports')
+						cy.get('[data-cy-files-list-row-name*="import-problems"]', { timeout: 20000 })
+							.should('be.visible')
+						return
+					}
+					if (retries <= 0) {
+						cy.task('exec', { command: 'tail -500 ../../data/nextcloud.log | grep -i "import\\|report" | tail -40' })
+							.then(r => {
+								throw new Error('Import problems file was not created. '
+									+ `cron.php: code=${cronResult?.code} stderr=${JSON.stringify(cronResult?.stderr)}\n`
+									+ `log tail: ${r.stdout}`)
+							})
+						return
+					}
+					cy.wait(2000)
+					waitForProblemsFile(retries - 1)
+				})
+		}
+		waitForProblemsFile()
 	})
 
 	it('Import small csv from device', () => {
@@ -100,7 +132,7 @@ describe('Import csv', () => {
 		cy.wait('@importUploadReq').its('response.statusCode').should('equal', 200)
 	})
 
-	it('Import csv from device with updating of existent files', () => {
+	it('Import csv from device with updating of existent files and a broken row', () => {
 		cy.intercept({ method: 'GET', url: '**/apps/tables/row/table/*' }).as('rowsReq')
 
 		cy.loadTable('Welcome to Nextcloud Tables!')
@@ -110,6 +142,7 @@ describe('Import csv', () => {
 			const csv = [
 				['id', 'What', 'How to do'],
 				[firstRow.id, 'What (Updated)', 'How to do (Updated)'],
+				['not-a-number', 'Skipped row', 'Skipped row'],
 			]
 
 			cy.writeFile('cypress/fixtures/test-import-update.csv', csv.map(row => row.join(',')).join('\n'))
@@ -133,7 +166,11 @@ describe('Import csv', () => {
 		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '0')
 		cy.get('[data-cy="importResultRowsUpdated"]').should('contain.text', '1')
 		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '1')
+		cy.get('[data-cy="importResultProblems"] tbody tr').should('have.length', 1)
+		cy.get('[data-cy="importResultProblems"] tbody tr').first()
+			.should('contain.text', '3')
+			.and('contain.text', 'not numeric')
 	})
 
 	it('Import small csv from device with an extra ignored column', () => {

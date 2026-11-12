@@ -18,6 +18,11 @@ use OCP\AppFramework\Http\DataResponse;
 
 trait Errors {
 
+	/**
+	 * @template T of array<array-key, mixed>|null|object|scalar
+	 * @param Closure(): T $callback
+	 * @return DataResponse<Http::STATUS_OK, T, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 */
 	protected function handleError(Closure $callback): DataResponse {
 		try {
 			return new DataResponse($callback());
