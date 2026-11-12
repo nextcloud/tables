@@ -677,22 +677,22 @@ export async function createTextLinkColumn(
 		.click()
 	await expect(page.getByText('Allowed types')).toBeVisible()
 
-	await setCheckboxState(
-		page.getByRole('switch', { name: /^URL$/i }),
-		false,
-	)
-	await setCheckboxState(
-		page.getByRole('switch', { name: /^Files$/i }),
-		false,
-	)
+	const providerSwitches = page.locator('.typeSelection').getByRole('switch')
+	await expect(providerSwitches.first()).toBeVisible()
+
+	const providerCount = await providerSwitches.count()
+	for (let index = 0; index < providerCount; index++) {
+		await setCheckboxState(providerSwitches.nth(index), false)
+	}
 
 	for (const provider of ressourceProvider) {
-		await setCheckboxState(
-			page.getByRole('switch', {
+		const providerSwitch = page
+			.locator('.typeSelection')
+			.getByRole('switch', {
 				name: new RegExp(`^${escapeRegExp(provider)}$`, 'i'),
-			}),
-			true,
-		)
+			})
+		await expect(providerSwitch).toHaveCount(1)
+		await setCheckboxState(providerSwitch, true)
 	}
 	await page
 		.locator('.modal-container button')
