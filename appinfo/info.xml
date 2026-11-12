@@ -31,8 +31,8 @@ Have a good time and manage whatever you want.
 	<author>Nextcloud GmbH and Nextcloud contributors</author>
 	<namespace>Tables</namespace>
 	<documentation>
-		<user>https://github.com/nextcloud/tables/wiki</user>
-		<admin>https://github.com/nextcloud/tables/wiki/Administration</admin>
+		<user>https://github.com/nextcloud/tables/blob/main/docs/README.md</user>
+		<admin>https://github.com/nextcloud/tables/blob/main/docs/administration.md</admin>
 	</documentation>
 	<category>office</category>
 	<website>https://github.com/nextcloud/tables</website>
