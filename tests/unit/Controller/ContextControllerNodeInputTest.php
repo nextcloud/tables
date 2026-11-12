@@ -44,6 +44,35 @@ final class ContextControllerNodeInputTest extends TestCase {
 		);
 	}
 
+	public function testCreateAnswers400ForANodeWithoutType(): void {
+		$this->contextService->expects($this->never())->method('create');
+
+		$response = $this->controller->create('Intake', 'star', '', [['id' => 5]]);
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertSame(['message' => 'Unexpected node type'], $response->getData());
+	}
+
+	public function testCreateAnswers400ForNodesThatAreNotAList(): void {
+		$this->contextService->expects($this->never())->method('create');
+
+		$response = $this->controller->create('Intake', 'star', '', ['a' => ['id' => 5, 'type' => 0, 'permissions' => 1]]);
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertSame(['message' => 'Nodes must be given as a list'], $response->getData());
+	}
+
+	public function testCreateDefaultsMissingNodePermissionsToRead(): void {
+		$this->contextService->expects($this->once())
+			->method('create')
+			->with('Intake', 'star', '', $this->identicalTo([['id' => 5, 'type' => 0, 'permissions' => 1]]), 'user-1', 0)
+			->willReturn(new Context());
+
+		$response = $this->controller->create('Intake', 'star', '', [['id' => '5', 'type' => '0']]);
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+	}
+
 	public function testUpdateAnswers400ForNodesThatAreNotAList(): void {
 		$this->contextService->expects($this->never())->method('update');
 

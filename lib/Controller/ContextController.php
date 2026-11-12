@@ -114,11 +114,16 @@ class ContextController extends AOCSController {
 			if (!$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
+			try {
+				$nodeInputs = ContextNodeInputSet::createFromInputArray($nodes);
+			} catch (InvalidArgumentException $e) {
+				return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			}
 			return new DataResponse($this->contextService->create(
 				$name,
 				$iconName,
 				$description,
-				$this->sanitizeInputNodes($nodes),
+				$nodeInputs->jsonSerialize(),
 				$this->userId,
 				0,
 			)->jsonSerialize());
@@ -175,33 +180,6 @@ class ContextController extends AOCSController {
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
-	}
-
-	/**
-	 * @psalm-param list<array{id: mixed, type: mixed, permissions?: mixed, order?: mixed}> $nodes
-	 * @psalm-return list<array{id: int, type: int, permissions?: int, order?: int}>
-	 */
-	protected function sanitizeInputNodes(array $nodes): array {
-		foreach ($nodes as &$node) {
-			if (!is_numeric($node['type'])) {
-				throw new InvalidArgumentException('Unexpected node type');
-			}
-			$node['type'] = (int)$node['type'];
-
-			if (!is_numeric($node['id'])) {
-				throw new InvalidArgumentException('Unexpected node id');
-			}
-			$node['id'] = (int)$node['id'];
-
-			if (isset($node['permissions'])) {
-				$node['permissions'] = (int)$node['permissions'];
-			}
-
-			if (isset($node['order'])) {
-				$node['order'] = (int)$node['order'];
-			}
-		}
-		return $nodes;
 	}
 
 	/**
