@@ -512,6 +512,62 @@ Feature: APIv2
       | node  | table:t1:read,create,update  |
       | node  | table:t2:read                |
 
+  @api2 @contexts @contexts-update
+  Scenario: Add a table to an owned context without stating its permissions
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    When user "participant1-v2" updates the nodes of the Context "c1" with a JSON "list" of
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table |                     |
+    Then the reported status is "200"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" contains "table" "t1" with permissions "read,create,update"
+    And known Context "c1" contains "table" "t2" with permissions "read"
+
+  @api2 @contexts @contexts-update
+  Scenario: Keep a table in an owned context without stating its permissions
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    When user "participant1-v2" updates the nodes of the Context "c1" with a JSON "list" of
+      | alias | type  | permissions         |
+      | t1    | table |                     |
+    Then the reported status is "200"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" contains "table" "t1" with permissions "read"
+
+  @api2 @contexts @contexts-update
+  Scenario: Attempt to update the nodes of an owned context with an object instead of a list
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    When user "participant1-v2" updates the nodes of the Context "c1" with a JSON "object" of
+      | alias | type  | permissions         |
+      | t1    | table | read                |
+    Then the reported status is "400"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" contains "table" "t1" with permissions "read,create,update"
+
+  @api2 @contexts @contexts-update
+  Scenario: Remove all tables from an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant1-v2" updates the nodes of the Context "c1" with a JSON "list" of
+      | alias | type  | permissions         |
+    Then the reported status is "200"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" contains no nodes
+
   @api2 @contexts @contexts-ownership
   Scenario: Transfer an owned context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2

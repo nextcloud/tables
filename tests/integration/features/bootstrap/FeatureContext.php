@@ -2583,6 +2583,18 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @Then known Context :contextAlias contains no nodes
+	 */
+	public function knownContextContainsNoNodes(string $contextAlias): void {
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		Assert::assertSame([], $context['nodes']);
+		foreach ($context['pages'] as $page) {
+			Assert::assertSame([], $page['content']);
+		}
+	}
+
+	/**
 	 * @Then the reported status is :statusCode
 	 */
 	public function theReportedStatusIs(int $statusCode): void {
@@ -2786,6 +2798,41 @@ class FeatureContext implements Context {
 			'PUT',
 			sprintf('/apps/tables/api/2/contexts/%d', $context['id']),
 			['nodes' => $nodes]
+		);
+	}
+
+	/**
+	 * Sends a JSON body, because the form encoding of the step above can
+	 * express neither an object nor an empty list. An empty permissions cell
+	 * leaves the property out.
+	 *
+	 * @When user :user updates the nodes of the Context :contextAlias with a JSON :shape of
+	 */
+	public function userUpdatesNodesOfContextWithJson(string $user, string $contextAlias, string $shape, TableNode $updatedNodes): void {
+		$this->setCurrentUser($user);
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		$nodes = [];
+
+		foreach ($updatedNodes as $row) {
+			$node = [
+				'id' => $row['type'] === 'table' ? $this->tableIds[$row['alias']] : $this->viewIds[$row['alias']],
+				'type' => $row['type'] === 'table' ? 0 : 1,
+			];
+			if ($row['permissions'] !== '') {
+				$node['permissions'] = $this->humanReadablePermissionToInt($row['permissions']);
+			}
+			if ($shape === 'object') {
+				$nodes[$row['alias']] = $node;
+			} else {
+				$nodes[] = $node;
+			}
+		}
+
+		$this->sendOcsRequest(
+			'PUT',
+			sprintf('/apps/tables/api/2/contexts/%d', $context['id']),
+			json_encode(['nodes' => $nodes]),
+			['Content-Type' => 'application/json'],
 		);
 	}
 

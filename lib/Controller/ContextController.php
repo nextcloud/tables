@@ -16,6 +16,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ContextNodeInputSet;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -154,14 +155,18 @@ class ContextController extends AOCSController {
 			if ($iconName !== null && !$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
-			$nodes = $nodes !== null ? $this->sanitizeInputNodes($nodes) : null;
+			try {
+				$nodeInputs = $nodes !== null ? ContextNodeInputSet::createFromInputArray($nodes) : null;
+			} catch (InvalidArgumentException $e) {
+				return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			}
 			return new DataResponse($this->contextService->update(
 				$contextId,
 				$this->userId,
 				$name,
 				$iconName,
 				$description,
-				$nodes,
+				$nodeInputs?->jsonSerialize(),
 			)->jsonSerialize());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			return $this->handleError($e);
