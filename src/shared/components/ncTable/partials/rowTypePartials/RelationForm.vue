@@ -53,7 +53,7 @@ export default {
 		loading() {
 			const dataStore = useDataStore()
 			const elementId = this.activeView?.id ?? this.activeTable?.id ?? this.column?.tableId
-			if (elementId) {
+			if (elementId || dataStore.publicToken) {
 				return dataStore.getRelationsLoading(!!this.activeView, elementId)
 			}
 			return false
@@ -61,7 +61,8 @@ export default {
 		relationOptions() {
 			const dataStore = useDataStore()
 			const columnRelations = dataStore.getRelations(this.column?.id)
-			return Object.values(columnRelations)
+			return Object.values(columnRelations.values || {})
+				.map(relation => ({ id: relation.id, label: relation.value }))
 		},
 		localValue: {
 			get() {
@@ -75,7 +76,7 @@ export default {
 	async mounted() {
 		const viewId = this.activeView?.id ?? null
 		const tableId = this.activeTable?.id ?? this.column?.tableId ?? null
-		if (viewId || tableId) {
+		if (viewId || tableId || useDataStore().publicToken) {
 			await this.loadRelationsFromBE({
 				tableId,
 				viewId,

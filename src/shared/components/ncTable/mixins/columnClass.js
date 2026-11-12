@@ -4,6 +4,7 @@
  */
 import { Filters } from './filter.js'
 import { MagicFields } from './magicFields.js'
+import { ColumnTypes } from './columnHandler.js'
 
 export class AbstractColumn {
 
@@ -29,6 +30,16 @@ export class AbstractColumn {
 
 	canSort() {
 		return typeof this.sort === 'function'
+	}
+
+	/**
+	 * Virtual columns do not store their own cell data,
+	 * their values are derived from a related column.
+	 *
+	 * @return {boolean}
+	 */
+	isVirtual() {
+		return this.type === ColumnTypes.Lookup
 	}
 
 	getNextSortsResult(nextSorts, rowA, rowB) {
@@ -80,6 +91,16 @@ export class AbstractColumn {
 	 */
 	parseValue(value) {
 		return value
+	}
+
+	/**
+	 * Get the id of the column whose cell holds this column's value.
+	 * Virtual columns may source their value from another column.
+	 *
+	 * @return {number} The column id to read the cell value from
+	 */
+	getValueColumnId() {
+		return this.id
 	}
 
 }

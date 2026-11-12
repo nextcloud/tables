@@ -57,7 +57,7 @@ export default {
 			}
 
 			// Prevent editing for readonly columns
-			if (this.isView && this.column?.viewColumnInformation?.readonly) {
+			if (this.column.isVirtual() || (this.isView && this.column?.viewColumnInformation?.readonly)) {
 				return false
 			}
 
