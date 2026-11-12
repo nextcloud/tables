@@ -14,6 +14,8 @@ use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Service\ArchiveCleanupService;
+use OCA\Tables\Service\ArchiveService;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
@@ -69,6 +71,8 @@ final class TableServiceAuditLogTest extends TestCase {
 			$this->createMock(ActivityManager::class),
 			$this->createMock(FederationService::class),
 			$this->auditLogService,
+			$this->createMock(ArchiveService::class),
+			$this->createMock(ArchiveCleanupService::class),
 		);
 	}
 

@@ -55,8 +55,8 @@ class RenameTable extends Command {
 			->addOption(
 				'archived',
 				'a',
-				InputOption::VALUE_NONE,
-				'Archived'
+				InputOption::VALUE_NEGATABLE,
+				'Archive (--archived) or unarchive (--no-archived) the table; the archived state is kept unchanged when omitted'
 			)
 		;
 	}
@@ -70,6 +70,8 @@ class RenameTable extends Command {
 		$id = $input->getArgument('ID');
 		$title = $input->getArgument('title');
 		$emoji = $input->getOption('emoji');
+		// A negatable option is null when neither form was given, which leaves the
+		// archived state unchanged rather than unarchiving the table.
 		$archived = $input->getOption('archived');
 		$description = $input->getOption('description');
 
