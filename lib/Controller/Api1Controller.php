@@ -296,11 +296,12 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
-	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViews(int $tableId): DataResponse {
 		try {
-			return new DataResponse($this->viewService->formatViews($this->viewService->findAll($this->tableService->find($tableId))));
+			$table = $this->tableService->find($tableId);
+			return new DataResponse($this->viewService->formatViews($table->getViews() ?? []));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

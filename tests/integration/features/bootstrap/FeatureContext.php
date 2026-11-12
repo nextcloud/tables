@@ -64,6 +64,8 @@ class FeatureContext implements Context {
 
 	// Store data from last request to perform assertions, id is used as a key
 	private array $tableData = [];
+	private array $viewData = [];
+	private array $sharedViewsData = [];
 
 	private $importColumnData = null;
 
@@ -1350,6 +1352,27 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user attempts to fetch views of table :tableAlias
+	 */
+	public function attemptToFetchAllViews(string $user, string $tableAlias): void {
+		$this->setCurrentUser($user);
+		$tableId = $this->collectionManager->getByAlias('table', $tableAlias)['id'];
+
+		$this->sendRequest(
+			'GET',
+			sprintf('/apps/tables/api/1/tables/%d/views', $tableId)
+		);
+	}
+
+	/**
+	 * @Then the response contains :count shares
+	 * @Then the response contains :count views
+	 */
+	public function theResponseContainsShares(int $count): void {
+		Assert::assertCount($count, $this->getDataFromResponse($this->response));
+	}
+
+	/**
 	 * @Then user :user has the following permissions
 	 */
 	public function checkSharePermissions($user, ?TableNode $permissions = null) {
@@ -2203,10 +2226,103 @@ class FeatureContext implements Context {
 		foreach ($table->getRows() as $row) {
 			$attribute = $row[0];
 			$value = $row[1];
-			if (in_array($attribute, ['archived', 'favorite'])) {
+			if (in_array($attribute, ['archived', 'favorite', 'hasShares', 'isShared'])) {
 				$value = (bool)$value;
 			}
 			Assert::assertEquals($value, $this->tableData[$tableName][$attribute]);
+		}
+	}
+
+	/**
+	 * @Then user :user sees the following views of table :tableName
+	 *
+	 * The first row of the table contains the attribute names to check,
+	 * the first column is always the view alias. Views are compared in order.
+	 */
+	public function userSeesTheFollowingViewsOfTable(string $user, string $tableName, TableNode $table): void {
+		$views = $this->tableData[$tableName]['views'] ?? [];
+		$rows = $table->getRows();
+		$headers = array_shift($rows);
+
+		Assert::assertCount(count($rows), $views, 'View count does not match');
+		foreach ($rows as $i => $row) {
+			$alias = $row[0];
+			$viewId = $this->collectionManager->getByAlias('view', $alias)['id'];
+			Assert::assertEquals($viewId, $views[$i]['id'], 'Unexpected view at position ' . $i);
+			foreach (array_slice($row, 1) as $j => $expected) {
+				$attribute = $headers[$j + 1];
+				$actual = $views[$i][$attribute];
+				if (is_bool($actual)) {
+					$expected = (bool)$expected;
+				} elseif (is_array($actual)) {
+					$expected = json_decode((string)$expected, true);
+				} elseif (is_int($actual)) {
+					$expected = (int)$expected;
+				}
+				Assert::assertEquals($expected, $actual, sprintf('Attribute %s of view %s is not as expected', $attribute, $alias));
+			}
+		}
+	}
+
+	/**
+	 * @When user :user fetches view info for view :viewAlias
+	 */
+	public function userFetchesViewInfo(string $user, string $viewAlias): void {
+		$this->setCurrentUser($user);
+		$viewId = $this->collectionManager->getByAlias('view', $viewAlias)['id'];
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/views/' . $viewId,
+		);
+
+		$this->viewData[$viewAlias] = $this->getDataFromResponse($this->response);
+	}
+
+	/**
+	 * @Then user :user sees the following view attributes on view :viewAlias
+	 */
+	public function userSeesTheFollowingViewAttributesOnView(string $user, string $viewAlias, TableNode $table): void {
+		$this->assertViewAttributes($this->viewData[$viewAlias] ?? [], $table);
+	}
+
+	/**
+	 * @When user :user fetches the views shared with them
+	 */
+	public function userFetchesViewsSharedWithThem(string $user): void {
+		$this->setCurrentUser($user);
+
+		$this->sendRequest('GET', '/apps/tables/view');
+
+		$this->sharedViewsData = $this->getDataFromResponse($this->response);
+	}
+
+	/**
+	 * @Then view :viewAlias in the shared views list has the following attributes
+	 */
+	public function sharedViewsListViewHasAttributes(string $viewAlias, TableNode $table): void {
+		$viewId = $this->collectionManager->getByAlias('view', $viewAlias)['id'];
+		$matches = array_values(array_filter(
+			$this->sharedViewsData,
+			static fn (array $view): bool => $view['id'] === $viewId
+		));
+		Assert::assertCount(1, $matches, 'View not found in the shared views list');
+		$this->assertViewAttributes($matches[0], $table);
+	}
+
+	private function assertViewAttributes(array $view, TableNode $table): void {
+		foreach ($table->getRows() as $row) {
+			$attribute = $row[0];
+			$expected = $row[1];
+			$actual = $view[$attribute] ?? null;
+			if (is_bool($actual)) {
+				$expected = (bool)$expected;
+			} elseif (is_array($actual)) {
+				$expected = json_decode((string)$expected, true);
+			} elseif (is_int($actual)) {
+				$expected = (int)$expected;
+			}
+			Assert::assertEquals($expected, $actual, sprintf('Attribute %s is not as expected', $attribute));
 		}
 	}
 
