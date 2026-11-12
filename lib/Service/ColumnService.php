@@ -349,6 +349,8 @@ class ColumnService extends SuperService {
 			author: $userId ?? $this->userId,
 		);
 
+		$this->touchTable($table->getId(), $userId ?? $this->userId);
+
 		return $this->enhanceColumn($entity);
 	}
 
@@ -445,6 +447,8 @@ class ColumnService extends SuperService {
 					subject: ActivityManager::SUBJECT_COLUMN_UPDATE,
 					author: $userId ?? $this->userId,
 				);
+
+				$this->touchTable($updatedColumn->getTableId(), $userId ?? $this->userId);
 
 				return $this->enhanceColumn($updatedColumn);
 			} catch (\OCP\DB\Exception $e) {
@@ -643,6 +647,17 @@ class ColumnService extends SuperService {
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Updates the table's last-modified metadata after a column change.
+	 */
+	private function touchTable(int $tableId, ?string $userId): void {
+		try {
+			$this->tableMapper->touch($tableId, $userId);
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->warning('Failed to update last modified timestamp for table ' . $tableId . ': ' . $e->getMessage(), ['exception' => $e]);
 		}
 	}
 
