@@ -13,12 +13,12 @@ use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
-use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ConfigService;
+use OCA\Tables\Service\RowVisibilityService;
 use OCA\Tables\Service\ShareService;
 use OCP\Notification\IManager;
 use OCP\Notification\INotification;
@@ -75,7 +75,7 @@ final class NotificationHelperPayloadTest extends TestCase {
 			$this->createMock(ShareService::class),
 			$tableMapper,
 			$viewMapper,
-			$this->createMock(Row2Mapper::class),
+			$this->createMock(RowVisibilityService::class),
 			$columnMapper,
 			$activityManager,
 			'author',
