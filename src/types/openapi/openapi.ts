@@ -7280,17 +7280,17 @@ export interface operations {
                     readonly iconName?: string | null;
                     /** @description provide this parameter to set a new description */
                     readonly description?: string | null;
-                    /** @description provide this parameter to set a new list of nodes. */
-                    readonly nodes?: {
+                    /** @description provide this parameter to set a new list of nodes. Permissions default to read when omitted. */
+                    readonly nodes?: readonly {
                         /** Format: int64 */
                         readonly id: number;
                         /** Format: int64 */
                         readonly type: number;
                         /** Format: int64 */
-                        readonly permissions: number;
+                        readonly permissions?: number;
                         /** Format: int64 */
-                        readonly order: number;
-                    } | null;
+                        readonly order?: number;
+                    }[] | null;
                 };
             };
         };

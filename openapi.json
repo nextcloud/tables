@@ -12699,31 +12699,32 @@
                                         "description": "provide this parameter to set a new description"
                                     },
                                     "nodes": {
-                                        "type": "object",
+                                        "type": "array",
                                         "nullable": true,
-                                        "description": "provide this parameter to set a new list of nodes.",
-                                        "required": [
-                                            "id",
-                                            "type",
-                                            "permissions",
-                                            "order"
-                                        ],
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "type": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "permissions": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "order": {
-                                                "type": "integer",
-                                                "format": "int64"
+                                        "description": "provide this parameter to set a new list of nodes. Permissions default to read when omitted.",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "type"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "type": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "permissions": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "order": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                }
                                             }
                                         }
                                     }
