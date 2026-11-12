@@ -5,6 +5,7 @@
 import { AbstractSelectionColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
+import { selectionOptionId } from '../selectionReference.js'
 
 export default class SelectionColumn extends AbstractSelectionColumn {
 
@@ -50,8 +51,26 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 		return super.isSearchStringFound(this.getLabel(cell.value), cell, searchString)
 	}
 
+	/**
+	 * @param {object} cell the row cell to test
+	 * @param {object} filter the stored filter or condition
+	 * @return {boolean}
+	 */
 	isFilterFound(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const referencedId = selectionOptionId(filterValue)
+		if (referencedId !== null) {
+			const isThatOption = cell.value === referencedId
+			const byReference = {
+				[FilterIds.Contains]: () => isThatOption,
+				[FilterIds.IsEqual]: () => isThatOption,
+				[FilterIds.DoesNotContain]: () => !isThatOption,
+				[FilterIds.IsNotEqual]: () => !isThatOption,
+			}[filter.operator.id]
+			if (byReference) {
+				return super.isFilterFound(byReference, cell)
+			}
+		}
 		const cellLabel = this.getLabel(cell.value)?.toLowerCase()
 		const filterMethod = {
 			[FilterIds.ContainsItem]() { return filterValue.map(option => option.id).includes(cell.value) },
