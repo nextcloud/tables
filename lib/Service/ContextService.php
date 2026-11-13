@@ -259,8 +259,17 @@ class ContextService {
 					$node['order'] ?? 100,
 					$userId
 				);
-				$currentNodes[$addedNode->getId()] = $addedNode->jsonSerialize();
-				$currentPages[$updatedContent->getPageId()]['content'][$updatedContent->getId()] = $updatedContent->jsonSerialize();
+				// The same shape as the nodes and contents the mapper loads
+				$currentNodes[$addedNode->getId()] = [
+					'id' => $addedNode->getId(),
+					'node_id' => $addedNode->getNodeId(),
+					'node_type' => $addedNode->getNodeType(),
+					'permissions' => $addedNode->getPermissions(),
+				];
+				$currentPages[$updatedContent->getPageId()]['content'][$updatedContent->getId()] = [
+					'order' => $updatedContent->getOrder(),
+					'node_rel_id' => $updatedContent->getNodeRelId(),
+				];
 			}
 			unset($nodesBeingAdded);
 
