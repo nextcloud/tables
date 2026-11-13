@@ -33,6 +33,32 @@ class ContextNavigationMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int[] $shareIds
+	 * @throws Exception
+	 */
+	public function deleteByShareIds(array $shareIds): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->table)
+			->where($qb->expr()->in('share_id', $qb->createParameter('shareIds')));
+		foreach (array_chunk($shareIds, 1000) as $chunk) {
+			$qb->setParameter('shareIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$qb->executeStatement();
+		}
+	}
+
+	/**
+	 * Deletes the navigation settings a user made for themselves.
+	 *
+	 * @throws Exception
+	 */
+	public function deleteByUserId(string $userId): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->table)
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+		return $qb->executeStatement();
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function deleteByShareIdAndUserId(int $shareId, string $userId): void {
