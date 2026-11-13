@@ -46,6 +46,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $auditLogService;
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
+	private MockObject $logger;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -54,7 +55,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
@@ -71,7 +72,7 @@ final class ContextServiceTest extends TestCase {
 			$this->contextNodeRelMapper,
 			$this->pageMapper,
 			$this->pageContentMapper,
-			$logger,
+			$this->logger,
 			$permissionsService,
 			$this->userManager,
 			$this->auditLogService,
@@ -649,5 +650,81 @@ final class ContextServiceTest extends TestCase {
 		], 5);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
+	}
+
+	public function testImportingSchemePagesKeepsWhatCanBeUsedAndSkipsTheRestWithAReason(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setName('Intake portal');
+		$context->setOwnerId('user-1');
+		$context->setOwnerType(Application::OWNER_TYPE_USER);
+		$context->setNodes([]);
+		$context->setPages([
+			301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'dashboard', 'content' => []],
+			302 => ['id' => 302, 'page_type' => Page::TYPE_GRID, 'technical_name' => 'overview', 'content' => []],
+		]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->method('findById')->willReturnCallback(static function (int $id): Page {
+			$page = new Page();
+			$page->id = $id;
+			$page->resetUpdatedFields();
+			return $page;
+		});
+		$updated = [];
+		$this->pageMapper->method('update')->willReturnCallback(static function (Page $page) use (&$updated): Page {
+			$updated[] = [$page->getId(), $page->getTitle(), $page->getIcon()];
+			return $page;
+		});
+		$inserted = [];
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$inserted): Page {
+			$page->id = 400 + count($inserted);
+			$inserted[] = [$page->getTechnicalName(), $page->getTitle(), $page->getPageType()];
+			return $page;
+		});
+		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$inserted): Page {
+			$page->id = 400 + count($inserted);
+			$inserted[] = ['page_' . $page->getId(), $page->getTitle(), $page->getPageType()];
+			return $page;
+		});
+		$synced = [];
+		$this->widgetService->method('syncPage')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced): array {
+			$synced[$pageId] = array_map(static fn (WidgetInput $widget): array => [$widget->type, $widget->title, $widget->nodeRelId], $widgets);
+			return [];
+		});
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
+		$text = static fn (?string $title): array => ['type' => 'text', 'title' => $title, 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hi']];
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', null, [
+			['page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'dashboard', 'title' => 'Home', 'icon' => 'star', 'widgets' => [$text('On the start page')]],
+			['page_type' => Page::TYPE_STARTPAGE, 'title' => 'Second start'],
+			['page_type' => Page::TYPE_GRID, 'technical_name' => 'overview', 'title' => 'Overview', 'widgets' => [
+				$text('Kept'),
+				['type' => 'data', 'title' => 'Without source', 'gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => null],
+				['type' => 'data', 'title' => 'Old source', 'gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['nodeRelId' => 5]],
+				['type' => 'chart', 'title' => 'Unknown type', 'gridX' => 0, 'gridY' => 12, 'gridWidth' => 12, 'gridHeight' => 5],
+			]],
+			['page_type' => Page::TYPE_GRID, 'technical_name' => 'overview', 'title' => 'Same name'],
+			'not a page',
+			['page_type' => Page::TYPE_GRID, 'technical_name' => 'reports', 'title' => 'Reports', 'widgets' => array_fill(0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE + 1, $text(null))],
+		]);
+
+		$this->assertSame([[301, 'Home', 'star'], [302, 'Overview', null]], $updated);
+		$this->assertSame([['page_400', 'Same name', Page::TYPE_GRID], ['reports', 'Reports', Page::TYPE_GRID]], $inserted);
+		$this->assertSame([['text', 'Kept', null], ['data', 'Without source', null]], $synced[302]);
+		$this->assertSame([], $synced[400]);
+		$this->assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $synced[401]);
+		$this->assertArrayNotHasKey(301, $synced);
+		$this->assertSame([
+			'Skipping widget 0 of page 0 of an imported scheme: only grid pages hold widgets',
+			'Skipping page 1 of an imported scheme: an application has one start page',
+			'Skipping widget 2 of page 2 of an imported scheme: its source names no table or view by uuid',
+			'Skipping widget 3 of page 2 of an imported scheme: Unknown widget type "chart", expected one of: header, text, data',
+			'Skipping page 4 of an imported scheme: its type is not startpage or grid',
+			'Skipping widget 100 of page 5 of an imported scheme: a page holds at most 100 widgets',
+		], $warnings);
 	}
 }

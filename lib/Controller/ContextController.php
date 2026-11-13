@@ -360,6 +360,7 @@ class ContextController extends AOCSController {
 	 * @param list<array{node_type: int, node_uuid: string, permissions: int}> $nodes Ordered meta data of the related nodes
 	 * @psalm-param array{addTables: list<TablesTable>, modifyTables: list<TablesTable>} $tables Tables to be added or modified
 	 * @param list<array<string, mixed>>|null $menu Menu of the scheme, replacing the menu of the context: pages by technical name, tables and views by uuid, the group of an item by its position in the list; items that cannot be used here are skipped. Left out, the menu stays as it is
+	 * @param list<array<string, mixed>>|null $pages Pages of the scheme: the start page updates the start page, a grid page the page with its technical name or it is added, and its widgets replace the widgets of that page; a widget names its table or view by `targetType` and `targetUuid` in its `source`. Pages and widgets that cannot be used here are skipped. Left out, the pages stay as they are
 	 *
 	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
@@ -370,10 +371,10 @@ class ContextController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, ?array $menu = null): DataResponse {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, ?array $menu = null, ?array $pages = null): DataResponse {
 		try {
 			$this->db->beginTransaction();
-			$context = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId, $menu);
+			$context = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId, $menu, $pages);
 			$this->db->commit();
 			return new DataResponse($context->jsonSerialize());
 		} catch (\InvalidArgumentException $e) {

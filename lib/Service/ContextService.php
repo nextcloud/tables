@@ -23,6 +23,7 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
@@ -35,6 +36,7 @@ use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -640,19 +642,32 @@ class ContextService {
 		$importable = [];
 		$hasStartPage = false;
 		foreach ($pages as $key => $pageArr) {
-			$type = is_array($pageArr) ? ($pageArr['page_type'] ?? null) : null;
-			if ($type !== Page::TYPE_STARTPAGE && $type !== Page::TYPE_GRID) {
-				$this->logger->warning('Skipping an imported page: its type is not ' . Page::TYPE_STARTPAGE . ' or ' . Page::TYPE_GRID . '.');
+			$reason = self::pageSkipReason($pageArr, $hasStartPage);
+			if ($reason !== null) {
+				$this->logger->warning('Skipping an imported page: ' . $reason . '.');
 				continue;
 			}
-			if ($type === Page::TYPE_STARTPAGE && $hasStartPage) {
-				$this->logger->warning('Skipping an imported page: an application has one start page.');
-				continue;
-			}
-			$hasStartPage = $hasStartPage || $type === Page::TYPE_STARTPAGE;
 			$importable[$key] = $pageArr;
 		}
 		return $importable;
+	}
+
+	/**
+	 * Why an exported page cannot be imported, or null when it can: it must be a start
+	 * page or a grid page, and an application has one start page.
+	 *
+	 * @param bool $hasStartPage whether an earlier page of the import is the start page; set when this one is
+	 */
+	private static function pageSkipReason(mixed $pageArr, bool &$hasStartPage): ?string {
+		$type = is_array($pageArr) ? ($pageArr['page_type'] ?? null) : null;
+		if ($type !== Page::TYPE_STARTPAGE && $type !== Page::TYPE_GRID) {
+			return 'its type is not ' . Page::TYPE_STARTPAGE . ' or ' . Page::TYPE_GRID;
+		}
+		if ($type === Page::TYPE_STARTPAGE && $hasStartPage) {
+			return 'an application has one start page';
+		}
+		$hasStartPage = $hasStartPage || $type === Page::TYPE_STARTPAGE;
+		return null;
 	}
 
 	/**
@@ -825,14 +840,23 @@ class ContextService {
 	}
 
 	/**
-	 * The node relation of an application for an exported table or view, found by uuid.
+	 * The table or view (by kind, `table` or `view`) with a uuid, or null when it is not here.
+	 *
+	 * @throws Exception
 	 */
-	private function nodeRelIdByUuid(Context $context, string $kind, string $uuid): ?int {
+	private function findNodeByUuid(string $kind, string $uuid): Table|View|null {
 		try {
-			$node = $kind === 'table' ? $this->tableMapper->findByUuid($uuid) : $this->viewMapper->findByUuid($uuid);
+			return $kind === 'table' ? $this->tableMapper->findByUuid($uuid) : $this->viewMapper->findByUuid($uuid);
 		} catch (DoesNotExistException) {
 			return null;
 		}
+	}
+
+	/**
+	 * The node relation of an application for an exported table or view, found by uuid.
+	 */
+	private function nodeRelIdByUuid(Context $context, string $kind, string $uuid): ?int {
+		$node = $this->findNodeByUuid($kind, $uuid);
 		if ($node === null) {
 			return null;
 		}
@@ -943,6 +967,27 @@ class ContextService {
 	}
 
 	/**
+	 * A widget of an exported scheme read the way the API reads one, with its source set
+	 * aside: a scheme names a table or view by uuid, which the caller resolves. An unknown
+	 * icon is dropped, not the widget.
+	 *
+	 * @return array{widget: WidgetInput, hasSource: bool, source: mixed}
+	 * @throws BadRequestError
+	 */
+	private function readImportedWidget(int $index, mixed $widgetArr): array {
+		if (!is_array($widgetArr)) {
+			throw new BadRequestError('Widget ' . $index . ' must be an object.');
+		}
+		$source = $widgetArr['source'] ?? null;
+		$widgetArr['source'] = null;
+		if (isset($widgetArr['icon']) && (!is_string($widgetArr['icon']) || !IconHelper::isValid($widgetArr['icon']))) {
+			$widgetArr['icon'] = null;
+		}
+		$widget = $this->gridWidgetTypes->readWidget($index, $widgetArr);
+		return ['widget' => $widget->withId(null), 'hasSource' => $this->gridWidgetTypes->get($widget->type)['hasSource'], 'source' => $source];
+	}
+
+	/**
 	 * An exported id usable as an array key, or null for a value of another type.
 	 */
 	private static function importedKey(mixed $id): int|string|null {
@@ -1017,10 +1062,38 @@ class ContextService {
 			$context->getIcon(),
 			$context->getDescription(),
 			array_values($nodes),
-			$this->getPagesWithWidgets($context),
+			self::exportPages($this->getPagesWithWidgets($context), $nodes),
 			array_values($tables),
 			$this->menuService->export($context),
 		);
+	}
+
+	/**
+	 * The pages of an application as a scheme carries them: the source of a widget also
+	 * names its table or view by `targetType` and `targetUuid`, which an import resolves.
+	 *
+	 * @param array<int, array<string, mixed>> $pages the pages with their widgets
+	 * @param array<array-key, array<string, mixed>> $nodes the nodes of the scheme, with their uuid
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function exportPages(array $pages, array $nodes): array {
+		$targets = [];
+		foreach ($nodes as $node) {
+			if (isset($node['node_uuid'])) {
+				$targets[$node['id']] = [
+					'targetType' => $node['node_type'] === Application::NODE_TYPE_TABLE ? 'table' : 'view',
+					'targetUuid' => $node['node_uuid'],
+				];
+			}
+		}
+		foreach ($pages as $pageId => $page) {
+			foreach ($page['widgets'] ?? [] as $index => $widget) {
+				if (is_array($widget['source'] ?? null)) {
+					$pages[$pageId]['widgets'][$index]['source'] += $targets[$widget['source']['nodeRelId']] ?? [];
+				}
+			}
+		}
+		return $pages;
 	}
 
 	/**
@@ -1089,6 +1162,23 @@ class ContextService {
 			}
 		}
 
+		$schemePageIds = [];
+		if (is_array($updateScheme['pages'] ?? null)) {
+			$addedUuids = $this->addedSchemeUuids($updateSchemeTables, array_keys($tablesMap));
+			$schemeNodes = $this->previewSchemeNodes($context, is_array($updateScheme['nodes'] ?? null) ? $updateScheme['nodes'] : [], $userId, $addedUuids);
+			['pages' => $pages, 'skipped' => $skipped] = $this->resolveSchemePages($context, array_values($updateScheme['pages']), $schemeNodes);
+			$changes['pages'] = [
+				'from' => array_values(array_map(static fn (array $page): array => ['technicalName' => $page['technical_name'] ?? null, 'title' => $page['title'] ?? null], $context->getPages() ?? [])),
+				'to' => array_column($pages, 'entry'),
+				'skipped' => $skipped,
+			];
+			foreach ($pages as $page) {
+				if ($page['exportedId'] !== null) {
+					// a page the import adds is not here yet; any id passes the check
+					$schemePageIds[$page['exportedId']] = $page['pageId'] ?? 0;
+				}
+			}
+		}
 		if (is_array($updateScheme['menu'] ?? null)) {
 			$schemeUuids = [];
 			foreach ($changes['nodes']['to'] ?? [] as $node) {
@@ -1100,7 +1190,7 @@ class ContextService {
 				$context,
 				$updateScheme['menu'],
 				static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
-				static fn (int $pageId): ?int => $pageIds[$pageId] ?? null,
+				static fn (int $pageId): ?int => $pageIds[$pageId] ?? $schemePageIds[$pageId] ?? null,
 			);
 			$changes['menu'] = [
 				'from' => $currentScheme->getMenu(),
@@ -1113,6 +1203,234 @@ class ContextService {
 	}
 
 	/**
+	 * The nodes of a scheme that an import makes nodes of the application, by node type and
+	 * uuid as {@see self::resolveSchemePages()} takes them: a node the application has, one
+	 * the import adds, and one that is here and manageable by the user.
+	 *
+	 * @param array<array-key, mixed> $schemeNodes
+	 * @param array<string, true> $addedUuids uuids of the tables and views the import adds
+	 * @return array<string, ?int>
+	 * @throws Exception
+	 */
+	private function previewSchemeNodes(Context $context, array $schemeNodes, string $userId, array $addedUuids): array {
+		$current = [];
+		foreach ($context->getNodes() ?? [] as $node) {
+			$current[sprintf('t%di%d', $node['node_type'], $node['node_id'])] = true;
+		}
+		$nodes = [];
+		foreach ($schemeNodes as $node) {
+			$nodeType = is_array($node) ? ($node['node_type'] ?? null) : null;
+			$uuid = is_array($node) ? ($node['node_uuid'] ?? null) : null;
+			if (($nodeType !== Application::NODE_TYPE_TABLE && $nodeType !== Application::NODE_TYPE_VIEW) || !is_string($uuid)) {
+				continue;
+			}
+			$found = $this->findNodeByUuid($nodeType === Application::NODE_TYPE_TABLE ? 'table' : 'view', $uuid);
+			if (isset($addedUuids[$uuid])
+				|| ($found !== null && (isset($current[sprintf('t%di%d', $nodeType, $found->getId())]) || $this->permissionsService->canManageNodeById($nodeType, $found->getId(), $userId)))) {
+				$nodes[$nodeType . ':' . $uuid] = $found?->getId();
+			}
+		}
+		return $nodes;
+	}
+
+	/**
+	 * The uuids of the tables and views of a scheme that are not here, which an import adds.
+	 *
+	 * @param array<array-key, mixed> $schemeTables
+	 * @param list<string> $localTableUuids
+	 * @return array<string, true>
+	 * @throws Exception
+	 */
+	private function addedSchemeUuids(array $schemeTables, array $localTableUuids): array {
+		$localTableUuids = array_flip($localTableUuids);
+		$addedUuids = [];
+		foreach ($schemeTables as $table) {
+			if (!is_array($table)) {
+				continue;
+			}
+			if (is_string($table['uuid'] ?? null) && !isset($localTableUuids[$table['uuid']])) {
+				$addedUuids[$table['uuid']] = true;
+			}
+			foreach (is_array($table['views'] ?? null) ? $table['views'] : [] as $view) {
+				if (is_array($view) && is_string($view['uuid'] ?? null) && $this->findNodeByUuid('view', $view['uuid']) === null) {
+					$addedUuids[$view['uuid']] = true;
+				}
+			}
+		}
+		return $addedUuids;
+	}
+
+	/**
+	 * Checks the pages of a scheme against an application of this instance. Pages follow
+	 * {@see self::pageSkipReason()}: the start page of the scheme is the start page of the
+	 * application, and a grid page is the page with its technical name, or a new one. A
+	 * widget is checked as the API would save it, and the table or view it shows, named by
+	 * uuid, must be a node of the application once the nodes of the scheme are imported; a
+	 * widget never adds a node. A widget that does not pass, that sits on the start page or
+	 * that is past {@see GridWidgetTypes::MAX_WIDGETS_PER_PAGE} is skipped with the reason,
+	 * and so is a page that cannot be imported.
+	 *
+	 * Each page comes with the id the scheme gives it, the id of the page it updates or
+	 * the technical name a new page gets, and its entry with the kept widgets only.
+	 *
+	 * @param list<mixed> $schemePages
+	 * @param array<string, ?int> $nodes the nodes of the application after the import, by node type and uuid (`<type>:<uuid>`), with their id when it is known
+	 * @return array{pages: list<array{entry: array<array-key, mixed>, exportedId: ?int, pageId: ?int, technicalName: ?string, isGrid: bool, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>}>, skipped: list<array{pageIndex: int, page: mixed, widgetIndex: ?int, widget: mixed, reason: string}>}
+	 */
+	private function resolveSchemePages(Context $context, array $schemePages, array $nodes): array {
+		$startPageId = null;
+		$pageIdsByName = [];
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			if (($page['page_type'] ?? null) === Page::TYPE_STARTPAGE) {
+				$startPageId ??= (int)$pageId;
+			}
+			if (is_string($page['technical_name'] ?? null)) {
+				$pageIdsByName[$page['technical_name']] = (int)$pageId;
+			}
+		}
+
+		$pages = [];
+		$skipped = [];
+		$usedNames = [];
+		$hasStartPage = false;
+		foreach ($schemePages as $pageIndex => $pageArr) {
+			$skip = static function (string $reason, ?int $widgetIndex = null, mixed $widget = null) use (&$skipped, $pageIndex, $pageArr): void {
+				$skipped[] = [
+					'pageIndex' => $pageIndex,
+					'page' => is_array($pageArr) ? ($pageArr['title'] ?? $pageArr['technical_name'] ?? null) : null,
+					'widgetIndex' => $widgetIndex,
+					'widget' => is_array($widget) ? ($widget['title'] ?? null) : null,
+					'reason' => $reason,
+				];
+			};
+			$reason = self::pageSkipReason($pageArr, $hasStartPage);
+			if ($reason !== null || !is_array($pageArr)) {
+				$skip($reason ?? 'it is not an object');
+				continue;
+			}
+			$name = $pageArr['technical_name'] ?? null;
+			$name = is_string($name) && TechnicalNameValidator::isValid($name) && !isset($usedNames[$name]) ? $name : null;
+			$pageId = null;
+			$technicalName = null;
+			if (($pageArr['page_type'] ?? null) === Page::TYPE_STARTPAGE) {
+				if ($startPageId === null) {
+					$skip('the application has no start page');
+					continue;
+				}
+				$pageId = $startPageId;
+			} elseif ($name !== null && isset($pageIdsByName[$name])) {
+				$pageId = $pageIdsByName[$name];
+			} elseif ($name !== null && !Page::isDefaultName($name)) {
+				$technicalName = $name;
+			}
+			if ($name !== null) {
+				$usedNames[$name] = true;
+			}
+			$isGrid = $pageId === null || $pageId !== $startPageId;
+
+			$widgets = [];
+			$keptEntries = [];
+			foreach (is_array($pageArr['widgets'] ?? null) ? array_values($pageArr['widgets']) : [] as $widgetIndex => $widgetArr) {
+				if (!$isGrid) {
+					$skip('only grid pages hold widgets', $widgetIndex, $widgetArr);
+					continue;
+				}
+				if ($widgetIndex >= GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
+					$skip('a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . ' widgets', $widgetIndex, $widgetArr);
+					continue;
+				}
+				try {
+					$widget = $this->readImportedWidget($widgetIndex, $widgetArr);
+				} catch (BadRequestError $e) {
+					$skip($e->getMessage(), $widgetIndex, $widgetArr);
+					continue;
+				}
+				$source = $widget['hasSource'] ? $widget['source'] : null;
+				$node = null;
+				if ($source !== null) {
+					$targetType = is_array($source) ? ($source['targetType'] ?? null) : null;
+					$targetUuid = is_array($source) ? ($source['targetUuid'] ?? null) : null;
+					if (($targetType !== 'table' && $targetType !== 'view') || !is_string($targetUuid)) {
+						$skip('its source names no table or view by uuid', $widgetIndex, $widgetArr);
+						continue;
+					}
+					$nodeType = $targetType === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+					if (!array_key_exists($nodeType . ':' . $targetUuid, $nodes)) {
+						$skip('its ' . $targetType . ' is not one of the resources of the application', $widgetIndex, $widgetArr);
+						continue;
+					}
+					$node = [$nodeType, $nodes[$nodeType . ':' . $targetUuid]];
+				}
+				$widgets[] = ['widget' => $widget['widget'], 'source' => $node];
+				$keptEntries[] = $widgetArr;
+			}
+
+			$pages[] = [
+				'entry' => ['widgets' => $keptEntries] + $pageArr,
+				'exportedId' => is_int($pageArr['id'] ?? null) ? $pageArr['id'] : null,
+				'pageId' => $pageId,
+				'technicalName' => $technicalName,
+				'isGrid' => $isGrid,
+				'title' => $this->importedText($pageArr['title'] ?? null, TextHelper::TITLE_MAX_LENGTH, 'page title'),
+				'icon' => $this->importedIcon($pageArr['icon'] ?? null),
+				'description' => $this->importedText($pageArr['description'] ?? null, TextHelper::DESCRIPTION_MAX_LENGTH, 'page description'),
+				'widgets' => $widgets,
+			];
+		}
+		return ['pages' => $pages, 'skipped' => $skipped];
+	}
+
+	/**
+	 * Saves the pages of a scheme as {@see self::resolveSchemePages()} resolved them. A page
+	 * takes the title, icon and description of the scheme, and the widgets of a grid page
+	 * replace its widgets. A new page without a free technical name gets the default name.
+	 *
+	 * @param list<array{exportedId: ?int, pageId: ?int, technicalName: ?string, isGrid: bool, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>, ...<array-key, mixed>}> $pages
+	 * @return array<int, int> ids of the pages by the id the scheme gives them
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 */
+	private function importSchemePages(int $contextId, array $pages, string $userId): array {
+		$relIds = [];
+		foreach ($this->contextMapper->findById($contextId, $userId)->getNodes() ?? [] as $relId => $node) {
+			$relIds[sprintf('t%di%d', $node['node_type'], $node['node_id'])] = (int)$relId;
+		}
+		$pageIds = [];
+		foreach ($pages as $resolved) {
+			$page = $resolved['pageId'] !== null ? $this->pageMapper->findById($resolved['pageId']) : new Page();
+			$page->setTitle($resolved['title']);
+			$page->setIcon($resolved['icon']);
+			$page->setDescription($resolved['description']);
+			if ($resolved['pageId'] !== null) {
+				if ($page->getUpdatedFields() !== []) {
+					$this->pageMapper->update($page);
+				}
+			} else {
+				$page->setContextId($contextId);
+				$page->setPageType(Page::TYPE_GRID);
+				if ($resolved['technicalName'] === null) {
+					$page = $this->pageMapper->insertWithDefaultName($page);
+				} else {
+					$page->setTechnicalName($resolved['technicalName']);
+					$page = $this->pageMapper->insert($page);
+				}
+			}
+			if ($resolved['exportedId'] !== null) {
+				$pageIds[$resolved['exportedId']] = $page->getId();
+			}
+			if ($resolved['isGrid']) {
+				$this->widgetService->syncPage($page->getId(), array_map(
+					static fn (array $kept): WidgetInput => $kept['widget']->withNodeRelId($kept['source'] !== null ? ($relIds[sprintf('t%di%d', $kept['source'][0], $kept['source'][1])] ?? null) : null),
+					$resolved['widgets'],
+				));
+			}
+		}
+		return $pageIds;
+	}
+
+	/**
 	 * @param int $contextId
 	 * @param string $name
 	 * @param string $iconName
@@ -1120,6 +1438,7 @@ class ContextService {
 	 * @param array $nodes
 	 * @param array $tables
 	 * @param string $userId
+	 * @param list<mixed>|null $pages the pages of the scheme, see {@see self::resolveSchemePages()}; null leaves the pages alone
 	 *
 	 * @return Context
 	 *
@@ -1133,7 +1452,7 @@ class ContextService {
 	 * @throws NotFoundExceptionInterface
 	 * @throws PermissionError
 	 */
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?array $menu = null): Context {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?array $menu = null, ?array $pages = null): Context {
 		// Validate the structure of the columns and views arrays
 		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
 			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
@@ -1175,6 +1494,7 @@ class ContextService {
 
 		// Resolve node ids for the new tables and views
 		$resolvedNodes = [];
+		$nodeIds = [];
 		foreach ($nodes as $node) {
 			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
 				$table = $this->tableMapper->findByUuid($node['node_uuid']);
@@ -1183,6 +1503,7 @@ class ContextService {
 					'type' => $node['node_type'],
 					'permissions' => $node['permissions'],
 				];
+				$nodeIds[$node['node_type'] . ':' . $node['node_uuid']] = $table->getId();
 			} elseif ($node['node_type'] === Application::NODE_TYPE_VIEW) {
 				$view = $this->viewMapper->findByUuid($node['node_uuid']);
 				$resolvedNodes[] = [
@@ -1190,20 +1511,29 @@ class ContextService {
 					'type' => $node['node_type'],
 					'permissions' => $node['permissions'],
 				];
+				$nodeIds[$node['node_type'] . ':' . $node['node_uuid']] = $view->getId();
 			}
 		}
 
+		$schemePages = null;
+		if ($pages !== null) {
+			['pages' => $schemePages, 'skipped' => $skipped] = $this->resolveSchemePages($this->contextMapper->findById($contextId, $userId), array_values($pages), $nodeIds);
+			foreach ($skipped as $skip) {
+				$this->logger->warning('Skipping ' . ($skip['widgetIndex'] === null ? '' : 'widget ' . $skip['widgetIndex'] . ' of ') . 'page ' . $skip['pageIndex'] . ' of an imported scheme: ' . $skip['reason']);
+			}
+		}
 		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
+		$schemePageIds = $schemePages !== null ? $this->importSchemePages($contextId, $schemePages, $userId) : [];
 		if ($menu !== null) {
 			$withNodes = $this->contextMapper->findById($contextId, $userId);
 			$this->logSkippedMenuItems($this->menuService->import(
 				$withNodes,
 				$menu,
 				fn (string $kind, string $uuid): ?int => $this->nodeRelIdByUuid($withNodes, $kind, $uuid),
-				static fn (int $pageId): ?int => null,
+				static fn (int $pageId): ?int => $schemePageIds[$pageId] ?? null,
 			));
 		}
 
-		return $context;
+		return $schemePages !== null ? $this->contextMapper->findById($contextId, $userId) : $context;
 	}
 }
