@@ -4,12 +4,13 @@
 -->
 <template>
 	<NcLoadingIcon v-if="loading"
-		:name="t('tables', 'Icon {iconName} loading', { iconName: label})"
+		:name="t('tables', 'Icon {iconName} loading', { iconName: { value: label, escape: false } })"
 		:size="30" />
 	<NcButton v-else
 		class="icon-picker__icon"
 		type="tertiary"
-		:aria-label="t('tables', 'Select icon {iconName}', { iconName: label })"
+		:aria-label="t('tables', 'Select icon {iconName}', { iconName: { value: label, escape: false } })"
+		:title="label"
 		@click.prevent="select">
 		<template #icon>
 			<NcIconSvgWrapper :svg="icon" :size="30" />
