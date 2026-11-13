@@ -230,6 +230,22 @@ class PageServiceTest extends TestCase {
 		$this->assertSame([$stored, 5], [$page['widgets'], $page['version']]);
 	}
 
+	public function testWidgetsCanSitInTheTabsOfATabsWidgetListedAfterThem(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$synced = null;
+		$this->widgetService->expects($this->once())->method('syncPage')->willReturnCallback(function (int $pageId, array $widgets) use (&$synced): array {
+			$synced = $widgets;
+			return [];
+		});
+
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [
+			self::widget(['settings' => ['text' => 'In the second tab'], 'parentIndex' => 1, 'parentTab' => 1]),
+			self::widget(['type' => 'tabs', 'settings' => ['tabs' => "Open\n\n Closed "]]),
+		], 4);
+
+		$this->assertSame([[1, 1], [null, null]], array_map(static fn (WidgetInput $w): array => [$w->parentIndex, $w->parentTab], $synced));
+	}
+
 	public function testTheStartPageHoldsWidgets(): void {
 		$this->pageMapper->method('raiseVersion')->willReturn(true);
 		$this->widgetService->expects($this->once())->method('syncPage')->with(self::START_PAGE)->willReturn([]);
@@ -340,6 +356,12 @@ class PageServiceTest extends TestCase {
 			'source of another application' => [[self::widget(['type' => 'data', 'settings' => [], 'source' => ['nodeRelId' => 99]])], 'The source of widget 0'],
 			'the same id twice' => [[self::widget(['id' => 31]), self::widget(['id' => 31])], 'Widget 1 has the id of another widget'],
 			'too many' => [array_fill(0, 101, self::widget()), 'A page holds at most 100 widgets'],
+			'tab without tabs widget' => [[self::widget(['parentTab' => 0])], 'names a tab but no tabs widget'],
+			'parent not a tabs widget' => [[self::widget(), self::widget(['parentIndex' => 0, 'parentTab' => 0])], 'Widget 1 must sit in a tabs widget'],
+			'parentIndex not a number' => [[self::widget(['parentIndex' => '0', 'parentTab' => 0])], 'parentIndex of widget 0 must be a number'],
+			'tabs in tabs' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => 'A']]), self::widget(['type' => 'tabs', 'settings' => ['tabs' => 'B'], 'parentIndex' => 0, 'parentTab' => 0])], 'more than one level deep'],
+			'unknown tab' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => "A\nB"]]), self::widget(['parentIndex' => 0, 'parentTab' => 2])], 'one of the 2 tabs'],
+			'too many tabs' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => implode("\n", range(1, 21))]])], 'more than 20 tabs'],
 		];
 	}
 

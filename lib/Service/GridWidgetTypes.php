@@ -30,6 +30,7 @@ class GridWidgetTypes {
 	public const TYPE_HEADER = 'header';
 	public const TYPE_TEXT = 'text';
 	public const TYPE_DATA = 'data';
+	public const TYPE_TABS = 'tabs';
 
 	public const GRID_COLUMNS = 12;
 	public const HEADER_HEIGHT = 2;
@@ -37,6 +38,7 @@ class GridWidgetTypes {
 	public const GRID_MAX_HEIGHT = 100;
 	public const GRID_MAX_Y = 10000;
 	public const MAX_WIDGETS_PER_PAGE = 100;
+	public const MAX_TABS = 20;
 	/** Bytes of the settings as stored JSON. */
 	public const SETTINGS_MAX_BYTES = 60000;
 
@@ -88,6 +90,16 @@ class GridWidgetTypes {
 				'hasSource' => true,
 				'settings' => [],
 			],
+			self::TYPE_TABS => [
+				'type' => self::TYPE_TABS,
+				'title' => $this->l10n->t('Tabs'),
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => 8,
+				'hasSource' => false,
+				'settings' => [
+					'tabs' => ['type' => 'text', 'title' => $this->l10n->t('Tabs, one per line'), 'default' => '', 'required' => true],
+				],
+			],
 		];
 	}
 
@@ -117,6 +129,17 @@ class GridWidgetTypes {
 			$gridY += self::DATA_HEIGHT;
 		}
 		return $widgets;
+	}
+
+	/**
+	 * The titles of the tabs of a tabs widget: the non-empty lines of its `tabs` setting.
+	 *
+	 * @param array<string, TablesWidgetValue> $settings
+	 * @return list<string>
+	 */
+	public static function tabTitles(array $settings): array {
+		$lines = array_map(trim(...), explode("\n", (string)($settings['tabs'] ?? '')));
+		return array_values(array_filter($lines, static fn (string $line): bool => $line !== ''));
 	}
 
 	/**
@@ -269,7 +292,19 @@ class GridWidgetTypes {
 		if ($source !== null && !is_int($nodeRelId)) {
 			throw new BadRequestError('The source of widget ' . $index . ' must be an object with a numeric nodeRelId.');
 		}
+		$parentIndex = $widget['parentIndex'] ?? null;
+		if ($parentIndex !== null && !is_int($parentIndex)) {
+			throw new BadRequestError('The parentIndex of widget ' . $index . ' must be a number.');
+		}
+		$parentTab = $widget['parentTab'] ?? null;
+		if ($parentTab !== null && !is_int($parentTab)) {
+			throw new BadRequestError('The parentTab of widget ' . $index . ' must be a number.');
+		}
 		$position = $this->validatePosition($index, $widget);
+		$settings = $this->sanitizeSettings($type, $widget['settings'] ?? null);
+		if ($type === self::TYPE_TABS && count(self::tabTitles($settings)) > self::MAX_TABS) {
+			throw new BadRequestError('Widget ' . $index . ' has more than ' . self::MAX_TABS . ' tabs.');
+		}
 
 		return new WidgetInput(
 			$id,
@@ -281,9 +316,39 @@ class GridWidgetTypes {
 			$position['gridY'],
 			$position['gridWidth'],
 			$position['gridHeight'],
-			$this->sanitizeSettings($type, $widget['settings'] ?? null),
+			$settings,
 			$nodeRelId,
+			$parentIndex,
+			$parentTab,
 		);
+	}
+
+	/**
+	 * Checks where one widget of a list sits: on the page, or in a tab of a tabs widget of
+	 * the same list that sits on the page itself, so tabs go one level deep.
+	 *
+	 * @param list<WidgetInput> $widgets
+	 * @throws BadRequestError
+	 */
+	public function validateParent(int $index, array $widgets): void {
+		$widget = $widgets[$index];
+		if ($widget->parentIndex === null) {
+			if ($widget->parentTab !== null) {
+				throw new BadRequestError('Widget ' . $index . ' names a tab but no tabs widget.');
+			}
+			return;
+		}
+		$parent = $widgets[$widget->parentIndex] ?? null;
+		if ($widget->parentIndex === $index || $parent === null || $parent->type !== self::TYPE_TABS) {
+			throw new BadRequestError('Widget ' . $index . ' must sit in a tabs widget of the same page.');
+		}
+		if ($parent->parentIndex !== null || $widget->type === self::TYPE_TABS) {
+			throw new BadRequestError('Widget ' . $index . ' would nest tabs more than one level deep.');
+		}
+		$tabCount = count(self::tabTitles($parent->settings));
+		if ($widget->parentTab === null || $widget->parentTab < 0 || $widget->parentTab >= $tabCount) {
+			throw new BadRequestError('Widget ' . $index . ' must name one of the ' . $tabCount . ' tabs of its tabs widget.');
+		}
 	}
 
 	/**
