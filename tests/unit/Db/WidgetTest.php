@@ -29,6 +29,6 @@ class WidgetTest extends TestCase {
 		$widget = new Widget();
 		$widget->setSettings($stored);
 
-		$this->assertSame($serialised, json_encode($widget->getSettingsObject()));
+		$this->assertSame($serialised, json_encode($widget->getSettingsForResponse()));
 	}
 }

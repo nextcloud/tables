@@ -13,6 +13,7 @@ use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Model\WidgetInput;
+use OCA\Tables\ResponseDefinitions;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
 
@@ -22,7 +23,7 @@ use OCP\IDBConnection;
  * in their own transaction.
  *
  * @psalm-import-type TablesWidgetSettingValue from Widget
- * @psalm-type TablesWidgetRecord = array{id: int, type: string, title: ?string, icon: ?string, description: ?string, gridX: int, gridY: int, gridWidth: int, gridHeight: int, settings: \stdClass, source: ?array{nodeRelId: int}}
+ * @psalm-import-type TablesWidget from ResponseDefinitions
  */
 class WidgetService {
 	use \OCP\AppFramework\Db\TTransactional;
@@ -36,7 +37,7 @@ class WidgetService {
 
 	/**
 	 * @param int[] $pageIds
-	 * @return array<int, list<TablesWidgetRecord>> widgets by page id, in grid order
+	 * @return array<int, list<TablesWidget>> widgets by page id, in grid order
 	 * @throws Exception
 	 */
 	public function findByPageIds(array $pageIds): array {
@@ -57,7 +58,7 @@ class WidgetService {
 				'gridY' => $widget->getGridY(),
 				'gridWidth' => $widget->getGridWidth(),
 				'gridHeight' => $widget->getGridHeight(),
-				'settings' => $widget->getSettingsObject(),
+				'settings' => $widget->getSettingsForResponse(),
 				'source' => isset($sources[$id]) ? ['nodeRelId' => $sources[$id]] : null,
 			];
 		}
@@ -96,19 +97,28 @@ class WidgetService {
 	}
 
 	/**
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function findIdsByPageId(int $pageId): array {
+		return $this->widgetMapper->findIdsByPageId($pageId);
+	}
+
+	/**
 	 * Makes the widgets of a page match the given list: widgets with an id are updated,
 	 * widgets without one are inserted and widgets of the page that are not listed are
 	 * deleted, in one transaction. The widgets of the page and the node relations shown
 	 * are locked first, so the checks still hold when the writes run.
 	 *
 	 * @param list<WidgetInput> $widgets
+	 * @return list<TablesWidget> the widgets of the page as stored, in grid order
 	 * @throws \InvalidArgumentException when an id is not one of a widget of the page, or a
 	 *                                   source is not a node of the application of the page
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
-	public function syncPage(int $pageId, array $widgets): void {
-		$this->atomic(function () use ($pageId, $widgets): void {
+	public function syncPage(int $pageId, array $widgets): array {
+		return $this->atomic(function () use ($pageId, $widgets): array {
 			$existing = [];
 			foreach ($this->widgetMapper->findByPageIds([$pageId], true) as $widget) {
 				$existing[$widget->getId()] = $widget;
@@ -140,6 +150,7 @@ class WidgetService {
 					$this->widgetSourceMapper->setSource($input->id, $input->nodeRelId);
 				}
 			}
+			return $this->findByPageIds([$pageId])[$pageId] ?? [];
 		}, $this->db);
 	}
 

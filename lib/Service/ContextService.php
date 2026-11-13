@@ -354,6 +354,8 @@ class ContextService {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		$this->atomic(function () use ($context): void {
+			// a page added in the meantime waits for this and then finds no application
+			$this->pageMapper->lockContext($context->getId());
 			$this->shareService->deleteAllForContext($context);
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
@@ -856,7 +858,6 @@ class ContextService {
 	 * @param list<mixed> $widgets
 	 * @param array<array-key, ContextNodeRelation> $nodeRelMap new node relations by exported id
 	 * @throws Exception
-	 * @throws \JsonException
 	 */
 	private function importWidgets(int $pageId, array $widgets, array $nodeRelMap): void {
 		$inputs = [];

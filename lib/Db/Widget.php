@@ -86,12 +86,14 @@ class Widget extends Entity {
 	}
 
 	/**
-	 * The settings as an object, so they serialise as a JSON object also when empty,
-	 * ordered by name: a JSON column does not keep the stored order on every database.
+	 * The settings for a response, ordered by name: an array, which OCS also renders as
+	 * XML, or an empty object when there are none, so JSON shows `{}` and not `[]`.
+	 *
+	 * @return array<string, TablesWidgetSettingValue>|\stdClass
 	 */
-	public function getSettingsObject(): \stdClass {
+	public function getSettingsForResponse(): array|\stdClass {
 		$settings = $this->getSettingsArray();
 		ksort($settings);
-		return (object)$settings;
+		return $settings === [] ? new \stdClass() : $settings;
 	}
 }
