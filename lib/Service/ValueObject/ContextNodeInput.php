@@ -15,7 +15,7 @@ use OCA\Tables\AppInfo\Application;
 
 /**
  * A table or view as it is requested for an application (context), together
- * with the permissions it is offered with.
+ * with the permissions it is offered with, if they are given.
  */
 class ContextNodeInput implements JsonSerializable {
 	/** The values are stored in signed 32-bit integer columns */
@@ -29,7 +29,7 @@ class ContextNodeInput implements JsonSerializable {
 	private function __construct(
 		private readonly int $nodeId,
 		private readonly int $nodeType,
-		private readonly int $permissions,
+		private readonly ?int $permissions,
 		private readonly ?int $order,
 	) {
 	}
@@ -48,7 +48,7 @@ class ContextNodeInput implements JsonSerializable {
 			nodeType: $nodeType,
 			permissions: isset($inputNode['permissions'])
 				? self::toInteger($inputNode['permissions'], 'Unexpected node permissions')
-				: Application::PERMISSION_READ,
+				: null,
 			order: isset($inputNode['order'])
 				? self::toInteger($inputNode['order'], 'Unexpected node order')
 				: null,
@@ -56,14 +56,16 @@ class ContextNodeInput implements JsonSerializable {
 	}
 
 	/**
-	 * @return array{id: int, type: int, permissions: int, order?: int}
+	 * @return array{id: int, type: int, permissions?: int, order?: int}
 	 */
 	public function jsonSerialize(): array {
 		$node = [
 			'id' => $this->nodeId,
 			'type' => $this->nodeType,
-			'permissions' => $this->permissions,
 		];
+		if ($this->permissions !== null) {
+			$node['permissions'] = $this->permissions;
+		}
 		if ($this->order !== null) {
 			$node['order'] = $this->order;
 		}

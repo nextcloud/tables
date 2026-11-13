@@ -62,10 +62,10 @@ final class ContextControllerNodeInputTest extends TestCase {
 		$this->assertSame(['message' => 'Nodes must be given as a list'], $response->getData());
 	}
 
-	public function testCreateDefaultsMissingNodePermissionsToRead(): void {
+	public function testCreateLeavesMissingNodePermissionsToTheService(): void {
 		$this->contextService->expects($this->once())
 			->method('create')
-			->with('Intake', 'star', '', $this->identicalTo([['id' => 5, 'type' => 0, 'permissions' => 1]]), 'user-1', 0)
+			->with('Intake', 'star', '', $this->identicalTo([['id' => 5, 'type' => 0]]), 'user-1', 0)
 			->willReturn(new Context());
 
 		$response = $this->controller->create('Intake', 'star', '', [['id' => '5', 'type' => '0']]);
@@ -82,10 +82,10 @@ final class ContextControllerNodeInputTest extends TestCase {
 		$this->assertSame(['message' => 'Nodes must be given as a list'], $response->getData());
 	}
 
-	public function testUpdateDefaultsMissingNodePermissionsToRead(): void {
+	public function testUpdateLeavesMissingNodePermissionsToTheService(): void {
 		$this->contextService->expects($this->once())
 			->method('update')
-			->with(7, 'user-1', null, null, null, $this->identicalTo([['id' => 5, 'type' => 0, 'permissions' => 1]]))
+			->with(7, 'user-1', null, null, null, $this->identicalTo([['id' => 5, 'type' => 0]]))
 			->willReturn(new Context());
 
 		$response = $this->controller->update(7, null, null, null, [['id' => 5, 'type' => 0]]);

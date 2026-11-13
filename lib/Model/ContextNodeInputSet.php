@@ -44,7 +44,7 @@ class ContextNodeInputSet implements JsonSerializable {
 	}
 
 	/**
-	 * @return list<array{id: int, type: int, permissions: int, order?: int}>
+	 * @return list<array{id: int, type: int, permissions?: int, order?: int}>
 	 */
 	public function jsonSerialize(): array {
 		return array_map(static fn (ContextNodeInput $node): array => $node->jsonSerialize(), $this->nodes);

@@ -203,7 +203,8 @@ class ContextService {
 				$key = sprintf('t%di%d', $node['type'], $node['id']);
 				if (isset($oldNodeResolvableIdMapper[$key])) {
 					$nodesBeingKept[$key] = $node;
-					if ($node['permissions'] !== $currentNodes[$oldNodeResolvableIdMapper[$key]]['permissions']) {
+					// a node that is kept without permissions keeps the ones it has
+					if (isset($node['permissions']) && $node['permissions'] !== $currentNodes[$oldNodeResolvableIdMapper[$key]]['permissions']) {
 						$nodeRel = $this->contextNodeRelMapper->findById($currentNodes[$oldNodeResolvableIdMapper[$key]]['id']);
 						$updatedNodes[] = [
 							'nodeType' => $nodeRel->getNodeType(),
@@ -255,7 +256,7 @@ class ContextService {
 					$contextId,
 					$node['id'],
 					$node['type'],
-					$node['permissions'],
+					$node['permissions'] ?? Application::PERMISSION_READ,
 					$node['order'] ?? 100,
 					$userId
 				);

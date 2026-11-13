@@ -539,7 +539,7 @@ Feature: APIv2
       | t1    | table |                     |
     Then the reported status is "200"
     When user "participant1-v2" fetches Context "c1"
-    Then known Context "c1" contains "table" "t1" with permissions "read"
+    Then known Context "c1" contains "table" "t1" with permissions "read,create,update"
 
   @api2 @contexts @contexts-update
   Scenario: Attempt to update the nodes of an owned context with an object instead of a list

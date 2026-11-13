@@ -38,15 +38,15 @@ class ContextNodeInputSetTest extends TestCase {
 		], $nodeSet->jsonSerialize());
 	}
 
-	public function testCreateFromInputArrayDefaultsMissingPermissionsToRead(): void {
+	public function testCreateFromInputArrayLeavesOutMissingPermissions(): void {
 		$nodeSet = ContextNodeInputSet::createFromInputArray([
 			['id' => 5, 'type' => 0],
 			['id' => 6, 'type' => 0, 'permissions' => null],
 		]);
 
 		$this->assertSame([
-			['id' => 5, 'type' => 0, 'permissions' => Application::PERMISSION_READ],
-			['id' => 6, 'type' => 0, 'permissions' => Application::PERMISSION_READ],
+			['id' => 5, 'type' => 0],
+			['id' => 6, 'type' => 0],
 		], $nodeSet->jsonSerialize());
 	}
 

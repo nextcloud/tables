@@ -7280,7 +7280,7 @@ export interface operations {
                     readonly iconName?: string | null;
                     /** @description provide this parameter to set a new description */
                     readonly description?: string | null;
-                    /** @description provide this parameter to set a new list of nodes. Permissions default to read when omitted. */
+                    /** @description provide this parameter to set a new list of nodes. When permissions are omitted, a node that is added gets read permissions and a node that is already in the context keeps its permissions. */
                     readonly nodes?: readonly {
                         /** Format: int64 */
                         readonly id: number;
