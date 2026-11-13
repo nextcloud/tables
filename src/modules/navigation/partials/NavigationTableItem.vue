@@ -18,7 +18,6 @@
 
 		<template #counter>
 			<IconCloudOutline v-if="table.isFederated" :size="20" decorative />
-			<NcCounterBubble v-else-if="canReadData(table)" :count="table.rowsCount" />
 			<NcActionButton v-if="table.hasShares" icon="icon-share"
 				:class="{ 'margin-right': !(activeTable && table.id === activeTable.id) }" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
@@ -151,7 +150,7 @@
 </template>
 
 <script>
-import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
+import { NcActionButton, NcAppNavigationItem, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
@@ -191,7 +190,6 @@ export default {
 		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
-		NcCounterBubble,
 		NcAvatar,
 		ListBoxOutline,
 		PlaylistPlus,
@@ -408,10 +406,6 @@ export default {
 .app-navigation-entry:hover {
 	.margin-right {
 		margin-inline-end: 0;
-	}
-
-	.app-navigation-entry__counter-wrapper .counter-bubble__counter {
-		display: inline;
 	}
 }
 
