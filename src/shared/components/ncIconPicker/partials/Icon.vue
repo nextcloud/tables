@@ -4,12 +4,12 @@
 -->
 <template>
 	<NcLoadingIcon v-if="loading"
-		:name="t('tables', 'Icon {iconName} loading', { iconName: name})"
+		:name="t('tables', 'Icon {iconName} loading', { iconName: label})"
 		:size="30" />
 	<NcButton v-else
 		class="icon-picker__icon"
 		type="tertiary"
-		:aria-label="t('tables', 'Select icon for the application')"
+		:aria-label="t('tables', 'Select icon {iconName}', { iconName: label })"
 		@click.prevent="select">
 		<template #icon>
 			<NcIconSvgWrapper :svg="icon" :size="30" />
@@ -20,6 +20,7 @@
 <script>
 import { NcLoadingIcon, NcIconSvgWrapper, NcButton } from '@nextcloud/vue'
 import svgHelper from '../mixins/svgHelper.js'
+import { iconLabel } from '../iconNames.js'
 
 export default {
 	name: 'Icon',
@@ -45,6 +46,12 @@ export default {
 			loading: true,
 			icon: null,
 		}
+	},
+
+	computed: {
+		label() {
+			return iconLabel(this.name)
+		},
 	},
 
 	async mounted() {
