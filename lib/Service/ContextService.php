@@ -26,6 +26,8 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\IconHelper;
+use OCA\Tables\Helper\TextHelper;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
@@ -63,6 +65,8 @@ class ContextService {
 		protected IURLGenerator $urlGenerator,
 		private TableMapper $tableMapper,
 		private ViewMapper $viewMapper,
+		private WidgetService $widgetService,
+		private GridWidgetTypes $gridWidgetTypes,
 	) {
 	}
 
@@ -73,7 +77,7 @@ class ContextService {
 	 * @throws Exception
 	 * @throws InternalError
 	 */
-	public function findAll(?string $userId): array {
+	public function findAll(?string $userId, bool $withAllPages = true): array {
 		if ($userId !== null && trim($userId) === '') {
 			$userId = null;
 		}
@@ -82,7 +86,7 @@ class ContextService {
 			$this->logger->warning($error);
 			throw new InternalError($error);
 		}
-		return $this->contextMapper->findAll($userId);
+		return $this->contextMapper->findAll($userId, $withAllPages);
 	}
 
 	public function findForNavigation(string $userId): array {
@@ -117,7 +121,7 @@ class ContextService {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 */
-	public function findById(int $id, ?string $userId): Context {
+	public function findById(int $id, ?string $userId, bool $withAllPages = true): Context {
 		if ($userId !== null && trim($userId) === '') {
 			$userId = null;
 		}
@@ -127,7 +131,7 @@ class ContextService {
 			throw new InternalError($error);
 		}
 
-		return $this->contextMapper->findById($id, $userId);
+		return $this->contextMapper->findById($id, $userId, $withAllPages);
 	}
 
 	/**
@@ -167,6 +171,14 @@ class ContextService {
 	 * @throws PermissionError|MultipleObjectsReturnedException
 	 */
 	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
+		// a refused or failing request changes nothing
+		return $this->atomic(fn (): Context => $this->updateInTransaction($contextId, $userId, $name, $iconName, $description, $nodes), $this->dbc);
+	}
+
+	/**
+	 * @throws Exception|PermissionError|NotFoundError
+	 */
+	private function updateInTransaction(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		if ($name !== null) {
@@ -230,6 +242,12 @@ class ContextService {
 
 			$hasUpdatedNodeInformation = $hasUpdatedNodeInformation || !empty($nodesBeingAdded) || !empty($nodesBeingRemoved);
 
+			foreach ($nodesBeingAdded as $node) {
+				if (!$this->permissionsService->canManageNodeById((int)$node['type'], (int)$node['id'], $userId)) {
+					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', (int)$node['id'], (int)$node['type']));
+				}
+			}
+
 			foreach ($nodesBeingRemoved as $node) {
 				$removedNodes[] = ['nodeType' => (int)$node['node_type'], 'nodeId' => (int)$node['node_id']];
 				/** @var ContextNodeRelation $removedNode */
@@ -245,9 +263,6 @@ class ContextService {
 			foreach ($nodesBeingAdded as $node) {
 				$nodeType = (int)($node['type']);
 				$nodeId = (int)($node['id']);
-				if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
-					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
-				}
 				$addedNodes[] = ['nodeType' => $nodeType, 'nodeId' => $nodeId];
 
 				/** @var ContextNodeRelation $addedNode */
@@ -342,6 +357,7 @@ class ContextService {
 			$this->shareService->deleteAllForContext($context);
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
+			$this->widgetService->deleteByPageIds($pageIds);
 			foreach ($pageIds as $pageId) {
 				$this->pageContentMapper->deleteByPageId($pageId);
 				$this->pageMapper->deleteByPageId($pageId);
@@ -359,6 +375,7 @@ class ContextService {
 		try {
 			$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
 			$this->atomic(function () use ($nodeRelIds): void {
+				$this->widgetService->deleteSourcesByNodeRelIds($nodeRelIds);
 				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
 			}, $this->dbc);
@@ -416,7 +433,7 @@ class ContextService {
 	 * @throws Exception
 	 */
 	public function addNodeToContextById(int $contextId, int $nodeId, int $nodeType, int $permissions, ?string $userId): ContextNodeRelation {
-		$context = $this->contextMapper->findById($contextId, $userId);
+		$context = $this->contextMapper->findById($contextId, $userId, false);
 		return $this->addNodeToContext($context, $nodeId, $nodeType, $permissions);
 	}
 
@@ -454,9 +471,14 @@ class ContextService {
 	 * @throws Exception
 	 */
 	public function removeNodeFromContextAndPages(int $nodeRelationId): array {
-		$nodeRelation = $this->removeNodeFromContextById($nodeRelationId);
-		$contents = $this->removeNodeRelFromAllPages($nodeRelation);
-		return [$nodeRelation, $contents];
+		return $this->atomic(function () use ($nodeRelationId): array {
+			// the order of deleteNodeRel(): sources, contents, relation
+			$this->widgetService->deleteSourcesByNodeRelIds([$nodeRelationId]);
+			$contents = $this->pageContentMapper->findByNodeRelation($nodeRelationId);
+			$this->pageContentMapper->deleteByNodeRelIds([$nodeRelationId]);
+			$nodeRelation = $this->removeNodeFromContextById($nodeRelationId);
+			return [$nodeRelation, $contents];
+		}, $this->dbc);
 	}
 
 	/**
@@ -475,7 +497,7 @@ class ContextService {
 	public function addNodeRelToPage(ContextNodeRelation $nodeRel, ?int $order = null, ?int $pageId = null): PageContent {
 		if ($pageId === null) {
 			// when no page is given, find the startpage to add it to
-			$context = $this->contextMapper->findById($nodeRel->getContextId());
+			$context = $this->contextMapper->findById($nodeRel->getContextId(), null, false);
 			$pages = $context->getPages();
 			foreach ($pages as $page) {
 				if ($page['page_type'] === 'startpage') {
@@ -496,22 +518,6 @@ class ContextService {
 			$pageContent = $this->pageContentMapper->insert($pageContent);
 		}
 		return $pageContent;
-	}
-
-	public function removeNodeRelFromAllPages(ContextNodeRelation $nodeRelation): array {
-		$contents = $this->pageContentMapper->findByNodeRelation($nodeRelation->getId());
-		/** @var PageContent $content */
-		foreach ($contents as $content) {
-			try {
-				$this->pageContentMapper->delete($content);
-			} catch (Exception $e) {
-				$this->logger->warning('Failed to delete Contexts page content with ID {pcId}', [
-					'pcId' => $content->getId(),
-					'exception' => $e,
-				]);
-			}
-		}
-		return $contents;
 	}
 
 	public function updateContentOrder(int $pageId, array $contents): array {
@@ -666,15 +672,26 @@ class ContextService {
 
 		// insert nodes
 		$nodeRelMap = [];
+		// the relations of the table being imported, the only node a widget source can keep
+		$sourceRelMap = [];
 		if (!empty($context['nodes'])) {
 			foreach ($context['nodes'] as $nodeArr) {
+				$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0;
 				$contextNodeRel = new ContextNodeRelation();
 				$contextNodeRel->setContextId($newContext->getId());
 				$contextNodeRel->setNodeId($table->getId());
-				$contextNodeRel->setNodeType($nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0);
+				$contextNodeRel->setNodeType($nodeType);
 				$contextNodeRel->setPermissions($nodeArr['permissions'] ?? 0);
 				$contextNodeRel = $this->contextNodeRelMapper->insert($contextNodeRel);
-				$nodeRelMap[$nodeArr['id'] ?? null] = $contextNodeRel;
+				$oldRelId = self::importedKey($nodeArr['id'] ?? null);
+				if ($oldRelId === null) {
+					continue;
+				}
+				$nodeRelMap[$oldRelId] = $contextNodeRel;
+				$oldNodeId = $nodeArr['node_id'] ?? $nodeArr['nodeId'] ?? null;
+				if (is_numeric($nodeType) && (int)$nodeType === Application::NODE_TYPE_TABLE && is_numeric($oldNodeId) && (int)$oldNodeId === $tableOldId) {
+					$sourceRelMap[$oldRelId] = $contextNodeRel;
+				}
 			}
 		}
 
@@ -687,6 +704,9 @@ class ContextService {
 			$page = new Page();
 			$page->setContextId($newContext->getId());
 			$page->setPageType($pageArr['page_type'] ?? '');
+			$page->setTitle($this->importedText($pageArr['title'] ?? null, TextHelper::TITLE_MAX_LENGTH, 'page title'));
+			$page->setIcon($this->importedIcon($pageArr['icon'] ?? null));
+			$page->setDescription($this->importedText($pageArr['description'] ?? null, TextHelper::DESCRIPTION_MAX_LENGTH, 'page description'));
 			if ($technicalNames[$pageKey] === null) {
 				$page = $this->pageMapper->insertWithDefaultName($page);
 			} else {
@@ -698,22 +718,34 @@ class ContextService {
 				// a grid page is named by its title, so it never stays without one
 				$page->resetUpdatedFields();
 				$page->setTitle((string)$page->getTechnicalName());
-				$page = $this->pageMapper->update($page);
+				$this->pageMapper->update($page);
 			}
-			$pageMap[$pageArr['id'] ?? null] = $page;
+			$exportedPageId = self::importedKey($pageArr['id'] ?? null);
+			if ($exportedPageId !== null) {
+				$pageMap[$exportedPageId] = $page;
+			}
 
 			// insert page conten
 			if (!empty($pageArr['content'])) {
 				foreach ($pageArr['content'] as $contentArr) {
+					$oldNodeRelId = self::importedKey($contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null);
+					$newNodeRel = $oldNodeRelId !== null ? ($nodeRelMap[$oldNodeRelId] ?? null) : null;
+					if ($newNodeRel === null) {
+						continue;
+					}
 					$pageContent = new PageContent();
 					$pageContent->setPageId($page->getId());
-					$oldNodeRelId = $contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null;
-					$newNodeRel = $nodeRelMap[$oldNodeRelId] ?? null;
-					$pageContent->setNodeRelId($newNodeRel ? $newNodeRel->getId() : null);
+					$pageContent->setNodeRelId($newNodeRel->getId());
 					$pageContent->setOrder($contentArr['order'] ?? 100);
 					$this->pageContentMapper->insert($pageContent);
 				}
 			}
+
+			$widgets = is_array($pageArr['widgets'] ?? null) ? array_values($pageArr['widgets']) : [];
+			if (count($widgets) > GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
+				$this->logger->warning('Skipping ' . (count($widgets) - GridWidgetTypes::MAX_WIDGETS_PER_PAGE) . ' imported widgets: a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . '.');
+			}
+			$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $sourceRelMap);
 		}
 
 		if (!$hasStartPage) {
@@ -781,6 +813,100 @@ class ContextService {
 	}
 
 	/**
+	 * The pages of an application, each with its widgets.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 * @throws Exception
+	 */
+	public function getPagesWithWidgets(Context $context): array {
+		$pages = $context->getPages() ?? [];
+		$widgets = $this->widgetService->findByPageIds(array_keys($pages));
+		foreach ($pages as $pageId => $page) {
+			$pages[$pageId]['widgets'] = $widgets[$pageId] ?? [];
+		}
+		return $pages;
+	}
+
+	/**
+	 * Gives every page of the applications its widgets, with one query for all of them.
+	 *
+	 * @param Context[] $contexts
+	 * @throws Exception
+	 */
+	public function addWidgetsToPages(array $contexts): void {
+		$pageIds = [];
+		foreach ($contexts as $context) {
+			array_push($pageIds, ...array_keys($context->getPages() ?? []));
+		}
+		$widgets = $this->widgetService->findByPageIds($pageIds);
+		foreach ($contexts as $context) {
+			$pages = $context->getPages() ?? [];
+			foreach ($pages as $pageId => $page) {
+				$pages[$pageId]['widgets'] = $widgets[$pageId] ?? [];
+			}
+			$context->setPages($pages);
+		}
+	}
+
+	/**
+	 * Imports the widgets of a page the way the API would save them: a widget that does
+	 * not pass is skipped with the reason, and a data widget keeps its source only when
+	 * that table or view came along.
+	 *
+	 * @param list<mixed> $widgets
+	 * @param array<array-key, ContextNodeRelation> $nodeRelMap new node relations by exported id
+	 * @throws Exception
+	 * @throws \JsonException
+	 */
+	private function importWidgets(int $pageId, array $widgets, array $nodeRelMap): void {
+		$inputs = [];
+		foreach ($widgets as $index => $widgetArr) {
+			// an unknown icon, or a source on a type that shows none, is dropped, not the widget
+			if (is_array($widgetArr) && isset($widgetArr['icon']) && (!is_string($widgetArr['icon']) || !IconHelper::isValid($widgetArr['icon']))) {
+				$widgetArr['icon'] = null;
+			}
+			if (is_array($widgetArr) && is_string($widgetArr['type'] ?? null) && !($this->gridWidgetTypes->all()[$widgetArr['type']]['hasSource'] ?? true)) {
+				$widgetArr['source'] = null;
+			}
+			try {
+				$input = $this->gridWidgetTypes->readWidget($index, $widgetArr);
+			} catch (BadRequestError $e) {
+				$this->logger->warning('Skipping an imported widget: ' . $e->getMessage());
+				continue;
+			}
+			$newNodeRel = $input->nodeRelId !== null ? ($nodeRelMap[$input->nodeRelId] ?? null) : null;
+			$inputs[] = $input->withId(null)->withNodeRelId($newNodeRel?->getId());
+		}
+		$this->widgetService->insertAll($pageId, $inputs);
+	}
+
+	/**
+	 * An exported id usable as an array key, or null for a value of another type.
+	 */
+	private static function importedKey(mixed $id): int|string|null {
+		return is_int($id) || is_string($id) ? $id : null;
+	}
+
+	/**
+	 * An exported text, trimmed, or null when it is empty, not a text or too long.
+	 */
+	private function importedText(mixed $text, int $maxLength, string $what): ?string {
+		try {
+			return TextHelper::optional($text, $maxLength);
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->warning('Dropping an imported ' . $what . ': it is ' . $e->getMessage() . '.');
+			return null;
+		}
+	}
+
+	/**
+	 * An exported icon name, or null when this instance has no such icon.
+	 */
+	private function importedIcon(mixed $icon): ?string {
+		return is_string($icon) && IconHelper::isValid($icon) ? $icon : null;
+	}
+
+	/**
 	 * @param int $contextId
 	 *
 	 * @return ContextScheme
@@ -829,7 +955,7 @@ class ContextService {
 			$context->getIcon(),
 			$context->getDescription(),
 			array_values($nodes),
-			$context->getPages(),
+			$this->getPagesWithWidgets($context),
 			array_values($tables),
 		);
 	}

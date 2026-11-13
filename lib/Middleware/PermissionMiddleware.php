@@ -180,7 +180,7 @@ class PermissionMiddleware extends Middleware {
 	 */
 	private function assertOwnerPermission(bool $isContext, int $nodeType, int $nodeId): bool {
 		if ($isContext) {
-			$context = $this->contextService->findById($nodeId, $this->userId);
+			$context = $this->contextService->findById($nodeId, $this->userId, false);
 			if ($context->getOwnerId() !== $this->userId) {
 				throw new PermissionError(sprintf('User %s is not the owner of context %d',
 					$this->userId, $nodeId
