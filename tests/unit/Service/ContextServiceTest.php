@@ -19,6 +19,7 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
@@ -281,6 +282,110 @@ final class ContextServiceTest extends TestCase {
 			]);
 
 		$this->service->delete(9, 'alice');
+	}
+
+	public function testANewApplicationGetsAStartPageNamedDashboard(): void {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 7;
+			return $context;
+		});
+		$inserted = [];
+		$this->pageMapper->expects($this->once())->method('insert')
+			->willReturnCallback(static function (Page $page) use (&$inserted): Page {
+				$page->id = 70;
+				$inserted[] = $page;
+				return $page;
+			});
+
+		$context = $this->service->create('Projects', 'star', '', [], 'user-1', 0);
+
+		self::assertSame(Page::TYPE_STARTPAGE, $inserted[0]->getPageType());
+		self::assertSame('dashboard', $inserted[0]->getTechnicalName());
+		self::assertSame('dashboard', $context->getPages()[70]['technicalName']);
+	}
+
+	public static function importedPages(): array {
+		$start = Page::TYPE_STARTPAGE;
+		$grid = Page::TYPE_GRID;
+		return [
+			'free names are kept, the rest get the default' => [
+				[
+					['id' => 1, 'page_type' => $start],
+					['id' => 2, 'page_type' => $grid, 'technical_name' => 'sales'],
+					['id' => 3, 'page_type' => $grid, 'technical_name' => 'sales'],
+					['id' => 4, 'page_type' => $grid, 'technical_name' => 'Bad Name'],
+					['id' => 5, 'page_type' => $grid],
+					['id' => 6, 'page_type' => $grid, 'technical_name' => 'page_2'],
+				],
+				[80 => [$start, 'dashboard'], 81 => [$grid, 'sales'], 82 => [$grid, 'page_82'], 83 => [$grid, 'page_83'], 84 => [$grid, 'page_84'], 85 => [$grid, 'page_85']],
+			],
+			'the start page leaves dashboard to the page exported with it' => [
+				[['id' => 1, 'page_type' => $start], ['id' => 2, 'page_type' => $grid, 'technical_name' => 'dashboard']],
+				[80 => [$start, 'page_80'], 81 => [$grid, 'dashboard']],
+			],
+			'only one start page and grid pages are imported' => [
+				[
+					['id' => 1, 'page_type' => $start, 'technical_name' => 'home'],
+					['id' => 2, 'page_type' => $start],
+					['id' => 3, 'page_type' => 'chart'],
+					['id' => 4],
+					'not a page',
+					['id' => 5, 'page_type' => $grid],
+				],
+				[80 => [$start, 'home'], 81 => [$grid, 'page_81']],
+			],
+			'an application without a start page gets one' => [
+				[['id' => 2, 'page_type' => $grid, 'technical_name' => 'sales', 'title' => 'Sales']],
+				[80 => [$grid, 'sales'], 81 => [$start, 'dashboard']],
+			],
+			'the new start page leaves dashboard to an imported page' => [
+				[['id' => 2, 'page_type' => $grid, 'technical_name' => 'dashboard']],
+				[80 => [$grid, 'dashboard'], 81 => [$start, 'page_81']],
+			],
+			'no pages at all' => [
+				[],
+				[80 => [$start, 'dashboard']],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider importedPages
+	 * @param array<int, array{0: string, 1: string}> $expected type and technical name by page id
+	 */
+	public function testImportedPages(array $pages, array $expected): void {
+		$table = new Table();
+		$table->id = 40;
+		$table->setOwnership('user-1');
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$inserted = [];
+		$pageId = 80;
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$inserted, &$pageId): Page {
+			$page->id = $pageId++;
+			$inserted[$page->getId()] = [$page->getPageType(), $page->getTechnicalName()];
+			return $page;
+		});
+		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$inserted, &$pageId): Page {
+			$page->id = $pageId++;
+			$page->setTechnicalName('page_' . $page->getId());
+			$inserted[$page->getId()] = [$page->getPageType(), $page->getTechnicalName()];
+			return $page;
+		});
+		$titles = [];
+		$this->pageMapper->method('update')->willReturnCallback(static function (Page $page) use (&$titles): Page {
+			$titles[$page->getId()] = $page->getTitle();
+			return $page;
+		});
+
+		$this->service->importContext($table, ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
+
+		self::assertSame($expected, $inserted);
+		$untitledGridPages = array_keys(array_filter($inserted, static fn (array $page): bool => $page[0] === Page::TYPE_GRID));
+		self::assertSame(array_map(static fn (int $id): string => $inserted[$id][1], $untitledGridPages), array_values($titles), 'every grid page without a title is named after its technical name');
 	}
 
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {

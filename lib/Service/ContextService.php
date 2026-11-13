@@ -32,6 +32,7 @@ use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
+use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -547,6 +548,7 @@ class ContextService {
 		$page = new Page();
 		$page->setContextId($context->getId());
 		$page->setPageType(Page::TYPE_STARTPAGE);
+		$page->setTechnicalName(Page::START_PAGE_NAME);
 		$this->pageMapper->insert($page);
 
 		$addedPage = $page->jsonSerialize();
@@ -604,6 +606,32 @@ class ContextService {
 	}
 
 	/**
+	 * The exported pages that can be imported: a start page or a grid page, and at most
+	 * one start page. Others are skipped with a warning.
+	 *
+	 * @param array<array-key, mixed> $pages exported pages
+	 * @return array<array-key, array<array-key, mixed>>
+	 */
+	private function importablePages(array $pages): array {
+		$importable = [];
+		$hasStartPage = false;
+		foreach ($pages as $key => $pageArr) {
+			$type = is_array($pageArr) ? ($pageArr['page_type'] ?? null) : null;
+			if ($type !== Page::TYPE_STARTPAGE && $type !== Page::TYPE_GRID) {
+				$this->logger->warning('Skipping an imported page: its type is not ' . Page::TYPE_STARTPAGE . ' or ' . Page::TYPE_GRID . '.');
+				continue;
+			}
+			if ($type === Page::TYPE_STARTPAGE && $hasStartPage) {
+				$this->logger->warning('Skipping an imported page: an application has one start page.');
+				continue;
+			}
+			$hasStartPage = $hasStartPage || $type === Page::TYPE_STARTPAGE;
+			$importable[$key] = $pageArr;
+		}
+		return $importable;
+	}
+
+	/**
 	 * @param Table $table
 	 * @param array $context
 	 * @param int $tableOldId
@@ -652,30 +680,104 @@ class ContextService {
 
 		// insert pages
 		$pageMap = [];
-		if (!empty($context['pages'])) {
-			foreach ($context['pages'] as $pageArr) {
-				$page = new Page();
-				$page->setContextId($newContext->getId());
-				$page->setPageType($pageArr['page_type'] ?? $pageArr['pageType'] ?? '');
+		$pages = $this->importablePages(is_array($context['pages'] ?? null) ? $context['pages'] : []);
+		$technicalNames = $this->importedPageNames($pages);
+		$hasStartPage = false;
+		foreach ($pages as $pageKey => $pageArr) {
+			$page = new Page();
+			$page->setContextId($newContext->getId());
+			$page->setPageType($pageArr['page_type'] ?? '');
+			if ($technicalNames[$pageKey] === null) {
+				$page = $this->pageMapper->insertWithDefaultName($page);
+			} else {
+				$page->setTechnicalName($technicalNames[$pageKey]);
 				$page = $this->pageMapper->insert($page);
-				$pageMap[$pageArr['id'] ?? null] = $page;
+			}
+			$hasStartPage = $hasStartPage || $page->getPageType() === Page::TYPE_STARTPAGE;
+			if ($page->getPageType() === Page::TYPE_GRID && trim((string)$page->getTitle()) === '') {
+				// a grid page is named by its title, so it never stays without one
+				$page->resetUpdatedFields();
+				$page->setTitle((string)$page->getTechnicalName());
+				$page = $this->pageMapper->update($page);
+			}
+			$pageMap[$pageArr['id'] ?? null] = $page;
 
-				// insert page conten
-				if (!empty($pageArr['content'])) {
-					foreach ($pageArr['content'] as $contentArr) {
-						$pageContent = new PageContent();
-						$pageContent->setPageId($page->getId());
-						$oldNodeRelId = $contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null;
-						$newNodeRel = $nodeRelMap[$oldNodeRelId] ?? null;
-						$pageContent->setNodeRelId($newNodeRel ? $newNodeRel->getId() : null);
-						$pageContent->setOrder($contentArr['order'] ?? 100);
-						$this->pageContentMapper->insert($pageContent);
-					}
+			// insert page conten
+			if (!empty($pageArr['content'])) {
+				foreach ($pageArr['content'] as $contentArr) {
+					$pageContent = new PageContent();
+					$pageContent->setPageId($page->getId());
+					$oldNodeRelId = $contentArr['node_rel_id'] ?? $contentArr['nodeRelId'] ?? null;
+					$newNodeRel = $nodeRelMap[$oldNodeRelId] ?? null;
+					$pageContent->setNodeRelId($newNodeRel ? $newNodeRel->getId() : null);
+					$pageContent->setOrder($contentArr['order'] ?? 100);
+					$this->pageContentMapper->insert($pageContent);
 				}
 			}
 		}
 
+		if (!$hasStartPage) {
+			$this->logger->warning('An imported application had no start page; it gets a new one.');
+			$this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_NAME, $technicalNames, true), array_values($nodeRelMap));
+		}
+
 		return $newContext;
+	}
+
+	/**
+	 * A start page for an imported application that came without one, holding all of its
+	 * tables and views. It is named `dashboard` unless an imported page took that name.
+	 *
+	 * @param list<ContextNodeRelation> $nodeRelations
+	 * @throws Exception
+	 */
+	private function insertImportedStartPage(int $contextId, bool $startPageNameTaken, array $nodeRelations): void {
+		$page = new Page();
+		$page->setContextId($contextId);
+		$page->setPageType(Page::TYPE_STARTPAGE);
+		if ($startPageNameTaken) {
+			$page = $this->pageMapper->insertWithDefaultName($page);
+		} else {
+			$page->setTechnicalName(Page::START_PAGE_NAME);
+			$page = $this->pageMapper->insert($page);
+		}
+		foreach ($nodeRelations as $i => $nodeRelation) {
+			$pageContent = new PageContent();
+			$pageContent->setPageId($page->getId());
+			$pageContent->setNodeRelId($nodeRelation->getId());
+			$pageContent->setOrder(10 * ($i + 1));
+			$this->pageContentMapper->insert($pageContent);
+		}
+	}
+
+	/**
+	 * The technical names of the pages of an imported application, by page key. A valid
+	 * exported name is kept unless an earlier page of the import uses it or it has the
+	 * reserved form `page_<id>`, a start page without one gets `dashboard` while it is
+	 * free, and null leaves the default name.
+	 *
+	 * @param array<array-key, mixed> $pages exported pages
+	 * @return array<array-key, ?string>
+	 */
+	private function importedPageNames(array $pages): array {
+		$names = [];
+		$taken = [];
+		foreach ($pages as $key => $pageArr) {
+			$name = is_array($pageArr) ? ($pageArr['technical_name'] ?? null) : null;
+			$names[$key] = null;
+			if (is_string($name) && TechnicalNameValidator::isValid($name) && !Page::isDefaultName($name) && !isset($taken[$name])) {
+				$names[$key] = $name;
+				$taken[$name] = true;
+			}
+		}
+		foreach ($pages as $key => $pageArr) {
+			$isStartPage = is_array($pageArr) && ($pageArr['page_type'] ?? '') === Page::TYPE_STARTPAGE;
+			if ($names[$key] === null && $isStartPage && !isset($taken[Page::START_PAGE_NAME])) {
+				$names[$key] = Page::START_PAGE_NAME;
+				$taken[Page::START_PAGE_NAME] = true;
+			}
+		}
+		return $names;
 	}
 
 	/**
