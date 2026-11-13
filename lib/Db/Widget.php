@@ -12,7 +12,7 @@ namespace OCA\Tables\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * A widget on a grid page: its type, optional title, icon and description, its place
+ * A widget on a page: its type, optional title, icon and description, its place
  * on the grid and its settings, stored as one JSON object.
  *
  * @psalm-type TablesWidgetSettingValue = string

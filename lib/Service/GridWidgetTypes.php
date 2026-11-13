@@ -18,7 +18,7 @@ use OCA\Tables\ResponseDefinitions;
 use OCP\IL10N;
 
 /**
- * The widget types a grid page can hold. Every type has a schema for its settings;
+ * The widget types a page can hold. Every type has a schema for its settings;
  * the frontend renders its form from it and saved widgets are validated against it.
  * A type with a source shows a table or view of the application.
  *
@@ -32,6 +32,8 @@ class GridWidgetTypes {
 	public const TYPE_DATA = 'data';
 
 	public const GRID_COLUMNS = 12;
+	public const HEADER_HEIGHT = 2;
+	public const DATA_HEIGHT = 5;
 	public const GRID_MAX_HEIGHT = 100;
 	public const GRID_MAX_Y = 10000;
 	public const MAX_WIDGETS_PER_PAGE = 100;
@@ -53,8 +55,8 @@ class GridWidgetTypes {
 			self::TYPE_HEADER => [
 				'type' => self::TYPE_HEADER,
 				'title' => $this->l10n->t('Header'),
-				'defaultWidth' => 12,
-				'defaultHeight' => 2,
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => self::HEADER_HEIGHT,
 				'hasSource' => false,
 				'settings' => [
 					'heading' => ['type' => 'string', 'title' => $this->l10n->t('Heading'), 'default' => '', 'required' => true],
@@ -81,12 +83,40 @@ class GridWidgetTypes {
 			self::TYPE_DATA => [
 				'type' => self::TYPE_DATA,
 				'title' => $this->l10n->t('Table or view'),
-				'defaultWidth' => 12,
-				'defaultHeight' => 5,
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => self::DATA_HEIGHT,
 				'hasSource' => true,
 				'settings' => [],
 			],
 		];
+	}
+
+	/**
+	 * The widgets a start page starts with: a header with the name and description of its
+	 * application, then one full width table or view widget per node, in the given order,
+	 * as far as a page holds them. Without a name there is no header. The header passes the
+	 * schema of its type; a description longer than a page description is cut.
+	 *
+	 * @param list<int> $nodeRelIds node relations of the application, in page order
+	 * @return list<WidgetInput>
+	 */
+	public function startPageWidgets(string $name, string $description, array $nodeRelIds): array {
+		$widgets = [];
+		$gridY = 0;
+		$heading = TextHelper::trim($name);
+		if ($heading !== '') {
+			$settings = $this->sanitizeSettings(self::TYPE_HEADER, [
+				'heading' => mb_substr($heading, 0, TextHelper::TITLE_MAX_LENGTH),
+				'subheading' => mb_substr(TextHelper::trim($description), 0, TextHelper::DESCRIPTION_MAX_LENGTH),
+			]);
+			$widgets[] = new WidgetInput(null, self::TYPE_HEADER, null, null, null, 0, $gridY, self::GRID_COLUMNS, self::HEADER_HEIGHT, $settings, null);
+			$gridY += self::HEADER_HEIGHT;
+		}
+		foreach (array_slice($nodeRelIds, 0, self::MAX_WIDGETS_PER_PAGE - count($widgets)) as $nodeRelId) {
+			$widgets[] = new WidgetInput(null, self::TYPE_DATA, null, null, null, 0, $gridY, self::GRID_COLUMNS, self::DATA_HEIGHT, [], $nodeRelId);
+			$gridY += self::DATA_HEIGHT;
+		}
+		return $widgets;
 	}
 
 	/**
