@@ -5,7 +5,8 @@
 <template>
 	<div>
 		<ElementTitle v-model:view-setting="localViewSetting" :active-element="table" :show-title="showTitle" />
-		<TableDescription :description="table.description" :read-only="true" />
+		<CollapsibleDescription v-if="collapseDescription" :description="table.description ?? ''" />
+		<TableDescription v-else :description="table.description" :read-only="true" />
 		<DataTable v-model:view-setting="localViewSetting" :show-options="false" :table="table" :columns="columns" :rows="rows"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
@@ -20,6 +21,7 @@
 
 <script>
 import TableDescription from './TableDescription.vue'
+import CollapsibleDescription from './CollapsibleDescription.vue'
 import ElementTitle from './ElementTitle.vue'
 import DataTable from './DataTable.vue'
 import { mapState } from 'pinia'
@@ -32,12 +34,18 @@ export default {
 		ElementTitle,
 		DataTable,
 		TableDescription,
+		CollapsibleDescription,
 	},
 
 	props: {
 		table: {
 			type: Object,
 			default: null,
+		},
+		// Shows the description behind a button, where it would take the room of the rows
+		collapseDescription: {
+			type: Boolean,
+			default: false,
 		},
 		columns: {
 			type: Array,
