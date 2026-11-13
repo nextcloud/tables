@@ -17,6 +17,7 @@ use OCA\Tables\ResponseDefinitions;
  */
 class Row2 implements JsonSerializable {
 	private ?int $id = null;
+	private ?string $uuid = null;
 	private ?int $tableId = null;
 	private ?string $createdBy = null;
 	private ?string $createdAt = null;
@@ -34,6 +35,13 @@ class Row2 implements JsonSerializable {
 	}
 	public function setId(int $id): void {
 		$this->id = $id;
+	}
+
+	public function getUuid(): ?string {
+		return $this->uuid;
+	}
+	public function setUuid(?string $uuid): void {
+		$this->uuid = $uuid;
 	}
 
 	public function getTableId(): ?int {
@@ -165,6 +173,7 @@ class Row2 implements JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
+			'uuid' => $this->uuid,
 			'tableId' => $this->tableId,
 			'createdBy' => $this->createdBy,
 			'createdAt' => $this->createdAt,

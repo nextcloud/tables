@@ -163,7 +163,7 @@ class PublicRowOCSController extends AOCSController {
 	 * [api v2] Update a row in a link share
 	 *
 	 * @param string $token The share token
-	 * @param int $rowId The row identifier
+	 * @param string $rowId The identifier of the row to update, either its integer id or its uuid
 	 * @param string|array<string, mixed> $data An array containing the column identifiers and their values
 	 * @return DataResponse<Http::STATUS_OK, TablesPublicRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
@@ -175,10 +175,10 @@ class PublicRowOCSController extends AOCSController {
 	 */
 	#[PublicPage]
 	#[AssertShareAccessIsAccessible]
-	#[ApiRoute(verb: 'PUT', url: '/api/2/public/{token}/rows/{rowId}', requirements: ['token' => '[a-zA-Z0-9]{16}', 'rowId' => '\d+'])]
+	#[ApiRoute(verb: 'PUT', url: '/api/2/public/{token}/rows/{rowId}', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 20, period: 30)]
-	public function updateRow(string $token, int $rowId, mixed $data): DataResponse {
+	public function updateRow(string $token, string $rowId, mixed $data): DataResponse {
 		try {
 			$shareToken = new ShareToken($token);
 			$share = $this->shareService->findByToken($shareToken);
@@ -202,7 +202,8 @@ class PublicRowOCSController extends AOCSController {
 				throw new InternalError('Cannot update row without table or view provided');
 			}
 
-			$row = $this->rowService->updateSet($rowId, $viewId, $data, '', $tableId);
+			$resolvedRowId = $this->rowService->resolveRowId($rowId, $tableId, $viewId);
+			$row = $this->rowService->updateSet($resolvedRowId, $viewId, $data, '', $tableId);
 			return new DataResponse($this->rowService->formatRowsForPublicShare([$row])[0]);
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
@@ -219,20 +220,21 @@ class PublicRowOCSController extends AOCSController {
 	 * [api v2] Delete a row in a link share
 	 *
 	 * @param string $token The share token
-	 * @param int $rowId The row identifier
-	 * @return DataResponse<Http::STATUS_OK, TablesPublicRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @param string $rowId The identifier of the row to delete, either its integer id or its uuid
+	 * @return DataResponse<Http::STATUS_OK, TablesPublicRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row deleted
+	 * 400: Invalid row identifier
 	 * 403: No permissions
 	 * 404: Not found
 	 * 500: Internal error
 	 */
 	#[PublicPage]
 	#[AssertShareAccessIsAccessible]
-	#[ApiRoute(verb: 'DELETE', url: '/api/2/public/{token}/rows/{rowId}', requirements: ['token' => '[a-zA-Z0-9]{16}', 'rowId' => '\d+'])]
+	#[ApiRoute(verb: 'DELETE', url: '/api/2/public/{token}/rows/{rowId}', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 20, period: 30)]
-	public function deleteRow(string $token, int $rowId): DataResponse {
+	public function deleteRow(string $token, string $rowId): DataResponse {
 		try {
 			$shareToken = new ShareToken($token);
 			$share = $this->shareService->findByToken($shareToken);
@@ -249,12 +251,15 @@ class PublicRowOCSController extends AOCSController {
 				throw new InternalError('Cannot delete row without table or view provided');
 			}
 
-			$row = $this->rowService->delete($rowId, $viewId, '', $tableId);
+			$resolvedRowId = $this->rowService->resolveRowId($rowId, $tableId, $viewId);
+			$row = $this->rowService->delete($resolvedRowId, $viewId, '', $tableId);
 			return new DataResponse($this->rowService->formatRowsForPublicShare([$row])[0]);
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
 		} catch (InternalError|\Exception $e) {
 			return $this->handleError($e);
 		}

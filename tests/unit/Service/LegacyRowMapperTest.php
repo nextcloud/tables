@@ -139,7 +139,9 @@ class LegacyRowMapperTest extends TestCase {
 
 		self::assertTrue($data === $data2);
 		$row2Serialized = $row2->jsonSerialize();
-		unset($row2Serialized['dataByAlias']);
+		// a migrated row only gets its uuid when it is inserted
+		self::assertNull($row2Serialized['uuid']);
+		unset($row2Serialized['dataByAlias'], $row2Serialized['uuid']);
 		self::assertTrue($legacyRow->jsonSerialize() === $row2Serialized);
 	}
 }

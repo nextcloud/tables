@@ -106,11 +106,47 @@ class RowOCSController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Get a row in a table or a view
+	 *
+	 * @param 'tables'|'views' $nodeCollection Indicates whether to get a row from a table or view
+	 * @param int $nodeId The identifier of the targeted table or view
+	 * @param string $rowId The identifier of the row, either its integer id or its uuid
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Row returned
+	 * 400: Invalid row identifier, or the table or view is federated
+	 * 403: No permissions
+	 * 404: Not found
+	 * 500: Internal error
+	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ, typeParam: 'nodeCollection')]
+	#[ApiRoute(verb: 'GET', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
+	public function getRow(string $nodeCollection, int $nodeId, string $rowId): DataResponse {
+		[$tableId, $viewId] = $this->splitNode($nodeCollection, $nodeId);
+		try {
+			if ($this->isFederated($tableId, $viewId)) {
+				throw new BadRequestError('Getting a single row is not supported for federated tables and views.');
+			}
+			$resolvedRowId = $this->rowService->resolveRowId($rowId, $tableId, $viewId);
+			return new DataResponse($this->rowService->findInNode($resolvedRowId, $tableId, $viewId, $this->userId)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError|\Exception $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
 	 * [api v2] Update a row in a table or a view
 	 *
 	 * @param 'tables'|'views' $nodeCollection Indicates whether to update a row on a table or view
 	 * @param int $nodeId The identifier of the targeted table or view
-	 * @param int $rowId The identifier of the row to update
+	 * @param string $rowId The identifier of the row to update, either its integer id or its uuid
 	 * @param string|array<string, mixed> $data An array containing the column identifiers and their values
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
@@ -123,30 +159,25 @@ class RowOCSController extends AOCSController {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_UPDATE, typeParam: 'nodeCollection')]
 	#[ApiRoute(verb: 'PUT', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
-	public function updateRow(string $nodeCollection, int $nodeId, int $rowId, mixed $data): DataResponse {
+	public function updateRow(string $nodeCollection, int $nodeId, string $rowId, mixed $data): DataResponse {
 		if (is_string($data)) {
 			$data = json_decode($data, true);
 		}
 		if (!is_array($data)) {
 			return $this->handleBadRequestError(new BadRequestError('Cannot update row: data input is invalid.'));
 		}
-		$iNodeType = ConversionHelper::stringNodeType2Const($nodeCollection);
-		$tableId = $viewId = null;
-		if ($iNodeType === Application::NODE_TYPE_TABLE) {
-			$tableId = $nodeId;
-		} elseif ($iNodeType === Application::NODE_TYPE_VIEW) {
-			$viewId = $nodeId;
-		}
+		[$tableId, $viewId] = $this->splitNode($nodeCollection, $nodeId);
 		try {
 			if ($tableId !== null && $this->federationService->isNodeFederated($tableId, 'table')) {
 				$table = $this->tableService->find($nodeId, true);
-				return new DataResponse($this->federationService->updateRow($table, $rowId, $data));
+				return new DataResponse($this->federationService->updateRow($table, $this->federatedRowId($rowId), $data));
 			}
 			if ($viewId !== null && $this->federationService->isNodeFederated($viewId, 'view')) {
 				$view = $this->viewService->find($nodeId, false, $this->userId);
-				return new DataResponse($this->federationService->updateRow($view, $rowId, $data));
+				return new DataResponse($this->federationService->updateRow($view, $this->federatedRowId($rowId), $data));
 			}
-			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $data, $this->userId, $tableId)->jsonSerialize());
+			$resolvedRowId = $this->rowService->resolveRowId($rowId, $tableId, $viewId);
+			return new DataResponse($this->rowService->updateSet($resolvedRowId, $viewId, $data, $this->userId, $tableId)->jsonSerialize());
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (NotFoundError $e) {
@@ -163,10 +194,11 @@ class RowOCSController extends AOCSController {
 	 *
 	 * @param 'tables'|'views' $nodeCollection Indicates whether to delete a row on a table or view
 	 * @param int $nodeId The identifier of the targeted table or view
-	 * @param int $rowId The identifier of the row to delete
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @param string $rowId The identifier of the row to delete, either its integer id or its uuid
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row deleted
+	 * 400: Invalid row identifier
 	 * 403: No permissions
 	 * 404: Not found
 	 * 500: Internal error
@@ -174,24 +206,21 @@ class RowOCSController extends AOCSController {
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_DELETE, typeParam: 'nodeCollection')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
-	public function deleteRow(string $nodeCollection, int $nodeId, int $rowId): DataResponse {
-		$iNodeType = ConversionHelper::stringNodeType2Const($nodeCollection);
-		$tableId = $viewId = null;
-		if ($iNodeType === Application::NODE_TYPE_TABLE) {
-			$tableId = $nodeId;
-		} elseif ($iNodeType === Application::NODE_TYPE_VIEW) {
-			$viewId = $nodeId;
-		}
+	public function deleteRow(string $nodeCollection, int $nodeId, string $rowId): DataResponse {
+		[$tableId, $viewId] = $this->splitNode($nodeCollection, $nodeId);
 		try {
 			if ($tableId !== null && $this->federationService->isNodeFederated($tableId, 'table')) {
 				$table = $this->tableService->find($nodeId, true);
-				return new DataResponse($this->federationService->deleteRow($table, $rowId));
+				return new DataResponse($this->federationService->deleteRow($table, $this->federatedRowId($rowId)));
 			}
 			if ($viewId !== null && $this->federationService->isNodeFederated($viewId, 'view')) {
 				$view = $this->viewService->find($nodeId, false, $this->userId);
-				return new DataResponse($this->federationService->deleteRow($view, $rowId));
+				return new DataResponse($this->federationService->deleteRow($view, $this->federatedRowId($rowId)));
 			}
-			return new DataResponse($this->rowService->delete($rowId, $viewId, $this->userId, $tableId)->jsonSerialize());
+			$resolvedRowId = $this->rowService->resolveRowId($rowId, $tableId, $viewId);
+			return new DataResponse($this->rowService->delete($resolvedRowId, $viewId, $this->userId, $tableId)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (PermissionError $e) {
@@ -199,5 +228,39 @@ class RowOCSController extends AOCSController {
 		} catch (InternalError|\Exception $e) {
 			return $this->handleError($e);
 		}
+	}
+
+	/**
+	 * @param 'tables'|'views' $nodeCollection
+	 * @return array{0: ?int, 1: ?int} the table id and the view id, one of them is null
+	 */
+	private function splitNode(string $nodeCollection, int $nodeId): array {
+		$iNodeType = ConversionHelper::stringNodeType2Const($nodeCollection);
+		if ($iNodeType === Application::NODE_TYPE_TABLE) {
+			return [$nodeId, null];
+		}
+		if ($iNodeType === Application::NODE_TYPE_VIEW) {
+			return [null, $nodeId];
+		}
+		return [null, null];
+	}
+
+	private function isFederated(?int $tableId, ?int $viewId): bool {
+		if ($tableId !== null) {
+			return $this->federationService->isNodeFederated($tableId, 'table');
+		}
+		return $viewId !== null && $this->federationService->isNodeFederated($viewId, 'view');
+	}
+
+	/**
+	 * Federated tables and views are still addressed by the integer row id of the remote instance.
+	 *
+	 * @throws BadRequestError
+	 */
+	private function federatedRowId(string $rowId): int {
+		if (preg_match('/^\d+$/', $rowId) !== 1) {
+			throw new BadRequestError('Federated tables and views only accept an integer row id.');
+		}
+		return (int)$rowId;
 	}
 }
