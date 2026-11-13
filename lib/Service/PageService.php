@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
@@ -49,6 +50,7 @@ class PageService {
 		private readonly WidgetService $widgetService,
 		private readonly GridWidgetTypes $gridWidgetTypes,
 		private readonly IDBConnection $dbc,
+		private readonly MenuItemMapper $menuItemMapper,
 	) {
 	}
 
@@ -161,7 +163,8 @@ class PageService {
 	}
 
 	/**
-	 * Deletes a page with its widgets. The start page cannot be deleted.
+	 * Deletes a page with its widgets and the menu items opening it. The start page cannot
+	 * be deleted.
 	 *
 	 * @return TablesPage the deleted page
 	 * @throws BadRequestError
@@ -180,6 +183,7 @@ class PageService {
 			}
 			$widgets = $this->widgetService->findByPageIds([$pageId])[$pageId] ?? [];
 			$this->widgetService->deleteByPageIds([$pageId]);
+			$this->menuItemMapper->deleteByPageIds([$pageId]);
 			$this->pageContentMapper->deleteByPageId($pageId);
 			$this->pageMapper->deleteByPageId($pageId);
 			return $widgets;

@@ -302,6 +302,17 @@ namespace OCA\Tables;
  *   widgets: list<TablesWidget>,
  * }
  *
+ * @psalm-type TablesMenuItem = array{
+ *   id: int,
+ *   contextId: int,
+ *   parentId: ?int,
+ *   title: ?string,
+ *   displayTitle: string,
+ *   icon: ?string,
+ *   description: ?string,
+ *   target: array{pageId: int}|array{nodeRelId: int}|array{url: string}|null,
+ * }
+ *
  * @psalm-type TablesContextNavigation = array{
  *     id: int,
  *     shareId: int,
