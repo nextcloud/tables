@@ -16,6 +16,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Неможе да се запишува на дискот",
     "A PHP extension stopped the file upload" : "PHP додаток го стопираше прикачувањето на датотеката",
     "No file uploaded or file size exceeds maximum of %s" : "Нема прикачена дадотека или големината го надмминува максимумот од %s",
+    "Team not found" : "Тимот не е пронајден",
     "Members" : "Членови",
     "Date" : "Датум",
     "Comments" : "Коментари",

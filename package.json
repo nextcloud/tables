@@ -55,7 +55,7 @@
     "dompurify": "^3.4.17",
     "papaparse": "^5.7.0",
     "pinia": "^4.1.0",
-    "vue": "^3.5.44",
+    "vue": "^3.5.45",
     "vue-material-design-icons": "^5.4.0",
     "vue-router": "^5.4.0"
   },
@@ -74,7 +74,7 @@
     "@nextcloud/eslint-config": "^9.0.1",
     "@nextcloud/stylelint-config": "^3.2.2",
     "@nextcloud/vite-config": "^2.5.4",
-    "@playwright/test": "^1.64.1",
+    "@playwright/test": "^1.65.0",
     "@vue/tsconfig": "^0.9.1",
     "cypress": "^15.21.1",
     "cypress-downloadfile": "^1.2.4",
