@@ -16,6 +16,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ContextNodeInputSet;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -99,7 +100,7 @@ class ContextController extends AOCSController {
 	 * @param string $name Name of the context
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
-	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context
+	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read.
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
@@ -113,11 +114,16 @@ class ContextController extends AOCSController {
 			if (!$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
+			try {
+				$nodeInputs = ContextNodeInputSet::createFromInputArray($nodes);
+			} catch (InvalidArgumentException $e) {
+				return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			}
 			return new DataResponse($this->contextService->create(
 				$name,
 				$iconName,
 				$description,
-				$this->sanitizeInputNodes($nodes),
+				$nodeInputs->jsonSerialize(),
 				$this->userId,
 				0,
 			)->jsonSerialize());
@@ -137,7 +143,7 @@ class ContextController extends AOCSController {
 	 * @param ?string $name provide this parameter to set a new name
 	 * @param ?string $iconName provide this parameter to set a new icon
 	 * @param ?string $description provide this parameter to set a new description
-	 * @param ?array{id: int, type: int, permissions: int, order: int} $nodes provide this parameter to set a new list of nodes.
+	 * @param ?list<array{id: int, type: int, permissions?: int, order?: int}> $nodes provide this parameter to set a new list of nodes. When permissions are omitted, a node that is added gets read permissions and a node that is already in the context keeps its permissions. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read.
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
@@ -154,14 +160,18 @@ class ContextController extends AOCSController {
 			if ($iconName !== null && !$this->isValidIcon($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
-			$nodes = $nodes !== null ? $this->sanitizeInputNodes($nodes) : null;
+			try {
+				$nodeInputs = $nodes !== null ? ContextNodeInputSet::createFromInputArray($nodes) : null;
+			} catch (InvalidArgumentException $e) {
+				return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			}
 			return new DataResponse($this->contextService->update(
 				$contextId,
 				$this->userId,
 				$name,
 				$iconName,
 				$description,
-				$nodes,
+				$nodeInputs?->jsonSerialize(),
 			)->jsonSerialize());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			return $this->handleError($e);
@@ -170,33 +180,6 @@ class ContextController extends AOCSController {
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
-	}
-
-	/**
-	 * @psalm-param list<array{id: mixed, type: mixed, permissions?: mixed, order?: mixed}> $nodes
-	 * @psalm-return list<array{id: int, type: int, permissions?: int, order?: int}>
-	 */
-	protected function sanitizeInputNodes(array $nodes): array {
-		foreach ($nodes as &$node) {
-			if (!is_numeric($node['type'])) {
-				throw new InvalidArgumentException('Unexpected node type');
-			}
-			$node['type'] = (int)$node['type'];
-
-			if (!is_numeric($node['id'])) {
-				throw new InvalidArgumentException('Unexpected node id');
-			}
-			$node['id'] = (int)$node['id'];
-
-			if (isset($node['permissions'])) {
-				$node['permissions'] = (int)$node['permissions'];
-			}
-
-			if (isset($node['order'])) {
-				$node['order'] = (int)$node['order'];
-			}
-		}
-		return $nodes;
 	}
 
 	/**

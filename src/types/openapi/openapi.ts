@@ -7090,7 +7090,7 @@ export interface operations {
                      */
                     readonly description?: string;
                     /**
-                     * @description optional nodes to be connected to this context
+                     * @description optional nodes to be connected to this context. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read.
                      * @default []
                      */
                     readonly nodes?: readonly {
@@ -7280,17 +7280,17 @@ export interface operations {
                     readonly iconName?: string | null;
                     /** @description provide this parameter to set a new description */
                     readonly description?: string | null;
-                    /** @description provide this parameter to set a new list of nodes. */
-                    readonly nodes?: {
+                    /** @description provide this parameter to set a new list of nodes. When permissions are omitted, a node that is added gets read permissions and a node that is already in the context keeps its permissions. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read. */
+                    readonly nodes?: readonly {
                         /** Format: int64 */
                         readonly id: number;
                         /** Format: int64 */
                         readonly type: number;
                         /** Format: int64 */
-                        readonly permissions: number;
+                        readonly permissions?: number;
                         /** Format: int64 */
-                        readonly order: number;
-                    } | null;
+                        readonly order?: number;
+                    }[] | null;
                 };
             };
         };

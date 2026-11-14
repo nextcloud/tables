@@ -12272,7 +12272,7 @@
                                     "nodes": {
                                         "type": "array",
                                         "default": [],
-                                        "description": "optional nodes to be connected to this context",
+                                        "description": "optional nodes to be connected to this context. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read.",
                                         "items": {
                                             "type": "object",
                                             "required": [
@@ -12699,31 +12699,32 @@
                                         "description": "provide this parameter to set a new description"
                                     },
                                     "nodes": {
-                                        "type": "object",
+                                        "type": "array",
                                         "nullable": true,
-                                        "description": "provide this parameter to set a new list of nodes.",
-                                        "required": [
-                                            "id",
-                                            "type",
-                                            "permissions",
-                                            "order"
-                                        ],
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "type": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "permissions": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "order": {
-                                                "type": "integer",
-                                                "format": "int64"
+                                        "description": "provide this parameter to set a new list of nodes. When permissions are omitted, a node that is added gets read permissions and a node that is already in the context keeps its permissions. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read.",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "type"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "type": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "permissions": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "order": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                }
                                             }
                                         }
                                     }
