@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "003764a4beacf099ac9bee50926c2a0b",
+    "content-hash": "786a8294406b4083ff2fd96e4fe994bb",
     "packages": [
         {
             "name": "bamarni/composer-bin-plugin",
@@ -1572,16 +1572,16 @@
         },
         {
             "name": "psalm/phar",
-            "version": "6.20.9",
+            "version": "6.20.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/psalm/phar.git",
-                "reference": "a0465306a64e7a77789329cc6d79dea6e1ec84bf"
+                "reference": "42f6faee9fb721ea0dcc60e095d1780135e3f11e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/psalm/phar/zipball/a0465306a64e7a77789329cc6d79dea6e1ec84bf",
-                "reference": "a0465306a64e7a77789329cc6d79dea6e1ec84bf",
+                "url": "https://api.github.com/repos/psalm/phar/zipball/42f6faee9fb721ea0dcc60e095d1780135e3f11e",
+                "reference": "42f6faee9fb721ea0dcc60e095d1780135e3f11e",
                 "shasum": ""
             },
             "require": {
@@ -1601,10 +1601,10 @@
             "description": "Composer-based Psalm Phar",
             "support": {
                 "issues": "https://github.com/psalm/phar/issues",
-                "source": "https://github.com/psalm/phar/tree/6.20.9"
+                "source": "https://github.com/psalm/phar/tree/6.20.10"
             },
-            "time": "2026-11-05T00:45:46+00:00",
-            "published-time": "2026-11-05T00:45:58+00:00"
+            "time": "2026-11-07T17:30:07+00:00",
+            "published-time": "2026-11-07T17:30:20+00:00"
         },
         {
             "name": "psr/clock",
