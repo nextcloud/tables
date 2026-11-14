@@ -47,7 +47,7 @@ class ContextNodeInput implements JsonSerializable {
 			nodeId: self::toInteger($inputNode['id'] ?? null, 'Unexpected node id'),
 			nodeType: $nodeType,
 			permissions: isset($inputNode['permissions'])
-				? self::toInteger($inputNode['permissions'], 'Unexpected node permissions')
+				? self::toPermissions($inputNode['permissions'])
 				: null,
 			order: isset($inputNode['order'])
 				? self::toInteger($inputNode['order'], 'Unexpected node order')
@@ -70,6 +70,22 @@ class ContextNodeInput implements JsonSerializable {
 			$node['order'] = $this->order;
 		}
 		return $node;
+	}
+
+	/**
+	 * Accepts a bitmask of the grantable permissions that includes read. Read is
+	 * the base permission of a node in an application: the application dialogs
+	 * always grant it and offer create, update and delete on top of it.
+	 *
+	 * @throws InvalidArgumentException
+	 */
+	private static function toPermissions(mixed $value): int {
+		$permissions = self::toInteger($value, 'Unexpected node permissions');
+		if (($permissions & ~Application::PERMISSION_ALL) !== 0
+			|| ($permissions & Application::PERMISSION_READ) === 0) {
+			throw new InvalidArgumentException('Unexpected node permissions');
+		}
+		return $permissions;
 	}
 
 	/**

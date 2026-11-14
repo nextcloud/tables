@@ -30,11 +30,11 @@ class ContextNodeInputSetTest extends TestCase {
 
 	public function testCreateFromInputArrayAcceptsStringsOfDigits(): void {
 		$nodeSet = ContextNodeInputSet::createFromInputArray([
-			['id' => '05', 'type' => '1', 'permissions' => '0', 'order' => '30'],
+			['id' => '05', 'type' => '1', 'permissions' => '07', 'order' => '0'],
 		]);
 
 		$this->assertSame([
-			['id' => 5, 'type' => 1, 'permissions' => 0, 'order' => 30],
+			['id' => 5, 'type' => 1, 'permissions' => 7, 'order' => 0],
 		], $nodeSet->jsonSerialize());
 	}
 
@@ -67,12 +67,35 @@ class ContextNodeInputSetTest extends TestCase {
 
 	public function testCreateFromInputArrayAcceptsTheLargestStorableInteger(): void {
 		$nodeSet = ContextNodeInputSet::createFromInputArray([
-			['id' => 2147483647, 'type' => 0, 'permissions' => '2147483647'],
+			['id' => 2147483647, 'type' => 0, 'order' => '2147483647'],
 		]);
 
 		$this->assertSame([
-			['id' => 2147483647, 'type' => 0, 'permissions' => 2147483647],
+			['id' => 2147483647, 'type' => 0, 'order' => 2147483647],
 		], $nodeSet->jsonSerialize());
+	}
+
+	/**
+	 * @dataProvider permissionsIncludingReadProvider
+	 */
+	public function testCreateFromInputArrayAcceptsPermissionsThatIncludeRead(int|string $permissions, int $expectedPermissions): void {
+		$nodeSet = ContextNodeInputSet::createFromInputArray([
+			['id' => 5, 'type' => 0, 'permissions' => $permissions],
+		]);
+
+		$this->assertSame([
+			['id' => 5, 'type' => 0, 'permissions' => $expectedPermissions],
+		], $nodeSet->jsonSerialize());
+	}
+
+	public static function permissionsIncludingReadProvider(): array {
+		return [
+			'read' => [Application::PERMISSION_READ, 1],
+			'read, create, update and delete' => [15, 15],
+			'read and manage' => [17, 17],
+			'all' => [Application::PERMISSION_ALL, 31],
+			'all as a string' => ['31', 31],
+		];
 	}
 
 	/**
@@ -129,6 +152,13 @@ class ContextNodeInputSetTest extends TestCase {
 			'empty string as permissions' => [['id' => 5, 'type' => 0, 'permissions' => ''], 'Unexpected node permissions'],
 			'boolean as permissions' => [['id' => 5, 'type' => 0, 'permissions' => true], 'Unexpected node permissions'],
 			'array as permissions' => [['id' => 5, 'type' => 0, 'permissions' => [1]], 'Unexpected node permissions'],
+			'no permissions' => [['id' => 5, 'type' => 0, 'permissions' => 0], 'Unexpected node permissions'],
+			'no permissions as a string' => [['id' => 5, 'type' => 0, 'permissions' => '0'], 'Unexpected node permissions'],
+			'create without read' => [['id' => 5, 'type' => 0, 'permissions' => 2], 'Unexpected node permissions'],
+			'manage without read' => [['id' => 5, 'type' => 0, 'permissions' => 16], 'Unexpected node permissions'],
+			'read and owner' => [['id' => 5, 'type' => 0, 'permissions' => 33], 'Unexpected node permissions'],
+			'read and an undefined permission' => [['id' => 5, 'type' => 0, 'permissions' => 65], 'Unexpected node permissions'],
+			'largest storable integer as permissions' => [['id' => 5, 'type' => 0, 'permissions' => '2147483647'], 'Unexpected node permissions'],
 			'word as order' => [['id' => 5, 'type' => 0, 'order' => 'first'], 'Unexpected node order'],
 			'negative order' => [['id' => 5, 'type' => 0, 'order' => -10], 'Unexpected node order'],
 		];

@@ -555,6 +555,19 @@ Feature: APIv2
     Then known Context "c1" contains "table" "t1" with permissions "read,create,update"
 
   @api2 @contexts @contexts-update
+  Scenario: Attempt to give a table in an owned context permissions without read
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    When user "participant1-v2" updates the nodes of the Context "c1" with a JSON "list" of
+      | alias | type  | permissions         |
+      | t1    | table | create              |
+    Then the reported status is "400"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" contains "table" "t1" with permissions "read,create,update"
+
+  @api2 @contexts @contexts-update
   Scenario: Remove all tables from an owned context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2

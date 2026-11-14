@@ -100,7 +100,7 @@ class ContextController extends AOCSController {
 	 * @param string $name Name of the context
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
-	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context
+	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read.
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
@@ -143,7 +143,7 @@ class ContextController extends AOCSController {
 	 * @param ?string $name provide this parameter to set a new name
 	 * @param ?string $iconName provide this parameter to set a new icon
 	 * @param ?string $description provide this parameter to set a new description
-	 * @param ?list<array{id: int, type: int, permissions?: int, order?: int}> $nodes provide this parameter to set a new list of nodes. When permissions are omitted, a node that is added gets read permissions and a node that is already in the context keeps its permissions.
+	 * @param ?list<array{id: int, type: int, permissions?: int, order?: int}> $nodes provide this parameter to set a new list of nodes. When permissions are omitted, a node that is added gets read permissions and a node that is already in the context keeps its permissions. Permissions are a bitmask of read (1), create (2), update (4), delete (8) and manage (16) that includes read.
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
