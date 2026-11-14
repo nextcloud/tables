@@ -22,6 +22,7 @@
     "Could not write file to disk" : "Skriving til disk mislyktes",
     "A PHP extension stopped the file upload" : "En PHP-utvidelse stoppet filopplastingen.",
     "No file uploaded or file size exceeds maximum of %s" : "Ingen fil lastet opp eller filen er større enn %s",
+    "Team not found" : "Laget ble ikke funnet",
     "Nextcloud tables" : "Nextcloud-tabeller",
     "_%n row_::_%n rows_" : ["%n rad","%n rader"],
     "table" : "tabell",
