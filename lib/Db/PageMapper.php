@@ -88,28 +88,6 @@ class PageMapper extends QBMapper {
 	}
 
 	/**
-	 * Locks an application until the transaction ends, so a page is never added to one
-	 * that is being deleted.
-	 *
-	 * @return bool false when the application is gone
-	 * @throws Exception
-	 */
-	public function lockContext(int $contextId): bool {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('id')
-			->from('tables_contexts_context')
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
-		// SQLite has no row locks and runs one write transaction at a time anyway
-		if ($this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
-			$qb->forUpdate();
-		}
-		$result = $qb->executeQuery();
-		$found = $result->fetchOne() !== false;
-		$result->closeCursor();
-		return $found;
-	}
-
-	/**
 	 * @return int[]
 	 */
 	public function getPageIdsForContext(int $contextId): array {
