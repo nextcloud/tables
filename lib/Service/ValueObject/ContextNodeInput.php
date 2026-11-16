@@ -21,6 +21,8 @@ class ContextNodeInput implements JsonSerializable {
 	/** The values are stored in signed 32-bit integer columns */
 	private const MAX_INTEGER_VALUE = 2_147_483_647;
 
+	private const PERMISSIONS_ERROR = 'Node permissions must include read (1) and may only combine 1, 2, 4, 8 and 16';
+
 	private const NODE_TYPES = [
 		Application::NODE_TYPE_TABLE,
 		Application::NODE_TYPE_VIEW,
@@ -80,10 +82,10 @@ class ContextNodeInput implements JsonSerializable {
 	 * @throws InvalidArgumentException
 	 */
 	private static function toPermissions(mixed $value): int {
-		$permissions = self::toInteger($value, 'Unexpected node permissions');
+		$permissions = self::toInteger($value, self::PERMISSIONS_ERROR);
 		if (($permissions & ~Application::PERMISSION_ALL) !== 0
 			|| ($permissions & Application::PERMISSION_READ) === 0) {
-			throw new InvalidArgumentException('Unexpected node permissions');
+			throw new InvalidArgumentException(self::PERMISSIONS_ERROR);
 		}
 		return $permissions;
 	}
