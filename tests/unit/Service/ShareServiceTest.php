@@ -16,6 +16,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
@@ -295,6 +296,25 @@ class ShareServiceTest extends TestCase {
 				new ShareToken('tokenBypass2026x'),
 			)
 		);
+	}
+
+	public function testCreateRemoteShareDeletesShareWhenSendFails(): void {
+		$this->secureRandom->method('generate')->willReturn('remoteShareToken');
+		$this->mapper->method('insert')->willReturnCallback(function (Share $share) {
+			$share->setId(7);
+			return $share;
+		});
+		$this->federationService->method('sendShare')
+			->willThrowException(new InternalError('Could not send federated share to remote instance'));
+
+		$this->mapper->expects($this->once())
+			->method('delete')
+			->with($this->callback(fn (Share $share) => $share->getId() === 7));
+		$this->auditLogService->expects($this->never())->method('log');
+
+		$this->expectException(InternalError::class);
+
+		$this->shareService->create(new ShareCreate(1, 'table', 'user@remote.invalid', 'remote', true, false, false, false, false, 0));
 	}
 
 	public function testDeleteForShareReviewCallsSideEffects(): void {
