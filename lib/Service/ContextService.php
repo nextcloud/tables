@@ -179,6 +179,7 @@ class ContextService {
 	 * @throws Exception|PermissionError|NotFoundError
 	 */
 	private function updateInTransaction(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
+		$this->contextMapper->lock($contextId);
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		if ($name !== null) {
@@ -355,6 +356,7 @@ class ContextService {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		$this->atomic(function () use ($context): void {
+			$this->contextMapper->lock($context->getId());
 			$this->shareService->deleteAllForContext($context);
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());

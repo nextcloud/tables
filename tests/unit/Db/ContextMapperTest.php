@@ -96,6 +96,18 @@ class ContextMapperTest extends DatabaseTestCase {
 		$this->assertSame([$startPage->getId()], array_keys($found[0]->getPages()));
 	}
 
+	public function testLockingFindsTheApplicationAndLeavesItAsItIs(): void {
+		$context = $this->createContext();
+
+		$this->connectionAdapter->beginTransaction();
+		try {
+			$this->assertSame([true, false], [$this->mapper->lock($context->getId()), $this->mapper->lock(999999999)]);
+		} finally {
+			$this->connectionAdapter->commit();
+		}
+		$this->assertSame('Mapper test', $this->mapper->findById($context->getId(), self::OWNER)->getName());
+	}
+
 	private function createContext(): Context {
 		$context = new Context();
 		$context->setName('Mapper test');

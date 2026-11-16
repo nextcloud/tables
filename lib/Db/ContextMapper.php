@@ -322,6 +322,33 @@ class ContextMapper extends QBMapper {
 	}
 
 	/**
+	 * Locks an application until the transaction ends. Call it first in the transaction:
+	 * on SQLite, a transaction that reads before it writes fails at once when another
+	 * one writes meanwhile, so there it takes the write lock with a write that changes
+	 * nothing, which waits for its turn instead.
+	 *
+	 * @return bool false when the application is gone
+	 * @throws Exception
+	 */
+	public function lock(int $contextId): bool {
+		$qb = $this->db->getQueryBuilder();
+		if ($this->db->getDatabaseProvider() === IDBConnection::PLATFORM_SQLITE) {
+			$qb->update($this->table)
+				->set('id', 'id')
+				->where($qb->expr()->eq('id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
+			return $qb->executeStatement() > 0;
+		}
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)))
+			->forUpdate();
+		$result = $qb->executeQuery();
+		$found = $result->fetchOne() !== false;
+		$result->closeCursor();
+		return $found;
+	}
+
+	/**
 	 * Adds a row for every page other than the start page of the contexts in the rows,
 	 * holding only the context id and the page fields.
 	 *
