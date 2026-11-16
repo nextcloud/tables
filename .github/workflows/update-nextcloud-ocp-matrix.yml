@@ -11,11 +11,12 @@ name: Update nextcloud/ocp
 on:
   workflow_dispatch:
   schedule:
-    - cron: '5 2 * * 0'
+    - cron: '5 22 * * 6'
 
 permissions:
-  contents: read
+  contents: write
   issues: write
+  pull-requests: write
 
 jobs:
   update-nextcloud-ocp:
@@ -23,6 +24,10 @@ jobs:
 
     # Only allowed to be run on nextcloud repositories
     if: ${{ github.repository_owner == 'nextcloud' }}
+
+    env:
+      # env variable for maintainers: 'false' disables auto-merge for these pull requests
+      AUTOMERGE: true
 
     strategy:
       fail-fast: false
@@ -41,12 +46,12 @@ jobs:
 
       - name: Get version matrix
         id: versions
-        uses: icewind1991/nextcloud-version-matrix@cd0211ffcef1065e2020cd579e4843b8746e7a58 # v1.3.3
+        uses: nextcloud-libraries/nextcloud-version-matrix@71959de73c244b11ecbf4503b87c41d65b0f64ae # v1.3.4
 
-      - name: Set up php8.2
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+      - name: Set up php${{ steps.versions.outputs.php-min }}
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
-          php-version: 8.2
+          php-version: ${{ steps.versions.outputs.php-min }}
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite
           coverage: none
@@ -59,8 +64,8 @@ jobs:
           grep '/appinfo/info.xml' .github/CODEOWNERS | cut -f 2- -d ' ' | xargs | awk '{ print "codeowners="$0 }' >> $GITHUB_OUTPUT
         continue-on-error: true
 
-      - name: Composer install
-        run: composer install
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
       - name: Check composer bin for nextcloud/ocp exists
         id: check_composer_bin
@@ -91,7 +96,8 @@ jobs:
           body: 'Please check the output of the GitHub action and manually resolve the issues<br>${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}<br>${{ steps.codeowners.outputs.codeowners }}'
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        id: create-pull-request
+        uses: peter-evans/create-pull-request@15733dbdfeedb4f7fdb73d13c6f5ac83b710fab8 # v8.1.2
         with:
           token: ${{ secrets.COMMAND_BOT_PAT }}
           commit-message: 'chore(dev-deps): Bump nextcloud/ocp package'
@@ -100,13 +106,25 @@ jobs:
           signoff: true
           branch: 'automated/noid/${{ matrix.branches }}-update-nextcloud-ocp'
           title: '[${{ matrix.branches }}] Update nextcloud/ocp dependency'
-          add-path: |
-            composer.json
-            composer.lock
-            vendor-bin/nextcloud-ocp/composer.json
-            vendor-bin/nextcloud-ocp/composer.lock
+          add-paths: ${{ steps.check_composer_bin.outputs.files_exists == 'true' && 'vendor-bin/nextcloud-ocp/composer.json,vendor-bin/nextcloud-ocp/composer.lock' || 'composer.json,composer.lock' }}
           body: |
             Auto-generated update of [nextcloud/ocp](https://github.com/nextcloud-deps/ocp/) dependency
           labels: |
             dependencies
             3. to review
+
+      # Approve using the default GITHUB_TOKEN, as the PR itself was created
+      # using COMMAND_BOT_PAT and GitHub does not allow an account to approve its own PR
+      - name: GitHub actions bot approve
+        if: steps.create-pull-request.outputs.pull-request-operation != 'none'
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ steps.create-pull-request.outputs.pull-request-url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto merge
+        if: steps.create-pull-request.outputs.pull-request-operation != 'none' && fromJSON(env.AUTOMERGE)
+        uses: peter-evans/enable-pull-request-automerge@a660677d5469627102a1c1e11409dd063606628d # v3.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
