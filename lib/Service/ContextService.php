@@ -1137,23 +1137,12 @@ class ContextService {
 		}
 
 		if (is_array($updateScheme['menu'] ?? null)) {
-			$schemeUuids = [];
-			foreach ($changes['nodes']['to'] ?? [] as $node) {
-				$kind = ($node['node_type'] ?? null) === Application::NODE_TYPE_VIEW ? 'view' : 'table';
-				$schemeUuids[$kind][(string)($node['node_uuid'] ?? '')] = true;
-			}
-			$pageIds = $this->menuService->schemePageIds($context, is_array($updateScheme['pages'] ?? null) ? $updateScheme['pages'] : []);
-			['items' => $items, 'skipped' => $skipped] = $this->menuService->readExported(
+			$changes['menu'] = ['from' => $currentScheme->getMenu()] + $this->menuService->previewSchemeImport(
 				$context,
 				$updateScheme['menu'],
-				static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
-				static fn (int $pageId): ?int => $pageIds[$pageId] ?? null,
+				is_array($updateScheme['pages'] ?? null) ? $updateScheme['pages'] : [],
+				$changes['nodes']['to'] ?? [],
 			);
-			$changes['menu'] = [
-				'from' => $currentScheme->getMenu(),
-				'to' => $this->menuService->withLocalPages(array_column($items, 'entry'), $pageIds),
-				'skipped' => $skipped,
-			];
 		}
 
 		return $changes;
