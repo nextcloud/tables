@@ -52,6 +52,7 @@ class PageServiceTest extends TestCase {
 		$context->setNodes([self::NODE_REL => ['id' => self::NODE_REL, 'node_id' => 3, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]]);
 		$contextMapper = $this->createMock(ContextMapper::class);
 		$contextMapper->method('findById')->willReturn($context);
+		$contextMapper->method('lock')->willReturn(true);
 
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageMapper->method('findById')->willReturnCallback(function (int $pageId): Page {
@@ -60,7 +61,6 @@ class PageServiceTest extends TestCase {
 			}
 			return clone $this->pages[$pageId];
 		});
-		$this->pageMapper->method('lockContext')->willReturn(true);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$this->widgetService = $this->createMock(WidgetService::class);
 		$l10n = $this->createMock(IL10N::class);
@@ -162,10 +162,11 @@ class PageServiceTest extends TestCase {
 	}
 
 	public function testCreateInAnApplicationThatIsGoneIsNotFound(): void {
+		$contextMapper = $this->createMock(ContextMapper::class);
+		$contextMapper->method('lock')->willReturn(false);
 		$this->pageMapper = $this->createMock(PageMapper::class);
-		$this->pageMapper->method('lockContext')->willReturn(false);
 		$this->pageMapper->expects($this->never())->method('insertWithDefaultName');
-		$service = new PageService($this->createMock(ContextMapper::class), $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
+		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
 
 		$this->expectException(NotFoundError::class);
 		$service->create(7, 'Planning', null, null, null);

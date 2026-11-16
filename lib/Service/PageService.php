@@ -97,7 +97,7 @@ class PageService {
 		}
 
 		$page = $this->save(fn (): Page => $this->atomic(function () use ($contextId, $page): Page {
-			if (!$this->pageMapper->lockContext($contextId)) {
+			if (!$this->contextMapper->lock($contextId)) {
 				throw new NotFoundError('Application ' . $contextId . ' does not exist');
 			}
 			return $page->getSlug() === null ? $this->pageMapper->insertWithDefaultName($page) : $this->pageMapper->insert($page);
