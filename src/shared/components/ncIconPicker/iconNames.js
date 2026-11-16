@@ -165,7 +165,7 @@ const iconNames = {
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	creation: t('tables', 'Sparkles'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
-	cricket: t('tables', 'Cricket'),
+	cricket: t('tables', 'Cricket bat'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	crop: t('tables', 'Crop marks'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
@@ -179,7 +179,7 @@ const iconNames = {
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	details: t('tables', 'Inverted triangle'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
-	devices: t('tables', 'Phone and monitor'),
+	devices: t('tables', 'Monitor, phone and watch'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	dialpad: t('tables', 'Keypad'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
@@ -273,7 +273,7 @@ const iconNames = {
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	gymnastics: t('tables', 'Gymnastics'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
-	hail: t('tables', 'Person hailing a taxi'),
+	hail: t('tables', 'Person hailing'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	hammer: t('tables', 'Hammer'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
@@ -293,7 +293,7 @@ const iconNames = {
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	home: t('tables', 'House'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
-	hub: t('tables', 'Network hub'),
+	hub: t('tables', 'Hub'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	human: t('tables', 'Human figure'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
@@ -335,7 +335,7 @@ const iconNames = {
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	leak: t('tables', 'Signal waves'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
-	library: t('tables', 'Books on a shelf'),
+	library: t('tables', 'Person reading a book'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	license: t('tables', 'Award seal'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
@@ -343,7 +343,7 @@ const iconNames = {
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	link: t('tables', 'Chain link'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
-	liquor: t('tables', 'Liquor bottles'),
+	liquor: t('tables', 'Liquor bottle'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
 	lock: t('tables', 'Padlock'),
 	// TRANSLATORS: Name of a pictogram in the icon picker, read out by screen readers
