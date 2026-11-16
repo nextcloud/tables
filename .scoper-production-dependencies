@@ -3,6 +3,7 @@ composer/pcre
 maennchen/zipstream-php
 markbaker/complex
 markbaker/matrix
+phpoffice/wmf
 psr/simple-cache
 symfony/uid
 symfony/polyfill-uuid
