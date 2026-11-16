@@ -403,6 +403,32 @@ class MenuService {
 	}
 
 	/**
+	 * The menu a scheme import into this application would save, as the preview shows it and
+	 * as the import takes it back: page targets point at pages of the application, and only
+	 * tables and views among the scheme's nodes count as having come along.
+	 *
+	 * @param list<mixed> $menu
+	 * @param array<array-key, mixed> $schemePages
+	 * @param array<array-key, mixed> $schemeNodes
+	 * @return array{to: list<array<array-key, mixed>>, skipped: list<array{index: int, title: ?string, reason: string}>}
+	 */
+	public function previewSchemeImport(Context $context, array $menu, array $schemePages, array $schemeNodes): array {
+		$schemeUuids = [];
+		foreach ($schemeNodes as $node) {
+			$kind = ($node['node_type'] ?? null) === Application::NODE_TYPE_VIEW ? 'view' : 'table';
+			$schemeUuids[$kind][(string)($node['node_uuid'] ?? '')] = true;
+		}
+		$pageIds = $this->schemePageIds($context, $schemePages);
+		['items' => $items, 'skipped' => $skipped] = $this->readExported(
+			$context,
+			$menu,
+			static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
+			static fn (int $pageId): ?int => $pageIds[$pageId] ?? null,
+		);
+		return ['to' => $this->withLocalPages(array_column($items, 'entry'), $pageIds), 'skipped' => $skipped];
+	}
+
+	/**
 	 * Points the page targets of exported items at pages of this application, so that they
 	 * no longer depend on the scheme they came from.
 	 *
