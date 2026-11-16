@@ -11,6 +11,7 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\View;
+use OCA\Tables\Db\ViewMapper;
 
 /**
  * Resolves which users see a row in a view, memoized so that activities and
@@ -23,6 +24,7 @@ class RowVisibilityService {
 
 	public function __construct(
 		private readonly Row2Mapper $row2Mapper,
+		private readonly ViewMapper $viewMapper,
 	) {
 	}
 
@@ -45,6 +47,16 @@ class RowVisibilityService {
 		}
 
 		return array_values(array_filter($userIds, static fn (string $userId): bool => $known[$userId]));
+	}
+
+	public function userSeesRowWithViewId(int $rowId, int $viewId, string $userId): bool {
+		$view = $this->viewMapper->find($viewId);
+		return $this->row2Mapper->isRowInViewPresent($rowId, $view, $userId);
+	}
+
+	public function rowBelongsToTableWithId(int $rowId, int $tableId): bool {
+		$owningTableId = $this->row2Mapper->getTableIdForRow($rowId);
+		return $owningTableId === $tableId;
 	}
 
 	public function forget(int $rowId): void {

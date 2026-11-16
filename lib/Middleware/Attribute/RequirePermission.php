@@ -16,6 +16,7 @@ class RequirePermission {
 		protected ?int $type = null,
 		protected string $typeParam = 'nodeType',
 		protected string $idParam = 'nodeId',
+		protected ?string $rowIdParam = null,
 	) {
 	}
 
@@ -33,5 +34,9 @@ class RequirePermission {
 
 	public function getType(): ?int {
 		return $this->type;
+	}
+
+	public function getRowIdParam(): ?string {
+		return $this->rowIdParam;
 	}
 }

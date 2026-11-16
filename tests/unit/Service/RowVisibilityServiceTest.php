@@ -11,14 +11,17 @@ namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\View;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\RowVisibilityService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class RowVisibilityServiceTest extends TestCase {
 	private const ROW_ID = 42;
+	private const VIEW_ID = 7;
 
 	private Row2Mapper&MockObject $row2Mapper;
+	private ViewMapper&MockObject $viewMapper;
 	private RowVisibilityService $service;
 	private View $view;
 
@@ -26,12 +29,39 @@ final class RowVisibilityServiceTest extends TestCase {
 		parent::setUp();
 
 		$this->row2Mapper = $this->createMock(Row2Mapper::class);
-		$this->service = new RowVisibilityService($this->row2Mapper);
+		$this->viewMapper = $this->createMock(ViewMapper::class);
+		$this->service = new RowVisibilityService($this->row2Mapper, $this->viewMapper);
 
 		$this->view = new View();
-		$this->view->setId(7);
+		$this->view->setId(self::VIEW_ID);
 		$this->view->setTableId(1);
 		$this->view->setFilter('[[{"columnId":-2,"operator":"is-equal","value":"@me"}]]');
+	}
+
+	public function testUserSeesRowInView(): void {
+		$this->viewMapper->expects($this->once())
+			->method('find')
+			->with(self::VIEW_ID)
+			->willReturn($this->view);
+		$this->row2Mapper->expects($this->once())
+			->method('isRowInViewPresent')
+			->with(self::ROW_ID, $this->view, 'alice')
+			->willReturn(true);
+
+		$this->assertTrue($this->service->userSeesRowWithViewId(self::ROW_ID, self::VIEW_ID, 'alice'));
+	}
+
+	public function testUserDoesNotSeeRowInView(): void {
+		$this->viewMapper->expects($this->once())
+			->method('find')
+			->with(self::VIEW_ID)
+			->willReturn($this->view);
+		$this->row2Mapper->expects($this->once())
+			->method('isRowInViewPresent')
+			->with(self::ROW_ID, $this->view, 'mallory')
+			->willReturn(false);
+
+		$this->assertFalse($this->service->userSeesRowWithViewId(self::ROW_ID, self::VIEW_ID, 'mallory'));
 	}
 
 	public function testKnownUsersAreNotResolvedAgain(): void {
