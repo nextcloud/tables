@@ -2375,8 +2375,11 @@ export interface operations {
         readonly requestBody: {
             readonly content: {
                 readonly "application/json": {
-                    /** @description Permission type that should be changed */
-                    readonly permissionType: string;
+                    /**
+                     * @description Permission type that should be changed
+                     * @enum {string}
+                     */
+                    readonly permissionType: "read" | "create" | "update" | "delete" | "manage";
                     /** @description New permission value */
                     readonly permissionValue: boolean;
                 };
@@ -2749,7 +2752,7 @@ export interface operations {
                      * @description Receiver type
                      * @enum {string}
                      */
-                    readonly receiverType: "user" | "group";
+                    readonly receiverType: "user" | "group" | "circle" | "remote";
                     /**
                      * @description Permission if receiver can read data
                      * @default false
@@ -7281,7 +7284,7 @@ export interface operations {
                     /** @description provide this parameter to set a new description */
                     readonly description?: string | null;
                     /** @description provide this parameter to set a new list of nodes. */
-                    readonly nodes?: {
+                    readonly nodes?: readonly {
                         /** Format: int64 */
                         readonly id: number;
                         /** Format: int64 */
@@ -7289,8 +7292,8 @@ export interface operations {
                         /** Format: int64 */
                         readonly permissions: number;
                         /** Format: int64 */
-                        readonly order: number;
-                    } | null;
+                        readonly order?: number;
+                    }[] | null;
                 };
             };
         };
