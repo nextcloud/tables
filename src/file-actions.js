@@ -6,8 +6,6 @@ import { registerFileAction } from '@nextcloud/files'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import tablesIcon from '@mdi/svg/svg/table-large.svg?raw'
 
-import '@nextcloud/dialogs/style.css'
-
 const validMimeTypes = [
 	'text/csv',
 	'text/html',
