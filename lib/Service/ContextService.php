@@ -356,7 +356,10 @@ class ContextService {
 		$context = $this->contextMapper->findById($contextId, $userId);
 
 		$this->atomic(function () use ($context): void {
-			$this->contextMapper->lock($context->getId());
+			// a delete that waited for another one finds the application gone
+			if (!$this->contextMapper->lock($context->getId())) {
+				throw new NotFoundError('Application ' . $context->getId() . ' does not exist');
+			}
 			$this->shareService->deleteAllForContext($context);
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());

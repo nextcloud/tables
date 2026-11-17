@@ -22,6 +22,7 @@ use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
@@ -43,6 +44,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $pageContentMapper;
 	private MockObject $userManager;
 	private MockObject $auditLogService;
+	private bool $contextExists = true;
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
 
@@ -50,6 +52,7 @@ final class ContextServiceTest extends TestCase {
 		parent::setUp();
 
 		$this->contextMapper = $this->createMock(ContextMapper::class);
+		$this->contextMapper->method('lock')->willReturnCallback(fn (): bool => $this->contextExists);
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
@@ -393,6 +396,19 @@ final class ContextServiceTest extends TestCase {
 				'contextId' => 9,
 				'ownerId' => 'alice',
 			]);
+
+		$this->service->delete(9, 'alice');
+	}
+
+	public function testASecondDeleteOfTheSameApplicationIsNotFoundAndNotLogged(): void {
+		$context = new Context();
+		$context->id = 9;
+		$this->contextMapper->method('findById')->with(9, 'alice')->willReturn($context);
+		$this->contextExists = false;
+
+		$this->contextMapper->expects($this->never())->method('delete');
+		$this->auditLogService->expects($this->never())->method('log');
+		$this->expectException(NotFoundError::class);
 
 		$this->service->delete(9, 'alice');
 	}
