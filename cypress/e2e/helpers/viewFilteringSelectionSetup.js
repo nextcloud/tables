@@ -82,6 +82,6 @@ const addRow = (title, selection, multiSelection, checked) => {
 	cy.get('[data-cy="createRowSaveButton"]').click()
 	cy.get('[data-cy="createRowModal"]').should('not.exist')
 	cy.get('body').then($body => {
-		$body.find('[class*="toast_success"] [class*="toastClose"]').each((_, el) => el.click())
+		$body.find('.toast-success .toast-close, [class*="toast_success"] [class*="toastClose"]').each((_, el) => el.click())
 	})
 }

@@ -296,7 +296,7 @@ export async function deleteTable(page: Page, title: string) {
 		.click()
 
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page.locator('[data-cy="navigationTableItem"]').filter({ hasText: title }),
 	).not.toBeVisible()
@@ -647,7 +647,7 @@ export async function createUsergroupColumn(
 
 	await page.locator('[data-cy="createColumnSaveBtn"]').click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('[data-cy="ncTable"] table tr th')
@@ -700,7 +700,7 @@ export async function createTextLinkColumn(
 		.click()
 
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -750,7 +750,7 @@ export async function createSelectionColumn(
 		.click()
 
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -807,7 +807,7 @@ export async function createSelectionMultiColumn(
 		.click()
 
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -840,7 +840,7 @@ export async function createTextLineColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -873,7 +873,7 @@ export async function createDatetimeColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -907,7 +907,7 @@ export async function createDatetimeDateColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -941,7 +941,7 @@ export async function createDatetimeTimeColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -1011,7 +1011,7 @@ export async function createNumberColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -1047,7 +1047,7 @@ export async function createNumberProgressColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -1081,7 +1081,7 @@ export async function createNumberStarsColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
@@ -1114,7 +1114,7 @@ export async function createSelectionCheckColumn(
 		.filter({ hasText: 'Save' })
 		.click()
 	await page.waitForTimeout(10)
-	await expect(page.locator('[class*="toast_success"]').first()).toBeVisible()
+	await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible()
 	await expect(
 		page
 			.locator('.custom-table table tr th .cell')
