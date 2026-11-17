@@ -55,6 +55,7 @@ namespace OCA\Tables;
  * 	title: string,
  * 	emoji: string|null,
  * 	ownership: string,
+ *  teamId: string|null,
  * 	ownerDisplayName: string,
  * 	createdBy: string,
  * 	createdAt: string,

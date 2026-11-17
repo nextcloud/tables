@@ -855,6 +855,7 @@
                     "title",
                     "emoji",
                     "ownership",
+                    "teamId",
                     "ownerDisplayName",
                     "createdBy",
                     "createdAt",
@@ -890,6 +891,10 @@
                     },
                     "ownership": {
                         "type": "string"
+                    },
+                    "teamId": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "ownerDisplayName": {
                         "type": "string"
@@ -7202,6 +7207,12 @@
                                         "type": "string",
                                         "default": "custom",
                                         "description": "Template to use if wanted"
+                                    },
+                                    "teamId": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Team to attach the table to"
                                     }
                                 }
                             }
@@ -7253,6 +7264,44 @@
                     },
                     "400": {
                         "description": "Invalid request data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
                         "content": {
                             "application/json": {
                                 "schema": {

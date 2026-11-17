@@ -33,6 +33,8 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setDescription(string $description)
  * @method getOwnership(): ?string
  * @method setOwnership(string $ownership)
+ * @method getTeamId(): ?string
+ * @method setTeamId(?string $teamId)
  * @method getOwnerDisplayName(): string
  * @method setOwnerDisplayName(string $ownerDisplayName)
  * @method getIsShared(): bool
@@ -73,6 +75,7 @@ class Table extends EntitySuper implements JsonSerializable {
 	protected ?string $title = null;
 	protected ?string $emoji = null;
 	protected ?string $ownership = null;
+	protected ?string $teamId = null;
 	protected ?string $createdBy = null;
 	protected ?string $createdAt = null;
 	protected ?string $lastEditBy = null;
@@ -104,6 +107,7 @@ class Table extends EntitySuper implements JsonSerializable {
 		$this->addType('uuid', 'string');
 		$this->addType('archived', 'boolean');
 		$this->addType('externalId', 'integer');
+		$this->addType('teamId', 'string');
 	}
 
 	public function setter(string $name, array $args): void {
@@ -140,6 +144,7 @@ class Table extends EntitySuper implements JsonSerializable {
 			'title' => $this->title ?: '',
 			'emoji' => $this->emoji,
 			'ownership' => $this->ownership ?: '',
+			'teamId' => $this->teamId,
 			'ownerDisplayName' => $this->ownerDisplayName ?: '',
 			'createdBy' => $this->createdBy ?: '',
 			'createdAt' => $this->createdAt ?: '',

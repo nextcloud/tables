@@ -11,6 +11,7 @@ use Exception;
 use OC\OCM\OCMSignatoryManager;
 use OCA\Analytics\Datasource\DatasourceEvent;
 use OCA\Circles\Events\CircleDestroyedEvent;
+use OCA\Circles\Events\RemovingCircleMemberEvent;
 use OCA\Tables\Capabilities;
 use OCA\Tables\Config\ConfigLexicon;
 use OCA\Tables\Event\RowDeletedEvent;
@@ -25,6 +26,7 @@ use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\ReceiverCleanupListener;
 use OCA\Tables\Listener\ResourceTypeRegisterListener;
 use OCA\Tables\Listener\TablesReferenceListener;
+use OCA\Tables\Listener\TeamOwnershipListener;
 use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Listener\WhenRowDeletedAuditLogListener;
 use OCA\Tables\Listener\WhenTableDeletedAuditLogListener;
@@ -108,6 +110,8 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(UserDeletedEvent::class, ReceiverCleanupListener::class);
 		$context->registerEventListener(GroupDeletedEvent::class, ReceiverCleanupListener::class);
 		$context->registerEventListener(CircleDestroyedEvent::class, ReceiverCleanupListener::class);
+		$context->registerEventListener(CircleDestroyedEvent::class, TeamOwnershipListener::class);
+		$context->registerEventListener(RemovingCircleMemberEvent::class, TeamOwnershipListener::class);
 		$context->registerEventListener(LocalOCMDiscoveryEvent::class, ResourceTypeRegisterListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);

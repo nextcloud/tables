@@ -29,6 +29,7 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -385,19 +386,26 @@ class ApiTablesController extends AOCSController {
 	 * @param string|null $emoji Emoji for the table
 	 * @param string|null $description Description for the table
 	 * @param string $template Template to use if wanted
+	 * @param string|null $teamId Team to attach the table to
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 * 400: Invalid request data
+	 * 403: No permissions
 	 */
 	#[NoAdminRequired]
-	public function create(string $title, ?string $emoji, ?string $description, string $template = 'custom'): DataResponse {
+	#[UserRateLimit(limit: 20, period: 60)]
+	public function create(string $title, ?string $emoji, ?string $description, string $template = 'custom', ?string $teamId = null): DataResponse {
 		try {
-			return new DataResponse($this->service->create($title, $template, $emoji, $description)->jsonSerialize());
+			return new DataResponse($this->service->create($title, $template, $emoji, $description, teamId: $teamId)->jsonSerialize());
 		} catch (\InvalidArgumentException $e) {
 			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
 		} catch (InternalError|Exception $e) {
 			return $this->handleError($e);
 		}

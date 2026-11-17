@@ -8,9 +8,12 @@
 namespace OCA\Tables\Helper;
 
 use OCA\Circles\CirclesManager;
+use OCA\Circles\Db\CircleRequest;
+use OCA\Circles\Db\MemberRequest;
 use OCA\Circles\Model\Circle;
 use OCA\Circles\Model\Member;
 use OCA\Circles\Model\Probes\CircleProbe;
+use OCA\Tables\Errors\InternalError;
 use OCP\App\IAppManager;
 use OCP\IL10N;
 use OCP\Server;
@@ -23,6 +26,8 @@ use Throwable;
 class CircleHelper {
 	private bool $circlesEnabled;
 	private ?CirclesManager $circlesManager;
+	private ?MemberRequest $memberRequest = null;
+	private ?CircleRequest $circleRequest = null;
 	private array $circleDisplayNames = [];
 	private array $federatedUsers = [];
 	private array $unreachableUserIds = [];
@@ -145,6 +150,46 @@ class CircleHelper {
 			return false;
 		}
 		return in_array($circleId, $userCircleIds, true);
+	}
+
+	public function findSuccessorUserId(string $circleId, string $excludeUserId): ?string {
+		if (!$this->circlesEnabled) {
+			throw new InternalError('Cannot find a table owner while Circles is unavailable');
+		}
+
+		try {
+			// Do not replace the Circles session while a membership event is running.
+			$circleRequest = $this->circleRequest ??= Server::get(CircleRequest::class);
+			$circle = $circleRequest->getCircle($circleId);
+			if ($circle->hasOwner() && $this->isEligibleSuccessor($circle->getOwner(), $excludeUserId)) {
+				return $circle->getOwner()->getUserId();
+			}
+
+			$memberRequest = $this->memberRequest ??= Server::get(MemberRequest::class);
+			$successor = null;
+			$highestLevel = -1;
+			foreach ($memberRequest->getMembers($circleId) as $member) {
+				if (!$this->isEligibleSuccessor($member, $excludeUserId)) {
+					continue;
+				}
+				if ($member->getLevel() > $highestLevel) {
+					$successor = $member->getUserId();
+					$highestLevel = $member->getLevel();
+				}
+			}
+			return $successor;
+		} catch (Throwable $e) {
+			$this->logger->error('Could not find a successor for a team table', ['circleId' => $circleId, 'exception' => $e]);
+			throw new InternalError('Could not find a successor for a team table', previous: $e);
+		}
+	}
+
+	private function isEligibleSuccessor(Member $member, string $excludeUserId): bool {
+		return $member->getUserType() === Member::TYPE_USER
+			&& $member->isLocal()
+			&& $member->getStatus() === Member::STATUS_MEMBER
+			&& $member->getUserId() !== ''
+			&& $member->getUserId() !== $excludeUserId;
 	}
 
 }

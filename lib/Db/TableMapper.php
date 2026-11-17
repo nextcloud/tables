@@ -68,6 +68,39 @@ class TableMapper extends QBMapper {
 	}
 
 	/**
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
+	public function findForUpdate(int $id): Table {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		if ($this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
+			$qb->forUpdate();
+		}
+		$table = $this->findEntity($qb);
+		$this->cache[(string)$id] = $table;
+		return $table;
+	}
+
+	/**
+	 * @return Table[]
+	 * @throws Exception
+	 */
+	public function findAllByTeamId(string $teamId, ?string $ownerUserId = null): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('team_id', $qb->createNamedParameter($teamId, IQueryBuilder::PARAM_STR)));
+		if ($ownerUserId !== null) {
+			$qb->andWhere($qb->expr()->eq('ownership', $qb->createNamedParameter($ownerUserId, IQueryBuilder::PARAM_STR)));
+		}
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @param int[] $ids
 	 * @return array<int, Table> indexed by table id
 	 */
