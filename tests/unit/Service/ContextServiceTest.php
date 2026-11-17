@@ -26,6 +26,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
+use OCP\DB\Exception;
 use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\INavigationManager;
@@ -202,6 +203,68 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(10, $updatedOrders[502]);
 		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
 		self::assertSame(10, $updatedContext->getPages()[301]['content'][502]['order']);
+	}
+
+	public function testAFailedOrderWriteFailsTheUpdateAndIsNotLogged(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([
+			101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1],
+			102 => ['id' => 102, 'node_type' => 0, 'node_id' => 12, 'permissions' => 1],
+		]);
+		$context->setPages([301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'content' => [
+			501 => ['id' => 501, 'node_rel_id' => 101, 'order' => 10],
+			502 => ['id' => 502, 'node_rel_id' => 102, 'order' => 20],
+		]]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->pageContentMapper->method('findById')->willReturnCallback(fn (int $contentId): PageContent => $this->buildPageContent($contentId, 301, $contentId - 400, 10));
+		$this->pageContentMapper->method('update')->willThrowException(new Exception('serialization failure'));
+		$this->auditLogService->expects($this->never())->method('log');
+
+		$this->expectException(Exception::class);
+		$this->service->update(7, 'user-1', null, null, null, [
+			['id' => 12, 'type' => 0, 'permissions' => 1],
+			['id' => 11, 'type' => 0, 'permissions' => 1],
+		]);
+	}
+
+	public function testTheAuditEntryOfAnAddedNodeHasItsPermissions(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([]);
+		$context->setPages([301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'content' => []]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		// the added relation in the shape the application holds its nodes
+		$added = new class extends ContextNodeRelation {
+			public function jsonSerialize(): array {
+				return ['id' => 103, 'context_id' => 7, 'node_id' => 13, 'node_type' => 0, 'permissions' => 5];
+			}
+		};
+		$added->id = 103;
+		$added->setContextId(7);
+		$this->contextNodeRelMapper->method('insert')->willReturn($added);
+		$content = new class extends PageContent {
+			public function jsonSerialize(): array {
+				return ['id' => 503, 'page_id' => 301, 'node_rel_id' => 103, 'order' => 100];
+			}
+		};
+		$content->id = 503;
+		$content->setPageId(301);
+		$this->pageContentMapper->method('insert')->willReturn($content);
+		$this->pageContentMapper->method('findById')->with(503)->willReturn($content);
+		$this->pageContentMapper->method('update')->willReturnArgument(0);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [['nodeType' => 0, 'nodeId' => 13, 'permissions' => 5]],
+				'removedNodes' => [],
+				'updatedNodes' => [],
+			]);
+
+		$this->service->update(7, 'user-1', null, null, null, [['id' => 13, 'type' => 0, 'permissions' => 5]]);
 	}
 
 	public function testUpdateLogsRemovedNodes(): void {

@@ -172,13 +172,16 @@ class ContextService {
 	 */
 	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
 		// a refused or failing request changes nothing
-		return $this->atomic(fn (): Context => $this->updateInTransaction($contextId, $userId, $name, $iconName, $description, $nodes), $this->dbc);
+		[$context, $changes] = $this->atomic(fn (): array => $this->updateInTransaction($contextId, $userId, $name, $iconName, $description, $nodes), $this->dbc);
+		$this->auditLogService->log(Operation::ContextUpdated, 'Tables application with ID %s was updated', ['contextId' => $contextId] + $changes);
+		return $context;
 	}
 
 	/**
+	 * @return array{Context, array{addedNodes: list<array{nodeType: int, nodeId: int, permissions: int}>, removedNodes: list<array{nodeType: int, nodeId: int}>, updatedNodes: list<array{nodeType: int, nodeId: int, previousPermissions: int, permissions: int}>}} the saved application and what changed, for the audit log
 	 * @throws Exception|PermissionError|NotFoundError
 	 */
-	private function updateInTransaction(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
+	private function updateInTransaction(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): array {
 		$this->contextMapper->lock($contextId);
 		$context = $this->contextMapper->findById($contextId, $userId);
 
@@ -265,7 +268,7 @@ class ContextService {
 			foreach ($nodesBeingAdded as $node) {
 				$nodeType = (int)($node['type']);
 				$nodeId = (int)($node['id']);
-				$addedNodes[] = ['nodeType' => $nodeType, 'nodeId' => $nodeId];
+				$addedNodes[] = ['nodeType' => $nodeType, 'nodeId' => $nodeId, 'permissions' => (int)$node['permissions']];
 
 				/** @var ContextNodeRelation $addedNode */
 				/** @var PageContent $updatedContent */
@@ -312,9 +315,6 @@ class ContextService {
 							$contentId = $relIdToContentId[$relId];
 							$newOrder = ($index + 1) * 10;
 
-							// Optimistic check: if order is already correct in memory, we might skip?
-							// However, simpler to just add to update list, updateContentOrder should handle exceptions.
-							// But to avoid DB writes if nothing changed:
 							if ($currentPages[$startPageId]['content'][$contentId]['order'] !== $newOrder) {
 								$contentsToUpdate[] = [
 									'id' => $contentId,
@@ -327,8 +327,9 @@ class ContextService {
 					}
 				}
 
-				if (!empty($contentsToUpdate)) {
-					$this->updateContentOrder($startPageId, $contentsToUpdate);
+				// a failed write fails the update, so the answer never shows an order that was not saved
+				foreach ($contentsToUpdate as $content) {
+					$this->updatePageContent($startPageId, $content['id'], $content['order']);
 				}
 			}
 		}
@@ -338,14 +339,12 @@ class ContextService {
 			$context->setNodes($currentNodes);
 			$context->setPages($currentPages);
 		}
-		$this->auditLogService->log(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
-			'contextId' => $contextId,
+
+		return [$context, [
 			'addedNodes' => $addedNodes,
 			'removedNodes' => $removedNodes,
 			'updatedNodes' => $updatedNodes,
-		]);
-
-		return $context;
+		]];
 	}
 
 	/**
