@@ -453,6 +453,7 @@ class ShareService extends SuperService {
 				$this->federationService->sendShare($newShare);
 			} catch (Throwable $e) {
 				$this->logger->error($e->getMessage());
+				$this->mapper->delete($newShare);
 				throw new InternalError($e->getMessage());
 			}
 		}
