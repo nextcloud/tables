@@ -117,6 +117,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../../../store/store.js'
+import { useDataStore } from '../../../store/data.js'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
@@ -175,15 +176,18 @@ export default {
 	watch: {
 		table() {
 			this.loadShares()
+			this.refreshTableViewCounts(this.table.id)
 		},
 	},
 
 	mounted() {
 		this.loadShares()
+		this.refreshTableViewCounts(this.table.id)
 	},
 
 	methods: {
 		...mapActions(useTablesStore, ['updateTable']),
+		...mapActions(useDataStore, ['refreshTableViewCounts']),
 		emit,
 		niceDateTime(value) {
 			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
