@@ -3019,6 +3019,13 @@
                                 "properties": {
                                     "permissionType": {
                                         "type": "string",
+                                        "enum": [
+                                            "read",
+                                            "create",
+                                            "update",
+                                            "delete",
+                                            "manage"
+                                        ],
                                         "description": "Permission type that should be changed"
                                     },
                                     "permissionValue": {
@@ -3566,7 +3573,9 @@
                                         "type": "string",
                                         "enum": [
                                             "user",
-                                            "group"
+                                            "group",
+                                            "circle",
+                                            "remote"
                                         ],
                                         "description": "Receiver type"
                                     },
@@ -12699,31 +12708,33 @@
                                         "description": "provide this parameter to set a new description"
                                     },
                                     "nodes": {
-                                        "type": "object",
+                                        "type": "array",
                                         "nullable": true,
                                         "description": "provide this parameter to set a new list of nodes.",
-                                        "required": [
-                                            "id",
-                                            "type",
-                                            "permissions",
-                                            "order"
-                                        ],
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "type": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "permissions": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            },
-                                            "order": {
-                                                "type": "integer",
-                                                "format": "int64"
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "type",
+                                                "permissions"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "type": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "permissions": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "order": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                }
                                             }
                                         }
                                     }
