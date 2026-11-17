@@ -84,6 +84,8 @@ OC.L10N.register(
     "Copy link" : "คัดลอกลิงก์",
     "Confirm" : "ยืนยัน",
     "Select" : "เลือก",
+    "Clock" : "นาฬิกา",
+    "Folder" : "โฟลเดอร์",
     "This year" : "ปีนี้",
     "This month" : "เดือนนี้",
     "This week" : "สัปดาห์นี้",

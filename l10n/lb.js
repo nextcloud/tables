@@ -65,6 +65,8 @@ OC.L10N.register(
     "Copy link" : "Link kopéieren",
     "Confirm" : "Konfirméieren",
     "Select" : "Auswielen",
+    "Folder" : "Dossier",
+    "Key" : "Schlëssel",
     "seconds ago" : "Sekonnen hier"
 },
 "nplurals=2; plural=(n != 1);");

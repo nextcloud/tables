@@ -126,6 +126,8 @@ OC.L10N.register(
     "Confirm" : "Confirm",
     "Content" : "Tarkib",
     "Select" : "Select",
+    "Folder" : "Jild",
+    "Key" : "Kalit",
     "This year" : "Shu yil",
     "This month" : "Shu oy",
     "This week" : "Shu hafta",

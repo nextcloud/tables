@@ -63,6 +63,7 @@ OC.L10N.register(
     "Copy link" : "Eilañ al liamm",
     "Confirm" : "Kadarnañ",
     "Select" : "Diuzañ",
+    "Star" : "Kregiñ",
     "This week" : "Er sizhun-mañ",
     "ID" : "ID",
     "seconds ago" : "eilenn zo",

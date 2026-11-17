@@ -46,6 +46,7 @@ OC.L10N.register(
     "Options" : "ជម្រើស",
     "Default" : "លំនាំ​ដើម",
     "Copy link" : "ចម្លងតំណ",
+    "Folder" : "ថត",
     "seconds ago" : "វិនាទី​មុន"
 },
 "nplurals=1; plural=0;");

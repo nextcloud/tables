@@ -111,6 +111,8 @@ OC.L10N.register(
     "Go to previous page" : "Go to previous page",
     "Confirm" : "Confirm",
     "Select" : "Select",
+    "Key" : "Key",
+    "Train" : "Train",
     "This year" : "This year",
     "This month" : "This month",
     "This week" : "This week",

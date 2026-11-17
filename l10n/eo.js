@@ -107,6 +107,7 @@ OC.L10N.register(
     "Confirm" : "Konfirmi",
     "Content" : "Enhavo",
     "Select" : "Elekti",
+    "Clock" : "Horloĝo",
     "This year" : "Ĉi jaro",
     "This week" : "Ĉi semajno",
     "ID" : "Identigilo",

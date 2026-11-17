@@ -114,6 +114,8 @@ OC.L10N.register(
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
     "Select" : "Përzgjidh",
+    "Clock" : "Ora",
+    "Folder" : "Dosje",
     "This month" : "Këtë muaj",
     "This week" : "Këtë javë",
     "ID" : "ID",
