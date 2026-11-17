@@ -65,7 +65,7 @@ test.describe('Test column number', () => {
 		await expect(page.locator('.number-input__hint').first()).toContainText('Enter a value between')
 		await expect(page.locator('.number-input__field').first()).toHaveAttribute('aria-invalid', 'true')
 		await page.locator('[data-cy="createRowSaveButton"]').click()
-		await expect(page.locator('[class*="toast_error"]').first()).toBeVisible()
+		await expect(page.locator('.toast-error, [class*="toast_error"]').first()).toBeVisible()
 		await expect(page.locator('[data-cy="createRowModal"]')).toBeVisible()
 		await expect(page.locator('.custom-table table tr td div').filter({ hasText: 'PRE20.0SUF' })).toHaveCount(0)
 
@@ -77,7 +77,7 @@ test.describe('Test column number', () => {
 		await expect(page.locator('.number-input__hint').first()).toContainText('Enter a value between')
 		await expect(page.locator('.number-input__field').first()).toHaveAttribute('aria-invalid', 'true')
 		await page.locator('[data-cy="createRowSaveButton"]').click()
-		await expect(page.locator('[class*="toast_error"]').first()).toBeVisible()
+		await expect(page.locator('.toast-error, [class*="toast_error"]').first()).toBeVisible()
 		await expect(page.locator('.custom-table table tr td div').filter({ hasText: 'PRE2.0SUF' })).toHaveCount(0)
 
 		await expect(page.locator('[data-cy="customTableRow"]')).toHaveCount(1)
