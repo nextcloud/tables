@@ -37,7 +37,10 @@ describe('Import Export Scheme', () => {
 		cy.get('button').contains('Import').click()
 		cy.get('.app-navigation-toggle-wrapper').should('be.visible').click()
 		cy.get('.app-navigation__list').contains('ToDo list').should('exist').parent().find('button.icon-collapse').click()
-		cy.get('.app-navigation__list').contains('Unfinished Tasks').should('exist').click().parent().find('button.action-item__menutoggle').click()
+		cy.get('.app-navigation__list').contains('Unfinished Tasks').should('exist').click()
+		// On mobile viewports, clicking a navigation entry closes the navigation, so reopen it
+		cy.get('.app-navigation-toggle-wrapper').should('be.visible').click()
+		cy.get('.app-navigation__list').contains('Unfinished Tasks').parent().find('button.action-item__menutoggle').click()
 		cy.get('.action-button').contains('Edit view').click()
 		const columns = ['Target', 'Description', 'Progress', 'Proofed', 'Comments', 'Task']
 		for (let i = 0; i < columns.length; i++) {
@@ -55,6 +58,8 @@ describe('Import Export Scheme', () => {
 		cy.get('.app-navigation-toggle-wrapper').should('be.visible').click()
 		cy.get('.app-navigation__list').contains('ToDo list').click()
 		cy.get('.row.first-row').should('be.visible')
+		// On mobile viewports, clicking a navigation entry closes the navigation, so reopen it
+		cy.get('.app-navigation-toggle-wrapper').should('be.visible').click()
 		cy.get('.app-navigation__list').contains('ToDo list').trigger('mouseover')
 		cy.get('.app-navigation-entry__actions').eq(2).trigger('mouseover').click()
 		cy.get('.action-button__text').contains('Export').click()
