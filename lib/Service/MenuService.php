@@ -82,6 +82,7 @@ class MenuService {
 	 */
 	public function create(int $contextId, ?string $title, ?string $icon, ?string $description, ?array $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $title, $icon, $description, $target, $userId): array {
+			$this->lockApplication($contextId);
 			$context = $this->getManageableContext($contextId, $userId);
 			$items = $this->menuItemMapper->findByContextId($contextId);
 			if (count($items) >= MenuItem::MAX_ITEMS_PER_APPLICATION) {
@@ -118,6 +119,7 @@ class MenuService {
 	 */
 	public function update(int $contextId, int $itemId, ?string $title, ?string $icon, ?string $description, ?array $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $itemId, $title, $icon, $description, $target, $userId): array {
+			$this->lockApplication($contextId);
 			[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
 
 			if ($title !== null) {
@@ -155,15 +157,14 @@ class MenuService {
 	 * @throws Exception
 	 */
 	public function delete(int $contextId, int $itemId, string $userId): array {
-		[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
-		$deleted = $this->serializeOne($context, $item);
-
-		$this->atomic(function () use ($item): void {
+		return $this->atomic(function () use ($contextId, $itemId, $userId): array {
+			$this->lockApplication($contextId);
+			[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
+			$deleted = $this->serializeOne($context, $item);
 			$this->menuItemMapper->clearParent($item->getId());
 			$this->menuItemMapper->delete($item);
+			return $deleted;
 		}, $this->dbc);
-
-		return $deleted;
 	}
 
 	/**
@@ -183,6 +184,7 @@ class MenuService {
 		$context = $this->getManageableContext($contextId, $userId);
 
 		$this->atomic(function () use ($context, $order): void {
+			$this->lockApplication($context->getId());
 			$items = [];
 			foreach ($this->visibleItems($context, $this->menuItemMapper->findByContextId($context->getId())) as $item) {
 				$items[$item->getId()] = $item;
@@ -233,6 +235,20 @@ class MenuService {
 	 * @throws PermissionError
 	 * @throws Exception
 	 */
+	/**
+	 * Locks the application as the first statement of a menu write, so the menu's rules
+	 * are checked on what no other write changes meanwhile, and an item is never added to
+	 * an application that is being deleted.
+	 *
+	 * @throws NotFoundError
+	 * @throws Exception
+	 */
+	private function lockApplication(int $contextId): void {
+		if (!$this->contextMapper->lock($contextId)) {
+			throw new NotFoundError('Application ' . $contextId . ' does not exist');
+		}
+	}
+
 	private function getManageableContext(int $contextId, string $userId): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
 		if (!$this->permissionsService->canManageContext($context, $userId)) {
