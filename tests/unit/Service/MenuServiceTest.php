@@ -20,7 +20,6 @@ use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Db\WidgetMapper;
-use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -67,7 +66,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$contextMapper = new ContextMapper($this->connectionAdapter, $userHelper, $this->createMock(GroupHelper::class));
 		$pageMapper = new PageMapper($this->connectionAdapter);
 		$pageContentMapper = new PageContentMapper($this->connectionAdapter);
-		$widgetService = new WidgetService(new WidgetMapper($this->connectionAdapter), new WidgetSourceMapper($this->connectionAdapter), $this->connectionAdapter);
+		$widgetService = new WidgetService(new WidgetMapper($this->connectionAdapter), new ContextNodeRelationMapper($this->connectionAdapter), $this->connectionAdapter);
 		$this->menuItemMapper = new MenuItemMapper($this->connectionAdapter);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->permissionsService->method('canManageNodeById')->willReturn(true);
