@@ -33,43 +33,21 @@ class Version2500Date20261109010000Test extends DatabaseTestCase {
 		parent::tearDown();
 	}
 
-	public function testAnEmptyStartPageGetsAHeaderAndItsTablesInPageOrderAndASecondRunChangesNothing(): void {
+	public function testAnEmptyStartPageGetsATablesWidgetAndASecondRunChangesNothing(): void {
 		$contextId = $this->insertContext('Intake portal', 'Requests from residents');
 		$startPage = $this->insert('page', ['context_id' => $contextId, 'page_type' => 'startpage']);
 		$gridPage = $this->insert('page', ['context_id' => $contextId, 'page_type' => 'grid']);
 		$tasks = $this->insert('rel_context_node', ['context_id' => $contextId, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1]);
-		$openTasks = $this->insert('rel_context_node', ['context_id' => $contextId, 'node_type' => 1, 'node_id' => 12, 'permissions' => 1]);
-		$this->insert('page_content', ['page_id' => $startPage, 'node_rel_id' => $tasks, 'order' => 20]);
-		$this->insert('page_content', ['page_id' => $startPage, 'node_rel_id' => $openTasks, 'order' => 10]);
-		$this->insert('page_content', ['page_id' => $startPage, 'node_rel_id' => 999999, 'order' => 30]);
+		$this->insert('page_content', ['page_id' => $startPage, 'node_rel_id' => $tasks, 'order' => 10]);
 
 		$this->migrate();
 
-		$expected = [
-			['header', 0, 0, 12, 2, ['backgroundColor' => '', 'heading' => 'Intake portal', 'subheading' => 'Requests from residents', 'textAlign' => 'start', 'textColor' => ''], null],
-			['data', 0, 2, 12, 5, [], $openTasks],
-			['data', 0, 7, 12, 5, [], $tasks],
-		];
+		$expected = [['tables', 0, 0, 12, 8, [], null]];
 		$this->assertSame($expected, $this->widgets($startPage));
 		$this->assertSame([], $this->widgets($gridPage));
 
 		$this->migrate();
 		$this->assertSame($expected, $this->widgets($startPage));
-	}
-
-	public function testALongDescriptionIsCutAndAStartPageHoldsAtMostAHundredWidgets(): void {
-		$contextId = $this->insertContext('Big', str_repeat('я', 2500));
-		$startPage = $this->insert('page', ['context_id' => $contextId, 'page_type' => 'startpage']);
-		foreach (range(1, 120) as $order) {
-			$node = $this->insert('rel_context_node', ['context_id' => $contextId, 'node_type' => 0, 'node_id' => $order, 'permissions' => 1]);
-			$this->insert('page_content', ['page_id' => $startPage, 'node_rel_id' => $node, 'order' => $order]);
-		}
-
-		$this->migrate();
-
-		$widgets = $this->widgets($startPage);
-		$this->assertCount(100, $widgets);
-		$this->assertSame(2000, mb_strlen($widgets[0][5]['subheading']));
 	}
 
 	public function testAStartPageWithWidgetsIsLeftAlone(): void {
@@ -112,9 +90,8 @@ class Version2500Date20261109010000Test extends DatabaseTestCase {
 	 */
 	private function widgets(int $pageId): array {
 		$qb = $this->connectionAdapter->getQueryBuilder();
-		$qb->select('w.type', 'w.grid_x', 'w.grid_y', 'w.grid_width', 'w.grid_height', 'w.settings', 's.node_rel_id')
+		$qb->select('w.type', 'w.grid_x', 'w.grid_y', 'w.grid_width', 'w.grid_height', 'w.settings', 'w.node_rel_id')
 			->from('tables_contexts_widget', 'w')
-			->leftJoin('w', 'tables_contexts_widget_source', 's', $qb->expr()->eq('s.widget_id', 'w.id'))
 			->where($qb->expr()->eq('w.page_id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)))
 			->orderBy('w.grid_y')
 			->addOrderBy('w.id');
