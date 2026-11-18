@@ -26,27 +26,12 @@
 				:clearable="false"
 				label="label"
 				@update:model-value="option => set(name, option?.value ?? property.default)" />
-			<div v-else-if="property.type === 'color'" class="schema-form__color">
-				<NcColorPicker :model-value="colorValue(name)"
-					advanced-fields
-					clearable
-					@update:model-value="color => set(name, color ?? '')">
-					<NcButton variant="secondary">
-						<template #icon>
-							<span class="schema-form__swatch" :style="{ backgroundColor: colorValue(name) ?? 'transparent' }" />
-						</template>
-						{{ property.title }}
-					</NcButton>
-				</NcColorPicker>
-				<span class="schema-form__hint">{{ colorValue(name) ?? t('tables', 'Theme color') }}</span>
-			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { NcButton, NcColorPicker, NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
-import { isHexColor } from '../../shared/utils/gridColors.js'
+import { NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
 
 /**
  * Renders the settings form of a widget from the schema of its type, so a
@@ -55,8 +40,6 @@ import { isHexColor } from '../../shared/utils/gridColors.js'
 export default {
 	name: 'SchemaForm',
 	components: {
-		NcButton,
-		NcColorPicker,
 		NcSelect,
 		NcTextArea,
 		NcTextField,
@@ -95,13 +78,6 @@ export default {
 			this.$emit('update:modelValue', { ...this.modelValue, [name]: value })
 		},
 		/**
-		 * @param {string} name property name
-		 * @return {string|undefined} the stored color, or undefined for the theme color
-		 */
-		colorValue(name) {
-			return isHexColor(this.value(name)) ? this.value(name) : undefined
-		},
-		/**
 		 * @param {object} property the enum property
 		 * @param {string} value the stored value
 		 * @return {object|null} the option of the value, else the option of the default
@@ -121,24 +97,6 @@ export default {
 
 	&__input {
 		width: 100%;
-	}
-
-	&__color {
-		display: flex;
-		align-items: center;
-		gap: calc(3 * var(--default-grid-baseline));
-	}
-
-	&__swatch {
-		display: inline-block;
-		width: calc(5 * var(--default-grid-baseline));
-		height: calc(5 * var(--default-grid-baseline));
-		border: 1px solid var(--color-border-maxcontrast);
-		border-radius: var(--border-radius);
-	}
-
-	&__hint {
-		color: var(--color-text-maxcontrast);
 	}
 }
 </style>
