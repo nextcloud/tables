@@ -26,10 +26,11 @@ class GridWidgetTypesTest extends TestCase {
 
 	public function testSanitizeFillsDefaultsAndDropsUnknownSettings(): void {
 		$this->assertSame(
-			['heading' => 'Welcome', 'subheading' => '', 'textAlign' => 'center', 'backgroundColor' => '#fff', 'textColor' => '#A0b1C2'],
-			$this->types->sanitizeSettings('header', ['heading' => 'Welcome', 'textAlign' => 'center', 'backgroundColor' => '#fff', 'textColor' => '#A0b1C2', 'script' => '<b>']),
+			['heading' => 'Welcome', 'subheading' => '', 'textAlign' => 'center', 'color' => 'warning'],
+			$this->types->sanitizeSettings('header', ['heading' => 'Welcome', 'textAlign' => 'center', 'color' => 'warning', 'script' => '<b>']),
 		);
-		$this->assertSame(['heading' => 'Welcome', 'subheading' => '', 'textAlign' => 'start', 'backgroundColor' => '', 'textColor' => ''], $this->types->sanitizeSettings('header', ['heading' => 'Welcome']));
+		$this->assertSame(['heading' => 'Welcome', 'subheading' => '', 'textAlign' => 'start', 'color' => 'primary'], $this->types->sanitizeSettings('header', ['heading' => 'Welcome']));
+		$this->assertSame([], $this->types->sanitizeSettings('tables', null));
 		$this->assertSame(['text' => ''], $this->types->sanitizeSettings('text', null));
 		$this->assertSame([], $this->types->sanitizeSettings('data', ['pageSize' => 10]));
 	}
@@ -52,9 +53,7 @@ class GridWidgetTypesTest extends TestCase {
 			'required heading missing' => ['header', ['heading' => '  '], 'header.heading is required'],
 			'required heading of a no-break space' => ['header', ['heading' => "\u{00A0}\u{200B}"], 'header.heading is required'],
 			'text not a string' => ['text', ['text' => 3], 'text.text must be a string'],
-			'color not hex' => ['header', ['heading' => 'A', 'textColor' => 'red'], 'header.textColor must be a hex color'],
-			'color of four digits' => ['header', ['heading' => 'A', 'textColor' => '#abcd'], 'header.textColor must be a hex color'],
-			'color with a trailing newline' => ['header', ['heading' => 'A', 'textColor' => "#abc\n"], 'header.textColor must be a hex color'],
+			'a free color' => ['header', ['heading' => 'A', 'color' => '#123456'], 'header.color must be one of'],
 			'alignment unknown' => ['header', ['heading' => 'A', 'textAlign' => 'left'], 'header.textAlign must be one of'],
 			'settings too large' => ['text', ['text' => str_repeat('a', 60000)], 'take more than 60000 bytes'],
 			'text not utf-8' => ['text', ['text' => "\xff"], 'must be valid UTF-8 text'],

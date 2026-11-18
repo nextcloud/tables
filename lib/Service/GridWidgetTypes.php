@@ -23,7 +23,7 @@ use OCP\IL10N;
  *
  * @psalm-import-type TablesWidgetSettingValue from Widget
  * @psalm-type TablesWidgetSettingSchema = array{
- *   type: 'string'|'text'|'color'|'enum',
+ *   type: 'string'|'text'|'enum',
  *   title: string,
  *   default: TablesWidgetSettingValue,
  *   options?: list<array{value: string, label: string}>,
@@ -42,6 +42,7 @@ class GridWidgetTypes {
 	public const TYPE_HEADER = 'header';
 	public const TYPE_TEXT = 'text';
 	public const TYPE_DATA = 'data';
+	public const TYPE_TABLES = 'tables';
 
 	public const GRID_COLUMNS = 12;
 	public const GRID_MAX_HEIGHT = 100;
@@ -49,8 +50,6 @@ class GridWidgetTypes {
 	public const MAX_WIDGETS_PER_PAGE = 100;
 	/** Bytes of the settings as stored JSON. */
 	public const SETTINGS_MAX_BYTES = 60000;
-
-	private const HEX_COLOR = '/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/D';
 
 	public function __construct(
 		private readonly IL10N $l10n,
@@ -76,8 +75,14 @@ class GridWidgetTypes {
 						['value' => 'center', 'label' => $this->l10n->t('Centered')],
 						['value' => 'end', 'label' => $this->l10n->t('End')],
 					]],
-					'backgroundColor' => ['type' => 'color', 'title' => $this->l10n->t('Background color'), 'default' => ''],
-					'textColor' => ['type' => 'color', 'title' => $this->l10n->t('Text color'), 'default' => ''],
+					// colour pairs of the theme, so the header stays readable in light, dark and high contrast
+					'color' => ['type' => 'enum', 'title' => $this->l10n->t('Color'), 'default' => 'primary', 'options' => [
+						['value' => 'primary', 'label' => $this->l10n->t('Primary')],
+						['value' => 'neutral', 'label' => $this->l10n->t('Neutral')],
+						['value' => 'success', 'label' => $this->l10n->t('Success')],
+						['value' => 'warning', 'label' => $this->l10n->t('Warning')],
+						['value' => 'error', 'label' => $this->l10n->t('Error')],
+					]],
 				],
 			],
 			self::TYPE_TEXT => [
@@ -96,6 +101,14 @@ class GridWidgetTypes {
 				'defaultWidth' => 12,
 				'defaultHeight' => 5,
 				'hasSource' => true,
+				'settings' => [],
+			],
+			self::TYPE_TABLES => [
+				'type' => self::TYPE_TABLES,
+				'title' => $this->l10n->t('Tables and views'),
+				'defaultWidth' => 12,
+				'defaultHeight' => 8,
+				'hasSource' => false,
 				'settings' => [],
 			],
 		];
@@ -150,7 +163,6 @@ class GridWidgetTypes {
 	private function sanitizeValue(string $label, array $property, mixed $value): string {
 		return match ($property['type']) {
 			'string', 'text' => $this->sanitizeText($label, $value, $property['required'] ?? false),
-			'color' => $this->sanitizeColor($label, $value),
 			'enum' => $this->sanitizeEnum($label, $value, array_column($property['options'] ?? [], 'value')),
 		};
 	}
@@ -165,19 +177,6 @@ class GridWidgetTypes {
 		}
 		if ($isRequired && TextHelper::trim($value) === '') {
 			throw new BadRequestError('Widget setting ' . $label . ' is required.');
-		}
-		return $value;
-	}
-
-	/**
-	 * @throws BadRequestError
-	 */
-	private function sanitizeColor(string $label, mixed $value): string {
-		if ($value === null || $value === '') {
-			return '';
-		}
-		if (!is_string($value) || !preg_match(self::HEX_COLOR, $value)) {
-			throw new BadRequestError('Widget setting ' . $label . ' must be a hex color.');
 		}
 		return $value;
 	}

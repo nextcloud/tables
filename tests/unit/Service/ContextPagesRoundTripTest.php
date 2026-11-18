@@ -190,7 +190,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$page = $this->pageMapper->insert($page);
 
 		$this->widgetService->insertAll($page->getId(), [
-			new WidgetInput(null, 'header', 'Welcome', 'home', 'Where to start', 0, 0, 12, 2, ['heading' => 'Projects', 'subheading' => '', 'textAlign' => 'center', 'backgroundColor' => '#123456', 'textColor' => ''], null),
+			new WidgetInput(null, 'header', 'Welcome', 'home', 'Where to start', 0, 0, 12, 2, ['heading' => 'Projects', 'subheading' => '', 'textAlign' => 'center', 'color' => 'success'], null),
 			new WidgetInput(null, 'data', null, null, null, 0, 2, 12, 5, [], $relation->getId()),
 		]);
 
