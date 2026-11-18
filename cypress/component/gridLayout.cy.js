@@ -15,7 +15,6 @@ import {
 	pageToGrid,
 	widgetTarget,
 } from '../../src/modules/grid/gridLayout.js'
-import { isHexColor } from '../../src/shared/utils/gridColors.js'
 
 const widgetTypes = [
 	{ type: 'header', hasSource: false, settings: { heading: { type: 'string', default: '' }, textAlign: { type: 'enum', default: 'start' } } },
@@ -103,13 +102,5 @@ describe('grid layout', () => {
 
 		expect(updated[0]).to.equal(layout[0])
 		expect(updated[1]).to.deep.equal({ widgetId: 'w2', gridX: 0, gridY: 2, gridWidth: 12, gridHeight: 3 })
-	})
-
-	it('accepts only hex colors, like the server', () => {
-		expect(isHexColor('#abc')).to.equal(true)
-		expect(isHexColor('#a1b2c3')).to.equal(true)
-		expect(isHexColor('red')).to.equal(false)
-		expect(isHexColor('url(evil)')).to.equal(false)
-		expect(isHexColor(null)).to.equal(false)
 	})
 })

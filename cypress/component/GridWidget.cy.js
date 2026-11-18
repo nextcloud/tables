@@ -49,6 +49,29 @@ describe('GridWidget', () => {
 		cy.get('[data-cy="gridWidget"] h1').should('not.exist')
 	})
 
+	it('colors a header with a color pair of the theme, and falls back to primary', () => {
+		mountWidget({ key: 'w6', id: 6, type: 'header', title: '', settings: { heading: 'Due today', color: 'warning' }, nodeRelId: null }, false)
+		cy.get('.header-widget').should('have.class', 'header-widget--warning')
+
+		mountWidget({ key: 'w7', id: 7, type: 'header', title: '', settings: { heading: 'Projects', color: '#ff0000' }, nodeRelId: null }, false)
+		cy.get('.header-widget').should('have.class', 'header-widget--primary')
+	})
+
+	it('shows every table and view of the application in a tables widget', () => {
+		cy.intercept('GET', '**/apps/tables/**', { statusCode: 404, body: {} })
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
+		const applicationNodes = { 4: nodes[4], 5: { id: 5, node_type: 1, node_id: 50, permissions: 1 }, 6: { id: 6, node_type: 9, node_id: 60, permissions: 1 } }
+		cy.mount(GridWidget, { props: { widget: { key: 'w8', id: 8, type: 'tables', title: '', settings: {}, nodeRelId: null }, nodes: applicationNodes, editable: false } })
+
+		cy.get('[data-cy="tablesWidget"] .data-widget').should('have.length', 2)
+	})
+
+	it('shows an empty state in a tables widget of an application without tables', () => {
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
+		cy.mount(GridWidget, { props: { widget: { key: 'w9', id: 9, type: 'tables', title: '', settings: {}, nodeRelId: null }, nodes: {}, editable: false } })
+		cy.get('[data-cy="tablesWidgetEmpty"]').should('contain.text', 'No tables or views yet')
+	})
+
 	it('asks editors to pick a table or view for a data widget without one, and shows viewers an empty state', () => {
 		mountWidget({ key: 'w3', id: 3, type: 'data', title: '', settings: {}, nodeRelId: 9 }, true)
 		cy.get('[data-cy="dataWidgetPickSource"]').should('be.visible')
