@@ -1203,7 +1203,7 @@ final class ContextServiceTest extends TestCase {
 			'Skipping widget 0 of page 0 of an imported scheme: only grid pages hold widgets',
 			'Skipping page 1 of an imported scheme: an application has one start page',
 			'Skipping widget 2 of page 2 of an imported scheme: its source names no table or view by uuid',
-			'Skipping widget 3 of page 2 of an imported scheme: Unknown widget type "chart", expected one of: header, text, data',
+			'Skipping widget 3 of page 2 of an imported scheme: Unknown widget type "chart", expected one of: header, text, data, tables',
 			'Skipping page 4 of an imported scheme: its type is not startpage or grid',
 			'Skipping widget 100 of page 5 of an imported scheme: a page holds at most 100 widgets',
 		], $warnings);
