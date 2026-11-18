@@ -43,7 +43,6 @@ class Version2500Date20261109000000 extends SimpleMigrationStep {
 
 		$this->extendPageTable($schema);
 		$this->haveWidgetTable($schema);
-		$this->haveWidgetSourceTable($schema);
 
 		return $schema;
 	}
@@ -161,18 +160,10 @@ class Version2500Date20261109000000 extends SimpleMigrationStep {
 		$table->addColumn('grid_width', Types::SMALLINT, ['notnull' => true, 'default' => 1]);
 		$table->addColumn('grid_height', Types::SMALLINT, ['notnull' => true, 'default' => 1]);
 		$table->addColumn('settings', Types::TEXT, ['notnull' => false]);
+		// the table or view a data widget shows, as a node relation of the application
+		$table->addColumn('node_rel_id', Types::INTEGER, ['notnull' => false]);
 		$table->setPrimaryKey(['id']);
 		$table->addIndex(['page_id'], 'tables_ctx_widget_page_idx');
-	}
-
-	private function haveWidgetSourceTable(ISchemaWrapper $schema): void {
-		if ($schema->hasTable(self::PREFIX . 'widget_source')) {
-			return;
-		}
-		$table = $schema->createTable(self::PREFIX . 'widget_source');
-		$table->addColumn('widget_id', Types::INTEGER, ['notnull' => true]);
-		$table->addColumn('node_rel_id', Types::INTEGER, ['notnull' => true]);
-		$table->setPrimaryKey(['widget_id']);
-		$table->addIndex(['node_rel_id'], 'tables_ctx_wsource_node_idx');
+		$table->addIndex(['node_rel_id'], 'tables_ctx_widget_node_idx');
 	}
 }

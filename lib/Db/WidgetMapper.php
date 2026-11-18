@@ -85,4 +85,24 @@ class WidgetMapper extends QBMapper {
 			$qb->executeStatement();
 		}
 	}
+
+	/**
+	 * Unlinks every widget that shows one of the given node relations. The widgets stay.
+	 *
+	 * @param int[] $nodeRelIds
+	 * @throws Exception
+	 */
+	public function clearNodeRelIds(array $nodeRelIds): void {
+		if ($nodeRelIds === []) {
+			return;
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->table)
+			->set('node_rel_id', $qb->createNamedParameter(null, IQueryBuilder::PARAM_NULL))
+			->where($qb->expr()->in('node_rel_id', $qb->createParameter('nodeRelIds')));
+		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('nodeRelIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$qb->executeStatement();
+		}
+	}
 }

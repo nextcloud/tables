@@ -90,6 +90,27 @@ class WidgetMapperTest extends DatabaseTestCase {
 		$this->assertSame([$kept->getId()], $this->mapper->findIdsByPageId(self::PAGE));
 	}
 
+	public function testClearingNodeRelationsUnlinksOnlyTheirWidgets(): void {
+		$first = $this->widget(self::PAGE, 'data', null, 0, 0);
+		$first->setNodeRelId(990241);
+		$first = $this->mapper->insert($first);
+		$second = $this->widget(self::PAGE, 'data', null, 0, 2);
+		$second->setNodeRelId(990241);
+		$second = $this->mapper->insert($second);
+		$third = $this->widget(self::OTHER_PAGE, 'data', null, 0, 0);
+		$third->setNodeRelId(990242);
+		$third = $this->mapper->insert($third);
+
+		$this->mapper->clearNodeRelIds([990241]);
+		$this->mapper->clearNodeRelIds([]);
+
+		$nodeRelIds = [];
+		foreach ($this->mapper->findByPageIds([self::PAGE, self::OTHER_PAGE]) as $widget) {
+			$nodeRelIds[$widget->getId()] = $widget->getNodeRelId();
+		}
+		$this->assertSame([$first->getId() => null, $second->getId() => null, $third->getId() => 990242], $nodeRelIds);
+	}
+
 	/**
 	 * @param array<string, string|int|float|bool|null> $settings
 	 */

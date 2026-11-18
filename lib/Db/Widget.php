@@ -13,7 +13,8 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * A widget on a grid page: its type, optional title, icon and description, its place
- * on the grid and its settings, stored as one JSON object.
+ * on the grid, its settings, stored as one JSON object, and for a data widget the node
+ * relation of the table or view it shows.
  *
  * @psalm-type TablesWidgetSettingValue = string|int|float|bool|null
  *
@@ -37,6 +38,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setGridHeight(int $value): void
  * @method getSettings(): ?string
  * @method setSettings(?string $value): void
+ * @method getNodeRelId(): ?int
+ * @method setNodeRelId(?int $value): void
  */
 class Widget extends Entity {
 	protected ?int $pageId = null;
@@ -49,6 +52,7 @@ class Widget extends Entity {
 	protected ?int $gridWidth = null;
 	protected ?int $gridHeight = null;
 	protected ?string $settings = null;
+	protected ?int $nodeRelId = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -57,6 +61,7 @@ class Widget extends Entity {
 		$this->addType('gridY', 'integer');
 		$this->addType('gridWidth', 'integer');
 		$this->addType('gridHeight', 'integer');
+		$this->addType('nodeRelId', 'integer');
 	}
 
 	/**
