@@ -17,6 +17,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<ContextNodeRelation> */
 class ContextNodeRelationMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_contexts_rel_context_node';
 
 	public function __construct(IDBConnection $db) {
@@ -65,5 +67,72 @@ class ContextNodeRelationMapper extends QBMapper {
 
 		$row = $this->findOneQuery($qb);
 		return $this->mapRowToEntity($row);
+	}
+
+	/**
+	 * The given node relations that belong to the application of a page, locked until
+	 * the transaction ends.
+	 *
+	 * @param int[] $nodeRelIds
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function filterIdsOfPageContext(int $pageId, array $nodeRelIds): array {
+		if ($nodeRelIds === []) {
+			return [];
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('r.id')
+			->from($this->table, 'r')
+			->innerJoin('r', 'tables_contexts_page', 'p', $qb->expr()->eq('p.context_id', 'r.context_id'))
+			->where($qb->expr()->eq('p.id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->in('r.id', $qb->createParameter('ids')))
+			->orderBy('r.id');
+		$this->lockRows($qb);
+
+		$ids = [];
+		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$result = $qb->executeQuery();
+			while ($row = $result->fetchAssociative()) {
+				$ids[] = (int)$row['id'];
+			}
+			$result->closeCursor();
+		}
+		return $ids;
+	}
+
+	/**
+	 * Locks node relations until the transaction ends. A path that removes relations
+	 * locks them before it unlinks their widgets, the way {@see self::filterIdsOfPageContext()}
+	 * locks the ones a save points widgets at, so the two never interleave.
+	 *
+	 * @param int[] $nodeRelIds
+	 * @throws Exception
+	 */
+	public function lockByIds(array $nodeRelIds): void {
+		if ($nodeRelIds === []) {
+			return;
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->in('id', $qb->createParameter('ids')))
+			->orderBy('id');
+		$this->lockRows($qb);
+		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
+			$qb->executeQuery()->closeCursor();
+		}
+	}
+
+	/**
+	 * Locks the rows a query reads until the transaction ends. SQLite has no row locks and
+	 * runs one write transaction at a time anyway.
+	 */
+	private function lockRows(IQueryBuilder $qb): void {
+		if ($this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
+			$qb->forUpdate();
+		}
 	}
 }

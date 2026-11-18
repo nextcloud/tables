@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Service;
 
+use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
-use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\WidgetService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
@@ -35,7 +35,7 @@ class WidgetServiceTest extends DatabaseTestCase {
 		parent::setUp();
 		$this->service = new WidgetService(
 			new WidgetMapper($this->connectionAdapter),
-			new WidgetSourceMapper($this->connectionAdapter),
+			new ContextNodeRelationMapper($this->connectionAdapter),
 			$this->connectionAdapter,
 		);
 		$this->removeFixtures();
@@ -171,15 +171,26 @@ class WidgetServiceTest extends DatabaseTestCase {
 		], json_decode(json_encode($byPage[$this->page]), true));
 	}
 
-	public function testDeletingPagesDeletesTheirWidgetsAndSources(): void {
-		$widget = $this->insert($this->page, 'data', null, $this->position(0, 0, 6, 5), [], $this->rel(51));
+	public function testDeletingPagesDeletesTheirWidgets(): void {
+		$this->insert($this->page, 'data', null, $this->position(0, 0, 6, 5), [], $this->rel(51));
 		$other = $this->insert($this->otherPage, 'data', null, $this->position(0, 0, 6, 5), [], $this->rel(52));
 
 		$this->service->deleteByPageIds([$this->page]);
 
 		$this->assertSame([], $this->service->findByPageIds([$this->page]));
-		$this->assertSame([], (new WidgetSourceMapper($this->connectionAdapter))->findNodeRelIdsByWidgetIds([$widget->getId()]));
 		$this->assertSame([[$other->getId(), ['nodeRelId' => $this->rel(52)]]], array_map(static fn (array $widget): array => [$widget['id'], $widget['source']], $this->service->findByPageIds([$this->otherPage])[$this->otherPage]));
+	}
+
+	public function testRemovingANodeRelationUnlinksItsWidgetsAndKeepsThem(): void {
+		$shown = $this->insert($this->page, 'data', null, $this->position(0, 0, 6, 5), [], $this->rel(53));
+		$other = $this->insert($this->page, 'data', null, $this->position(6, 0, 6, 5), [], $this->rel(54));
+
+		$this->service->deleteSourcesByNodeRelIds([$this->rel(53)]);
+
+		$this->assertSame(
+			[[$shown->getId(), null], [$other->getId(), ['nodeRelId' => $this->rel(54)]]],
+			array_map(static fn (array $widget): array => [$widget['id'], $widget['source']], $this->service->findByPageIds([$this->page])[$this->page]),
+		);
 	}
 
 	public function testSyncUpdatesListedInsertsNewAndDeletesMissingWidgets(): void {
@@ -200,7 +211,6 @@ class WidgetServiceTest extends DatabaseTestCase {
 		$this->assertSame(['heading' => 'New'], (array)$header['settings']);
 		$this->assertNotSame($removed->getId(), $data['id']);
 		$this->assertSame(['nodeRelId' => $this->rel(62)], $data['source']);
-		$this->assertSame([], (new WidgetSourceMapper($this->connectionAdapter))->findNodeRelIdsByWidgetIds([$removed->getId()]));
 		$this->assertSame($other->getId(), $widgets[$this->otherPage][0]['id']);
 	}
 

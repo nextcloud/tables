@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Db;
 
-use OCA\Tables\Db\WidgetSourceMapper;
+use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCP\DB\IResult;
 use OCP\DB\QueryBuilder\IExpressionBuilder;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use PHPUnit\Framework\TestCase;
 
-class WidgetSourceMapperLockTest extends TestCase {
+class ContextNodeRelationMapperLockTest extends TestCase {
 	public static function platforms(): array {
 		return [
 			'SQLite, which has no row locks' => [IDBConnection::PLATFORM_SQLITE, 0],
@@ -40,6 +40,6 @@ class WidgetSourceMapperLockTest extends TestCase {
 		$db->method('getQueryBuilder')->willReturn($qb);
 		$db->method('getDatabaseProvider')->willReturn($platform);
 
-		(new WidgetSourceMapper($db))->lockNodeRelations([7]);
+		(new ContextNodeRelationMapper($db))->lockByIds([7]);
 	}
 }

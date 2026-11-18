@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
-use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Model\WidgetInput;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
@@ -29,7 +29,7 @@ class WidgetService {
 
 	public function __construct(
 		private readonly WidgetMapper $widgetMapper,
-		private readonly WidgetSourceMapper $widgetSourceMapper,
+		private readonly ContextNodeRelationMapper $nodeRelMapper,
 		private readonly IDBConnection $db,
 	) {
 	}
@@ -41,14 +41,11 @@ class WidgetService {
 	 */
 	public function findByPageIds(array $pageIds): array {
 		$widgets = $this->widgetMapper->findByPageIds($pageIds);
-		$widgetIds = array_map(static fn (Widget $widget): int => $widget->getId(), $widgets);
-		$sources = $this->widgetSourceMapper->findNodeRelIdsByWidgetIds($widgetIds);
 
 		$byPage = [];
 		foreach ($widgets as $widget) {
-			$id = $widget->getId();
 			$byPage[$widget->getPageId()][] = [
-				'id' => $id,
+				'id' => $widget->getId(),
 				'type' => $widget->getType(),
 				'title' => $widget->getTitle(),
 				'icon' => $widget->getIcon(),
@@ -58,7 +55,7 @@ class WidgetService {
 				'gridWidth' => $widget->getGridWidth(),
 				'gridHeight' => $widget->getGridHeight(),
 				'settings' => $widget->getSettingsObject(),
-				'source' => isset($sources[$id]) ? ['nodeRelId' => $sources[$id]] : null,
+				'source' => $widget->getNodeRelId() !== null ? ['nodeRelId' => $widget->getNodeRelId()] : null,
 			];
 		}
 		return $byPage;
@@ -88,11 +85,7 @@ class WidgetService {
 		$widget = new Widget();
 		$widget->setPageId($pageId);
 		$this->applyFields($widget, $input);
-		$widget = $this->widgetMapper->insert($widget);
-		if ($input->nodeRelId !== null) {
-			$this->widgetSourceMapper->insertSource($widget->getId(), $input->nodeRelId);
-		}
-		return $widget;
+		return $this->widgetMapper->insert($widget);
 	}
 
 	/**
@@ -125,7 +118,6 @@ class WidgetService {
 				$listedIds[] = $input->id;
 			}
 			$this->deleteByIds(array_values(array_diff(array_keys($existing), $listedIds)));
-			$sources = $this->widgetSourceMapper->findNodeRelIdsByWidgetIds($listedIds);
 
 			foreach ($widgets as $input) {
 				if ($input->id === null) {
@@ -136,15 +128,12 @@ class WidgetService {
 				$widget = $existing[$input->id];
 				$this->applyFields($widget, $input);
 				$this->widgetMapper->update($widget);
-				if (($sources[$input->id] ?? null) !== $input->nodeRelId) {
-					$this->widgetSourceMapper->setSource($input->id, $input->nodeRelId);
-				}
 			}
 		}, $this->db);
 	}
 
 	/**
-	 * Deletes the widgets of the given pages with their sources.
+	 * Deletes the widgets of the given pages.
 	 *
 	 * @param int[] $pageIds
 	 * @throws Exception
@@ -158,7 +147,6 @@ class WidgetService {
 	 * @throws Exception
 	 */
 	public function deleteByIds(array $widgetIds): void {
-		$this->widgetSourceMapper->deleteByWidgetIds($widgetIds);
 		$this->widgetMapper->deleteByIds($widgetIds);
 	}
 
@@ -171,8 +159,8 @@ class WidgetService {
 	 * @throws Exception
 	 */
 	public function deleteSourcesByNodeRelIds(array $nodeRelIds): void {
-		$this->widgetSourceMapper->lockNodeRelations($nodeRelIds);
-		$this->widgetSourceMapper->deleteByNodeRelIds($nodeRelIds);
+		$this->nodeRelMapper->lockByIds($nodeRelIds);
+		$this->widgetMapper->clearNodeRelIds($nodeRelIds);
 	}
 
 	/**
@@ -182,7 +170,7 @@ class WidgetService {
 	 */
 	private function assertSourcesOfPage(int $pageId, array $widgets): void {
 		$nodeRelIds = array_values(array_unique(array_filter(array_map(static fn (WidgetInput $widget): ?int => $widget->nodeRelId, $widgets), static fn (?int $id): bool => $id !== null)));
-		$foreign = array_diff($nodeRelIds, $this->widgetSourceMapper->filterNodeRelIdsOfPageContext($pageId, $nodeRelIds));
+		$foreign = array_diff($nodeRelIds, $this->nodeRelMapper->filterIdsOfPageContext($pageId, $nodeRelIds));
 		if ($foreign !== []) {
 			throw new \InvalidArgumentException('Node relation ' . implode(', ', $foreign) . ' is not part of the application of page ' . $pageId);
 		}
@@ -201,5 +189,6 @@ class WidgetService {
 		$widget->setGridWidth($input->gridWidth);
 		$widget->setGridHeight($input->gridHeight);
 		$widget->setSettingsArray($input->settings);
+		$widget->setNodeRelId($input->nodeRelId);
 	}
 }

@@ -21,7 +21,6 @@ use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Db\WidgetMapper;
-use OCA\Tables\Db\WidgetSourceMapper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\WidgetInput;
@@ -64,7 +63,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->pageMapper = new PageMapper($this->connectionAdapter);
 		$this->widgetService = new WidgetService(
 			new WidgetMapper($this->connectionAdapter),
-			new WidgetSourceMapper($this->connectionAdapter),
+			new ContextNodeRelationMapper($this->connectionAdapter),
 			$this->connectionAdapter,
 		);
 		$this->service = new ContextService(
