@@ -27,7 +27,6 @@
 <script>
 import { NcDialog, NcButton } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/style.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import NcUserPicker from '../../shared/components/ncUserPicker/NcUserPicker.vue'
 import { mapState, mapActions } from 'pinia'

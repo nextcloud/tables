@@ -117,7 +117,6 @@
 </template>
 <script>
 import { NcAppNavigationItem, NcActionButton, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
-import '@nextcloud/dialogs/style.css'
 import { getCurrentUser } from '@nextcloud/auth'
 import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../../../store/store.js'

@@ -7,7 +7,6 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 import debounce from 'debounce'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/style.css'
 import ShareTypes from './shareTypesMixin.js'
 import generalHelper from './generalHelper.js'
 

@@ -164,7 +164,6 @@
 import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcNoteCard, NcRadioGroup, NcRadioGroupButton, NcSelect } from '@nextcloud/vue'
 import ChevronDown from 'vue-material-design-icons/ChevronDown.vue'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/style.css'
 import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../main/partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../main/partials/editViewPartials/SelectedViewColumns.vue'
