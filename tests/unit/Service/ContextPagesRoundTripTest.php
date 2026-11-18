@@ -157,9 +157,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			return array_map(static fn (array $widget): array => [$widget['type'], $widget['source']['nodeRelId'] ?? null], $pages[0]['widgets']);
 		};
 
-		$filled = $startPageWidgets($older, 4244);
-		$importedRelation = (int)array_key_first($this->contextMapper->findById(end($this->contextIds), self::OWNER)->getNodes());
-		$this->assertSame([['header', null], ['data', $importedRelation]], $filled);
+		$this->assertSame([['tables', null]], $startPageWidgets($older, 4244));
 		$this->assertSame([], $startPageWidgets($withoutWidgets, 4245));
 	}
 

@@ -385,7 +385,7 @@ final class ContextServiceTest extends TestCase {
 		$this->service->update(7, 'user-1', null, null, null, []);
 	}
 
-	public function testATableAddedToTheStartPageLaterGetsAWidget(): void {
+	public function testATableAddedLaterGetsNoWidgetOfItsOwn(): void {
 		$context = new Context();
 		$context->id = 7;
 		$context->setPages([3 => ['id' => 3, 'page_type' => Page::TYPE_STARTPAGE, 'content' => []], 4 => ['id' => 4, 'page_type' => Page::TYPE_GRID, 'content' => []]]);
@@ -395,7 +395,8 @@ final class ContextServiceTest extends TestCase {
 		$relation = new ContextNodeRelation();
 		$relation->id = 55;
 		$relation->setContextId(7);
-		$this->widgetService->expects($this->once())->method('appendDataWidget')->with(3, 55);
+		// the tables widget of the start page lists it
+		$this->widgetService->expects($this->never())->method('insertAll');
 
 		$this->service->addNodeRelToPage($relation);
 		$this->service->addNodeRelToPage($relation, null, 4);
@@ -749,11 +750,8 @@ final class ContextServiceTest extends TestCase {
 
 	public static function startPagesOfNewApplications(): array {
 		return [
-			'a header, then a table or view per node' => [
-				[['id' => 5, 'type' => 0], ['id' => 9, 'type' => 1]],
-				[['header', 0, 'Intake portal', 'Requests', null], ['data', 2, null, null, 41], ['data', 7, null, null, 42]],
-			],
-			'only a header without tables' => [[], [['header', 0, 'Intake portal', 'Requests', null]]],
+			'tables and views' => [[['id' => 5, 'type' => 0], ['id' => 9, 'type' => 1]], [['tables', 0, null, null, null]]],
+			'no tables yet' => [[], [['tables', 0, null, null, null]]],
 		];
 	}
 
