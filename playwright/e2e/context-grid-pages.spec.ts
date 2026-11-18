@@ -64,7 +64,7 @@ async function pickOption(page: Page, selectCy: string, option: string) {
 }
 
 test.describe('Grid pages of an application', () => {
-	test('The start page of a new application shows its name and its tables as widgets', async ({ userPage: { page, user } }) => {
+	test('The start page of a new application shows its tables in one widget', async ({ userPage: { page, user } }) => {
 		const first = await createTableViaApi(page.request, user, 'grid first table')
 		const second = await createTableViaApi(page.request, user, 'grid second table')
 		const contextId = await createApplicationViaApi(page.request, user, 'grid existing app', [first, second])
@@ -73,13 +73,14 @@ test.describe('Grid pages of an application', () => {
 
 		const startPage = page.locator('[data-cy="startPageGrid"]')
 		await expect(startPage).toBeVisible()
-		await expect(startPage.locator('.header-widget')).toContainText('grid existing app')
-		const firstHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid first table' })
-		const secondHeading = page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid second table' })
+		const tablesWidget = startPage.locator('[data-cy="tablesWidget"]')
+		const firstHeading = tablesWidget.getByRole('heading', { name: 'grid first table' })
+		const secondHeading = tablesWidget.getByRole('heading', { name: 'grid second table' })
 		await expect(firstHeading).toBeVisible({ timeout: 30000 })
 		await expect(secondHeading).toBeVisible({ timeout: 30000 })
 		expect((await firstHeading.boundingBox())!.y).toBeLessThan((await secondHeading.boundingBox())!.y)
-		await expect(page.locator('[data-cy="gridWidget"]')).toHaveCount(3)
+		await expect(page.locator('[data-cy="gridWidget"]')).toHaveCount(1)
+		await expect(startPage.locator('.header-widget')).toHaveCount(0)
 		await expect(page.locator('[data-cy="contextStartPageLink"]')).toHaveAttribute('aria-selected', 'true')
 		await expect(page.locator('[data-cy="contextPageAdd"]')).toBeVisible()
 		await expect(page.locator('.resources')).toHaveCount(0)
