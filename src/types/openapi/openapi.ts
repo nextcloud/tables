@@ -1603,7 +1603,7 @@ export type components = {
         };
         readonly WidgetSettingSchema: {
             /** @enum {string} */
-            readonly type: "string" | "text" | "color" | "enum";
+            readonly type: "string" | "text" | "enum";
             readonly title: string;
             readonly default: components["schemas"]["WidgetValue"];
             readonly options?: readonly {
