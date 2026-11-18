@@ -86,6 +86,7 @@ OC.L10N.register(
     "Page" : "Side",
     "Content" : "Innhald",
     "Select" : "Vel",
+    "Calendar" : "Kalendar",
     "Folder" : "Mappe",
     "ID" : "ID",
     "seconds ago" : "sekund sidan"

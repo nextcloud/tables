@@ -73,6 +73,7 @@ OC.L10N.register(
     "Copy link" : "Copiar liga",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
+    "Calendar" : "Calendario",
     "This month" : "Este mes",
     "This week" : "Esta semana",
     "Now" : "Ahora",

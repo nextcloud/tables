@@ -78,6 +78,7 @@ OC.L10N.register(
     "Default" : "საწყისი",
     "Confirm" : "დადასტურება",
     "Content" : "მოცულობა",
+    "Calendar" : "კალენდარი",
     "Unchecked" : "შეუმოწმებელია",
     "This month" : "ამ თვეში",
     "This week" : "ამ კვირაში",

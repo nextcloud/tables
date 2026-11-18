@@ -58,6 +58,8 @@ OC.L10N.register(
     "Copy link" : "Copiar ligamine",
     "Confirm" : "Confirmar",
     "Select" : "Selectionar",
+    "Calendar" : "Calendario",
+    "Folder" : "Dossier",
     "This month" : "Iste mense",
     "This week" : "Iste septimana",
     "seconds ago" : "secundas passate"

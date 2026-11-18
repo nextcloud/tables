@@ -78,6 +78,8 @@ OC.L10N.register(
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
     "Select" : "Seleccionar",
+    "Calendar" : "Calendario",
+    "Folder" : "Carpeta",
     "This month" : "Este mes",
     "This week" : "Esta semana",
     "ID" : "ID",

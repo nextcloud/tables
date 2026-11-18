@@ -126,6 +126,8 @@ OC.L10N.register(
     "Confirm" : "Confirm",
     "Content" : "Tarkib",
     "Select" : "Select",
+    "Calendar" : "Taqvim",
+    "Camera" : "Kamera",
     "Folder" : "Jild",
     "Key" : "Kalit",
     "This year" : "Shu yil",
