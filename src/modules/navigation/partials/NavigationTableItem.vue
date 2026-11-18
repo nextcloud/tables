@@ -68,7 +68,7 @@
 
 			<!-- EXPORT -->
 			<NcActionButton @click="exportFile">
-				{{ t('tables', 'Export') }}
+				{{ t('tables', 'Export scheme') }}
 				<template #icon>
 					<TrayArrowDown :size="20" />
 				</template>
