@@ -116,6 +116,7 @@ class View extends EntitySuper implements JsonSerializable {
 		$this->addType('uuid', 'string');
 		$this->addType('tableId', 'integer');
 		$this->addType('sidebarOrder', 'integer');
+		$this->addType('externalId', 'integer');
 	}
 
 	public function setter(string $name, array $args): void {
