@@ -89,6 +89,7 @@
 				<GridWidget v-if="widgetsById[item.widgetId]"
 					:widget="widgetsById[item.widgetId]"
 					:nodes="context.nodes"
+					:start-page-content="startPageContent"
 					:layout-item="item"
 					:editable="canChange"
 					:arrangeable="!narrow"
@@ -123,7 +124,7 @@ import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid, sortedLayout } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid, sortedLayout } from './gridLayout.js'
 
 /**
  * A grid page of an application: its widgets on a grid, with an edit mode that saves the
@@ -231,6 +232,9 @@ export default {
 		// The start page sits under the title of its application, so it only has a heading of its own once it gets a title
 		showHeading() {
 			return !this.isStartPage || !!this.page.title || !!this.page.description
+		},
+		startPageContent() {
+			return contextPages(this.context).find(isStartPage)?.content ?? {}
 		},
 		activeGrid() {
 			return this.draftGrid ?? this.storedGrid
