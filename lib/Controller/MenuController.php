@@ -11,6 +11,7 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\ConflictError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\MenuOrderEntry;
@@ -46,10 +47,11 @@ class MenuController extends AOCSController {
 	 *
 	 * A flat list in display order; the items of a group carry its id as `parentId`.
 	 * An application without items opens its start page. Readers who cannot manage the
-	 * application do not get empty groups.
+	 * application do not get empty groups. The `ETag` is the version of the order, which
+	 * a save of the order sends back as `If-Match`.
 	 *
 	 * @param int $contextId ID of the application
-	 * @return DataResponse<Http::STATUS_OK, list<TablesMenuItem>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesMenuItem>, array{ETag: string}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Menu returned
 	 * 404: Not found, also when the user has no access to the application
@@ -59,7 +61,8 @@ class MenuController extends AOCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/2/contexts/{contextId}/menu', requirements: ['contextId' => '\d+'])]
 	public function index(int $contextId): DataResponse {
 		try {
-			return new DataResponse($this->menuService->findAll($contextId, $this->userId));
+			$menu = $this->menuService->findAll($contextId, $this->userId);
+			return new DataResponse($menu['menu'], Http::STATUS_OK, ['ETag' => self::entityTag($menu['version'])]);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -107,16 +110,18 @@ class MenuController extends AOCSController {
 	 *
 	 * `items` lists every item of the menu exactly once, in display order, as
 	 * `{id, parentId}`; `parentId` is a group at the top level listed earlier, or null.
-	 * Either all of it is saved or nothing.
+	 * The `If-Match` header holds the `ETag` of the menu the list was built from. Either
+	 * all of it is saved or nothing; the `ETag` of the answer is the new version.
 	 *
 	 * @param int $contextId ID of the application
 	 * @param list<array{id: int, parentId: ?int}> $items Every item of the menu
-	 * @return DataResponse<Http::STATUS_OK, list<TablesMenuItem>, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesMenuItem>, array{ETag: string}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_CONFLICT|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Menu saved
-	 * 400: An item missing or listed twice, a parent that is not a group, or the menu changed in between
+	 * 400: No `If-Match`, an item missing or listed twice, or a parent that is not a group
 	 * 403: No permissions
-	 * 404: Not found, also for an item of another application
+	 * 404: Not found
+	 * 409: The menu changed since the version in `If-Match`
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 60, period: 60)]
@@ -124,9 +129,14 @@ class MenuController extends AOCSController {
 	#[ApiRoute(verb: 'PUT', url: '/api/2/contexts/{contextId}/menu/order', requirements: ['contextId' => '\d+'])]
 	public function order(int $contextId, array $items): DataResponse {
 		try {
-			return new DataResponse($this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray($items), $this->userId));
+			$order = MenuOrderEntry::listFromArray($items);
+			$version = self::matchedVersion($this->request->getHeader('If-Match'));
+			$menu = $this->menuService->saveOrder($contextId, $order, $version, $this->userId);
+			return new DataResponse($menu['menu'], Http::STATUS_OK, ['ETag' => self::entityTag($menu['version'])]);
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
+		} catch (ConflictError $e) {
+			return $this->handleConflictError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -193,5 +203,21 @@ class MenuController extends AOCSController {
 		} catch (Exception $e) {
 			return $this->handleError($e);
 		}
+	}
+
+	private static function entityTag(string $version): string {
+		return '"' . $version . '"';
+	}
+
+	/**
+	 * The version an `If-Match` header names: one entity tag, compared strongly.
+	 *
+	 * @throws BadRequestError
+	 */
+	private static function matchedVersion(string $ifMatch): string {
+		if (preg_match('/^"([^"]+)"$/', trim($ifMatch), $matches) !== 1) {
+			throw new BadRequestError('A save of the order names the ETag of the menu it is based on in If-Match.');
+		}
+		return $matches[1];
 	}
 }

@@ -27,7 +27,7 @@ class MenuServiceLockTest extends TestCase {
 			'create' => [static fn (MenuService $service): array => $service->create(7, 'Site', null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), 'alice')],
 			'update' => [static fn (MenuService $service): array => $service->update(7, 3, 'Site', null, null, null, 'alice')],
 			'delete' => [static fn (MenuService $service): array => $service->delete(7, 3, 'alice')],
-			'saveOrder' => [static fn (MenuService $service): array => $service->saveOrder(7, [], 'alice')],
+			'saveOrder' => [static fn (MenuService $service): array => $service->saveOrder(7, [], 'version', 'alice')],
 		];
 	}
 
