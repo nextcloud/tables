@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\WidgetService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
@@ -247,21 +248,33 @@ class WidgetServiceTest extends DatabaseTestCase {
 	}
 
 	public function testSyncPutsWidgetsInTabsAndTakesThemOutAgain(): void {
-		$tabs = $this->insert($this->page, 'tabs', null, $this->position(0, 0, 12, 8), ['tabs' => "Open\nClosed"], null);
+		$tabs = $this->insert($this->page, 'tabs', null, $this->position(0, 0, 12, 8), ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]], null);
 
 		$this->sync($this->page, [
-			['id' => null, 'type' => 'text', 'title' => null, 'position' => $this->position(0, 0, 6, 2), 'settings' => ['text' => 'A'], 'nodeRelId' => null, 'parentIndex' => 1, 'parentTab' => 1],
-			['id' => $tabs->getId(), 'type' => 'tabs', 'title' => null, 'position' => $this->position(0, 0, 12, 8), 'settings' => ['tabs' => "Open\nClosed"], 'nodeRelId' => null],
+			['id' => null, 'type' => 'text', 'title' => null, 'position' => $this->position(0, 0, 6, 2), 'settings' => ['text' => 'A'], 'nodeRelId' => null, 'parentIndex' => 1, 'parentTab' => 'closed'],
+			['id' => $tabs->getId(), 'type' => 'tabs', 'title' => null, 'position' => $this->position(0, 0, 12, 8), 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]], 'nodeRelId' => null],
 		]);
 		$widgets = $this->service->findByPageIds([$this->page])[$this->page];
 		$inTab = array_values(array_filter($widgets, static fn (array $widget): bool => $widget['type'] === 'text'))[0];
-		$this->assertSame([$tabs->getId(), 1], [$inTab['parentId'], $inTab['parentTab']]);
+		$this->assertSame([$tabs->getId(), 'closed'], [$inTab['parentId'], $inTab['parentTab']]);
 
 		$this->sync($this->page, [
 			['id' => $inTab['id'], 'type' => 'text', 'title' => null, 'position' => $this->position(0, 9, 6, 2), 'settings' => ['text' => 'A'], 'nodeRelId' => null],
 		]);
 		$widgets = $this->service->findByPageIds([$this->page])[$this->page];
 		$this->assertSame([[$inTab['id'], null, null]], array_map(static fn (array $widget): array => [$widget['id'], $widget['parentId'], $widget['parentTab']], $widgets));
+	}
+
+	public function testAWidgetInATabThatIsNotThereIsRefusedBeforeAnyWrite(): void {
+		$widget = new WidgetInput(null, 'text', null, null, null, 0, 0, 6, 2, ['text' => 'A'], null, 5, 'open');
+		try {
+			$this->service->insertAll($this->page, [$widget]);
+			$this->fail('A widget naming a tabs widget past the list was saved.');
+		} catch (BadRequestError $e) {
+			$this->assertStringContainsString('Widget 0 must sit in a tabs widget', $e->getMessage());
+		}
+
+		$this->assertSame([], $this->service->findByPageIds([$this->page])[$this->page] ?? []);
 	}
 
 	public function testSyncRejectsTheIdOfAWidgetOnAnotherPage(): void {

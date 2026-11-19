@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Migration;
 
 use Closure;
+use OCA\Tables\Service\GridWidgetTypes;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
 use OCP\Migration\IOutput;
@@ -18,7 +19,7 @@ use Override;
 
 /**
  * A widget can sit in a tab of a tabs widget on the same page: `parent_id` is the tabs
- * widget and `parent_tab` the position of the tab, both empty for a widget on the page itself.
+ * widget and `parent_tab` the key of the tab, both empty for a widget on the page itself.
  */
 class Version2500Date20261109020000 extends SimpleMigrationStep {
 	private const WIDGET_TABLE = 'tables_contexts_widget';
@@ -35,7 +36,7 @@ class Version2500Date20261109020000 extends SimpleMigrationStep {
 			return null;
 		}
 		$table->addColumn('parent_id', Types::INTEGER, ['notnull' => false]);
-		$table->addColumn('parent_tab', Types::SMALLINT, ['notnull' => false]);
+		$table->addColumn('parent_tab', Types::STRING, ['notnull' => false, 'length' => GridWidgetTypes::TAB_KEY_MAX_LENGTH]);
 		return $schema;
 	}
 }

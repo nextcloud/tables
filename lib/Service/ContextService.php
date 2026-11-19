@@ -907,7 +907,7 @@ class ContextService {
 	 * Imports the widgets of a page the way the API would save them: a widget that does
 	 * not pass is skipped with the reason, and a data widget keeps its source only when
 	 * that table or view came along. A widget in a tab goes into the imported tabs widget
-	 * it was in, and is skipped when that tabs widget or tab did not come along.
+	 * it was in, and onto the page when that tabs widget or tab did not come along.
 	 *
 	 * @param list<mixed> $widgets
 	 * @param array<array-key, ContextNodeRelation> $nodeRelMap new node relations by exported id
@@ -916,8 +916,6 @@ class ContextService {
 	 */
 	private function importWidgets(int $pageId, array $widgets, array $nodeRelMap): void {
 		$inputs = [];
-		$exportedIds = [];
-		$exportedParents = [];
 		foreach ($widgets as $index => $widgetArr) {
 			// an unknown icon, or a source on a type that shows none, is dropped, not the widget
 			if (is_array($widgetArr) && isset($widgetArr['icon']) && (!is_string($widgetArr['icon']) || !IconHelper::isValid($widgetArr['icon']))) {
@@ -926,13 +924,9 @@ class ContextService {
 			if (is_array($widgetArr) && is_string($widgetArr['type'] ?? null) && !($this->gridWidgetTypes->all()[$widgetArr['type']]['hasSource'] ?? true)) {
 				$widgetArr['source'] = null;
 			}
-			$exportedParent = is_array($widgetArr) ? self::importedKey($widgetArr['parentId'] ?? null) : null;
 			if (is_array($widgetArr)) {
-				// an export names the tabs widget by id; it becomes a position once all are read
-				unset($widgetArr['parentId'], $widgetArr['parentIndex']);
-				if ($exportedParent === null) {
-					unset($widgetArr['parentTab']);
-				}
+				// an export names the tabs widget by its id
+				unset($widgetArr['parentIndex']);
 			}
 			try {
 				$input = $this->gridWidgetTypes->readWidget($index, $widgetArr);
@@ -941,33 +935,33 @@ class ContextService {
 				continue;
 			}
 			$newNodeRel = $input->nodeRelId !== null ? ($nodeRelMap[$input->nodeRelId] ?? null) : null;
-			$exportedId = self::importedKey(is_array($widgetArr) ? ($widgetArr['id'] ?? null) : null);
-			if ($exportedId !== null) {
-				$exportedIds[$exportedId] = count($inputs);
-			}
-			$exportedParents[count($inputs)] = $exportedParent;
-			$inputs[] = $input->withId(null)->withNodeRelId($newNodeRel?->getId());
+			$inputs[] = $input->withNodeRelId($newNodeRel?->getId());
 		}
 
+		// a widget whose tabs widget or tab did not come along keeps its content on the page
+		$exportedIds = array_filter(array_map(static fn (WidgetInput $input): ?int => $input->id, $inputs), static fn (?int $id): bool => $id !== null);
 		foreach ($inputs as $position => $input) {
-			$exportedParent = $exportedParents[$position];
-			$inputs[$position] = $input->withParent($exportedParent === null ? null : ($exportedIds[$exportedParent] ?? -1), $exportedParent === null ? null : $input->parentTab);
-		}
-		$kept = [];
-		foreach (array_keys($inputs) as $position) {
-			try {
-				$this->gridWidgetTypes->validateParent($position, $inputs);
-				$kept[] = $position;
-			} catch (BadRequestError) {
-				$this->logger->warning('Skipping an imported widget: its tabs widget or tab did not come along.');
+			if ($input->parentId !== null && !in_array($input->parentId, $exportedIds, true)) {
+				$this->logger->warning('Putting imported widget ' . $position . ' on the page: its tabs widget did not come along.');
+				$inputs[$position] = $input->withParent(null, null);
 			}
 		}
-		// positions shift once widgets are left out
-		$newPositions = array_flip($kept);
-		$this->widgetService->insertAll($pageId, array_map(static fn (int $position): WidgetInput => $inputs[$position]->withParent(
-			$inputs[$position]->parentIndex === null ? null : $newPositions[$inputs[$position]->parentIndex],
-			$inputs[$position]->parentTab,
-		), $kept));
+		$inputs = GridWidgetTypes::resolveParents($inputs);
+		// tabs widgets first: one that moves to the page can still hold the widgets of its tabs
+		foreach ([true, false] as $tabsWidgets) {
+			foreach ($inputs as $position => $input) {
+				if (($input->type === GridWidgetTypes::TYPE_TABS) !== $tabsWidgets) {
+					continue;
+				}
+				try {
+					GridWidgetTypes::validateParent($position, $inputs);
+				} catch (BadRequestError $e) {
+					$this->logger->warning('Putting imported widget ' . $position . ' on the page: ' . $e->getMessage());
+					$inputs[$position] = $input->withParent(null, null);
+				}
+			}
+		}
+		$this->widgetService->insertAll($pageId, array_map(static fn (WidgetInput $input): WidgetInput => $input->withId(null), $inputs));
 	}
 
 	/**

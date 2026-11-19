@@ -41,6 +41,8 @@ class GridWidgetTypes {
 	public const GRID_MAX_Y = 10000;
 	public const MAX_WIDGETS_PER_PAGE = 100;
 	public const MAX_TABS = 20;
+	public const TAB_KEY_MAX_LENGTH = 32;
+	private const TAB_KEY_PATTERN = '/^[A-Za-z0-9_-]+$/';
 	/** Bytes of the settings as stored JSON. */
 	public const SETTINGS_MAX_BYTES = 60000;
 
@@ -111,7 +113,7 @@ class GridWidgetTypes {
 				'defaultHeight' => 8,
 				'hasSource' => false,
 				'settings' => [
-					'tabs' => ['type' => 'text', 'title' => $this->l10n->t('Tabs, one per line'), 'default' => '', 'required' => true],
+					'tabs' => ['type' => 'tabs', 'title' => $this->l10n->t('Tabs'), 'default' => [], 'required' => true, 'maxItems' => self::MAX_TABS],
 				],
 			],
 		];
@@ -128,14 +130,14 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * The titles of the tabs of a tabs widget: the non-empty lines of its `tabs` setting.
+	 * The keys of the tabs of a tabs widget, in the order of its `tabs` setting.
 	 *
 	 * @param array<string, TablesWidgetValue> $settings
 	 * @return list<string>
 	 */
-	public static function tabTitles(array $settings): array {
-		$lines = array_map(trim(...), explode("\n", (string)($settings['tabs'] ?? '')));
-		return array_values(array_filter($lines, static fn (string $line): bool => $line !== ''));
+	public static function tabKeys(array $settings): array {
+		$tabs = $settings['tabs'] ?? [];
+		return is_array($tabs) ? array_column($tabs, 'key') : [];
 	}
 
 	/**
@@ -184,11 +186,53 @@ class GridWidgetTypes {
 	 * @return TablesWidgetValue
 	 * @throws BadRequestError
 	 */
-	private function sanitizeValue(string $label, array $property, mixed $value): string {
+	private function sanitizeValue(string $label, array $property, mixed $value): string|array {
 		return match ($property['type']) {
 			'string', 'text' => $this->sanitizeText($label, $value, $property['required'] ?? false),
 			'enum' => $this->sanitizeEnum($label, $value, array_column($property['options'] ?? [], 'value')),
+			'tabs' => $this->sanitizeTabs($label, $value, $property['required'] ?? false, $property['maxItems'] ?? self::MAX_TABS),
 		};
+	}
+
+	/**
+	 * A list of tabs, each a `key` that stays when the tab is renamed or moved and a `title`.
+	 * A tab without a key gets a new one.
+	 *
+	 * @return list<array{key: string, title: string}>
+	 * @throws BadRequestError
+	 */
+	private function sanitizeTabs(string $label, mixed $value, bool $isRequired, int $maxItems): array {
+		$value ??= [];
+		if (!is_array($value) || !array_is_list($value)) {
+			throw new BadRequestError('Widget setting ' . $label . ' must be a list of tabs.');
+		}
+		if ($isRequired && $value === []) {
+			throw new BadRequestError('Widget setting ' . $label . ' needs at least one tab.');
+		}
+		if (count($value) > $maxItems) {
+			throw new BadRequestError('Widget setting ' . $label . ' holds at most ' . $maxItems . ' tabs.');
+		}
+		$tabs = [];
+		$keys = [];
+		foreach ($value as $position => $tab) {
+			$title = is_array($tab) && is_string($tab['title'] ?? null) ? TextHelper::trim($tab['title']) : '';
+			if ($title === '' || mb_strlen($title) > TextHelper::TITLE_MAX_LENGTH) {
+				throw new BadRequestError('Tab ' . $position . ' of widget setting ' . $label . ' needs a title of at most ' . TextHelper::TITLE_MAX_LENGTH . ' characters.');
+			}
+			$key = is_array($tab) ? ($tab['key'] ?? null) : null;
+			if ($key === null || $key === '') {
+				$key = bin2hex(random_bytes(6));
+			}
+			if (!is_string($key) || strlen($key) > self::TAB_KEY_MAX_LENGTH || preg_match(self::TAB_KEY_PATTERN, $key) !== 1) {
+				throw new BadRequestError('Tab ' . $position . ' of widget setting ' . $label . ' needs a key of at most ' . self::TAB_KEY_MAX_LENGTH . ' letters, digits, dashes and underscores.');
+			}
+			if (isset($keys[$key])) {
+				throw new BadRequestError('Tab ' . $position . ' of widget setting ' . $label . ' has the key of another tab.');
+			}
+			$keys[$key] = true;
+			$tabs[] = ['key' => $key, 'title' => $title];
+		}
+		return $tabs;
 	}
 
 	/**
@@ -278,15 +322,19 @@ class GridWidgetTypes {
 		if ($parentIndex !== null && !is_int($parentIndex)) {
 			throw new BadRequestError('The parentIndex of widget ' . $index . ' must be a number.');
 		}
+		$parentId = $widget['parentId'] ?? null;
+		if ($parentId !== null && !is_int($parentId)) {
+			throw new BadRequestError('The parentId of widget ' . $index . ' must be a number.');
+		}
+		if ($parentIndex !== null && $parentId !== null) {
+			throw new BadRequestError('Widget ' . $index . ' names its tabs widget by parentIndex or by parentId, not both.');
+		}
 		$parentTab = $widget['parentTab'] ?? null;
-		if ($parentTab !== null && !is_int($parentTab)) {
-			throw new BadRequestError('The parentTab of widget ' . $index . ' must be a number.');
+		if ($parentTab !== null && !is_string($parentTab)) {
+			throw new BadRequestError('The parentTab of widget ' . $index . ' must be the key of a tab.');
 		}
 		$position = $this->validatePosition($index, $widget);
 		$settings = $this->sanitizeSettings($type, $widget['settings'] ?? null);
-		if ($type === self::TYPE_TABS && count(self::tabTitles($settings)) > self::MAX_TABS) {
-			throw new BadRequestError('Widget ' . $index . ' has more than ' . self::MAX_TABS . ' tabs.');
-		}
 
 		return new WidgetInput(
 			$id,
@@ -302,7 +350,47 @@ class GridWidgetTypes {
 			$nodeRelId,
 			$parentIndex,
 			$parentTab,
+			$parentId,
 		);
+	}
+
+	/**
+	 * Turns the `parentId` of each widget, the id of a widget listed in the same request,
+	 * into the position of that widget, so a page read from the API can be saved as it is.
+	 *
+	 * @param list<WidgetInput> $widgets
+	 * @return list<WidgetInput>
+	 * @throws BadRequestError when a parentId names no widget of the list
+	 */
+	public static function resolveParents(array $widgets): array {
+		$positions = [];
+		foreach ($widgets as $position => $widget) {
+			if ($widget->id !== null) {
+				$positions[$widget->id] = $position;
+			}
+		}
+		foreach ($widgets as $index => $widget) {
+			if ($widget->parentId === null) {
+				continue;
+			}
+			if (!isset($positions[$widget->parentId])) {
+				throw new BadRequestError('Widget ' . $index . ' names a tabs widget that is not in the list.');
+			}
+			$widgets[$index] = $widget->withParent($positions[$widget->parentId], $widget->parentTab);
+		}
+		return $widgets;
+	}
+
+	/**
+	 * Checks where each widget of a list sits, see {@see self::validateParent()}.
+	 *
+	 * @param list<WidgetInput> $widgets
+	 * @throws BadRequestError
+	 */
+	public static function validateParents(array $widgets): void {
+		foreach (array_keys($widgets) as $index) {
+			self::validateParent($index, $widgets);
+		}
 	}
 
 	/**
@@ -312,8 +400,11 @@ class GridWidgetTypes {
 	 * @param list<WidgetInput> $widgets
 	 * @throws BadRequestError
 	 */
-	public function validateParent(int $index, array $widgets): void {
+	public static function validateParent(int $index, array $widgets): void {
 		$widget = $widgets[$index];
+		if ($widget->parentId !== null) {
+			throw new BadRequestError('Widget ' . $index . ' names its tabs widget by an id that was not resolved.');
+		}
 		if ($widget->parentIndex === null) {
 			if ($widget->parentTab !== null) {
 				throw new BadRequestError('Widget ' . $index . ' names a tab but no tabs widget.');
@@ -327,9 +418,8 @@ class GridWidgetTypes {
 		if ($parent->parentIndex !== null || $widget->type === self::TYPE_TABS) {
 			throw new BadRequestError('Widget ' . $index . ' would nest tabs more than one level deep.');
 		}
-		$tabCount = count(self::tabTitles($parent->settings));
-		if ($widget->parentTab === null || $widget->parentTab < 0 || $widget->parentTab >= $tabCount) {
-			throw new BadRequestError('Widget ' . $index . ' must name one of the ' . $tabCount . ' tabs of its tabs widget.');
+		if ($widget->parentTab === null || !in_array($widget->parentTab, self::tabKeys($parent->settings), true)) {
+			throw new BadRequestError('Widget ' . $index . ' must name the key of one of the tabs of its tabs widget.');
 		}
 	}
 
