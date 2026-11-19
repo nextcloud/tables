@@ -66,6 +66,7 @@ class MenuServiceTest extends DatabaseTestCase {
 	private MenuItemMapper $menuItemMapper;
 	private ContextMapper $contextMapper;
 	private ViewMapper&MockObject $viewMapper;
+	private LoggerInterface&MockObject $logger;
 	private PermissionsService&MockObject $permissionsService;
 	private bool $canManage = true;
 	/** @var int[] */
@@ -105,7 +106,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			new ContextNodeRelationMapper($this->connectionAdapter),
 			$pageMapper,
 			$pageContentMapper,
-			$this->createMock(LoggerInterface::class),
+			$this->logger = $this->createMock(LoggerInterface::class),
 			$this->permissionsService,
 			$this->createMock(IUserManager::class),
 			$this->createMock(AuditLogServiceInterface::class),
@@ -472,6 +473,10 @@ class MenuServiceTest extends DatabaseTestCase {
 		$movedTable->id = self::TABLE;
 		$movedTable->setOwnership(self::OWNER);
 		$exported['menu'][] = ['title' => 'Elsewhere', 'target' => ['table' => 'f0000000-0000-4000-8000-000000000000']];
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
 
 		$moved = $this->contextService->importContext($movedTable, $exported, self::TABLE, self::TABLE_UUID);
 		$this->contextIds[] = $moved->getId();
@@ -481,6 +486,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$movedPages = array_flip(array_map(static fn (array $page): string => $page['page_type'], $movedContext->getPages()));
 		$this->assertSame(['Sales', 'Projects', 'https://nextcloud.com', 'Overview'], array_column($menu, 'displayTitle'));
 		$this->assertSame([['pageId' => $movedPages[Page::TYPE_STARTPAGE]], ['nodeRelId' => (int)array_key_first($movedContext->getNodes())], ['pageId' => $movedPages[Page::TYPE_GRID]]], [$menu[0]['target'], $menu[1]['target'], $menu[3]['target']]);
+		$this->assertSame(['Skipping imported menu items: 4: Its table f0000000-0000-4000-8000-000000000000 is not the table of this copy: the account import brings one table per copy of the application.'], $warnings);
 	}
 
 	public function testASchemeImportWithoutAMenuKeepsTheMenu(): void {

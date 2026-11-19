@@ -324,7 +324,8 @@ class MenuService {
 	 * and are skipped with one record for all of them. `$pageIdOf`
 	 * gives the page of the application for an exported page id, or null; `{pageId}` is a
 	 * page of the application itself, see {@see self::withLocalPages()}. `$nodeRelIdOf`
-	 * gives the node relation for the kind (`table` or `view`) and uuid, or null.
+	 * gives the node relation for the kind (`table` or `view`) and uuid, or null. A resolver
+	 * may throw a {@see BadRequestError} to skip the item with its own reason.
 	 * An item sits in the group at the position it names when that group came before it
 	 * and was kept; otherwise it moves to the top.
 	 *
