@@ -55,8 +55,8 @@ export default {
 		},
 	},
 	watch: {
-		'$route'(to) {
-			this.routing(to)
+		'$route'(to, from) {
+			this.routing(to, from)
 		},
 	},
 	async created() {
@@ -80,7 +80,11 @@ export default {
 	},
 	methods: {
 		...mapActions(useTablesStore, ['loadTablesFromBE', 'getAllContexts', 'loadViewsSharedWithMeFromBE', 'loadTemplatesFromBE', 'setActiveRowId', 'setActiveTableId', 'setActiveViewId', 'setActiveContextId']),
-		routing(currentRoute) {
+		/**
+		 * @param {object} currentRoute the route that is shown
+		 * @param {object} [previousRoute] the route shown before, when the route changed
+		 */
+		routing(currentRoute, previousRoute) {
 			const url = generateUrl('/apps/tables/')
 
 			try {
@@ -132,7 +136,11 @@ export default {
 					this.switchActiveMenuEntry(targetElement)
 				}
 
-				// move the focus away from nav bar (import for app-internal switch)
+				// move the focus away from nav bar (import for app-internal switch); a page tab
+				// of the same application keeps it
+				if (this.isOnContext(previousRoute, contextId)) {
+					return
+				}
 				const appContent = document.getElementById('app-content-vue')
 				const oldTabIndex = appContent.tabIndex
 				if (oldTabIndex === -1) {

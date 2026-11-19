@@ -290,4 +290,23 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Added standalone')
 		await expect(page.locator('[data-cy="contextPageLink"]', { hasText: 'Added standalone' })).toHaveAttribute('aria-selected', 'true')
 	})
+
+	test('A page tab keeps the focus when it is activated', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid focus table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid focus app', [table])
+		await createPageViaApi(page.request, user, contextId, 'Focused page')
+		await openApplication(page, contextId)
+
+		const tab = page.locator('[data-cy="contextPageLink"]', { hasText: 'Focused page' })
+		await tab.focus()
+		await page.keyboard.press('Enter')
+		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Focused page')
+		await expect(tab).toBeFocused()
+
+		const home = page.locator('[data-cy="contextStartPageLink"]')
+		await home.focus()
+		await page.keyboard.press('Enter')
+		await expect(home).toHaveAttribute('aria-selected', 'true')
+		await expect(home).toBeFocused()
+	})
 })
