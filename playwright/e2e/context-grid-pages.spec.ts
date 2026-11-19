@@ -231,7 +231,7 @@ test.describe('Grid pages of an application', () => {
 		await shareeContext.close()
 	})
 
-	test('A table removed from the application leaves its widget asking for a new one', async ({ userPage: { page, user } }) => {
+	test('A table removed from the application hides its widget, which asks for a new one in edit mode', async ({ userPage: { page, user } }) => {
 		const table = await createTableViaApi(page.request, user, 'grid removed table')
 		const contextId = await createApplicationViaApi(page.request, user, 'grid removal app', [table])
 		const pageId = await createPageViaApi(page.request, user, contextId, 'Board')
@@ -248,10 +248,11 @@ test.describe('Grid pages of an application', () => {
 		})
 
 		await openApplication(page, contextId, `/page/${pageId}`)
-		await expect(page.locator('[data-cy="gridWidget"] h3', { hasText: 'Gone soon' })).toBeVisible({ timeout: 30000 })
-		await expect(page.locator('[data-cy="dataWidgetNoSource"]')).toBeVisible()
+		await expect(page.locator('[data-cy="gridPage"]')).toBeVisible({ timeout: 30000 })
+		await expect(page.locator('[data-cy="gridWidget"]')).toHaveCount(0)
 
 		await page.locator('[data-cy="gridPageEdit"]').click()
+		await expect(page.locator('[data-cy="gridWidget"] h3', { hasText: 'Gone soon' })).toBeVisible()
 		await expect(page.locator('[data-cy="dataWidgetPickSource"]')).toBeVisible()
 	})
 
