@@ -16,6 +16,7 @@ use OCA\Tables\Db\MenuItem;
 use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Model\MenuOrderEntry;
 use OCA\Tables\Service\MenuService;
 use OCA\Tables\Service\PermissionsService;
 use OCP\IDBConnection;
@@ -55,6 +56,25 @@ class MenuServiceWritesTest extends TestCase {
 
 		$this->menuItemMapper->expects($this->once())->method('clearParent')->with(7, 3);
 		$this->service->delete(7, 3, 'alice');
+	}
+
+	public function testAnOrderSaveWritesOnlyTheItemsThatMoved(): void {
+		$items = [$this->item(3, null, 0, null), $this->item(4, null, 1, 'https://nextcloud.com'), $this->item(5, null, 2, 'https://example.com')];
+		$this->menuItemMapper->method('findByContextId')->willReturn($items);
+		$version = $this->service->findAll(7, 'alice')['version'];
+
+		$this->menuItemMapper->expects($this->once())->method('updatePositions')->with([4 => ['order' => 1, 'parentId' => 3]]);
+		$this->menuItemMapper->expects($this->never())->method('update');
+		$this->service->saveOrder(7, [new MenuOrderEntry(3, null), new MenuOrderEntry(4, 3), new MenuOrderEntry(5, null)], $version, 'alice');
+	}
+
+	public function testAnUnchangedOrderWritesNothing(): void {
+		$this->menuItemMapper->method('findByContextId')->willReturn([$this->item(3, null, 0, null), $this->item(4, 3, 1, 'https://nextcloud.com')]);
+		$version = $this->service->findAll(7, 'alice')['version'];
+
+		$this->menuItemMapper->expects($this->once())->method('updatePositions')->with([]);
+		$this->menuItemMapper->expects($this->never())->method('update');
+		$this->service->saveOrder(7, [new MenuOrderEntry(3, null), new MenuOrderEntry(4, 3)], $version, 'alice');
 	}
 
 	private function item(int $id, ?int $parentId, int $order, ?string $url): MenuItem {

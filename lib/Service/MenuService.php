@@ -154,9 +154,7 @@ class MenuService {
 			}
 			$this->assertValid($item);
 
-			if ($item->getUpdatedFields() !== []) {
-				$this->menuItemMapper->update($item);
-			}
+			$this->menuItemMapper->update($item);
 			return $this->serializeOne($context, $item);
 		}, $this->dbc);
 	}
@@ -232,14 +230,15 @@ class MenuService {
 				}
 			}
 
-			$position = 0;
+			$changed = [];
 			foreach ($parents as $id => $parentId) {
-				$items[$id]->setOrder($position++);
-				$items[$id]->setParentId($parentId);
-				if ($items[$id]->getUpdatedFields() !== []) {
-					$this->menuItemMapper->update($items[$id]);
+				if ($items[$id]->getOrder() !== $positions[$id] || $items[$id]->getParentId() !== $parentId) {
+					$changed[$id] = ['order' => $positions[$id], 'parentId' => $parentId];
+					$items[$id]->setOrder($positions[$id]);
+					$items[$id]->setParentId($parentId);
 				}
 			}
+			$this->menuItemMapper->updatePositions($changed);
 			$saved = array_map(static fn (int $id): MenuItem => $items[$id], array_keys($parents));
 			return ['menu' => $this->serialize($context, $saved), 'version' => $this->version($saved)];
 		}, $this->dbc);
