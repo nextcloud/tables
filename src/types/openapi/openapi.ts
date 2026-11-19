@@ -7958,7 +7958,7 @@ export interface operations {
                     readonly iconName: string;
                     /** @description Description of the context */
                     readonly description: string;
-                    /** @description Ordered meta data of the related nodes */
+                    /** @description Ordered meta data of the related nodes, at most 1000. Each must name a table or view that is a node of the context, comes with a table to be added, or is the only one with its uuid that the user can manage; otherwise the whole import is refused with 400 before anything is written */
                     readonly nodes: readonly {
                         /** Format: int64 */
                         readonly node_type: number;
