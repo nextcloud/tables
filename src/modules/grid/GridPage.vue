@@ -70,7 +70,7 @@
 			</div>
 		</div>
 
-		<NcEmptyContent v-if="shownLayout.length === 0"
+		<NcEmptyContent v-if="shownLayout().length === 0"
 			class="grid-page__empty"
 			:name="t('tables', 'This page is empty')"
 			:description="emptyDescription">
@@ -84,20 +84,7 @@
 			</template>
 		</NcEmptyContent>
 
-		<GridCanvas :layout="shownLayout" :editable="canChange" @layout-change="onLayoutChange">
-			<template #widget="{ item, narrow }">
-				<GridWidget v-if="widgetsById[item.widgetId]"
-					:widget="widgetsById[item.widgetId]"
-					:nodes="context.nodes"
-					:start-page-content="startPageContent"
-					:layout-item="item"
-					:editable="canChange"
-					:arrangeable="!narrow"
-					@configure="configureWidget"
-					@remove="removeWidget"
-					@move="moveWidget" />
-			</template>
-		</GridCanvas>
+		<GridLevel />
 
 		<AddWidget :show-modal="addWidgetOpen"
 			:editing-widget="widgetBeingConfigured"
@@ -120,8 +107,7 @@ import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline
 import { computed, ref } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { mapActions, mapState } from 'pinia'
-import GridCanvas from './GridCanvas.vue'
-import GridWidget from './GridWidget.vue'
+import GridLevel from './GridLevel.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
@@ -145,8 +131,7 @@ export default {
 		TextBoxEditOutline,
 		TrashCanOutline,
 		ViewDashboardOutline,
-		GridCanvas,
-		GridWidget,
+		GridLevel,
 		AddWidget,
 		NamedIcon,
 	},
@@ -154,10 +139,13 @@ export default {
 		return {
 			// Widget titles sit below the title of the page, or of the application on a start page without one
 			gridHeadingLevel: computed(() => this.showHeading ? 3 : 2),
-			// What a tabs widget needs to show and change the widgets in its tabs
-			gridActions: {
-				grid: () => this.activeGrid,
+			// What each level of the grid, the page and every tab, needs to show and change its widgets
+			gridLevel: {
+				shownLayout: this.shownLayout,
+				widgetsByKey: () => this.widgetsById,
 				nodes: () => this.context.nodes,
+				startPageContent: () => this.startPageContent,
+				editable: () => this.canChange,
 				changeLayout: this.onLayoutChange,
 				configure: this.configureWidget,
 				remove: this.removeWidget,
@@ -266,19 +254,6 @@ export default {
 			}
 			return this.canEdit ? t('tables', 'Edit the page to add widgets.') : ''
 		},
-		// The widgets on the page itself, those in tabs are shown by their tabs widget. A data
-		// widget whose table or view left the application only shows in edit mode, where it
-		// can get another one or be removed
-		shownLayout() {
-			const layout = levelLayout(this.activeGrid)
-			if (this.isEditing) {
-				return layout
-			}
-			return layout.filter(item => {
-				const widget = this.widgetsById[item.widgetId]
-				return widget?.type !== WIDGET_TYPE_DATA || widgetTarget(widget, this.context.nodes) !== null
-			})
-		},
 		widgetsById() {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.key, widget]))
 		},
@@ -342,6 +317,24 @@ export default {
 			}
 			// A canvas shows one level of the grid, the page itself or one tab
 			this.draftGrid = { ...this.draftGrid, layout: mergeLayout(this.draftGrid.layout, layout) }
+		},
+		/**
+		 * The layout of one level of the grid as it shows. A data widget whose table or view left
+		 * the application only shows in edit mode, where it can get another one or be removed.
+		 *
+		 * @param {string|null} parentKey the key of the tabs widget, or null for the page itself
+		 * @param {number|null} tab the position of the tab
+		 * @return {Array} the layout items to show
+		 */
+		shownLayout(parentKey = null, tab = null) {
+			const layout = levelLayout(this.activeGrid, parentKey, tab)
+			if (this.isEditing) {
+				return layout
+			}
+			return layout.filter(item => {
+				const widget = this.widgetsById[item.widgetId]
+				return widget?.type !== WIDGET_TYPE_DATA || widgetTarget(widget, this.context.nodes) !== null
+			})
 		},
 		/**
 		 * Opens the dialog for a new widget.
