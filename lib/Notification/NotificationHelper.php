@@ -361,6 +361,7 @@ class NotificationHelper {
 				$params['view'] = [
 					'id' => $element->getId(),
 					'title' => $element->getTitle(),
+					'labelColumnId' => $element->getViewSettingsObject()->getCardTitleSource()
 				];
 			}
 
@@ -724,6 +725,7 @@ class NotificationHelper {
 			$params['view'] = [
 				'id' => $view->getId(),
 				'title' => $view->getTitle(),
+				'labelColumnId' => $view->getViewSettingsObject()->getCardTitleSource()
 			];
 		}
 

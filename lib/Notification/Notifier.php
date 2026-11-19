@@ -10,7 +10,18 @@ namespace OCA\Tables\Notification;
 
 use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\PermissionsService;
+use OCA\Tables\Service\RowVisibilityService;
+use OCA\Tables\Service\ViewService;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\DB\Exception;
+use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
@@ -24,6 +35,10 @@ class Notifier implements INotifier {
 		protected readonly IURLGenerator $url,
 		protected readonly IUserManager $userManager,
 		protected readonly PermissionsService $permissionsService,
+		protected readonly Row2Mapper $row2Mapper,
+		protected readonly ViewService $viewService,
+		protected readonly ColumnMapper $columnMapper,
+		protected readonly RowVisibilityService $rowVisibilityService,
 	) {
 	}
 
@@ -63,10 +78,7 @@ class Notifier implements INotifier {
 		$notification->setIcon($this->url->getAbsoluteURL($this->url->imagePath('tables', 'app-dark.svg')));
 		$params = $notification->getSubjectParameters();
 		$hasViewContext = ($params['isViewContext'] ?? false) === true;
-		$parsedSubject = '';
-		$subject = $notification->getSubject();
 		$richParams = [];
-		$link = '';
 
 		if (isset($params['author'])) {
 			$authorId = (string)$params['author'];
@@ -80,7 +92,10 @@ class Notifier implements INotifier {
 		}
 
 		if (isset($params['table']['id'], $params['table']['title'])) {
-			if (!$this->permissionsService->canAccessNodeById(Application::NODE_TYPE_TABLE, $params['table']['id'])) {
+			if (!$hasViewContext 
+				&& !isset($params['view']['id'], $params['view']['title'])
+				&& !$this->permissionsService->canAccessNodeById(Application::NODE_TYPE_TABLE, $params['table']['id'])
+			) {
 				throw new UnknownNotificationException();
 			}
 
@@ -109,7 +124,7 @@ class Notifier implements INotifier {
 			$richParams['row'] = [
 				'type' => 'highlight',
 				'id' => (string)$params['row']['id'],
-				'name' => 'row',
+				'name' => $this->resolveRowName($params, $notification->getUser(), $l),
 				'link' => $hasViewContext && isset($params['view']['id'])
 					? $this->tablesUrl('/view/' . $params['view']['id'] . '/row/' . $params['row']['id'])
 					: $this->tablesUrl('/table/' . $params['table']['id'] . '/row/' . $params['row']['id']),
@@ -170,8 +185,8 @@ class Notifier implements INotifier {
 						$richParams['table']['name'] ?? '',
 					]);
 				$subject = $hasViewContext
-					? $l->t('{user} has updated this {row} in view {view}')
-					: $l->t('{user} has updated this {row} in table {table}');
+					? $l->t('{user} has updated row {row} in view {view}')
+					: $l->t('{user} has updated row {row} in table {table}');
 				break;
 
 			case ActivityManager::SUBJECT_ROW_DELETE:
@@ -186,8 +201,8 @@ class Notifier implements INotifier {
 						$richParams['table']['name'] ?? '',
 					]);
 				$subject = $hasViewContext
-					? $l->t('{user} has deleted this {row} in view {view}')
-					: $l->t('{user} has deleted this {row} in table {table}');
+					? $l->t('{user} has deleted a row in view {view}')
+					: $l->t('{user} has deleted a row in table {table}');
 				break;
 
 			case ActivityManager::SUBJECT_ROW_ASSIGN:
@@ -368,5 +383,43 @@ class Notifier implements INotifier {
 
 	private function tablesUrl(string $endpoint): string {
 		return $this->url->linkToRouteAbsolute('tables.page.index') . '#/' . trim($endpoint, '/');
+	}
+
+	public function resolveRowName(array $params, string $userId, IL10N $l): string {
+		if (!isset($params['row']['id'])) {
+			return '';
+		}
+
+		// TRANSLATORS: A numeric identifier like: #12
+		$defaultName = $l->t('#%d', $params['row']['id']);
+
+		if (!isset($params['view']['labelColumnId'])) {
+			return $defaultName;
+		}
+
+		try {
+			$view = $this->viewService->find($params['view']['id']);
+
+			$columns = $view->getColumnIds();
+			if (!in_array($params['view']['labelColumnId'], $columns, true)) {
+				return $defaultName;
+			}
+
+			$seeingRow = $this->rowVisibilityService->usersSeeingRow($params['row']['id'], $view, [$userId]);
+			if (empty($seeingRow)) {
+				return $defaultName;
+			}
+
+			$column = $this->columnMapper->find($params['view']['labelColumnId']);
+			$row = $this->row2Mapper->find($params['row']['id'], [$column]);
+
+			$rowName = trim(strip_tags((string)($row->getData()[0]['value'] ?? '')));
+			if ($rowName !== '') {
+				return $rowName;
+			}
+		} catch (NotFoundError|InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|Exception) {
+			// pass for fallback
+		}
+		return $defaultName;
 	}
 }
