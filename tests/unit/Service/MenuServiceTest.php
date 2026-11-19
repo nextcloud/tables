@@ -531,6 +531,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			['id' => 11, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
 			['id' => 12, 'page_type' => Page::TYPE_GRID, 'slug' => $name],
 			['id' => 13, 'page_type' => Page::TYPE_GRID, 'slug' => 'somewhere_else'],
+			['id' => 14, 'page_type' => Page::TYPE_GRID, 'slug' => $context->getPages()[$startPageId]['slug']],
 			['page_type' => Page::TYPE_GRID, 'slug' => $name],
 			'not a page',
 		]));
