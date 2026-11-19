@@ -18,6 +18,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<MenuItem> */
 class MenuItemMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_contexts_menu_item';
 
 	public function __construct(IDBConnection $db) {
@@ -52,15 +54,16 @@ class MenuItemMapper extends QBMapper {
 	}
 
 	/**
-	 * Moves the items of a group to the top level.
+	 * Moves the items of a group of an application to the top level.
 	 *
 	 * @throws Exception
 	 */
-	public function clearParent(int $parentId): void {
+	public function clearParent(int $contextId, int $parentId): void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->update($this->table)
 			->set('parent_id', $qb->createNamedParameter(null, IQueryBuilder::PARAM_NULL))
-			->where($qb->expr()->eq('parent_id', $qb->createNamedParameter($parentId, IQueryBuilder::PARAM_INT)));
+			->where($qb->expr()->eq('context_id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('parent_id', $qb->createNamedParameter($parentId, IQueryBuilder::PARAM_INT)));
 		$qb->executeStatement();
 	}
 
@@ -98,7 +101,7 @@ class MenuItemMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
 			->where($qb->expr()->in($column, $qb->createParameter('values')));
-		foreach (array_chunk($values, 1_000) as $chunk) {
+		foreach (array_chunk($values, self::DB_CHUNK_SIZE) as $chunk) {
 			$qb->setParameter('values', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeStatement();
 		}
