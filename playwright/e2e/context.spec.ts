@@ -11,6 +11,7 @@ import {
 	createTable,
 	createTextLineColumn,
 	createView,
+	escapeRegExp,
 	fillInValueTextLine,
 	loadContext,
 	loadTable,
@@ -33,7 +34,7 @@ async function selectFromVueDropdown(page: Page, inputSelector: string, value: s
 	await input.clear()
 	await input.fill(value)
 
-	const optionByRole = page.getByRole('option', { name: new RegExp(value, 'i') }).first()
+	const optionByRole = page.getByRole('option', { name: new RegExp(escapeRegExp(value), 'i') }).first()
 	if (await optionByRole.isVisible({ timeout: 5000 }).catch(() => false)) {
 		await optionByRole.click()
 		return

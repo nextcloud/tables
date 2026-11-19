@@ -9,7 +9,7 @@ const IS_CI = !!process.env.CI
 const ACTION_TIMEOUT = IS_CI ? 30000 : 10000
 const APP_LOAD_TIMEOUT = IS_CI ? 45000 : 10000
 
-function escapeRegExp(value: string) {
+export function escapeRegExp(value: string) {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
@@ -418,7 +418,8 @@ export async function createContext(
 		const resourceInput = createContextModal.locator('[data-cy="contextResourceForm"] input').first()
 		await resourceInput.click()
 		await resourceInput.fill(resourceTitle)
-		await page.getByRole('option', { name: new RegExp(resourceTitle, 'i') }).first().click()
+		// The option starts with the emoji of the table or view, then its title and details
+		await page.getByRole('option', { name: new RegExp(`^\\W*${escapeRegExp(resourceTitle)}(?!\\w)`, 'i') }).first().click()
 		await expect(createContextModal.locator('[data-cy="contextResourceList"]')).toContainText(resourceTitle)
 	}
 	await page.locator('[data-cy="createContextSubmitBtn"]').click()
