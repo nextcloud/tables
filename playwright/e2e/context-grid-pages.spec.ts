@@ -452,4 +452,19 @@ test.describe('Grid pages of an application', () => {
 		const overflow = await page.locator('#app-content-vue').evaluate(element => element.scrollWidth - element.clientWidth)
 		expect(overflow).toBeLessThanOrEqual(0)
 	})
+
+	test('Deleting a page names it as it is written', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid delete table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid delete app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Q&A\'s plan')
+		await openApplication(page, contextId, `/page/${pageId}`)
+
+		await page.locator('[data-cy="gridPageActions"] button').first().click()
+		await page.locator('[data-cy="gridPageDelete"]').click()
+		const dialog = page.getByRole('dialog', { name: 'Delete page' })
+		await expect(dialog).toContainText('Delete the page "Q&A\'s plan" and its widgets?')
+		await dialog.getByRole('button', { name: 'Delete page' }).click()
+		await expect(page).toHaveURL(new RegExp(`/application/${contextId}$`))
+		await expect(page.locator('[data-cy="contextPageLink"]', { hasText: 'Q&A' })).toHaveCount(0)
+	})
 })
