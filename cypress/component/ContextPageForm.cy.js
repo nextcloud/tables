@@ -6,9 +6,10 @@ import ContextPageForm from '../../src/modules/modals/ContextPageForm.vue'
 
 /**
  * @param {object|null} page the page to edit, or null for a new one
+ * @param {boolean} pending whether the page is being added or saved
  */
-function mountForm(page = null) {
-	cy.mount(ContextPageForm, { props: { showModal: false, page } }).then(({ wrapper }) => {
+function mountForm(page = null, pending = false) {
+	cy.mount(ContextPageForm, { props: { showModal: false, page, pending } }).then(({ wrapper }) => {
 		cy.wrap(wrapper).as('wrapper')
 		cy.wrap(wrapper.setProps({ showModal: true }))
 	})
@@ -51,6 +52,26 @@ describe('ContextPageForm', () => {
 		cy.get('[data-cy="contextPageSubmit"]').should('be.enabled').click()
 		cy.get('@wrapper').then(wrapper => {
 			expect(wrapper.emitted('submit')[0][0]).to.deep.equal({ title: 'Overview', icon: '', description: '' })
+		})
+	})
+
+	it('adds the page with Enter in the title', () => {
+		mountForm()
+
+		cy.get('[data-cy="contextPageTitle"]').type('Overview{enter}')
+		cy.get('@wrapper').then(wrapper => {
+			expect(wrapper.emitted('submit')).to.have.length(1)
+			expect(wrapper.emitted('submit')[0][0].title).to.equal('Overview')
+		})
+	})
+
+	it('does not send the page again while it is being added', () => {
+		mountForm(null, true)
+
+		cy.get('[data-cy="contextPageTitle"]').type('Overview{enter}')
+		cy.get('[data-cy="contextPageSubmit"]').should('be.disabled')
+		cy.get('@wrapper').then(wrapper => {
+			expect(wrapper.emitted('submit')).to.equal(undefined)
 		})
 	})
 })

@@ -65,6 +65,7 @@
 
 		<ContextPageForm :show-modal="pageFormOpen"
 			:page="pageBeingEdited"
+			:pending="pageFormPending"
 			@close="closePageForm"
 			@submit="submitPageForm" />
 		<MainModals />
@@ -125,6 +126,7 @@ export default {
 			activePage: null,
 			pageLoading: false,
 			pageFormOpen: false,
+			pageFormPending: false,
 			pageBeingEdited: null,
 		}
 	},
@@ -436,9 +438,15 @@ export default {
 		 */
 		async submitPageForm(data) {
 			const editing = this.pageBeingEdited
-			const page = editing
-				? await this.updateContextPage({ contextId: this.activeContextId, pageId: editing.id, data })
-				: await this.createContextPage({ contextId: this.activeContextId, data })
+			this.pageFormPending = true
+			let page
+			try {
+				page = editing
+					? await this.updateContextPage({ contextId: this.activeContextId, pageId: editing.id, data })
+					: await this.createContextPage({ contextId: this.activeContextId, data })
+			} finally {
+				this.pageFormPending = false
+			}
 			if (!page) {
 				return
 			}
