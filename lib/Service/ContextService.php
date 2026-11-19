@@ -855,8 +855,8 @@ class ContextService {
 	 * @param list<array{index: int, title: ?string, reason: string}> $skipped
 	 */
 	private function logSkippedMenuItems(array $skipped): void {
-		foreach ($skipped as $item) {
-			$this->logger->warning('Skipping imported menu item ' . $item['index'] . ': ' . $item['reason']);
+		if ($skipped !== []) {
+			$this->logger->warning('Skipping imported menu items: ' . implode('; ', array_map(static fn (array $item): string => $item['index'] . ': ' . $item['reason'], $skipped)));
 		}
 	}
 
