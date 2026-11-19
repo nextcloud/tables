@@ -16,6 +16,11 @@ class RowCellUsergroup extends RowCellSuper {
 	protected ?string $value = null;
 	protected ?int $valueType = null;
 
+	public function __construct() {
+		parent::__construct();
+		$this->addType('valueType', 'integer');
+	}
+
 	public function jsonSerialize(): array {
 		return parent::jsonSerializePreparation($this->value, $this->valueType);
 	}

@@ -180,6 +180,7 @@ class Column extends EntitySuper implements JsonSerializable {
 		$this->addType('id', 'integer');
 		$this->addType('uuid', 'string');
 		$this->addType('tableId', 'integer');
+		$this->addType('orderWeight', 'integer');
 		$this->addType('mandatory', 'boolean');
 
 		// type number

@@ -43,6 +43,7 @@ class Page extends Entity implements \JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('contextId', 'integer');
 		$this->addType('version', 'integer');
 	}
 
