@@ -558,7 +558,9 @@ export default {
 	}
 }
 
-.main-context-view {
+// Only the table list grows wider than the content, so the page bar and the grid pages
+// keep the width of the content
+.resources {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
 }
