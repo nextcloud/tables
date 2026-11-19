@@ -131,7 +131,7 @@ test.describe('Tabs widget', () => {
 		await tabsWidget.getByRole('tab', { name: 'Second' }).click({ timeout: 30000 })
 		await page.locator('[data-cy="gridPageEdit"]').click()
 
-		await tabsWidget.locator('[data-cy="gridWidget"]', { hasText: 'Upper' }).getByRole('button', { name: 'Widget actions' }).click()
+		await tabsWidget.locator('[data-cy="gridWidget"]', { hasText: 'Upper' }).getByRole('button', { name: 'Actions for Upper' }).click()
 		await page.locator('[data-cy="widgetTaller"] button').click()
 		await page.keyboard.press('Escape')
 		const lower = tabsWidget.locator('[data-cy="gridItem"]', { hasText: 'Lower' })
