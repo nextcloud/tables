@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\Widget;
 use OCA\Tables\Db\WidgetMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\ResponseDefinitions;
 use OCP\DB\Exception;
@@ -70,30 +71,17 @@ class WidgetService {
 	 *
 	 * @param list<WidgetInput> $widgets
 	 * @return list<Widget>
+	 * @throws BadRequestError when a widget names a tab it can't sit in
 	 * @throws \InvalidArgumentException when a source is not a node of the application of the page
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
 	public function insertAll(int $pageId, array $widgets): array {
+		GridWidgetTypes::validateParents($widgets);
 		return $this->atomic(function () use ($pageId, $widgets): array {
 			$this->assertSourcesOfPage($pageId, $widgets);
-			$saved = array_map(fn (WidgetInput $widget): Widget => $this->insertWidget($pageId, $widget), $widgets);
-			$this->saveParents($widgets, $saved);
-			return $saved;
+			return $this->saveAll($pageId, $widgets, []);
 		}, $this->db);
-	}
-
-	/**
-	 * @throws Exception
-	 * @throws \JsonException
-	 */
-	private function insertWidget(int $pageId, WidgetInput $input): Widget {
-		$widget = new Widget();
-		$widget->setPageId($pageId);
-		$this->applyFields($widget, $input);
-		$widget = $this->widgetMapper->insert($widget);
-		$widget->resetUpdatedFields();
-		return $widget;
 	}
 
 	/**
@@ -112,12 +100,14 @@ class WidgetService {
 	 *
 	 * @param list<WidgetInput> $widgets
 	 * @return list<TablesWidget> the widgets of the page as stored, in grid order
+	 * @throws BadRequestError when a widget names a tab it can't sit in
 	 * @throws \InvalidArgumentException when an id is not one of a widget of the page, or a
 	 *                                   source is not a node of the application of the page
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
 	public function syncPage(int $pageId, array $widgets): array {
+		GridWidgetTypes::validateParents($widgets);
 		return $this->atomic(function () use ($pageId, $widgets): array {
 			$existing = [];
 			foreach ($this->widgetMapper->findByPageIds([$pageId], true) as $widget) {
@@ -136,42 +126,39 @@ class WidgetService {
 			}
 			$this->deleteByIds(array_values(array_diff(array_keys($existing), $listedIds)));
 
-			$saved = [];
-			foreach ($widgets as $index => $input) {
-				if ($input->id === null) {
-					$saved[$index] = $this->insertWidget($pageId, $input);
-					continue;
-				}
-				// A new entity would not mark a field set to its default, such as a null title, as changed.
-				$widget = $existing[$input->id];
-				$this->applyFields($widget, $input);
-				$saved[$index] = $widget;
-			}
-			$this->saveParents($widgets, $saved);
+			$this->saveAll($pageId, $widgets, $existing);
 			return $this->findByPageIds([$pageId])[$pageId] ?? [];
 		}, $this->db);
 	}
 
 	/**
-	 * Puts each saved widget in the tab its input names, or on the page, once every widget
-	 * has an id, so a widget can name a tabs widget listed after it. Writes what changed.
+	 * Inserts or updates each widget once: the widgets on the page first, so a widget in a
+	 * tab is written with the id of its tabs widget.
 	 *
 	 * @param list<WidgetInput> $inputs
-	 * @param array<int, Widget> $saved the saved widgets by their position in `$inputs`
+	 * @param array<int, Widget> $existing the widgets of the page by id
+	 * @return list<Widget> the saved widgets in the order of `$inputs`
 	 * @throws Exception
+	 * @throws \JsonException
 	 */
-	private function saveParents(array $inputs, array $saved): void {
-		foreach ($inputs as $index => $input) {
-			$widget = $saved[$index];
-			$parentId = $input->parentIndex === null ? null : $saved[$input->parentIndex]->getId();
-			$parentTab = $input->parentIndex === null ? null : $input->parentTab;
-			if ($widget->getParentId() !== $parentId || $widget->getParentTab() !== $parentTab) {
-				$widget->setParentId($parentId);
-				$widget->setParentTab($parentTab);
+	private function saveAll(int $pageId, array $inputs, array $existing): array {
+		$saved = [];
+		foreach ([false, true] as $inTab) {
+			foreach ($inputs as $index => $input) {
+				if (($input->parentIndex !== null) !== $inTab) {
+					continue;
+				}
+				// A new entity would not mark a field set to its default, such as a null title, as changed.
+				$widget = $input->id === null ? new Widget() : $existing[$input->id];
+				$widget->setPageId($pageId);
+				$this->applyFields($widget, $input);
+				$widget->setParentId($input->parentIndex === null ? null : $saved[$input->parentIndex]->getId());
+				$widget->setParentTab($input->parentIndex === null ? null : $input->parentTab);
+				$saved[$index] = $input->id === null ? $this->widgetMapper->insert($widget) : $this->widgetMapper->update($widget);
 			}
-			// a widget with nothing changed is skipped by the mapper
-			$this->widgetMapper->update($widget);
 		}
+		ksort($saved);
+		return array_values($saved);
 	}
 
 	/**

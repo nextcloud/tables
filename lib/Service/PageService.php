@@ -257,9 +257,8 @@ class PageService {
 			}
 			$inputs[] = $input;
 		}
-		foreach (array_keys($inputs) as $index) {
-			$this->gridWidgetTypes->validateParent($index, $inputs);
-		}
+		$inputs = GridWidgetTypes::resolveParents($inputs);
+		GridWidgetTypes::validateParents($inputs);
 		return $inputs;
 	}
 

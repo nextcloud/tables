@@ -243,14 +243,17 @@ namespace OCA\Tables;
  *   ownerType: int,
  * }
  *
- * @psalm-type TablesWidgetValue = string
+ * @psalm-type TablesWidgetTab = array{key: string, title: string}
+ *
+ * @psalm-type TablesWidgetValue = string|list<TablesWidgetTab>
  *
  * @psalm-type TablesWidgetSettingSchema = array{
- *   type: 'string'|'text'|'enum',
+ *   type: 'string'|'text'|'enum'|'tabs',
  *   title: string,
  *   default: TablesWidgetValue,
  *   options?: list<array{value: string, label: string}>,
  *   required?: bool,
+ *   maxItems?: int,
  *   hint?: string,
  * }
  *
@@ -276,7 +279,8 @@ namespace OCA\Tables;
  *   settings?: array<string, TablesWidgetValue>,
  *   source?: array{nodeRelId: int},
  *   parentIndex?: int,
- *   parentTab?: int,
+ *   parentId?: int,
+ *   parentTab?: string,
  * }
  *
  * @psalm-type TablesWidget = array{
@@ -292,7 +296,7 @@ namespace OCA\Tables;
  *   settings: array<string, TablesWidgetValue>|\stdClass,
  *   source: ?array{nodeRelId: int},
  *   parentId: ?int,
- *   parentTab: ?int,
+ *   parentTab: ?string,
  * }
  *
  * @psalm-type TablesPage = array{
