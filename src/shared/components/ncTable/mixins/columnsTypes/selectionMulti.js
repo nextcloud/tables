@@ -5,6 +5,7 @@
 import { AbstractSelectionColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
+import { selectionOptionId } from '../selectionReference.js'
 
 export default class SelectionMutliColumn extends AbstractSelectionColumn {
 
@@ -66,8 +67,27 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 		return super.isSearchStringFound(this.getValueString(cell), cell, searchString)
 	}
 
+	/**
+	 * @param {object} cell the row cell to test
+	 * @param {object} filter the stored filter or condition
+	 * @return {boolean}
+	 */
 	isFilterFound(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const referencedId = selectionOptionId(filterValue)
+		if (referencedId !== null) {
+			const selected = Array.isArray(cell.value) ? cell.value : []
+			const holdsOnly = selected.length === 1 && selected[0] === referencedId
+			const byReference = {
+				[FilterIds.Contains]: () => selected.includes(referencedId),
+				[FilterIds.DoesNotContain]: () => !selected.includes(referencedId),
+				[FilterIds.IsEqual]: () => holdsOnly,
+				[FilterIds.IsNotEqual]: () => !holdsOnly,
+			}[filter.operator.id]
+			if (byReference) {
+				return super.isFilterFound(byReference, cell)
+			}
+		}
 		const valueString = this.getValueString(cell)?.toLowerCase()
 
 		const filterMethod = {
