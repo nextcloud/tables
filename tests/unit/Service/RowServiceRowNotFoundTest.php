@@ -43,6 +43,7 @@ class RowServiceRowNotFoundTest extends TestCase {
 	private PermissionsService&MockObject $permissionsService;
 	private LoggerInterface&MockObject $logger;
 	private bool $canReadView = true;
+	private bool $canDeleteFromTable = true;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -62,7 +63,8 @@ class RowServiceRowNotFoundTest extends TestCase {
 			->willReturnCallback(fn (int $elementId, string $nodeType): bool => $nodeType !== 'view' || $this->canReadView);
 		$this->permissionsService->method('canUpdateRowsByViewId')->willReturn(true);
 		$this->permissionsService->method('canUpdateRowsByTableId')->willReturn(true);
-		$this->permissionsService->method('canDeleteRowsByTableId')->willReturn(true);
+		$this->permissionsService->method('canDeleteRowsByTableId')
+			->willReturnCallback(fn (): bool => $this->canDeleteFromTable);
 
 		$this->viewMapper = $this->createMock(ViewMapper::class);
 
@@ -155,10 +157,22 @@ class RowServiceRowNotFoundTest extends TestCase {
 	}
 
 	public function testDeletingARowThroughAViewWithoutDeletePermissionIsForbidden(): void {
-		$this->permissionsService->method('canDeleteRowsByViewId')->willReturn(false);
+		$this->permissionsService->expects($this->once())
+			->method('canDeleteRowsByViewId')
+			->with(self::VIEW_ID, 'alice')
+			->willReturn(false);
 		$this->row2Mapper->expects($this->never())->method('isRowInViewPresent');
 
 		$this->expectException(PermissionError::class);
+		$this->expectExceptionMessage('Delete row is not allowed.');
 		$this->service->delete(self::ROW_ID, self::VIEW_ID, 'alice');
+	}
+
+	public function testDeletingARowOfATableWithoutDeletePermissionIsForbidden(): void {
+		$this->canDeleteFromTable = false;
+
+		$this->expectException(PermissionError::class);
+		$this->expectExceptionMessage('Delete row is not allowed.');
+		$this->service->delete(self::ROW_ID, null, 'alice');
 	}
 }

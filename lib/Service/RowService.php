@@ -746,8 +746,8 @@ class RowService extends SuperService {
 			if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
-			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
-				$e = new \Exception('Update row is not allowed.');
+			if (!$this->permissionsService->canDeleteRowsByViewId($viewId, $userId)) {
+				$e = new \Exception('Delete row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new PermissionError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
@@ -772,7 +772,7 @@ class RowService extends SuperService {
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId(), $userId)) {
-				$e = new \Exception('Update row is not allowed.');
+				$e = new \Exception('Delete row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new PermissionError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
