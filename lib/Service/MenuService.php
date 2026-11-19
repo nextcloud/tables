@@ -397,70 +397,27 @@ class MenuService {
 	}
 
 	/**
-	 * The pages of an application that the pages of a scheme stand for, by the slug of the
-	 * scheme page. The start page of the scheme is the start page of the application, and
-	 * any other page is the page of the same type with its slug. An automatic `page_<id>`
-	 * slug names a page of the instance the scheme came from, so it stands for no page here.
-	 *
-	 * @param array<array-key, mixed> $schemePages
-	 * @return array<string, int>
-	 */
-	public function schemePageIds(Context $context, array $schemePages): array {
-		$startPageId = null;
-		$pageIdsByName = [];
-		foreach ($context->getPages() ?? [] as $pageId => $page) {
-			if ($page['page_type'] === Page::TYPE_STARTPAGE) {
-				$startPageId ??= (int)$pageId;
-			} else {
-				$pageIdsByName[$page['page_type']][(string)($page['slug'] ?? '')] = (int)$pageId;
-			}
-		}
-
-		$pageIds = [];
-		foreach ($schemePages as $page) {
-			if (!is_array($page) || !is_string($page['slug'] ?? null) || isset($pageIds[$page['slug']])) {
-				continue;
-			}
-			$pageType = is_string($page['page_type'] ?? null) ? $page['page_type'] : '';
-			$pageId = match (true) {
-				$pageType === Page::TYPE_STARTPAGE => $startPageId,
-				Page::isDefaultSlug($page['slug']) => null,
-				default => $pageIdsByName[$pageType][$page['slug']] ?? null,
-			};
-			if ($pageId !== null) {
-				$pageIds[$page['slug']] = $pageId;
-			}
-		}
-		return $pageIds;
-	}
-
-	/**
 	 * The menu a scheme import into this application would save, as the preview shows it and
-	 * as the import takes it back: page targets name the slug of the page of the application
-	 * they stand for and show the title they get there, an item names its group by the group's position among the
-	 * kept items, and only tables and views among the scheme's nodes count as having come
-	 * along. A page the import adds is not there yet; `$addedPageIds` lists those by
-	 * exported id.
+	 * as the import takes it back: page targets point at pages of the application and show
+	 * the title they get there, an item names its group by the group's position among the
+	 * kept items, and only tables and views that are nodes of the application after the
+	 * import count as having come along. Both come resolved, so that the menu and the pages
+	 * of the preview agree.
 	 *
 	 * @param list<mixed> $menu
-	 * @param array<array-key, mixed> $schemePages
-	 * @param array<array-key, mixed> $schemeNodes
-	 * @param array<int, int> $addedPageIds
+	 * @param array<int, ?int> $schemePageIds the page of the application for a page of the scheme by exported id, null for a page the import adds
+	 * @param array<string, ?int> $schemeNodes the tables and views that are nodes of the application after the import, by node type and uuid (`<type>:<uuid>`)
 	 * @return array{to: list<array<array-key, mixed>>, skipped: list<array{index: int, title: ?string, reason: string}>}
 	 */
-	public function previewSchemeImport(Context $context, array $menu, array $schemePages, array $schemeNodes, array $addedPageIds = []): array {
-		$schemeUuids = [];
-		foreach ($schemeNodes as $node) {
-			$kind = ($node['node_type'] ?? null) === Application::NODE_TYPE_VIEW ? 'view' : 'table';
-			$schemeUuids[$kind][(string)($node['node_uuid'] ?? '')] = true;
-		}
-		$pageIds = $this->schemePageIds($context, $schemePages);
+	public function previewSchemeImport(Context $context, array $menu, array $schemePageIds, array $schemeNodes): array {
 		['items' => $items, 'skipped' => $skipped] = $this->readExported(
 			$context,
 			$menu,
-			static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
-			static fn (int $pageId): ?int => $pageIds[$pageId] ?? $addedPageIds[$pageId] ?? null,
+			static fn (string $kind, string $uuid): ?int => array_key_exists(($kind === 'view' ? Application::NODE_TYPE_VIEW : Application::NODE_TYPE_TABLE) . ':' . $uuid, $schemeNodes) ? 0 : null,
+			// a page the import adds is not there yet; any id passes the check
+			static fn (int $pageId): ?int => array_key_exists($pageId, $schemePageIds) ? ($schemePageIds[$pageId] ?? 0) : null,
 		);
+		$pageIds = array_filter($schemePageIds, static fn (?int $pageId): bool => $pageId !== null);
 		$pages = $context->getPages() ?? [];
 		$positions = array_flip(array_column($items, 'index'));
 		$entries = array_map(static function (array $item) use ($positions, $pages, $context): array {

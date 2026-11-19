@@ -251,4 +251,27 @@ class ViewMapper extends QBMapper {
 			->where($qb->expr()->eq('v.uuid', $qb->createNamedParameter($uuid)));
 		return $this->findEntity($qb);
 	}
+
+	/**
+	 * The views of the given tables that have one of the given uuids. A uuid is unique
+	 * within a table only.
+	 *
+	 * @param int[] $tableIds
+	 * @param string[] $uuids
+	 * @return list<View>
+	 * @throws Exception
+	 */
+	public function findByTableIdsAndUuids(array $tableIds, array $uuids): array {
+		$views = [];
+		foreach (array_chunk($uuids, 1000) as $uuidChunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('v.*', 't.ownership')
+				->from($this->table, 'v')
+				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+				->where($qb->expr()->in('v.table_id', $qb->createNamedParameter($tableIds, IQueryBuilder::PARAM_INT_ARRAY)))
+				->andWhere($qb->expr()->in('v.uuid', $qb->createNamedParameter($uuidChunk, IQueryBuilder::PARAM_STR_ARRAY)));
+			array_push($views, ...$this->findEntities($qb));
+		}
+		return $views;
+	}
 }
