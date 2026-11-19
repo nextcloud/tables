@@ -97,4 +97,39 @@ test.describe('Tabs widget', () => {
 		await page.locator('[data-cy="tabsWidget"]').getByRole('tab', { name: 'Second' }).click()
 		await expect(page.getByText('Only in the second tab')).toBeVisible()
 	})
+
+	test('A widget in a tab is arranged within its tab', async ({ userPage: { page, user } }) => {
+		const { contextId, pageId } = await createApplicationWithPage(page.request, user, 'tabs arrange')
+		await ocsRequest(page.request, user, {
+			method: 'PATCH',
+			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
+			data: {
+				version: 0,
+				widgets: [
+					{ type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 12, settings: { tabs: 'First\nSecond' } },
+					{ type: 'text', title: 'Upper', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Upper' }, parentIndex: 0, parentTab: 1 },
+					{ type: 'text', title: 'Lower', gridX: 0, gridY: 2, gridWidth: 6, gridHeight: 2, settings: { text: 'Lower' }, parentIndex: 0, parentTab: 1 },
+				],
+			},
+		})
+		const errors: string[] = []
+		page.on('pageerror', error => errors.push(error.message))
+		await page.goto(`/index.php/apps/tables/#/application/${contextId}/page/${pageId}`)
+		const tabsWidget = page.locator('[data-cy="tabsWidget"]')
+		await tabsWidget.getByRole('tab', { name: 'Second' }).click({ timeout: 30000 })
+		await page.locator('[data-cy="gridPageEdit"]').click()
+
+		await tabsWidget.locator('[data-cy="gridWidget"]', { hasText: 'Upper' }).getByRole('button', { name: 'Widget actions' }).click()
+		await page.locator('[data-cy="widgetTaller"] button').click()
+		await page.keyboard.press('Escape')
+		const lower = tabsWidget.locator('[data-cy="gridItem"]', { hasText: 'Lower' })
+		await expect(lower).toHaveAttribute('gs-y', '3')
+		// The page canvas holds only the tabs widget itself
+		await expect(page.locator('[data-cy="gridPage"] > .grid-canvas > .grid-stack > [data-cy="gridItem"]')).toHaveCount(1)
+
+		await page.locator('[data-cy="gridPageCancel"]').click()
+		await page.locator('[data-cy="contextStartPageLink"]').click()
+		await expect(page.locator('[data-cy="startPageGrid"]')).toBeVisible()
+		expect(errors).toEqual([])
+	})
 })
