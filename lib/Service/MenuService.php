@@ -22,6 +22,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Helper\TextHelper;
+use OCA\Tables\Helper\UrlHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -406,9 +407,8 @@ class MenuService {
 	 * @throws BadRequestError
 	 */
 	private function validateUrl(string $url): string {
-		$url = trim($url);
-		$scheme = strtolower((string)parse_url($url, PHP_URL_SCHEME));
-		if (strlen($url) > MenuItem::URL_MAX_LENGTH || filter_var($url, FILTER_VALIDATE_URL) === false || !in_array($scheme, ['http', 'https'], true)) {
+		$url = TextHelper::trim($url);
+		if (mb_strlen($url) > MenuItem::URL_MAX_LENGTH || !UrlHelper::isAllowedLink($url)) {
 			throw new BadRequestError('A link is an http or https address of at most ' . MenuItem::URL_MAX_LENGTH . ' characters.');
 		}
 		return $url;
