@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+import { ref } from 'vue'
 import { createPinia } from 'pinia'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import TabsWidget from '../../src/modules/grid/widgets/TabsWidget.vue'
@@ -87,6 +88,23 @@ describe('TabsWidget', () => {
 		cy.focused().should('contain.text', 'Closed')
 		cy.focused().trigger('keydown', { key: 'Home' })
 		cy.focused().should('contain.text', 'Open')
+	})
+})
+
+describe('TabsWidget headings', () => {
+	it('puts the titles of widgets in a tab one level below the tabs widget, also when that level changes', () => {
+		cy.viewport(1400, 800)
+		const grid = pageToGrid({ widgets: page.widgets.map(widget => widget.id === 2 ? { ...widget, title: 'Open work' } : widget) })
+		const widgetHeadingLevel = ref(2)
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
+		cy.mount(TabsWidget, {
+			props: { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: false },
+			global: { plugins: [createPinia()], mixins: [{ methods: { t, n } }], provide: { gridLevel: gridLevel(grid, false), widgetHeadingLevel } },
+		})
+
+		cy.contains('h2', 'Open work', { timeout: 20000 }).should('exist')
+		cy.then(() => { widgetHeadingLevel.value = 3 })
+		cy.contains('h3', 'Open work').should('exist')
 	})
 })
 

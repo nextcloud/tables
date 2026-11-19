@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import { tabTitles } from '../gridLayout.js'
@@ -75,7 +75,8 @@ export default {
 	},
 	provide() {
 		return {
-			gridHeadingLevel: this.widgetHeadingLevel,
+			// Follows the level of the tabs widget, which changes when it gets or loses a title
+			gridHeadingLevel: computed(() => this.widgetHeadingLevel),
 		}
 	},
 	props: {
