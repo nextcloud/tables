@@ -1094,7 +1094,7 @@ export type paths = {
         };
         /**
          * [api v2] Get the menu of an application
-         * @description A flat list in display order; the items of a group carry its id as `parentId`. An application without items opens its start page. Readers who cannot manage the application do not get empty groups.
+         * @description A flat list in display order; the items of a group carry its id as `parentId`. An application without items opens its start page. Readers who cannot manage the application do not get empty groups. The `ETag` is the version of the order, which a save of the order sends back as `If-Match`.
          */
         readonly get: operations["menu-index"];
         readonly put?: never;
@@ -1119,7 +1119,7 @@ export type paths = {
         readonly get?: never;
         /**
          * [api v2] Save the order and grouping of the menu of an application
-         * @description `items` lists every item of the menu exactly once, in display order, as `{id, parentId}`; `parentId` is a group at the top level listed earlier, or null. Either all of it is saved or nothing.
+         * @description `items` lists every item of the menu exactly once, in display order, as `{id, parentId}`; `parentId` is a group at the top level listed earlier, or null. The `If-Match` header holds the `ETag` of the menu the list was built from. Either all of it is saved or nothing; the `ETag` of the answer is the new version.
          */
         readonly put: operations["menu-order"];
         readonly post?: never;
@@ -1375,15 +1375,16 @@ export type components = {
             readonly displayTitle: string;
             readonly icon: string | null;
             readonly description: string | null;
-            readonly target: ({
-                /** Format: int64 */
-                readonly pageId: number;
-            } | {
-                /** Format: int64 */
-                readonly nodeRelId: number;
-            } | {
-                readonly url: string;
-            }) | null;
+            readonly target: components["schemas"]["MenuTarget"] | null;
+        };
+        readonly MenuTarget: {
+            /** Format: int64 */
+            readonly pageId: number;
+        } | {
+            /** Format: int64 */
+            readonly nodeRelId: number;
+        } | {
+            readonly url: string;
         };
         readonly NotifyConfig: {
             readonly "notify-assigned": boolean;
@@ -9196,6 +9197,7 @@ export interface operations {
             /** @description Menu returned */
             readonly 200: {
                 headers: {
+                    readonly ETag?: string;
                     readonly [name: string]: unknown;
                 };
                 content: {
@@ -9289,9 +9291,7 @@ export interface operations {
                      * @description What the item opens
                      * @default null
                      */
-                    readonly target?: {
-                        readonly [key: string]: Record<string, never>;
-                    } | null;
+                    readonly target?: components["schemas"]["MenuTarget"] | null;
                 };
             };
         };
@@ -9393,6 +9393,8 @@ export interface operations {
         readonly parameters: {
             readonly query?: never;
             readonly header: {
+                /** @description The ETag of the menu the order was built from */
+                readonly "if-match"?: string;
                 /** @description Required to be true for the API request to pass */
                 readonly "OCS-APIRequest": boolean;
             };
@@ -9419,6 +9421,7 @@ export interface operations {
             /** @description Menu saved */
             readonly 200: {
                 headers: {
+                    readonly ETag?: string;
                     readonly [name: string]: unknown;
                 };
                 content: {
@@ -9430,7 +9433,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description An item missing or listed twice, a parent that is not a group, or the menu changed in between */
+            /** @description No `If-Match`, an item missing or listed twice, or a parent that is not a group */
             readonly 400: {
                 headers: {
                     readonly [name: string]: unknown;
@@ -9476,8 +9479,24 @@ export interface operations {
                     };
                 };
             };
-            /** @description Not found, also for an item of another application */
+            /** @description Not found */
             readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description The menu changed since the version in `If-Match` */
+            readonly 409: {
                 headers: {
                     readonly [name: string]: unknown;
                 };
@@ -9640,9 +9659,7 @@ export interface operations {
                      * @description New target
                      * @default null
                      */
-                    readonly target?: {
-                        readonly [key: string]: Record<string, never>;
-                    } | null;
+                    readonly target?: components["schemas"]["MenuTarget"] | null;
                 };
             };
         };
