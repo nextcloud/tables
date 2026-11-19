@@ -68,6 +68,26 @@ class TableMapper extends QBMapper {
 	}
 
 	/**
+	 * @param string[] $uuids
+	 * @return list<Table> the tables with one of the uuids
+	 * @throws Exception
+	 */
+	public function findAllByUuids(array $uuids): array {
+		$result = [];
+		foreach (array_chunk(array_values(array_unique($uuids)), self::DB_CHUNK_SIZE) as $chunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->where($qb->expr()->in('uuid', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_STR_ARRAY)));
+			foreach ($this->findEntities($qb) as $entity) {
+				$this->cache[(string)$entity->getId()] = $entity;
+				$result[] = $entity;
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * @param int[] $ids
 	 * @return array<int, Table> indexed by table id
 	 */

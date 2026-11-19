@@ -53,6 +53,29 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
+	 * A view uuid is unique within its table only, so several views can have the same one.
+	 *
+	 * @param string[] $uuids
+	 * @return list<View> the views with one of the uuids
+	 * @throws Exception
+	 */
+	public function findAllByUuids(array $uuids): array {
+		$result = [];
+		foreach (array_chunk(array_values(array_unique($uuids)), self::DB_CHUNK_SIZE) as $chunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('v.*', 't.ownership')
+				->from($this->table, 'v')
+				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+				->where($qb->expr()->in('v.uuid', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_STR_ARRAY)));
+			foreach ($this->findEntities($qb) as $entity) {
+				$this->cache[(string)$entity->getId()] = $entity;
+				$result[] = $entity;
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * @param int[] $ids
 	 * @return array<int, View> indexed by view id
 	 */
