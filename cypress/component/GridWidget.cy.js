@@ -65,7 +65,17 @@ describe('GridWidget', () => {
 
 		mountWidget({ key: 'w2', id: 2, type: 'text', title: '', settings: { text: 'First' }, nodeRelId: null }, true)
 		cy.get('[data-cy="gridWidget"] h2').should('not.exist')
-		cy.get('.grid-widget__header--floating button[aria-label="Widget actions"]').should('be.visible')
+		cy.get('.grid-widget__header--floating button[aria-label="Actions for text"]').should('be.visible')
+	})
+
+	it('is a region labelled by its heading only when it has a title', () => {
+		mountWidget({ key: 'w2', id: 2, type: 'text', title: '', settings: { text: 'First' }, nodeRelId: null }, false)
+		cy.get('div[data-cy="gridWidget"]').should('not.have.attr', 'aria-label')
+		cy.get('section[data-cy="gridWidget"]').should('not.exist')
+
+		mountWidget({ key: 'w11', id: 11, type: 'text', title: 'Notes', settings: { text: 'First' }, nodeRelId: null }, false)
+		cy.get('section[data-cy="gridWidget"]').should('have.attr', 'aria-labelledby', 'grid-widget-title-w11')
+		cy.get('#grid-widget-title-w11').should('contain.text', 'Notes')
 	})
 
 	it('titles a data widget without a title after its table, which then shows no title of its own', () => {
@@ -151,6 +161,18 @@ describe('GridWidget', () => {
 		cy.then(() => document.documentElement.style.removeProperty('--app-content-width'))
 	})
 
+	it('keeps the line breaks of a widget description', () => {
+		mountWidget({ key: 'w12', id: 12, type: 'text', title: 'Notes', description: 'First line\nSecond line', settings: { text: '' }, nodeRelId: null }, false)
+		cy.get('[data-cy="gridWidgetDescription"]').should('have.css', 'white-space', 'pre-wrap')
+	})
+
+	it('gives the heading of a header the text color of its color pair', () => {
+		mountWidget({ key: 'w6', id: 6, type: 'header', title: '', settings: { heading: 'Due today', color: 'primary' }, nodeRelId: null }, false)
+		cy.get('.header-widget').then(([header]) => {
+			cy.get('.header-widget__title').should('have.css', 'color', getComputedStyle(header).color)
+		})
+	})
+
 	it('colors a header with a color pair of the theme, and falls back to primary', () => {
 		mountWidget({ key: 'w6', id: 6, type: 'header', title: '', settings: { heading: 'Due today', color: 'warning' }, nodeRelId: null }, false)
 		cy.get('.header-widget').should('have.class', 'header-widget--warning')
@@ -187,11 +209,42 @@ describe('GridWidget', () => {
 	it('moves and resizes a widget from its menu, so the grid can be arranged with a keyboard', () => {
 		mountWidget({ key: 'w6', id: 6, type: 'text', title: 'Notes', settings: { text: '' }, nodeRelId: null }, true, { widgetId: 'w6', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2 })
 
-		cy.get('[data-cy="gridWidget"] button[aria-label="Widget actions"]').click()
+		cy.get('[data-cy="gridWidget"] button[aria-label="Actions for Notes"]').click()
 		cy.get('[data-cy="widgetMoveLeft"]').should('have.class', 'action--disabled')
 		cy.get('[data-cy="widgetMoveRight"] button').click()
 		cy.get('@wrapper').then(wrapper => {
 			expect(wrapper.emitted('move')[0][1]).to.deep.equal({ gridX: 1 })
+		})
+	})
+
+	it('keeps focus on a step from the menu and reads out where the widget went', () => {
+		mountWidget({ key: 'w6', id: 6, type: 'text', title: 'Notes', settings: { text: '' }, nodeRelId: null }, true, { widgetId: 'w6', gridX: 2, gridY: 1, gridWidth: 6, gridHeight: 2 })
+
+		cy.get('[data-cy="gridWidget"] button[aria-label="Actions for Notes"]').click()
+		// The menu focuses its first action once it is open
+		cy.focused().should('contain.text', 'Remove widget')
+		cy.get('[data-cy="widgetNarrower"] button').focus()
+		cy.focused().type('{enter}')
+		cy.get('@wrapper').then(wrapper => {
+			expect(wrapper.emitted('move')[0][1]).to.deep.equal({ gridWidth: -1 })
+			wrapper.setProps({ layoutItem: { widgetId: 'w6', gridX: 2, gridY: 1, gridWidth: 5, gridHeight: 2 } })
+		})
+		cy.get('[data-cy="gridWidgetAnnouncement"]').should('have.attr', 'aria-live', 'polite')
+			.and('contain.text', 'Column 3, row 2, 5 columns wide and 2 rows high')
+		cy.focused().should('contain.text', 'Make narrower')
+	})
+
+	it('swaps moving left and right in a right-to-left language', () => {
+		const language = globalThis._nc_l10n_language
+		globalThis._nc_l10n_language = 'ar'
+		mountWidget({ key: 'w6', id: 6, type: 'text', title: 'Notes', settings: { text: '' }, nodeRelId: null }, true, { widgetId: 'w6', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2 })
+
+		cy.get('[data-cy="gridWidget"] button[aria-label="Actions for Notes"]').click()
+		cy.get('[data-cy="widgetMoveRight"]').should('have.class', 'action--disabled')
+		cy.get('[data-cy="widgetMoveLeft"] button').click()
+		cy.get('@wrapper').then(wrapper => {
+			expect(wrapper.emitted('move')[0][1]).to.deep.equal({ gridX: 1 })
+			globalThis._nc_l10n_language = language
 		})
 	})
 })

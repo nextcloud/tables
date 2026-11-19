@@ -74,6 +74,8 @@ export default {
 
 	&__title {
 		margin: 0;
+		// Core styles give headings the main text color, which is not the text color of every pair
+		color: inherit;
 	}
 
 	&__subtitle {
