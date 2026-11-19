@@ -19,6 +19,7 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Errors\BadRequestError;
@@ -38,6 +39,7 @@ use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\WidgetService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
@@ -54,12 +56,16 @@ class MenuServiceTest extends DatabaseTestCase {
 	private const TABLE_UUID = 'a5d8e2c4-4151-4cde-9f00-000000004151';
 	private const OTHER_TABLE = 4152;
 	private const OTHER_TABLE_UUID = 'a5d8e2c4-4152-4cde-9f00-000000004152';
+	private const VIEW = 4153;
+	private const VIEW_UUID = 'a5d8e2c4-4153-4cde-9f00-000000004153';
+	private const SHARED_VIEW_UUID = 'a5d8e2c4-4154-4cde-9f00-000000004154';
 
 	private MenuService $menuService;
 	private ContextService $contextService;
 	private PageService $pageService;
 	private MenuItemMapper $menuItemMapper;
 	private ContextMapper $contextMapper;
+	private ViewMapper&MockObject $viewMapper;
 	private PermissionsService&MockObject $permissionsService;
 	private bool $canManage = true;
 	/** @var int[] */
@@ -91,7 +97,8 @@ class MenuServiceTest extends DatabaseTestCase {
 		$otherTable->id = self::OTHER_TABLE;
 		$otherTable->setUuid(self::OTHER_TABLE_UUID);
 		$tableMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): Table => [self::TABLE_UUID => $table, self::OTHER_TABLE_UUID => $otherTable][$uuid] ?? throw new DoesNotExistException('No table'));
-		$this->menuService = new MenuService($contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $this->menuItemMapper, $this->permissionsService, $tableMapper, $this->createMock(ViewMapper::class), $this->connectionAdapter);
+		$this->viewMapper = $this->createMock(ViewMapper::class);
+		$this->menuService = new MenuService($contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $this->menuItemMapper, $this->permissionsService, $tableMapper, $this->viewMapper, $this->connectionAdapter);
 
 		$this->contextService = new ContextService(
 			$contextMapper,
@@ -108,7 +115,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			$this->createMock(INavigationManager::class),
 			$this->createMock(IURLGenerator::class),
 			$tableMapper,
-			$this->createMock(ViewMapper::class),
+			$this->viewMapper,
 			$widgetService,
 			new GridWidgetTypes($l10n),
 			$this->menuItemMapper,
@@ -496,6 +503,33 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], self::OWNER, $menu);
 
 		$this->assertSame(['Projects'], array_column($this->menu($contextId), 'displayTitle'));
+	}
+
+	public function testASchemeImportFindsAViewAmongTheApplicationsOwnViews(): void {
+		$view = new View();
+		$view->id = self::VIEW;
+		$view->setUuid(self::VIEW_UUID);
+		$view->setTableId(self::TABLE);
+		$this->viewMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): View => $uuid === self::VIEW_UUID ? $view : throw new MultipleObjectsReturnedException('Two views'));
+		$this->viewMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => $view] : []);
+		$this->viewMapper->method('findIdToTitleMap')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => 'Open projects'] : []);
+		$context = $this->contextService->create('Sales', 'tables', '', [['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE], ['id' => self::VIEW, 'type' => Application::NODE_TYPE_VIEW]], self::OWNER, Application::OWNER_TYPE_USER);
+		$contextId = $context->getId();
+		$this->contextIds[] = $contextId;
+		$nodes = [
+			['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1],
+			['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => self::VIEW_UUID, 'permissions' => 1],
+		];
+		$menu = [
+			['title' => 'Shared', 'target' => ['view' => self::SHARED_VIEW_UUID]],
+			['title' => null, 'target' => ['view' => self::VIEW_UUID]],
+		];
+
+		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $menu);
+
+		$imported = $this->menu($contextId);
+		$viewRelations = array_keys(array_filter($this->contextService->findById($contextId, self::OWNER)->getNodes(), static fn (array $node): bool => $node['node_type'] === Application::NODE_TYPE_VIEW));
+		$this->assertSame([['Open projects', ['nodeRelId' => $viewRelations[0]]]], array_map(static fn (array $item): array => [$item['displayTitle'], $item['target']], $imported));
 	}
 
 	public function testTheMenuOfASchemePreviewImportsAsShown(): void {
