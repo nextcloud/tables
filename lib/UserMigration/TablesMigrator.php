@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\UserMigration;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
@@ -239,7 +240,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 			$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 			$viewIdMap = $this->importViews($views, $tableIdMap, $columnIdMap, $userId);
 			$uuids = ['table' => self::newIdsByUuid($tables, $tableIdMap), 'view' => self::newIdsByUuid($views, $viewIdMap)];
-			$contextIdMap = $this->importContexts($contexts, $userId, $tableIdMap, $viewIdMap, $uuids);
+			$contextIdMap = $this->importContexts($contexts, $userId, $importSource->getOriginalUid(), $tableIdMap, $viewIdMap, $uuids, $output);
 			$this->importShares($importSource, $tableIdMap, $contextIdMap, $userId);
 
 			$this->importRowCells(
@@ -455,23 +456,26 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	}
 
 	/**
-	 * Imports each application once, with its nodes pointing at the imported tables and views.
+	 * Imports each application the exporting user owned once, with its nodes pointing at
+	 * the imported tables and views. An application that was shared with them is skipped.
 	 *
 	 * @param array $contexts
 	 * @param string $userId the user the data is imported for
+	 * @param string $originalUid the user the data was exported from
 	 * @param array<int, int> $tableIdMap new table ids by exported id
 	 * @param array<int, int> $viewIdMap new view ids by exported id
 	 * @param array{table: array<string, list<int>>, view: array<string, list<int>>} $uuids new table and view ids by exported uuid
 	 *
 	 * @return array<int, int> new application ids by exported id
 	 */
-	private function importContexts(array $contexts, string $userId, array $tableIdMap, array $viewIdMap, array $uuids): array {
+	private function importContexts(array $contexts, string $userId, string $originalUid, array $tableIdMap, array $viewIdMap, array $uuids, OutputInterface $output): array {
 		$contextIdMap = [];
 		foreach ($contexts as $context) {
-			$newContext = $this->contextService->importContext($context, $userId, $tableIdMap, $viewIdMap, $uuids);
-			if ($newContext !== null) {
-				$contextIdMap[$context['id']] = $newContext->getId();
+			if (($context['owner'] ?? null) !== $originalUid || ($context['ownerType'] ?? null) !== Application::OWNER_TYPE_USER) {
+				$output->writeln('Skipping application ' . ($context['id'] ?? '?') . ': the exported user did not own it.');
+				continue;
 			}
+			$contextIdMap[$context['id']] = $this->contextService->importContext($context, $userId, $tableIdMap, $viewIdMap, $uuids)->getId();
 		}
 		return $contextIdMap;
 	}

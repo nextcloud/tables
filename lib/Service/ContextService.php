@@ -678,11 +678,10 @@ class ContextService {
 	/**
 	 * Imports an exported application of a moved user's data as an application of
 	 * `$ownerId`, with each node pointing at the table or view it was imported as. A node
-	 * that was not imported is left out, together with the page contents, widget sources
-	 * and menu items showing it. A menu item finds its table or view by the uuid it was
-	 * exported with, among the nodes of this application only. An application none of
-	 * whose nodes was imported is not imported. Without a menu, or when none of its items is
-	 * kept, the menu gets the item that opens the start page.
+	 * that was not imported is left out, with a log line, together with the page contents,
+	 * widget sources and menu items showing it. A menu item finds its table or view by the
+	 * uuid it was exported with, among the nodes of this application only. Without a menu,
+	 * or when none of its items is kept, the menu gets the item that opens the start page.
 	 *
 	 * @param array<array-key, mixed> $context exported application
 	 * @param string $ownerId the user the application is imported for
@@ -690,20 +689,22 @@ class ContextService {
 	 * @param array<int, int> $viewIds ids of the views this import created, by exported id
 	 * @param array{table?: array<string, list<int>>, view?: array<string, list<int>>} $uuids
 	 *        ids of the tables and views this import created, by kind and exported uuid
-	 * @return Context|null the imported application, or null when it was not imported
+	 * @return Context the imported application
 	 *
 	 * @throws \Exception
 	 */
-	public function importContext(array $context, string $ownerId, array $tableIds, array $viewIds, array $uuids = []): ?Context {
+	public function importContext(array $context, string $ownerId, array $tableIds, array $viewIds, array $uuids = []): Context {
 		$nodes = [];
 		foreach (is_array($context['nodes'] ?? null) ? $context['nodes'] : [] as $nodeArr) {
 			$node = is_array($nodeArr) ? self::importedNode($nodeArr, $tableIds, $viewIds) : null;
-			if ($node !== null) {
-				$nodes[] = $node;
+			if ($node === null) {
+				$this->logger->info('Leaving a node out of an imported application: its table or view was not imported.', [
+					'app' => Application::APP_ID,
+					'node' => $nodeArr,
+				]);
+				continue;
 			}
-		}
-		if ($nodes === []) {
-			return null;
+			$nodes[] = $node;
 		}
 
 		return $this->atomic(fn (): Context => $this->insertImportedContext($context, $ownerId, $nodes, $uuids), $this->dbc);
