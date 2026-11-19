@@ -21,6 +21,7 @@ use OCA\Tables\Service\MenuService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\RequestHeader;
 use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception;
@@ -30,6 +31,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesMenuItem from ResponseDefinitions
+ * @psalm-import-type TablesMenuTarget from ResponseDefinitions
  */
 class MenuController extends AOCSController {
 	public function __construct(
@@ -81,7 +83,7 @@ class MenuController extends AOCSController {
 	 * @param string|null $title Title of the item
 	 * @param string|null $icon Name of the icon shown with the title
 	 * @param string|null $description Description of the item
-	 * @param array<string, mixed>|null $target What the item opens
+	 * @param TablesMenuTarget|null $target What the item opens
 	 * @return DataResponse<Http::STATUS_OK, TablesMenuItem, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Item created
@@ -125,12 +127,13 @@ class MenuController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 20, period: 60)]
+	#[RequestHeader(name: 'if-match', description: 'The ETag of the menu the order was built from')]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	#[ApiRoute(verb: 'PUT', url: '/api/2/contexts/{contextId}/menu/order', requirements: ['contextId' => '\d+'])]
 	public function order(int $contextId, array $items): DataResponse {
 		try {
 			$order = MenuOrderEntry::listFromArray($items);
-			$version = self::matchedVersion($this->request->getHeader('If-Match'));
+			$version = self::matchedVersion($this->request->getHeader('if-match'));
 			$menu = $this->menuService->saveOrder($contextId, $order, $version, $this->userId);
 			return new DataResponse($menu['menu'], Http::STATUS_OK, ['ETag' => self::entityTag($menu['version'])]);
 		} catch (BadRequestError $e) {
@@ -155,7 +158,7 @@ class MenuController extends AOCSController {
 	 * @param string|null $title New title, empty to show the title of what the item opens
 	 * @param string|null $icon New icon name, empty to remove it
 	 * @param string|null $description New description, empty to remove it
-	 * @param array<string, mixed>|null $target New target
+	 * @param TablesMenuTarget|null $target New target
 	 * @return DataResponse<Http::STATUS_OK, TablesMenuItem, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Item updated

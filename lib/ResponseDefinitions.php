@@ -303,6 +303,8 @@ namespace OCA\Tables;
  *   widgets: list<TablesWidget>,
  * }
  *
+ * @psalm-type TablesMenuTarget = array{pageId: int}|array{nodeRelId: int}|array{url: string}
+ *
  * @psalm-type TablesMenuItem = array{
  *   id: int,
  *   contextId: int,
@@ -311,7 +313,7 @@ namespace OCA\Tables;
  *   displayTitle: string,
  *   icon: ?string,
  *   description: ?string,
- *   target: array{pageId: int}|array{nodeRelId: int}|array{url: string}|null,
+ *   target: TablesMenuTarget|null,
  * }
  *
  * @psalm-type TablesContextNavigation = array{

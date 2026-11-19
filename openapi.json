@@ -463,45 +463,52 @@
                     },
                     "target": {
                         "nullable": true,
-                        "anyOf": [
+                        "allOf": [
                             {
-                                "type": "object",
-                                "required": [
-                                    "pageId"
-                                ],
-                                "properties": {
-                                    "pageId": {
-                                        "type": "integer",
-                                        "format": "int64"
-                                    }
-                                }
-                            },
-                            {
-                                "type": "object",
-                                "required": [
-                                    "nodeRelId"
-                                ],
-                                "properties": {
-                                    "nodeRelId": {
-                                        "type": "integer",
-                                        "format": "int64"
-                                    }
-                                }
-                            },
-                            {
-                                "type": "object",
-                                "required": [
-                                    "url"
-                                ],
-                                "properties": {
-                                    "url": {
-                                        "type": "string"
-                                    }
-                                }
+                                "$ref": "#/components/schemas/MenuTarget"
                             }
                         ]
                     }
                 }
+            },
+            "MenuTarget": {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "required": [
+                            "pageId"
+                        ],
+                        "properties": {
+                            "pageId": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "nodeRelId"
+                        ],
+                        "properties": {
+                            "nodeRelId": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "url"
+                        ],
+                        "properties": {
+                            "url": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ]
             },
             "NotifyConfig": {
                 "type": "object",
@@ -16921,7 +16928,7 @@
             "get": {
                 "operationId": "menu-index",
                 "summary": "[api v2] Get the menu of an application",
-                "description": "A flat list in display order; the items of a group carry its id as `parentId`. An application without items opens its start page. Readers who cannot manage the application do not get empty groups.",
+                "description": "A flat list in display order; the items of a group carry its id as `parentId`. An application without items opens its start page. Readers who cannot manage the application do not get empty groups. The `ETag` is the version of the order, which a save of the order sends back as `If-Match`.",
                 "tags": [
                     "menu"
                 ],
@@ -16958,6 +16965,13 @@
                 "responses": {
                     "200": {
                         "description": "Menu returned",
+                        "headers": {
+                            "ETag": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -17136,13 +17150,14 @@
                                         "description": "Description of the item"
                                     },
                                     "target": {
-                                        "type": "object",
                                         "nullable": true,
                                         "default": null,
                                         "description": "What the item opens",
-                                        "additionalProperties": {
-                                            "type": "object"
-                                        }
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/MenuTarget"
+                                            }
+                                        ]
                                     }
                                 }
                             }
@@ -17389,7 +17404,7 @@
             "put": {
                 "operationId": "menu-order",
                 "summary": "[api v2] Save the order and grouping of the menu of an application",
-                "description": "`items` lists every item of the menu exactly once, in display order, as `{id, parentId}`; `parentId` is a group at the top level listed earlier, or null. Either all of it is saved or nothing.",
+                "description": "`items` lists every item of the menu exactly once, in display order, as `{id, parentId}`; `parentId` is a group at the top level listed earlier, or null. The `If-Match` header holds the `ETag` of the menu the list was built from. Either all of it is saved or nothing; the `ETag` of the answer is the new version.",
                 "tags": [
                     "menu"
                 ],
@@ -17450,6 +17465,14 @@
                         }
                     },
                     {
+                        "name": "if-match",
+                        "in": "header",
+                        "description": "The ETag of the menu the order was built from",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "OCS-APIRequest",
                         "in": "header",
                         "description": "Required to be true for the API request to pass",
@@ -17463,6 +17486,13 @@
                 "responses": {
                     "200": {
                         "description": "Menu saved",
+                        "headers": {
+                            "ETag": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -17495,7 +17525,7 @@
                         }
                     },
                     "400": {
-                        "description": "An item missing or listed twice, a parent that is not a group, or the menu changed in between",
+                        "description": "No `If-Match`, an item missing or listed twice, or a parent that is not a group",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -17571,7 +17601,45 @@
                         }
                     },
                     "404": {
-                        "description": "Not found, also for an item of another application",
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The menu changed since the version in `If-Match`",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -17719,13 +17787,14 @@
                                         "description": "New description, empty to remove it"
                                     },
                                     "target": {
-                                        "type": "object",
                                         "nullable": true,
                                         "default": null,
                                         "description": "New target",
-                                        "additionalProperties": {
-                                            "type": "object"
-                                        }
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/MenuTarget"
+                                            }
+                                        ]
                                     }
                                 }
                             }

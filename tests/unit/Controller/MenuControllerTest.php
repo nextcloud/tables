@@ -35,7 +35,7 @@ class MenuControllerTest extends TestCase {
 		parent::setUp();
 		$this->menuService = $this->createMock(MenuService::class);
 		$request = $this->createMock(IRequest::class);
-		$request->method('getHeader')->willReturnCallback(fn (string $name): string => $name === 'If-Match' ? $this->ifMatch : '');
+		$request->method('getHeader')->willReturnCallback(fn (string $name): string => $name === 'if-match' ? $this->ifMatch : '');
 		$this->controller = new MenuController(
 			$request,
 			$this->createMock(LoggerInterface::class),
