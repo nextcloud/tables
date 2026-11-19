@@ -173,7 +173,9 @@ class MenuService {
 			$this->lockApplication($contextId);
 			[$item, $context] = $this->getItem($contextId, $itemId, $userId);
 			$deleted = $this->serializeOne($context, $item);
-			$this->menuItemMapper->clearParent($item->getId());
+			if ($item->isGroup()) {
+				$this->menuItemMapper->clearParent($contextId, $item->getId());
+			}
 			$this->menuItemMapper->delete($item);
 			return $deleted;
 		}, $this->dbc);
