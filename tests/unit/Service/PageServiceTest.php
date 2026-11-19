@@ -196,7 +196,9 @@ class PageServiceTest extends TestCase {
 		$this->pageMapper->expects($this->never())->method('update');
 		$this->pageMapper->expects($this->never())->method('deleteByPageId');
 		$this->widgetService->expects($this->never())->method($this->anything());
-		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
+		$menuItemMapper = $this->createMock(MenuItemMapper::class);
+		$menuItemMapper->expects($this->never())->method($this->anything());
+		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class), $menuItemMapper);
 
 		$this->expectException(NotFoundError::class);
 		$this->expectExceptionMessage('Application 7 does not exist');
