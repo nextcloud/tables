@@ -497,7 +497,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$movedPages = array_flip(array_map(static fn (array $page): string => $page['page_type'], $movedContext->getPages()));
 		$this->assertSame(['Sales', 'Projects', 'https://nextcloud.com', 'Overview'], array_column($menu, 'displayTitle'));
 		$this->assertSame([['pageId' => $movedPages[Page::TYPE_STARTPAGE]], ['nodeRelId' => (int)array_key_first($movedContext->getNodes())], ['pageId' => $movedPages[Page::TYPE_GRID]]], [$menu[0]['target'], $menu[1]['target'], $menu[3]['target']]);
-		$this->assertSame(['Skipping imported menu items: 4: Its table f0000000-0000-4000-8000-000000000000 is not the table of this copy: the account import brings one table per copy of the application.'], $warnings);
+		$this->assertSame(['Skipping imported menu items: 4: Its table f0000000-0000-4000-8000-000000000000 is not part of the application.'], $warnings);
 	}
 
 	public function testASchemeImportWithoutAMenuKeepsTheMenu(): void {
@@ -635,11 +635,7 @@ class MenuServiceTest extends DatabaseTestCase {
 	}
 
 	public function testAMovedUsersMenuFollowsTheTablesAndViewsTheyWereImportedAs(): void {
-		$view = new View();
-		$view->id = self::VIEW;
-		$view->setUuid(self::VIEW_UUID);
-		$this->viewMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => $view] : []);
-		$this->viewMapper->method('findIdToTitleMap')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => 'Team'] : []);
+		$this->stubTheView();
 		$context = $this->contextService->create('Sales', 'tables', '', [
 			['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE],
 			['id' => self::VIEW, 'type' => Application::NODE_TYPE_VIEW],
@@ -664,6 +660,7 @@ class MenuServiceTest extends DatabaseTestCase {
 	}
 
 	public function testAMovedUsersMenuItemFindsItsViewWhenTwoViewsShareItsUuid(): void {
+		$this->stubTheView();
 		$context = $this->contextService->create('Sales', 'tables', '', [['id' => self::VIEW, 'type' => Application::NODE_TYPE_VIEW]], self::OWNER, Application::OWNER_TYPE_USER);
 		$this->contextIds[] = $context->getId();
 		$this->menuService->create($context->getId(), null, null, null, MenuTarget::fromArray(['nodeRelId' => (int)array_key_first($this->contextService->findById($context->getId(), self::OWNER)->getNodes())]), self::OWNER);
@@ -776,6 +773,18 @@ class MenuServiceTest extends DatabaseTestCase {
 
 		$menu = $this->menu($contextId);
 		$this->assertSame([null, null, $menu[1]['id'], null], array_column($menu, 'parentId'));
+	}
+
+	/**
+	 * Lets the view mapper find the view "Team" by its id.
+	 */
+	private function stubTheView(): void {
+		$view = new View();
+		$view->id = self::VIEW;
+		$view->setUuid(self::VIEW_UUID);
+		$view->setTitle('Team');
+		$this->viewMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => $view] : []);
+		$this->viewMapper->method('findIdToTitleMap')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => 'Team'] : []);
 	}
 
 	/**
