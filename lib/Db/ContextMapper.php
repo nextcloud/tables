@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace OCA\Tables\Db;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\QBMapper;
@@ -27,6 +29,7 @@ class ContextMapper extends QBMapper {
 		IDBConnection $db,
 		protected UserHelper $userHelper,
 		protected GroupHelper $groupHelper,
+		protected CircleHelper $circleHelper,
 	) {
 		parent::__construct($db, $this->table, Context::class);
 	}
@@ -304,6 +307,13 @@ class ContextMapper extends QBMapper {
 		return $map;
 	}
 
+	/**
+	 * Restrict the query to the contexts this user owns or has been given.
+	 *
+	 * Teams are resolved the same way tables and views resolve them, through
+	 * CircleHelper: without this clause a context shared with a team matches nobody, so the
+	 * share is written and accepted by the UI while every member is refused access.
+	 */
 	protected function applyOwnedOrSharedQuery(IQueryBuilder $qb, string $userId): void {
 		$sharedToConditions = $qb->expr()->orX();
 
@@ -313,7 +323,7 @@ class ContextMapper extends QBMapper {
 
 		// shared to user clause
 		$userShare = $qb->expr()->andX(
-			$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter('user')),
+			$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter(ShareReceiverType::USER)),
 			$qb->expr()->eq('s.receiver', $qb->createNamedParameter($userId)),
 		);
 		$sharedToConditions->add($userShare);
@@ -322,10 +332,20 @@ class ContextMapper extends QBMapper {
 		$groupIDs = $this->userHelper->getGroupIdsForUser($userId);
 		if (!empty($groupIDs)) {
 			$groupShares = $qb->expr()->andX(
-				$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter('group')),
+				$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter(ShareReceiverType::GROUP)),
 				$qb->expr()->in('s.receiver', $qb->createNamedParameter($groupIDs, IQueryBuilder::PARAM_STR_ARRAY)),
 			);
 			$sharedToConditions->add($groupShares);
+		}
+
+		// shared to team clause
+		$circleIds = $this->circleHelper->getCircleIdsForUser($userId) ?? [];
+		if (!empty($circleIds)) {
+			$circleShares = $qb->expr()->andX(
+				$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter(ShareReceiverType::CIRCLE)),
+				$qb->expr()->in('s.receiver', $qb->createNamedParameter($circleIds, IQueryBuilder::PARAM_STR_ARRAY)),
+			);
+			$sharedToConditions->add($circleShares);
 		}
 
 		// owned contexts + apply share conditions
