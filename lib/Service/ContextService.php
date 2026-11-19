@@ -687,8 +687,7 @@ class ContextService {
 	 * @param string $ownerId the user the application is imported for
 	 * @param array<int, int> $tableIds ids of the tables this import created, by exported id
 	 * @param array<int, int> $viewIds ids of the views this import created, by exported id
-	 * @param array{table?: array<string, list<int>>, view?: array<string, list<int>>} $uuids
-	 *        ids of the tables and views this import created, by kind and exported uuid
+	 * @param array{table?: array<string, list<int>>, view?: array<string, list<int>>} $uuids ids of the tables and views this import created, by kind and exported uuid
 	 * @return Context the imported application
 	 *
 	 * @throws \Exception
