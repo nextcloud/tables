@@ -489,7 +489,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			$warnings[] = $message;
 		});
 
-		$moved = $this->contextService->importContext($exported, self::OWNER, [self::TABLE => self::TABLE], []);
+		$moved = $this->contextService->importContext($exported, self::OWNER, [self::TABLE => self::TABLE], [], ['table' => [self::TABLE_UUID => [self::TABLE]]]);
 		$this->contextIds[] = $moved->getId();
 
 		$menu = $this->menu($moved->getId());
@@ -597,7 +597,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$context = $this->contextService->findById($contextId, self::OWNER);
 		$exported = json_decode(json_encode($context->jsonSerialize() + ['pages' => $this->contextService->getPagesWithWidgets($context), 'menu' => $this->menuService->export($context)]), true);
 
-		$moved = $this->contextService->importContext($exported, self::OWNER, [self::TABLE => self::TABLE], []);
+		$moved = $this->contextService->importContext($exported, self::OWNER, [self::TABLE => self::TABLE], [], ['table' => [self::TABLE_UUID => [self::TABLE]]]);
 		$this->contextIds[] = $moved->getId();
 
 		$movedContext = $this->contextService->findById($moved->getId(), self::OWNER);
@@ -654,13 +654,28 @@ class MenuServiceTest extends DatabaseTestCase {
 		$exported['nodes'][$relationIds[self::VIEW]]['node_id'] = 12;
 		$exported['menu'][] = ['title' => 'Elsewhere', 'target' => ['view' => 'f0000000-0000-4000-8000-000000000000']];
 
-		$moved = $this->contextService->importContext($exported, self::OWNER, [11 => self::TABLE], [12 => self::VIEW]);
+		$moved = $this->contextService->importContext($exported, self::OWNER, [11 => self::TABLE], [12 => self::VIEW], ['table' => [self::TABLE_UUID => [self::TABLE]], 'view' => [self::VIEW_UUID => [self::VIEW]]]);
 		$this->contextIds[] = $moved->getId();
 
 		$movedRelationIds = array_flip(array_column($this->contextService->findById($moved->getId(), self::OWNER)->getNodes(), 'node_id', 'id'));
 		$menu = array_slice($this->menu($moved->getId()), -2);
 		$this->assertSame(['Projects', 'Team'], array_column($menu, 'displayTitle'));
 		$this->assertSame([['nodeRelId' => $movedRelationIds[self::TABLE]], ['nodeRelId' => $movedRelationIds[self::VIEW]]], array_column($menu, 'target'));
+	}
+
+	public function testAMovedUsersMenuItemFindsItsViewWhenTwoViewsShareItsUuid(): void {
+		$context = $this->contextService->create('Sales', 'tables', '', [['id' => self::VIEW, 'type' => Application::NODE_TYPE_VIEW]], self::OWNER, Application::OWNER_TYPE_USER);
+		$this->contextIds[] = $context->getId();
+		$this->menuService->create($context->getId(), null, null, null, MenuTarget::fromArray(['nodeRelId' => (int)array_key_first($this->contextService->findById($context->getId(), self::OWNER)->getNodes())]), self::OWNER);
+		$context = $this->contextService->findById($context->getId(), self::OWNER);
+		$exported = json_decode(json_encode($context->jsonSerialize() + ['pages' => $this->contextService->getPagesWithWidgets($context), 'menu' => $this->menuService->export($context)]), true);
+		$exported['nodes'][array_key_first($exported['nodes'])]['node_id'] = 12;
+
+		$moved = $this->contextService->importContext($exported, self::OWNER, [], [11 => 4999, 12 => self::VIEW], ['view' => [self::VIEW_UUID => [4999, self::VIEW]]]);
+		$this->contextIds[] = $moved->getId();
+
+		$movedRelationId = (int)array_key_first($this->contextService->findById($moved->getId(), self::OWNER)->getNodes());
+		$this->assertSame([['nodeRelId' => $movedRelationId]], array_column(array_slice($this->menu($moved->getId()), -1), 'target'));
 	}
 
 	public static function unusableItems(): array {

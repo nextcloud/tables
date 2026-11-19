@@ -421,8 +421,8 @@ class TablesMigratorTest extends TestCase {
 			['id' => 3, 'node_id' => 30, 'node_type' => 1],
 		]];
 		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
-			'tables.json' => json_encode([['id' => 1, 'title' => 'Tasks'], ['id' => 2, 'title' => 'People']]),
-			'views.json' => json_encode([['id' => 30, 'tableId' => 2, 'title' => 'Team']]),
+			'tables.json' => json_encode([['id' => 1, 'uuid' => 'tasks-uuid', 'title' => 'Tasks'], ['id' => 2, 'uuid' => 'people-uuid', 'title' => 'People']]),
+			'views.json' => json_encode([['id' => 30, 'uuid' => 'team-uuid', 'tableId' => 2, 'title' => 'Team'], ['id' => 31, 'uuid' => 'team-uuid', 'tableId' => 2, 'title' => 'Team again']]),
 			'contexts.json' => json_encode([$context]),
 			default => json_encode([]),
 		});
@@ -447,7 +447,7 @@ class TablesMigratorTest extends TestCase {
 
 		$this->contextService->expects($this->once())
 			->method('importContext')
-			->with($context, 'user1', [1 => 100, 2 => 200], [30 => 300])
+			->with($context, 'user1', [1 => 100, 2 => 200], [30 => 300, 31 => 310], ['table' => ['tasks-uuid' => [100], 'people-uuid' => [200]], 'view' => ['team-uuid' => [300, 310]]])
 			->willReturn($this->createMock(Context::class));
 
 		$this->migrator->import($user, $importSource, new NullOutput());

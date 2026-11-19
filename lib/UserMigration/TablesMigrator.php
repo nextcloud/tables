@@ -236,8 +236,10 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				$tableIdMap[$table['id']] = $newTable->getId();
 			}
 
-			$viewIdMap = $this->importViews($importSource, $tableIdMap, $columnIdMap, $userId);
-			$contextIdMap = $this->importContexts($contexts, $userId, $tableIdMap, $viewIdMap);
+			$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
+			$viewIdMap = $this->importViews($views, $tableIdMap, $columnIdMap, $userId);
+			$uuids = ['table' => self::newIdsByUuid($tables, $tableIdMap), 'view' => self::newIdsByUuid($views, $viewIdMap)];
+			$contextIdMap = $this->importContexts($contexts, $userId, $tableIdMap, $viewIdMap, $uuids);
 			$this->importShares($importSource, $tableIdMap, $contextIdMap, $userId);
 
 			$this->importRowCells(
@@ -342,15 +344,14 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	}
 
 	/**
-	 * @param IImportSource $importSource
+	 * @param array $views exported views
 	 * @param array $tableIdMap
 	 * @param array $columnIdMap
 	 * @param string $userId
 	 *
 	 * @return array<int, int> new view ids by exported id
 	 */
-	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, string $userId): array {
-		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
+	private function importViews(array $views, array $tableIdMap, array $columnIdMap, string $userId): array {
 		$viewIdMap = [];
 		foreach ($views as $view) {
 			if (isset($tableIdMap[$view['tableId']])) {
@@ -368,6 +369,25 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 			}
 		}
 		return $viewIdMap;
+	}
+
+	/**
+	 * The ids of the imported tables or views by the uuid they were exported with. A
+	 * uuid can stand for more than one of them.
+	 *
+	 * @param array $exported exported tables or views
+	 * @param array<int, int> $idMap new ids by exported id
+	 * @return array<string, list<int>>
+	 */
+	private static function newIdsByUuid(array $exported, array $idMap): array {
+		$ids = [];
+		foreach ($exported as $node) {
+			$uuid = $node['uuid'] ?? null;
+			if (is_string($uuid) && isset($idMap[$node['id']])) {
+				$ids[$uuid][] = $idMap[$node['id']];
+			}
+		}
+		return $ids;
 	}
 
 	private function remapViewCardSources(array $view, array $columnIdMap): array {
@@ -438,15 +458,17 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	 * Imports each application once, with its nodes pointing at the imported tables and views.
 	 *
 	 * @param array $contexts
+	 * @param string $userId the user the data is imported for
 	 * @param array<int, int> $tableIdMap new table ids by exported id
 	 * @param array<int, int> $viewIdMap new view ids by exported id
+	 * @param array{table: array<string, list<int>>, view: array<string, list<int>>} $uuids new table and view ids by exported uuid
 	 *
 	 * @return array<int, int> new application ids by exported id
 	 */
-	private function importContexts(array $contexts, string $userId, array $tableIdMap, array $viewIdMap): array {
+	private function importContexts(array $contexts, string $userId, array $tableIdMap, array $viewIdMap, array $uuids): array {
 		$contextIdMap = [];
 		foreach ($contexts as $context) {
-			$newContext = $this->contextService->importContext($context, $userId, $tableIdMap, $viewIdMap);
+			$newContext = $this->contextService->importContext($context, $userId, $tableIdMap, $viewIdMap, $uuids);
 			if ($newContext !== null) {
 				$contextIdMap[$context['id']] = $newContext->getId();
 			}
