@@ -16,13 +16,19 @@
 			</div>
 			<div v-if="canEdit" class="grid-page__actions">
 				<template v-if="isEditing">
-					<NcButton variant="secondary" data-cy="gridPageAddWidget" @click="openAddWidget">
+					<NcButton variant="secondary"
+						:disabled="saving"
+						data-cy="gridPageAddWidget"
+						@click="openAddWidget">
 						<template #icon>
 							<Plus :size="20" />
 						</template>
 						{{ t('tables', 'Add widget') }}
 					</NcButton>
-					<NcButton variant="tertiary" data-cy="gridPageCancel" @click="cancelEditing">
+					<NcButton variant="tertiary"
+						:disabled="saving"
+						data-cy="gridPageCancel"
+						@click="cancelEditing">
 						{{ t('tables', 'Cancel') }}
 					</NcButton>
 					<NcButton variant="primary" :disabled="saving" data-cy="gridPageSave" @click="save">
@@ -65,19 +71,19 @@
 				<ViewDashboardOutline />
 			</template>
 			<template v-if="isEditing" #action>
-				<NcButton variant="primary" @click="openAddWidget">
+				<NcButton variant="primary" :disabled="saving" @click="openAddWidget">
 					{{ t('tables', 'Add widget') }}
 				</NcButton>
 			</template>
 		</NcEmptyContent>
 
-		<GridCanvas :layout="activeGrid.layout" :editable="isEditing" @layout-change="onLayoutChange">
+		<GridCanvas :layout="activeGrid.layout" :editable="canChange" @layout-change="onLayoutChange">
 			<template #widget="{ item, narrow }">
 				<GridWidget v-if="widgetsById[item.widgetId]"
 					:widget="widgetsById[item.widgetId]"
 					:nodes="context.nodes"
 					:layout-item="item"
-					:editable="isEditing"
+					:editable="canChange"
 					:arrangeable="!narrow"
 					@configure="configureWidget"
 					@remove="removeWidget"
@@ -207,6 +213,10 @@ export default {
 		isEditing() {
 			return this.draftGrid !== null
 		},
+		// The draft is read only while it is being saved
+		canChange() {
+			return this.isEditing && !this.saving
+		},
 		emptyDescription() {
 			if (this.isEditing) {
 				return t('tables', 'Add a header, a description or a table.')
@@ -258,7 +268,7 @@ export default {
 		 * @param {Array} layout the new layout
 		 */
 		onLayoutChange(layout) {
-			if (!this.isEditing) {
+			if (!this.canChange) {
 				return
 			}
 			this.draftGrid = { ...this.draftGrid, layout }
@@ -292,6 +302,10 @@ export default {
 		 * @param {{type: string, title: string, icon: string|null, description: string, settings: object, nodeRelId: number|null}} payload the widget from the dialog
 		 */
 		onWidgetSubmit(payload) {
+			if (!this.canChange) {
+				this.closeAddWidget()
+				return
+			}
 			if (this.widgetBeingConfigured) {
 				this.draftGrid = {
 					...this.draftGrid,
@@ -356,22 +370,25 @@ export default {
 		 * Saves the whole grid at once.
 		 */
 		async save() {
-			if (!this.isEditing) {
+			if (!this.canChange) {
 				return
 			}
 			this.saving = true
+			const sent = this.draftGrid
 			// Which types carry a source comes from the server
 			await this.loadWidgetTypes()
 			const page = await this.updateContextPage({
 				contextId: this.context.id,
 				pageId: this.page.id,
 				// the version this edit started from, so a save by someone else in between is not undone
-				data: { widgets: gridToWidgets(this.draftGrid, this.widgetTypes), version: this.page.version },
+				data: { widgets: gridToWidgets(sent, this.widgetTypes), version: this.page.version },
 			})
 			this.saving = false
 			// A failed save is already reported by the store
 			if (page) {
-				this.draftGrid = null
+				if (this.draftGrid === sent) {
+					this.draftGrid = null
+				}
 				this.$emit('saved', page)
 				showSuccess(t('tables', 'Page saved'))
 			}
