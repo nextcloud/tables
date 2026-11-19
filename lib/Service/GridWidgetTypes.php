@@ -39,6 +39,9 @@ class GridWidgetTypes {
 	/** Bytes of the settings as stored JSON. */
 	public const SETTINGS_MAX_BYTES = 60000;
 
+	/** @var array<string, TablesWidgetType>|null */
+	private ?array $types = null;
+
 	public function __construct(
 		private readonly IL10N $l10n,
 	) {
@@ -48,7 +51,7 @@ class GridWidgetTypes {
 	 * @return array<string, TablesWidgetType>
 	 */
 	public function all(): array {
-		return [
+		return $this->types ??= [
 			self::TYPE_HEADER => [
 				'type' => self::TYPE_HEADER,
 				'title' => $this->l10n->t('Header'),

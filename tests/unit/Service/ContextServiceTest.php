@@ -67,7 +67,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$this->logger = $logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
@@ -1141,20 +1141,21 @@ final class ContextServiceTest extends TestCase {
 		$context->setOwnerType(Application::OWNER_TYPE_USER);
 		$context->setNodes([]);
 		$context->setPages([
-			301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'dashboard', 'content' => []],
-			302 => ['id' => 302, 'page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'content' => []],
+			301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'dashboard', 'title' => null, 'icon' => null, 'description' => null, 'content' => []],
+			302 => ['id' => 302, 'page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => 'Overview', 'icon' => 'star', 'description' => null, 'content' => []],
 		]);
-		$this->contextMapper->method('findById')->willReturn($context);
+		// once in update(), once after it for the pages and the menu, once for the answer
+		$this->contextMapper->expects($this->exactly(3))->method('findById')->willReturn($context);
 		$this->contextMapper->method('update')->willReturnArgument(0);
-		$this->pageMapper->method('findById')->willReturnCallback(static function (int $id): Page {
-			$page = new Page();
-			$page->id = $id;
-			$page->resetUpdatedFields();
-			return $page;
+		$this->pageMapper->expects($this->never())->method('findById');
+		$raised = [];
+		$this->pageMapper->method('raiseVersion')->willReturnCallback(static function (int $pageId, ?int $expected) use (&$raised): bool {
+			$raised[] = [$pageId, $expected];
+			return true;
 		});
 		$updated = [];
 		$this->pageMapper->method('update')->willReturnCallback(static function (Page $page) use (&$updated): Page {
-			$updated[] = [$page->getId(), $page->getTitle(), $page->getIcon()];
+			$updated[] = [$page->getId(), $page->getTitle(), $page->getIcon(), array_keys($page->getUpdatedFields())];
 			return $page;
 		});
 		$inserted = [];
@@ -1165,12 +1166,18 @@ final class ContextServiceTest extends TestCase {
 		});
 		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$inserted): Page {
 			$page->id = 400 + count($inserted);
+			$page->setSlug('page_' . $page->getId());
 			$inserted[] = ['page_' . $page->getId(), $page->getTitle(), $page->getPageType()];
 			return $page;
 		});
 		$synced = [];
-		$this->widgetService->method('syncPage')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced): array {
-			$synced[$pageId] = array_map(static fn (WidgetInput $widget): array => [$widget->type, $widget->title, $widget->nodeRelId], $widgets);
+		$widgetsOf = static fn (array $widgets): array => array_map(static fn (WidgetInput $widget): array => [$widget->type, $widget->title, $widget->nodeRelId], $widgets);
+		$this->widgetService->method('syncPage')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced, $widgetsOf): array {
+			$synced[$pageId] = $widgetsOf($widgets);
+			return [];
+		});
+		$this->widgetService->method('insertAll')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced, $widgetsOf): array {
+			$synced[$pageId] = $widgetsOf($widgets);
 			return [];
 		});
 		$warnings = [];
@@ -1182,30 +1189,56 @@ final class ContextServiceTest extends TestCase {
 		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', null, [
 			['page_type' => Page::TYPE_STARTPAGE, 'slug' => 'dashboard', 'title' => 'Home', 'icon' => 'star', 'widgets' => [$text('On the start page')]],
 			['page_type' => Page::TYPE_STARTPAGE, 'title' => 'Second start'],
-			['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => 'Overview', 'widgets' => [
-				$text('Kept'),
+			['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => 'Overview', 'icon' => 'star', 'widgets' => [
+				['id' => '12', 'icon' => 'no-such-icon'] + $text('Kept'),
 				['type' => 'data', 'title' => 'Without source', 'gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => null],
 				['type' => 'data', 'title' => 'Old source', 'gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['nodeRelId' => 5]],
+				['type' => 'data', 'title' => 'Not a resource', 'gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['targetType' => 'table', 'targetUuid' => 'elsewhere']],
 				['type' => 'chart', 'title' => 'Unknown type', 'gridX' => 0, 'gridY' => 12, 'gridWidth' => 12, 'gridHeight' => 5],
 			]],
-			['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => 'Same name'],
-			'not a page',
-			['page_type' => Page::TYPE_GRID, 'slug' => 'reports', 'title' => 'Reports', 'widgets' => array_fill(0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE + 1, $text(null))],
+			['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => '   '],
+			['page_type' => 'list'],
+			['page_type' => Page::TYPE_GRID, 'slug' => 'reports', 'title' => 'Reports', 'widgets' => array_fill(0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE + 50, $text(null))],
 		]);
 
-		$this->assertSame([[301, 'Home', 'star'], [302, 'Overview', null]], $updated);
-		$this->assertSame([['page_400', 'Same name', Page::TYPE_GRID], ['reports', 'Reports', Page::TYPE_GRID]], $inserted);
-		$this->assertSame([['text', 'Kept', null], ['data', 'Without source', null]], $synced[302]);
+		$this->assertSame([[301, null], [302, null]], $raised);
+		$this->assertSame([[301, 'Home', 'star', ['title', 'icon']], [400, 'page_400', null, ['title']]], $updated);
+		$this->assertSame([['page_400', null, Page::TYPE_GRID], ['reports', 'Reports', Page::TYPE_GRID]], $inserted);
+		$this->assertSame([['text', 'On the start page', null]], $synced[301]);
+		$this->assertSame([['text', 'Kept', null], ['data', 'Without source', null], ['data', 'Old source', null], ['data', 'Not a resource', null]], $synced[302]);
 		$this->assertSame([], $synced[400]);
 		$this->assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $synced[401]);
-		$this->assertArrayNotHasKey(301, $synced);
 		$this->assertSame([
-			'Skipping widget 0 of page 0 of an imported scheme: only grid pages hold widgets',
 			'Skipping page 1 of an imported scheme: an application has one start page',
-			'Skipping widget 2 of page 2 of an imported scheme: its source names no table or view by uuid',
-			'Skipping widget 3 of page 2 of an imported scheme: Unknown widget type "chart", expected one of: header, text, data, tables',
+			'Skipping widget 4 of page 2 of an imported scheme: Unknown widget type "chart", expected one of: header, text, data, tables',
 			'Skipping page 4 of an imported scheme: its type is not startpage or grid',
-			'Skipping widget 100 of page 5 of an imported scheme: a page holds at most 100 widgets',
+			'Skipping page 5 of an imported scheme: 50 widgets past the limit of 100 widgets of a page',
 		], $warnings);
+	}
+
+	public function testASchemeBringsAtMostTheMaximumNumberOfPages(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 500;
+			return $page;
+		});
+		$this->widgetService->expects($this->exactly(ContextService::MAX_SCHEME_PAGES))->method('insertAll');
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
+
+		$pages = [];
+		for ($i = 0; $i < ContextService::MAX_SCHEME_PAGES + 30; $i++) {
+			$pages[] = ['page_type' => Page::TYPE_GRID, 'slug' => 'page' . $i, 'title' => 'Page ' . $i];
+		}
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', null, $pages);
+
+		$this->assertSame(['Skipping page 50 of an imported scheme: 30 pages past the limit of 50 pages of a scheme'], $warnings);
 	}
 }
