@@ -267,8 +267,9 @@ class MenuService {
 	 * @throws Exception
 	 */
 	private function lockTarget(?MenuTarget $target): void {
-		if ($target?->nodeRelId !== null) {
-			$this->contextNodeRelMapper->lockByIds([$target->nodeRelId]);
+		$nodeRelId = $target?->nodeRelId;
+		if ($nodeRelId !== null) {
+			$this->contextNodeRelMapper->lockByIds([$nodeRelId]);
 		}
 	}
 

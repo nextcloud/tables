@@ -64,7 +64,7 @@ class MenuController extends AOCSController {
 	public function index(int $contextId): DataResponse {
 		try {
 			$menu = $this->menuService->findAll($contextId, $this->userId);
-			return new DataResponse($menu['menu'], Http::STATUS_OK, ['ETag' => self::entityTag($menu['version'])]);
+			return (new DataResponse($menu['menu']))->addHeader('ETag', self::entityTag($menu['version']));
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -135,7 +135,7 @@ class MenuController extends AOCSController {
 			$order = MenuOrderEntry::listFromArray($items);
 			$version = self::matchedVersion($this->request->getHeader('if-match'));
 			$menu = $this->menuService->saveOrder($contextId, $order, $version, $this->userId);
-			return new DataResponse($menu['menu'], Http::STATUS_OK, ['ETag' => self::entityTag($menu['version'])]);
+			return (new DataResponse($menu['menu']))->addHeader('ETag', self::entityTag($menu['version']));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (ConflictError $e) {
