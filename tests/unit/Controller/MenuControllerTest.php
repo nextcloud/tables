@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Controller;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Controller\MenuController;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\MenuOrderEntry;
 use OCA\Tables\Model\MenuTarget;
 use OCA\Tables\Service\MenuService;
@@ -64,9 +65,6 @@ class MenuControllerTest extends TestCase {
 		$errors = [];
 		foreach (self::endpoints() as $endpoint => [$method, , $call]) {
 			$errors[$endpoint . ', not found'] = [$method, $call, new NotFoundError('Menu item 3 does not exist'), Http::STATUS_NOT_FOUND];
-			if ($endpoint !== 'index') {
-				$errors[$endpoint . ', no permission'] = [$method, $call, new PermissionError('User bob cannot manage application 7'), Http::STATUS_FORBIDDEN];
-			}
 			if ($endpoint !== 'index' && $endpoint !== 'destroy') {
 				$errors[$endpoint . ', bad request'] = [$method, $call, new BadRequestError('A group needs a title.'), Http::STATUS_BAD_REQUEST];
 			}
@@ -104,5 +102,26 @@ class MenuControllerTest extends TestCase {
 		$this->menuService->expects($this->never())->method($this->anything());
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $call($this->controller)->getStatus());
+	}
+
+	public static function permissions(): array {
+		return [
+			'index' => ['index', Application::PERMISSION_READ],
+			'create' => ['create', Application::PERMISSION_MANAGE],
+			'order' => ['order', Application::PERMISSION_MANAGE],
+			'update' => ['update', Application::PERMISSION_MANAGE],
+			'destroy' => ['destroy', Application::PERMISSION_MANAGE],
+		];
+	}
+
+	/**
+	 * @dataProvider permissions
+	 */
+	public function testAnEndpointRequiresItsPermissionOnTheApplication(string $method, int $permission): void {
+		$attributes = (new \ReflectionMethod(MenuController::class, $method))->getAttributes(RequirePermission::class);
+
+		$this->assertCount(1, $attributes);
+		$attribute = $attributes[0]->newInstance();
+		$this->assertSame([$permission, 'context', 'contextId'], [$attribute->getPermission(), $attribute->getTypeParam(), $attribute->getIdParam()]);
 	}
 }

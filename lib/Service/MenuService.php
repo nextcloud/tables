@@ -19,7 +19,6 @@ use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Helper\TextHelper;
 use OCA\Tables\Model\MenuOrderEntry;
@@ -35,7 +34,8 @@ use OCP\IDBConnection;
  * The menu of an application. Every item opens something inside the application, so
  * all readers see the same menu; an item whose target is gone is left out.
  *
- * Reads need access to the application, writes need manage permissions on it.
+ * The controller checks access to the application before a read and manage
+ * permissions on it before a write; this class checks that an item belongs to it.
  *
  * @psalm-import-type TablesMenuItem from ResponseDefinitions
  */
@@ -82,13 +82,12 @@ class MenuService {
 	 * @return TablesMenuItem
 	 * @throws BadRequestError
 	 * @throws NotFoundError
-	 * @throws PermissionError
 	 * @throws Exception
 	 */
 	public function create(int $contextId, ?string $title, ?string $icon, ?string $description, ?MenuTarget $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $title, $icon, $description, $target, $userId): array {
 			$this->lockApplication($contextId);
-			$context = $this->getManageableContext($contextId, $userId);
+			$context = $this->contextMapper->findById($contextId, $userId);
 			$items = $this->menuItemMapper->findByContextId($contextId);
 			$startPageId = $this->startPageId($context);
 			if ($items === [] && $startPageId !== null) {
@@ -122,13 +121,12 @@ class MenuService {
 	 * @return TablesMenuItem
 	 * @throws BadRequestError
 	 * @throws NotFoundError
-	 * @throws PermissionError
 	 * @throws Exception
 	 */
 	public function update(int $contextId, int $itemId, ?string $title, ?string $icon, ?string $description, ?MenuTarget $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $itemId, $title, $icon, $description, $target, $userId): array {
 			$this->lockApplication($contextId);
-			[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
+			[$item, $context] = $this->getItem($contextId, $itemId, $userId);
 
 			if ($title !== null) {
 				$item->setTitle(TextHelper::title($title, self::ITEM));
@@ -161,13 +159,12 @@ class MenuService {
 	 *
 	 * @return TablesMenuItem the deleted item
 	 * @throws NotFoundError
-	 * @throws PermissionError
 	 * @throws Exception
 	 */
 	public function delete(int $contextId, int $itemId, string $userId): array {
 		return $this->atomic(function () use ($contextId, $itemId, $userId): array {
 			$this->lockApplication($contextId);
-			[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
+			[$item, $context] = $this->getItem($contextId, $itemId, $userId);
 			$deleted = $this->serializeOne($context, $item);
 			$this->menuItemMapper->clearParent($item->getId());
 			$this->menuItemMapper->delete($item);
@@ -185,14 +182,12 @@ class MenuService {
 	 * @return list<TablesMenuItem> the whole menu
 	 * @throws BadRequestError
 	 * @throws NotFoundError
-	 * @throws PermissionError
 	 * @throws Exception
 	 */
 	public function saveOrder(int $contextId, array $order, string $userId): array {
-		$context = $this->getManageableContext($contextId, $userId);
-
-		$this->atomic(function () use ($context, $order): void {
-			$this->lockApplication($context->getId());
+		return $this->atomic(function () use ($contextId, $order, $userId): array {
+			$this->lockApplication($contextId);
+			$context = $this->contextMapper->findById($contextId, $userId);
 			$items = [];
 			foreach ($this->visibleItems($context, $this->menuItemMapper->findByContextId($context->getId())) as $item) {
 				$items[$item->getId()] = $item;
@@ -230,16 +225,10 @@ class MenuService {
 					$this->menuItemMapper->update($items[$id]);
 				}
 			}
+			return $this->serialize($context, array_map(static fn (int $id): MenuItem => $items[$id], array_keys($parents)));
 		}, $this->dbc);
-
-		return $this->findAll($contextId, $userId);
 	}
 
-	/**
-	 * @throws NotFoundError
-	 * @throws PermissionError
-	 * @throws Exception
-	 */
 	/**
 	 * Locks the application as the first statement of a menu write, so the menu's rules
 	 * are checked on what no other write changes meanwhile, and an item is never added to
@@ -254,24 +243,15 @@ class MenuService {
 		}
 	}
 
-	private function getManageableContext(int $contextId, string $userId): Context {
-		$context = $this->contextMapper->findById($contextId, $userId);
-		if (!$this->permissionsService->canManageContext($context, $userId)) {
-			throw new PermissionError(sprintf('User %s cannot manage application %d', $userId, $contextId));
-		}
-		return $context;
-	}
-
 	/**
-	 * An item with its application, checked once through that application. An item
-	 * whose target is gone is not found, as it is left out of the menu.
+	 * An item with its application. An item whose target is gone is not found, as it is
+	 * left out of the menu.
 	 *
 	 * @return array{MenuItem, Context}
 	 * @throws NotFoundError
-	 * @throws PermissionError
 	 * @throws Exception
 	 */
-	private function getManageableItem(int $contextId, int $itemId, string $userId): array {
+	private function getItem(int $contextId, int $itemId, string $userId): array {
 		try {
 			$item = $this->menuItemMapper->findById($itemId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException $e) {
@@ -280,7 +260,7 @@ class MenuService {
 		if ($item->getContextId() !== $contextId) {
 			throw new NotFoundError('Menu item ' . $itemId . ' does not exist');
 		}
-		$context = $this->getManageableContext($contextId, $userId);
+		$context = $this->contextMapper->findById($contextId, $userId);
 		if ($this->visibleItems($context, [$item]) === []) {
 			throw new NotFoundError('Menu item ' . $itemId . ' does not exist');
 		}

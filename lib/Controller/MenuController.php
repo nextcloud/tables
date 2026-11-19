@@ -12,7 +12,6 @@ namespace OCA\Tables\Controller;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\MenuOrderEntry;
 use OCA\Tables\Model\MenuTarget;
@@ -96,8 +95,6 @@ class MenuController extends AOCSController {
 			return new DataResponse($this->menuService->create($contextId, $title, $icon, $description, $target === null ? null : MenuTarget::fromArray($target), $this->userId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -130,8 +127,6 @@ class MenuController extends AOCSController {
 			return new DataResponse($this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray($items), $this->userId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -167,8 +162,6 @@ class MenuController extends AOCSController {
 			return new DataResponse($this->menuService->update($contextId, $itemId, $title, $icon, $description, $target === null ? null : MenuTarget::fromArray($target), $this->userId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {
@@ -195,8 +188,6 @@ class MenuController extends AOCSController {
 	public function destroy(int $contextId, int $itemId): DataResponse {
 		try {
 			return new DataResponse($this->menuService->delete($contextId, $itemId, $this->userId));
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
 		} catch (Exception $e) {

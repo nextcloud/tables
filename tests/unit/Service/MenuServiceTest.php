@@ -22,7 +22,6 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\MenuOrderEntry;
@@ -321,27 +320,6 @@ class MenuServiceTest extends DatabaseTestCase {
 
 		$this->expectException(NotFoundError::class);
 		$this->menuService->delete($contextId, $item->getId(), self::OWNER);
-	}
-
-	public static function changes(): array {
-		return [
-			'create' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->create($contextId, 'Reports', null, null, null, self::OWNER)],
-			'update' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->update($contextId, $itemId, 'Home', null, null, null, self::OWNER)],
-			'delete' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->delete($contextId, $itemId, self::OWNER)],
-			'order' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->saveOrder($contextId, MenuOrderEntry::listFromArray([['id' => $itemId, 'parentId' => null]]), self::OWNER)],
-		];
-	}
-
-	/**
-	 * @dataProvider changes
-	 */
-	public function testOnlyAManagerChangesTheMenu(\Closure $change): void {
-		[$contextId] = $this->createApplication();
-		$itemId = $this->menuService->findAll($contextId, self::OWNER)[0]['id'];
-		$this->canManage = false;
-
-		$this->expectException(PermissionError::class);
-		$change($this->menuService, $contextId, $itemId);
 	}
 
 	public function testAnItemIsNotFoundThroughAnotherApplication(): void {
