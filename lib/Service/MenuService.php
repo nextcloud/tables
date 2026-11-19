@@ -104,16 +104,8 @@ class MenuService {
 				throw new BadRequestError('A menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items.');
 			}
 
-			$item = new MenuItem();
-			$item->setContextId($contextId);
+			$item = $this->newItem($context, TextHelper::title($title, self::ITEM), IconHelper::optional($icon, self::ITEM), TextHelper::description($description, self::ITEM), $target === null ? null : $this->validateTarget($target, $context));
 			$item->setOrder($items === [] ? 0 : max(array_map(static fn (MenuItem $item): int => $item->getOrder(), $items)) + 1);
-			$item->setTitle(TextHelper::title($title, self::ITEM));
-			$item->setIcon(IconHelper::optional($icon, self::ITEM));
-			$item->setDescription(TextHelper::description($description, self::ITEM));
-			if ($target !== null) {
-				$item->setTarget($this->validateTarget($target, $context));
-			}
-			$this->assertValid($item);
 
 			return $this->serializeOne($context, $this->menuItemMapper->insert($item));
 		}, $this->dbc);
@@ -350,15 +342,8 @@ class MenuService {
 				if (!is_array($entry)) {
 					throw new BadRequestError('It is not an object.');
 				}
-				$item = new MenuItem();
-				$item->setContextId($context->getId());
-				$item->setTitle(TextHelper::title(self::importedText($entry, 'title'), self::ITEM));
-				$item->setIcon(IconHelper::optional(self::importedText($entry, 'icon'), self::ITEM));
-				$item->setDescription(TextHelper::description(self::importedText($entry, 'description'), self::ITEM));
-				if (($entry['target'] ?? null) !== null) {
-					$item->setTarget($this->importedTarget($entry['target'], $context, $pageIdOf, $nodeRelIdOf));
-				}
-				$this->assertValid($item);
+				$target = ($entry['target'] ?? null) === null ? null : $this->importedTarget($entry['target'], $context, $pageIdOf, $nodeRelIdOf);
+				$item = $this->newItem($context, TextHelper::title(self::importedText($entry, 'title'), self::ITEM), IconHelper::optional(self::importedText($entry, 'icon'), self::ITEM), TextHelper::description(self::importedText($entry, 'description'), self::ITEM), $target);
 			} catch (BadRequestError $e) {
 				$skipped[] = ['index' => $index, 'title' => is_array($entry) ? self::importedTitle($entry) : null, 'reason' => $e->getMessage()];
 				continue;
@@ -457,6 +442,10 @@ class MenuService {
 	}
 
 	/**
+	 * The target of an exported item as the API takes it. `{page}`, `{table}` and `{view}`
+	 * are translated by the resolvers, which give pages and node relations of the
+	 * application; `{url}` and `{pageId}` are checked like the API checks a target.
+	 *
 	 * @param \Closure(int): ?int $pageIdOf
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
 	 * @return array{pageId: int}|array{nodeRelId: int}|array{url: string}
@@ -466,17 +455,14 @@ class MenuService {
 		if (is_array($target) && count($target) === 1) {
 			$kind = (string)array_key_first($target);
 			$value = $target[$kind];
-			if ($kind === 'url' && is_string($value)) {
-				return MenuTarget::fromArray(['url' => $value])->toArray();
-			}
 			if ($kind === 'page' && is_int($value)) {
 				return ['pageId' => $pageIdOf($value) ?? throw new BadRequestError('The application has no page ' . $value . '.')];
 			}
-			if ($kind === 'pageId' && is_int($value)) {
-				return isset($context->getPages()[$value]) ? ['pageId' => $value] : throw new BadRequestError('The application has no page ' . $value . '.');
-			}
 			if (($kind === 'table' || $kind === 'view') && is_string($value)) {
 				return ['nodeRelId' => $nodeRelIdOf($kind, $value) ?? throw new BadRequestError('Its ' . $kind . ' ' . $value . ' is not part of the application.')];
+			}
+			if ($kind === 'url' || $kind === 'pageId') {
+				return $this->validateTarget(MenuTarget::fromArray($target), $context);
 			}
 		}
 		throw new BadRequestError('Its target is not {page}, {table}, {view} or {url}.');
@@ -681,6 +667,25 @@ class MenuService {
 			throw new BadRequestError('The target of a menu item is {pageId} of a page or {nodeRelId} of a table or view of this application, or {url} of a link.');
 		}
 		return $target->toArray();
+	}
+
+	/**
+	 * A new item of the application, checked like every item.
+	 *
+	 * @param array{pageId: int}|array{nodeRelId: int}|array{url: string}|null $target
+	 * @throws BadRequestError
+	 */
+	private function newItem(Context $context, ?string $title, ?string $icon, ?string $description, ?array $target): MenuItem {
+		$item = new MenuItem();
+		$item->setContextId($context->getId());
+		$item->setTitle($title);
+		$item->setIcon($icon);
+		$item->setDescription($description);
+		if ($target !== null) {
+			$item->setTarget($target);
+		}
+		$this->assertValid($item);
+		return $item;
 	}
 
 	/**

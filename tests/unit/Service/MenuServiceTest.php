@@ -541,7 +541,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		return [
 			'not an object' => [['Reports'], 'It is not an object.'],
 			'a page that did not come along' => [[['target' => ['page' => 999999999]]], 'The application has no page 999999999.'],
-			'a page the application does not have' => [[['target' => ['pageId' => 999999999]]], 'The application has no page 999999999.'],
+			'a page the application does not have' => [[['target' => ['pageId' => 999999999]]], 'The target of a menu item is {pageId} of a page or {nodeRelId} of a table or view of this application, or {url} of a link.'],
 			'a page by name' => [[['target' => ['page' => 'dashboard']]], 'Its target is not'],
 			'a table that did not come along' => [[['target' => ['table' => 'f0000000-0000-4000-8000-000000000000']]], 'is not part of the application'],
 			'an unknown kind of target' => [[['title' => 'Row', 'target' => ['row' => 'x']]], 'Its target is not'],
