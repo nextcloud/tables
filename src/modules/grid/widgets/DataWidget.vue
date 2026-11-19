@@ -99,8 +99,8 @@ export default {
 	},
 	setup() {
 		const store = useDataStore()
-		const { getColumns, getRows } = storeToRefs(store)
-		return { getColumns, getRows }
+		const { getColumns, getRows, hasRows } = storeToRefs(store)
+		return { getColumns, getRows, hasRows }
 	},
 	data() {
 		return {
@@ -207,7 +207,8 @@ export default {
 				this.loading = false
 				return
 			}
-			this.loading = true
+			// What the store already has stays on screen while it is fetched again
+			this.loading = !this.element || !this.hasRows(this.isView, this.targetId)
 			try {
 				if (this.isView) {
 					await this.loadContextView({ id: this.targetId })

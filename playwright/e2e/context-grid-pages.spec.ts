@@ -555,4 +555,29 @@ test.describe('Grid pages of an application', () => {
 		await expect(tablesWidget.getByRole('heading', { name: 'grid after missing table' })).toBeVisible({ timeout: 30000 })
 		await expect(tablesWidget.getByRole('heading', { name: 'grid before missing table' })).toHaveCount(0)
 	})
+
+	test('Going back to the start page loads each of its tables once, without a spinner', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid back home table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid back home app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Away')
+		await openApplication(page, contextId)
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		await expect(tablesWidget.getByRole('heading', { name: 'grid back home table' })).toBeVisible({ timeout: 30000 })
+
+		await page.locator('[data-cy="contextPageLink"]', { hasText: 'Away' }).click()
+		await expect(page).toHaveURL(new RegExp(`/page/${pageId}$`))
+		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Away')
+
+		const rowRequests: string[] = []
+		page.on('request', request => {
+			if (request.method() === 'GET' && new RegExp(`/row/table/${table}(\\?|$)`).test(request.url())) {
+				rowRequests.push(request.url())
+			}
+		})
+		await page.locator('[data-cy="contextStartPageLink"]').click()
+		await expect(tablesWidget.getByRole('heading', { name: 'grid back home table' })).toBeVisible()
+		await expect(tablesWidget.locator('.data-widget__loading')).toHaveCount(0)
+		await page.waitForTimeout(1000)
+		expect(rowRequests).toHaveLength(1)
+	})
 })
