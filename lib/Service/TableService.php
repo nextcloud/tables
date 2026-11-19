@@ -111,7 +111,7 @@ class TableService extends SuperService {
 		if (count($allTables) === 0 && $createTutorial) {
 			try {
 				$productName = $this->themingDefaults->getName();
-				$tutorialTable = $this->create($this->l->t('Welcome to %s Tables!', [$productName]), 'tutorial', '🚀');
+				$tutorialTable = $this->create($this->l->t('Welcome to %s Tables!', [$productName]), 'tutorial', '🚀', userId: $userId);
 				$allTables[$tutorialTable->getId()] = $tutorialTable;
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|OcpDbException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
