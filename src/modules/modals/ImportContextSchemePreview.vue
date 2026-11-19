@@ -191,16 +191,30 @@
 						<li class="preview-card__meta-title">
 							{{ t('tables', 'From') }}:
 						</li>
-						<li v-for="(item, index) in previewData.menu.from" :key="index">
-							{{ item.displayTitle }}
+						<li v-for="entry in menuTree(previewData.menu.from)" :key="entry.index" data-cy="importSchemeMenuFrom">
+							<span class="preview-menu__title">{{ menuItemTitle(entry.item) }}</span>
+							<span class="preview-menu__target">{{ menuItemTarget(entry.item, previewData.nodes.from) }}</span>
+							<ul v-if="entry.children.length > 0" class="preview-menu__children">
+								<li v-for="child in entry.children" :key="child.index">
+									<span class="preview-menu__title">{{ menuItemTitle(child.item) }}</span>
+									<span class="preview-menu__target">{{ menuItemTarget(child.item, previewData.nodes.from) }}</span>
+								</li>
+							</ul>
 						</li>
 					</ul>
 					<ul class="preview-card__meta--after">
 						<li class="preview-card__meta-title">
 							{{ t('tables', 'To') }}:
 						</li>
-						<li v-for="(item, index) in menuPreview.to" :key="index">
-							{{ item.displayTitle ?? item.title }}
+						<li v-for="entry in menuTree(menuPreview.to)" :key="entry.index" data-cy="importSchemeMenuTo">
+							<span class="preview-menu__title">{{ menuItemTitle(entry.item) }}</span>
+							<span class="preview-menu__target">{{ menuItemTarget(entry.item, importedNodes) }}</span>
+							<ul v-if="entry.children.length > 0" class="preview-menu__children">
+								<li v-for="child in entry.children" :key="child.index">
+									<span class="preview-menu__title">{{ menuItemTitle(child.item) }}</span>
+									<span class="preview-menu__target">{{ menuItemTarget(child.item, importedNodes) }}</span>
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</div>
@@ -209,7 +223,8 @@
 						{{ t('tables', 'Skipped, not available here') }}:
 					</li>
 					<li v-for="item in menuPreview.skipped" :key="item.index">
-						{{ item.title }}
+						<span class="preview-menu__title">{{ menuItemTitle(item) }}</span>
+						<span class="preview-menu__target">{{ item.reason }}</span>
 					</li>
 				</ul>
 			</div>
@@ -222,6 +237,7 @@ import { translate as t } from '@nextcloud/l10n'
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import ImportTableSchemePreview from './ImportTableSchemePreview.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js';
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.ts'
 
 export default {
 	name: 'ImportContextSchemePreview',
@@ -295,6 +311,10 @@ export default {
 			}
 			return this.importNodes || !menu.withCurrentNodes ? menu : menu.withCurrentNodes
 		},
+
+		importedNodes() {
+			return this.importNodes ? this.previewData.nodes.to : this.previewData.nodes.from
+		},
 	},
 
 	watch: {
@@ -365,6 +385,61 @@ export default {
 				tableSubmitPayload: {},
 				included: true,
 			}))
+		},
+
+		/**
+		 * @param {Array} items menu items, each naming its group by the group's position in the list
+		 * @return {Array<{item: object, index: number, children: Array}>} the top-level items with the items of each group
+		 */
+		menuTree(items) {
+			const entries = []
+			const roots = []
+			items.forEach((item, index) => {
+				const entry = { item, index, children: [] }
+				entries[index] = entry
+				const group = item.parent === null || item.parent === undefined ? undefined : entries[item.parent]
+				if (group) {
+					group.children.push(entry)
+				} else {
+					roots.push(entry)
+				}
+			})
+			return roots
+		},
+
+		/**
+		 * @param {object} item a menu item
+		 * @return {string} the title the item shows
+		 */
+		menuItemTitle(item) {
+			return item.displayTitle || item.title || t('tables', 'Untitled item')
+		},
+
+		/**
+		 * @param {object} item a menu item
+		 * @param {Array} nodes the tables and views its table or view is one of
+		 * @return {string} what the item opens
+		 */
+		menuItemTarget(item, nodes) {
+			const target = item.target
+			if (!target) {
+				return t('tables', 'Group')
+			}
+			if (target.url !== undefined) {
+				return t('tables', 'Link: {url}', { url: target.url }, undefined, { escape: false })
+			}
+			if (target.page !== undefined || target.pageId !== undefined) {
+				return t('tables', 'Page')
+			}
+			const isTable = target.table !== undefined
+			const uuid = isTable ? target.table : target.view
+			const node = (nodes ?? []).find(node => node.node_uuid === uuid && node.node_type === (isTable ? NODE_TYPE_TABLE : NODE_TYPE_VIEW))
+			if (!node?.node_title) {
+				return isTable ? t('tables', 'Table') : t('tables', 'View')
+			}
+			return isTable
+				? t('tables', 'Table: {title}', { title: node.node_title }, undefined, { escape: false })
+				: t('tables', 'View: {title}', { title: node.node_title }, undefined, { escape: false })
 		},
 
 		getShortDescription(description) {
@@ -520,5 +595,15 @@ export default {
 
 .preview-empty {
 	color: var(--color-text-maxcontrast);
+}
+
+.preview-menu__title,
+.preview-menu__target {
+	display: block;
+	overflow-wrap: anywhere;
+}
+
+.preview-menu__title {
+	color: var(--color-main-text);
 }
 </style>

@@ -7,6 +7,7 @@ import ImportContextSchemePreview from '../../src/modules/modals/ImportContextSc
 const MENU_SWITCH = '[data-cy="importSchemeMenu"]'
 const SKIPPED = '[data-cy="importSchemeMenuSkipped"]'
 const NODES_SWITCH = '[data-cy="importSchemeNodes"]'
+const TO_ITEMS = '[data-cy="importSchemeMenuTo"]'
 
 const schemeMenu = [
 	{ parent: null, title: 'Reports', displayTitle: 'Reports', icon: null, description: null, target: null },
@@ -47,10 +48,27 @@ describe('Import application scheme preview', () => {
 			})
 	})
 
-	it('lists the items the import would skip', () => {
-		mountPreview({ from: [], to: [], skipped: [{ index: 0, title: 'Missing table', reason: 'Its table is not part of the application.' }] })
+	it('lists the items the import would skip with the reason', () => {
+		mountPreview({ from: [], to: [], skipped: [{ index: 0, title: 'Missing table', reason: 'Its table is not part of the application.' }, { index: 1, title: null, reason: 'It is not an object.' }] })
 
-		cy.get(SKIPPED).should('contain', 'Missing table')
+		cy.get(SKIPPED).should('contain', 'Missing table').and('contain', 'Its table is not part of the application.').and('contain', 'Untitled item')
+	})
+
+	it('shows what each item opens, with the items of a group in it', () => {
+		const to = [
+			...schemeMenu,
+			{ parent: null, title: 'Projects', displayTitle: 'Projects', icon: null, description: null, target: { url: 'https://projects.example.org' } },
+			{ parent: null, title: null, displayTitle: 'Projects', icon: null, description: null, target: { table: 'table-uuid' } },
+			{ parent: null, title: null, displayTitle: '', icon: null, description: null, target: { pageId: 4 } },
+		]
+		mountPreview({ from: [], to, skipped: [] }, { from: [], to: [{ node_type: 0, node_uuid: 'table-uuid', node_title: 'Projects' }] })
+
+		cy.get(TO_ITEMS).should('have.length', 4)
+		cy.get(TO_ITEMS).eq(0).should('contain', 'Reports').and('contain', 'Group')
+		cy.get(TO_ITEMS).eq(0).find('li').should('have.length', 1).and('contain', 'Docs').and('contain', 'Link: https://example.org')
+		cy.get(TO_ITEMS).eq(1).should('contain', 'Link: https://projects.example.org')
+		cy.get(TO_ITEMS).eq(2).should('contain', 'Table: Projects')
+		cy.get(TO_ITEMS).eq(3).should('contain', 'Untitled item').and('contain', 'Page')
 	})
 
 	it('has no menu section for a preview without a menu', () => {
@@ -66,16 +84,17 @@ describe('Import application scheme preview', () => {
 
 /**
  * @param {object|undefined} menu the menu part of the preview response
+ * @param {object} nodes the nodes part of the preview response
  * @return {Cypress.Chainable} the mount result
  */
-function mountPreview(menu) {
+function mountPreview(menu, nodes = { from: [], to: [] }) {
 	return cy.mount(ImportContextSchemePreview, {
 		props: {
 			previewData: {
 				name: { from: 'Intake', to: 'Intake' },
 				icon: { from: 'star', to: 'star' },
 				description: { from: '', to: '' },
-				nodes: { from: [], to: [] },
+				nodes,
 				addTables: {},
 				modifyTables: {},
 				...(menu === undefined ? {} : { menu }),
