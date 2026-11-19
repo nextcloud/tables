@@ -88,10 +88,10 @@ import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import ContextPageBar from '../modules/grid/ContextPageBar.vue'
 import GridPage from '../modules/grid/GridPage.vue'
 import ContextPageForm from '../modules/modals/ContextPageForm.vue'
-import { contextPages, isStartPage } from '../modules/grid/gridLayout.js'
+import { contextPages, isStartPage, pageTitle } from '../modules/grid/gridLayout.js'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
-import { showConfirmation, showError } from '@nextcloud/dialogs'
+import { getDialogBuilder, showError } from '@nextcloud/dialogs'
 
 export default {
 	components: {
@@ -465,13 +465,13 @@ export default {
 		async deletePage(page) {
 			let confirmed = false
 			try {
-				confirmed = await showConfirmation({
-					name: t('tables', 'Delete page'),
-					text: t('tables', 'Delete the page "{title}" and its widgets? The tables and views stay in the application.', { title: page.title }),
-					labelConfirm: t('tables', 'Delete page'),
-					labelReject: t('tables', 'Cancel'),
-					severity: 'warning',
-				})
+				await getDialogBuilder(t('tables', 'Delete page'))
+					.setText(t('tables', 'Delete the page "{title}" and its widgets? The tables and views stay in the application.', { title: pageTitle(page) }, undefined, { escape: false }))
+					.setSeverity('warning')
+					.addButton({ label: t('tables', 'Cancel'), callback: () => {} })
+					.addButton({ label: t('tables', 'Delete page'), variant: 'error', callback: () => { confirmed = true } })
+					.build()
+					.show()
 			} catch {
 				// Closing the dialog keeps the page
 			}
