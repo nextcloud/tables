@@ -1492,7 +1492,7 @@ class ContextService {
 	 * based on the version from before the import is refused.
 	 *
 	 * @param Context $context the application, loaded after its nodes were imported
-	 * @param list<array{exportedId: ?int, pageId: ?int, pageType: string, slug: ?string, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>}> $pages
+	 * @param list<array{exportedId: ?int, pageId: ?int, pageType: string, slug: ?string, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>, ...}> $pages
 	 * @return array<int, int> ids of the pages by the id the scheme gives them
 	 * @throws Exception
 	 * @throws \JsonException
