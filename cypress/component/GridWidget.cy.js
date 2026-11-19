@@ -2,10 +2,40 @@
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+import { h } from 'vue'
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import GridWidget from '../../src/modules/grid/GridWidget.vue'
+import DataWidget from '../../src/modules/grid/widgets/DataWidget.vue'
+import TableWrapper from '../../src/modules/main/sections/TableWrapper.vue'
 import { useTablesStore } from '../../src/store/store.js'
 
-const nodes = { 4: { id: 4, node_type: 0, node_id: 40, permissions: 1 } }
+const nodes = {
+	4: { id: 4, node_type: 0, node_id: 40, permissions: 1 },
+	5: { id: 5, node_type: 1, node_id: 50, permissions: 1 },
+}
+
+const table = { id: 40, title: 'Tasks', emoji: '✅', ownership: 'admin', ownerDisplayName: 'admin', isShared: false, onSharePermissions: null, sort: [] }
+const view = { id: 50, tableId: 40, title: 'Open', emoji: '📌', ownership: 'admin', ownerDisplayName: 'admin', isShared: false, onSharePermissions: null, filter: [], sort: [{ columnId: 1, mode: 'DESC' }], columns: [1], columnSettings: [{ columnId: 1, order: 0 }] }
+const columns = [{ id: 1, tableId: 40, title: 'Name', type: 'text', subtype: 'line', mandatory: false, description: '', textDefault: '', textAllowedPattern: '', textMaxLength: -1, textUnique: false, selectionOptions: [], selectionDefault: '', datetimeDefault: '' }]
+const rows = [{ id: 7, tableId: 40, createdBy: 'admin', createdAt: '2026-01-01 10:00:00', lastEditBy: 'admin', lastEditAt: '2026-01-01 10:00:00', data: [{ columnId: 1, value: 'Write the plan' }] }]
+
+/**
+ * Answers the requests of a data widget for the table and the view with one column and one row,
+ * and puts both in the store, so the widget renders its table.
+ */
+function stubData() {
+	cy.intercept('GET', '**/apps/tables/api/1/tables/40/columns', columns).as('tableColumns')
+	cy.intercept('GET', '**/apps/tables/row/table/40', rows).as('tableRows')
+	cy.intercept('GET', '**/apps/tables/api/1/tables/40/relations', {})
+	cy.intercept('GET', '**/apps/tables/api/1/views/50/columns', columns).as('viewColumns')
+	cy.intercept('GET', '**/apps/tables/row/view/50', rows).as('viewRows')
+	cy.intercept('GET', '**/apps/tables/api/1/views/50/relations', {})
+	cy.then(() => {
+		const store = useTablesStore()
+		store.tables = [{ ...table }]
+		store.views = [{ ...view }]
+	})
+}
 
 /**
  * @param {object} widget the widget to show
@@ -39,14 +69,86 @@ describe('GridWidget', () => {
 	})
 
 	it('titles a data widget without a title after its table, which then shows no title of its own', () => {
-		cy.intercept('GET', '**/apps/tables/**', { statusCode: 404, body: {} })
+		stubData()
 		mountWidget({ key: 'w5', id: 5, type: 'data', title: '', settings: {}, nodeRelId: 4 }, false)
-		cy.then(() => {
-			useTablesStore().tables = [{ id: 40, title: 'Tasks', emoji: '✅' }]
-		})
 
 		cy.get('[data-cy="gridWidget"] h2').should('contain.text', '✅ Tasks')
+		cy.get('[data-cy="gridWidget"] table').should('contain.text', 'Write the plan')
 		cy.get('[data-cy="gridWidget"] h1').should('not.exist')
+		// Without the title row, the sticky options of the table sit at the top of the widget
+		cy.get('[data-cy="gridWidget"] .options.row').should('have.css', 'top', '0px')
+	})
+
+	it('loads the table of a data widget once, also when edit mode toggles', () => {
+		stubData()
+		mountWidget({ key: 'w5', id: 5, type: 'data', title: '', settings: {}, nodeRelId: 4 }, false)
+		cy.get('[data-cy="gridWidget"] table').should('contain.text', 'Write the plan')
+
+		cy.get('@wrapper').then(wrapper => wrapper.setProps({ editable: true }))
+		cy.get('[data-cy="gridWidget"] button[aria-haspopup]').should('exist')
+		cy.get('@wrapper').then(wrapper => wrapper.setProps({ editable: false }))
+		cy.get('[data-cy="gridWidget"] table').should('contain.text', 'Write the plan')
+		cy.get('@tableColumns.all').should('have.length', 1)
+		cy.get('@tableRows.all').should('have.length', 1)
+	})
+
+	it('starts a view in its saved sorting, reloads it when the view changes and starts over on another target', () => {
+		stubData()
+		mountWidget({ key: 'w10', id: 10, type: 'data', title: '', settings: {}, nodeRelId: 5 }, false)
+		cy.get('[data-cy="gridWidget"] table').should('contain.text', 'Write the plan')
+		cy.get('@wrapper').should(wrapper => {
+			expect(wrapper.findComponent(DataWidget).vm.viewSetting).to.deep.equal({ presetSorting: [{ columnId: 1, mode: 'DESC' }] })
+		})
+
+		// As the view settings dialog does after saving a new filter
+		cy.then(() => {
+			const store = useTablesStore()
+			store.views = store.views.map(item => item.id === 50 ? { ...item, filter: [[{ columnId: 1, operator: 'contains', value: 'plan' }]] } : item)
+		})
+		cy.get('@viewRows.all').should('have.length', 2)
+		cy.get('@viewColumns.all').should('have.length', 2)
+
+		cy.get('@wrapper').then(wrapper => wrapper.setProps({ widget: { ...wrapper.props('widget'), nodeRelId: 4 } }))
+		cy.get('[data-cy="gridWidget"] table').should('contain.text', 'Write the plan')
+		cy.get('@wrapper').should(wrapper => {
+			expect(wrapper.findComponent(DataWidget).vm.viewSetting).to.deep.equal({})
+		})
+	})
+
+	it('opens the sharing and integration tabs of the sidebar for the table of a data widget', () => {
+		stubData()
+		const opened = []
+		const onOpen = data => opened.push(data)
+		subscribe('tables:sidebar:sharing', onOpen)
+		subscribe('tables:sidebar:integration', onOpen)
+		mountWidget({ key: 'w5', id: 5, type: 'data', title: '', settings: {}, nodeRelId: 4 }, false)
+		cy.get('[data-cy="gridWidget"] table').should('exist')
+
+		cy.get('@wrapper').then(wrapper => {
+			wrapper.findComponent(TableWrapper).vm.$emit('toggle-share')
+			wrapper.findComponent(TableWrapper).vm.$emit('show-integration')
+		})
+		cy.then(() => {
+			expect(opened).to.deep.equal([{ open: true, tab: 'sharing' }, { open: true, tab: 'integration' }])
+			expect(useTablesStore().activeTableId).to.equal(40)
+			unsubscribe('tables:sidebar:sharing', onOpen)
+			unsubscribe('tables:sidebar:integration', onOpen)
+		})
+	})
+
+	it('fits the table of a data widget into the widget instead of the app content', () => {
+		cy.viewport(1400, 800)
+		stubData()
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
+		cy.then(() => document.documentElement.style.setProperty('--app-content-width', '1400px'))
+		const widget = { key: 'w5', id: 5, type: 'data', title: '', settings: {}, nodeRelId: 4 }
+		cy.mount({ render: () => h('div', { style: 'width: 600px; height: 500px' }, [h(GridWidget, { widget, nodes, editable: false })]) })
+
+		cy.get('[data-cy="gridWidget"] table').should('exist')
+		cy.get('.data-widget').then(([dataWidget]) => {
+			cy.get('.data-widget .options.row').invoke('width').should('be.at.most', dataWidget.clientWidth)
+		})
+		cy.then(() => document.documentElement.style.removeProperty('--app-content-width'))
 	})
 
 	it('colors a header with a color pair of the theme, and falls back to primary', () => {
