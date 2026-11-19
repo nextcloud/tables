@@ -399,4 +399,42 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.locator('[data-cy="gridPageEdit"]')).toBeVisible()
 		await expect(page.getByText('Saved slowly')).toBeVisible()
 	})
+
+	test('The focus moves to the button that takes the place of the one activated', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid focus edit table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid focus edit app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Focus edit')
+		await ocsRequest(page.request, user, {
+			method: 'PATCH',
+			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
+			data: {
+				version: 0,
+				widgets: [
+					{ type: 'text', title: 'First note', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'One' } },
+					{ type: 'text', title: 'Second note', gridX: 6, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Two' } },
+				],
+			},
+		})
+		await openApplication(page, contextId, `/page/${pageId}`)
+
+		await page.locator('[data-cy="gridPageEdit"]').focus()
+		await page.keyboard.press('Enter')
+		await expect(page.locator('[data-cy="gridPageAddWidget"]')).toBeFocused()
+
+		const firstActions = page.locator('[data-cy="gridWidget"]', { hasText: 'First note' }).getByRole('button', { name: 'Widget actions' })
+		const secondActions = page.locator('[data-cy="gridWidget"]', { hasText: 'Second note' }).getByRole('button', { name: 'Widget actions' })
+		await firstActions.click()
+		await page.getByRole('menuitem', { name: 'Configure widget' }).click()
+		await page.locator('[data-cy="addWidgetModal"]').getByRole('textbox', { name: 'Title' }).fill('First note again')
+		await page.locator('[data-cy="addWidgetSubmit"]').click()
+		await expect(firstActions).toBeFocused()
+
+		await firstActions.click()
+		await page.getByRole('menuitem', { name: 'Remove widget' }).click()
+		await expect(secondActions).toBeFocused()
+
+		await page.locator('[data-cy="gridPageCancel"]').focus()
+		await page.keyboard.press('Enter')
+		await expect(page.locator('[data-cy="gridPageEdit"]')).toBeFocused()
+	})
 })

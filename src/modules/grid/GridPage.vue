@@ -16,7 +16,8 @@
 			</div>
 			<div v-if="canEdit" class="grid-page__actions">
 				<template v-if="isEditing">
-					<NcButton variant="secondary"
+					<NcButton ref="addWidgetButton"
+						variant="secondary"
 						:disabled="saving"
 						data-cy="gridPageAddWidget"
 						@click="openAddWidget">
@@ -39,7 +40,10 @@
 					</NcButton>
 				</template>
 				<template v-else>
-					<NcButton variant="secondary" data-cy="gridPageEdit" @click="startEditing">
+					<NcButton ref="editButton"
+						variant="secondary"
+						data-cy="gridPageEdit"
+						@click="startEditing">
 						<template #icon>
 							<PencilOutline :size="20" />
 						</template>
@@ -116,7 +120,7 @@ import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, nextFreeRow, pageTitle, pageToGrid } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, nextFreeRow, pageTitle, pageToGrid, sortedLayout } from './gridLayout.js'
 
 /**
  * A grid page of an application: its widgets on a grid, with an edit mode that saves the
@@ -255,12 +259,30 @@ export default {
 		 */
 		startEditing() {
 			this.draftGrid = cloneGrid(this.storedGrid)
+			this.focusLater(() => this.$refs.addWidgetButton?.$el)
 		},
 		/**
 		 * Leaves edit mode and drops the draft.
 		 */
 		cancelEditing() {
 			this.draftGrid = null
+			this.focusLater(() => this.$refs.editButton?.$el)
+		},
+		/**
+		 * Moves the focus once the buttons and dialogs that change with it are rendered and
+		 * have returned their own focus, so it does not fall to the page.
+		 *
+		 * @param {() => (HTMLElement|null|undefined)} find returns the element to focus, if it is still there
+		 */
+		focusLater(find) {
+			this.$nextTick(() => setTimeout(() => find()?.focus()))
+		},
+		/**
+		 * @param {string} key the key of a widget on the grid
+		 * @return {HTMLElement|null} the button that opens its actions
+		 */
+		widgetActionsButton(key) {
+			return this.$el.querySelector(`[gs-id="${CSS.escape(key)}"] .grid-widget__header button`)
 		},
 		/**
 		 * Takes over the layout after a drag or resize.
@@ -284,8 +306,13 @@ export default {
 		 * Closes the widget dialog.
 		 */
 		closeAddWidget() {
+			const configured = this.widgetBeingConfigured
 			this.addWidgetOpen = false
 			this.widgetBeingConfigured = null
+			// The menu item that opened the dialog is gone, so the focus goes back to the menu
+			if (configured) {
+				this.focusLater(() => this.widgetActionsButton(configured.key))
+			}
 		},
 		/**
 		 * Opens the dialog for a widget on the grid.
@@ -330,6 +357,7 @@ export default {
 				}],
 			}
 			this.closeAddWidget()
+			this.focusLater(() => this.widgetActionsButton(key))
 		},
 		/**
 		 * Moves or resizes a widget by one step, kept inside the grid.
@@ -361,6 +389,11 @@ export default {
 		 * @param {object} widget the widget to remove
 		 */
 		removeWidget(widget) {
+			// The focus goes to the widget after it in reading order, else the one before
+			const order = sortedLayout(this.draftGrid.layout)
+			const index = order.findIndex(item => item.widgetId === widget.key)
+			const next = order[index + 1] ?? order[index - 1]
+			this.focusLater(() => (next ? this.widgetActionsButton(next.widgetId) : null) ?? this.$refs.addWidgetButton?.$el)
 			this.draftGrid = {
 				widgets: this.draftGrid.widgets.filter(item => item.key !== widget.key),
 				layout: this.draftGrid.layout.filter(item => item.widgetId !== widget.key),
@@ -390,6 +423,7 @@ export default {
 					this.draftGrid = null
 				}
 				this.$emit('saved', page)
+				this.focusLater(() => this.$refs.editButton?.$el)
 				showSuccess(t('tables', 'Page saved'))
 			}
 		},
