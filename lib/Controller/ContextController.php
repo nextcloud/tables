@@ -359,15 +359,21 @@ class ContextController extends AOCSController {
 			$context = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId, $menu);
 			$this->db->commit();
 			return new DataResponse($context->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->db->rollBack();
+			return $this->handleBadRequestError($e);
 		} catch (\InvalidArgumentException $e) {
 			$this->db->rollBack();
 			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
-		} catch (Exception|MultipleObjectsReturnedException $e) {
+		} catch (Exception|MultipleObjectsReturnedException|InternalError $e) {
 			$this->db->rollBack();
 			return $this->handleError($e);
 		} catch (PermissionError $e) {
 			$this->db->rollBack();
 			return $this->handlePermissionError($e);
+		} catch (NotFoundError $e) {
+			$this->db->rollBack();
+			return $this->handleNotFoundError($e);
 		} catch (DoesNotExistException $e) {
 			$this->db->rollBack();
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
