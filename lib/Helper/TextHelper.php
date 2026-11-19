@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Helper;
 
+use OCA\Tables\Errors\BadRequestError;
+
 /**
  * The rule for the optional titles and descriptions of pages, widgets and menu items.
  */
@@ -44,5 +46,36 @@ final class TextHelper {
 			throw new \InvalidArgumentException('longer than ' . $maxLength . ' characters');
 		}
 		return $text === '' ? null : $text;
+	}
+
+	/**
+	 * An optional title, see {@see self::optional()}.
+	 *
+	 * @param string $of what the title belongs to, such as "a menu item" or "widget 2"
+	 * @throws BadRequestError
+	 */
+	public static function title(mixed $title, string $of): ?string {
+		return self::optionalOrRefuse($title, self::TITLE_MAX_LENGTH, 'The title of ' . $of);
+	}
+
+	/**
+	 * An optional description, see {@see self::optional()}.
+	 *
+	 * @param string $of what the description belongs to, such as "a menu item" or "widget 2"
+	 * @throws BadRequestError
+	 */
+	public static function description(mixed $description, string $of): ?string {
+		return self::optionalOrRefuse($description, self::DESCRIPTION_MAX_LENGTH, 'The description of ' . $of);
+	}
+
+	/**
+	 * @throws BadRequestError
+	 */
+	private static function optionalOrRefuse(mixed $text, int $maxLength, string $subject): ?string {
+		try {
+			return self::optional($text, $maxLength);
+		} catch (\InvalidArgumentException) {
+			throw new BadRequestError($subject . ' must be a text of at most ' . $maxLength . ' characters.');
+		}
 	}
 }
