@@ -8,6 +8,7 @@
 namespace OCA\Tables\Listener;
 
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\TableService;
 use OCP\EventDispatcher\Event;
@@ -21,6 +22,7 @@ use Psr\Log\LoggerInterface;
 class UserDeletedListener implements IEventListener {
 	public function __construct(
 		private readonly TableService $tableService,
+		private readonly TableMapper $tableMapper,
 		private readonly ContextService $contextService,
 		private readonly ContextMapper $contextMapper,
 		private readonly LoggerInterface $logger,
@@ -60,7 +62,7 @@ class UserDeletedListener implements IEventListener {
 
 	private function deleteTables(string $userId): void {
 		try {
-			$tables = $this->tableService->findAll($userId, true, true, false);
+			$tables = $this->tableMapper->findAll($userId);
 		} catch (\Throwable $e) {
 			$this->logger->error('could not find the tables of the deleted user ' . $userId, ['exception' => $e]);
 			return;

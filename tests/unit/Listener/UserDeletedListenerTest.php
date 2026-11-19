@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Listener;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Service\ContextService;
@@ -27,6 +28,7 @@ use Psr\Log\LoggerInterface;
 
 final class UserDeletedListenerTest extends TestCase {
 	private TableService&MockObject $tableService;
+	private TableMapper&MockObject $tableMapper;
 	private ContextService&MockObject $contextService;
 	private ContextMapper&MockObject $contextMapper;
 	private LoggerInterface&MockObject $logger;
@@ -34,12 +36,14 @@ final class UserDeletedListenerTest extends TestCase {
 
 	protected function setUp(): void {
 		$this->tableService = $this->createMock(TableService::class);
+		$this->tableMapper = $this->createMock(TableMapper::class);
 		$this->contextService = $this->createMock(ContextService::class);
 		$this->contextMapper = $this->createMock(ContextMapper::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->listener = new UserDeletedListener(
 			$this->tableService,
+			$this->tableMapper,
 			$this->contextService,
 			$this->contextMapper,
 			$this->logger,
@@ -48,7 +52,7 @@ final class UserDeletedListenerTest extends TestCase {
 
 	public function testDeletesTheApplicationsAndTablesTheUserOwns(): void {
 		$this->contextMapper->expects($this->once())->method('findIdsOwnedByUser')->with('alice')->willReturn([1, 4]);
-		$this->tableService->expects($this->once())->method('findAll')->with('alice', true, true, false)->willReturn([$this->table(7)]);
+		$this->tableMapper->expects($this->once())->method('findAll')->with('alice')->willReturn([$this->table(7)]);
 
 		$deleted = [];
 		$this->contextService->expects($this->exactly(2))->method('delete')
@@ -64,6 +68,15 @@ final class UserDeletedListenerTest extends TestCase {
 		$this->assertSame([[1, 'alice'], [4, 'alice']], $deleted);
 	}
 
+	public function testDeletesOnlyTheTablesTheUserOwns(): void {
+		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([]);
+		$this->tableMapper->expects($this->once())->method('findAll')->with('alice')->willReturn([$this->table(7)]);
+		$this->tableService->method('findAll')->willReturn([$this->table(7), $this->table(8)]);
+		$this->tableService->expects($this->once())->method('delete')->with(7, 'alice');
+
+		$this->listener->handle($this->event('alice'));
+	}
+
 	public function testDeletesApplicationsBeforeTables(): void {
 		$calls = [];
 		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([1]);
@@ -72,7 +85,7 @@ final class UserDeletedListenerTest extends TestCase {
 			return new Context();
 		});
 		$table = $this->table(7);
-		$this->tableService->method('findAll')->willReturn([$table]);
+		$this->tableMapper->method('findAll')->willReturn([$table]);
 		$this->tableService->method('delete')->with(7, 'alice')->willReturnCallback(function () use (&$calls, $table): Table {
 			$calls[] = 'table';
 			return $table;
@@ -92,7 +105,7 @@ final class UserDeletedListenerTest extends TestCase {
 				}
 				return new Context();
 			});
-		$this->tableService->method('findAll')->willReturn([$this->table(7)]);
+		$this->tableMapper->method('findAll')->willReturn([$this->table(7)]);
 		$this->tableService->expects($this->once())->method('delete')->with(7, 'alice');
 		$this->logger->expects($this->once())->method('error')
 			->with($this->stringContains('could not delete application 1'));
@@ -103,7 +116,7 @@ final class UserDeletedListenerTest extends TestCase {
 	public function testFailingToFindTheApplicationsStillDeletesTheTables(): void {
 		$this->contextMapper->method('findIdsOwnedByUser')->willThrowException(new Exception('db down'));
 		$this->contextService->expects($this->never())->method('delete');
-		$this->tableService->method('findAll')->willReturn([$this->table(7)]);
+		$this->tableMapper->method('findAll')->willReturn([$this->table(7)]);
 		$this->tableService->expects($this->once())->method('delete')->with(7, 'alice');
 		$this->logger->expects($this->once())->method('error')
 			->with($this->stringContains('could not find the applications'));
@@ -113,7 +126,7 @@ final class UserDeletedListenerTest extends TestCase {
 
 	public function testAFailingTableDoesNotStopTheRest(): void {
 		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([]);
-		$this->tableService->method('findAll')->willReturn([$this->table(7), $this->table(8)]);
+		$this->tableMapper->method('findAll')->willReturn([$this->table(7), $this->table(8)]);
 		$deleted = [];
 		$this->tableService->expects($this->exactly(2))->method('delete')
 			->willReturnCallback(function (int $tableId) use (&$deleted): Table {
@@ -133,7 +146,7 @@ final class UserDeletedListenerTest extends TestCase {
 
 	public function testFailingToFindTheTablesIsLogged(): void {
 		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([]);
-		$this->tableService->method('findAll')->willThrowException(new Exception('db down'));
+		$this->tableMapper->method('findAll')->willThrowException(new Exception('db down'));
 		$this->tableService->expects($this->never())->method('delete');
 		$this->logger->expects($this->once())->method('error')
 			->with($this->stringContains('could not find the tables'));
@@ -143,14 +156,14 @@ final class UserDeletedListenerTest extends TestCase {
 
 	public function testIgnoresTheEventBeforeTheDeletion(): void {
 		$this->contextMapper->expects($this->never())->method('findIdsOwnedByUser');
-		$this->tableService->expects($this->never())->method('findAll');
+		$this->tableMapper->expects($this->never())->method('findAll');
 
 		$this->listener->handle(new BeforeUserDeletedEvent($this->user('alice')));
 	}
 
 	public function testIgnoresOtherEvents(): void {
 		$this->contextMapper->expects($this->never())->method('findIdsOwnedByUser');
-		$this->tableService->expects($this->never())->method('findAll');
+		$this->tableMapper->expects($this->never())->method('findAll');
 
 		$this->listener->handle(new Event());
 	}
