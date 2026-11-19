@@ -6,9 +6,11 @@
 	<NcDialog v-if="showModal"
 		:name="page ? t('tables', 'Edit page details') : t('tables', 'Add page')"
 		size="normal"
+		is-form
 		data-cy="contextPageForm"
-		@closing="$emit('close')">
-		<form class="context-page-form" @submit.prevent="submit">
+		@closing="$emit('close')"
+		@submit="submit">
+		<div class="context-page-form">
 			<NcTextField v-model="title"
 				:label="t('tables', 'Title')"
 				:maxlength="200"
@@ -26,9 +28,12 @@
 				resize="vertical"
 				rows="3"
 				data-cy="contextPageDescription" />
-		</form>
+		</div>
 		<template #actions>
-			<NcButton variant="primary" :disabled="!canSubmit" data-cy="contextPageSubmit" @click="submit">
+			<NcButton variant="primary"
+				type="submit"
+				:disabled="!canSubmit || pending"
+				data-cy="contextPageSubmit">
 				{{ page ? t('tables', 'Save') : t('tables', 'Add page') }}
 			</NcButton>
 		</template>
@@ -62,6 +67,11 @@ export default {
 		page: {
 			type: Object,
 			default: null,
+		},
+		// The page is being added or saved
+		pending: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	emits: ['close', 'submit'],
@@ -101,7 +111,7 @@ export default {
 		 * an empty slug is left out, so the server keeps or gives one.
 		 */
 		submit() {
-			if (!this.canSubmit) {
+			if (!this.canSubmit || this.pending) {
 				return
 			}
 			const data = { title: this.title.trim(), icon: this.icon ?? '', description: this.description.trim() }
