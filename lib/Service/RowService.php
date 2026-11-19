@@ -272,6 +272,7 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->userId);
+			$this->touchTable($tableId, $this->userId);
 			$this->attachAliasPayload($insertedRow, $columns);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
@@ -694,6 +695,7 @@ class RowService extends SuperService {
 		}
 
 		$updatedRow = $this->row2Mapper->update($item, $this->userId);
+		$this->touchTable($item->getTableId(), $this->userId);
 		$this->attachAliasPayload($updatedRow, $columns);
 
 		try {
@@ -799,6 +801,7 @@ class RowService extends SuperService {
 			// row is gone when they are sent. Any other code path deleting rows has to take the snapshot first.
 			$this->activityManager->snapshotRowVisibility($item);
 			$deletedRow = $this->row2Mapper->delete($item);
+			$this->touchTable($item->getTableId(), $userId);
 			$this->attachAliasPayload($item, $columns);
 
 			$event = new RowDeletedEvent($item, $item->getData());
@@ -842,6 +845,7 @@ class RowService extends SuperService {
 		$columns = $this->columnMapper->findAllByTable($tableId);
 
 		$this->row2Mapper->deleteAllForTable($tableId, $columns);
+		$this->touchTable($tableId, $userId ?? $this->userId);
 	}
 
 	/**
@@ -857,6 +861,18 @@ class RowService extends SuperService {
 	 */
 	public function deleteColumnDataFromRows(Column $column):void {
 		$this->row2Mapper->deleteDataForColumn($column);
+		$this->touchTable($column->getTableId(), $this->userId);
+	}
+
+	/**
+	 * Updates the table's last-modified metadata.
+	 */
+	private function touchTable(int $tableId, ?string $userId): void {
+		try {
+			$this->tableMapper->touch($tableId, $userId);
+		} catch (Exception $e) {
+			$this->logger->warning('Failed to update last modified timestamp for table ' . $tableId . ': ' . $e->getMessage(), ['exception' => $e]);
+		}
 	}
 
 	/**

@@ -5611,6 +5611,14 @@
                             "format": "int64",
                             "nullable": true
                         }
+                    },
+                    {
+                        "name": "if-modified-since",
+                        "in": "header",
+                        "description": "Respond with 304 Not Modified if the table has not been edited since this date",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -5626,6 +5634,9 @@
                                 }
                             }
                         }
+                    },
+                    "304": {
+                        "description": "Not modified"
                     },
                     "403": {
                         "description": "No permissions",
