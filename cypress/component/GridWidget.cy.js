@@ -190,6 +190,18 @@ describe('GridWidget', () => {
 		cy.get('[data-cy="tablesWidget"] .data-widget').should('have.length', 2)
 	})
 
+	it('shows the tables and views in a tables widget in the order of the start page', () => {
+		cy.intercept('GET', '**/apps/tables/**', { statusCode: 404, body: {} })
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
+		const applicationNodes = { 4: nodes[4], 5: { id: 5, node_type: 0, node_id: 50, permissions: 1 } }
+		const startPageContent = { 11: { node_rel_id: 4, order: 2 }, 12: { node_rel_id: 5, order: 1 } }
+		cy.mount(GridWidget, { props: { widget: { key: 'w10', id: 10, type: 'tables', title: '', settings: {}, nodeRelId: null }, nodes: applicationNodes, startPageContent, editable: false } })
+			.then(({ wrapper }) => {
+				const targets = wrapper.findAllComponents(DataWidget).map(widget => widget.props('target').id)
+				expect(targets).to.deep.equal([50, 40])
+			})
+	})
+
 	it('shows an empty state in a tables widget of an application without tables', () => {
 		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
 		cy.mount(GridWidget, { props: { widget: { key: 'w9', id: 9, type: 'tables', title: '', settings: {}, nodeRelId: null }, nodes: {}, editable: false } })

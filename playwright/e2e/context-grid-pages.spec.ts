@@ -580,4 +580,23 @@ test.describe('Grid pages of an application', () => {
 		await page.waitForTimeout(1000)
 		expect(rowRequests).toHaveLength(1)
 	})
+
+	test('The tables widget on the start page follows the order of the application', async ({ userPage: { page, user } }) => {
+		const first = await createTableViaApi(page.request, user, 'grid order first table')
+		const second = await createTableViaApi(page.request, user, 'grid order second table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid order app', [first, second])
+		await ocsRequest(page.request, user, {
+			method: 'PUT',
+			url: `${API}/contexts/${contextId}?format=json`,
+			data: { nodes: [second, first].map(id => ({ id, type: 0, permissions: 1 })) },
+		})
+		await openApplication(page, contextId)
+
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		const firstHeading = tablesWidget.getByRole('heading', { name: 'grid order first table' })
+		const secondHeading = tablesWidget.getByRole('heading', { name: 'grid order second table' })
+		await expect(firstHeading).toBeVisible({ timeout: 30000 })
+		await expect(secondHeading).toBeVisible({ timeout: 30000 })
+		expect((await secondHeading.boundingBox())!.y).toBeLessThan((await firstHeading.boundingBox())!.y)
+	})
 })
