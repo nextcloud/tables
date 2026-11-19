@@ -368,6 +368,27 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->assertSame(array_column($gridPages, 'slug'), array_column($gridPages, 'title'));
 	}
 
+	public function testAGridPageNamedLikeTheStartPageIsANewPageAndItsMenuItemOpensIt(): void {
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('findAll')->willReturn([]);
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+		$startPages = $this->contextMapper->findById($target->getId(), self::OWNER)->getPages();
+		$startPageId = (int)array_key_first($startPages);
+		$startPageName = $startPages[$startPageId]['slug'];
+		$pages = [['id' => 1, 'page_type' => Page::TYPE_GRID, 'slug' => $startPageName, 'title' => 'Reports']];
+		$menu = [['title' => null, 'displayTitle' => 'Reports', 'target' => ['page' => 1]]];
+
+		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($target->getId(), ['pages' => $pages, 'menu' => $menu], self::OWNER));
+		$this->service->importScheme($target->getId(), 'Target', 'tables', '', [], ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['menu']['to'], $preview['pages']['to']);
+
+		$this->assertSame(['add', ['page' => 1]], [$preview['pages']['summary'][0]['action'], $preview['menu']['to'][0]['target']]);
+		$imported = $this->contextMapper->findById($target->getId(), self::OWNER)->getPages();
+		$gridPageIds = array_keys(array_filter($imported, static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID));
+		$this->assertCount(1, $gridPageIds);
+		$this->assertSame($startPageName, $imported[$startPageId]['slug']);
+		$this->assertSame('page_' . $gridPageIds[0], $imported[$gridPageIds[0]]['slug']);
+	}
+
 	public function testAPreviewFindsAViewWithinItsOwnTableWhenViewsShareAUuid(): void {
 		$this->permissionsService->method('canManageNodeById')->willReturnCallback(static fn (int $type, int $id): bool => [$type, $id] === [Application::NODE_TYPE_VIEW, 6102]);
 		$this->viewMapper->method('findByUuid')->willThrowException(new MultipleObjectsReturnedException('Two views'));
