@@ -7979,7 +7979,7 @@ export interface operations {
                         readonly [key: string]: Record<string, never>;
                     }[] | null;
                     /**
-                     * @description Pages of the scheme: the start page updates the start page, a grid page the page with its technical name or it is added, and its widgets replace the widgets of that page; a widget names its table or view by `targetType` and `targetUuid` in its `source`. Pages and widgets that cannot be used here are skipped. Left out, the pages stay as they are
+                     * @description Pages of the scheme: the start page updates the start page, a grid page the page with its technical name or it is added, and its widgets replace the widgets of that page; a widget names its table or view by `targetType` and `targetUuid` in its `source`, and is kept without one when that table or view is not a resource of the application. At most 50 pages are imported; pages and widgets that cannot be used here are skipped. Left out, the pages stay as they are
                      * @default null
                      */
                     readonly pages?: readonly {
