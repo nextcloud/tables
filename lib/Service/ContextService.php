@@ -192,6 +192,7 @@ class ContextService {
 			$nodesBeingRemoved = [];
 			$nodesBeingAdded = [];
 			$nodesBeingKept = [];
+			$nodeOrders = [];
 
 			// new node relationships do not have an ID. We can recognize them
 			// through their nodeType and nodeIds. For this we need to transform
@@ -202,8 +203,9 @@ class ContextService {
 				$oldNodeResolvableIdMapper[$key] = $i;
 			}
 
-			foreach ($nodes as $node) {
+			foreach ($nodes as $index => $node) {
 				$key = sprintf('t%di%d', $node['type'], $node['id']);
+				$nodeOrders[$key] = isset($node['order']) ? (int)$node['order'] : ($index + 1) * 10;
 				if (isset($oldNodeResolvableIdMapper[$key])) {
 					$nodesBeingKept[$key] = $node;
 					// a node that is kept without permissions keeps the ones it has
@@ -245,7 +247,7 @@ class ContextService {
 			}
 			unset($nodesBeingRemoved);
 
-			foreach ($nodesBeingAdded as $node) {
+			foreach ($nodesBeingAdded as $key => $node) {
 				$nodeType = (int)($node['type']);
 				$nodeId = (int)($node['id']);
 				if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
@@ -260,7 +262,7 @@ class ContextService {
 					$node['id'],
 					$node['type'],
 					$node['permissions'] ?? Application::PERMISSION_READ,
-					$node['order'] ?? 100,
+					$nodeOrders[$key],
 					$userId
 				);
 				// The same shape as the nodes and contents the mapper loads
@@ -299,13 +301,13 @@ class ContextService {
 				}
 
 				$contentsToUpdate = [];
-				foreach ($nodes as $index => $node) {
+				foreach ($nodes as $node) {
 					$key = sprintf('t%di%d', $node['type'], $node['id']);
 					if (isset($nodeTypeIdToRelId[$key])) {
 						$relId = $nodeTypeIdToRelId[$key];
 						if (isset($relIdToContentId[$relId])) {
 							$contentId = $relIdToContentId[$relId];
-							$newOrder = ($index + 1) * 10;
+							$newOrder = $nodeOrders[$key];
 
 							// Optimistic check: if order is already correct in memory, we might skip?
 							// However, simpler to just add to update list, updateContentOrder should handle exceptions.

@@ -192,7 +192,43 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(10, $updatedContext->getPages()[301]['content'][502]['order']);
 	}
 
-	public function testUpdateGivesAnAddedNodeTheShapeOfTheLoadedNodesAndOrdersIt(): void {
+	public function testUpdateGivesAnAddedNodeTheShapeOfTheLoadedNodesAndInsertsItAtItsPosition(): void {
+		[$insertedOrders, $updatedOrders] = $this->expectNodeAddedToContext(10, [501]);
+
+		$updatedContext = $this->service->update(7, 'user-1', null, null, null, [
+			['id' => 12, 'type' => 1, 'permissions' => 3],
+			['id' => 11, 'type' => 0, 'permissions' => 1],
+		]);
+
+		self::assertSame([10], $insertedOrders->getArrayCopy());
+		self::assertSame([501 => 20], $updatedOrders->getArrayCopy());
+		self::assertSame(['id' => 102, 'node_id' => 12, 'node_type' => 1, 'permissions' => 3], $updatedContext->getNodes()[102]);
+		self::assertSame(['order' => 10, 'node_rel_id' => 102], $updatedContext->getPages()[301]['content'][502]);
+		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
+	}
+
+	public function testUpdateStoresTheOrderSentForAddedAndKeptNodes(): void {
+		[$insertedOrders, $updatedOrders] = $this->expectNodeAddedToContext(5, [501]);
+
+		$updatedContext = $this->service->update(7, 'user-1', null, null, null, [
+			['id' => 11, 'type' => 0, 'permissions' => 1, 'order' => 40],
+			['id' => 12, 'type' => 1, 'permissions' => 3, 'order' => 5],
+		]);
+
+		self::assertSame([5], $insertedOrders->getArrayCopy());
+		self::assertSame([501 => 40], $updatedOrders->getArrayCopy());
+		self::assertSame(5, $updatedContext->getPages()[301]['content'][502]['order']);
+		self::assertSame(40, $updatedContext->getPages()[301]['content'][501]['order']);
+	}
+
+	/**
+	 * Prepares a context with node 11 (relation 101, content 501 at order 10) on its startpage,
+	 * to which an update adds node 12 as relation 102 with content 502.
+	 *
+	 * @param int[] $updatedContentIds
+	 * @return array{\ArrayObject<int, int>, \ArrayObject<int, int>} the inserted orders and the updated orders by content id
+	 */
+	private function expectNodeAddedToContext(int $insertedOrder, array $updatedContentIds): array {
 		$context = new Context();
 		$context->id = 7;
 		$context->setNodes([
@@ -208,30 +244,39 @@ final class ContextServiceTest extends TestCase {
 		$this->contextMapper->method('findById')->willReturn($context);
 		$this->contextMapper->method('update')->willReturnArgument(0);
 		$this->permissionsService->method('canManageNodeById')->willReturn(true);
-		$this->contextNodeRelMapper->method('insert')->willReturnCallback(static function (ContextNodeRelation $relation): ContextNodeRelation {
-			$relation->id = 102;
-			return $relation;
-		});
-		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content): PageContent {
-			$content->id = 502;
-			return $content;
-		});
+		$this->contextNodeRelMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(static function (ContextNodeRelation $relation): ContextNodeRelation {
+				$relation->id = 102;
+				return $relation;
+			});
+
+		$insertedOrders = new \ArrayObject();
+		$this->pageContentMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(static function (PageContent $content) use ($insertedOrders): PageContent {
+				$insertedOrders[] = $content->getOrder();
+				$content->id = 502;
+				return $content;
+			});
+
 		$pageContentsById = [
 			501 => $this->buildPageContent(501, 301, 101, 10),
-			502 => $this->buildPageContent(502, 301, 102, 100),
+			502 => $this->buildPageContent(502, 301, 102, $insertedOrder),
 		];
-		$this->pageContentMapper->method('findById')
+		$this->pageContentMapper->expects($this->exactly(count($updatedContentIds)))
+			->method('findById')
 			->willReturnCallback(static fn (int $contentId): PageContent => $pageContentsById[$contentId]);
-		$this->pageContentMapper->method('update')->willReturnArgument(0);
 
-		$updatedContext = $this->service->update(7, 'user-1', null, null, null, [
-			['id' => 12, 'type' => 1, 'permissions' => 3],
-			['id' => 11, 'type' => 0, 'permissions' => 1],
-		]);
+		$updatedOrders = new \ArrayObject();
+		$this->pageContentMapper->expects($this->exactly(count($updatedContentIds)))
+			->method('update')
+			->willReturnCallback(static function (PageContent $content) use ($updatedOrders): PageContent {
+				$updatedOrders[$content->getId()] = $content->getOrder();
+				return $content;
+			});
 
-		self::assertSame(['id' => 102, 'node_id' => 12, 'node_type' => 1, 'permissions' => 3], $updatedContext->getNodes()[102]);
-		self::assertSame(['order' => 10, 'node_rel_id' => 102], $updatedContext->getPages()[301]['content'][502]);
-		self::assertSame(20, $updatedContext->getPages()[301]['content'][501]['order']);
+		return [$insertedOrders, $updatedOrders];
 	}
 
 	public function testUpdateLogsRemovedNodes(): void {
