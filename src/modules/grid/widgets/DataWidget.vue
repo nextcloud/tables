@@ -327,6 +327,12 @@ export default {
 		font-size: revert;
 	}
 
+	// The title bar of the table lines up with the widget instead of the page
+	:deep(.row.first-row) {
+		margin-inline-start: 0;
+		padding-inline-start: 20px;
+	}
+
 	// Without the title row of the table or view, its sticky options and head move up by its height
 	&:not(:has(.first-row)) {
 		:deep(.options.row) {
