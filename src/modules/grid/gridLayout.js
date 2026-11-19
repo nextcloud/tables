@@ -147,14 +147,14 @@ export function widgetTarget(widget, nodes) {
 }
 
 /**
- * The widgets of a grid as the API saves them. A saved widget keeps its id; a widget of
- * a type with a source names the node relation it shows, or null.
+ * The widgets of a grid as the API saves them. A saved widget keeps its id and names the
+ * node relation it shows, or null. The source never depends on the loaded widget types,
+ * so a save without them keeps the tables of data widgets.
  *
  * @param {{widgets: Array, layout: Array}} grid the grid
- * @param {Array} widgetTypes the types loaded from the server
  * @return {Array} the widgets to save
  */
-export function gridToWidgets(grid, widgetTypes) {
+export function gridToWidgets(grid) {
 	const positions = Object.fromEntries(grid.layout.map(item => [item.widgetId, item]))
 	return grid.widgets.filter(widget => positions[widget.key]).map(widget => {
 		const { gridX, gridY, gridWidth, gridHeight } = positions[widget.key]
@@ -168,12 +168,10 @@ export function gridToWidgets(grid, widgetTypes) {
 			gridWidth,
 			gridHeight,
 			settings: copy(widget.settings ?? {}),
+			source: widget.nodeRelId ? { nodeRelId: widget.nodeRelId } : null,
 		}
 		if (widget.id) {
 			saved.id = widget.id
-		}
-		if (findWidgetType(widgetTypes, widget.type)?.hasSource) {
-			saved.source = widget.nodeRelId ? { nodeRelId: widget.nodeRelId } : null
 		}
 		return saved
 	})
