@@ -10,7 +10,7 @@
 			:aria-label="t('tables', 'Pages of this application')"
 			@keydown="onKeydown">
 			<button v-for="page in pages"
-				:id="tabId(page)"
+				:id="pageTabId(page.id)"
 				:key="page.id"
 				type="button"
 				role="tab"
@@ -44,7 +44,7 @@ import HomeOutline from 'vue-material-design-icons/HomeOutline.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
-import { PAGE_TYPE_START, contextPages, pageTitle } from './gridLayout.js'
+import { PAGE_TYPE_START, contextPages, pageTabId, pageTitle } from './gridLayout.js'
 
 /**
  * The pages of an application as tabs that look like the tabs of NcAppSidebar: the start page
@@ -106,14 +106,8 @@ export default {
 		},
 	},
 	methods: {
+		pageTabId,
 		pageTitle,
-		/**
-		 * @param {object} page a page of the application
-		 * @return {string} the id of its tab
-		 */
-		tabId(page) {
-			return 'context-page-tab-' + page.id
-		},
 		/**
 		 * Moves the focus between tabs with the arrow keys, Home and End.
 		 *
@@ -136,7 +130,7 @@ export default {
 			}
 			event.preventDefault()
 			this.focusedPageId = ids[target]
-			this.$nextTick(() => document.getElementById(this.tabId({ id: ids[target] }))?.focus())
+			this.$nextTick(() => document.getElementById(pageTabId(ids[target]))?.focus())
 		},
 	},
 }
