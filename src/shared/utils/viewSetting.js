@@ -42,3 +42,13 @@ export function hasLocalViewAdjustments(viewSetting) {
 		|| viewSetting.filter?.length > 0
 		|| !!viewSetting.layout
 }
+
+/**
+ * The view setting a table or view starts with: its rows in the sorting it is saved with.
+ *
+ * @param {object|null} element a table or view
+ * @return {object} a new view setting
+ */
+export function presetViewSetting(element) {
+	return element?.sort?.length ? { presetSorting: [...element.sort] } : {}
+}

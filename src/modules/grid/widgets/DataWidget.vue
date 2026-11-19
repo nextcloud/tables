@@ -63,6 +63,7 @@ import CustomView from '../../main/sections/View.vue'
 import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
+import { presetViewSetting } from '../../../shared/utils/viewSetting.js'
 
 /**
  * Shows the rows of one table or view of the application on a grid page, with the
@@ -106,6 +107,8 @@ export default {
 			loading: false,
 			loadFailed: false,
 			viewSetting: {},
+			// The table or view the view setting was started for
+			seededFor: null,
 		}
 	},
 	computed: {
@@ -153,6 +156,19 @@ export default {
 				this.load(true)
 			}
 		},
+		// A loaded table or view starts in the sorting it is saved with. Loading it again keeps
+		// what the viewer searched, filtered and sorted; only a change of its saved sorting
+		// is taken over.
+		element() {
+			this.seedViewSetting()
+		},
+		'element.sort'(sort, previous) {
+			if (this.seededFor !== this.targetKey || JSON.stringify(sort ?? []) === JSON.stringify(previous ?? [])) {
+				return
+			}
+			const { presetSorting, ...viewSetting } = this.viewSetting
+			this.viewSetting = { ...viewSetting, ...presetViewSetting(this.element) }
+		},
 	},
 	created() {
 		// Counts the loads, so a load that a newer one overtook leaves the state alone
@@ -162,6 +178,7 @@ export default {
 		this.resizeObserver = null
 	},
 	mounted() {
+		this.seedViewSetting()
 		this.load()
 		// The table sizes itself from --app-content-width, which is the width of the widget here
 		this.resizeObserver = new ResizeObserver(entries => {
@@ -178,8 +195,7 @@ export default {
 		...mapActions(useTablesStore, ['loadContextTable', 'loadContextView', 'setActiveTableId', 'setActiveViewId', 'validateExportAccess']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		/**
-		 * Loads the table or view with its columns, rows and relations. The search, sorting and
-		 * filters of the widget start over from what the table or view was saved with.
+		 * Loads the table or view with its columns, rows and relations.
 		 *
 		 * @param {boolean} force also load the relations when they were loaded before
 		 */
@@ -187,7 +203,6 @@ export default {
 			const request = ++this.loadRequest
 			this.loadFailed = false
 			this.loadedViewQueryKey = null
-			this.viewSetting = {}
 			if (!this.targetId) {
 				this.loading = false
 				return
@@ -213,8 +228,6 @@ export default {
 					])
 				}
 				if (request === this.loadRequest) {
-					// The rows start in the sorting the table or view was saved with
-					this.viewSetting = this.element?.sort?.length ? { presetSorting: [...this.element.sort] } : {}
 					this.loadedViewQueryKey = this.viewQueryKey
 				}
 			} catch {
@@ -227,6 +240,16 @@ export default {
 					this.loading = false
 				}
 			}
+		},
+		/**
+		 * Starts the view setting of the shown table or view, once for each.
+		 */
+		seedViewSetting() {
+			if (!this.element || this.seededFor === this.targetKey) {
+				return
+			}
+			this.seededFor = this.targetKey
+			this.viewSetting = presetViewSetting(this.element)
 		},
 		/**
 		 * Asks the app to open the create column dialog for the shown table or view.
