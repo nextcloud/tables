@@ -198,9 +198,18 @@ export default {
 			}
 		}
 
+		/**
+		 * @param {object} to the route that opens
+		 * @param {object} from the route that is shown
+		 * @return {boolean} whether the route shows this page too, as when a row of it opens
+		 */
+		const staysOnPage = (to, from) => String(to.params.contextId) === String(from.params.contextId)
+			&& (to.params.pageId ? parseInt(to.params.pageId) === props.page.id : isStartPage(props.page))
+
 		// Leaving the page, or switching to another page, asks first while the grid has unsaved changes
-		onBeforeRouteLeave(confirmDiscard)
-		onBeforeRouteUpdate(confirmDiscard)
+		const guard = (to, from) => staysOnPage(to, from) || confirmDiscard()
+		onBeforeRouteLeave(guard)
+		onBeforeRouteUpdate(guard)
 
 		return { draftGrid, storedGrid, hasUnsavedChanges, confirmDiscard }
 	},

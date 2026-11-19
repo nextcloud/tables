@@ -518,4 +518,25 @@ test.describe('Grid pages of an application', () => {
 		await page.waitForTimeout(1000)
 		expect(reloaded).toBe(false)
 	})
+
+	test('Opening a row while the start page is edited does not ask to discard the changes', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid guard table')
+		const rowId = await createRowViaApi(page.request, user, table, 'Guarded task')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid guard app', [table])
+		await openApplication(page, contextId)
+		const row = page.locator('[data-cy="tablesWidget"] tr', { hasText: 'Guarded task' })
+		await expect(row).toBeVisible({ timeout: 30000 })
+
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.getByRole('button', { name: 'Widget actions' }).click()
+		await page.locator('[data-cy="widgetTaller"] button').click()
+		await page.keyboard.press('Escape')
+
+		await row.locator('[data-cy="rowActionMenu"] button').click()
+		await page.locator('[data-cy="editRowBtn"]').click()
+		await expect(page).toHaveURL(new RegExp(`/application/${contextId}/row/${rowId}$`))
+		await expect(page.locator('[data-cy="editRowModal"]')).toBeVisible()
+		await expect(page.getByRole('dialog', { name: 'Discard unsaved changes?' })).toHaveCount(0)
+		await expect(page.locator('[data-cy="gridPageSave"]')).toBeVisible()
+	})
 })
