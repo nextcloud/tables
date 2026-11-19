@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\MenuItem;
 use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
@@ -48,6 +49,7 @@ class MenuService {
 
 	public function __construct(
 		private readonly ContextMapper $contextMapper,
+		private readonly ContextNodeRelationMapper $contextNodeRelMapper,
 		private readonly MenuItemMapper $menuItemMapper,
 		private readonly PermissionsService $permissionsService,
 		private readonly TableMapper $tableMapper,
@@ -90,6 +92,7 @@ class MenuService {
 	public function create(int $contextId, ?string $title, ?string $icon, ?string $description, ?MenuTarget $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $title, $icon, $description, $target, $userId): array {
 			$this->lockApplication($contextId);
+			$this->lockTarget($target);
 			$context = $this->contextMapper->findById($contextId, $userId);
 			$items = $this->menuItemMapper->findByContextId($contextId);
 			$startPageId = $this->startPageId($context);
@@ -129,6 +132,7 @@ class MenuService {
 	public function update(int $contextId, int $itemId, ?string $title, ?string $icon, ?string $description, ?MenuTarget $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $itemId, $title, $icon, $description, $target, $userId): array {
 			$this->lockApplication($contextId);
+			$this->lockTarget($target);
 			[$item, $context] = $this->getItem($contextId, $itemId, $userId);
 
 			if ($title !== null) {
@@ -250,6 +254,20 @@ class MenuService {
 	private function lockApplication(int $contextId): void {
 		if (!$this->contextMapper->lock($contextId)) {
 			throw new NotFoundError('Application ' . $contextId . ' does not exist');
+		}
+	}
+
+	/**
+	 * Locks the node relation an item is about to open before the application is read,
+	 * so a removal of that table or view either ends first and the item is refused, or
+	 * waits and removes the item with it. A page is covered by the application lock,
+	 * which its delete takes too.
+	 *
+	 * @throws Exception
+	 */
+	private function lockTarget(?MenuTarget $target): void {
+		if ($target?->nodeRelId !== null) {
+			$this->contextNodeRelMapper->lockByIds([$target->nodeRelId]);
 		}
 	}
 
