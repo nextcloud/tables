@@ -381,7 +381,6 @@ class ContextService {
 				throw new NotFoundError('Application ' . $context->getId() . ' does not exist');
 			}
 			$this->shareService->deleteAllForContext($context);
-			$this->menuItemMapper->deleteByContextId($context->getId());
 			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
 			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
 			$this->widgetService->deleteByPageIds($pageIds);
@@ -389,6 +388,7 @@ class ContextService {
 				$this->pageContentMapper->deleteByPageId($pageId);
 				$this->pageMapper->deleteByPageId($pageId);
 			}
+			$this->menuItemMapper->deleteByContextId($context->getId());
 			$this->contextMapper->delete($context);
 		}, $this->dbc);
 		$this->auditLogService->log(Operation::ContextDeleted, 'Tables application with ID %s was deleted', [
@@ -404,8 +404,8 @@ class ContextService {
 				$this->lockContexts($this->contextNodeRelMapper->getContextIdsForNode($nodeId, $nodeType));
 				$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
 				$this->widgetService->deleteSourcesByNodeRelIds($nodeRelIds);
-				$this->menuItemMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
+				$this->menuItemMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
 			}, $this->dbc);
 		} catch (Exception $e) {
@@ -501,7 +501,7 @@ class ContextService {
 	 */
 	public function removeNodeFromContextAndPages(int $nodeRelationId): array {
 		return $this->atomic(function () use ($nodeRelationId): array {
-			// the order of deleteNodeRel(): application, sources, contents, relation
+			// the order of deleteNodeRel(): application, widget sources, page contents, menu items, relation
 			$nodeRelation = $this->contextNodeRelMapper->findById($nodeRelationId);
 			$this->lockContexts([$nodeRelation->getContextId()]);
 			$this->widgetService->deleteSourcesByNodeRelIds([$nodeRelationId]);

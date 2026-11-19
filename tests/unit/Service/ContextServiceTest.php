@@ -586,6 +586,51 @@ final class ContextServiceTest extends TestCase {
 		$this->service->delete(7, 'user-1');
 	}
 
+	public function testDeletingAnApplicationRemovesItsMenuLastBeforeTheApplication(): void {
+		$context = new Context();
+		$context->id = 7;
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->willReturn([301]);
+		$calls = $this->recordCalls([
+			[$this->contextNodeRelMapper, 'deleteAllByContextId', 'relations'],
+			[$this->pageMapper, 'deleteByPageId', 'pages'],
+			[$this->menuItemMapper, 'deleteByContextId', 'menu items'],
+			[$this->contextMapper, 'delete', 'application'],
+		]);
+
+		$this->service->delete(7, 'user-1');
+
+		self::assertSame(['relations', 'pages', 'menu items', 'application'], $calls->getArrayCopy());
+	}
+
+	public static function nodeRemovals(): array {
+		return [
+			'a deleted table or view' => [static fn (ContextService $service) => $service->deleteNodeRel(11, 0)],
+			'a node taken out of an application' => [static fn (ContextService $service) => $service->removeNodeFromContextAndPages(101)],
+		];
+	}
+
+	/**
+	 * @dataProvider nodeRemovals
+	 */
+	public function testANodeIsRemovedInOneOrder(\Closure $remove): void {
+		$this->contextNodeRelMapper->method('getRelIdsForNode')->willReturn([101]);
+		$relation = new ContextNodeRelation();
+		$relation->setContextId(7);
+		$this->contextNodeRelMapper->method('findById')->willReturn($relation);
+		$calls = $this->recordCalls([
+			[$this->widgetService, 'deleteSourcesByNodeRelIds', 'widget sources'],
+			[$this->pageContentMapper, 'deleteByNodeRelIds', 'page contents'],
+			[$this->menuItemMapper, 'deleteByNodeRelIds', 'menu items'],
+			[$this->contextNodeRelMapper, 'deleteByNodeRelIds', 'relations'],
+			[$this->contextNodeRelMapper, 'delete', 'relations'],
+		]);
+
+		$remove($this->service);
+
+		self::assertSame(['widget sources', 'page contents', 'menu items', 'relations'], $calls->getArrayCopy());
+	}
+
 	public function testDeletingANodeUnlinksItsWidgets(): void {
 		$this->contextNodeRelMapper->method('getRelIdsForNode')->with(11, 0)->willReturn([101, 102]);
 
@@ -888,6 +933,22 @@ final class ContextServiceTest extends TestCase {
 		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
 			['id' => 1, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
 		]], 4);
+	}
+
+	/**
+	 * Records the name of each call, in call order.
+	 *
+	 * @param list<array{MockObject, string, string}> $methods mock, method and name
+	 */
+	private function recordCalls(array $methods): \ArrayObject {
+		$calls = new \ArrayObject();
+		foreach ($methods as [$mock, $method, $name]) {
+			$mock->method($method)->willReturnCallback(static function (mixed $argument = null) use ($calls, $name): mixed {
+				$calls[] = $name;
+				return $argument;
+			});
+		}
+		return $calls;
 	}
 
 	private function importTable(): Table {
