@@ -181,32 +181,6 @@ class GridWidgetTypes {
 	}
 
 	/**
-	 * The title of a widget, trimmed, or null when it has none.
-	 *
-	 * @throws BadRequestError
-	 */
-	public function validateTitle(int $index, mixed $title): ?string {
-		try {
-			return TextHelper::optional($title, TextHelper::TITLE_MAX_LENGTH);
-		} catch (\InvalidArgumentException) {
-			throw new BadRequestError('The title of widget ' . $index . ' must be a text of at most ' . TextHelper::TITLE_MAX_LENGTH . ' characters.');
-		}
-	}
-
-	/**
-	 * The description of a widget, trimmed, or null when it has none.
-	 *
-	 * @throws BadRequestError
-	 */
-	public function validateDescription(int $index, mixed $description): ?string {
-		try {
-			return TextHelper::optional($description, TextHelper::DESCRIPTION_MAX_LENGTH);
-		} catch (\InvalidArgumentException) {
-			throw new BadRequestError('The description of widget ' . $index . ' must be a text of at most ' . TextHelper::DESCRIPTION_MAX_LENGTH . ' characters.');
-		}
-	}
-
-	/**
 	 * Reads one widget as the API and the import receive it, with every rule its type
 	 * sets. `source` is `{nodeRelId}` as given; whether that node belongs to the
 	 * application is for the caller to check.
@@ -226,10 +200,7 @@ class GridWidgetTypes {
 		if ($id !== null && !is_int($id)) {
 			throw new BadRequestError('The id of widget ' . $index . ' must be a number.');
 		}
-		$icon = $widget['icon'] ?? null;
-		if ($icon !== null && (!is_string($icon) || ($icon !== '' && !IconHelper::isValid($icon)))) {
-			throw new BadRequestError('The icon of widget ' . $index . ' must be the name of an icon.');
-		}
+		$icon = IconHelper::optional($widget['icon'] ?? null, 'widget ' . $index);
 		$source = $widget['source'] ?? null;
 		if ($source !== null && !$typeSchema['hasSource']) {
 			throw new BadRequestError('Widget ' . $index . ' is a ' . $type . ' widget, which shows no table or view.');
@@ -243,9 +214,9 @@ class GridWidgetTypes {
 		return new WidgetInput(
 			$id,
 			$type,
-			$this->validateTitle($index, $widget['title'] ?? null),
-			$icon === '' ? null : $icon,
-			$this->validateDescription($index, $widget['description'] ?? null),
+			TextHelper::title($widget['title'] ?? null, 'widget ' . $index),
+			$icon,
+			TextHelper::description($widget['description'] ?? null, 'widget ' . $index),
 			$position['gridX'],
 			$position['gridY'],
 			$position['gridWidth'],

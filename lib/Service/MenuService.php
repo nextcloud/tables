@@ -40,6 +40,7 @@ use OCP\IDBConnection;
 class MenuService {
 	use TTransactional;
 
+	private const ITEM = 'a menu item';
 	private const CHANGED_IN_BETWEEN = 'The menu was changed by another save in the meantime. Load it again and retry.';
 
 	public function __construct(
@@ -99,9 +100,9 @@ class MenuService {
 			$item = new MenuItem();
 			$item->setContextId($contextId);
 			$item->setOrder($items === [] ? 0 : max(array_map(static fn (MenuItem $item): int => $item->getOrder(), $items)) + 1);
-			$item->setTitle($this->validateTitle($title));
-			$item->setIcon($this->validateIcon($icon));
-			$item->setDescription($this->validateDescription($description));
+			$item->setTitle(TextHelper::title($title, self::ITEM));
+			$item->setIcon(IconHelper::optional($icon, self::ITEM));
+			$item->setDescription(TextHelper::description($description, self::ITEM));
 			if ($target !== null) {
 				$item->setTarget($this->validateTarget($target, $context));
 			}
@@ -130,13 +131,13 @@ class MenuService {
 			[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
 
 			if ($title !== null) {
-				$item->setTitle($this->validateTitle($title));
+				$item->setTitle(TextHelper::title($title, self::ITEM));
 			}
 			if ($icon !== null) {
-				$item->setIcon($this->validateIcon($icon));
+				$item->setIcon(IconHelper::optional($icon, self::ITEM));
 			}
 			if ($description !== null) {
-				$item->setDescription($this->validateDescription($description));
+				$item->setDescription(TextHelper::description($description, self::ITEM));
 			}
 			if ($target !== null) {
 				foreach ($this->menuItemMapper->findByContextId($context->getId()) as $other) {
@@ -425,43 +426,6 @@ class MenuService {
 		}
 		if ($item->isGroup() && $item->getTitle() === null) {
 			throw new BadRequestError('A group needs a title.');
-		}
-	}
-
-	/**
-	 * A title, or null for an empty one.
-	 *
-	 * @throws BadRequestError
-	 */
-	private function validateTitle(?string $title): ?string {
-		try {
-			return TextHelper::optional($title, TextHelper::TITLE_MAX_LENGTH);
-		} catch (\InvalidArgumentException) {
-			throw new BadRequestError('A menu item title has at most ' . TextHelper::TITLE_MAX_LENGTH . ' characters.');
-		}
-	}
-
-	/**
-	 * A named icon, or null for an empty one.
-	 *
-	 * @throws BadRequestError
-	 */
-	private function validateIcon(?string $icon): ?string {
-		$icon = trim((string)$icon);
-		if ($icon !== '' && !IconHelper::isValid($icon)) {
-			throw new BadRequestError('A menu item has an unknown icon: ' . $icon);
-		}
-		return $icon === '' ? null : $icon;
-	}
-
-	/**
-	 * @throws BadRequestError
-	 */
-	private function validateDescription(?string $description): ?string {
-		try {
-			return TextHelper::optional($description, TextHelper::DESCRIPTION_MAX_LENGTH);
-		} catch (\InvalidArgumentException) {
-			throw new BadRequestError('A menu item description has at most ' . TextHelper::DESCRIPTION_MAX_LENGTH . ' characters.');
 		}
 	}
 }

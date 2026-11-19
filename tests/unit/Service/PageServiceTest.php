@@ -372,7 +372,7 @@ class PageServiceTest extends TestCase {
 
 	public function testAnUnknownIconIsRefused(): void {
 		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('unknown icon');
+		$this->expectExceptionMessage('The icon of a page must be the name of an icon.');
 		$this->service->update(7, self::GRID_PAGE, null, null, 'no-such-icon', null, null, null);
 	}
 

@@ -151,7 +151,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			'a table outside the application' => [null, ['nodeRelId' => -1], 'The target of a menu item'],
 			'two targets' => [null, ['url' => 'https://nextcloud.com', 'nodeRelId' => -1], 'The target of a menu item'],
 			'a link that is not http' => [null, ['url' => 'javascript:alert(1)'], 'A link is an http or https address'],
-			'an unknown icon' => ['Reports', null, 'unknown icon', 'no-such-icon'],
+			'an unknown icon' => ['Reports', null, 'The icon of a menu item must be the name of an icon.', 'no-such-icon'],
 			'a long title' => [str_repeat('a', 201), null, 'at most 200 characters'],
 		];
 	}

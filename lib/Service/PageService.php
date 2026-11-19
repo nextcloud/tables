@@ -93,8 +93,8 @@ class PageService {
 		$page->setContextId($contextId);
 		$page->setPageType(Page::TYPE_GRID);
 		$page->setTitle($this->validateTitle($title, Page::TYPE_GRID));
-		$page->setIcon($this->validateIcon($icon));
-		$page->setDescription($this->validateDescription($description));
+		$page->setIcon(IconHelper::optional($icon, 'a page'));
+		$page->setDescription(TextHelper::description($description, 'a page'));
 		if ($slug !== null) {
 			$page->setSlug($this->validateSlug($slug));
 		}
@@ -134,10 +134,10 @@ class PageService {
 			throw new BadRequestError('The slug of a page cannot be changed.');
 		}
 		if ($icon !== null) {
-			$page->setIcon($this->validateIcon($icon));
+			$page->setIcon(IconHelper::optional($icon, 'a page'));
 		}
 		if ($description !== null) {
-			$page->setDescription($this->validateDescription($description));
+			$page->setDescription(TextHelper::description($description, 'a page'));
 		}
 
 		$inputs = null;
@@ -321,30 +321,4 @@ class PageService {
 		return $slug;
 	}
 
-	/**
-	 * A named icon, or null for an empty one.
-	 *
-	 * @throws BadRequestError
-	 */
-	private function validateIcon(?string $icon): ?string {
-		$icon = trim((string)$icon);
-		if ($icon === '') {
-			return null;
-		}
-		if (!IconHelper::isValid($icon)) {
-			throw new BadRequestError('A page has an unknown icon: ' . $icon);
-		}
-		return $icon;
-	}
-
-	/**
-	 * @throws BadRequestError
-	 */
-	private function validateDescription(?string $description): ?string {
-		try {
-			return TextHelper::optional($description, TextHelper::DESCRIPTION_MAX_LENGTH);
-		} catch (\InvalidArgumentException) {
-			throw new BadRequestError('A page description has at most ' . TextHelper::DESCRIPTION_MAX_LENGTH . ' characters.');
-		}
-	}
 }
