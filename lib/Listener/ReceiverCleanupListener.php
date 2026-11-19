@@ -28,8 +28,9 @@ class ReceiverCleanupListener implements IEventListener {
 
 	public function handle(Event $event): void {
 		if ($event instanceof UserDeletedEvent) {
-			$this->cleanupByParticipant(ShareReceiverType::USER, $event->getUser()->getUID());
-			$this->cleanupNavigationOfUser($event->getUser()->getUID());
+			$userId = $event->getUser()->getUID();
+			$this->cleanupByParticipant(ShareReceiverType::USER, $userId);
+			$this->cleanupNavigationOfUser($userId);
 		} elseif ($event instanceof GroupDeletedEvent) {
 			$this->cleanupByParticipant(ShareReceiverType::GROUP, $event->getGroup()->getGID());
 		} elseif ($event instanceof CircleDestroyedEvent) {
@@ -38,11 +39,31 @@ class ReceiverCleanupListener implements IEventListener {
 	}
 
 	private function cleanupByParticipant(string $type, string $participant): void {
+		$contextShareIds = [];
 		try {
-			$this->contextNavigationMapper->deleteByShareIds($this->shareMapper->findContextShareIdsByReceiver($participant, $type));
+			$contextShareIds = $this->shareMapper->findContextShareIdsByReceiver($participant, $type);
+		} catch (\Throwable $e) {
+			$this->logger->warning('reading application shares of deleted receiver has failed: ' . $e->getMessage(), [
+				'exception' => $e,
+				'receiver_type' => $type,
+				'receiver' => $participant,
+			]);
+		}
+
+		try {
 			$this->shareMapper->deleteByReceiver($participant, $type);
 		} catch (\Throwable $e) {
 			$this->logger->warning('cleanup table shares for deleted receiver has failed: ' . $e->getMessage(), [
+				'exception' => $e,
+				'receiver_type' => $type,
+				'receiver' => $participant,
+			]);
+		}
+
+		try {
+			$this->contextNavigationMapper->deleteByShareIds($contextShareIds);
+		} catch (\Throwable $e) {
+			$this->logger->warning('cleanup application navigation of deleted receiver has failed: ' . $e->getMessage(), [
 				'exception' => $e,
 				'receiver_type' => $type,
 				'receiver' => $participant,
