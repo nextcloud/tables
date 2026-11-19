@@ -497,7 +497,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$preview = $this->menuService->previewSchemeImport($context, $menu, $this->contextService->getPagesWithWidgets($context), $nodes);
 		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
 
-		$imported = $this->menuService->findAll($contextId, self::OWNER);
+		$imported = $this->menu($contextId);
 		$this->assertSame([null, null, null, null, 2], array_column($preview['to'], 'parent'));
 		$this->assertSame(['Sales', 'Projects', 'Group One', 'Group Two', 'Site'], array_column($imported, 'displayTitle'));
 		$this->assertSame($imported[2]['id'], $imported[4]['parentId']);
@@ -558,12 +558,34 @@ class MenuServiceTest extends DatabaseTestCase {
 	 */
 	public function testAnImportSkipsTheItemsItCannotUseWithTheReason(array $exported, string $reason): void {
 		[$contextId] = $this->createApplication();
+		$before = $this->menu($contextId);
 
 		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static fn (): ?int => null, static fn (): ?int => null);
 
 		$this->assertCount(1, $skipped);
 		$this->assertStringContainsString($reason, $skipped[0]['reason']);
-		$this->assertCount(count($exported) - 1, $this->menu($contextId));
+		$this->assertCount(count($exported) === 1 ? count($before) : count($exported) - 1, $this->menu($contextId));
+	}
+
+	public static function menusWithoutAUsableItem(): array {
+		return [
+			'an empty menu' => [[], 0],
+			'only unusable items' => [[['target' => ['url' => 'ftp://nextcloud.com']], ['title' => 'Elsewhere', 'target' => ['table' => self::OTHER_TABLE_UUID]]], 2],
+		];
+	}
+
+	/**
+	 * @dataProvider menusWithoutAUsableItem
+	 */
+	public function testAnImportThatKeepsNoItemLeavesTheMenuAsItIs(array $exported, int $skippedCount): void {
+		[$contextId, , $pageId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$before = $this->menu($contextId);
+
+		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static fn (): ?int => null, static fn (): ?int => null);
+
+		$this->assertCount($skippedCount, $skipped);
+		$this->assertSame($before, $this->menu($contextId));
 	}
 
 	public function testAnImportedItemMovesToTheTopWhenItsGroupDidNotComeFirst(): void {

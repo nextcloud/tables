@@ -296,7 +296,8 @@ class MenuService {
 
 	/**
 	 * Replaces the menu of an application with an exported one, as {@see self::readExported()}
-	 * reads it, and returns the items it skipped. Callers check permissions.
+	 * reads it, and returns the items it skipped. A menu of which no item is kept leaves the
+	 * menu as it is. Callers check permissions.
 	 *
 	 * @param list<mixed> $exported
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
@@ -306,6 +307,9 @@ class MenuService {
 	 */
 	public function import(Context $context, array $exported, \Closure $nodeRelIdOf, \Closure $pageIdOf): array {
 		['items' => $items, 'skipped' => $skipped] = $this->readExported($context, $exported, $nodeRelIdOf, $pageIdOf);
+		if ($items === []) {
+			return $skipped;
+		}
 
 		$this->atomic(function () use ($context, $items): void {
 			$this->menuItemMapper->deleteByContextId($context->getId());
