@@ -708,6 +708,11 @@ class ContextService {
 			return null;
 		}
 
+		if (($context['ownerType'] ?? Application::OWNER_TYPE_USER) !== Application::OWNER_TYPE_USER) {
+			$this->logger->warning('Skipping an imported application: its owner type is not a user.');
+			return null;
+		}
+
 		return $this->atomic(fn (): Context => $this->insertImportedContext($table, $context, $tableOldId, $tableOldUuid), $this->dbc);
 	}
 
@@ -723,7 +728,7 @@ class ContextService {
 		$newContext->setIcon($context['iconName'] ?? '');
 		$newContext->setDescription($context['description'] ?? '');
 		$newContext->setOwnerId($table->getOwnership() ?? '');
-		$newContext->setOwnerType($context['ownerType'] ?? 0);
+		$newContext->setOwnerType(Application::OWNER_TYPE_USER);
 		$this->contextMapper->insert($newContext);
 
 		// insert nodes
@@ -732,7 +737,11 @@ class ContextService {
 		$sourceRelMap = [];
 		if (!empty($context['nodes'])) {
 			foreach ($context['nodes'] as $nodeArr) {
-				$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0;
+				$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? Application::NODE_TYPE_TABLE;
+				if ($nodeType !== Application::NODE_TYPE_TABLE && $nodeType !== Application::NODE_TYPE_VIEW) {
+					$this->logger->warning('Skipping an imported node of an application: its node type is not a table or a view.');
+					continue;
+				}
 				$contextNodeRel = new ContextNodeRelation();
 				$contextNodeRel->setContextId($newContext->getId());
 				$contextNodeRel->setNodeId($table->getId());
@@ -745,7 +754,7 @@ class ContextService {
 				}
 				$nodeRelMap[$oldRelId] = $contextNodeRel;
 				$oldNodeId = $nodeArr['node_id'] ?? $nodeArr['nodeId'] ?? null;
-				if (is_numeric($nodeType) && (int)$nodeType === Application::NODE_TYPE_TABLE && is_numeric($oldNodeId) && (int)$oldNodeId === $tableOldId) {
+				if ($nodeType === Application::NODE_TYPE_TABLE && is_numeric($oldNodeId) && (int)$oldNodeId === $tableOldId) {
 					$sourceRelMap[$oldRelId] = $contextNodeRel;
 				}
 			}
