@@ -1119,12 +1119,9 @@ class ContextService {
 		}
 
 		if (is_array($updateScheme['menu'] ?? null) && $updateScheme['menu'] !== []) {
-			$changes['menu'] = ['from' => $currentScheme->getMenu()] + $this->menuService->previewSchemeImport(
-				$context,
-				$updateScheme['menu'],
-				is_array($updateScheme['pages'] ?? null) ? $updateScheme['pages'] : [],
-				$changes['nodes']['to'] ?? [],
-			);
+			$schemePages = is_array($updateScheme['pages'] ?? null) ? $updateScheme['pages'] : [];
+			$changes['menu'] = ['from' => $currentScheme->getMenu()] + $this->menuService->previewSchemeImport($context, $updateScheme['menu'], $schemePages, $changes['nodes']['to'] ?? []);
+			$changes['menu']['withCurrentNodes'] = $this->menuService->previewSchemeImport($context, $updateScheme['menu'], $schemePages, $changes['nodes']['from'] ?? []);
 		}
 
 		return $changes;
@@ -1138,8 +1135,9 @@ class ContextService {
 	 * @param array $nodes
 	 * @param array $tables
 	 * @param string $userId
+	 * @param list<mixed>|null $menu the menu of the scheme, see {@see MenuService::readExported()}; null leaves the menu alone
 	 *
-	 * @return Context
+	 * @return array{context: Context, menuSkipped: list<array{index: int, title: ?string, reason: string}>} the application and the menu items the import skipped
 	 *
 	 * @throws BadRequestError
 	 * @throws ContainerExceptionInterface
@@ -1151,7 +1149,7 @@ class ContextService {
 	 * @throws NotFoundExceptionInterface
 	 * @throws PermissionError
 	 */
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?array $menu = null): Context {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?array $menu = null): array {
 		// Validate the structure of the columns and views arrays
 		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
 			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
@@ -1212,17 +1210,19 @@ class ContextService {
 		}
 
 		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
+		$menuSkipped = [];
 		if ($menu !== null) {
 			$withNodes = $this->contextMapper->findById($contextId, $userId);
 			$nodeRelIds = $this->menuService->nodeRelIdsByUuid($withNodes);
-			$this->logSkippedMenuItems($this->menuService->import(
+			$menuSkipped = $this->menuService->import(
 				$withNodes,
 				$menu,
 				static fn (string $kind, string $uuid): ?int => $nodeRelIds[$kind][$uuid] ?? null,
 				static fn (int $pageId): ?int => null,
-			));
+			);
+			$this->logSkippedMenuItems($menuSkipped);
 		}
 
-		return $context;
+		return ['context' => $context, 'menuSkipped' => $menuSkipped];
 	}
 }

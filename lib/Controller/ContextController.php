@@ -302,7 +302,8 @@ class ContextController extends AOCSController {
 	 *
 	 * When the scheme carries a `menu` with items, the changes hold `menu` with the current
 	 * menu under `from`, the items an import would save under `to` and the items it would
-	 * skip, with the reason, under `skipped`.
+	 * skip, with the reason, under `skipped`. `withCurrentNodes` holds `to` and `skipped`
+	 * for an import that keeps the current tables and views of the context.
 	 *
 	 * @param int $contextId ID of the context
 	 * @psalm-param TablesContext $updateScheme New scheme of the context
@@ -346,7 +347,7 @@ class ContextController extends AOCSController {
 	 *
 	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
-	 * 200: context updated successfully
+	 * 200: context updated successfully, with the menu items the import skipped, and the reason, under `menuSkipped`
 	 * 400: Bad request
 	 * 403: No permissions
 	 * 404: Not found
@@ -356,9 +357,9 @@ class ContextController extends AOCSController {
 	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, ?array $menu = null): DataResponse {
 		try {
 			$this->db->beginTransaction();
-			$context = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId, $menu);
+			['context' => $context, 'menuSkipped' => $menuSkipped] = $this->contextService->importScheme($contextId, $name, $iconName, $description, $nodes, $tables, $this->userId, $menu);
 			$this->db->commit();
-			return new DataResponse($context->jsonSerialize());
+			return new DataResponse($context->jsonSerialize() + ['menuSkipped' => $menuSkipped]);
 		} catch (BadRequestError $e) {
 			$this->db->rollBack();
 			return $this->handleBadRequestError($e);

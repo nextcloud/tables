@@ -156,7 +156,7 @@
 		<!-- Resources Section -->
 		<div class="preview-section preview-section--option">
 			<div class="preview-option">
-				<NcCheckboxRadioSwitch v-model="importNodes" class="preview-option__label" type="switch">
+				<NcCheckboxRadioSwitch v-model="importNodes" class="preview-option__label" type="switch" data-cy="importSchemeNodes">
 					{{ t('tables', 'Resources') }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="importNodes" class="preview-card__meta preview-card__meta--compare">
@@ -199,16 +199,16 @@
 						<li class="preview-card__meta-title">
 							{{ t('tables', 'To') }}:
 						</li>
-						<li v-for="(item, index) in previewData.menu.to" :key="index">
+						<li v-for="(item, index) in menuPreview.to" :key="index">
 							{{ item.displayTitle ?? item.title }}
 						</li>
 					</ul>
 				</div>
-				<ul v-if="importMenu && previewData.menu.skipped.length > 0" class="preview-card__meta" data-cy="importSchemeMenuSkipped">
+				<ul v-if="importMenu && menuPreview.skipped.length > 0" class="preview-card__meta" data-cy="importSchemeMenuSkipped">
 					<li class="preview-card__meta-title">
 						{{ t('tables', 'Skipped, not available here') }}:
 					</li>
-					<li v-for="item in previewData.menu.skipped" :key="item.index">
+					<li v-for="item in menuPreview.skipped" :key="item.index">
 						{{ item.title }}
 					</li>
 				</ul>
@@ -279,6 +279,22 @@ export default {
 			removeViewsConfig: [],
 			modifyViewsConfig: [],
 		}
+	},
+
+	computed: {
+		/**
+		 * The menu the import saves: with the tables and views of the scheme, or with the
+		 * current ones of the application when those are not imported.
+		 *
+		 * @return {{to: Array, skipped: Array}|null}
+		 */
+		menuPreview() {
+			const menu = this.previewData.menu
+			if (!menu) {
+				return null
+			}
+			return this.importNodes || !menu.withCurrentNodes ? menu : menu.withCurrentNodes
+		},
 	},
 
 	watch: {
@@ -375,8 +391,8 @@ export default {
 				nodes: this.importNodes ? this.previewData.nodes.to : this.previewData.nodes.from,
 			}
 			// without a menu the import leaves the menu of the application as it is
-			if (this.importMenu && this.previewData.menu) {
-				payload.menu = this.previewData.menu.to
+			if (this.importMenu && this.menuPreview) {
+				payload.menu = this.menuPreview.to
 			}
 
 			this.$emit('update', payload)

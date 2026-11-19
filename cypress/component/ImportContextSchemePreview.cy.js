@@ -6,6 +6,7 @@ import ImportContextSchemePreview from '../../src/modules/modals/ImportContextSc
 
 const MENU_SWITCH = '[data-cy="importSchemeMenu"]'
 const SKIPPED = '[data-cy="importSchemeMenuSkipped"]'
+const NODES_SWITCH = '[data-cy="importSchemeNodes"]'
 
 const schemeMenu = [
 	{ parent: null, title: 'Reports', displayTitle: 'Reports', icon: null, description: null, target: null },
@@ -30,6 +31,18 @@ describe('Import application scheme preview', () => {
 				cy.get(MENU_SWITCH).click({ force: true })
 				cy.wrap(null).then(() => {
 					expect(lastPayload(wrapper)).to.not.have.property('menu')
+				})
+			})
+	})
+
+	it('sends the menu judged against the current resources when those are not imported', () => {
+		const withCurrentNodes = { to: [schemeMenu[0]], skipped: [{ index: 1, title: 'Projects', reason: 'Its table is not part of the application.' }] }
+		mountPreview({ from: [], to: schemeMenu, skipped: [], withCurrentNodes })
+			.then(({ wrapper }) => {
+				cy.get(NODES_SWITCH).click({ force: true })
+				cy.get(SKIPPED).should('contain', 'Projects')
+				cy.wrap(null).then(() => {
+					expect(lastPayload(wrapper).menu).to.deep.equal(withCurrentNodes.to)
 				})
 			})
 	})
