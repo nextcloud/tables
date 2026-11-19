@@ -481,6 +481,28 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->assertSame([[], ['pageId' => $startPageId], ['nodeRelId' => $nodeRelId], ['pageId' => $pageId]], [$preview['skipped'], ...array_column($this->menu($contextId), 'target')]);
 	}
 
+	public function testAPreviewedItemStaysInItsGroupWhenAnItemBeforeItIsSkipped(): void {
+		[$contextId, $startPageId] = $this->createApplication();
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
+		$menu = [
+			['title' => null, 'target' => ['page' => $startPageId]],
+			['title' => 'Projects', 'target' => ['table' => self::TABLE_UUID]],
+			['title' => 'Gone', 'target' => ['page' => 999999999]],
+			['title' => 'Group One', 'target' => null],
+			['title' => 'Group Two', 'target' => null],
+			['title' => 'Site', 'parent' => 3, 'target' => ['url' => 'https://nextcloud.com']],
+		];
+
+		$preview = $this->menuService->previewSchemeImport($context, $menu, $this->contextService->getPagesWithWidgets($context), $nodes);
+		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
+
+		$imported = $this->menuService->findAll($contextId, self::OWNER);
+		$this->assertSame([null, null, null, null, 2], array_column($preview['to'], 'parent'));
+		$this->assertSame(['Sales', 'Projects', 'Group One', 'Group Two', 'Site'], array_column($imported, 'displayTitle'));
+		$this->assertSame($imported[2]['id'], $imported[4]['parentId']);
+	}
+
 	public function testAnItemFollowsItsPageWhenTheImportDropsThePagesName(): void {
 		[$contextId, , $pageId] = $this->createApplication();
 		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
