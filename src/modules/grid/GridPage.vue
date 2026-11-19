@@ -231,11 +231,6 @@ export default {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.key, widget]))
 		},
 	},
-	watch: {
-		'page.id'() {
-			this.draftGrid = null
-		},
-	},
 	mounted() {
 		window.addEventListener('beforeunload', this.warnBeforeUnload)
 	},
