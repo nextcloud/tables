@@ -298,14 +298,12 @@ class MenuService {
 
 	/**
 	 * @param list<MenuItem> $items
-	 * @return list<MenuItem> the items whose target is a page, table or view of the application, a link, or none
+	 * @return list<MenuItem> the items the menu shows, see {@see self::displayTitles()}
+	 * @throws Exception
 	 */
 	private function visibleItems(Context $context, array $items): array {
-		$pages = $context->getPages() ?? [];
-		$nodes = $context->getNodes() ?? [];
-		return array_values(array_filter($items, static fn (MenuItem $item): bool
-			=> ($item->getPageId() === null || isset($pages[$item->getPageId()]))
-			&& ($item->getNodeRelId() === null || isset($nodes[$item->getNodeRelId()]))));
+		$titles = $this->displayTitles($context, $items);
+		return array_values(array_filter($items, static fn (MenuItem $item): bool => isset($titles[$item->getId()])));
 	}
 
 	/**
@@ -318,19 +316,45 @@ class MenuService {
 	}
 
 	/**
-	 * The visible items with the title they show: their own, else the title of the page,
-	 * table, view or link they open. A start page without a title shows the name of the
-	 * application.
-	 *
 	 * @param list<MenuItem> $items
-	 * @return list<TablesMenuItem>
+	 * @return list<TablesMenuItem> the items the menu shows, see {@see self::displayTitles()}
 	 * @throws Exception
 	 */
 	private function serialize(Context $context, array $items): array {
+		$titles = $this->displayTitles($context, $items);
+		$menu = [];
+		foreach ($items as $item) {
+			if (!isset($titles[$item->getId()])) {
+				continue;
+			}
+			$menu[] = [
+				'id' => $item->getId(),
+				'contextId' => $item->getContextId(),
+				'parentId' => $item->getParentId(),
+				'title' => $item->getTitle(),
+				'displayTitle' => $titles[$item->getId()],
+				'icon' => $item->getIcon(),
+				'description' => $item->getDescription(),
+				'target' => $item->getTarget(),
+			];
+		}
+		return $menu;
+	}
+
+	/**
+	 * The title each item the menu shows, by item id: its own, else the title of the page,
+	 * table, view or link it opens. A start page without a title shows the name of the
+	 * application. The menu leaves out an item whose page, table or view is no longer
+	 * part of the application or no longer exists.
+	 *
+	 * @param list<MenuItem> $items
+	 * @return array<int, string>
+	 * @throws Exception
+	 */
+	private function displayTitles(Context $context, array $items): array {
 		$pages = $context->getPages() ?? [];
 		$nodes = $context->getNodes() ?? [];
 		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
-		$items = $this->visibleItems($context, $items);
 		foreach ($items as $item) {
 			$node = $this->nodeOf($item, $nodes);
 			if ($node !== null) {
@@ -342,29 +366,20 @@ class MenuService {
 			Application::NODE_TYPE_VIEW => $this->viewMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_VIEW]),
 		];
 
-		$menu = [];
+		$titles = [];
 		foreach ($items as $item) {
+			$pageId = $item->getPageId();
 			$node = $this->nodeOf($item, $nodes);
 			$targetTitle = match (true) {
-				$item->getPageId() !== null => $pages[$item->getPageId()]['title'] ?? $context->getName(),
-				$node !== null => $nodeTitles[$node['node_type']][$node['node_id']] ?? null,
+				$pageId !== null => isset($pages[$pageId]) ? ($pages[$pageId]['title'] ?? $context->getName()) : null,
+				$item->getNodeRelId() !== null => $node === null ? null : ($nodeTitles[$node['node_type']][$node['node_id']] ?? null),
 				default => $item->getUrl() ?? '',
 			};
-			if ($targetTitle === null) {
-				continue;
+			if ($targetTitle !== null) {
+				$titles[$item->getId()] = $item->getTitle() ?? $targetTitle;
 			}
-			$menu[] = [
-				'id' => $item->getId(),
-				'contextId' => $item->getContextId(),
-				'parentId' => $item->getParentId(),
-				'title' => $item->getTitle(),
-				'displayTitle' => $item->getTitle() ?? $targetTitle,
-				'icon' => $item->getIcon(),
-				'description' => $item->getDescription(),
-				'target' => $item->getTarget(),
-			];
 		}
-		return $menu;
+		return $titles;
 	}
 
 	/**
