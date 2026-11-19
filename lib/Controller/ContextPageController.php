@@ -144,7 +144,7 @@ class ContextPageController extends AOCSController {
 	 * @return DataResponse<Http::STATUS_OK, TablesPage, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_CONFLICT|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Page updated
-	 * 400: Invalid page field or widget, or too many widgets
+	 * 400: Invalid page field or widget, a widget id that is not on the page, or too many widgets
 	 * 403: No permissions
 	 * 404: Not found
 	 * 409: The page was saved by someone else since the given version

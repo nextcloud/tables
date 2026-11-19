@@ -243,6 +243,7 @@ class PageServiceTest extends TestCase {
 
 	public function testUpdateSyncsWidgetsAndAnswersWithWhatWasStored(): void {
 		$this->pageMapper->expects($this->once())->method('raiseVersion')->with(self::GRID_PAGE, 4)->willReturn(true);
+		$this->pageMapper->method('findVersion')->willReturn(5);
 		$stored = [['id' => 31, 'type' => 'text'], ['id' => 32, 'type' => 'data']];
 		$synced = null;
 		$this->widgetService->expects($this->once())->method('syncPage')->willReturnCallback(function (int $pageId, array $widgets) use (&$synced, $stored): array {
@@ -293,13 +294,21 @@ class PageServiceTest extends TestCase {
 		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget()], 4);
 	}
 
-	public function testAWidgetRemovedByAConcurrentSaveIsAConflict(): void {
+	public function testAWidgetThatIsNotOnThePageIsRefusedByName(): void {
 		$this->pageMapper->method('raiseVersion')->willReturn(true);
 		$this->widgetService->method('syncPage')->willThrowException(new \InvalidArgumentException('Widget 31 is not on page 2'));
 
-		$this->expectException(ConflictError::class);
-		$this->expectExceptionMessage('Load it again and retry');
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('Widget 31 is not on page 2');
 		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget(['id' => 31])], 4);
+	}
+
+	public function testASaveAnswersWithTheVersionOfTheLockedRow(): void {
+		$this->pageMapper->expects($this->once())->method('raiseVersion')->with(self::GRID_PAGE, null)->willReturn(true);
+		$this->pageMapper->method('findVersion')->with(self::GRID_PAGE)->willReturn(9);
+		$this->widgetService->method('findByPageIds')->willReturn([]);
+
+		$this->assertSame(9, $this->service->update(7, self::GRID_PAGE, 'Planning', null, null, null, null, null)['version']);
 	}
 
 	public function testUpdateChangesThePageFields(): void {

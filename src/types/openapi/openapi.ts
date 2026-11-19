@@ -8474,7 +8474,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Invalid page field or widget, or too many widgets */
+            /** @description Invalid page field or widget, a widget id that is not on the page, or too many widgets */
             readonly 400: {
                 headers: {
                     readonly [name: string]: unknown;
