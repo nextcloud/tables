@@ -7,6 +7,7 @@ import { type APIRequestContext, type Page } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
 import { createRandomUser, ocsRequest, type TestUser } from '../support/api'
 import { login } from '../support/login'
+import { openContextEditModal } from '../support/commands'
 
 // The app navigation takes width from the canvas; the grid only arranges at 12 columns
 test.use({ viewport: { width: 1600, height: 1000 } })
@@ -308,5 +309,38 @@ test.describe('Grid pages of an application', () => {
 		await page.keyboard.press('Enter')
 		await expect(home).toHaveAttribute('aria-selected', 'true')
 		await expect(home).toBeFocused()
+	})
+
+	test('Editing the application keeps the edit of the page that is shown', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid reload table')
+		const added = await createTableViaApi(page.request, user, 'grid reload added table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid reload app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Being edited')
+		await ocsRequest(page.request, user, {
+			method: 'PATCH',
+			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
+			data: { version: 0, widgets: [{ type: 'text', title: 'Keep me out', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Hello' } }] },
+		})
+		expect(added).toBeGreaterThan(0)
+		await openApplication(page, contextId, `/page/${pageId}`)
+
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.getByRole('button', { name: 'Widget actions' }).click()
+		await page.getByRole('menuitem', { name: 'Remove widget' }).click()
+		await expect(page.locator('[data-cy="gridItem"]')).toHaveCount(0)
+
+		await openContextEditModal(page, 'grid reload app')
+		const resourceInput = page.locator('[data-cy="contextResourceForm"] input').first()
+		await resourceInput.click()
+		await resourceInput.fill('grid reload added table')
+		await page.getByRole('option', { name: /^grid reload added table/ }).first().click()
+		await expect(page.locator('[data-cy="contextResourceList"]')).toContainText('grid reload added table')
+		const updated = page.waitForResponse(r => r.url().includes(`/contexts/${contextId}`) && r.request().method() === 'PUT')
+		await page.locator('[data-cy="editContextSubmitBtn"]').click()
+		expect((await updated).ok()).toBe(true)
+		await expect(page.getByRole('dialog', { name: 'Edit application' })).toBeHidden({ timeout: 10000 })
+
+		await expect(page.locator('[data-cy="gridPageSave"]')).toBeVisible()
+		await expect(page.locator('[data-cy="gridItem"]')).toHaveCount(0)
 	})
 })

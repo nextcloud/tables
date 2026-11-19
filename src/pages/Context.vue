@@ -237,9 +237,15 @@ export default {
 				return
 			}
 			this.isReloading = true
-			this.loading = true
-			this.contextResources = []
-			this.resourceViewSettings = {}
+			// The same application is refreshed in place, so an edit of its page goes on
+			const quiet = this.context !== null && parseInt(this.context.id) === parseInt(this.activeContextId) && !this.errorMessage
+			if (!quiet) {
+				this.loading = true
+				this.contextResources = []
+				this.resourceViewSettings = {}
+			}
+			const resources = []
+			const viewSettings = {}
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -288,8 +294,8 @@ export default {
 										})
 										table.key = (table.id).toString()
 										table.isView = false
-										this.resourceViewSettings[table.key] = this.createViewSetting(table)
-										this.contextResources.push(table)
+										viewSettings[table.key] = this.resourceViewSettings[table.key] ?? this.createViewSetting(table)
+										resources.push(table)
 									}
 
 								} else if (nodeType === NODE_TYPE_VIEW) {
@@ -308,8 +314,8 @@ export default {
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
-										this.resourceViewSettings[view.key] = this.createViewSetting(view)
-										this.contextResources.push(view)
+										viewSettings[view.key] = this.resourceViewSettings[view.key] ?? this.createViewSetting(view)
+										resources.push(view)
 									}
 								}
 							} catch (err) {
@@ -318,6 +324,8 @@ export default {
 							}
 						}
 					}
+					this.resourceViewSettings = viewSettings
+					this.contextResources = resources
 					// TODO: check this
 					// Fallback if no startpage or content (though unexpected for valid contexts with nodes)
 					// If nodes exist but not in startpage content, they won't be shown.
@@ -342,7 +350,10 @@ export default {
 		async loadActivePage() {
 			const pageId = this.activePageId
 			this.pageLoading = true
-			this.activePage = null
+			// The page shown stays until it is loaded again, so its edit mode keeps its draft
+			if (this.activePage?.id !== pageId) {
+				this.activePage = null
+			}
 			try {
 				const page = await this.loadContextPage({ contextId: this.activeContextId, pageId })
 				if (pageId === this.activePageId) {
@@ -351,6 +362,8 @@ export default {
 			} catch (e) {
 				if (e?.response?.status !== 404) {
 					displayError(e, t('tables', 'Could not load the page.'))
+				} else if (pageId === this.activePageId) {
+					this.activePage = null
 				}
 			} finally {
 				this.pageLoading = false
