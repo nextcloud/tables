@@ -618,9 +618,7 @@ class RowService extends SuperService {
 		if ($viewId) {
 			// security
 			if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
-				$e = new \Exception('Row not found.');
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 			if (!$this->permissionsService->canUpdateRowsByViewId($viewId, $userId)) {
 				$e = new \Exception('Update row is not allowed.');
@@ -630,19 +628,16 @@ class RowService extends SuperService {
 
 			try {
 				$view = $this->viewMapper->find($viewId);
-			} catch (InternalError|MultipleObjectsReturnedException|Exception $e) {
+			} catch (MultipleObjectsReturnedException|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-			} catch (DoesNotExistException $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			} catch (DoesNotExistException) {
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 
 			// is row in view?
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
-				$e = new \Exception('Row not found.');
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 
 			// fetch all needed columns
@@ -655,16 +650,12 @@ class RowService extends SuperService {
 		} else {
 			$tableId ??= $item->getTableId();
 			if ($tableId !== $item->getTableId()) {
-				$e = new \Exception('Row does not belong to table with id ' . $tableId);
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row does not belong to table with id ' . $tableId);
 			}
 
 			// security
 			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
-				$e = new \Exception('Row not found.');
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 			if (!$this->permissionsService->canUpdateRowsByTableId($tableId, $userId)) {
 				$e = new \Exception('Update row is not allowed.');
@@ -753,9 +744,7 @@ class RowService extends SuperService {
 		if ($viewId) {
 			// security
 			if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
-				$e = new \Exception('Row not found.');
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
 				$e = new \Exception('Update row is not allowed.');
@@ -764,30 +753,23 @@ class RowService extends SuperService {
 			}
 			try {
 				$view = $this->viewMapper->find($viewId);
-			} catch (InternalError|MultipleObjectsReturnedException|Exception $e) {
+			} catch (MultipleObjectsReturnedException|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-			} catch (DoesNotExistException $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			} catch (DoesNotExistException) {
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
-				$e = new \Exception('Row not found.');
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 		} else {
 			if ($tableId !== null && $tableId !== $item->getTableId()) {
-				$e = new \Exception('Row does not belong to table with id ' . $tableId);
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row does not belong to table with id ' . $tableId);
 			}
 
 			// security
 			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
-				$e = new \Exception('Row not found.');
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId(), $userId)) {
 				$e = new \Exception('Update row is not allowed.');

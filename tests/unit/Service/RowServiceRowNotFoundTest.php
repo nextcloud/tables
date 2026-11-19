@@ -41,6 +41,8 @@ class RowServiceRowNotFoundTest extends TestCase {
 	private Row2Mapper&MockObject $row2Mapper;
 	private ViewMapper&MockObject $viewMapper;
 	private PermissionsService&MockObject $permissionsService;
+	private LoggerInterface&MockObject $logger;
+	private bool $canReadView = true;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -56,15 +58,18 @@ class RowServiceRowNotFoundTest extends TestCase {
 		$this->row2Mapper->expects($this->never())->method('delete');
 
 		$this->permissionsService = $this->createMock(PermissionsService::class);
-		$this->permissionsService->method('canReadRowsByElementId')->willReturn(true);
+		$this->permissionsService->method('canReadRowsByElementId')
+			->willReturnCallback(fn (int $elementId, string $nodeType): bool => $nodeType !== 'view' || $this->canReadView);
 		$this->permissionsService->method('canUpdateRowsByViewId')->willReturn(true);
 		$this->permissionsService->method('canUpdateRowsByTableId')->willReturn(true);
 		$this->permissionsService->method('canDeleteRowsByTableId')->willReturn(true);
 
 		$this->viewMapper = $this->createMock(ViewMapper::class);
 
+		$this->logger = $this->createMock(LoggerInterface::class);
+
 		$this->service = new RowService(
-			$this->createMock(LoggerInterface::class),
+			$this->logger,
 			'alice',
 			$this->permissionsService,
 			$this->createMock(ColumnMapper::class),
@@ -90,6 +95,7 @@ class RowServiceRowNotFoundTest extends TestCase {
 		$this->givenTheViewExists();
 		$this->row2Mapper->method('isRowInViewPresent')->willReturn(false);
 
+		$this->logger->expects($this->never())->method('error');
 		$this->expectException(NotFoundError::class);
 		$this->service->updateSet(self::ROW_ID, self::VIEW_ID, [], 'alice', null);
 	}
@@ -99,24 +105,51 @@ class RowServiceRowNotFoundTest extends TestCase {
 		$this->permissionsService->method('canDeleteRowsByViewId')->willReturn(true);
 		$this->row2Mapper->method('isRowInViewPresent')->willReturn(false);
 
+		$this->logger->expects($this->never())->method('error');
 		$this->expectException(NotFoundError::class);
 		$this->service->delete(self::ROW_ID, self::VIEW_ID, 'alice');
 	}
 
 	public function testDeletingARowThroughAViewThatDoesNotExistIsNotFound(): void {
-		$this->permissionsService->method('canDeleteRowsByViewId')->willReturn(true);
-		$this->viewMapper->method('find')->willThrowException(new DoesNotExistException('View not found'));
+		$this->canReadView = false;
+		$this->viewMapper->expects($this->never())->method('find');
 
+		$this->logger->expects($this->never())->method('error');
 		$this->expectException(NotFoundError::class);
 		$this->service->delete(self::ROW_ID, self::VIEW_ID, 'alice');
 	}
 
+	public function testUpdatingARowThroughAViewThatDoesNotExistIsNotFound(): void {
+		$this->canReadView = false;
+		$this->viewMapper->expects($this->never())->method('find');
+
+		$this->logger->expects($this->never())->method('error');
+		$this->expectException(NotFoundError::class);
+		$this->service->updateSet(self::ROW_ID, self::VIEW_ID, [], 'alice', null);
+	}
+
+	public function testAViewThatVanishesAfterTheReadCheckDoesNotEchoTheMapperMessage(): void {
+		$this->permissionsService->method('canDeleteRowsByViewId')->willReturn(true);
+		$this->viewMapper->method('find')->willThrowException(new DoesNotExistException('SELECT * FROM oc_tables_views'));
+
+		$this->logger->expects($this->never())->method('error');
+		try {
+			$this->service->delete(self::ROW_ID, self::VIEW_ID, 'alice');
+			$this->fail('Expected a NotFoundError');
+		} catch (NotFoundError $e) {
+			$this->assertStringEndsWith(': Row not found.', $e->getMessage());
+			$this->assertStringNotContainsString('SELECT', $e->getMessage());
+		}
+	}
+
 	public function testUpdatingARowThatIsNotInTheTableIsNotFound(): void {
+		$this->logger->expects($this->never())->method('error');
 		$this->expectException(NotFoundError::class);
 		$this->service->updateSet(self::ROW_ID, null, [], 'alice', self::TABLE_ID + 1);
 	}
 
 	public function testDeletingARowThatIsNotInTheTableIsNotFound(): void {
+		$this->logger->expects($this->never())->method('error');
 		$this->expectException(NotFoundError::class);
 		$this->service->delete(self::ROW_ID, null, 'alice', self::TABLE_ID + 1);
 	}
