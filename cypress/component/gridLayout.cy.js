@@ -12,10 +12,12 @@ import {
 	cloneGrid,
 	columnsForWidth,
 	gridToWidgets,
+	isBlank,
 	nextFreeRow,
 	nodeTarget,
 	pageToGrid,
 	targetTitle,
+	trimText,
 	widgetTarget,
 } from '../../src/modules/grid/gridLayout.js'
 
@@ -123,6 +125,15 @@ describe('grid layout', () => {
 		const widgets = gridToWidgets(grid)
 
 		expect(widgets[1]).to.deep.include({ id: 12, type: 'data', source: { nodeRelId: 4 } })
+	})
+
+	it('reads a text of blanks and zero width spaces as empty, as the server does', () => {
+		expect(isBlank('')).to.equal(true)
+		expect(isBlank(null)).to.equal(true)
+		expect(isBlank(' \u200B\uFEFF\u00A0\u0085\n')).to.equal(true)
+		expect(isBlank('\u200BA')).to.equal(false)
+		expect(trimText('\u200B Notes \uFEFF')).to.equal('Notes')
+		expect(trimText('a\u00A0b')).to.equal('a\u00A0b')
 	})
 
 	it('places a new widget below the lowest one', () => {

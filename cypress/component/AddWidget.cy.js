@@ -13,7 +13,7 @@ const widgetTypes = [
 		defaultHeight: 2,
 		hasSource: false,
 		settings: {
-			heading: { type: 'string', title: 'Heading', default: '', required: true },
+			heading: { type: 'string', title: 'Heading', default: '', required: true, hint: 'The large text at the top' },
 			textAlign: { type: 'enum', title: 'Text alignment', default: 'start', options: [{ value: 'start', label: 'Start' }, { value: 'center', label: 'Centered' }] },
 		},
 	},
@@ -27,7 +27,7 @@ const nodes = { 4: { id: 4, node_type: 0, node_id: 40, permissions: 1 } }
  * @param {object} props props of the dialog besides showModal
  */
 function mountDialog(props = {}) {
-	cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: widgetTypes } })
+	cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: widgetTypes } }).as('widgetTypes')
 	cy.mount(AddWidget, { props: { showModal: false, nodes, ...props } }).then(({ wrapper }) => {
 		const store = useTablesStore()
 		store.widgetTypes = []
@@ -84,5 +84,78 @@ describe('AddWidget', () => {
 
 		cy.get('[data-cy="addWidgetNode"]').should('exist')
 		cy.get('[data-cy="addWidgetSubmit"]').should('be.disabled')
+	})
+
+	it('limits the title and description to what the server accepts', () => {
+		mountDialog()
+
+		cy.get('[data-cy="addWidgetTitle"]').should('have.attr', 'maxlength', '200')
+		cy.get('[data-cy="addWidgetDescription"]').should('have.attr', 'maxlength', '2000')
+	})
+
+	it('marks required fields and says what is still missing, with blanks counting as empty', () => {
+		mountDialog()
+
+		cy.get('[data-cy="widgetFieldHeading"] input').should('have.attr', 'required')
+		cy.get('[data-cy="widgetFieldHeading"]').should('contain.text', 'Heading *')
+		cy.get('[data-cy="widgetFieldHeading"]').should('contain.text', 'The large text at the top')
+		cy.get('[data-cy="addWidgetMissing"]').should('contain.text', 'Still needed: Heading')
+		cy.get('[data-cy="widgetFieldHeading"] input').type('\u200B\u200B')
+		cy.get('[data-cy="addWidgetSubmit"]').should('be.disabled')
+		cy.get('[data-cy="addWidgetMissing"]').should('contain.text', 'Heading')
+		cy.get('[data-cy="widgetFieldHeading"] input').type('Projects')
+		cy.get('[data-cy="addWidgetMissing"]').should('not.exist')
+		cy.get('[data-cy="addWidgetSubmit"]').should('be.enabled')
+	})
+
+	it('marks the table or view of a data widget as required', () => {
+		mountDialog({ editingWidget: { key: 'w2', id: 2, type: 'data', title: '', settings: {}, nodeRelId: null } })
+
+		cy.get('[data-cy="addWidgetNode"]').should('contain.text', 'Table or view *')
+		cy.get('[data-cy="addWidgetNode"] input').should('have.attr', 'required')
+		cy.get('[data-cy="addWidgetMissing"]').should('contain.text', 'Still needed: Table or view')
+	})
+
+	it('says what an empty title does for the type of the widget', () => {
+		mountDialog()
+		cy.get('[data-cy="addWidgetModal"]').should('contain.text', 'Leave empty to show no title and no icon')
+
+		mountDialog({ editingWidget: { key: 'w2', id: 2, type: 'data', title: '', settings: {}, nodeRelId: 4 } })
+		cy.get('[data-cy="addWidgetModal"]').should('contain.text', 'Leave empty to use the title of the table or view').and('not.contain.text', 'no title and no icon')
+	})
+
+	it('configures a widget of a type this frontend cannot show yet', () => {
+		mountDialog({ editingWidget: { key: 'w3', id: 3, type: 'unrendered', title: 'Later', settings: {}, nodeRelId: null } })
+
+		cy.get('[data-cy="addWidgetType"]').should('contain.text', 'Not shown yet')
+		cy.get('[data-cy="addWidgetTitle"]').clear().type('Soon')
+		cy.get('[data-cy="addWidgetSubmit"]').should('be.enabled').click()
+		cy.get('@wrapper').then(wrapper => {
+			expect(wrapper.emitted('submit')[0][0]).to.deep.include({ type: 'unrendered', title: 'Soon' })
+		})
+	})
+
+	it('shows the form only once the widget types are there', () => {
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { delay: 800, body: { ocs: { data: widgetTypes } } }).as('slowTypes')
+		cy.mount(AddWidget, { props: { showModal: false, nodes } }).then(({ wrapper }) => {
+			useTablesStore().widgetTypes = []
+			cy.wrap(wrapper.setProps({ showModal: true }))
+		})
+
+		cy.get('[data-cy="addWidgetLoading"]').should('exist')
+		cy.get('[data-cy="addWidgetTitle"]').should('not.exist')
+		cy.get('[data-cy="addWidgetSubmit"]').should('be.disabled')
+		cy.wait('@slowTypes')
+		cy.get('[data-cy="addWidgetTitle"]').should('exist')
+		cy.get('[data-cy="addWidgetLoading"]').should('not.exist')
+	})
+
+	it('moves focus to the icon button after removing the icon', () => {
+		mountDialog({ editingWidget: { key: 'w1', id: 1, type: 'header', title: 'Hi', icon: 'star', description: '', settings: { heading: 'Old' }, nodeRelId: null } })
+
+		cy.get('[data-cy="iconFieldClear"]').focus()
+		cy.focused().type('{enter}')
+		cy.get('[data-cy="iconFieldClear"]').should('not.exist')
+		cy.focused().should('have.attr', 'data-cy', 'iconFieldPick')
 	})
 })
