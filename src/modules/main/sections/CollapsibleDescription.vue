@@ -24,11 +24,10 @@
 </template>
 
 <script>
+import { useId } from 'vue'
 import { NcButton } from '@nextcloud/vue'
 import InformationOutline from 'vue-material-design-icons/InformationOutline.vue'
 import TableDescription from './TableDescription.vue'
-
-let instances = 0
 
 /**
  * The description of a table or view behind a button, for places where it would take the
@@ -52,12 +51,14 @@ export default {
 			default: '',
 		},
 	},
+	setup() {
+		return { panelId: 'collapsible-description-' + useId() }
+	},
 	data() {
 		return {
 			open: false,
 			// The panel stays once it was opened, so its editor is built once
 			opened: false,
-			panelId: 'collapsible-description-' + (++instances),
 		}
 	},
 	methods: {

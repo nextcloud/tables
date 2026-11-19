@@ -60,7 +60,7 @@ function mountInPage(component, props, actions) {
 function mountTabs(editable) {
 	const grid = pageToGrid(page)
 	const actions = gridLevel(grid, editable)
-	mountInPage(TabsWidget, { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable }, actions)
+	mountInPage(TabsWidget, { widget: grid.widgets[0], editable }, actions)
 	return actions
 }
 
@@ -88,7 +88,7 @@ describe('TabsWidget', () => {
 
 	it('names the tab list after the widget and lets its panel scroll with the keyboard', () => {
 		const grid = pageToGrid(page)
-		mountInPage(TabsWidget, { widget: { ...grid.widgets[0], title: 'Work' }, settings: grid.widgets[0].settings, editable: false }, gridLevel(grid, false))
+		mountInPage(TabsWidget, { widget: { ...grid.widgets[0], title: 'Work' }, editable: false }, gridLevel(grid, false))
 
 		cy.get('[role="tablist"]').should('have.attr', 'aria-label', 'Work')
 		cy.get('[role="tabpanel"]').should('have.attr', 'tabindex', '0')
@@ -96,11 +96,11 @@ describe('TabsWidget', () => {
 
 	it('tells a viewer that a tab is empty and asks an editor to add widgets to it', () => {
 		const grid = pageToGrid({ widgets: [{ ...page.widgets[0], settings: { tabs: 'Empty' } }] })
-		mountInPage(TabsWidget, { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: false }, gridLevel(grid, false))
+		mountInPage(TabsWidget, { widget: grid.widgets[0], editable: false }, gridLevel(grid, false))
 		cy.get('[data-cy="tabsWidgetEmpty"]').should('have.text', 'This tab is empty.')
 		cy.get('[data-cy="gridItem"]').should('not.exist')
 
-		mountInPage(TabsWidget, { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: true }, gridLevel(grid, true))
+		mountInPage(TabsWidget, { widget: grid.widgets[0], editable: true }, gridLevel(grid, true))
 		cy.get('[data-cy="tabsWidgetEmpty"]').should('have.text', 'Add widgets to this tab.')
 		cy.get('[data-cy="tabsWidgetAdd"]').should('be.visible')
 	})
@@ -122,13 +122,13 @@ describe('TabsWidget keyboard', () => {
 		const actions = gridLevel(grid, false)
 		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
 		cy.mount(TabsWidget, {
-			props: { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: false },
+			props: { widget: grid.widgets[0], editable: false },
 			global: { plugins: [createPinia()], mixins: [{ methods: { t, n } }], provide: { gridLevel: actions } },
 		}).then(({ wrapper }) => cy.wrap(wrapper).as('wrapper'))
 
 		cy.get('[role="tab"]').eq(0).focus().trigger('keydown', { key: 'End' })
 		cy.focused().should('contain.text', 'Four')
-		cy.get('@wrapper').then(wrapper => wrapper.setProps({ settings: { tabs: 'One\nTwo' } }))
+		cy.get('@wrapper').then(wrapper => wrapper.setProps({ widget: { ...grid.widgets[0], settings: { tabs: 'One\nTwo' } } }))
 		cy.get('[role="tab"]').should('have.length', 2)
 		cy.get('[role="tab"][tabindex="0"]').should('have.length', 1)
 
@@ -148,7 +148,7 @@ describe('TabsWidget headings', () => {
 		const widgetHeadingLevel = ref(2)
 		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
 		cy.mount(TabsWidget, {
-			props: { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: false },
+			props: { widget: grid.widgets[0], editable: false },
 			global: { plugins: [createPinia()], mixins: [{ methods: { t, n } }], provide: { gridLevel: gridLevel(grid, false), widgetHeadingLevel } },
 		})
 

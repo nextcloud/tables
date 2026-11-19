@@ -375,7 +375,6 @@ export default {
 		 */
 		configureWidget(widget) {
 			this.widgetBeingConfigured = widget
-			this.targetTab = widget.parentKey ? { parentKey: widget.parentKey, tab: widget.parentTab } : null
 			this.addWidgetOpen = true
 		},
 		/**
