@@ -70,7 +70,7 @@
 			</div>
 		</div>
 
-		<NcEmptyContent v-if="activeGrid.layout.length === 0"
+		<NcEmptyContent v-if="shownLayout.length === 0"
 			class="grid-page__empty"
 			:name="t('tables', 'This page is empty')"
 			:description="emptyDescription">
@@ -84,7 +84,7 @@
 			</template>
 		</NcEmptyContent>
 
-		<GridCanvas :layout="activeGrid.layout" :editable="canChange" @layout-change="onLayoutChange">
+		<GridCanvas :layout="shownLayout" :editable="canChange" @layout-change="onLayoutChange">
 			<template #widget="{ item, narrow }">
 				<GridWidget v-if="widgetsById[item.widgetId]"
 					:widget="widgetsById[item.widgetId]"
@@ -124,7 +124,8 @@ import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid, sortedLayout } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid, sortedLayout, widgetTarget } from './gridLayout.js'
+import { WIDGET_TYPE_DATA } from './widgetRegistry.js'
 
 /**
  * A grid page of an application: its widgets on a grid, with an edit mode that saves the
@@ -251,6 +252,17 @@ export default {
 				return t('tables', 'Add a header, a description or a table.')
 			}
 			return this.canEdit ? t('tables', 'Edit the page to add widgets.') : ''
+		},
+		// A data widget whose table or view left the application only shows in edit mode,
+		// where it can get another one or be removed
+		shownLayout() {
+			if (this.isEditing) {
+				return this.activeGrid.layout
+			}
+			return this.activeGrid.layout.filter(item => {
+				const widget = this.widgetsById[item.widgetId]
+				return widget?.type !== WIDGET_TYPE_DATA || widgetTarget(widget, this.context.nodes) !== null
+			})
 		},
 		widgetsById() {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.key, widget]))
