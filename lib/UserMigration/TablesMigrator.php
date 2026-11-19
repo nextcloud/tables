@@ -366,6 +366,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 					unset($setting);
 				}
 				$view = $this->remapViewCardSources($view, $columnIdMap);
+				$view = self::remapViewFilterAndSort($view, $columnIdMap);
 				$viewIdMap[$view['id']] = $this->viewService->importView($newTableId, $view, $userId)->getId();
 			}
 		}
@@ -389,6 +390,26 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 			}
 		}
 		return $ids;
+	}
+
+	/**
+	 * Points the filter rules and sort rules of an exported view at the imported columns.
+	 * A meta column, or a column that was not imported, keeps its id.
+	 */
+	private static function remapViewFilterAndSort(array $view, array $columnIdMap): array {
+		$remap = static function (mixed $rule) use ($columnIdMap): mixed {
+			if (is_array($rule) && is_int($rule['columnId'] ?? null) && isset($columnIdMap[$rule['columnId']])) {
+				$rule['columnId'] = $columnIdMap[$rule['columnId']];
+			}
+			return $rule;
+		};
+		if (is_array($view['filter'] ?? null)) {
+			$view['filter'] = array_map(static fn (mixed $group): mixed => is_array($group) ? array_map($remap, $group) : $group, $view['filter']);
+		}
+		if (is_array($view['sort'] ?? null)) {
+			$view['sort'] = array_map($remap, $view['sort']);
+		}
+		return $view;
 	}
 
 	private function remapViewCardSources(array $view, array $columnIdMap): array {

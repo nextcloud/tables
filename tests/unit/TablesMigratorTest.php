@@ -489,4 +489,47 @@ class TablesMigratorTest extends TestCase {
 
 		$this->assertSame(['Skipping application 8: the exported user did not own it.', 'Skipping application 9: the exported user did not own it.'], $skipped);
 	}
+
+	public function testImportPointsTheFilterAndSortOfAViewAtTheImportedColumns(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('user1');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$view = [
+			'id' => 30,
+			'tableId' => 1,
+			'title' => 'Open',
+			'columnSettings' => [],
+			'filter' => [
+				[['columnId' => 10, 'operator' => 'is-equal', 'value' => 'open'], ['columnId' => -1, 'operator' => 'is-equal', 'value' => 3]],
+				[['columnId' => 11, 'operator' => 'contains', 'value' => 'x'], ['columnId' => 99, 'operator' => 'is-empty', 'value' => '']],
+			],
+			'sort' => [['columnId' => 11, 'mode' => 'DESC'], ['columnId' => -2, 'mode' => 'ASC']],
+		];
+		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
+			'tables.json' => json_encode([['id' => 1, 'title' => 'Tasks']]),
+			'columns.json' => json_encode([['id' => 10, 'tableId' => 1], ['id' => 11, 'tableId' => 1]]),
+			'views.json' => json_encode([$view]),
+			default => json_encode([]),
+		});
+		$this->tableMapper->method('getDBConnection')->willReturn($this->createMock(IDBConnection::class));
+		$newTable = new Table();
+		$newTable->setId(100);
+		$this->tableService->method('importTable')->willReturn($newTable);
+		$this->columnService->method('importColumn')->willReturnOnConsecutiveCalls(20, 21);
+		$imported = null;
+		$this->viewService->expects($this->once())->method('importView')
+			->willReturnCallback(static function (int $tableId, array $view) use (&$imported): View {
+				$imported = $view;
+				$newView = new View();
+				$newView->setId(300);
+				return $newView;
+			});
+
+		$this->migrator->import($user, $importSource, new NullOutput());
+
+		$this->assertSame([[20, -1], [21, 99]], array_map(static fn (array $group): array => array_column($group, 'columnId'), $imported['filter']));
+		$this->assertSame([['columnId' => 21, 'mode' => 'DESC'], ['columnId' => -2, 'mode' => 'ASC']], $imported['sort']);
+		$this->assertSame(['is-equal', 'open'], [$imported['filter'][0][0]['operator'], $imported['filter'][0][0]['value']]);
+	}
 }
