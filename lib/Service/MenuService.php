@@ -367,8 +367,8 @@ class MenuService {
 	/**
 	 * The pages of an application that the pages of a scheme stand for, by exported id. A
 	 * scheme imported into an existing application has no other link between the two: its
-	 * start page is the start page of the application, and any other page is the page with
-	 * its slug.
+	 * start page is the start page of the application, and any other page is the page of the
+	 * same type with its slug.
 	 *
 	 * @param array<array-key, mixed> $schemePages
 	 * @return array<int, int>
@@ -379,8 +379,9 @@ class MenuService {
 		foreach ($context->getPages() ?? [] as $pageId => $page) {
 			if ($page['page_type'] === Page::TYPE_STARTPAGE) {
 				$startPageId ??= (int)$pageId;
+			} else {
+				$pageIdsByName[$page['page_type']][(string)($page['slug'] ?? '')] = (int)$pageId;
 			}
-			$pageIdsByName[(string)($page['slug'] ?? '')] = (int)$pageId;
 		}
 
 		$pageIds = [];
@@ -388,7 +389,8 @@ class MenuService {
 			if (!is_array($page) || !is_int($page['id'] ?? null)) {
 				continue;
 			}
-			$pageId = ($page['page_type'] ?? null) === Page::TYPE_STARTPAGE ? $startPageId : ($pageIdsByName[(string)($page['slug'] ?? '')] ?? null);
+			$pageType = is_string($page['page_type'] ?? null) ? $page['page_type'] : '';
+			$pageId = $pageType === Page::TYPE_STARTPAGE ? $startPageId : ($pageIdsByName[$pageType][(string)($page['slug'] ?? '')] ?? null);
 			if ($pageId !== null) {
 				$pageIds[$page['id']] = $pageId;
 			}
