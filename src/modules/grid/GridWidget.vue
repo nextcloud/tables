@@ -75,7 +75,7 @@ import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { mapActions, mapState } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, findWidgetType, widgetTarget } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, findWidgetType, targetTitle, widgetTarget } from './gridLayout.js'
 import { WIDGET_TYPE_DATA, WIDGET_TYPE_TABLES, getWidgetComponent } from './widgetRegistry.js'
 
 /**
@@ -153,9 +153,7 @@ export default {
 				return ''
 			}
 			const target = widgetTarget(this.widget, this.nodes)
-			const elements = target?.type === 'view' ? this.views : this.tables
-			const element = target ? elements.find(element => element.id === target.id) : null
-			return element ? [element.emoji, element.title].filter(Boolean).join(' ') : ''
+			return target ? targetTitle(target, this.tables, this.views) : ''
 		},
 		headingId() {
 			return 'grid-widget-title-' + this.widget.key
