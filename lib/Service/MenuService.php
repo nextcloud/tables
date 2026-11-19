@@ -365,6 +365,33 @@ class MenuService {
 	}
 
 	/**
+	 * The node relations of an application by kind (`table` or `view`) and the uuid of their
+	 * table or view, for resolving the tables and views of an exported menu. A view uuid is
+	 * unique per table only; when two views of the application share one, the first counts.
+	 *
+	 * @return array<string, array<string, int>>
+	 * @throws Exception
+	 */
+	public function nodeRelIdsByUuid(Context $context): array {
+		$relIdsByNode = [];
+		foreach ($context->getNodes() ?? [] as $relId => $node) {
+			$relIdsByNode[$node['node_type']][$node['node_id']] ??= (int)$relId;
+		}
+		$entities = [
+			'table' => $this->tableMapper->findMany(array_keys($relIdsByNode[Application::NODE_TYPE_TABLE] ?? [])),
+			'view' => $this->viewMapper->findMany(array_keys($relIdsByNode[Application::NODE_TYPE_VIEW] ?? [])),
+		];
+		$relIds = [];
+		foreach ($entities as $kind => $byId) {
+			$nodeType = $kind === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+			foreach ($byId as $id => $entity) {
+				$relIds[$kind][(string)$entity->getUuid()] ??= $relIdsByNode[$nodeType][$id];
+			}
+		}
+		return $relIds;
+	}
+
+	/**
 	 * The pages of an application that the pages of a scheme stand for, by exported id. A
 	 * scheme imported into an existing application has no other link between the two: its
 	 * start page is the start page of the application, and any other page is the page of the

@@ -861,27 +861,6 @@ class ContextService {
 	}
 
 	/**
-	 * The node relation of an application for an exported table or view, found by uuid.
-	 */
-	private function nodeRelIdByUuid(Context $context, string $kind, string $uuid): ?int {
-		try {
-			$node = $kind === 'table' ? $this->tableMapper->findByUuid($uuid) : $this->viewMapper->findByUuid($uuid);
-		} catch (DoesNotExistException) {
-			return null;
-		}
-		if ($node === null) {
-			return null;
-		}
-		$nodeType = $kind === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
-		foreach ($context->getNodes() ?? [] as $relId => $relation) {
-			if ($relation['node_type'] === $nodeType && $relation['node_id'] === $node->getId()) {
-				return (int)$relId;
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * The slugs of the pages of an imported application, by page key. A valid
 	 * exported name is kept unless an earlier page of the import uses it or it has the
 	 * reserved form `page_<id>`, a start page without one gets `dashboard` while it is
@@ -1221,10 +1200,11 @@ class ContextService {
 		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
 		if ($menu !== null) {
 			$withNodes = $this->contextMapper->findById($contextId, $userId);
+			$nodeRelIds = $this->menuService->nodeRelIdsByUuid($withNodes);
 			$this->logSkippedMenuItems($this->menuService->import(
 				$withNodes,
 				$menu,
-				fn (string $kind, string $uuid): ?int => $this->nodeRelIdByUuid($withNodes, $kind, $uuid),
+				static fn (string $kind, string $uuid): ?int => $nodeRelIds[$kind][$uuid] ?? null,
 				static fn (int $pageId): ?int => null,
 			));
 		}
