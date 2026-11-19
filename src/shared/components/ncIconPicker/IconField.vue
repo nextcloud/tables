@@ -5,7 +5,8 @@
 <template>
 	<div class="icon-field" data-cy="iconField">
 		<NcIconPicker :close-on-select="true" @select="name => $emit('update:modelValue', name)">
-			<NcButton variant="secondary"
+			<NcButton ref="pickButton"
+				variant="secondary"
 				:aria-label="modelValue ? t('tables', '{label}: {icon}', { label, icon: modelValue }) : t('tables', '{label}: none', { label })"
 				data-cy="iconFieldPick">
 				<template #icon>
@@ -20,7 +21,7 @@
 			variant="tertiary"
 			:aria-label="t('tables', 'Remove icon')"
 			data-cy="iconFieldClear"
-			@click="$emit('update:modelValue', null)">
+			@click="clear">
 			<template #icon>
 				<Close :size="20" />
 			</template>
@@ -62,6 +63,16 @@ export default {
 		},
 	},
 	emits: ['update:modelValue'],
+	methods: {
+		/**
+		 * Removes the icon. The remove button goes with it, so focus moves to the button that
+		 * picks an icon.
+		 */
+		clear() {
+			this.$emit('update:modelValue', null)
+			this.$nextTick(() => this.$refs.pickButton?.$el?.focus())
+		},
+	},
 }
 </script>
 

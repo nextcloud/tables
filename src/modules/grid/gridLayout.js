@@ -24,6 +24,15 @@ export const GRID_BREAKPOINT_SINGLE = 560
 /** Below this canvas width in pixels the grid shows six columns. */
 export const GRID_BREAKPOINT_MEDIUM = 960
 
+/** Longest title of a widget, as TextHelper::TITLE_MAX_LENGTH on the server. */
+export const TITLE_MAX_LENGTH = 200
+
+/** Longest description of a widget, as TextHelper::DESCRIPTION_MAX_LENGTH on the server. */
+export const DESCRIPTION_MAX_LENGTH = 2000
+
+/** Blanks at either end of a text, the ones TextHelper::trim() removes on the server. */
+const EDGE_BLANKS = /^[\s\p{Z}\u0085\u200B\uFEFF]+|[\s\p{Z}\u0085\u200B\uFEFF]+$/gu
+
 /**
  * Deep copy of plain data. A JSON round-trip also copies reactive proxies, which
  * structuredClone refuses.
@@ -33,6 +42,33 @@ export const GRID_BREAKPOINT_MEDIUM = 960
  */
 function copy(value) {
 	return JSON.parse(JSON.stringify(value ?? null))
+}
+
+/**
+ * A text without blanks at either end, including zero width spaces, so a text of blanks
+ * only is empty as it is on the server.
+ *
+ * @param {string|null|undefined} text the text
+ * @return {string} the trimmed text
+ */
+export function trimText(text) {
+	return String(text ?? '').replace(EDGE_BLANKS, '')
+}
+
+/**
+ * @param {string|null|undefined} text the text
+ * @return {boolean} whether the server reads the text as empty
+ */
+export function isBlank(text) {
+	return trimText(text) === ''
+}
+
+/**
+ * @param {string} label the label of a form field
+ * @return {string} the label marked as required
+ */
+export function requiredLabel(label) {
+	return t('tables', '{label} *', { label }, undefined, { escape: false, sanitize: false })
 }
 
 /**
@@ -226,9 +262,9 @@ export function gridToWidgets(grid) {
 		const { gridX, gridY, gridWidth, gridHeight } = positions[widget.key]
 		const saved = {
 			type: widget.type,
-			title: widget.title?.trim() || null,
+			title: trimText(widget.title) || null,
 			icon: widget.icon || null,
-			description: widget.description?.trim() || null,
+			description: trimText(widget.description) || null,
 			gridX,
 			gridY,
 			gridWidth,

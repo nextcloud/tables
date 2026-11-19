@@ -8,7 +8,10 @@
 		size="normal"
 		data-cy="addWidgetModal"
 		@closing="$emit('close')">
-		<div class="modal__content">
+		<div v-if="!ready" class="modal__content">
+			<NcLoadingIcon :size="32" class="add-widget__loading" data-cy="addWidgetLoading" />
+		</div>
+		<div v-else class="modal__content">
 			<div class="row space-T">
 				<NcSelect :model-value="selectedType"
 					class="add-widget__input"
@@ -25,7 +28,8 @@
 				<NcTextField v-model="title"
 					class="add-widget__input"
 					:label="t('tables', 'Title')"
-					:helper-text="t('tables', 'Shown above the widget. Leave empty to show no title.')"
+					:maxlength="titleMaxLength"
+					:helper-text="titleHint"
 					data-cy="addWidgetTitle" />
 			</div>
 
@@ -37,6 +41,7 @@
 				<NcTextArea v-model="description"
 					class="add-widget__input"
 					:label="t('tables', 'Description')"
+					:maxlength="descriptionMaxLength"
 					resize="vertical"
 					rows="2"
 					data-cy="addWidgetDescription" />
@@ -45,9 +50,10 @@
 			<div v-if="hasSource" class="row space-T">
 				<NcSelect :model-value="nodeOption"
 					class="add-widget__input"
-					:input-label="t('tables', 'Table or view')"
+					:input-label="requiredLabel(t('tables', 'Table or view'))"
 					:options="nodeOptions"
 					:clearable="false"
+					:required="true"
 					:placeholder="t('tables', 'Pick a table or view of this application')"
 					label="label"
 					data-cy="addWidgetNode"
@@ -60,9 +66,13 @@
 			<SchemaForm v-if="widgetType"
 				v-model="settings"
 				:properties="widgetType.settings" />
+
+			<p v-if="missingFields.length > 0" class="add-widget__hint" data-cy="addWidgetMissing">
+				{{ t('tables', 'Still needed: {fields}', { fields: missingFields.join(', ') }, undefined, { escape: false, sanitize: false }) }}
+			</p>
 		</div>
 		<template #actions>
-			<NcButton variant="primary" :disabled="!canSubmit" data-cy="addWidgetSubmit" @click="submit">
+			<NcButton variant="primary" :disabled="!ready || !canSubmit" data-cy="addWidgetSubmit" @click="submit">
 				{{ editingWidget ? t('tables', 'Save widget') : t('tables', 'Add widget') }}
 			</NcButton>
 		</template>
@@ -70,12 +80,13 @@
 </template>
 
 <script>
-import { NcButton, NcDialog, NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
+import { NcButton, NcDialog, NcLoadingIcon, NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
+import { translate as t } from '@nextcloud/l10n'
 import { mapActions, mapState } from 'pinia'
 import SchemaForm from '../grid/SchemaForm.vue'
 import IconField from '../../shared/components/ncIconPicker/IconField.vue'
 import { useTablesStore } from '../../store/store.js'
-import { applicationNodeOptions, defaultSettings, findWidgetType } from '../grid/gridLayout.js'
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isBlank, requiredLabel, trimText } from '../grid/gridLayout.js'
 import { getWidgetComponent } from '../grid/widgetRegistry.js'
 
 /**
@@ -89,6 +100,7 @@ export default {
 		IconField,
 		NcButton,
 		NcDialog,
+		NcLoadingIcon,
 		NcSelect,
 		NcTextArea,
 		NcTextField,
@@ -118,6 +130,8 @@ export default {
 			description: '',
 			settings: {},
 			nodeRelId: null,
+			// False until the form is filled, so nothing typed early gets overwritten
+			ready: false,
 		}
 	},
 	computed: {
@@ -131,6 +145,18 @@ export default {
 		widgetType() {
 			return findWidgetType(this.widgetTypes, this.selectedType?.id)
 		},
+		titleMaxLength() {
+			return TITLE_MAX_LENGTH
+		},
+		descriptionMaxLength() {
+			return DESCRIPTION_MAX_LENGTH
+		},
+		// What an empty title does differs: a table or view widget takes the title of its source
+		titleHint() {
+			return this.hasSource
+				? t('tables', 'Shown above the widget, with the icon. Leave empty to use the title of the table or view.')
+				: t('tables', 'Shown above the widget, with the icon. Leave empty to show no title and no icon.')
+		},
 		hasSource() {
 			return !!this.widgetType?.hasSource
 		},
@@ -140,27 +166,38 @@ export default {
 		nodeOption() {
 			return this.nodeOptions.find(option => option.id === this.nodeRelId) ?? null
 		},
-		canSubmit() {
-			if (!this.widgetType || (this.hasSource && !this.nodeOption)) {
-				return false
+		// The labels of the required fields that are still empty, by the same rule as the server
+		missingFields() {
+			if (!this.widgetType) {
+				return []
 			}
-			return Object.entries(this.widgetType.settings).every(([name, setting]) => {
-				return !setting.required || String(this.settings[name] ?? '').trim() !== ''
-			})
+			const missing = this.hasSource && !this.nodeOption ? [t('tables', 'Table or view')] : []
+			for (const [name, setting] of Object.entries(this.widgetType.settings)) {
+				if (setting.required && isBlank(this.settings[name])) {
+					missing.push(setting.title)
+				}
+			}
+			return missing
+		},
+		canSubmit() {
+			return !!this.widgetType && this.missingFields.length === 0
 		},
 	},
 	watch: {
 		showModal(open) {
 			if (open) {
+				this.ready = false
 				this.reset()
 			}
 		},
 	},
 	methods: {
 		...mapActions(useTablesStore, ['loadWidgetTypes']),
+		requiredLabel,
 		/**
-		 * Fills the form for a new widget, or with the widget being configured. A widget of a type
-		 * the server does not know keeps no type here, so it can never be saved as another one.
+		 * Fills the form for a new widget, or with the widget being configured. A widget being
+		 * configured keeps its type also when this frontend has no renderer for it yet; a widget of
+		 * a type the server does not know keeps no type here, so it can never be saved as another one.
 		 */
 		async reset() {
 			// Awaited only when the types are missing, so the common case fills the form before it renders
@@ -168,18 +205,20 @@ export default {
 				await this.loadWidgetTypes()
 			}
 			if (this.editingWidget) {
-				this.selectedType = this.typeOptions.find(option => option.id === this.editingWidget.type) ?? null
+				const editingType = findWidgetType(this.widgetTypes, this.editingWidget.type)
+				this.selectedType = editingType ? { id: editingType.type, label: editingType.title } : null
 				this.title = this.editingWidget.title ?? ''
 				this.icon = this.editingWidget.icon ?? null
 				this.description = this.editingWidget.description ?? ''
 				this.settings = { ...defaultSettings(this.widgetType), ...JSON.parse(JSON.stringify(this.editingWidget.settings ?? {})) }
 				this.nodeRelId = this.editingWidget.nodeRelId ?? null
-				return
+			} else {
+				this.title = ''
+				this.icon = null
+				this.description = ''
+				this.selectType(this.typeOptions[0] ?? null)
 			}
-			this.title = ''
-			this.icon = null
-			this.description = ''
-			this.selectType(this.typeOptions[0] ?? null)
+			this.ready = true
 		},
 		/**
 		 * A type the user picks starts from the defaults of that type. Only this resets the form,
@@ -201,9 +240,9 @@ export default {
 			}
 			this.$emit('submit', {
 				type: this.widgetType.type,
-				title: this.title.trim(),
+				title: trimText(this.title),
 				icon: this.icon,
-				description: this.description.trim(),
+				description: trimText(this.description),
 				settings: JSON.parse(JSON.stringify(this.settings)),
 				nodeRelId: this.hasSource ? this.nodeRelId : null,
 			})
@@ -222,6 +261,10 @@ export default {
 
 	.add-widget__hint {
 		color: var(--color-text-maxcontrast);
+	}
+
+	.add-widget__loading {
+		margin: calc(4 * var(--default-grid-baseline)) auto;
 	}
 }
 </style>

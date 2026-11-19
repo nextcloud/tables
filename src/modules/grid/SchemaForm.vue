@@ -8,20 +8,24 @@
 			<NcTextField v-if="property.type === 'string'"
 				class="schema-form__input"
 				:model-value="value(name)"
-				:label="property.title"
+				:label="fieldLabel(property)"
+				:required="!!property.required"
+				:helper-text="property.hint"
 				@update:model-value="text => set(name, text)" />
 			<NcTextArea v-else-if="property.type === 'text'"
 				class="schema-form__input"
 				:model-value="value(name)"
-				:label="property.title"
-				:placeholder="t('tables', 'Leave an empty line between paragraphs')"
+				:label="fieldLabel(property)"
+				:required="!!property.required"
+				:helper-text="property.hint"
 				resize="vertical"
 				rows="6"
 				@update:model-value="text => set(name, text)" />
 			<NcSelect v-else-if="property.type === 'enum'"
 				class="schema-form__input"
 				:model-value="enumOption(property, value(name))"
-				:input-label="property.title"
+				:input-label="fieldLabel(property)"
+				:required="!!property.required"
 				:options="property.options"
 				:clearable="false"
 				label="label"
@@ -32,6 +36,7 @@
 
 <script>
 import { NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
+import { requiredLabel } from './gridLayout.js'
 
 /**
  * Renders the settings form of a widget from the schema of its type, so a
@@ -62,6 +67,13 @@ export default {
 		 */
 		fieldDataCy(name) {
 			return 'widgetField' + name.charAt(0).toUpperCase() + name.slice(1)
+		},
+		/**
+		 * @param {object} property a property of the schema
+		 * @return {string} its title, marked when the property is required
+		 */
+		fieldLabel(property) {
+			return property.required ? requiredLabel(property.title) : property.title
 		},
 		/**
 		 * @param {string} name property name
