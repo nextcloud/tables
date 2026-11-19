@@ -29,6 +29,11 @@ export default createRouter({
 			name: 'contextPage',
 		},
 		{
+			path: '/application/:contextId/page/:pageId/row/:rowId',
+			component: Context,
+			name: 'contextPageRow',
+		},
+		{
 			path: '/application/:contextId/row/:rowId',
 			component: Context,
 			name: 'contextRow',
