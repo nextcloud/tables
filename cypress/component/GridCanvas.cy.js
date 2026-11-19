@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-import { h } from 'vue'
+import { h, ref } from 'vue'
 import GridCanvas from '../../src/modules/grid/GridCanvas.vue'
 
 const layout = [
@@ -138,6 +138,26 @@ describe('GridCanvas', () => {
 		cy.get('@wrapper').should(wrapper => {
 			const node = wrapper.vm.grid.engine.nodes.find(node => node.id === 'w2')
 			expect({ x: node.x, y: node.y, w: node.w, h: node.h }).to.deep.equal({ x: 6, y: 4, w: 4, h: 2 })
+		})
+	})
+
+	it('keeps the grid of a canvas inside a widget apart from the grid around it', () => {
+		cy.viewport(1400, 800)
+		const inner = [{ widgetId: 'i1', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2 }]
+		// The nested canvas mounts after the outer grid, as the canvas of a tab that is opened
+		const showNested = ref(false)
+		cy.mount(GridCanvas, {
+			props: { layout: [{ widgetId: 'w1', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 6 }], editable: false },
+			slots: { widget: () => showNested.value ? h(GridCanvas, { layout: inner, editable: false }, { widget: ({ item }) => h('span', item.widgetId) }) : null },
+		}).then(({ wrapper }) => {
+			cy.get('[gs-id="w1"]').should('exist').then(() => {
+				showNested.value = true
+			})
+			cy.contains('i1').should('exist').then(() => {
+				const nested = wrapper.findComponent(GridCanvas)
+				expect(nested.vm.grid.parentGridNode).to.equal(undefined)
+				expect(wrapper.vm.grid.engine.nodes[0].subGrid).to.equal(undefined)
+			})
 		})
 	})
 })

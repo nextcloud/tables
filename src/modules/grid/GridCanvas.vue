@@ -107,6 +107,12 @@ export default {
 			disableResize: !this.isArranging,
 			minRow: 1,
 		}, this.$refs.gridElement)
+		// GridStack takes a grid inside an item of another grid for its sub grid and hands its
+		// changes to the outer one; the canvas of a tab handles its own
+		if (this.grid.parentGridNode) {
+			delete this.grid.parentGridNode.subGrid
+			delete this.grid.parentGridNode
+		}
 		this.grid.on('change', (event, changedNodes) => this.onGridChange(changedNodes))
 		// The column count follows the canvas width, so the grid restores when the window grows again
 		this.resizeObserver = new ResizeObserver(entries => this.applyColumns(entries[0]?.contentRect.width ?? 0))
