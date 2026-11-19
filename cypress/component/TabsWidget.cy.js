@@ -94,6 +94,17 @@ describe('TabsWidget', () => {
 		cy.get('[role="tabpanel"]').should('have.attr', 'tabindex', '0')
 	})
 
+	it('tells a viewer that a tab is empty and asks an editor to add widgets to it', () => {
+		const grid = pageToGrid({ widgets: [{ ...page.widgets[0], settings: { tabs: 'Empty' } }] })
+		mountInPage(TabsWidget, { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: false }, gridLevel(grid, false))
+		cy.get('[data-cy="tabsWidgetEmpty"]').should('have.text', 'This tab is empty.')
+		cy.get('[data-cy="gridItem"]').should('not.exist')
+
+		mountInPage(TabsWidget, { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: true }, gridLevel(grid, true))
+		cy.get('[data-cy="tabsWidgetEmpty"]').should('have.text', 'Add widgets to this tab.')
+		cy.get('[data-cy="tabsWidgetAdd"]').should('be.visible')
+	})
+
 	it('moves between tabs with the keyboard with one tab stop', () => {
 		mountTabs(false)
 

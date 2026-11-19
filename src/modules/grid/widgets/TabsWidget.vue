@@ -4,51 +4,49 @@
 -->
 <template>
 	<div class="tabs-widget" data-cy="tabsWidget">
-		<p v-if="titles.length === 0" class="tabs-widget__empty">
-			{{ t('tables', 'Name the tabs in the widget settings') }}
-		</p>
-		<template v-else>
-			<div ref="tablist"
-				role="tablist"
-				class="tabs-widget__tabs"
-				:aria-label="widget.title || t('tables', 'Tabs')"
-				@keydown="onKeydown">
-				<button v-for="(title, index) in titles"
-					:id="tabId(index)"
-					:key="index"
-					type="button"
-					role="tab"
-					class="tabs-widget__tab"
-					:class="{ 'tabs-widget__tab--active': index === activeTab }"
-					:aria-selected="index === activeTab ? 'true' : 'false'"
-					:aria-controls="visitedTabs.includes(index) ? panelId(index) : undefined"
-					:tabindex="index === focusTab ? 0 : -1"
-					data-cy="tabsWidgetTab"
-					@click="activeTab = index">
-					{{ title }}
-				</button>
-			</div>
-			<div v-for="index in visitedTabs"
-				v-show="index === activeTab"
-				:id="panelId(index)"
+		<div ref="tablist"
+			role="tablist"
+			class="tabs-widget__tabs"
+			:aria-label="widget.title || t('tables', 'Tabs')"
+			@keydown="onKeydown">
+			<button v-for="(title, index) in titles"
+				:id="tabId(index)"
 				:key="index"
-				role="tabpanel"
-				class="tabs-widget__panel"
-				tabindex="0"
-				:aria-labelledby="tabId(index)">
-				<GridLevel :parent-key="widget.key" :tab="index" />
-				<NcButton v-if="editable"
-					variant="secondary"
-					class="tabs-widget__add"
-					data-cy="tabsWidgetAdd"
-					@click="grid.addToTab(widget, index)">
-					<template #icon>
-						<Plus :size="20" />
-					</template>
-					{{ t('tables', 'Add widget to this tab') }}
-				</NcButton>
-			</div>
-		</template>
+				type="button"
+				role="tab"
+				class="tabs-widget__tab"
+				:class="{ 'tabs-widget__tab--active': index === activeTab }"
+				:aria-selected="index === activeTab ? 'true' : 'false'"
+				:aria-controls="visitedTabs.includes(index) ? panelId(index) : undefined"
+				:tabindex="index === focusTab ? 0 : -1"
+				data-cy="tabsWidgetTab"
+				@click="activeTab = index">
+				{{ title }}
+			</button>
+		</div>
+		<div v-for="index in visitedTabs"
+			v-show="index === activeTab"
+			:id="panelId(index)"
+			:key="index"
+			role="tabpanel"
+			class="tabs-widget__panel"
+			tabindex="0"
+			:aria-labelledby="tabId(index)">
+			<p v-if="isEmpty(index)" class="tabs-widget__empty" data-cy="tabsWidgetEmpty">
+				{{ editable ? t('tables', 'Add widgets to this tab.') : t('tables', 'This tab is empty.') }}
+			</p>
+			<GridLevel v-if="editable || !isEmpty(index)" :parent-key="widget.key" :tab="index" />
+			<NcButton v-if="editable"
+				variant="secondary"
+				class="tabs-widget__add"
+				data-cy="tabsWidgetAdd"
+				@click="grid.addToTab(widget, index)">
+				<template #icon>
+					<Plus :size="20" />
+				</template>
+				{{ t('tables', 'Add widget to this tab') }}
+			</NcButton>
+		</div>
 	</div>
 </template>
 
@@ -136,6 +134,13 @@ export default {
 		 */
 		tabId(index) {
 			return 'tabs-widget-' + this.instance + '-tab-' + index
+		},
+		/**
+		 * @param {number} index position of a tab
+		 * @return {boolean} whether the tab shows no widgets
+		 */
+		isEmpty(index) {
+			return this.grid.shownLayout(this.widget.key, index).length === 0
 		},
 		/**
 		 * @param {number} index position of a tab
