@@ -13,7 +13,9 @@ import {
 	columnsForWidth,
 	gridToWidgets,
 	nextFreeRow,
+	nodeTarget,
 	pageToGrid,
+	targetTitle,
 	widgetTarget,
 } from '../../src/modules/grid/gridLayout.js'
 
@@ -68,6 +70,36 @@ describe('grid layout', () => {
 			{ id: 4, label: '✅ Tasks' },
 			{ id: 5, label: 'Open (view)' },
 		])
+	})
+
+	it('names the table of a view, keeps titles as typed and skips nodes that are no table or view', () => {
+		const tables = [{ id: 40, title: 'Hardware', emoji: '' }, { id: 41, title: 'Software', emoji: '💾' }]
+		const views = [{ id: 50, tableId: 40, title: 'Open', emoji: '' }, { id: 51, tableId: 41, title: 'Open', emoji: '' }, { id: 52, tableId: 40, title: 'Stock < 10', emoji: '' }, { id: 53, title: '<Draft> plan', emoji: '' }]
+		const applicationNodes = {
+			5: { id: 5, node_type: 1, node_id: 50 },
+			6: { id: 6, node_type: 1, node_id: 51 },
+			7: { id: 7, node_type: 1, node_id: 52 },
+			8: { id: 8, node_type: 1, node_id: 53 },
+			9: { id: 9, node_type: 9, node_id: 90 },
+		}
+
+		expect(applicationNodeOptions(applicationNodes, tables, views)).to.deep.equal([
+			{ id: 5, label: 'Open (view of Hardware)' },
+			{ id: 6, label: 'Open (view of 💾 Software)' },
+			{ id: 7, label: 'Stock < 10 (view of Hardware)' },
+			{ id: 8, label: '<Draft> plan (view)' },
+		])
+	})
+
+	it('titles a table or view with its emoji, and finds the target of a node', () => {
+		const tables = [{ id: 40, title: 'Tasks', emoji: '✅' }]
+		const views = [{ id: 50, title: 'Open', emoji: '' }]
+
+		expect(targetTitle({ type: 'table', id: 40 }, tables, views)).to.equal('✅ Tasks')
+		expect(targetTitle({ type: 'view', id: 50 }, tables, views)).to.equal('Open')
+		expect(targetTitle({ type: 'view', id: 40 }, tables, views)).to.equal('')
+		expect(nodeTarget({ id: 5, node_type: 1, node_id: 50 })).to.deep.equal({ type: 'view', id: 50 })
+		expect(nodeTarget({ id: 9, node_type: 9, node_id: 90 })).to.equal(null)
 	})
 
 	it('saves widgets with their id and the node relation they show', () => {

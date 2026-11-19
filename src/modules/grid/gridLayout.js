@@ -138,15 +138,12 @@ export function pageToGrid(page) {
 }
 
 /**
- * The table or view a data widget shows.
+ * The table or view a node of the application stands for.
  *
- * @param {object} widget a widget of the grid
- * @param {object} nodes the nodes of the application by relation id, as in context.nodes
- * @return {{type: string, id: number}|null} the target, or null when the widget has no source
- * or its table or view left the application
+ * @param {object|null|undefined} node a node of the application, as in context.nodes
+ * @return {{type: string, id: number}|null} the target, or null for a node of another type
  */
-export function widgetTarget(widget, nodes) {
-	const node = widget?.nodeRelId ? nodes?.[widget.nodeRelId] : null
+export function nodeTarget(node) {
 	if (!node) {
 		return null
 	}
@@ -158,27 +155,60 @@ export function widgetTarget(widget, nodes) {
 }
 
 /**
- * The tables and views of the application a data widget can show, with their titles.
+ * The table or view a data widget shows.
+ *
+ * @param {object} widget a widget of the grid
+ * @param {object} nodes the nodes of the application by relation id, as in context.nodes
+ * @return {{type: string, id: number}|null} the target, or null when the widget has no source
+ * or its table or view left the application
+ */
+export function widgetTarget(widget, nodes) {
+	return nodeTarget(widget?.nodeRelId ? nodes?.[widget.nodeRelId] : null)
+}
+
+/**
+ * The emoji and title of a table or view.
+ *
+ * @param {{type: string, id: number}} target the table or view
+ * @param {Array} tables tables known to the store
+ * @param {Array} views views known to the store
+ * @return {string} the title, empty when the store does not know the table or view
+ */
+export function targetTitle(target, tables, views) {
+	const elements = target?.type === 'view' ? views : tables
+	const element = target ? elements.find(element => element.id === target.id) : null
+	return element ? [element.emoji, element.title].filter(Boolean).join(' ') : ''
+}
+
+/**
+ * The tables and views of the application a data widget can show, with their titles. A view
+ * also names its table, so views with the same title can be told apart.
  *
  * @param {object} nodes the nodes of the application by relation id
  * @param {Array} tables tables known to the store
  * @param {Array} views views known to the store
- * @return {Array<{id: number, label: string}>} one option per node relation, by relation id
+ * @return {Array<{id: number, label: string}>} one option per table or view, by relation id
  */
 export function applicationNodeOptions(nodes, tables, views) {
-	return Object.values(nodes ?? {}).map(node => {
-		const nodeType = parseInt(node.node_type)
-		const nodeId = parseInt(node.node_id)
-		const element = nodeType === NODE_TYPE_VIEW
-			? views.find(view => view.id === nodeId)
-			: tables.find(table => table.id === nodeId)
-		const title = element ? (element.emoji ? element.emoji + ' ' : '') + element.title : '#' + nodeId
-		return {
-			id: parseInt(node.id),
-			label: nodeType === NODE_TYPE_VIEW
-				? t('tables', '{title} (view)', { title }, undefined, { escape: false })
-				: title,
+	// The select shows labels as text, so they are neither escaped nor sanitized
+	const options = { escape: false, sanitize: false }
+	return Object.values(nodes ?? {}).flatMap(node => {
+		const target = nodeTarget(node)
+		if (!target) {
+			return []
 		}
+		const title = targetTitle(target, tables, views) || '#' + target.id
+		if (target.type !== 'view') {
+			return [{ id: parseInt(node.id), label: title }]
+		}
+		const tableId = views.find(view => view.id === target.id)?.tableId
+		const table = tableId ? targetTitle({ type: 'table', id: tableId }, tables, views) : ''
+		return [{
+			id: parseInt(node.id),
+			label: table
+				? t('tables', '{title} (view of {table})', { title, table }, undefined, options)
+				: t('tables', '{title} (view)', { title }, undefined, options),
+		}]
 	})
 }
 
