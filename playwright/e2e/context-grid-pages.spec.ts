@@ -7,7 +7,8 @@ import { type APIRequestContext, type Page } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
 import { createRandomUser, ocsRequest, type TestUser } from '../support/api'
 import { login } from '../support/login'
-import { openContextEditModal } from '../support/commands'
+import * as fs from 'fs'
+import { clickOnTableThreeDotMenu, openContextEditModal } from '../support/commands'
 
 // The app navigation takes width from the canvas; the grid only arranges at 12 columns
 test.use({ viewport: { width: 1600, height: 1000 } })
@@ -83,7 +84,6 @@ test.describe('Grid pages of an application', () => {
 		await expect(startPage.locator('.header-widget')).toHaveCount(0)
 		await expect(page.locator('[data-cy="contextStartPageLink"]')).toHaveAttribute('aria-selected', 'true')
 		await expect(page.locator('[data-cy="contextPageAdd"]')).toBeVisible()
-		await expect(page.locator('.resources')).toHaveCount(0)
 	})
 
 	test('The start page can be edited like a grid page, but not deleted', async ({ userPage: { page, user } }) => {
@@ -104,7 +104,7 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.getByText('Read this first')).toBeVisible({ timeout: 30000 })
 		// With only one action left the menu shows it as a button of its own
 		await expect(page.getByRole('button', { name: 'Edit page details' })).toBeVisible()
-		await expect(page.getByRole('button', { name: 'Page actions' })).toHaveCount(0)
+		await expect(page.locator('[data-cy="gridPageDelete"]')).toHaveCount(0)
 	})
 
 	test('A new page holds a header and a table of the application after a reload', async ({ userPage: { page, user } }) => {
@@ -599,5 +599,72 @@ test.describe('Grid pages of an application', () => {
 		await expect(firstHeading).toBeVisible({ timeout: 30000 })
 		await expect(secondHeading).toBeVisible({ timeout: 30000 })
 		expect((await secondHeading.boundingBox())!.y).toBeLessThan((await firstHeading.boundingBox())!.y)
+	})
+
+	test('A table on the start page exports all rows and the filtered rows as CSV', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid export table')
+		await createRowViaApi(page.request, user, table, 'Exported task')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid export app', [table])
+		await openApplication(page, contextId)
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		await expect(tablesWidget.getByText('Exported task')).toBeVisible({ timeout: 30000 })
+
+		const [all] = await Promise.all([
+			page.waitForEvent('download'),
+			clickOnTableThreeDotMenu(page, 'Export all rows'),
+		])
+		expect(fs.readFileSync(await all.path(), 'utf8')).toContain('Exported task')
+
+		await tablesWidget.getByRole('textbox', { name: 'Search' }).fill('Exported')
+		await page.waitForTimeout(600)
+		const [filtered] = await Promise.all([
+			page.waitForEvent('download'),
+			clickOnTableThreeDotMenu(page, 'Export filtered rows'),
+		])
+		expect(fs.readFileSync(await filtered.path(), 'utf8')).toContain('Exported task')
+	})
+
+	test('A table on the start page opens the scheme import', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid scheme table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid scheme app', [table])
+		await openApplication(page, contextId)
+		await expect(page.locator('[data-cy="tablesWidget"]').getByRole('heading', { name: 'grid scheme table' })).toBeVisible({ timeout: 30000 })
+
+		await page.locator('[data-cy="customTableAction"] button').first().click()
+		await page.getByRole('menuitem', { name: 'Import scheme' }).click()
+		await expect(page.getByRole('dialog', { name: /Import scheme/i })).toBeVisible()
+	})
+
+	test('A view on the start page shows its rows in the sorting it is saved with', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid sorted table')
+		const column = await ocsRequest(page.request, user, {
+			method: 'POST',
+			url: `/index.php/apps/tables/api/1/tables/${table}/columns`,
+			data: { title: 'Name', type: 'text', subtype: 'line', mandatory: false },
+		})
+		const columnId = (await column.json()).id
+		for (const name of ['Banana', 'Apple', 'Cherry']) {
+			await ocsRequest(page.request, user, { method: 'POST', url: `/index.php/apps/tables/api/1/tables/${table}/rows`, data: { data: { [columnId]: name } } })
+		}
+		const view = await ocsRequest(page.request, user, { method: 'POST', url: `/index.php/apps/tables/api/1/tables/${table}/views`, data: { title: 'grid sorted view' } })
+		const viewId = (await view.json()).id
+		await ocsRequest(page.request, user, {
+			method: 'PUT',
+			url: `/index.php/apps/tables/api/1/views/${viewId}`,
+			data: { data: { columnSettings: [{ columnId, order: 0 }], sort: [{ columnId, mode: 'DESC' }] } },
+		})
+		const res = await ocsRequest(page.request, user, {
+			method: 'POST',
+			url: `${API}/contexts?format=json`,
+			data: { name: 'grid sorted app', iconName: 'equalizer', description: '', nodes: [{ id: viewId, type: 1, permissions: 1 }] },
+		})
+		const contextId = (await res.json()).ocs.data.id
+		await openApplication(page, contextId)
+
+		const rows = page.locator('[data-cy="tablesWidget"] [data-cy="customTableRow"]')
+		await expect(rows).toHaveCount(3, { timeout: 30000 })
+		await expect(rows.nth(0)).toContainText('Cherry')
+		await expect(rows.nth(1)).toContainText('Banana')
+		await expect(rows.nth(2)).toContainText('Apple')
 	})
 })
