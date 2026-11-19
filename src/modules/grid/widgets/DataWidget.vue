@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="data-widget" :class="{ 'data-widget--untitled': !showTitle }">
+	<div class="data-widget">
 		<p v-if="!target && editable" class="data-widget__empty" data-cy="dataWidgetPickSource">
 			{{ t('tables', 'Pick a table or view in the widget settings') }}
 		</p>
@@ -28,6 +28,10 @@
 				:view-setting="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
+				@download-csv="downloadCSV(rows)"
+				@download-filtered-csv="downloadCSV"
+				@toggle-share="openSidebar('tables:sidebar:sharing', 'sharing')"
+				@show-integration="openSidebar('tables:sidebar:integration', 'integration')"
 				@update:view-setting="setting => viewSetting = setting" />
 			<TableWrapper v-else
 				:show-title="showTitle"
@@ -37,6 +41,11 @@
 				:view-setting="viewSetting"
 				@create-column="createColumn"
 				@import="openImportModal"
+				@import-scheme="openImportSchemeModal"
+				@download-csv="downloadCSV(rows)"
+				@download-filtered-csv="downloadCSV"
+				@toggle-share="openSidebar('tables:sidebar:sharing', 'sharing')"
+				@show-integration="openSidebar('tables:sidebar:integration', 'integration')"
 				@update:view-setting="setting => viewSetting = setting" />
 		</template>
 	</div>
@@ -47,10 +56,13 @@ import { NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
 import TableOff from 'vue-material-design-icons/TableOff.vue'
 import { mapActions, mapState, storeToRefs } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
+import { showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
 import TableWrapper from '../../main/sections/TableWrapper.vue'
 import CustomView from '../../main/sections/View.vue'
 import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
+import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 
 /**
  * Shows the rows of one table or view of the application on a grid page, with the
@@ -65,6 +77,7 @@ export default {
 		TableWrapper,
 		CustomView,
 	},
+	mixins: [exportTableMixin],
 	props: {
 		// The table or view to show, as {type: 'table'|'view', id}; null when the widget has none,
 		// also when its table or view left the application
@@ -103,6 +116,18 @@ export default {
 		targetId() {
 			return this.target?.id ?? null
 		},
+		// The parent builds a new target object on every render, so changes are told by this key
+		targetKey() {
+			return this.target ? this.target.type + ':' + this.target.id : null
+		},
+		// What decides the rows and columns of a shown view; null for a table
+		viewQueryKey() {
+			if (!this.isView || !this.element) {
+				return null
+			}
+			const { filter, sort, columns, columnSettings } = this.element
+			return JSON.stringify({ filter, sort, columns, columnSettings })
+		},
 		element() {
 			if (!this.targetId || this.loadFailed) {
 				return null
@@ -119,29 +144,50 @@ export default {
 		},
 	},
 	watch: {
-		target: {
-			deep: true,
-			handler() {
-				this.load()
-			},
+		targetKey() {
+			this.load()
+		},
+		// A view saved from inside the widget, for example with a new filter, shows its new rows
+		viewQueryKey(key) {
+			if (key !== null && this.loadedViewQueryKey !== null && key !== this.loadedViewQueryKey) {
+				this.load(true)
+			}
 		},
 	},
 	created() {
 		// Counts the loads, so a load that a newer one overtook leaves the state alone
 		this.loadRequest = 0
+		// The view query of the last finished load, null while loading
+		this.loadedViewQueryKey = null
+		this.resizeObserver = null
 	},
 	mounted() {
 		this.load()
+		// The table sizes itself from --app-content-width, which is the width of the widget here
+		this.resizeObserver = new ResizeObserver(entries => {
+			const width = entries[0]?.contentRect.width ?? 0
+			this.$el.style.setProperty('--app-content-width', `${width}px`)
+		})
+		this.resizeObserver.observe(this.$el)
+	},
+	beforeUnmount() {
+		this.resizeObserver?.disconnect()
+		this.resizeObserver = null
 	},
 	methods: {
-		...mapActions(useTablesStore, ['loadContextTable', 'loadContextView']),
+		...mapActions(useTablesStore, ['loadContextTable', 'loadContextView', 'setActiveTableId', 'setActiveViewId', 'validateExportAccess']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		/**
-		 * Loads the table or view with its columns, rows and relations.
+		 * Loads the table or view with its columns, rows and relations. The search, sorting and
+		 * filters of the widget start over from what the table or view was saved with.
+		 *
+		 * @param {boolean} force also load the relations when they were loaded before
 		 */
-		async load() {
+		async load(force = false) {
 			const request = ++this.loadRequest
 			this.loadFailed = false
+			this.loadedViewQueryKey = null
+			this.viewSetting = {}
 			if (!this.targetId) {
 				this.loading = false
 				return
@@ -152,15 +198,24 @@ export default {
 					await this.loadContextView({ id: this.targetId })
 					const view = this.views.find(view => view.id === this.targetId)
 					if (view) {
-						await this.loadColumnsFromBE({ view })
-						await this.loadRowsFromBE({ viewId: view.id, tableId: view.tableId })
-						await this.loadRelationsFromBE({ viewId: view.id })
+						await Promise.all([
+							this.loadColumnsFromBE({ view }),
+							this.loadRowsFromBE({ viewId: view.id, tableId: view.tableId }),
+							this.loadRelationsFromBE({ viewId: view.id, force }),
+						])
 					}
 				} else {
 					await this.loadContextTable({ id: this.targetId })
-					await this.loadColumnsFromBE({ view: null, tableId: this.targetId })
-					await this.loadRowsFromBE({ viewId: null, tableId: this.targetId })
-					await this.loadRelationsFromBE({ tableId: this.targetId })
+					await Promise.all([
+						this.loadColumnsFromBE({ view: null, tableId: this.targetId }),
+						this.loadRowsFromBE({ viewId: null, tableId: this.targetId }),
+						this.loadRelationsFromBE({ tableId: this.targetId, force }),
+					])
+				}
+				if (request === this.loadRequest) {
+					// The rows start in the sorting the table or view was saved with
+					this.viewSetting = this.element?.sort?.length ? { presetSorting: [...this.element.sort] } : {}
+					this.loadedViewQueryKey = this.viewQueryKey
 				}
 			} catch {
 				// The store already reported the error
@@ -184,6 +239,42 @@ export default {
 		 */
 		openImportModal() {
 			emit('tables:modal:import', { element: this.element, isView: this.isView })
+		},
+		/**
+		 * Asks the app to open the scheme import dialog for the shown table.
+		 */
+		openImportSchemeModal() {
+			emit('tables:modal:table-scheme-import', { table: this.element })
+		},
+		/**
+		 * Downloads rows of the shown table or view as CSV, after checking the user may still read it.
+		 *
+		 * @param {Array} rows the rows to download
+		 */
+		async downloadCSV(rows) {
+			const access = await this.validateExportAccess({ id: this.element.id, isView: this.isView })
+			if (!access?.ok) {
+				if (access?.reason === 'NO_ACCESS') {
+					showError(t('tables', 'Your access was revoked. Reload the page to update your permissions.'))
+				}
+				return
+			}
+			this.downloadCsv(rows, this.columns, this.element.title)
+		},
+		/**
+		 * Opens a tab of the sidebar for the shown table or view, which the sidebar shows as the
+		 * active element.
+		 *
+		 * @param {string} event the event bus event that opens the tab
+		 * @param {string} tab the tab to open
+		 */
+		openSidebar(event, tab) {
+			if (this.isView) {
+				this.setActiveViewId(this.targetId)
+			} else {
+				this.setActiveTableId(this.targetId)
+			}
+			emit(event, { open: true, tab })
 		},
 	},
 }
@@ -212,14 +303,10 @@ export default {
 		font-size: revert;
 	}
 
-	// The sticky parts of the table leave room for the title of the table or view
-	&--untitled {
+	// Without the title row of the table or view, its sticky options and head move up by its height
+	&:not(:has(.first-row)) {
 		:deep(.options.row) {
 			top: 0;
-		}
-
-		:deep(.sticky) {
-			top: 30px;
 		}
 
 		:deep(thead) {
