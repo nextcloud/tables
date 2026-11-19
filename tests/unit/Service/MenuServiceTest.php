@@ -59,6 +59,7 @@ class MenuServiceTest extends DatabaseTestCase {
 	private ContextService $contextService;
 	private PageService $pageService;
 	private MenuItemMapper $menuItemMapper;
+	private ContextMapper $contextMapper;
 	private PermissionsService&MockObject $permissionsService;
 	private bool $canManage = true;
 	/** @var int[] */
@@ -71,6 +72,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$userHelper = $this->createMock(UserHelper::class);
 		$userHelper->method('getGroupIdsForUser')->willReturn([]);
 		$contextMapper = new ContextMapper($this->connectionAdapter, $userHelper, $this->createMock(GroupHelper::class));
+		$this->contextMapper = $contextMapper;
 		$pageMapper = new PageMapper($this->connectionAdapter);
 		$pageContentMapper = new PageContentMapper($this->connectionAdapter);
 		$widgetService = new WidgetService(new WidgetMapper($this->connectionAdapter), new ContextNodeRelationMapper($this->connectionAdapter), $this->connectionAdapter);
@@ -83,6 +85,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$table = new Table();
 		$table->id = self::TABLE;
 		$table->setUuid(self::TABLE_UUID);
+		$table->setTitle('Projects');
 		$tableMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => in_array(self::TABLE, $ids, true) ? [self::TABLE => $table] : []);
 		$otherTable = new Table();
 		$otherTable->id = self::OTHER_TABLE;
@@ -418,6 +421,37 @@ class MenuServiceTest extends DatabaseTestCase {
 		$expected[0][2] = ['page' => $pageIds[$startPageId]];
 		$this->assertSame(array_values($expected), $shape($this->menuService->export($this->contextService->findById($imported->getId(), self::OWNER))));
 		$this->assertSame([$startPageId, 1], [$exported[0]['target']['page'], $exported[2]['parent']]);
+	}
+
+	public function testAnExportLoadsTheTablesAndViewsOfItsItemsOnce(): void {
+		[$contextId, , , $nodeRelId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$table = new Table();
+		$table->id = self::TABLE;
+		$table->setUuid(self::TABLE_UUID);
+		$table->setTitle('Projects');
+		$tableMapper = $this->createMock(TableMapper::class);
+		$tableMapper->expects($this->once())->method('findMany')->with([self::TABLE])->willReturn([self::TABLE => $table]);
+		$tableMapper->expects($this->never())->method('findIdToTitleMap');
+		$viewMapper = $this->createMock(ViewMapper::class);
+		$viewMapper->expects($this->once())->method('findMany')->with([])->willReturn([]);
+		$viewMapper->expects($this->never())->method('findIdToTitleMap');
+		$menuService = new MenuService($this->contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $this->menuItemMapper, $this->permissionsService, $tableMapper, $viewMapper, $this->connectionAdapter);
+
+		$exported = $menuService->export($this->contextService->findById($contextId, self::OWNER));
+
+		$this->assertSame(['Sales', 'Projects'], array_column($exported, 'displayTitle'));
+		$this->assertSame(['table' => self::TABLE_UUID], $exported[1]['target']);
+	}
+
+	public function testAReadersExportLeavesOutTheEmptyGroupsTheReaderDoesNotSee(): void {
+		[$contextId] = $this->createApplication();
+		$this->menuService->create($contextId, 'Empty', null, null, null, self::OWNER);
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$this->canManage = false;
+
+		$this->assertSame(['Sales'], array_column($this->menuService->export($context, 'reader'), 'displayTitle'));
+		$this->assertSame(['Sales', 'Empty'], array_column($this->menuService->export($context), 'displayTitle'));
 	}
 
 	public function testAMovedUsersMenuKeepsItsTableItsPagesAndItsLinks(): void {

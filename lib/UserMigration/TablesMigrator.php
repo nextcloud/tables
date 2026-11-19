@@ -127,7 +127,7 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 			$contexts = $this->contextMapper->findAll($uid);
 			$this->contextService->addWidgetsToPages($contexts);
 			$exportDestination->addFileContents(self::FILE_CONTEXTS, json_encode(array_map(
-				fn (Context $context): array => $context->jsonSerialize() + ['menu' => $this->menuService->export($context)],
+				fn (Context $context): array => $context->jsonSerialize() + ['menu' => $this->menuService->export($context, $uid)],
 				$contexts,
 			)));
 			$contextIds = array_map(fn ($c) => $c->getId(), $contexts);

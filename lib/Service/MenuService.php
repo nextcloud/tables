@@ -16,7 +16,9 @@ use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\MenuItem;
 use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\ConflictError;
@@ -73,8 +75,7 @@ class MenuService {
 		$items = $this->visibleItems($context, $this->menuItemMapper->findByContextId($contextId));
 		$menu = $this->serialize($context, $items);
 		if (!$this->permissionsService->canManageContext($context, $userId)) {
-			$parentIds = array_flip(array_filter(array_column($menu, 'parentId')));
-			$menu = array_values(array_filter($menu, static fn (array $item): bool => $item['target'] !== null || isset($parentIds[$item['id']])));
+			$menu = self::forReader($menu);
 		}
 		return ['menu' => $menu, 'version' => $this->version($items)];
 	}
@@ -241,24 +242,23 @@ class MenuService {
 	 * The menu as an export carries it: a page by its slug, a table or view by
 	 * uuid, and the group of an item by the group's position in the exported menu. Each
 	 * item keeps the title it shows, for a preview; an import reads only its own title.
+	 * With a user who cannot manage the application, the menu is the one that user reads.
 	 *
 	 * @return list<TablesMenuExportItem>
 	 * @throws Exception
 	 */
-	public function export(Context $context): array {
-		$menu = $this->serialize($context, $this->menuItemMapper->findByContextId($context->getId()));
+	public function export(Context $context, ?string $userId = null): array {
+		$items = $this->menuItemMapper->findByContextId($context->getId());
 		$nodes = $context->getNodes() ?? [];
-		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
-		foreach ($menu as $item) {
-			$node = isset($item['target']['nodeRelId']) ? $nodes[$item['target']['nodeRelId']] : null;
-			if ($node !== null) {
-				$nodeIds[$node['node_type']][] = $node['node_id'];
-			}
-		}
+		$nodeIds = $this->nodeIdsByType($items, $nodes);
 		$nodesById = [
 			Application::NODE_TYPE_TABLE => $this->tableMapper->findMany($nodeIds[Application::NODE_TYPE_TABLE]),
 			Application::NODE_TYPE_VIEW => $this->viewMapper->findMany($nodeIds[Application::NODE_TYPE_VIEW]),
 		];
+		$menu = $this->serialize($context, $items, array_map(static fn (array $entities): array => array_map(static fn (Table|View $entity): ?string => $entity->getTitle(), $entities), $nodesById));
+		if ($userId !== null && !$this->permissionsService->canManageContext($context, $userId)) {
+			$menu = self::forReader($menu);
+		}
 		$positions = [];
 		$exported = [];
 		foreach ($menu as $item) {
@@ -610,11 +610,12 @@ class MenuService {
 
 	/**
 	 * @param list<MenuItem> $items
+	 * @param array<int, array<int, ?string>>|null $nodeTitles the titles of the tables and views of the items by node type and id, or null to load them
 	 * @return list<TablesMenuItem> the items the menu shows, see {@see self::displayTitles()}
 	 * @throws Exception
 	 */
-	private function serialize(Context $context, array $items): array {
-		$titles = $this->displayTitles($context, $items);
+	private function serialize(Context $context, array $items, ?array $nodeTitles = null): array {
+		$titles = $this->displayTitles($context, $items, $nodeTitles);
 		$menu = [];
 		foreach ($items as $item) {
 			if (!isset($titles[$item->getId()])) {
@@ -641,23 +642,20 @@ class MenuService {
 	 * part of the application or no longer exists.
 	 *
 	 * @param list<MenuItem> $items
+	 * @param array<int, array<int, ?string>>|null $nodeTitles the titles of the tables and views of the items by node type and id, or null to load them
 	 * @return array<int, string>
 	 * @throws Exception
 	 */
-	private function displayTitles(Context $context, array $items): array {
+	private function displayTitles(Context $context, array $items, ?array $nodeTitles = null): array {
 		$pages = $context->getPages() ?? [];
 		$nodes = $context->getNodes() ?? [];
-		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
-		foreach ($items as $item) {
-			$node = $this->nodeOf($item, $nodes);
-			if ($node !== null) {
-				$nodeIds[$node['node_type']][] = $node['node_id'];
-			}
+		if ($nodeTitles === null) {
+			$nodeIds = $this->nodeIdsByType($items, $nodes);
+			$nodeTitles = [
+				Application::NODE_TYPE_TABLE => $this->tableMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_TABLE]),
+				Application::NODE_TYPE_VIEW => $this->viewMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_VIEW]),
+			];
 		}
-		$nodeTitles = [
-			Application::NODE_TYPE_TABLE => $this->tableMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_TABLE]),
-			Application::NODE_TYPE_VIEW => $this->viewMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_VIEW]),
-		];
 
 		$titles = [];
 		foreach ($items as $item) {
@@ -673,6 +671,35 @@ class MenuService {
 			}
 		}
 		return $titles;
+	}
+
+	/**
+	 * The ids of the tables and views the items open, by node type.
+	 *
+	 * @param list<MenuItem> $items
+	 * @param array<array-key, mixed> $nodes the nodes of the application by relation id
+	 * @return array<int, list<int>>
+	 */
+	private function nodeIdsByType(array $items, array $nodes): array {
+		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
+		foreach ($items as $item) {
+			$node = $this->nodeOf($item, $nodes);
+			if ($node !== null) {
+				$nodeIds[$node['node_type']][] = $node['node_id'];
+			}
+		}
+		return $nodeIds;
+	}
+
+	/**
+	 * The menu as a reader who cannot manage the application sees it: without empty groups.
+	 *
+	 * @param list<TablesMenuItem> $menu
+	 * @return list<TablesMenuItem>
+	 */
+	private static function forReader(array $menu): array {
+		$parentIds = array_flip(array_filter(array_column($menu, 'parentId')));
+		return array_values(array_filter($menu, static fn (array $item): bool => $item['target'] !== null || isset($parentIds[$item['id']])));
 	}
 
 	/**

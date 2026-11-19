@@ -176,7 +176,7 @@ class TablesMigratorTest extends TestCase {
 			});
 
 		$menu = [['parent' => null, 'title' => 'Site', 'displayTitle' => 'Site', 'icon' => null, 'description' => null, 'target' => ['url' => 'https://nextcloud.com']]];
-		$this->menuService->method('export')->with($context)->willReturn($menu);
+		$this->menuService->method('export')->with($context, 'user1')->willReturn($menu);
 
 		$files = [];
 		$exportDestination->method('addFileContents')->willReturnCallback(static function (string $path, string $content) use (&$files): void {
