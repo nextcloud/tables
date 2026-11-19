@@ -171,6 +171,16 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->assertSame([], $this->pageMapper->getPageIdsForContext($context->getId()));
 	}
 
+	public function testTheVersionOfAPageIsReadAfterEveryRaise(): void {
+		[, , $gridPageId] = $this->createContextWithGridPage();
+		$initial = $this->pageMapper->findById($gridPageId)->getVersion();
+
+		$this->assertTrue($this->pageMapper->raiseVersion($gridPageId, null));
+		$this->assertTrue($this->pageMapper->raiseVersion($gridPageId, null));
+
+		$this->assertSame($initial + 2, $this->pageMapper->findVersion($gridPageId));
+	}
+
 	/**
 	 * @return array{0: Context, 1: ContextNodeRelation, 2: int}
 	 */

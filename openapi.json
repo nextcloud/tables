@@ -15166,7 +15166,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid page field or widget, or too many widgets",
+                        "description": "Invalid page field or widget, a widget id that is not on the page, or too many widgets",
                         "content": {
                             "application/json": {
                                 "schema": {

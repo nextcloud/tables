@@ -88,6 +88,24 @@ class PageMapper extends QBMapper {
 	}
 
 	/**
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 */
+	public function findVersion(int $pageId): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('version')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)));
+		$result = $qb->executeQuery();
+		$version = $result->fetchOne();
+		$result->closeCursor();
+		if ($version === false) {
+			throw new DoesNotExistException('Page ' . $pageId . ' does not exist');
+		}
+		return (int)$version;
+	}
+
+	/**
 	 * @return int[]
 	 */
 	public function getPageIdsForContext(int $contextId): array {

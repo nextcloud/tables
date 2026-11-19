@@ -153,10 +153,11 @@ class PageService {
 				throw new ConflictError(self::CHANGED_IN_BETWEEN);
 			}
 			$this->pageMapper->update($page);
-			return $inputs === null ? null : $this->widgetService->syncPage($pageId, $inputs);
+			$stored = $inputs === null ? null : $this->widgetService->syncPage($pageId, $inputs);
+			$page->setVersion($this->pageMapper->findVersion($pageId));
+			return $stored;
 		}, $this->dbc), $renamed ? (string)$page->getSlug() : null);
 
-		$page->setVersion($page->getVersion() + 1);
 		return $this->response($page, $stored ?? $this->widgetService->findByPageIds([$pageId])[$pageId] ?? []);
 	}
 
@@ -261,8 +262,9 @@ class PageService {
 
 	/**
 	 * Runs a save. A unique index refusing a new slug means the name was
-	 * taken; a widget the save lists that is not on the page means the list was built
-	 * from another state of the page.
+	 * taken. A widget the save lists that is not on the page, or a source that is not
+	 * part of the application, is refused: the version check already ruled out a list
+	 * built from another state of the page.
 	 *
 	 * @template T
 	 * @param callable(): T $save
@@ -275,7 +277,7 @@ class PageService {
 		try {
 			return $save();
 		} catch (\InvalidArgumentException $e) {
-			throw new ConflictError(self::CHANGED_IN_BETWEEN, 0, $e);
+			throw new BadRequestError($e->getMessage(), 0, $e);
 		} catch (Exception $e) {
 			if ($newSlug === null || $e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
 				throw $e;
