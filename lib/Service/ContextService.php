@@ -679,7 +679,8 @@ class ContextService {
 	/**
 	 * Imports an application of a user's data that holds the given table. Its menu keeps
 	 * the links, the items for its pages and the items for the table, found by the uuid
-	 * it was exported with.
+	 * it was exported with. Items for other tables and for views of the application are
+	 * left out, as each table brings its own copy of the application.
 	 *
 	 * @param Table $table
 	 * @param array $context
@@ -815,7 +816,9 @@ class ContextService {
 			$this->logSkippedMenuItems($this->menuService->import(
 				$this->contextMapper->findById($newContext->getId()),
 				$context['menu'],
-				static fn (string $kind, string $uuid): ?int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false ? $tableRelation->getId() : null,
+				static fn (string $kind, string $uuid): int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false
+					? $tableRelation->getId()
+					: throw new BadRequestError('Its ' . $kind . ' ' . $uuid . ' is not the table of this copy: the account import brings one table per copy of the application.'),
 				static fn (int $pageId): ?int => ($pageMap[$pageId] ?? null)?->getId(),
 			));
 		}
