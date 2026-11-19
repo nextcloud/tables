@@ -11,7 +11,7 @@
 			<div ref="tablist"
 				role="tablist"
 				class="tabs-widget__tabs"
-				:aria-label="t('tables', 'Tabs')"
+				:aria-label="widget.title || t('tables', 'Tabs')"
 				@keydown="onKeydown">
 				<button v-for="(title, index) in titles"
 					:id="tabId(index)"
@@ -34,6 +34,7 @@
 				:key="index"
 				role="tabpanel"
 				class="tabs-widget__panel"
+				tabindex="0"
 				:aria-labelledby="tabId(index)">
 				<GridLevel :parent-key="widget.key" :tab="index" />
 				<NcButton v-if="editable"
