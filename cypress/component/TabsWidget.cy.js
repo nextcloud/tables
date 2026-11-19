@@ -116,6 +116,31 @@ describe('TabsWidget', () => {
 	})
 })
 
+describe('TabsWidget keyboard', () => {
+	it('keeps one tab in the tab order when the tabs change, and leaves Alt with an arrow to the browser', () => {
+		const grid = pageToGrid({ widgets: [{ ...page.widgets[0], settings: { tabs: 'One\nTwo\nThree\nFour' } }] })
+		const actions = gridLevel(grid, false)
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
+		cy.mount(TabsWidget, {
+			props: { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable: false },
+			global: { plugins: [createPinia()], mixins: [{ methods: { t, n } }], provide: { gridLevel: actions } },
+		}).then(({ wrapper }) => cy.wrap(wrapper).as('wrapper'))
+
+		cy.get('[role="tab"]').eq(0).focus().trigger('keydown', { key: 'End' })
+		cy.focused().should('contain.text', 'Four')
+		cy.get('@wrapper').then(wrapper => wrapper.setProps({ settings: { tabs: 'One\nTwo' } }))
+		cy.get('[role="tab"]').should('have.length', 2)
+		cy.get('[role="tab"][tabindex="0"]').should('have.length', 1)
+
+		cy.get('[role="tab"][tabindex="0"]').focus()
+		cy.get('[role="tablist"]').then(tablist => {
+			const event = new KeyboardEvent('keydown', { key: 'ArrowLeft', altKey: true, bubbles: true, cancelable: true })
+			tablist.find('[role="tab"][tabindex="0"]')[0].dispatchEvent(event)
+			expect(event.defaultPrevented).to.equal(false)
+		})
+	})
+})
+
 describe('TabsWidget headings', () => {
 	it('puts the titles of widgets in a tab one level below the tabs widget, also when that level changes', () => {
 		cy.viewport(1400, 800)
