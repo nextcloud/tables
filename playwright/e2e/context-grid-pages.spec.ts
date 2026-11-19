@@ -343,4 +343,30 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.locator('[data-cy="gridPageSave"]')).toBeVisible()
 		await expect(page.locator('[data-cy="gridItem"]')).toHaveCount(0)
 	})
+
+	test('A page that is opened while another one still loads shows without a flash of an error', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid race table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid race app', [table])
+		const firstId = await createPageViaApi(page.request, user, contextId, 'First page')
+		const secondId = await createPageViaApi(page.request, user, contextId, 'Second page')
+		await openApplication(page, contextId)
+
+		// The first page answers while the second one, opened after it, still loads
+		const delays = { [firstId]: 1000, [secondId]: 3000 }
+		await page.route(new RegExp(`/contexts/${contextId}/pages/(${firstId}|${secondId})(\\?|$)`), async route => {
+			const pageId = Number(new URL(route.request().url()).pathname.split('/').pop())
+			await new Promise(resolve => setTimeout(resolve, delays[pageId]))
+			await route.continue()
+		})
+		await page.locator('[data-cy="contextPageLink"]', { hasText: 'First page' }).click()
+		await page.locator('[data-cy="contextPageLink"]', { hasText: 'Second page' }).click()
+		let notFoundShown = false
+		const deadline = Date.now() + 4000
+		while (Date.now() < deadline) {
+			notFoundShown ||= await page.getByText('This page could not be found').isVisible()
+			await page.waitForTimeout(100)
+		}
+		expect(notFoundShown).toBe(false)
+		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Second page')
+	})
 })

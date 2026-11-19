@@ -121,6 +121,7 @@ export default {
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
+			reloadAgain: false,
 			activePage: null,
 			pageLoading: false,
 			pageFormOpen: false,
@@ -214,6 +215,11 @@ export default {
 		},
 	},
 
+	created() {
+		// Counts the page loads, so a load that a newer one overtook leaves the page alone
+		this.pageRequest = 0
+	},
+
 	async mounted() {
 		emit('toggle-navigation', {
 			open: false,
@@ -233,7 +239,9 @@ export default {
 				return
 			}
 
+			// A reload asked for while one runs follows it, so it sees the latest application
 			if (this.isReloading) {
+				this.reloadAgain = true
 				return
 			}
 			this.isReloading = true
@@ -341,6 +349,10 @@ export default {
 			} finally {
 				this.loading = false
 				this.isReloading = false
+				if (this.reloadAgain) {
+					this.reloadAgain = false
+					await this.reload()
+				}
 			}
 		},
 		/**
@@ -354,21 +366,29 @@ export default {
 			if (this.activePage?.id !== pageId) {
 				this.activePage = null
 			}
+			const request = ++this.pageRequest
 			try {
 				const page = await this.loadContextPage({ contextId: this.activeContextId, pageId })
-				if (pageId === this.activePageId) {
+				if (request === this.pageRequest && pageId === this.activePageId) {
 					this.activePage = page
 				}
 			} catch (e) {
+				if (request !== this.pageRequest) {
+					return
+				}
 				if (e?.response?.status !== 404) {
 					displayError(e, t('tables', 'Could not load the page.'))
-				} else if (pageId === this.activePageId) {
+				} else {
 					this.activePage = null
 				}
 			} finally {
-				this.pageLoading = false
+				if (request === this.pageRequest) {
+					this.pageLoading = false
+				}
 			}
-			await this.loadApplicationNodes()
+			if (request === this.pageRequest) {
+				await this.loadApplicationNodes()
+			}
 		},
 		/**
 		 * Puts the tables and views of the application in the store, without their rows.
