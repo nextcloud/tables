@@ -149,6 +149,7 @@ export default {
 	align-items: center;
 	gap: var(--default-grid-baseline);
 	margin-inline-start: 32px;
+	max-width: calc(var(--app-content-width, 100%) - 32px);
 	border-bottom: 1px solid var(--color-border);
 
 	&__tabs {

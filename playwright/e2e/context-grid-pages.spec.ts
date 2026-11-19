@@ -437,4 +437,19 @@ test.describe('Grid pages of an application', () => {
 		await page.keyboard.press('Enter')
 		await expect(page.locator('[data-cy="gridPageEdit"]')).toBeFocused()
 	})
+
+	test('Many pages wrap in the page bar on a phone without widening the view', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid narrow table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid narrow app', [table])
+		let pageId = 0
+		for (let index = 1; index <= 20; index++) {
+			pageId = await createPageViaApi(page.request, user, contextId, `Narrow page ${index}`)
+		}
+		await page.setViewportSize({ width: 375, height: 800 })
+		await openApplication(page, contextId, `/page/${pageId}`)
+		await expect(page.locator('[data-cy="gridPage"]')).toBeVisible()
+
+		const overflow = await page.locator('#app-content-vue').evaluate(element => element.scrollWidth - element.clientWidth)
+		expect(overflow).toBeLessThanOrEqual(0)
+	})
 })
