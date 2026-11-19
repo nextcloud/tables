@@ -326,8 +326,9 @@ class MenuService {
 
 	/**
 	 * Reads an exported menu for an application. Every item is checked like the API
-	 * checks it, and skipped, with the reason, when it fails, when its target did not
-	 * come along, or past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th item. `$pageIdOf`
+	 * checks it, and skipped, with the reason, when it fails or when its target did not
+	 * come along. Entries past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th are not read
+	 * and are skipped with one record for all of them. `$pageIdOf`
 	 * gives the page of the application for an exported page id, or null; `{pageId}` is a
 	 * page of the application itself, see {@see self::withLocalPages()}. `$nodeRelIdOf`
 	 * gives the node relation for the kind (`table` or `view`) and uuid, or null.
@@ -343,13 +344,11 @@ class MenuService {
 		$items = [];
 		$skipped = [];
 		$groups = [];
-		foreach (array_values($exported) as $index => $entry) {
+		$exported = array_values($exported);
+		foreach (array_slice($exported, 0, MenuItem::MAX_ITEMS_PER_APPLICATION) as $index => $entry) {
 			try {
 				if (!is_array($entry)) {
 					throw new BadRequestError('It is not an object.');
-				}
-				if (count($items) >= MenuItem::MAX_ITEMS_PER_APPLICATION) {
-					throw new BadRequestError('A menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items.');
 				}
 				$item = new MenuItem();
 				$item->setContextId($context->getId());
@@ -370,6 +369,10 @@ class MenuService {
 				$groups[$index] = true;
 			}
 			$items[] = ['item' => $item, 'entry' => $entry, 'index' => $index, 'parent' => $parent];
+		}
+		$leftOut = count($exported) - MenuItem::MAX_ITEMS_PER_APPLICATION;
+		if ($leftOut > 0) {
+			$skipped[] = ['index' => MenuItem::MAX_ITEMS_PER_APPLICATION, 'title' => null, 'reason' => 'A menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items. ' . $leftOut . ' more were left out.'];
 		}
 		return ['items' => $items, 'skipped' => $skipped];
 	}

@@ -567,6 +567,21 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->assertCount(count($exported) === 1 ? count($before) : count($exported) - 1, $this->menu($contextId));
 	}
 
+	public function testAnImportReadsNoMoreEntriesThanAMenuHolds(): void {
+		[$contextId] = $this->createApplication();
+		$lookups = 0;
+		$exported = array_fill(0, 1000, ['title' => 'Elsewhere', 'target' => ['table' => self::OTHER_TABLE_UUID]]);
+
+		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static function () use (&$lookups): ?int {
+			$lookups++;
+			return null;
+		}, static fn (): ?int => null);
+
+		$this->assertSame(MenuItem::MAX_ITEMS_PER_APPLICATION, $lookups);
+		$this->assertCount(MenuItem::MAX_ITEMS_PER_APPLICATION + 1, $skipped);
+		$this->assertSame(['index' => 200, 'title' => null, 'reason' => 'A menu holds at most 200 items. 800 more were left out.'], end($skipped));
+	}
+
 	public static function menusWithoutAUsableItem(): array {
 		return [
 			'an empty menu' => [[], 0],
