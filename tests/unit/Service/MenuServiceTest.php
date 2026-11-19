@@ -305,6 +305,24 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->assertSame([], $this->menuItemMapper->findByContextId($contextId));
 	}
 
+	public function testAnItemWhoseTableIsGoneIsLeftOutOfTheMenuAndOfItsOrder(): void {
+		[$contextId] = $this->createApplication();
+		[$relation] = $this->contextService->addNodeToContextAndStartpage($contextId, self::TABLE + 1, Application::NODE_TYPE_TABLE, 1, 100, self::OWNER);
+		$item = new MenuItem();
+		$item->setContextId($contextId);
+		$item->setOrder(1);
+		$item->setNodeRelId($relation->getId());
+		$item = $this->menuItemMapper->insert($item);
+
+		$menu = $this->menuService->findAll($contextId, self::OWNER);
+		$this->assertSame(['Sales'], array_column($menu, 'displayTitle'));
+		$saved = $this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray(array_map(static fn (array $entry): array => ['id' => $entry['id'], 'parentId' => $entry['parentId']], $menu)), self::OWNER);
+		$this->assertSame($menu, $saved);
+
+		$this->expectException(NotFoundError::class);
+		$this->menuService->delete($contextId, $item->getId(), self::OWNER);
+	}
+
 	public static function changes(): array {
 		return [
 			'create' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->create($contextId, 'Reports', null, null, null, self::OWNER)],
