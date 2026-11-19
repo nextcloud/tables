@@ -122,6 +122,15 @@ class MenuServiceTest extends DatabaseTestCase {
 		]], $menu);
 	}
 
+	public function testTheFirstItemOfAMenuWithoutItemsComesAfterTheStartPage(): void {
+		[$contextId, $startPageId] = $this->createApplication();
+		$this->menuItemMapper->deleteByContextId($contextId);
+
+		$this->menuService->create($contextId, 'Reports', null, null, null, self::OWNER);
+
+		$this->assertSame([['pageId' => $startPageId], null], array_column($this->menuService->findAll($contextId, self::OWNER), 'target'));
+	}
+
 	public function testAnItemWithoutATitleShowsTheTitleOfWhatItOpens(): void {
 		[$contextId, , $pageId, $nodeRelId] = $this->createApplication();
 		$this->menuService->create($contextId, null, null, null, ['pageId' => $pageId], self::OWNER);

@@ -59,6 +59,17 @@ class MenuItem extends Entity {
 		$this->addType('nodeRelId', 'integer');
 	}
 
+	/**
+	 * The item without a title that opens the start page of an application.
+	 */
+	public static function forStartPage(int $contextId, int $startPageId): self {
+		$item = new self();
+		$item->setContextId($contextId);
+		$item->setOrder(0);
+		$item->setPageId($startPageId);
+		return $item;
+	}
+
 	public function isGroup(): bool {
 		return $this->pageId === null && $this->nodeRelId === null && $this->url === null;
 	}

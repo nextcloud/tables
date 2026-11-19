@@ -15,6 +15,7 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItem;
 use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
@@ -51,6 +52,7 @@ final class ContextServiceTest extends TestCase {
 	private array $calls = [];
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
+	private MockObject $menuItemMapper;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -74,6 +76,7 @@ final class ContextServiceTest extends TestCase {
 		$shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
+		$this->menuItemMapper = $this->createMock(MenuItemMapper::class);
 
 		$this->service = new ContextService(
 			$this->contextMapper,
@@ -93,7 +96,7 @@ final class ContextServiceTest extends TestCase {
 			$this->createMock(ViewMapper::class),
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
-			$this->createMock(MenuItemMapper::class),
+			$this->menuItemMapper,
 		);
 	}
 
@@ -817,7 +820,10 @@ final class ContextServiceTest extends TestCase {
 	}
 
 	public function testImportKeepsTheTitleIconAndDescriptionOfAPage(): void {
-		$this->contextMapper->method('insert')->willReturnArgument(0);
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 9;
+			return $context;
+		});
 		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
 		$inserted = [];
 		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$inserted): Page {
@@ -836,6 +842,38 @@ final class ContextServiceTest extends TestCase {
 			[['Welcome', 'star', 'Start here'], ['Overview', null, null]],
 			array_map(static fn (Page $page): array => [$page->getTitle(), $page->getIcon(), $page->getDescription()], $inserted),
 		);
+	}
+
+	public static function importedStartPages(): array {
+		return [
+			'an exported start page' => [[['id' => 1, 'page_type' => Page::TYPE_GRID, 'title' => 'Overview'], ['id' => 2, 'page_type' => Page::TYPE_STARTPAGE]], 81],
+			'a new start page' => [[['id' => 1, 'page_type' => Page::TYPE_GRID, 'title' => 'Overview']], 81],
+		];
+	}
+
+	/**
+	 * @dataProvider importedStartPages
+	 */
+	public function testAnImportedApplicationGetsAMenuThatOpensItsStartPage(array $pages, int $startPageId): void {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 9;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$pageId = 80;
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$pageId): Page {
+			$page->id = $pageId++;
+			return $page;
+		});
+		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$pageId): Page {
+			$page->id = $pageId++;
+			return $page;
+		});
+		$this->menuItemMapper->expects($this->once())->method('insert')->with($this->callback(
+			static fn (MenuItem $item): bool => [$item->getContextId(), $item->getOrder(), $item->getPageId(), $item->getTitle()] === [9, 0, $startPageId, null],
+		))->willReturnArgument(0);
+
+		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
 	}
 
 	public function testAFailedImportIsRolledBack(): void {

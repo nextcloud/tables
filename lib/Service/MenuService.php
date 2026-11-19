@@ -14,6 +14,7 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\MenuItem;
 use OCA\Tables\Db\MenuItemMapper;
+use OCA\Tables\Db\Page;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
@@ -71,7 +72,9 @@ class MenuService {
 
 	/**
 	 * Adds an item to the end of the menu. Without a target the item is a group, which
-	 * needs a title. The target is checked in the transaction that saves the item.
+	 * needs a title. The target is checked in the transaction that saves the item. A
+	 * menu without any item first gets the one that opens the start page, so the new
+	 * item never replaces it.
 	 *
 	 * @param array<array-key, mixed>|null $target
 	 * @return TablesMenuItem
@@ -85,6 +88,10 @@ class MenuService {
 			$this->lockApplication($contextId);
 			$context = $this->getManageableContext($contextId, $userId);
 			$items = $this->menuItemMapper->findByContextId($contextId);
+			$startPageId = $this->startPageId($context);
+			if ($items === [] && $startPageId !== null) {
+				$items[] = $this->menuItemMapper->insert(MenuItem::forStartPage($contextId, $startPageId));
+			}
 			if (count($items) >= MenuItem::MAX_ITEMS_PER_APPLICATION) {
 				throw new BadRequestError('A menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items.');
 			}
@@ -280,6 +287,15 @@ class MenuService {
 			throw new NotFoundError('Menu item ' . $itemId . ' does not exist');
 		}
 		return [$item, $context];
+	}
+
+	private function startPageId(Context $context): ?int {
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			if (($page['page_type'] ?? null) === Page::TYPE_STARTPAGE) {
+				return (int)$pageId;
+			}
+		}
+		return null;
 	}
 
 	/**
