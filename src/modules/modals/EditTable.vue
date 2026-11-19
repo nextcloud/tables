@@ -203,7 +203,7 @@ export default {
 		},
 		async actionDeleteTable() {
 			const deleteId = this.tableId
-			const activeTableId = this.activeTable.id
+			const activeTableId = this.activeTable?.id
 			this.prepareDeleteTable = false
 			const res = await this.removeTable({ tableId: this.tableId })
 			if (res) {
