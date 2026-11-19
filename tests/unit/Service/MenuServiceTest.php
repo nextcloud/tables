@@ -645,7 +645,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			['id' => self::VIEW, 'type' => Application::NODE_TYPE_VIEW],
 		], self::OWNER, Application::OWNER_TYPE_USER);
 		$this->contextIds[] = $context->getId();
-		$relationIds = array_flip(array_column($this->contextService->findById($context->getId(), self::OWNER)->getNodes(), 'node_id', 'id'));
+		$relationIds = array_column($this->contextService->findById($context->getId(), self::OWNER)->getNodes(), 'id', 'node_id');
 		$this->menuService->create($context->getId(), null, null, null, MenuTarget::fromArray(['nodeRelId' => $relationIds[self::TABLE]]), self::OWNER);
 		$this->menuService->create($context->getId(), null, null, null, MenuTarget::fromArray(['nodeRelId' => $relationIds[self::VIEW]]), self::OWNER);
 		$context = $this->contextService->findById($context->getId(), self::OWNER);
@@ -657,7 +657,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$moved = $this->contextService->importContext($exported, self::OWNER, [11 => self::TABLE], [12 => self::VIEW], ['table' => [self::TABLE_UUID => [self::TABLE]], 'view' => [self::VIEW_UUID => [self::VIEW]]]);
 		$this->contextIds[] = $moved->getId();
 
-		$movedRelationIds = array_flip(array_column($this->contextService->findById($moved->getId(), self::OWNER)->getNodes(), 'node_id', 'id'));
+		$movedRelationIds = array_column($this->contextService->findById($moved->getId(), self::OWNER)->getNodes(), 'id', 'node_id');
 		$menu = array_slice($this->menu($moved->getId()), -2);
 		$this->assertSame(['Projects', 'Team'], array_column($menu, 'displayTitle'));
 		$this->assertSame([['nodeRelId' => $movedRelationIds[self::TABLE]], ['nodeRelId' => $movedRelationIds[self::VIEW]]], array_column($menu, 'target'));
