@@ -46,6 +46,7 @@ import { useTablesStore } from '../../../store/store.js'
 import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
 import { showError } from '@nextcloud/dialogs'
+import { presetViewSetting } from '../../../shared/utils/viewSetting.js'
 
 export default {
 	name: 'MainWrapper',
@@ -174,10 +175,7 @@ export default {
 				// Since we show one page at a time, no need keep other tables in the store
 				this.clearState()
 
-				this.viewSetting = {}
-				if (this.element?.sort?.length) {
-					this.viewSetting.presetSorting = [...this.element.sort]
-				}
+				this.viewSetting = presetViewSetting(this.element)
 
 				await this.loadColumnsFromBE({
 					view: this.isView ? this.element : null,
