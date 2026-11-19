@@ -172,6 +172,35 @@ class PageServiceTest extends TestCase {
 		$service->create(7, 'Planning', null, null, null);
 	}
 
+	public static function writesOfAPage(): array {
+		return [
+			'update of the fields' => [static fn (PageService $service): array => $service->update(7, self::GRID_PAGE, 'Planning', null, null, null, null, null)],
+			'update of the widgets' => [static fn (PageService $service): array => $service->update(7, self::GRID_PAGE, null, null, null, null, [self::widget()], 4)],
+			'delete' => [static fn (PageService $service): array => $service->delete(7, self::GRID_PAGE)],
+		];
+	}
+
+	/**
+	 * @dataProvider writesOfAPage
+	 */
+	public function testAWriteToAPageOfAnApplicationThatIsGoneStopsAtTheApplicationLock(\Closure $write): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([]);
+		$contextMapper = $this->createMock(ContextMapper::class);
+		$contextMapper->method('findById')->willReturn($context);
+		$contextMapper->expects($this->once())->method('lock')->with(7)->willReturn(false);
+		$this->pageMapper->expects($this->never())->method('raiseVersion');
+		$this->pageMapper->expects($this->never())->method('update');
+		$this->pageMapper->expects($this->never())->method('deleteByPageId');
+		$this->widgetService->expects($this->never())->method($this->anything());
+		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
+
+		$this->expectException(NotFoundError::class);
+		$this->expectExceptionMessage('Application 7 does not exist');
+		$write($service);
+	}
+
 	public static function blankTitles(): array {
 		return [
 			'empty' => [''],
