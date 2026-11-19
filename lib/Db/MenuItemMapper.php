@@ -68,6 +68,29 @@ class MenuItemMapper extends QBMapper {
 	}
 
 	/**
+	 * Saves the position and group of items with one prepared statement.
+	 *
+	 * @param array<int, array{order: int, parentId: ?int}> $positions by item id
+	 * @throws Exception
+	 */
+	public function updatePositions(array $positions): void {
+		if ($positions === []) {
+			return;
+		}
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->table)
+			->set('order', $qb->createParameter('order'))
+			->set('parent_id', $qb->createParameter('parentId'))
+			->where($qb->expr()->eq('id', $qb->createParameter('id')));
+		foreach ($positions as $id => $position) {
+			$qb->setParameter('order', $position['order'], IQueryBuilder::PARAM_INT);
+			$qb->setParameter('parentId', $position['parentId'], $position['parentId'] === null ? IQueryBuilder::PARAM_NULL : IQueryBuilder::PARAM_INT);
+			$qb->setParameter('id', $id, IQueryBuilder::PARAM_INT);
+			$qb->executeStatement();
+		}
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function deleteByContextId(int $contextId): void {

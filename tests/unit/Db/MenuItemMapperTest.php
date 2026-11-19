@@ -44,6 +44,22 @@ class MenuItemMapperTest extends DatabaseTestCase {
 		$this->assertSame($group->getId(), $this->mapper->findById($elsewhere->getId())->getParentId());
 	}
 
+	public function testPositionsAreSavedForTheListedItemsOnly(): void {
+		$group = $this->insert(self::CONTEXT, null, 0);
+		$moved = $this->insert(self::CONTEXT, null, 1);
+		$kept = $this->insert(self::CONTEXT, null, 2);
+
+		$this->mapper->updatePositions([
+			$moved->getId() => ['order' => 5, 'parentId' => $group->getId()],
+			$group->getId() => ['order' => 4, 'parentId' => null],
+		]);
+
+		$this->assertSame(
+			[[$kept->getId(), 2, null], [$group->getId(), 4, null], [$moved->getId(), 5, $group->getId()]],
+			array_map(static fn (MenuItem $item): array => [$item->getId(), $item->getOrder(), $item->getParentId()], $this->mapper->findByContextId(self::CONTEXT)),
+		);
+	}
+
 	private function insert(int $contextId, ?int $parentId, int $order): MenuItem {
 		$item = new MenuItem();
 		$item->setContextId($contextId);
