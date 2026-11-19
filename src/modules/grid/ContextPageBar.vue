@@ -20,7 +20,7 @@
 				:aria-controls="panelId"
 				:tabindex="page.id === focusPageId ? 0 : -1"
 				:data-cy="page.page_type === PAGE_TYPE_START ? 'contextStartPageLink' : 'contextPageLink'"
-				@click="$emit('select', page)">
+				@click="select(page)">
 				<span class="context-page-bar__tab-icon" aria-hidden="true">
 					<NamedIcon v-if="page.icon" :name="page.icon" :size="20" />
 					<HomeOutline v-else-if="page.page_type === PAGE_TYPE_START" :size="20" />
@@ -45,6 +45,7 @@ import Plus from 'vue-material-design-icons/Plus.vue'
 import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { PAGE_TYPE_START, contextPages, pageTabId, pageTitle } from './gridLayout.js'
+import { eventTabIndex, rovingTabTarget } from '../../shared/utils/rovingTabs.js'
 
 /**
  * The pages of an application as tabs that look like the tabs of NcAppSidebar: the start page
@@ -109,23 +110,22 @@ export default {
 		pageTabId,
 		pageTitle,
 		/**
+		 * @param {object} page the page whose tab was clicked
+		 */
+		select(page) {
+			this.focusedPageId = null
+			this.$emit('select', page)
+		},
+		/**
 		 * Moves the focus between tabs with the arrow keys, Home and End.
 		 *
 		 * @param {KeyboardEvent} event the key that was pressed
 		 */
 		onKeydown(event) {
 			const ids = this.pages.map(page => page.id)
-			const index = ids.indexOf(this.focusPageId)
 			const isRtl = getComputedStyle(this.$refs.tablist).direction === 'rtl'
-			const next = { ArrowRight: isRtl ? -1 : 1, ArrowLeft: isRtl ? 1 : -1 }
-			let target
-			if (event.key in next) {
-				target = (index + next[event.key] + ids.length) % ids.length
-			} else if (event.key === 'Home') {
-				target = 0
-			} else if (event.key === 'End') {
-				target = ids.length - 1
-			} else {
+			const target = rovingTabTarget(event, eventTabIndex(event), ids.length, isRtl)
+			if (target === null) {
 				return
 			}
 			event.preventDefault()

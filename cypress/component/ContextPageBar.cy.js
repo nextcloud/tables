@@ -65,4 +65,17 @@ describe('ContextPageBar', () => {
 		mountBar({ canManage: true })
 		cy.get('[data-cy="contextPageAdd"]').should('be.visible')
 	})
+
+	it('leaves a key with Alt, Ctrl or Meta to the browser', () => {
+		mountBar({ selectedPageId: 5 })
+
+		cy.get('[role="tab"][tabindex="0"]').then(tab => {
+			for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
+				const event = new KeyboardEvent('keydown', { key: 'ArrowRight', [modifier]: true, bubbles: true, cancelable: true })
+				tab[0].dispatchEvent(event)
+				expect(event.defaultPrevented).to.equal(false)
+			}
+		})
+		cy.get('[role="tab"][tabindex="0"]').should('have.length', 1).and('contain.text', 'Overview')
+	})
 })

@@ -8,7 +8,8 @@
 			role="tablist"
 			class="tabs-widget__tabs"
 			:aria-label="widget.title || t('tables', 'Tabs')"
-			@keydown="onKeydown">
+			@keydown="onKeydown"
+			@focusout="onFocusout">
 			<button v-for="(title, index) in titles"
 				:id="tabId(index)"
 				:key="index"
@@ -20,7 +21,7 @@
 				:aria-controls="visitedTabs.includes(index) ? panelId(index) : undefined"
 				:tabindex="index === focusTab ? 0 : -1"
 				data-cy="tabsWidgetTab"
-				@click="activeTab = index">
+				@click="openTab(index)">
 				{{ title }}
 			</button>
 		</div>
@@ -55,6 +56,7 @@ import { computed, defineAsyncComponent } from 'vue'
 import { NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import { tabTitles } from '../gridLayout.js'
+import { eventTabIndex, rovingTabTarget } from '../../../shared/utils/rovingTabs.js'
 
 let instances = 0
 
@@ -110,7 +112,7 @@ export default {
 		},
 		// The tab in the tab order: the one last moved to with the keyboard, else the open one
 		focusTab() {
-			return this.focusedTab ?? this.activeTab
+			return Math.min(this.focusedTab ?? this.activeTab, this.titles.length - 1)
 		},
 	},
 	watch: {
@@ -119,6 +121,7 @@ export default {
 				this.activeTab = Math.max(0, titles.length - 1)
 			}
 			this.visitedTabs = this.visitedTabs.filter(index => index < Math.max(1, titles.length))
+			this.focusedTab = null
 		},
 		activeTab(index) {
 			this.focusedTab = null
@@ -150,22 +153,31 @@ export default {
 			return 'tabs-widget-panel-' + this.instance + '-' + index
 		},
 		/**
+		 * @param {number} index position of the tab to open
+		 */
+		openTab(index) {
+			this.activeTab = index
+			this.focusedTab = null
+		},
+		/**
+		 * Puts the open tab back in the tab order once the focus leaves the tab list.
+		 *
+		 * @param {FocusEvent} event the focus that left a tab
+		 */
+		onFocusout(event) {
+			if (!this.$refs.tablist.contains(event.relatedTarget)) {
+				this.focusedTab = null
+			}
+		},
+		/**
 		 * Moves the focus between tabs with the arrow keys, Home and End.
 		 *
 		 * @param {KeyboardEvent} event the key that was pressed
 		 */
 		onKeydown(event) {
-			const count = this.titles.length
 			const isRtl = getComputedStyle(this.$refs.tablist).direction === 'rtl'
-			const step = { ArrowRight: isRtl ? -1 : 1, ArrowLeft: isRtl ? 1 : -1 }
-			let target
-			if (event.key in step) {
-				target = (this.focusTab + step[event.key] + count) % count
-			} else if (event.key === 'Home') {
-				target = 0
-			} else if (event.key === 'End') {
-				target = count - 1
-			} else {
+			const target = rovingTabTarget(event, eventTabIndex(event), this.titles.length, isRtl)
+			if (target === null) {
 				return
 			}
 			event.preventDefault()
