@@ -37,6 +37,21 @@ async function createPageViaApi(request: APIRequestContext, user: TestUser, cont
 	return (await res.json()).ocs.data.id
 }
 
+async function createRowViaApi(request: APIRequestContext, user: TestUser, tableId: number, value: string): Promise<number> {
+	const column = await ocsRequest(request, user, {
+		method: 'POST',
+		url: `/index.php/apps/tables/api/1/tables/${tableId}/columns`,
+		data: { title: 'Name', type: 'text', subtype: 'line', mandatory: false },
+	})
+	const columnId = (await column.json()).id
+	const row = await ocsRequest(request, user, {
+		method: 'POST',
+		url: `/index.php/apps/tables/api/1/tables/${tableId}/rows`,
+		data: { data: { [columnId]: value } },
+	})
+	return (await row.json()).id
+}
+
 async function openApplication(page: Page, contextId: number, path = '') {
 	await page.goto(`/index.php/apps/tables/#/application/${contextId}${path}`)
 	await expect(page.locator('[data-cy="contextPageBar"]')).toBeVisible({ timeout: 30000 })
@@ -235,5 +250,26 @@ test.describe('Grid pages of an application', () => {
 		await page.locator('[data-cy="gridPageSave"]').click()
 		const widget = (await (await saved).json()).ocs.data.widgets[0]
 		expect(widget).toMatchObject({ gridX: 1, gridWidth: 7 })
+	})
+
+	test('A row opened from a data widget on a grid page opens in the row editor', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid row table')
+		const rowId = await createRowViaApi(page.request, user, table, 'First task')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid row app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Rows')
+		const nodeRelId = Number(Object.keys((await getApplication(page.request, user, contextId)).nodes)[0])
+		await ocsRequest(page.request, user, {
+			method: 'PATCH',
+			url: `${API}/contexts/${contextId}/pages/${pageId}?format=json`,
+			data: { version: 0, widgets: [{ type: 'data', title: 'Tasks', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 5, source: { nodeRelId } }] },
+		})
+		await openApplication(page, contextId, `/page/${pageId}`)
+
+		const row = page.locator('[data-cy="gridWidget"] tr', { hasText: 'First task' })
+		await row.locator('[data-cy="rowActionMenu"] button').click()
+		await page.locator('[data-cy="editRowBtn"]').click()
+		await expect(page).toHaveURL(new RegExp(`/application/${contextId}/page/${pageId}/row/${rowId}$`))
+		await expect(page.locator('[data-cy="editRowModal"]')).toBeVisible()
+		await expect(page.locator('[data-cy="gridPage"]')).toBeVisible()
 	})
 })
