@@ -3,11 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="grid-canvas">
+	<div class="grid-canvas" :class="{ 'grid-canvas--editing': isArranging }">
 		<p v-if="editable && isNarrow" class="grid-canvas__hint" data-cy="gridNarrowHint">
 			{{ t('tables', 'Widen the window to arrange the widgets. On a narrow screen the page is only shown.') }}
 		</p>
-		<div ref="gridElement" class="grid-stack grid-canvas__stack" :class="{ 'grid-canvas__stack--editing': isArranging }">
+		<div ref="gridElement" class="grid-stack grid-canvas__stack">
 			<div v-for="item in layout"
 				:key="item.widgetId"
 				class="grid-stack-item"
@@ -28,8 +28,18 @@
 
 <script>
 import { GridStack } from 'gridstack'
+import { isRTL } from '@nextcloud/l10n'
 import 'gridstack/dist/gridstack.min.css'
 import { GRID_CELL_HEIGHT, GRID_COLUMNS, GRID_MARGIN, GRID_MIN_WIDTH, applyNodePositions, columnsForWidth } from './gridLayout.js'
+
+/**
+ * @param {{x: number, y: number, w: number, h: number}} node a GridStack node
+ * @param {object} item the layout item of its widget
+ * @return {boolean} whether the node sits where the item says
+ */
+function isAtPosition(node, item) {
+	return node.x === item.gridX && node.y === item.gridY && node.w === item.gridWidth && node.h === item.gridHeight
+}
 
 /**
  * Places widgets on a 12 column grid. In edit mode the widgets can be dragged and resized;
@@ -82,6 +92,8 @@ export default {
 		this.grid = null
 		this.resizeObserver = null
 		this.minWidth = GRID_MIN_WIDTH
+		// Set while the grid takes a layout from the prop, whose changes are not the user's
+		this.applyingLayout = false
 	},
 	mounted() {
 		this.grid = GridStack.init({
@@ -89,7 +101,8 @@ export default {
 			cellHeight: GRID_CELL_HEIGHT,
 			margin: GRID_MARGIN,
 			float: true,
-			animate: true,
+			animate: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+			rtl: isRTL(),
 			disableDrag: !this.isArranging,
 			disableResize: !this.isArranging,
 			minRow: 1,
@@ -119,16 +132,15 @@ export default {
 			}
 			const previousIds = new Set(previousLayout.map(item => item.widgetId))
 			const positions = Object.fromEntries(layout.map(item => [item.widgetId, item]))
-			// On a narrower canvas the grid shows a reflow of the stored layout, so positions only sync at full width
-			const isFullWidth = this.grid.getColumn() === GRID_COLUMNS
 			for (const node of [...this.grid.engine.nodes]) {
-				const item = positions[node.id]
-				if (!item) {
+				if (!positions[node.id]) {
 					this.grid.removeWidget(node.el, false, false)
-				} else if (isFullWidth && (node.x !== item.gridX || node.y !== item.gridY || node.w !== item.gridWidth || node.h !== item.gridHeight)) {
-					// A move from the widget menu rather than a drag
-					this.grid.update(node.el, { x: item.gridX, y: item.gridY, w: item.gridWidth, h: item.gridHeight })
 				}
+			}
+			// A move from the widget menu rather than a drag. On a narrower canvas the grid shows a
+			// reflow of the stored layout, which loads again when the canvas widens.
+			if (this.grid.getColumn() === GRID_COLUMNS && this.grid.engine.nodes.some(node => !isAtPosition(node, positions[node.id]))) {
+				this.loadLayout(layout)
 			}
 
 			const addedIds = layout.filter(item => !previousIds.has(item.widgetId)).map(item => item.widgetId)
@@ -145,6 +157,27 @@ export default {
 			})
 		},
 		/**
+		 * Puts the widgets GridStack knows where the layout has them, in one go so they do not push
+		 * each other on the way. Emits the layout when GridStack had to move a widget to make room.
+		 *
+		 * @param {Array} layout the layout to show
+		 */
+		loadLayout(layout) {
+			const nodeIds = new Set(this.grid.engine.nodes.map(node => node.id))
+			const items = layout.filter(item => nodeIds.has(item.widgetId))
+				.map(item => ({ id: item.widgetId, x: item.gridX, y: item.gridY, w: item.gridWidth, h: item.gridHeight }))
+			this.applyingLayout = true
+			try {
+				this.grid.load(items, false)
+			} finally {
+				this.applyingLayout = false
+			}
+			const nodes = Object.fromEntries(this.grid.engine.nodes.map(node => [node.id, node]))
+			if (layout.some(item => nodes[item.widgetId] && !isAtPosition(nodes[item.widgetId], item))) {
+				this.$emit('layout-change', applyNodePositions(layout, this.grid.engine.nodes))
+			}
+		},
+		/**
 		 * Shows the number of columns that fits the canvas width.
 		 *
 		 * @param {number} width current width of the canvas in pixels
@@ -155,7 +188,17 @@ export default {
 			}
 			const columns = columnsForWidth(width)
 			if (this.grid.getColumn() !== columns) {
-				this.grid.column(columns, 'moveScale')
+				this.applyingLayout = true
+				try {
+					this.grid.column(columns, 'moveScale')
+				} finally {
+					this.applyingLayout = false
+				}
+				// GridStack restores the 12 columns from its own cache, which misses layout changes
+				// made while the canvas was narrower
+				if (columns === GRID_COLUMNS) {
+					this.loadLayout(this.layout)
+				}
 			}
 			this.columns = columns
 		},
@@ -166,7 +209,7 @@ export default {
 		 * @param {Array} changedNodes the GridStack nodes that moved
 		 */
 		onGridChange(changedNodes) {
-			if (!Array.isArray(changedNodes) || changedNodes.length === 0 || this.grid.getColumn() !== GRID_COLUMNS) {
+			if (this.applyingLayout || !Array.isArray(changedNodes) || changedNodes.length === 0 || this.grid.getColumn() !== GRID_COLUMNS) {
 				return
 			}
 			this.$emit('layout-change', applyNodePositions(this.layout, changedNodes))
@@ -196,7 +239,7 @@ export default {
 	border-radius: var(--border-radius-large);
 }
 
-.grid-canvas__stack--editing .grid-stack-item-content {
+.grid-canvas--editing .grid-stack-item-content {
 	outline: 2px dashed var(--color-border);
 	outline-offset: -2px;
 	cursor: move;
