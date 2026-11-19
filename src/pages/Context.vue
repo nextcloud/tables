@@ -89,6 +89,7 @@ export default {
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
+			loadedContextId: null,
 			reloadAgain: false,
 			activePage: null,
 			pageLoading: false,
@@ -117,7 +118,7 @@ export default {
 
 		activeContext: {
 			handler() {
-				if (this.errorMessage) {
+				if (this.errorMessage && this.loadedContextId === this.activeContextId) {
 					// Already showing an error, don't redirect
 					return
 				}
@@ -170,9 +171,14 @@ export default {
 				return
 			}
 			this.isReloading = true
-			// The same application is refreshed in place, so an edit of its page goes on
-			const quiet = this.context !== null && parseInt(this.context.id) === parseInt(this.activeContextId) && !this.errorMessage
-			if (!quiet) {
+			// The same application is refreshed in place, so an edit of its page goes on;
+			// another one starts without the page and the error of the previous one
+			if (this.loadedContextId !== this.activeContextId) {
+				this.loadedContextId = this.activeContextId
+				this.activePage = null
+				this.errorMessage = null
+			}
+			if (!this.context || parseInt(this.context.id) !== parseInt(this.activeContextId) || this.errorMessage) {
 				this.loading = true
 			}
 

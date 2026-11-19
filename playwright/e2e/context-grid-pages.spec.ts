@@ -539,4 +539,20 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.getByRole('dialog', { name: 'Discard unsaved changes?' })).toHaveCount(0)
 		await expect(page.locator('[data-cy="gridPageSave"]')).toBeVisible()
 	})
+
+	test('An application opened after a missing one shows its own start page', async ({ userPage: { page, user } }) => {
+		const first = await createTableViaApi(page.request, user, 'grid before missing table')
+		const second = await createTableViaApi(page.request, user, 'grid after missing table')
+		const firstId = await createApplicationViaApi(page.request, user, 'grid before missing app', [first])
+		const secondId = await createApplicationViaApi(page.request, user, 'grid after missing app', [second])
+
+		await openApplication(page, firstId)
+		await expect(page.locator('[data-cy="tablesWidget"]').getByRole('heading', { name: 'grid before missing table' })).toBeVisible({ timeout: 30000 })
+		await page.goto('/index.php/apps/tables/#/application/999999')
+		await expect(page.getByText(/could not be found/)).toBeVisible({ timeout: 30000 })
+		await page.goto(`/index.php/apps/tables/#/application/${secondId}`)
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		await expect(tablesWidget.getByRole('heading', { name: 'grid after missing table' })).toBeVisible({ timeout: 30000 })
+		await expect(tablesWidget.getByRole('heading', { name: 'grid before missing table' })).toHaveCount(0)
+	})
 })
