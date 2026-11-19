@@ -86,6 +86,14 @@ describe('TabsWidget', () => {
 		cy.get('[role="tab"]').each(tab => cy.get('#' + tab.attr('aria-controls')).should('have.attr', 'role', 'tabpanel'))
 	})
 
+	it('names the tab list after the widget and lets its panel scroll with the keyboard', () => {
+		const grid = pageToGrid(page)
+		mountInPage(TabsWidget, { widget: { ...grid.widgets[0], title: 'Work' }, settings: grid.widgets[0].settings, editable: false }, gridLevel(grid, false))
+
+		cy.get('[role="tablist"]').should('have.attr', 'aria-label', 'Work')
+		cy.get('[role="tabpanel"]').should('have.attr', 'tabindex', '0')
+	})
+
 	it('moves between tabs with the keyboard with one tab stop', () => {
 		mountTabs(false)
 
