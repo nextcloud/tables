@@ -234,6 +234,29 @@ final class NotifierTest extends TestCase {
 		$this->assertSame('You have been assigned in row #42 of view View by .', $this->parsedSubject);
 	}
 
+	public function testViewContextWithoutViewIsRejected(): void {
+		$this->permissionsService->expects($this->never())->method('canAccessNodeById');
+
+		$params = $this->tableParams();
+		$params['isViewContext'] = true;
+
+		$this->expectException(UnknownNotificationException::class);
+		$this->prepare(ActivityManager::SUBJECT_ROW_UPDATE, $params);
+	}
+
+	public function testTableContextWithViewParamsStillChecksTable(): void {
+		$this->permissionsService->expects($this->once())
+			->method('canAccessNodeById')
+			->with(Application::NODE_TYPE_TABLE, self::TABLE_ID)
+			->willReturn(false);
+
+		$params = $this->viewParams(null);
+		$params['isViewContext'] = false;
+
+		$this->expectException(UnknownNotificationException::class);
+		$this->prepare(ActivityManager::SUBJECT_ROW_UPDATE, $params);
+	}
+
 	private function prepare(string $subject, array $params): void {
 		$notification = $this->createMock(INotification::class);
 		$notification->method('getApp')->willReturn('tables');

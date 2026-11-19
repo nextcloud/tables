@@ -91,9 +91,14 @@ class Notifier implements INotifier {
 			];
 		}
 
+		// view-only recipients cannot read the table, the view permission is checked below instead
+		$checkViewPermission = $hasViewContext && isset($params['view']['id'], $params['view']['title']);
+		if ($hasViewContext && !$checkViewPermission) {
+			throw new UnknownNotificationException();
+		}
+
 		if (isset($params['table']['id'], $params['table']['title'])) {
-			if (!$hasViewContext 
-				&& !isset($params['view']['id'], $params['view']['title'])
+			if (!$checkViewPermission
 				&& !$this->permissionsService->canAccessNodeById(Application::NODE_TYPE_TABLE, $params['table']['id'])
 			) {
 				throw new UnknownNotificationException();
@@ -107,7 +112,7 @@ class Notifier implements INotifier {
 			];
 		}
 
-		if ($hasViewContext && isset($params['view']['id'], $params['view']['title'])) {
+		if ($checkViewPermission) {
 			if (!$this->permissionsService->canAccessNodeById(Application::NODE_TYPE_VIEW, $params['view']['id'])) {
 				throw new UnknownNotificationException();
 			}
