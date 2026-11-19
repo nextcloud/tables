@@ -130,8 +130,11 @@ export default {
 				this.reload()
 			},
 		},
-		'$route.params.pageId'() {
-			this.loadActivePage()
+		// Another application loads its page itself, when it is loaded
+		$route(to, from) {
+			if (to.params.contextId === from.params.contextId && to.params.pageId !== from.params.pageId) {
+				this.loadActivePage()
+			}
 		},
 		'context.iconName': {
 			async handler(value) {
@@ -222,11 +225,9 @@ export default {
 			if (pageId === null) {
 				return
 			}
+			// The page shown stays until the next one is loaded, so its edit mode keeps its
+			// draft and its widgets do not mount again for nothing
 			this.pageLoading = true
-			// The page shown stays until it is loaded again, so its edit mode keeps its draft
-			if (this.activePage?.id !== pageId) {
-				this.activePage = null
-			}
 			const request = ++this.pageRequest
 			try {
 				const page = await this.loadContextPage({ contextId: this.activeContextId, pageId })

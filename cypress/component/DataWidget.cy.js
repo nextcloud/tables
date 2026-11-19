@@ -58,4 +58,23 @@ describe('DataWidget', () => {
 			expect(wrapper.vm.viewSetting).to.deep.equal({ searchString: 'open', presetSorting: sortByName })
 		})
 	})
+
+	it('shows the rows the store has while it loads them again', () => {
+		mountWidget({ id: 40, title: 'Tasks', sort: [] })
+		cy.then(() => {
+			useDataStore().loadColumnsFromBE = cy.stub().returns(new Promise(() => {}))
+		})
+
+		cy.get('@wrapper').then(wrapper => {
+			wrapper.vm.load()
+		})
+		cy.get('.data-widget__loading').should('exist')
+		cy.then(() => {
+			useDataStore().rows = { 40: [] }
+		})
+		cy.get('@wrapper').then(wrapper => {
+			wrapper.vm.load()
+		})
+		cy.get('.data-widget__loading').should('not.exist')
+	})
 })
