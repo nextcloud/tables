@@ -77,7 +77,13 @@ describe('TabsWidget', () => {
 		cy.contains('Below').should('not.exist')
 		cy.get('[role="tab"]').eq(1).click()
 		cy.contains('Closed ones').should('be.visible')
-		cy.get('[role="tabpanel"]').should('have.attr', 'aria-labelledby').then(id => cy.get('[role="tab"]').eq(1).should('have.id', id))
+		cy.get('[role="tabpanel"]:visible').should('have.attr', 'aria-labelledby').then(id => cy.get('[role="tab"]').eq(1).should('have.id', id))
+		// The first tab stays mounted, hidden, so its widgets keep their state
+		cy.get('[role="tabpanel"]').should('have.length', 2)
+		cy.contains('Open ones').should('exist').and('not.be.visible')
+		cy.get('[role="tab"]').eq(0).click()
+		cy.contains('Open ones').should('be.visible')
+		cy.get('[role="tab"]').each(tab => cy.get('#' + tab.attr('aria-controls')).should('have.attr', 'role', 'tabpanel'))
 	})
 
 	it('moves between tabs with the keyboard with one tab stop', () => {
