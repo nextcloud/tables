@@ -151,6 +151,8 @@ class MenuServiceTest extends DatabaseTestCase {
 			'a table outside the application' => [null, ['nodeRelId' => -1], 'The target of a menu item'],
 			'two targets' => [null, ['url' => 'https://nextcloud.com', 'nodeRelId' => -1], 'The target of a menu item'],
 			'a link that is not http' => [null, ['url' => 'javascript:alert(1)'], 'A link is an http or https address'],
+			'an ftp link' => [null, ['url' => 'ftp://example.com/file'], 'A link is an http or https address'],
+			'a link without a host' => [null, ['url' => 'https:///path'], 'A link is an http or https address'],
 			'an unknown icon' => ['Reports', null, 'The icon of a menu item must be the name of an icon.', 'no-such-icon'],
 			'a long title' => [str_repeat('a', 201), null, 'at most 200 characters'],
 		];
@@ -165,6 +167,14 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage($message);
 		$this->menuService->create($contextId, $title, $icon, null, $target, self::OWNER);
+	}
+
+	public function testALinkMayHoldAnyCharacterAPersonTypes(): void {
+		[$contextId] = $this->createApplication();
+
+		foreach (['https://www.müller.de/', 'https://example.com/straße', 'https://my_host.example/', ' HTTPS://nextcloud.com '] as $url) {
+			$this->assertSame(['url' => trim($url)], $this->menuService->create($contextId, null, null, null, ['url' => $url], self::OWNER)['target']);
+		}
 	}
 
 	public function testAnItemOpensAtMostOneThing(): void {

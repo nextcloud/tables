@@ -115,6 +115,15 @@ class TextLinkBusinessTest extends TestCase {
 		]), $column));
 	}
 
+	public function testALinkWithAnUpperCaseSchemeIsValid(): void {
+		$this->textLinkBusiness->validateValue(json_encode([
+			'title' => 'Test link',
+			'value' => 'HTTPS://nextcloud.com',
+			'providerId' => 'url',
+		]), $this->column, 'userId', 1, null);
+		$this->addToAssertionCount(1);
+	}
+
 	public function testValidateValue() {
 		// Assert that no exception is thrown for valid values
 		try {
