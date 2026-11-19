@@ -369,4 +369,34 @@ test.describe('Grid pages of an application', () => {
 		expect(notFoundShown).toBe(false)
 		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Second page')
 	})
+
+	test('Edit mode is read only while the page is being saved', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid saving table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid saving app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Saving')
+		await openApplication(page, contextId, `/page/${pageId}`)
+
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.locator('[data-cy="gridPageAddWidget"]').click()
+		await page.locator('[data-cy="widgetFieldHeading"] input').fill('Saved slowly')
+		await page.locator('[data-cy="addWidgetSubmit"]').click()
+
+		let release: () => void = () => {}
+		const held = new Promise<void>(resolve => { release = resolve })
+		await page.route(new RegExp(`/contexts/${contextId}/pages/${pageId}(\\?|$)`), async route => {
+			if (route.request().method() === 'PATCH') {
+				await held
+			}
+			await route.continue()
+		})
+		await page.locator('[data-cy="gridPageSave"]').click()
+		await expect(page.locator('[data-cy="gridPageSave"]')).toBeDisabled()
+		await expect(page.locator('[data-cy="gridPageAddWidget"]')).toBeDisabled()
+		await expect(page.locator('[data-cy="gridPageCancel"]')).toBeDisabled()
+		await expect(page.getByRole('button', { name: 'Widget actions' })).toHaveCount(0)
+
+		release()
+		await expect(page.locator('[data-cy="gridPageEdit"]')).toBeVisible()
+		await expect(page.getByText('Saved slowly')).toBeVisible()
+	})
 })
