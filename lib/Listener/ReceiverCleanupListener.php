@@ -39,7 +39,7 @@ class ReceiverCleanupListener implements IEventListener {
 
 	private function cleanupByParticipant(string $type, string $participant): void {
 		try {
-			$this->contextNavigationMapper->deleteByShareIds($this->shareMapper->findIdsByReceiver($participant, $type));
+			$this->contextNavigationMapper->deleteByShareIds($this->shareMapper->findContextShareIdsByReceiver($participant, $type));
 			$this->shareMapper->deleteByReceiver($participant, $type);
 		} catch (\Throwable $e) {
 			$this->logger->warning('cleanup table shares for deleted receiver has failed: ' . $e->getMessage(), [
