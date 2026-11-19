@@ -565,7 +565,8 @@ export const useTablesStore = defineStore('store', {
 		},
 
 		/**
-		 * Changes the fields of a page and, when given, saves all its widgets at once.
+		 * Changes the fields of a page and, when given, saves all its widgets at once. The
+		 * application is loaded again only when the details of the page changed.
 		 *
 		 * @param {object} params parameters
 		 * @param {number} params.contextId id of the application
@@ -585,7 +586,10 @@ export const useTablesStore = defineStore('store', {
 				}
 				return null
 			}
-			await this.reloadContextQuietly(contextId)
+			// Only the details of a page show in the page bar; a save of its widgets returns the whole page
+			if (['title', 'icon', 'slug', 'description'].some(field => field in data)) {
+				await this.reloadContextQuietly(contextId)
+			}
 			return page
 		},
 

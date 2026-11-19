@@ -467,4 +467,29 @@ test.describe('Grid pages of an application', () => {
 		await expect(page).toHaveURL(new RegExp(`/application/${contextId}$`))
 		await expect(page.locator('[data-cy="contextPageLink"]', { hasText: 'Q&A' })).toHaveCount(0)
 	})
+
+	test('Saving the widgets of a page does not load the application again', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid save table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid save app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Saved once')
+		await openApplication(page, contextId, `/page/${pageId}`)
+
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.locator('[data-cy="gridPageAddWidget"]').click()
+		await page.locator('[data-cy="widgetFieldHeading"] input').fill('Just a widget')
+		await page.locator('[data-cy="addWidgetSubmit"]').click()
+
+		let reloaded = false
+		page.on('request', request => {
+			if (request.method() === 'GET' && new RegExp(`/contexts/${contextId}(\\?|$)`).test(request.url())) {
+				reloaded = true
+			}
+		})
+		const saved = page.waitForResponse(r => /\/pages\/\d+/.test(r.url()) && r.request().method() === 'PATCH')
+		await page.locator('[data-cy="gridPageSave"]').click()
+		expect((await saved).ok()).toBe(true)
+		await expect(page.locator('[data-cy="gridPageEdit"]')).toBeVisible()
+		await page.waitForTimeout(1000)
+		expect(reloaded).toBe(false)
+	})
 })
