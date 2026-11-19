@@ -5,6 +5,7 @@
 import { createPinia } from 'pinia'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import TabsWidget from '../../src/modules/grid/widgets/TabsWidget.vue'
+import GridLevel from '../../src/modules/grid/GridLevel.vue'
 import { gridToWidgets, levelLayout, mergeLayout, pageToGrid, tabTitles } from '../../src/modules/grid/gridLayout.js'
 
 const page = {
@@ -19,25 +20,46 @@ const page = {
 const widgetTypes = [{ type: 'tabs', hasSource: false }, { type: 'text', hasSource: false }, { type: 'header', hasSource: false }]
 
 /**
+ * @param {object} grid the grid of the page
  * @param {boolean} editable whether the page is edited
- * @return {object} the actions the widget calls
+ * @return {object} the grid level the page provides
  */
-function mountTabs(editable) {
-	const grid = pageToGrid(page)
-	const actions = {
-		grid: () => grid,
+function gridLevel(grid, editable) {
+	return {
+		shownLayout: (parentKey = null, tab = null) => levelLayout(grid, parentKey, tab),
+		widgetsByKey: () => Object.fromEntries(grid.widgets.map(widget => [widget.key, widget])),
 		nodes: () => ({}),
+		startPageContent: () => ({}),
+		editable: () => editable,
 		changeLayout: cy.stub().as('changeLayout'),
 		configure: cy.stub(),
 		remove: cy.stub(),
 		move: cy.stub(),
 		addToTab: cy.stub().as('addToTab'),
 	}
+}
+
+/**
+ * @param {object} component the component to mount
+ * @param {object} props its props
+ * @param {object} actions the grid level the page provides
+ */
+function mountInPage(component, props, actions) {
 	cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
-	cy.mount(TabsWidget, {
-		props: { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable },
-		global: { plugins: [createPinia()], mixins: [{ methods: { t, n } }], provide: { gridActions: actions } },
+	cy.mount(component, {
+		props,
+		global: { plugins: [createPinia()], mixins: [{ methods: { t, n } }], provide: { gridLevel: actions } },
 	})
+}
+
+/**
+ * @param {boolean} editable whether the page is edited
+ * @return {object} the actions the widget calls
+ */
+function mountTabs(editable) {
+	const grid = pageToGrid(page)
+	const actions = gridLevel(grid, editable)
+	mountInPage(TabsWidget, { widget: grid.widgets[0], settings: grid.widgets[0].settings, editable }, actions)
 	return actions
 }
 
@@ -65,6 +87,18 @@ describe('TabsWidget', () => {
 		cy.focused().should('contain.text', 'Closed')
 		cy.focused().trigger('keydown', { key: 'Home' })
 		cy.focused().should('contain.text', 'Open')
+	})
+})
+
+describe('GridLevel', () => {
+	it('shows the widgets of one tab', () => {
+		cy.viewport(1400, 800)
+		const grid = pageToGrid(page)
+		mountInPage(GridLevel, { parentKey: 'w1', tab: 1 }, gridLevel(grid, false))
+
+		cy.contains('Closed ones').should('be.visible')
+		cy.contains('Open ones').should('not.exist')
+		cy.get('[data-cy="gridItem"]').should('have.length', 1)
 	})
 })
 

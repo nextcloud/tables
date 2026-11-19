@@ -32,27 +32,12 @@
 				role="tabpanel"
 				class="tabs-widget__panel"
 				:aria-labelledby="tabId(activeTab)">
-				<GridCanvas :key="activeTab"
-					:layout="layout"
-					:editable="editable"
-					@layout-change="items => actions.changeLayout(items)">
-					<template #widget="{ item, narrow }">
-						<GridWidget v-if="widgetsByKey[item.widgetId]"
-							:widget="widgetsByKey[item.widgetId]"
-							:nodes="actions.nodes()"
-							:layout-item="item"
-							:editable="editable"
-							:arrangeable="!narrow"
-							@configure="actions.configure"
-							@remove="actions.remove"
-							@move="actions.move" />
-					</template>
-				</GridCanvas>
+				<GridLevel :key="activeTab" :parent-key="widget.key" :tab="activeTab" />
 				<NcButton v-if="editable"
 					variant="secondary"
 					class="tabs-widget__add"
 					data-cy="tabsWidgetAdd"
-					@click="actions.addToTab(widget, activeTab)">
+					@click="grid.addToTab(widget, activeTab)">
 					<template #icon>
 						<Plus :size="20" />
 					</template>
@@ -67,8 +52,7 @@
 import { defineAsyncComponent } from 'vue'
 import { NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
-import GridCanvas from '../GridCanvas.vue'
-import { levelLayout, tabTitles } from '../gridLayout.js'
+import { tabTitles } from '../gridLayout.js'
 
 let instances = 0
 
@@ -79,15 +63,14 @@ let instances = 0
 export default {
 	name: 'TabsWidget',
 	components: {
-		// Loaded later: a widget in a tab is a GridWidget, which renders this widget too
-		GridWidget: defineAsyncComponent(() => import('../GridWidget.vue')),
-		GridCanvas,
+		// Loaded later: the widgets of a tab are GridWidgets, which render this widget too
+		GridLevel: defineAsyncComponent(() => import('../GridLevel.vue')),
 		NcButton,
 		Plus,
 	},
 	inject: {
 		// The grid of the page and its actions, provided by the page
-		actions: { from: 'gridActions' },
+		grid: { from: 'gridLevel' },
 		widgetHeadingLevel: { default: 2 },
 	},
 	provide() {
@@ -122,12 +105,6 @@ export default {
 		},
 		panelId() {
 			return 'tabs-widget-panel-' + this.instance
-		},
-		layout() {
-			return levelLayout(this.actions.grid(), this.widget.key, this.activeTab)
-		},
-		widgetsByKey() {
-			return Object.fromEntries(this.actions.grid().widgets.map(widget => [widget.key, widget]))
 		},
 		// The tab in the tab order: the one last moved to with the keyboard, else the open one
 		focusTab() {
