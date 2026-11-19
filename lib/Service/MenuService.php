@@ -319,7 +319,8 @@ class MenuService {
 	/**
 	 * Reads an exported menu for an application. Every item is checked like the API
 	 * checks it, and skipped, with the reason, when it fails or when its target did not
-	 * come along. Entries past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th are not read
+	 * come along. An icon this instance does not have and a title or description that is
+	 * too long are left out instead, except for the title of a group, which is cut short. Entries past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th are not read
 	 * and are skipped with one record for all of them. `$pageIdOf`
 	 * gives the page of the application for an exported page id, or null; `{pageId}` is a
 	 * page of the application itself, see {@see self::withLocalPages()}. `$nodeRelIdOf`
@@ -343,7 +344,8 @@ class MenuService {
 					throw new BadRequestError('It is not an object.');
 				}
 				$target = ($entry['target'] ?? null) === null ? null : $this->importedTarget($entry['target'], $context, $pageIdOf, $nodeRelIdOf);
-				$item = $this->newItem($context, TextHelper::title(self::importedText($entry, 'title'), self::ITEM), IconHelper::optional(self::importedText($entry, 'icon'), self::ITEM), TextHelper::description(self::importedText($entry, 'description'), self::ITEM), $target);
+				$title = self::importedOptional(self::importedText($entry, 'title'), TextHelper::TITLE_MAX_LENGTH, $target === null);
+				$item = $this->newItem($context, $title, self::importedIcon(self::importedText($entry, 'icon')), self::importedOptional(self::importedText($entry, 'description'), TextHelper::DESCRIPTION_MAX_LENGTH), $target);
 			} catch (BadRequestError $e) {
 				$skipped[] = ['index' => $index, 'title' => is_array($entry) ? self::importedTitle($entry) : null, 'reason' => $e->getMessage()];
 				continue;
@@ -480,6 +482,29 @@ class MenuService {
 			throw new BadRequestError('Its ' . $field . ' is not a text.');
 		}
 		return $value;
+	}
+
+	/**
+	 * An exported text, trimmed, or null when it is empty or too long. With `$cut` a text
+	 * that is too long is cut to the length instead.
+	 */
+	private static function importedOptional(?string $text, int $maxLength, bool $cut = false): ?string {
+		if ($cut && $text !== null) {
+			$text = mb_substr(TextHelper::trim($text), 0, $maxLength);
+		}
+		try {
+			return TextHelper::optional($text, $maxLength);
+		} catch (\InvalidArgumentException) {
+			return null;
+		}
+	}
+
+	/**
+	 * An exported icon name, or null when it is empty or this instance has no such icon.
+	 */
+	private static function importedIcon(?string $icon): ?string {
+		$icon = trim((string)$icon);
+		return $icon !== '' && IconHelper::isValid($icon) ? $icon : null;
 	}
 
 	/**

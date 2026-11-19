@@ -582,6 +582,24 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->assertSame(['index' => 200, 'title' => null, 'reason' => 'A menu holds at most 200 items. 800 more were left out.'], end($skipped));
 	}
 
+	public function testAnImportedItemLosesOnlyTheFieldsThisInstanceCannotUse(): void {
+		[$contextId] = $this->createApplication();
+		$exported = [
+			['title' => str_repeat('g', 250), 'icon' => 'no-such-icon', 'target' => null],
+			['title' => 'Site', 'parent' => 0, 'description' => str_repeat('d', 2500), 'target' => ['url' => 'https://nextcloud.com']],
+			['title' => str_repeat('t', 250), 'parent' => 0, 'icon' => 'star', 'target' => ['url' => 'https://docs.nextcloud.com']],
+		];
+
+		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static fn (): ?int => null, static fn (): ?int => null);
+
+		$menu = $this->menu($contextId);
+		$this->assertSame([], $skipped);
+		$this->assertSame([str_repeat('g', 200), 'Site', null], array_column($menu, 'title'));
+		$this->assertSame([null, null, 'star'], array_column($menu, 'icon'));
+		$this->assertSame([null, null, null], array_column($menu, 'description'));
+		$this->assertSame([null, $menu[0]['id'], $menu[0]['id']], array_column($menu, 'parentId'));
+	}
+
 	public static function menusWithoutAUsableItem(): array {
 		return [
 			'an empty menu' => [[], 0],
