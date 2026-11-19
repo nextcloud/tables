@@ -25,6 +25,8 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\MenuOrderEntry;
+use OCA\Tables\Model\MenuTarget;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\MenuService;
@@ -133,9 +135,9 @@ class MenuServiceTest extends DatabaseTestCase {
 
 	public function testAnItemWithoutATitleShowsTheTitleOfWhatItOpens(): void {
 		[$contextId, , $pageId, $nodeRelId] = $this->createApplication();
-		$this->menuService->create($contextId, null, null, null, ['pageId' => $pageId], self::OWNER);
-		$this->menuService->create($contextId, null, null, null, ['nodeRelId' => $nodeRelId], self::OWNER);
-		$this->menuService->create($contextId, null, 'star', 'Our site', ['url' => 'https://nextcloud.com'], self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$this->menuService->create($contextId, null, 'star', 'Our site', MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
 		$this->menuService->create($contextId, 'Reports', null, null, null, self::OWNER);
 
 		$menu = $this->menuService->findAll($contextId, self::OWNER);
@@ -166,20 +168,20 @@ class MenuServiceTest extends DatabaseTestCase {
 
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage($message);
-		$this->menuService->create($contextId, $title, $icon, null, $target, self::OWNER);
+		$this->menuService->create($contextId, $title, $icon, null, $target === null ? null : MenuTarget::fromArray($target), self::OWNER);
 	}
 
 	public function testALinkMayHoldAnyCharacterAPersonTypes(): void {
 		[$contextId] = $this->createApplication();
 
 		foreach (['https://www.müller.de/', 'https://example.com/straße', 'https://my_host.example/', ' HTTPS://nextcloud.com '] as $url) {
-			$this->assertSame(['url' => trim($url)], $this->menuService->create($contextId, null, null, null, ['url' => $url], self::OWNER)['target']);
+			$this->assertSame(['url' => trim($url)], $this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['url' => $url]), self::OWNER)['target']);
 		}
 	}
 
 	public function testAnItemOpensAtMostOneThing(): void {
 		[$contextId, , $pageId] = $this->createApplication();
-		$item = $this->menuService->create($contextId, null, null, null, ['url' => 'https://nextcloud.com'], self::OWNER);
+		$item = $this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
 		$stored = $this->menuItemMapper->findById($item['id']);
 		$stored->setPageId($pageId);
 
@@ -214,9 +216,9 @@ class MenuServiceTest extends DatabaseTestCase {
 
 	public function testAnUpdateKeepsWhatIsLeftOutAndATargetReplacesThePreviousOne(): void {
 		[$contextId, , $pageId] = $this->createApplication();
-		$item = $this->menuService->create($contextId, 'Site', 'star', 'Ours', ['url' => 'https://nextcloud.com'], self::OWNER);
+		$item = $this->menuService->create($contextId, 'Site', 'star', 'Ours', MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
 
-		$updated = $this->menuService->update($contextId, $item['id'], '', null, '', ['pageId' => $pageId], self::OWNER);
+		$updated = $this->menuService->update($contextId, $item['id'], '', null, '', MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
 
 		$this->assertSame([null, 'Overview', 'star', null, ['pageId' => $pageId]], [$updated['title'], $updated['displayTitle'], $updated['icon'], $updated['description'], $updated['target']]);
 		$this->assertSame($updated, $this->menuService->findAll($contextId, self::OWNER)[1]);
@@ -226,24 +228,24 @@ class MenuServiceTest extends DatabaseTestCase {
 		[$contextId] = $this->createApplication();
 		$menu = $this->menuService->findAll($contextId, self::OWNER);
 		$group = $this->menuService->create($contextId, 'Reports', null, null, null, self::OWNER);
-		$this->menuService->saveOrder($contextId, [['id' => $group['id'], 'parentId' => null], ['id' => $menu[0]['id'], 'parentId' => $group['id']]], self::OWNER);
+		$this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray([['id' => $group['id'], 'parentId' => null], ['id' => $menu[0]['id'], 'parentId' => $group['id']]]), self::OWNER);
 
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('Move its items out first');
-		$this->menuService->update($contextId, $group['id'], null, null, null, ['url' => 'https://nextcloud.com'], self::OWNER);
+		$this->menuService->update($contextId, $group['id'], null, null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
 	}
 
 	public function testTheOrderSavesPositionAndGroupsAndDeletingAGroupMovesItsItemsUp(): void {
 		[$contextId] = $this->createApplication();
 		$start = $this->menuService->findAll($contextId, self::OWNER)[0];
-		$site = $this->menuService->create($contextId, null, null, null, ['url' => 'https://nextcloud.com'], self::OWNER);
+		$site = $this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
 		$group = $this->menuService->create($contextId, 'Links', null, null, null, self::OWNER);
 
-		$saved = $this->menuService->saveOrder($contextId, [
+		$saved = $this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray([
 			['id' => $group['id'], 'parentId' => null],
 			['id' => $site['id'], 'parentId' => $group['id']],
 			['id' => $start['id'], 'parentId' => null],
-		], self::OWNER);
+		]), self::OWNER);
 		$this->assertSame([[$group['id'], null], [$site['id'], $group['id']], [$start['id'], null]], array_map(static fn (array $item): array => [$item['id'], $item['parentId']], $saved));
 
 		$this->menuService->delete($contextId, $group['id'], self::OWNER);
@@ -270,11 +272,11 @@ class MenuServiceTest extends DatabaseTestCase {
 		[$contextId] = $this->createApplication();
 		$start = $this->menuService->findAll($contextId, self::OWNER)[0]['id'];
 		$group = $this->menuService->create($contextId, 'Links', null, null, null, self::OWNER)['id'];
-		$site = $this->menuService->create($contextId, null, null, null, ['url' => 'https://nextcloud.com'], self::OWNER)['id'];
+		$site = $this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER)['id'];
 		$before = $this->menuService->findAll($contextId, self::OWNER);
 
 		try {
-			$this->menuService->saveOrder($contextId, array_map(static fn (array $entry): array => ['id' => $entry[0], 'parentId' => $entry[1]], $order($start, $group, $site)), self::OWNER);
+			$this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray(array_map(static fn (array $entry): array => ['id' => $entry[0], 'parentId' => $entry[1]], $order($start, $group, $site))), self::OWNER);
 			$this->fail('The order was saved');
 		} catch (\Exception $e) {
 			$this->assertInstanceOf($error, $e);
@@ -285,8 +287,8 @@ class MenuServiceTest extends DatabaseTestCase {
 
 	public function testAnItemGoesWithItsTargetAndAnItemWhoseTargetIsGoneIsLeftOut(): void {
 		[$contextId, $startPageId, $pageId, $nodeRelId] = $this->createApplication();
-		$this->menuService->create($contextId, null, null, null, ['pageId' => $pageId], self::OWNER);
-		$this->menuService->create($contextId, null, null, null, ['nodeRelId' => $nodeRelId], self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
 		$dangling = new MenuItem();
 		$dangling->setContextId($contextId);
 		$dangling->setOrder(9);
@@ -308,7 +310,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			'create' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->create($contextId, 'Reports', null, null, null, self::OWNER)],
 			'update' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->update($contextId, $itemId, 'Home', null, null, null, self::OWNER)],
 			'delete' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->delete($contextId, $itemId, self::OWNER)],
-			'order' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->saveOrder($contextId, [['id' => $itemId, 'parentId' => null]], self::OWNER)],
+			'order' => [static fn (MenuService $service, int $contextId, int $itemId) => $service->saveOrder($contextId, MenuOrderEntry::listFromArray([['id' => $itemId, 'parentId' => null]]), self::OWNER)],
 		];
 	}
 

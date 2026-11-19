@@ -14,6 +14,8 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\MenuOrderEntry;
+use OCA\Tables\Model\MenuTarget;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\MenuService;
 use OCP\AppFramework\Http;
@@ -91,7 +93,7 @@ class MenuController extends AOCSController {
 	#[ApiRoute(verb: 'POST', url: '/api/2/contexts/{contextId}/menu', requirements: ['contextId' => '\d+'])]
 	public function create(int $contextId, ?string $title = null, ?string $icon = null, ?string $description = null, ?array $target = null): DataResponse {
 		try {
-			return new DataResponse($this->menuService->create($contextId, $title, $icon, $description, $target, $this->userId));
+			return new DataResponse($this->menuService->create($contextId, $title, $icon, $description, $target === null ? null : MenuTarget::fromArray($target), $this->userId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (PermissionError $e) {
@@ -125,7 +127,7 @@ class MenuController extends AOCSController {
 	#[ApiRoute(verb: 'PUT', url: '/api/2/contexts/{contextId}/menu/order', requirements: ['contextId' => '\d+'])]
 	public function order(int $contextId, array $items): DataResponse {
 		try {
-			return new DataResponse($this->menuService->saveOrder($contextId, $items, $this->userId));
+			return new DataResponse($this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray($items), $this->userId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (PermissionError $e) {
@@ -162,7 +164,7 @@ class MenuController extends AOCSController {
 	#[ApiRoute(verb: 'PATCH', url: '/api/2/contexts/{contextId}/menu/{itemId}', requirements: ['contextId' => '\d+', 'itemId' => '\d+'])]
 	public function update(int $contextId, int $itemId, ?string $title = null, ?string $icon = null, ?string $description = null, ?array $target = null): DataResponse {
 		try {
-			return new DataResponse($this->menuService->update($contextId, $itemId, $title, $icon, $description, $target, $this->userId));
+			return new DataResponse($this->menuService->update($contextId, $itemId, $title, $icon, $description, $target === null ? null : MenuTarget::fromArray($target), $this->userId));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (PermissionError $e) {
