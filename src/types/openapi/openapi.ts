@@ -893,7 +893,7 @@ export type paths = {
         readonly put?: never;
         /**
          * [api v2] Preview the changes that would be applied to a context scheme
-         * @description When the scheme carries a `menu`, the changes hold `menu` with the current menu under `from`, the items an import would save under `to` and the items it would skip, with the reason, under `skipped`.
+         * @description When the scheme carries a `menu` with items, the changes hold `menu` with the current menu under `from`, the items an import would save under `to` and the items it would skip, with the reason, under `skipped`. `withCurrentNodes` holds `to` and `skipped` for an import that keeps the current tables and views of the context.
          */
         readonly post: operations["context-preview-scheme-changes"];
         readonly delete?: never;
@@ -7982,7 +7982,7 @@ export interface operations {
             };
         };
         readonly responses: {
-            /** @description context updated successfully */
+            /** @description context updated successfully, with the menu items the import skipped, and the reason, under `menuSkipped` */
             readonly 200: {
                 headers: {
                     readonly [name: string]: unknown;
