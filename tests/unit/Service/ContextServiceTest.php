@@ -54,6 +54,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $menuItemMapper;
 	private MockObject $viewMapper;
 	private MockObject $menuService;
+	private MockObject $logger;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -66,7 +67,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
@@ -1084,8 +1085,10 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame([501, 502, 503, null], array_column($record['widgets'], 5));
 	}
 
-	public function testAnApplicationWithoutImportedNodesIsNotImported(): void {
-		$this->contextMapper->expects($this->never())->method('insert');
+	public function testAnApplicationWithoutImportedNodesIsImportedWithItsPagesAndMenu(): void {
+		$record = $this->recordImport();
+		$this->logger->expects($this->exactly(3))->method('info')->with('Leaving a node out of an imported application: its table or view was not imported.');
+		$this->menuService->expects($this->once())->method('import')->willReturn([]);
 
 		$imported = $this->service->importContext([
 			'name' => 'Projects',
@@ -1094,9 +1097,16 @@ final class ContextServiceTest extends TestCase {
 				['id' => 102, 'node_id' => '6', 'node_type' => Application::NODE_TYPE_TABLE],
 				['id' => 103, 'node_id' => 6, 'node_type' => 7],
 			],
+			'pages' => [['id' => 301, 'page_type' => Page::TYPE_GRID, 'slug' => 'notes', 'widgets' => [
+				['type' => 'text', 'title' => 'Notes', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hi'], 'source' => null],
+			]]],
+			'menu' => [['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']]],
 		], 'user-1', [6 => 78], [5 => 90]);
 
-		self::assertNull($imported);
+		self::assertSame(['user-1', Application::OWNER_TYPE_USER], [$imported->getOwnerId(), $imported->getOwnerType()]);
+		self::assertSame([], $record['relations']);
+		self::assertSame([Page::TYPE_GRID, Page::TYPE_STARTPAGE], array_map(static fn (Page $page): string => $page->getPageType(), $record['pages']));
+		self::assertSame(['Notes'], array_column($record['widgets'], 2));
 	}
 
 	public function testABrokenExportFileSkipsTheWidgetInsteadOfFailing(): void {

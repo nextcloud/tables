@@ -33,12 +33,14 @@ use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCA\Tables\UserMigration\TablesMigrator;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IUser;
 use OCP\UserMigration\IExportDestination;
 use OCP\UserMigration\IImportSource;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class TablesMigratorTest extends TestCase {
 	private TablesMigrator $migrator;
@@ -415,7 +417,8 @@ class TablesMigratorTest extends TestCase {
 		$user->method('getUID')->willReturn('user1');
 		$importSource = $this->createMock(IImportSource::class);
 		$importSource->method('getMigratorVersion')->willReturn(1);
-		$context = ['id' => 7, 'name' => 'Projects', 'nodes' => [
+		$importSource->method('getOriginalUid')->willReturn('user1');
+		$context = ['id' => 7, 'name' => 'Projects', 'owner' => 'user1', 'ownerType' => 0, 'nodes' => [
 			['id' => 1, 'node_id' => 1, 'node_type' => 0],
 			['id' => 2, 'node_id' => 2, 'node_type' => 0],
 			['id' => 3, 'node_id' => 30, 'node_type' => 1],
@@ -451,5 +454,39 @@ class TablesMigratorTest extends TestCase {
 			->willReturn($this->createMock(Context::class));
 
 		$this->migrator->import($user, $importSource, new NullOutput());
+	}
+
+	public function testImportTakesTheApplicationsTheExportingUserOwnedAndSkipsSharedOnes(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('new-uid');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$importSource->method('getOriginalUid')->willReturn('old-uid');
+		$own = ['id' => 7, 'name' => 'Notes', 'owner' => 'old-uid', 'ownerType' => 0, 'nodes' => [], 'menu' => [['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']]]];
+		$shared = ['id' => 8, 'name' => 'Team', 'owner' => 'someone-else', 'ownerType' => 0, 'nodes' => []];
+		$groupOwned = ['id' => 9, 'name' => 'Group', 'owner' => 'old-uid', 'ownerType' => 1, 'nodes' => []];
+		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
+			'contexts.json' => json_encode([$own, $shared, $groupOwned]),
+			default => json_encode([]),
+		});
+		$this->tableMapper->method('getDBConnection')->willReturn($this->createMock(IDBConnection::class));
+		$newContext = new Context();
+		$newContext->setId(70);
+		$this->contextService->expects($this->once())
+			->method('importContext')
+			->with($own, 'new-uid', [], [], ['table' => [], 'view' => []])
+			->willReturn($newContext);
+		$output = $this->createMock(OutputInterface::class);
+		$skipped = [];
+		$output->method('writeln')->willReturnCallback(static function (string $line) use (&$skipped): void {
+			if (str_starts_with($line, 'Skipping application')) {
+				$skipped[] = $line;
+			}
+		});
+		$this->shareService->expects($this->never())->method('importShare');
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertSame(['Skipping application 8: the exported user did not own it.', 'Skipping application 9: the exported user did not own it.'], $skipped);
 	}
 }
