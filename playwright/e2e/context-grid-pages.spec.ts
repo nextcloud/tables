@@ -529,7 +529,7 @@ test.describe('Grid pages of an application', () => {
 		await expect(row).toBeVisible({ timeout: 30000 })
 
 		await page.locator('[data-cy="gridPageEdit"]').click()
-		await page.getByRole('button', { name: 'Widget actions' }).click()
+		await page.getByRole('button', { name: /^Actions for / }).click()
 		await page.locator('[data-cy="widgetTaller"] button').click()
 		await page.keyboard.press('Escape')
 
