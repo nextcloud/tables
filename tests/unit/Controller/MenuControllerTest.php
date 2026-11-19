@@ -19,6 +19,7 @@ use OCA\Tables\Model\MenuOrderEntry;
 use OCA\Tables\Model\MenuTarget;
 use OCA\Tables\Service\MenuService;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\IL10N;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -165,5 +166,19 @@ class MenuControllerTest extends TestCase {
 		$this->assertCount(1, $attributes);
 		$attribute = $attributes[0]->newInstance();
 		$this->assertSame([$permission, 'context', 'contextId'], [$attribute->getPermission(), $attribute->getTypeParam(), $attribute->getIdParam()]);
+	}
+
+	/**
+	 * @dataProvider permissions
+	 */
+	public function testEveryWriteIsRateLimited(string $method, int $permission): void {
+		$attributes = (new \ReflectionMethod(MenuController::class, $method))->getAttributes(UserRateLimit::class);
+
+		if ($permission === Application::PERMISSION_READ) {
+			$this->assertSame([], $attributes);
+			return;
+		}
+		$this->assertCount(1, $attributes);
+		$this->assertSame(['limit' => 20, 'period' => 60], $attributes[0]->getArguments());
 	}
 }

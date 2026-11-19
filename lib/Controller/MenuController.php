@@ -124,7 +124,7 @@ class MenuController extends AOCSController {
 	 * 409: The menu changed since the version in `If-Match`
 	 */
 	#[NoAdminRequired]
-	#[UserRateLimit(limit: 60, period: 60)]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	#[ApiRoute(verb: 'PUT', url: '/api/2/contexts/{contextId}/menu/order', requirements: ['contextId' => '\d+'])]
 	public function order(int $contextId, array $items): DataResponse {
@@ -164,7 +164,7 @@ class MenuController extends AOCSController {
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
-	#[UserRateLimit(limit: 60, period: 60)]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/2/contexts/{contextId}/menu/{itemId}', requirements: ['contextId' => '\d+', 'itemId' => '\d+'])]
 	public function update(int $contextId, int $itemId, ?string $title = null, ?string $icon = null, ?string $description = null, ?array $target = null): DataResponse {
@@ -193,6 +193,7 @@ class MenuController extends AOCSController {
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/2/contexts/{contextId}/menu/{itemId}', requirements: ['contextId' => '\d+', 'itemId' => '\d+'])]
 	public function destroy(int $contextId, int $itemId): DataResponse {
