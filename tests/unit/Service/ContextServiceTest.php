@@ -39,6 +39,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $pageContentMapper;
 	private MockObject $userManager;
 	private MockObject $auditLogService;
+	private MockObject $dbConnection;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -51,7 +52,7 @@ final class ContextServiceTest extends TestCase {
 		$permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
-		$dbConnection = $this->createMock(IDBConnection::class);
+		$this->dbConnection = $this->createMock(IDBConnection::class);
 		$shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
@@ -65,7 +66,7 @@ final class ContextServiceTest extends TestCase {
 			$permissionsService,
 			$this->userManager,
 			$this->auditLogService,
-			$dbConnection,
+			$this->dbConnection,
 			$shareService,
 			false,
 			$navigationManager,
@@ -384,8 +385,52 @@ final class ContextServiceTest extends TestCase {
 		$this->service->importContext($table, ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
 
 		self::assertSame($expected, $inserted);
-		$untitledGridPages = array_keys(array_filter($inserted, static fn (array $page): bool => $page[0] === Page::TYPE_GRID));
+		$titled = array_column(array_filter($pages, static fn ($page): bool => is_array($page) && isset($page['title'])), 'technical_name');
+		$untitledGridPages = array_keys(array_filter($inserted, static fn (array $page): bool => $page[0] === Page::TYPE_GRID && !in_array($page[1], $titled, true)));
 		self::assertSame(array_map(static fn (int $id): string => $inserted[$id][1], $untitledGridPages), array_values($titles), 'every grid page without a title is named after its technical name');
+	}
+
+	public function testImportKeepsTheTitleIconAndDescriptionOfAPage(): void {
+		$this->contextMapper->method('insert')->willReturnArgument(0);
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$inserted = [];
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$inserted): Page {
+			$page->id = 80 + count($inserted);
+			$inserted[] = $page;
+			return $page;
+		});
+		$this->pageMapper->expects($this->never())->method('update');
+
+		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
+			['id' => 1, 'page_type' => Page::TYPE_STARTPAGE, 'title' => 'Welcome', 'icon' => 'star', 'description' => 'Start here'],
+			['id' => 2, 'page_type' => Page::TYPE_GRID, 'technical_name' => 'overview', 'title' => '  Overview ', 'icon' => 'no-such-icon', 'description' => str_repeat('a', 2001)],
+		]], 4);
+
+		self::assertSame(
+			[['Welcome', 'star', 'Start here'], ['Overview', null, null]],
+			array_map(static fn (Page $page): array => [$page->getTitle(), $page->getIcon(), $page->getDescription()], $inserted),
+		);
+	}
+
+	public function testAFailedImportIsRolledBack(): void {
+		$this->contextMapper->method('insert')->willReturnArgument(0);
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$this->pageMapper->method('insert')->willThrowException(new \RuntimeException('database error'));
+		$this->dbConnection->expects($this->once())->method('beginTransaction');
+		$this->dbConnection->expects($this->once())->method('rollBack');
+		$this->dbConnection->expects($this->never())->method('commit');
+
+		$this->expectException(\RuntimeException::class);
+		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
+			['id' => 1, 'page_type' => Page::TYPE_STARTPAGE, 'technical_name' => 'home'],
+		]], 4);
+	}
+
+	private function importTable(): Table {
+		$table = new Table();
+		$table->id = 40;
+		$table->setOwnership('user-1');
+		return $table;
 	}
 
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {

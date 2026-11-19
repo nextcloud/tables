@@ -26,6 +26,8 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\IconHelper;
+use OCA\Tables\Helper\TextHelper;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
@@ -656,6 +658,15 @@ class ContextService {
 			return null;
 		}
 
+		return $this->atomic(fn (): Context => $this->insertImportedContext($table, $context), $this->dbc);
+	}
+
+	/**
+	 * Inserts an exported application with its node relations, pages and page contents.
+	 *
+	 * @throws Exception
+	 */
+	private function insertImportedContext(Table $table, array $context): Context {
 		$newContext = new Context();
 		$newContext->setName($context['name'] ?? '');
 		$newContext->setIcon($context['iconName'] ?? '');
@@ -687,6 +698,9 @@ class ContextService {
 			$page = new Page();
 			$page->setContextId($newContext->getId());
 			$page->setPageType($pageArr['page_type'] ?? '');
+			$page->setTitle($this->importedText($pageArr['title'] ?? null, TextHelper::TITLE_MAX_LENGTH, 'page title'));
+			$page->setIcon($this->importedIcon($pageArr['icon'] ?? null));
+			$page->setDescription($this->importedText($pageArr['description'] ?? null, TextHelper::DESCRIPTION_MAX_LENGTH, 'page description'));
 			if ($technicalNames[$pageKey] === null) {
 				$page = $this->pageMapper->insertWithDefaultName($page);
 			} else {
@@ -722,6 +736,25 @@ class ContextService {
 		}
 
 		return $newContext;
+	}
+
+	/**
+	 * An exported text, trimmed, or null when it is empty, not a text or too long.
+	 */
+	private function importedText(mixed $text, int $maxLength, string $what): ?string {
+		try {
+			return TextHelper::optional($text, $maxLength);
+		} catch (\InvalidArgumentException $e) {
+			$this->logger->warning('Dropping an imported ' . $what . ': it is ' . $e->getMessage() . '.');
+			return null;
+		}
+	}
+
+	/**
+	 * An exported icon name, or null when this instance has no such icon.
+	 */
+	private function importedIcon(mixed $icon): ?string {
+		return is_string($icon) && IconHelper::isValid($icon) ? $icon : null;
 	}
 
 	/**
