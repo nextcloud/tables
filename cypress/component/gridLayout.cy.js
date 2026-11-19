@@ -16,12 +16,6 @@ import {
 	widgetTarget,
 } from '../../src/modules/grid/gridLayout.js'
 
-const widgetTypes = [
-	{ type: 'header', hasSource: false, settings: { heading: { type: 'string', default: '' }, textAlign: { type: 'enum', default: 'start' } } },
-	{ type: 'text', hasSource: false, settings: { text: { type: 'text', default: '' } } },
-	{ type: 'data', hasSource: true, settings: {} },
-]
-
 const nodes = {
 	4: { id: 4, node_type: 0, node_id: 40, permissions: 1 },
 	5: { id: 5, node_type: 1, node_id: 50, permissions: 1 },
@@ -65,19 +59,27 @@ describe('grid layout', () => {
 		expect(widgetTarget(grid.widgets[1], { 5: nodes[5] })).to.equal(null)
 	})
 
-	it('saves widgets with their id, and a source only for types that have one', () => {
+	it('saves widgets with their id and the node relation they show', () => {
 		const grid = pageToGrid(page)
 		grid.widgets.push({ key: 'new-1', id: null, type: 'text', title: ' Notes ', icon: 'star', description: ' Read me ', settings: { text: 'A' }, nodeRelId: null })
 		grid.layout.push({ widgetId: 'new-1', gridX: 0, gridY: 12, gridWidth: 6, gridHeight: 2 })
 		grid.widgets.push({ key: 'unplaced', id: null, type: 'text', title: '', settings: {}, nodeRelId: null })
 
-		const widgets = gridToWidgets(grid, widgetTypes)
+		const widgets = gridToWidgets(grid)
 
 		expect(widgets).to.have.length(5)
-		expect(widgets[0]).to.deep.equal({ id: 11, type: 'header', title: null, icon: null, description: null, gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 2, settings: { heading: 'Hi', textAlign: 'center' } })
+		expect(widgets[0]).to.deep.equal({ id: 11, type: 'header', title: null, icon: null, description: null, gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 2, settings: { heading: 'Hi', textAlign: 'center' }, source: null })
 		expect(widgets[1]).to.deep.include({ id: 12, title: 'Tasks', icon: 'check', description: 'Open work', source: { nodeRelId: 4 } })
 		expect(widgets[3]).to.deep.include({ id: 14, source: null })
-		expect(widgets[4]).to.deep.equal({ type: 'text', title: 'Notes', icon: 'star', description: 'Read me', gridX: 0, gridY: 12, gridWidth: 6, gridHeight: 2, settings: { text: 'A' } })
+		expect(widgets[4]).to.deep.equal({ type: 'text', title: 'Notes', icon: 'star', description: 'Read me', gridX: 0, gridY: 12, gridWidth: 6, gridHeight: 2, settings: { text: 'A' }, source: null })
+	})
+
+	it('keeps the table of a data widget when the widget types did not load', () => {
+		const grid = pageToGrid(page)
+
+		const widgets = gridToWidgets(grid)
+
+		expect(widgets[1]).to.deep.include({ id: 12, type: 'data', source: { nodeRelId: 4 } })
 	})
 
 	it('places a new widget below the lowest one', () => {
