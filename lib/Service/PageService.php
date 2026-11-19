@@ -31,8 +31,9 @@ use OCP\IDBConnection;
  * The pages of an application and the widgets on them. The controller checks access to
  * the application before any call; this class checks that a page belongs to it.
  *
- * Every save raises the version of its page as its first write, which also locks the
- * page, so saves and the delete of a page run one after the other.
+ * Every write first locks the application, so it runs after a delete of the application
+ * or before it. A save then raises the version of its page, which also locks the page,
+ * so saves and the delete of a page run one after the other.
  *
  * @psalm-import-type TablesPage from ResponseDefinitions
  * @psalm-import-type TablesWidget from ResponseDefinitions
@@ -97,9 +98,7 @@ class PageService {
 		}
 
 		$page = $this->save(fn (): Page => $this->atomic(function () use ($contextId, $page): Page {
-			if (!$this->contextMapper->lock($contextId)) {
-				throw new NotFoundError('Application ' . $contextId . ' does not exist');
-			}
+			$this->lockApplication($contextId);
 			return $page->getSlug() === null ? $this->pageMapper->insertWithDefaultName($page) : $this->pageMapper->insert($page);
 		}, $this->dbc), $slug);
 
@@ -147,7 +146,8 @@ class PageService {
 		}
 
 		$renamed = array_key_exists('slug', $page->getUpdatedFields());
-		$stored = $this->save(fn (): ?array => $this->atomic(function () use ($page, $pageId, $version, $inputs): ?array {
+		$stored = $this->save(fn (): ?array => $this->atomic(function () use ($page, $contextId, $pageId, $version, $inputs): ?array {
+			$this->lockApplication($contextId);
 			if (!$this->pageMapper->raiseVersion($pageId, $version)) {
 				$this->getPage($page->getContextId(), $pageId);
 				throw new ConflictError(self::CHANGED_IN_BETWEEN);
@@ -175,6 +175,7 @@ class PageService {
 		}
 
 		$widgets = $this->atomic(function () use ($contextId, $pageId): array {
+			$this->lockApplication($contextId);
 			if (!$this->pageMapper->raiseVersion($pageId, null)) {
 				throw new NotFoundError('Page ' . $pageId . ' does not belong to application ' . $contextId);
 			}
@@ -205,6 +206,19 @@ class PageService {
 			throw new NotFoundError('Page ' . $pageId . ' is neither a grid page nor a start page');
 		}
 		return $page;
+	}
+
+	/**
+	 * Locks the application row until the transaction ends, the first statement of every
+	 * write, so writers take application, page and relations in the same order.
+	 *
+	 * @throws NotFoundError
+	 * @throws Exception
+	 */
+	private function lockApplication(int $contextId): void {
+		if (!$this->contextMapper->lock($contextId)) {
+			throw new NotFoundError('Application ' . $contextId . ' does not exist');
+		}
 	}
 
 	/**
