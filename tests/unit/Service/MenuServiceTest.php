@@ -506,9 +506,10 @@ class MenuServiceTest extends DatabaseTestCase {
 			['title' => 'Projects', 'target' => ['table' => self::TABLE_UUID]],
 		];
 
-		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], self::OWNER, $menu);
+		$imported = $this->contextService->importScheme($contextId, 'Sales', 'tables', '', [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], self::OWNER, $menu);
 
 		$this->assertSame(['Projects'], array_column($this->menu($contextId), 'displayTitle'));
+		$this->assertSame([['index' => 0, 'title' => 'Elsewhere', 'reason' => 'Its table ' . self::OTHER_TABLE_UUID . ' is not part of the application.']], $imported['menuSkipped']);
 	}
 
 	public function testASchemeImportFindsAViewAmongTheApplicationsOwnViews(): void {
