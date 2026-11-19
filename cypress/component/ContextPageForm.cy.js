@@ -74,4 +74,13 @@ describe('ContextPageForm', () => {
 			expect(wrapper.emitted('submit')).to.equal(undefined)
 		})
 	})
+
+	it('marks a wrong slug as invalid', () => {
+		mountForm()
+
+		cy.get('[data-cy="contextPageSlug"]').type('Bad Name')
+		cy.get('[data-cy="contextPageSlug"]').should('have.attr', 'aria-invalid', 'true')
+		cy.get('[data-cy="contextPageSlug"]').clear().type('good_name')
+		cy.get('[data-cy="contextPageSlug"]').should('not.have.attr', 'aria-invalid')
+	})
 })

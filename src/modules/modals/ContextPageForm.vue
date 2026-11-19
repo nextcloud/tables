@@ -20,6 +20,7 @@
 				:label="t('tables', 'Slug')"
 				:maxlength="200"
 				:error="slugError !== null"
+				:aria-invalid="slugError !== null ? 'true' : undefined"
 				:helper-text="slugError ?? t('tables', 'Used by imports and links to this page. Leave empty to get one automatically.')"
 				data-cy="contextPageSlug" />
 			<NcTextArea v-model="description"
