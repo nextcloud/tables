@@ -18,6 +18,7 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\ConflictError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Helper\TextHelper;
@@ -56,21 +57,23 @@ class MenuService {
 	}
 
 	/**
-	 * The menu of an application in display order. Readers who cannot manage the
-	 * application do not see empty groups.
+	 * The menu of an application in display order, with the version of its order that
+	 * {@see self::saveOrder()} expects. Readers who cannot manage the application do not
+	 * see empty groups.
 	 *
-	 * @return list<TablesMenuItem> in menu order
+	 * @return array{menu: list<TablesMenuItem>, version: string}
 	 * @throws NotFoundError
 	 * @throws Exception
 	 */
 	public function findAll(int $contextId, string $userId): array {
 		$context = $this->contextMapper->findById($contextId, $userId);
-		$menu = $this->serialize($context, $this->menuItemMapper->findByContextId($contextId));
-		if ($this->permissionsService->canManageContext($context, $userId)) {
-			return $menu;
+		$items = $this->visibleItems($context, $this->menuItemMapper->findByContextId($contextId));
+		$menu = $this->serialize($context, $items);
+		if (!$this->permissionsService->canManageContext($context, $userId)) {
+			$parentIds = array_flip(array_filter(array_column($menu, 'parentId')));
+			$menu = array_values(array_filter($menu, static fn (array $item): bool => $item['target'] !== null || isset($parentIds[$item['id']])));
 		}
-		$parentIds = array_flip(array_filter(array_column($menu, 'parentId')));
-		return array_values(array_filter($menu, static fn (array $item): bool => $item['target'] !== null || isset($parentIds[$item['id']])));
+		return ['menu' => $menu, 'version' => $this->version($items)];
 	}
 
 	/**
@@ -175,21 +178,27 @@ class MenuService {
 	/**
 	 * Saves the order and grouping of the whole menu in one transaction. The list holds
 	 * every item exactly once, in display order, each with the id of its group or null.
-	 * Only top-level groups hold items, and a group comes before its items. A menu that
-	 * changed since it was read is refused.
+	 * Only top-level groups hold items, and a group comes before its items. A save based
+	 * on another version than the current one is refused, whatever changed in between.
 	 *
 	 * @param list<MenuOrderEntry> $order
-	 * @return list<TablesMenuItem> the whole menu
+	 * @param string $version the version of the order the list was built from
+	 * @return array{menu: list<TablesMenuItem>, version: string} the whole menu
 	 * @throws BadRequestError
+	 * @throws ConflictError
 	 * @throws NotFoundError
 	 * @throws Exception
 	 */
-	public function saveOrder(int $contextId, array $order, string $userId): array {
-		return $this->atomic(function () use ($contextId, $order, $userId): array {
+	public function saveOrder(int $contextId, array $order, string $version, string $userId): array {
+		return $this->atomic(function () use ($contextId, $order, $version, $userId): array {
 			$this->lockApplication($contextId);
 			$context = $this->contextMapper->findById($contextId, $userId);
+			$visible = $this->visibleItems($context, $this->menuItemMapper->findByContextId($context->getId()));
+			if (!hash_equals($this->version($visible), $version)) {
+				throw new ConflictError(self::CHANGED_IN_BETWEEN);
+			}
 			$items = [];
-			foreach ($this->visibleItems($context, $this->menuItemMapper->findByContextId($context->getId())) as $item) {
+			foreach ($visible as $item) {
 				$items[$item->getId()] = $item;
 			}
 
@@ -199,7 +208,7 @@ class MenuService {
 				$id = $entry->id;
 				$parentId = $entry->parentId;
 				if (!isset($items[$id])) {
-					throw new NotFoundError('Menu item ' . $id . ' is not an item of application ' . $context->getId());
+					throw new BadRequestError('Menu item ' . $id . ' is not an item of application ' . $context->getId());
 				}
 				if (array_key_exists($id, $parents)) {
 					throw new BadRequestError('Menu item ' . $id . ' is listed twice.');
@@ -208,7 +217,7 @@ class MenuService {
 				$positions[$id] = $position;
 			}
 			if (count($parents) !== count($items)) {
-				throw new BadRequestError(self::CHANGED_IN_BETWEEN);
+				throw new BadRequestError('The order lists every item of the menu.');
 			}
 
 			foreach ($parents as $id => $parentId) {
@@ -225,7 +234,8 @@ class MenuService {
 					$this->menuItemMapper->update($items[$id]);
 				}
 			}
-			return $this->serialize($context, array_map(static fn (int $id): MenuItem => $items[$id], array_keys($parents)));
+			$saved = array_map(static fn (int $id): MenuItem => $items[$id], array_keys($parents));
+			return ['menu' => $this->serialize($context, $saved), 'version' => $this->version($saved)];
 		}, $this->dbc);
 	}
 
@@ -265,6 +275,16 @@ class MenuService {
 			throw new NotFoundError('Menu item ' . $itemId . ' does not exist');
 		}
 		return [$item, $context];
+	}
+
+	/**
+	 * The version of the order and grouping of the items the menu shows. It changes with
+	 * every item added, deleted, moved, or hidden because its target is gone.
+	 *
+	 * @param list<MenuItem> $items in menu order
+	 */
+	private function version(array $items): string {
+		return md5(json_encode(array_map(static fn (MenuItem $item): array => [$item->getId(), $item->getParentId(), $item->getOrder()], $items), JSON_THROW_ON_ERROR));
 	}
 
 	private function startPageId(Context $context): ?int {

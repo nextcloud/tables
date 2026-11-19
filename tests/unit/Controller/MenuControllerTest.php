@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Controller;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Controller\MenuController;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\ConflictError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\MenuOrderEntry;
@@ -27,12 +28,15 @@ use Psr\Log\LoggerInterface;
 class MenuControllerTest extends TestCase {
 	private MenuController $controller;
 	private MenuService&MockObject $menuService;
+	private string $ifMatch = '"v1"';
 
 	protected function setUp(): void {
 		parent::setUp();
 		$this->menuService = $this->createMock(MenuService::class);
+		$request = $this->createMock(IRequest::class);
+		$request->method('getHeader')->willReturnCallback(fn (string $name): string => $name === 'If-Match' ? $this->ifMatch : '');
 		$this->controller = new MenuController(
-			$this->createMock(IRequest::class),
+			$request,
 			$this->createMock(LoggerInterface::class),
 			$this->createMock(IL10N::class),
 			'alice',
@@ -43,10 +47,11 @@ class MenuControllerTest extends TestCase {
 	public static function endpoints(): array {
 		$target = ['url' => 'https://nextcloud.com'];
 		$order = [['id' => 3, 'parentId' => null]];
+		$menu = ['menu' => [], 'version' => 'v2'];
 		return [
-			'index' => ['findAll', [7, 'alice'], static fn (MenuController $controller) => $controller->index(7)],
+			'index' => ['findAll', [7, 'alice'], static fn (MenuController $controller) => $controller->index(7), $menu],
 			'create' => ['create', [7, 'Site', 'star', 'Ours', MenuTarget::fromArray($target), 'alice'], static fn (MenuController $controller) => $controller->create(7, 'Site', 'star', 'Ours', $target)],
-			'order' => ['saveOrder', [7, [new MenuOrderEntry(3, null)], 'alice'], static fn (MenuController $controller) => $controller->order(7, $order)],
+			'order' => ['saveOrder', [7, [new MenuOrderEntry(3, null)], 'v1', 'alice'], static fn (MenuController $controller) => $controller->order(7, $order), $menu],
 			'update' => ['update', [7, 3, '', null, null, MenuTarget::fromArray($target), 'alice'], static fn (MenuController $controller) => $controller->update(7, 3, '', null, null, $target)],
 			'destroy' => ['delete', [7, 3, 'alice'], static fn (MenuController $controller) => $controller->destroy(7, 3)],
 		];
@@ -55,10 +60,47 @@ class MenuControllerTest extends TestCase {
 	/**
 	 * @dataProvider endpoints
 	 */
-	public function testAnEndpointPassesItsArgumentsOn(string $method, array $arguments, \Closure $call): void {
-		$this->menuService->expects($this->once())->method($method)->with(...$arguments)->willReturn([]);
+	public function testAnEndpointPassesItsArgumentsOn(string $method, array $arguments, \Closure $call, array $result = []): void {
+		$this->menuService->expects($this->once())->method($method)->with(...$arguments)->willReturn($result);
 
 		$this->assertSame(Http::STATUS_OK, $call($this->controller)->getStatus());
+	}
+
+	public function testTheMenuAndASavedOrderCarryTheVersionAsETag(): void {
+		$this->menuService->method('findAll')->willReturn(['menu' => [['id' => 3]], 'version' => 'v1']);
+		$this->menuService->method('saveOrder')->willReturn(['menu' => [['id' => 3]], 'version' => 'v2']);
+
+		$index = $this->controller->index(7);
+		$order = $this->controller->order(7, [['id' => 3, 'parentId' => null]]);
+
+		$this->assertSame([[['id' => 3]], '"v1"'], [$index->getData(), $index->getHeaders()['ETag']]);
+		$this->assertSame([[['id' => 3]], '"v2"'], [$order->getData(), $order->getHeaders()['ETag']]);
+	}
+
+	public static function ifMatchHeaders(): array {
+		return [
+			'none' => [''],
+			'without quotes' => ['v1'],
+			'weak' => ['W/"v1"'],
+			'any' => ['*'],
+			'two tags' => ['"v1", "v2"'],
+		];
+	}
+
+	/**
+	 * @dataProvider ifMatchHeaders
+	 */
+	public function testAnOrderSaveWithoutOneStrongETagInIfMatchIsRefused(string $ifMatch): void {
+		$this->ifMatch = $ifMatch;
+		$this->menuService->expects($this->never())->method('saveOrder');
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $this->controller->order(7, [['id' => 3, 'parentId' => null]])->getStatus());
+	}
+
+	public function testAnOrderSaveOnAnotherVersionIsAConflict(): void {
+		$this->menuService->method('saveOrder')->willThrowException(new ConflictError('The menu was changed by another save in the meantime.'));
+
+		$this->assertSame(Http::STATUS_CONFLICT, $this->controller->order(7, [['id' => 3, 'parentId' => null]])->getStatus());
 	}
 
 	public static function errors(): array {
