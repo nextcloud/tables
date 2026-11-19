@@ -428,9 +428,10 @@ class MenuService {
 
 	/**
 	 * The menu a scheme import into this application would save, as the preview shows it and
-	 * as the import takes it back: page targets point at pages of the application, an item
-	 * names its group by the group's position among the kept items, and only tables and
-	 * views among the scheme's nodes count as having come along.
+	 * as the import takes it back: page targets point at pages of the application and show
+	 * the title they get there, an item names its group by the group's position among the
+	 * kept items, and only tables and views among the scheme's nodes count as having come
+	 * along.
 	 *
 	 * @param list<mixed> $menu
 	 * @param array<array-key, mixed> $schemePages
@@ -450,8 +451,16 @@ class MenuService {
 			static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
 			static fn (int $pageId): ?int => $pageIds[$pageId] ?? null,
 		);
+		$pages = $context->getPages() ?? [];
 		$positions = array_flip(array_column($items, 'index'));
-		$entries = array_map(static fn (array $item): array => ['parent' => $item['parent'] === null ? null : $positions[$item['parent']]] + $item['entry'], $items);
+		$entries = array_map(static function (array $item) use ($positions, $pages, $context): array {
+			$entry = ['parent' => $item['parent'] === null ? null : $positions[$item['parent']]] + $item['entry'];
+			$pageId = $item['item']->getPageId();
+			if ($pageId !== null && isset($pages[$pageId])) {
+				$entry['displayTitle'] = $item['item']->getTitle() ?? $pages[$pageId]['title'] ?? $context->getName();
+			}
+			return $entry;
+		}, $items);
 		return ['to' => $this->withLocalPages($entries, $pageIds), 'skipped' => $skipped];
 	}
 

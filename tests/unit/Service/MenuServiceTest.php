@@ -561,7 +561,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$context = $this->contextService->findById($contextId, self::OWNER);
 		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
 		$menu = [
-			['title' => null, 'target' => ['page' => $startPageId]],
+			['title' => null, 'displayTitle' => 'Source application', 'target' => ['page' => $startPageId]],
 			['title' => 'Projects', 'target' => ['table' => self::TABLE_UUID]],
 			['title' => 'Gone', 'target' => ['page' => 999999999]],
 			['title' => 'Group One', 'target' => null],
@@ -574,6 +574,7 @@ class MenuServiceTest extends DatabaseTestCase {
 
 		$imported = $this->menu($contextId);
 		$this->assertSame([null, null, null, null, 2], array_column($preview['to'], 'parent'));
+		$this->assertSame('Sales', $preview['to'][0]['displayTitle']);
 		$this->assertSame(['Sales', 'Projects', 'Group One', 'Group Two', 'Site'], array_column($imported, 'displayTitle'));
 		$this->assertSame($imported[2]['id'], $imported[4]['parentId']);
 	}
