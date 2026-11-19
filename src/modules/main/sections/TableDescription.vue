@@ -51,6 +51,7 @@ export default {
 		}
 	},
 	async beforeUnmount() {
+		this.unmounted = true
 		await this.destroyEditor()
 	},
 	methods: {
@@ -59,7 +60,7 @@ export default {
 			if (this.$refs.textEditor === undefined) {
 				return
 			}
-			this.editor = await window.OCA.Text.createEditor({
+			const editor = await window.OCA.Text.createEditor({
 				el: this.$refs.textEditor,
 				content: this.description,
 				readOnly: this.readOnly,
@@ -71,6 +72,12 @@ export default {
 					this.$emit('update:description', markdown)
 				},
 			})
+			// An editor that is ready after the description left the page is not kept
+			if (this.unmounted) {
+				editor.destroy()
+				return
+			}
+			this.editor = editor
 
 		},
 		async destroyEditor() {
