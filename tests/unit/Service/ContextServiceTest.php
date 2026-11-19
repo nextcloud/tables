@@ -1074,7 +1074,6 @@ final class ContextServiceTest extends TestCase {
 
 		$imported = $this->service->importContext($exported, 'user-1', [5 => 77, 6 => 78], [5 => 90]);
 
-		self::assertNotNull($imported);
 		self::assertSame('user-1', $imported->getOwnerId());
 		self::assertSame(
 			[[Application::NODE_TYPE_TABLE, 77, 1], [Application::NODE_TYPE_TABLE, 78, 3], [Application::NODE_TYPE_VIEW, 90, 1]],

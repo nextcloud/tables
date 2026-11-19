@@ -429,14 +429,7 @@ class TablesMigratorTest extends TestCase {
 			'contexts.json' => json_encode([$context]),
 			default => json_encode([]),
 		});
-		$this->tableMapper->method('getDBConnection')->willReturn(new class {
-			public function beginTransaction(): void {
-			}
-			public function commit(): void {
-			}
-			public function rollBack(): void {
-			}
-		});
+		$this->tableMapper->method('getDBConnection')->willReturn($this->createMock(IDBConnection::class));
 		$this->tableService->method('importTable')->willReturnCallback(static function (array $table): Table {
 			$newTable = new Table();
 			$newTable->setId($table['id'] * 100);
