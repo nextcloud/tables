@@ -161,7 +161,7 @@ export default {
 		typeOptions() {
 			return this.widgetTypes
 				.filter(widgetType => getWidgetComponent(widgetType.type) !== null)
-				.filter(widgetType => this.allowTabs || widgetType.type !== WIDGET_TYPE_TABS || widgetType.type === this.editingWidget?.type)
+				.filter(widgetType => this.allowTabs || widgetType.type !== WIDGET_TYPE_TABS)
 				.map(widgetType => ({ id: widgetType.type, label: widgetType.title }))
 		},
 		widgetType() {

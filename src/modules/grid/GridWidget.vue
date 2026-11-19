@@ -182,7 +182,7 @@ export default {
 				return { nodes: this.nodes, content: this.startPageContent }
 			}
 			if (this.widget.type === WIDGET_TYPE_TABS) {
-				return { widget: this.widget, settings: this.widget.settings, editable: this.editable }
+				return { widget: this.widget, editable: this.editable }
 			}
 			return { settings: this.widget.settings, editable: this.editable }
 		},

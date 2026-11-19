@@ -40,7 +40,6 @@
 				:columns="columns"
 				:rows="rows"
 				:view-setting="viewSetting"
-				collapse-description
 				@create-column="createColumn"
 				@import="openImportModal"
 				@import-scheme="openImportSchemeModal"

@@ -5,8 +5,7 @@
 <template>
 	<div>
 		<ElementTitle v-model:view-setting="localViewSetting" :active-element="table" :show-title="showTitle" />
-		<CollapsibleDescription v-if="collapseDescription" :description="table.description ?? ''" :title="table.title" />
-		<TableDescription v-else :description="table.description" :read-only="true" />
+		<CollapsibleDescription :description="table.description ?? ''" :title="table.title" />
 		<DataTable v-model:view-setting="localViewSetting" :show-options="false" :table="table" :columns="columns" :rows="rows"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
@@ -20,7 +19,6 @@
 </template>
 
 <script>
-import TableDescription from './TableDescription.vue'
 import CollapsibleDescription from './CollapsibleDescription.vue'
 import ElementTitle from './ElementTitle.vue'
 import DataTable from './DataTable.vue'
@@ -33,7 +31,6 @@ export default {
 	components: {
 		ElementTitle,
 		DataTable,
-		TableDescription,
 		CollapsibleDescription,
 	},
 
@@ -41,11 +38,6 @@ export default {
 		table: {
 			type: Object,
 			default: null,
-		},
-		// Shows the description behind a button, where it would take the room of the rows
-		collapseDescription: {
-			type: Boolean,
-			default: false,
 		},
 		columns: {
 			type: Array,

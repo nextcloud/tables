@@ -58,8 +58,6 @@ import Plus from 'vue-material-design-icons/Plus.vue'
 import { tabTitles } from '../gridLayout.js'
 import { eventTabIndex, rovingTabTarget } from '../../../shared/utils/rovingTabs.js'
 
-let instances = 0
-
 /**
  * A tab strip whose tabs each hold their own grid of widgets. The widgets live in the grid of
  * the page, with the key of this widget as their parent; the page handles every change to them.
@@ -88,10 +86,6 @@ export default {
 			type: Object,
 			required: true,
 		},
-		settings: {
-			type: Object,
-			required: true,
-		},
 		editable: {
 			type: Boolean,
 			default: false,
@@ -103,12 +97,11 @@ export default {
 			focusedTab: null,
 			// A tab is mounted when it is first opened and kept, so its widgets keep their state
 			visitedTabs: [0],
-			instance: ++instances,
 		}
 	},
 	computed: {
 		titles() {
-			return tabTitles(this.settings)
+			return tabTitles(this.widget.settings)
 		},
 		// The tab in the tab order: the one last moved to with the keyboard, else the open one
 		focusTab() {
@@ -136,7 +129,7 @@ export default {
 		 * @return {string} the id of its tab button
 		 */
 		tabId(index) {
-			return 'tabs-widget-' + this.instance + '-tab-' + index
+			return 'tabs-widget-' + this.widget.key + '-tab-' + index
 		},
 		/**
 		 * @param {number} index position of a tab
@@ -150,7 +143,7 @@ export default {
 		 * @return {string} the id of its panel
 		 */
 		panelId(index) {
-			return 'tabs-widget-panel-' + this.instance + '-' + index
+			return 'tabs-widget-' + this.widget.key + '-panel-' + index
 		},
 		/**
 		 * @param {number} index position of the tab to open
