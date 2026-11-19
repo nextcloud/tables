@@ -8,6 +8,7 @@ const MENU_SWITCH = '[data-cy="importSchemeMenu"]'
 const SKIPPED = '[data-cy="importSchemeMenuSkipped"]'
 const NODES_SWITCH = '[data-cy="importSchemeNodes"]'
 const TO_ITEMS = '[data-cy="importSchemeMenuTo"]'
+const REFUSED = '[data-cy="importSchemeNodesRefused"]'
 
 const schemeMenu = [
 	{ parent: null, title: 'Reports', displayTitle: 'Reports', icon: null, description: null, target: null },
@@ -61,7 +62,7 @@ describe('Import application scheme preview', () => {
 			{ parent: null, title: null, displayTitle: 'Projects', icon: null, description: null, target: { table: 'table-uuid' } },
 			{ parent: null, title: null, displayTitle: '', icon: null, description: null, target: { page: 'dashboard' } },
 		]
-		mountPreview({ from: [], to, skipped: [] }, { from: [], to: [{ node_type: 0, node_uuid: 'table-uuid', node_title: 'Projects' }] })
+		mountPreview({ from: [], to, skipped: [] }, { nodes: { from: [], to: [{ node_type: 0, node_uuid: 'table-uuid', node_title: 'Projects' }] } })
 
 		cy.get(TO_ITEMS).should('have.length', 4)
 		cy.get(TO_ITEMS).eq(0).should('contain', 'Reports').and('contain', 'Group')
@@ -69,6 +70,32 @@ describe('Import application scheme preview', () => {
 		cy.get(TO_ITEMS).eq(1).should('contain', 'Link: https://projects.example.org')
 		cy.get(TO_ITEMS).eq(2).should('contain', 'Table: Projects')
 		cy.get(TO_ITEMS).eq(3).should('contain', 'Untitled item').and('contain', 'Page')
+	})
+
+	it('leaves out the nodes of a new table that is switched off', () => {
+		const newTable = { uuid: 'new-table', title: 'Requests', emoji: null, description: '', columns: [], views: [{ uuid: 'new-view', title: 'Open' }] }
+		const nodes = [
+			{ node_type: 0, node_uuid: 'here', node_title: 'Projects', permissions: 1 },
+			{ node_type: 0, node_uuid: 'new-table', node_title: 'Requests', permissions: 1 },
+			{ node_type: 1, node_uuid: 'new-view', node_title: 'Open', permissions: 1 },
+		]
+		mountPreview(undefined, { nodes: { from: [], to: nodes, unresolved: [] }, addTables: [newTable] })
+			.then(({ wrapper }) => {
+				cy.wrap(null).then(() => {
+					expect(lastPayload(wrapper).nodes).to.deep.equal(nodes)
+				})
+				cy.contains('.preview-card', 'Requests').find('input').click({ force: true })
+				cy.contains('.preview-card', 'Requests').find('.preview-card__meta').should('not.exist')
+				cy.wrap(null).then(() => {
+					expect(lastPayload(wrapper).nodes).to.deep.equal([nodes[0]])
+				})
+			})
+	})
+
+	it('lists the nodes the import would refuse', () => {
+		mountPreview(undefined, { nodes: { from: [], to: [], unresolved: [{ index: 0, uuid: 'elsewhere', title: 'Somebody else\'s table', reason: 'is not a table or view that is here and can be managed by the user' }] } })
+
+		cy.get(REFUSED).should('contain', 'Somebody else\'s table')
 	})
 
 	it('has no menu section for a preview without a menu', () => {
@@ -84,20 +111,21 @@ describe('Import application scheme preview', () => {
 
 /**
  * @param {object|undefined} menu the menu part of the preview response
- * @param {object} nodes the nodes part of the preview response
+ * @param {object} preview other parts of the preview response
  * @return {Cypress.Chainable} the mount result
  */
-function mountPreview(menu, nodes = { from: [], to: [] }) {
+function mountPreview(menu, preview = {}) {
 	return cy.mount(ImportContextSchemePreview, {
 		props: {
 			previewData: {
 				name: { from: 'Intake', to: 'Intake' },
 				icon: { from: 'star', to: 'star' },
 				description: { from: '', to: '' },
-				nodes,
+				nodes: { from: [], to: [] },
 				addTables: {},
 				modifyTables: {},
 				...(menu === undefined ? {} : { menu }),
+				...preview,
 			},
 		},
 	})

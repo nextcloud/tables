@@ -329,9 +329,12 @@ export default {
 			} else if (res?.status === 404) {
 				console.debug('error while importing', e || res)
 				this.errorMessage = t('tables', 'Could not import, needed resources were not found.')
+			} else if (res?.status === 400) {
+				console.debug('error while importing', e || res)
+				this.errorMessage = res.data?.ocs?.data?.message || t('tables', 'Could not import, the scheme cannot be used here.')
 			} else {
 				console.debug('error while importing', e || res)
-				this.errorMessage = t('tables', e?.response?.data?.message || 'Could not import scheme due to unknown errors.')
+				this.errorMessage = t('tables', 'Could not import scheme due to unknown errors.')
 			}
 		},
 	},
