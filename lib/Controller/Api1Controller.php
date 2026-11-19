@@ -1478,6 +1478,14 @@ class Api1Controller extends ApiController {
 		} catch (BadRequestError $e) {
 			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		} catch (PermissionError $e) {
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (NotFoundError $e) {
+			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
