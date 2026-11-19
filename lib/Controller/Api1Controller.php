@@ -570,9 +570,10 @@ class Api1Controller extends ApiController {
 	 * @param bool $permissionManage Permission if receiver can manage node
 	 * @param int $displayMode context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all (default). Cf. Application::NAV_ENTRY_MODE_*.
 	 * @psalm-param int<0, 2> $displayMode
-	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Share returned
+	 * 400: Receiver type not supported for this node type
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -608,6 +609,9 @@ class Api1Controller extends ApiController {
 					$displayMode
 				)))->jsonSerialize()
 			);
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1636,9 +1640,10 @@ class Api1Controller extends ApiController {
 	 * @param bool $permissionUpdate Permission if receiver can update data
 	 * @param bool $permissionDelete Permission if receiver can delete data
 	 * @param bool $permissionManage Permission if receiver can manage table
-	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
-	 * 200: View deleted
+	 * 200: Share returned
+	 * 400: Receiver type not supported for this node type
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -1663,6 +1668,9 @@ class Api1Controller extends ApiController {
 					Application::NAV_ENTRY_MODE_ALL
 				)))->jsonSerialize()
 			);
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

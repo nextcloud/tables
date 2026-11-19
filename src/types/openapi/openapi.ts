@@ -2672,13 +2672,24 @@ export interface operations {
             };
         };
         readonly responses: {
-            /** @description View deleted */
+            /** @description Share returned */
             readonly 200: {
                 headers: {
                     readonly [name: string]: unknown;
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Share"];
+                };
+            };
+            /** @description Receiver type not supported for this node type */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description Current user is not logged in */
@@ -2795,6 +2806,17 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Share"];
+                };
+            };
+            /** @description Receiver type not supported for this node type */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description Current user is not logged in */
