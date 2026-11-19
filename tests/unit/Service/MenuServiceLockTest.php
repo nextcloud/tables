@@ -15,6 +15,7 @@ use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Model\MenuTarget;
 use OCA\Tables\Service\MenuService;
 use OCA\Tables\Service\PermissionsService;
 use OCP\IDBConnection;
@@ -23,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 class MenuServiceLockTest extends TestCase {
 	public static function writes(): array {
 		return [
-			'create' => [static fn (MenuService $service): array => $service->create(7, 'Site', null, null, ['url' => 'https://nextcloud.com'], 'alice')],
+			'create' => [static fn (MenuService $service): array => $service->create(7, 'Site', null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), 'alice')],
 			'update' => [static fn (MenuService $service): array => $service->update(7, 3, 'Site', null, null, null, 'alice')],
 			'delete' => [static fn (MenuService $service): array => $service->delete(7, 3, 'alice')],
 			'saveOrder' => [static fn (MenuService $service): array => $service->saveOrder(7, [], 'alice')],

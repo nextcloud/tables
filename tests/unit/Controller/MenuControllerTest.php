@@ -13,6 +13,8 @@ use OCA\Tables\Controller\MenuController;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\MenuOrderEntry;
+use OCA\Tables\Model\MenuTarget;
 use OCA\Tables\Service\MenuService;
 use OCP\AppFramework\Http;
 use OCP\IL10N;
@@ -42,9 +44,9 @@ class MenuControllerTest extends TestCase {
 		$order = [['id' => 3, 'parentId' => null]];
 		return [
 			'index' => ['findAll', [7, 'alice'], static fn (MenuController $controller) => $controller->index(7)],
-			'create' => ['create', [7, 'Site', 'star', 'Ours', $target, 'alice'], static fn (MenuController $controller) => $controller->create(7, 'Site', 'star', 'Ours', $target)],
-			'order' => ['saveOrder', [7, $order, 'alice'], static fn (MenuController $controller) => $controller->order(7, $order)],
-			'update' => ['update', [7, 3, '', null, null, $target, 'alice'], static fn (MenuController $controller) => $controller->update(7, 3, '', null, null, $target)],
+			'create' => ['create', [7, 'Site', 'star', 'Ours', MenuTarget::fromArray($target), 'alice'], static fn (MenuController $controller) => $controller->create(7, 'Site', 'star', 'Ours', $target)],
+			'order' => ['saveOrder', [7, [new MenuOrderEntry(3, null)], 'alice'], static fn (MenuController $controller) => $controller->order(7, $order)],
+			'update' => ['update', [7, 3, '', null, null, MenuTarget::fromArray($target), 'alice'], static fn (MenuController $controller) => $controller->update(7, 3, '', null, null, $target)],
 			'destroy' => ['delete', [7, 3, 'alice'], static fn (MenuController $controller) => $controller->destroy(7, 3)],
 		];
 	}
@@ -82,5 +84,25 @@ class MenuControllerTest extends TestCase {
 
 		$this->assertSame($status, $response->getStatus());
 		$this->assertArrayHasKey('message', $response->getData());
+	}
+
+	public static function malformedBodies(): array {
+		return [
+			'create, two targets' => [static fn (MenuController $controller) => $controller->create(7, 'Site', null, null, ['url' => 'https://nextcloud.com', 'pageId' => 3])],
+			'create, a page id as text' => [static fn (MenuController $controller) => $controller->create(7, 'Site', null, null, ['pageId' => '3'])],
+			'update, an unknown target' => [static fn (MenuController $controller) => $controller->update(7, 3, null, null, null, ['tableId' => 3])],
+			'update, a javascript link' => [static fn (MenuController $controller) => $controller->update(7, 3, null, null, null, ['url' => 'javascript:alert(1)'])],
+			'order, an object instead of a list' => [static fn (MenuController $controller) => $controller->order(7, ['a' => ['id' => 3, 'parentId' => null]])],
+			'order, an entry without an id' => [static fn (MenuController $controller) => $controller->order(7, [['parentId' => null]])],
+		];
+	}
+
+	/**
+	 * @dataProvider malformedBodies
+	 */
+	public function testAMalformedBodyIsRefusedBeforeTheServiceRuns(\Closure $call): void {
+		$this->menuService->expects($this->never())->method($this->anything());
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $call($this->controller)->getStatus());
 	}
 }

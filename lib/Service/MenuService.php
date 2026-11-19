@@ -22,7 +22,8 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Helper\TextHelper;
-use OCA\Tables\Helper\UrlHelper;
+use OCA\Tables\Model\MenuOrderEntry;
+use OCA\Tables\Model\MenuTarget;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -78,14 +79,13 @@ class MenuService {
 	 * menu without any item first gets the one that opens the start page, so the new
 	 * item never replaces it.
 	 *
-	 * @param array<array-key, mixed>|null $target
 	 * @return TablesMenuItem
 	 * @throws BadRequestError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws Exception
 	 */
-	public function create(int $contextId, ?string $title, ?string $icon, ?string $description, ?array $target, string $userId): array {
+	public function create(int $contextId, ?string $title, ?string $icon, ?string $description, ?MenuTarget $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $title, $icon, $description, $target, $userId): array {
 			$this->lockApplication($contextId);
 			$context = $this->getManageableContext($contextId, $userId);
@@ -119,14 +119,13 @@ class MenuService {
 	 * of what it opens. A target replaces the previous one and is checked in the
 	 * transaction that saves it; a group that holds items cannot get one.
 	 *
-	 * @param array<array-key, mixed>|null $target
 	 * @return TablesMenuItem
 	 * @throws BadRequestError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws Exception
 	 */
-	public function update(int $contextId, int $itemId, ?string $title, ?string $icon, ?string $description, ?array $target, string $userId): array {
+	public function update(int $contextId, int $itemId, ?string $title, ?string $icon, ?string $description, ?MenuTarget $target, string $userId): array {
 		return $this->atomic(function () use ($contextId, $itemId, $title, $icon, $description, $target, $userId): array {
 			$this->lockApplication($contextId);
 			[$item, $context] = $this->getManageableItem($contextId, $itemId, $userId);
@@ -182,7 +181,7 @@ class MenuService {
 	 * Only top-level groups hold items, and a group comes before its items. A menu that
 	 * changed since it was read is refused.
 	 *
-	 * @param list<mixed> $order
+	 * @param list<MenuOrderEntry> $order
 	 * @return list<TablesMenuItem> the whole menu
 	 * @throws BadRequestError
 	 * @throws NotFoundError
@@ -201,12 +200,9 @@ class MenuService {
 
 			$parents = [];
 			$positions = [];
-			foreach (array_values($order) as $position => $entry) {
-				$id = is_array($entry) ? ($entry['id'] ?? null) : null;
-				$parentId = is_array($entry) ? ($entry['parentId'] ?? null) : null;
-				if (!is_int($id) || ($parentId !== null && !is_int($parentId))) {
-					throw new BadRequestError('Entry ' . $position . ' needs the id of an item and the id of its group or null.');
-				}
+			foreach ($order as $position => $entry) {
+				$id = $entry->id;
+				$parentId = $entry->parentId;
 				if (!isset($items[$id])) {
 					throw new NotFoundError('Menu item ' . $id . ' is not an item of application ' . $context->getId());
 				}
@@ -381,37 +377,15 @@ class MenuService {
 	}
 
 	/**
-	 * @param array<array-key, mixed> $target
 	 * @return array{pageId: int}|array{nodeRelId: int}|array{url: string}
 	 * @throws BadRequestError
 	 */
-	private function validateTarget(array $target, Context $context): array {
-		if (count($target) === 1) {
-			$pageId = $target['pageId'] ?? null;
-			if (is_int($pageId) && isset(($context->getPages() ?? [])[$pageId])) {
-				return ['pageId' => $pageId];
-			}
-			$nodeRelId = $target['nodeRelId'] ?? null;
-			if (is_int($nodeRelId) && isset(($context->getNodes() ?? [])[$nodeRelId])) {
-				return ['nodeRelId' => $nodeRelId];
-			}
-			$url = $target['url'] ?? null;
-			if (is_string($url)) {
-				return ['url' => $this->validateUrl($url)];
-			}
+	private function validateTarget(MenuTarget $target, Context $context): array {
+		if (($target->pageId !== null && !isset(($context->getPages() ?? [])[$target->pageId]))
+			|| ($target->nodeRelId !== null && !isset(($context->getNodes() ?? [])[$target->nodeRelId]))) {
+			throw new BadRequestError('The target of a menu item is {pageId} of a page or {nodeRelId} of a table or view of this application, or {url} of a link.');
 		}
-		throw new BadRequestError('The target of a menu item is {pageId} of a page or {nodeRelId} of a table or view of this application, or {url} of a link.');
-	}
-
-	/**
-	 * @throws BadRequestError
-	 */
-	private function validateUrl(string $url): string {
-		$url = TextHelper::trim($url);
-		if (mb_strlen($url) > MenuItem::URL_MAX_LENGTH || !UrlHelper::isAllowedLink($url)) {
-			throw new BadRequestError('A link is an http or https address of at most ' . MenuItem::URL_MAX_LENGTH . ' characters.');
-		}
-		return $url;
+		return $target->toArray();
 	}
 
 	/**
