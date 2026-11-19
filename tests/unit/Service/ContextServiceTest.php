@@ -52,6 +52,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
 	private MockObject $menuItemMapper;
+	private MockObject $viewMapper;
 	private MockObject $menuService;
 
 	protected function setUp(): void {
@@ -94,7 +95,7 @@ final class ContextServiceTest extends TestCase {
 			$navigationManager,
 			$urlGenerator,
 			$this->createMock(TableMapper::class),
-			$this->createMock(ViewMapper::class),
+			$this->viewMapper = $this->createMock(ViewMapper::class),
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->menuItemMapper,
@@ -1140,5 +1141,55 @@ final class ContextServiceTest extends TestCase {
 		], 'user-1', [5 => 77], []);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
+	}
+
+	public function testANodeWhosePermissionsAreNotANumberIsImportedWithoutPermissions(): void {
+		$record = $this->recordImport();
+
+		$this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => '15']],
+		], 'user-1', [5 => 77], []);
+
+		self::assertSame([[77, 0]], array_map(static fn (ContextNodeRelation $relation): array => [$relation->getNodeId(), $relation->getPermissions()], $record['relations']));
+	}
+
+	public function testAnEmptyMenuIsNotImported(): void {
+		$this->recordImport();
+		$this->contextMapper->expects($this->never())->method('findById');
+		$this->menuService->expects($this->never())->method('import');
+
+		$this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]],
+			'menu' => [],
+		], 'user-1', [5 => 77], []);
+	}
+
+	public function testAMenuItemFindsItsViewByUuidAmongTheNodesOfTheApplication(): void {
+		$record = $this->recordImport();
+		$this->contextMapper->expects($this->never())->method('findById');
+		$this->viewMapper->expects($this->never())->method('findByUuid');
+		$nodeRelIdOf = null;
+		$this->menuService->expects($this->once())->method('import')
+			->willReturnCallback(static function (Context $context, array $menu, \Closure $resolve) use (&$nodeRelIdOf): array {
+				$nodeRelIdOf = $resolve;
+				return [];
+			});
+
+		$this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [
+				['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 102, 'node_id' => 6, 'node_type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+			],
+			'menu' => [['title' => 'Team', 'target' => ['view' => 'shared-uuid']]],
+		], 'user-1', [5 => 77], [6 => 90, 7 => 91], ['table' => ['table-uuid' => [77]], 'view' => ['shared-uuid' => [91, 90]]]);
+
+		self::assertSame([501, 502], array_map(static fn (ContextNodeRelation $relation): int => $relation->getId(), $record['relations']));
+		self::assertSame(
+			[502, 501, null, null],
+			[$nodeRelIdOf('view', 'shared-uuid'), $nodeRelIdOf('table', 'table-uuid'), $nodeRelIdOf('table', 'shared-uuid'), $nodeRelIdOf('view', 'unknown-uuid')],
+		);
 	}
 }
