@@ -241,7 +241,7 @@ test.describe('Grid pages of an application', () => {
 		await openApplication(page, contextId, `/page/${pageId}`)
 
 		await page.locator('[data-cy="gridPageEdit"]').click()
-		await page.getByRole('button', { name: 'Widget actions' }).click()
+		await page.getByRole('button', { name: /^Actions for / }).click()
 		// The steps keep the menu open, so a widget can be moved several steps in a row
 		await page.locator('[data-cy="widgetMoveRight"] button').click()
 		await page.locator('[data-cy="widgetWider"] button').click()
@@ -325,7 +325,7 @@ test.describe('Grid pages of an application', () => {
 		await openApplication(page, contextId, `/page/${pageId}`)
 
 		await page.locator('[data-cy="gridPageEdit"]').click()
-		await page.getByRole('button', { name: 'Widget actions' }).click()
+		await page.getByRole('button', { name: /^Actions for / }).click()
 		await page.getByRole('menuitem', { name: 'Remove widget' }).click()
 		await expect(page.locator('[data-cy="gridItem"]')).toHaveCount(0)
 
@@ -393,7 +393,7 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.locator('[data-cy="gridPageSave"]')).toBeDisabled()
 		await expect(page.locator('[data-cy="gridPageAddWidget"]')).toBeDisabled()
 		await expect(page.locator('[data-cy="gridPageCancel"]')).toBeDisabled()
-		await expect(page.getByRole('button', { name: 'Widget actions' })).toHaveCount(0)
+		await expect(page.getByRole('button', { name: /^Actions for / })).toHaveCount(0)
 
 		release()
 		await expect(page.locator('[data-cy="gridPageEdit"]')).toBeVisible()
@@ -421,8 +421,8 @@ test.describe('Grid pages of an application', () => {
 		await page.keyboard.press('Enter')
 		await expect(page.locator('[data-cy="gridPageAddWidget"]')).toBeFocused()
 
-		const firstActions = page.locator('[data-cy="gridWidget"]', { hasText: 'First note' }).getByRole('button', { name: 'Widget actions' })
-		const secondActions = page.locator('[data-cy="gridWidget"]', { hasText: 'Second note' }).getByRole('button', { name: 'Widget actions' })
+		const firstActions = page.locator('[data-cy="gridWidget"]', { hasText: 'First note' }).getByRole('button', { name: /^Actions for First note/ })
+		const secondActions = page.locator('[data-cy="gridWidget"]', { hasText: 'Second note' }).getByRole('button', { name: 'Actions for Second note' })
 		await firstActions.click()
 		await page.getByRole('menuitem', { name: 'Configure widget' }).click()
 		await page.locator('[data-cy="addWidgetModal"]').getByRole('textbox', { name: 'Title' }).fill('First note again')
