@@ -79,7 +79,6 @@ OC.L10N.register(
     "Automatic" : "Automatike",
     "Advanced settings" : "Rregullime të mëtejshme",
     "Saving..." : "Duke ruajtur...",
-    "Export" : "Eksport",
     "Add to favorites" : "U shtua te të parapëlqyerat",
     "Remove from favorites" : "Hiqeni nga të parapëlqyerat",
     "Copy" : "Kopjoni",

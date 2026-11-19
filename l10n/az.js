@@ -47,7 +47,6 @@ OC.L10N.register(
     "Automatic" : "Avtomatik",
     "Advanced settings" : "İrəliləmiş quraşdırmalar",
     "Saving..." : "Saxlama...",
-    "Export" : "Çıxarış",
     "Copy" : "Kopyala",
     "Favorites" : "Sevimlilər",
     "group" : "qrup",

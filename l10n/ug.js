@@ -385,7 +385,6 @@ OC.L10N.register(
     "Saving..." : "ساقلاۋاتىدۇ…",
     "Delete application" : "پروگراممىنى ئۆچۈرۈڭ",
     "Do you really want to delete the table \"{table}\"?" : "جەدۋەل «{table}» نى ئۆچۈرمەكچىمۇ؟",
-    "Export" : "چىقار",
     "Add to favorites" : "ياقتۇرىدىغانلارغا قوشۇڭ",
     "Remove from favorites" : "ياقتۇرىدىغانلاردىن ئۆچۈرۈڭ",
     "Archive table" : "ئارخىپ جەدۋىلى",

@@ -572,7 +572,6 @@ OC.L10N.register(
     "Export scheme" : "Exportă schema",
     "Delete application" : "Șterge aplicația",
     "Do you really want to delete the table \"{table}\"?" : "Sigur vrei să ștergi tabelul „{table}”?",
-    "Export" : "Exportă",
     "Add to favorites" : "Adaugă la favorite",
     "Remove from favorites" : "Elimină din favorite",
     "Archive table" : "Arhivează tabelul",

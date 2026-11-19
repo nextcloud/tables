@@ -110,7 +110,6 @@ OC.L10N.register(
     "Automatic" : "Automatsko",
     "Advanced settings" : "Napredne postavke",
     "Saving..." : "Spremanje...",
-    "Export" : "Izvoz",
     "Add to favorites" : "Dodaj u favorite",
     "Remove from favorites" : "Ukloni iz omiljenih",
     "Copy" : "Kopirajte",

@@ -104,7 +104,6 @@ OC.L10N.register(
     "Automatic" : "Moja kwa moja",
     "Advanced settings" : "Mipangilio ya kiwango cha juu",
     "Saving..." : "Inahifadhi",
-    "Export" : "Safirisha",
     "Add to favorites" : "Ongeza kwenye pendwa",
     "Remove from favorites" : "Ondoa kutoka katika pendwa",
     "Archive table" : "Jedwali la kumbukumbu",

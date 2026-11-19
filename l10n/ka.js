@@ -74,7 +74,6 @@ OC.L10N.register(
     "Filter" : "Filter",
     "Automatic" : "Automatic",
     "Advanced settings" : "Advanced settings",
-    "Export" : "Export",
     "Add to favorites" : "Add to favorites",
     "Remove from favorites" : "Remove from favorites",
     "Copy" : "Copy",

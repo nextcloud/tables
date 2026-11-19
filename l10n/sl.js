@@ -270,7 +270,6 @@ OC.L10N.register(
     "Advanced settings" : "Napredne nastavitve",
     "Saving..." : "Poteka shranjevanje ...",
     "Do you really want to delete the table \"{table}\"?" : "Ali res želite izbrisati razpredelnico »{table}«?",
-    "Export" : "Izvozi",
     "Add to favorites" : "Dodaj med priljubljene",
     "Remove from favorites" : "Odstrani iz priljubljenih",
     "Delete table" : "Izbriši razpredelnico",

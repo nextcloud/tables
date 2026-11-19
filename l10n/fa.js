@@ -411,7 +411,6 @@ OC.L10N.register(
     "Saving..." : "در حال ذخیره...",
     "Delete application" : "حذف برنامه",
     "Do you really want to delete the table \"{table}\"?" : "آیا واقعاً می‌خواهید جدول \"{table}\" را حذف کنید؟",
-    "Export" : "خروجی",
     "Add to favorites" : "افزودن به موارد دلخواه",
     "Remove from favorites" : "حذف از موارد دلخواه",
     "Archive table" : "بایگانی جدول",

@@ -572,7 +572,6 @@ OC.L10N.register(
     "Export scheme" : "匯出格式",
     "Delete application" : "刪除應用程式",
     "Do you really want to delete the table \"{table}\"?" : "您真的想要刪除表格「{table}」嗎？",
-    "Export" : "匯出",
     "Add to favorites" : "新增至我的最愛",
     "Remove from favorites" : "取消我的最愛",
     "Archive table" : "封存表格",

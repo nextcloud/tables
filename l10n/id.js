@@ -567,7 +567,6 @@ OC.L10N.register(
     "Export scheme" : "Ekspor skema",
     "Delete application" : "Hapus aplikasi",
     "Do you really want to delete the table \"{table}\"?" : "Apakah Anda benar-benar ingin menghapus tabel \"{table}\"?",
-    "Export" : "Ekspor",
     "Add to favorites" : "Tambahkan ke favorit",
     "Remove from favorites" : "Hapus dari favorit",
     "Archive table" : "Arsipkan tabel",

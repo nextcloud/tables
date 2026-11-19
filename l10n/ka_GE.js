@@ -57,7 +57,6 @@ OC.L10N.register(
     "Automatic" : "ავტომატური",
     "Advanced settings" : "დამატებითი პარამეტრები",
     "Saving..." : "მიმხინარეობს შენახვა…",
-    "Export" : "ექსპორტი",
     "Remove from favorites" : "რჩეულებიდან მოშორება",
     "Favorites" : "რჩეულები",
     "group" : "ჯგუფი",

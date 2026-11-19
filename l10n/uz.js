@@ -81,7 +81,6 @@ OC.L10N.register(
     "Gallery" : "Galereya",
     "Automatic" : "Automatik",
     "Saving..." : "Saqlanmoqda...",
-    "Export" : "Eksport",
     "Add to favorites" : "Sevimlilarga qo'shing",
     "Remove from favorites" : "Sevimlilardan olib tashlang",
     "Archive table" : "Arxiv jadvali",

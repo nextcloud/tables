@@ -193,7 +193,6 @@ OC.L10N.register(
     "Advanced settings" : "Ustawienia zaawansowane",
     "Saving..." : "Zapisywanie…",
     "Do you really want to delete the table \"{table}\"?" : "Czy na pewno chcesz usunąć tabelę \"{table}\"?",
-    "Export" : "Eksportuj",
     "Add to favorites" : "Dodaj do ulubionych",
     "Remove from favorites" : "Usuń z ulubionych",
     "Archive table" : "Zarchiwizuj tabelę",

@@ -97,7 +97,6 @@ OC.L10N.register(
     "Gallery" : "Timidelt",
     "Automatic" : "Awurman",
     "Delete application" : "Kkes asnas",
-    "Export" : "Sifeḍ",
     "Add to favorites" : "Rnu ismal",
     "Remove from favorites" : "Kkes-it seg ismal",
     "Delete table" : "Kkes tafelwit",

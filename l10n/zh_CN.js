@@ -353,7 +353,6 @@ OC.L10N.register(
     "Saving..." : "正在保存……",
     "Delete application" : "删除应用程序",
     "Do you really want to delete the table \"{table}\"?" : "您真的想要删除数据表“{table}”吗？",
-    "Export" : "导出",
     "Add to favorites" : "添加到收藏",
     "Remove from favorites" : "从收藏中移除",
     "Archive table" : "封存数据表",

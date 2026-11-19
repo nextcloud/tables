@@ -366,7 +366,6 @@ OC.L10N.register(
     "Saving..." : "الحفظُ جارٍ ...",
     "Delete application" : "حذف التطبيق",
     "Do you really want to delete the table \"{table}\"?" : "هل تريد حقًا حذف الجدول \"{table}\"؟",
-    "Export" : "تصدير",
     "Add to favorites" : "إضافة إلى المفضلة",
     "Remove from favorites" : "إزالة مِن المفضلة",
     "Archive table" : "أرشفة جدول",

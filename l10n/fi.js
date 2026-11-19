@@ -366,7 +366,6 @@ OC.L10N.register(
     "Saving..." : "Tallennetaan...",
     "Delete application" : "Poista sovellus",
     "Do you really want to delete the table \"{table}\"?" : "Haluatko varmasti poistaa taulukon \"{table}\"?",
-    "Export" : "Vie",
     "Add to favorites" : "Lisää suosikkeihin",
     "Remove from favorites" : "Poista suosikeista",
     "Archive table" : "Arkistoi taulukko",

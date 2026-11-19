@@ -84,7 +84,6 @@ OC.L10N.register(
     "Automatic" : "Automàticu",
     "Advanced settings" : "Cunfiguratzione avantzada",
     "Saving..." : "Sarvende...",
-    "Export" : "Esporta",
     "Add to favorites" : "Agiunghe a preferidos",
     "Remove from favorites" : "Boga·nche dae preferidos",
     "Copy" : "Còpia",

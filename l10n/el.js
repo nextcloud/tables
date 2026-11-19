@@ -522,7 +522,6 @@ OC.L10N.register(
     "Saving..." : "Γίνεται αποθήκευση...",
     "Delete application" : "Διαγραφή εφαρμογής",
     "Do you really want to delete the table \"{table}\"?" : "Θέλετε πραγματικά να διαγράψετε τον πίνακα \"{table}\";",
-    "Export" : "Εξαγωγή",
     "Add to favorites" : "Προσθήκη στα αγαπημένα",
     "Remove from favorites" : "Αφαίρεση από τα αγαπημένα",
     "Archive table" : "Αρχειοθέτηση πίνακα",

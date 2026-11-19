@@ -69,7 +69,6 @@ OC.L10N.register(
     "Automatic" : "Aŭtomata",
     "Advanced settings" : "Altanivela agordo",
     "Saving..." : "Konservado...",
-    "Export" : "Eksporti",
     "Add to favorites" : "Aldoni al pliŝatataĵoj",
     "Remove from favorites" : "Malpliŝatigi",
     "Favorites" : "Plej ŝatataj",

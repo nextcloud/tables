@@ -47,7 +47,6 @@ OC.L10N.register(
     "Sort" : "Trefnu",
     "Automatic" : "Awtomatig",
     "Saving..." : "Yn cadw...",
-    "Export" : "Allforio",
     "Favorites" : "Ffefrynnau",
     "group" : "grŵp",
     "Created at" : "Crëwyd ar",

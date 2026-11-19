@@ -43,7 +43,6 @@ OC.L10N.register(
     "Automatic" : "Automatic",
     "Advanced settings" : "Configurationes avantiate",
     "Saving..." : "Salveguardante...",
-    "Export" : "Exportar",
     "Favorites" : "Favoritos",
     "group" : "gruppo",
     "Share link" : "Divulgar ligamine",

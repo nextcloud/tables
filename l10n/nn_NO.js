@@ -64,7 +64,6 @@ OC.L10N.register(
     "Automatic" : "Automatisk",
     "Advanced settings" : "Avanserte innstillingar",
     "Saving..." : "Lagrar …",
-    "Export" : "Eksporter",
     "Add to favorites" : "Legg til i favorittar",
     "Copy" : "Kopier",
     "Favorites" : "Favorittar",

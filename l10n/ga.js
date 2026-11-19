@@ -572,7 +572,6 @@ OC.L10N.register(
     "Export scheme" : "Scéim onnmhairithe",
     "Delete application" : "Scrios iarratas",
     "Do you really want to delete the table \"{table}\"?" : "An bhfuil tú cinnte gur mhaith leat an tábla \"{table}\" a scriosadh?",
-    "Export" : "Easpórtáil",
     "Add to favorites" : "Cuir le ceanáin",
     "Remove from favorites" : "Bain ó cheanáin",
     "Archive table" : "Tábla cartlainne",

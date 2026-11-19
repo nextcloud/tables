@@ -52,7 +52,6 @@ OC.L10N.register(
     "Automatic" : "Automatesch",
     "Advanced settings" : "Erweidert Astellungen",
     "Saving..." : "Speicheren...",
-    "Export" : "Exportéieren",
     "Copy" : "Kopie",
     "Favorites" : "Favoriten",
     "group" : "Grupp",

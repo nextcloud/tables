@@ -388,7 +388,6 @@ OC.L10N.register(
     "Saving..." : "A guardar...",
     "Delete application" : "Excluir aplicativo",
     "Do you really want to delete the table \"{table}\"?" : "Você realmente deseja excluir a tabela \"{table}\"?",
-    "Export" : "Exportar",
     "Add to favorites" : "Adicionar aos favoritos",
     "Remove from favorites" : "Remover dos favoritos",
     "Archive table" : "Arquivar tabela",

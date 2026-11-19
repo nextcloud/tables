@@ -572,7 +572,6 @@ OC.L10N.register(
     "Export scheme" : "Ekspordi andmeskeema",
     "Delete application" : "Kustuta rakendus",
     "Do you really want to delete the table \"{table}\"?" : "Oled sa kindel, et soovid „{table}“ tabeli kustutada?",
-    "Export" : "Ekspordi",
     "Add to favorites" : "Lisa lemmikuks",
     "Remove from favorites" : "Eemalda lemmikutest",
     "Archive table" : "Arhiveeri tabel",

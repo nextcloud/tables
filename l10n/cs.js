@@ -399,7 +399,6 @@ OC.L10N.register(
     "Saving..." : "Ukládá se …",
     "Delete application" : "Smazat aplikaci",
     "Do you really want to delete the table \"{table}\"?" : "Opravdu chcete tabulku „{table}“ smazat?",
-    "Export" : "Exportovat",
     "Add to favorites" : "Přidat do oblíbených",
     "Remove from favorites" : "Odebrat z oblíbených",
     "Archive table" : "Archivovat tabulku",

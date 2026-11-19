@@ -216,7 +216,6 @@ OC.L10N.register(
     "Advanced settings" : "Paràmetres avançats",
     "Saving..." : "S'està desant...",
     "Do you really want to delete the table \"{table}\"?" : "Realment voleu suprimir la taula \"{table}\"?",
-    "Export" : "Exporta",
     "Add to favorites" : "Afegeix a preferits",
     "Remove from favorites" : "Suprimeix dels preferits",
     "Delete table" : "Suprimeix la taula",

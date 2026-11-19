@@ -283,7 +283,6 @@ OC.L10N.register(
     "Advanced settings" : "고급 설정",
     "Saving..." : "저장 중...",
     "Do you really want to delete the table \"{table}\"?" : "표 \"{table}\"을(를) 정말 삭제하겠습니까?",
-    "Export" : "내보내기",
     "Remove from favorites" : "즐겨찾기에서 삭제",
     "Delete table" : "표 삭제",
     "Copy" : "복사",

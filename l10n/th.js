@@ -56,7 +56,6 @@ OC.L10N.register(
     "Automatic" : "อัตโนมัติ",
     "Advanced settings" : "การตั้งค่าขั้นสูง",
     "Saving..." : "กำลังบันทึก...",
-    "Export" : "ส่งออก",
     "Add to favorites" : "เพิ่มในรายการโปรด",
     "Remove from favorites" : "เอาออกจากรายการโปรด",
     "Copy" : "คัดลอก",

@@ -250,7 +250,6 @@ OC.L10N.register(
     "Saving..." : "Salvataggio…",
     "Delete application" : "Elimina applicazione",
     "Do you really want to delete the table \"{table}\"?" : "Vuoi davvero eliminare la tabella \"{table}\"?",
-    "Export" : "Esporta",
     "Add to favorites" : "Aggiungi ai preferiti",
     "Remove from favorites" : "Rimuovi dai preferiti",
     "Delete table" : "Elimina tabella",

@@ -50,7 +50,6 @@ OC.L10N.register(
     "Automatic" : "Outomaties",
     "Advanced settings" : "Gevorderde instellings",
     "Saving..." : "Stoor tans…",
-    "Export" : "Voer uit",
     "Favorites" : "Gunstelinge",
     "group" : "Groep",
     "Can edit" : "Kan redigeer",

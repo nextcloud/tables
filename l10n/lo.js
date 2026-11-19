@@ -385,7 +385,6 @@ OC.L10N.register(
     "Saving..." : "ກຳລັງບັນທຶກ...",
     "Delete application" : "ລຶບແອັບພລິເຄຊັນ",
     "Do you really want to delete the table \"{table}\"?" : "ທ່ານຕ້ອງການລຶບຕາຕະລາງ \"{table}\" ແທ້ໆບໍ?",
-    "Export" : "ສົ່ງອອກ",
     "Add to favorites" : "ເພີ່ມລາຍການທີ່ມັກ",
     "Remove from favorites" : "ລຶບອອກຈາກລາຍການທີ່ມັກ",
     "Archive table" : "ຈັດເກັບຕາຕະລາງ",

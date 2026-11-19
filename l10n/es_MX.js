@@ -94,7 +94,6 @@ OC.L10N.register(
     "Automatic" : "Automático",
     "Advanced settings" : "Configuraciones avanzadas",
     "Saving..." : "Guardando...",
-    "Export" : "Exportar",
     "Add to favorites" : "Añadir a favoritos",
     "Remove from favorites" : "Eliminar de favoritos",
     "Copy" : "Copiar",

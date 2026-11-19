@@ -89,7 +89,6 @@ OC.L10N.register(
     "Automatic" : "Automātisks",
     "Advanced settings" : "Paplašināti iestatījumi",
     "Saving..." : "Saglabā...",
-    "Export" : "Izgūt",
     "Add to favorites" : "Pievienot izlasei",
     "Remove from favorites" : "Noņemt no izlases",
     "Copy" : "Kopēt",

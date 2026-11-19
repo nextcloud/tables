@@ -90,7 +90,6 @@ OC.L10N.register(
     "Automatic" : "Автомат",
     "Advanced settings" : "–ù–∞—Ä–∏–π–≤—á–∏–ª—Å–∞–Ω —Ç–æ—Ö–∏—Ä–≥–æ–æ",
     "Saving..." : "Хадгалж байна...",
-    "Export" : "–≠–∫—Å–ø–æ—Ä—Ç",
     "Add to favorites" : "Дуртайд нэмэх",
     "Remove from favorites" : "Дуртайнуудаас хасах",
     "Copy" : "—Ö—É—É–ª–∞—Ö",

@@ -93,7 +93,6 @@ OC.L10N.register(
     "Automatic" : "Автоматски",
     "Advanced settings" : "Напредни параметри",
     "Saving..." : "Зачувува ...",
-    "Export" : "Извези",
     "Add to favorites" : "Додади во фаворити",
     "Remove from favorites" : "Избриши од фаворити",
     "Copy" : "Копирај",

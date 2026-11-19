@@ -177,7 +177,6 @@ OC.L10N.register(
     "Automatic" : "Automatisch",
     "Advanced settings" : "Geavanceerde instellingen",
     "Saving..." : "Opslaan...",
-    "Export" : "Exporteren",
     "Add to favorites" : "Toevoegen aan favorieten",
     "Remove from favorites" : "Verwijder uit favorieten",
     "Archive table" : "Archiveer tabel",

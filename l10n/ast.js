@@ -191,7 +191,6 @@ OC.L10N.register(
     "Automatic" : "Automáticu",
     "Advanced settings" : "Configuración avanzada",
     "Saving..." : "Guardando…",
-    "Export" : "Esportar",
     "Add to favorites" : "Meter en Favoritos",
     "Remove from favorites" : "Quitar de Favoritos",
     "Delete table" : "Desaniciar la tabla",

@@ -164,7 +164,6 @@ OC.L10N.register(
     "Automatic" : "Tự động",
     "Advanced settings" : "Cài đặt nâng cao",
     "Saving..." : "Đang lưu...",
-    "Export" : "Xuất ra",
     "Favorites" : "Ưa thích",
     "Clear filter" : "Xóa bộ lọc",
     "Copy internal link to clipboard" : "Sao chép liên kết nội bộ vào bộ nhớ tạm",

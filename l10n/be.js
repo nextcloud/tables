@@ -199,7 +199,6 @@ OC.L10N.register(
     "Advanced settings" : "Пашыраныя налады",
     "Saving..." : "Захаванне…",
     "Do you really want to delete the table \"{table}\"?" : "Вы сапраўды хочаце выдаліць табліцу \"{table}\"?",
-    "Export" : "Экспарт",
     "Add to favorites" : "У абранае",
     "Remove from favorites" : "Выдаліць з абранага",
     "Delete table" : "Выдаліць табліцу",

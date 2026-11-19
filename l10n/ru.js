@@ -572,7 +572,6 @@ OC.L10N.register(
     "Export scheme" : "Экспорт схемы",
     "Delete application" : "Удалить приложение",
     "Do you really want to delete the table \"{table}\"?" : "Удалить таблицу «{table}»?",
-    "Export" : "Экспорт",
     "Add to favorites" : "Добавить в избранное",
     "Remove from favorites" : "Убрать из избранного",
     "Archive table" : "Архивировать таблицу",

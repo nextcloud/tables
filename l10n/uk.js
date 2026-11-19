@@ -490,7 +490,6 @@ OC.L10N.register(
     "Saving..." : "Збереження...",
     "Delete application" : "Вилучити застосунок",
     "Do you really want to delete the table \"{table}\"?" : "Дійсно вилучити таблицю \"{table}\"?",
-    "Export" : "Експорт",
     "Add to favorites" : "Додати зірочку",
     "Remove from favorites" : "Прибрати зірочку",
     "Archive table" : "Архівувати таблицю",

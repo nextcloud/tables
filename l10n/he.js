@@ -128,7 +128,6 @@ OC.L10N.register(
     "Automatic" : "אוטומטי",
     "Advanced settings" : "הגדרות מתקדמות",
     "Saving..." : "מתבצעת שמירה…",
-    "Export" : "ייצוא",
     "Copy" : "העתקה",
     "Favorites" : "מועדפים",
     "Clear filter" : "מחיקת מסנן",

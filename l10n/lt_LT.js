@@ -530,7 +530,6 @@ OC.L10N.register(
     "Saving..." : "Įrašoma...",
     "Delete application" : "Ištrinti paraišką",
     "Do you really want to delete the table \"{table}\"?" : "Ar tikrai norite ištrinti lentelę „{table}“?",
-    "Export" : "Eksportuoti",
     "Add to favorites" : "Pridėti į mėgstamus",
     "Remove from favorites" : "Šalinti iš svarbiausių",
     "Archive table" : "Archyvuoti lentelę",

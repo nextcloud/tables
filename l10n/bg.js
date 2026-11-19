@@ -222,7 +222,6 @@ OC.L10N.register(
     "Advanced settings" : "Допълнителни настройки",
     "Saving..." : "Записване...",
     "Do you really want to delete the table \"{table}\"?" : "Наистина ли искате да изтриете таблицата \"{table}\"?",
-    "Export" : "Експорт /изнасям/",
     "Add to favorites" : "Добавяне към любими",
     "Remove from favorites" : "Премахване от любими",
     "Delete table" : "Изтриване на таблица",

@@ -572,7 +572,6 @@ OC.L10N.register(
     "Export scheme" : "Export scheme",
     "Delete application" : "Delete application",
     "Do you really want to delete the table \"{table}\"?" : "Do you really want to delete the table \"{table}\"?",
-    "Export" : "Export",
     "Add to favorites" : "Add to favourites",
     "Remove from favorites" : "Remove from favourites",
     "Archive table" : "Archive table",

@@ -303,7 +303,6 @@ OC.L10N.register(
     "Saving..." : "保存中...",
     "Delete application" : "アプリケーションの削除",
     "Do you really want to delete the table \"{table}\"?" : "本当にテーブル\"{table}\"を削除しますか？",
-    "Export" : "エクスポート",
     "Add to favorites" : "お気に入りに追加",
     "Remove from favorites" : "お気に入りから削除",
     "Archive table" : "テーブルをアーカイブする",

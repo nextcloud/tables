@@ -246,7 +246,6 @@ OC.L10N.register(
     "Advanced settings" : "Ezarpen aurreratuak",
     "Saving..." : "Gordetzen...",
     "Do you really want to delete the table \"{table}\"?" : "Benetan ezabatu nahi al duzu \"{table}\" taula?",
-    "Export" : "Esportatu",
     "Add to favorites" : "Gehitu gogokoetara",
     "Remove from favorites" : "Kendu gogokoetatik",
     "Archive table" : "Artxibatu taula",

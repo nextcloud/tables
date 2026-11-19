@@ -572,7 +572,6 @@ OC.L10N.register(
     "Export scheme" : "Eksportér skema",
     "Delete application" : "Slet applikation",
     "Do you really want to delete the table \"{table}\"?" : "Vil du virkelig slette tabellen \"{table}\"?",
-    "Export" : "Eksportér",
     "Add to favorites" : "Tilføj til favoritter",
     "Remove from favorites" : "Fjern fra favoritter",
     "Archive table" : "Arkiver tabel",
