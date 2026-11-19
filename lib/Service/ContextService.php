@@ -680,7 +680,8 @@ class ContextService {
 	 * Imports an application of a user's data that holds the given table. Its menu keeps
 	 * the links, the items for its pages and the items for the table, found by the uuid
 	 * it was exported with. Items for other tables and for views of the application are
-	 * left out, as each table brings its own copy of the application.
+	 * left out, as each table brings its own copy of the application. Without a menu, or
+	 * when none of its items is kept, the menu gets the item that opens the start page.
 	 *
 	 * @param Table $table
 	 * @param array $context
@@ -809,8 +810,8 @@ class ContextService {
 			$this->logger->warning('An imported application had no start page; it gets a new one.');
 			$startPageId = $this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_SLUG, $slugs, true), array_values($nodeRelMap));
 		}
-		$this->menuItemMapper->insert(MenuItem::forStartPage($newContext->getId(), $startPageId));
 
+		$menuKept = false;
 		if (is_array($context['menu'] ?? null)) {
 			$tableRelation = reset($sourceRelMap);
 			$this->logSkippedMenuItems($this->menuService->import(
@@ -821,6 +822,10 @@ class ContextService {
 					: throw new BadRequestError('Its ' . $kind . ' ' . $uuid . ' is not the table of this copy: the account import brings one table per copy of the application.'),
 				static fn (int $pageId): ?int => ($pageMap[$pageId] ?? null)?->getId(),
 			));
+			$menuKept = $this->menuItemMapper->findByContextId($newContext->getId()) !== [];
+		}
+		if (!$menuKept) {
+			$this->menuItemMapper->insert(MenuItem::forStartPage($newContext->getId(), $startPageId));
 		}
 
 		return $newContext;
