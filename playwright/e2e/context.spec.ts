@@ -205,6 +205,28 @@ test.describe('Manage a context', () => {
 		await expect(page.locator('li', { hasText: contextTitle })).toBeHidden()
 	})
 
+	test('Delete context from the edit dialog', async ({ userPage: { page } }) => {
+		const contextTitle = 'test application delete in dialog'
+		const errors: string[] = []
+		page.on('console', message => {
+			if (message.type() === 'error' && message.text().startsWith('TypeError')) {
+				errors.push(message.text())
+			}
+		})
+
+		await setupContextAndNavigate(page, contextTitle)
+		await openContextEditModal(page, contextTitle)
+		const dialog = page.getByRole('dialog', { name: 'Edit application' })
+		await dialog.getByRole('button', { name: 'Delete', exact: true }).last().click()
+		const deleteResponse = page.waitForResponse(r => r.url().includes('/apps/tables/api/2/contexts/') && r.request().method() === 'DELETE')
+		await dialog.getByRole('button', { name: 'I really want to delete this application!' }).click()
+		expect((await deleteResponse).ok()).toBeTruthy()
+
+		await expect(dialog).toBeHidden({ timeout: 10000 })
+		await expect(page.locator('[data-cy="navigationContextItem"]').filter({ hasText: contextTitle })).toBeHidden({ timeout: 15000 })
+		expect(errors).toEqual([])
+	})
+
 	test('Remove context resource', async ({ userPage: { page } }) => {
 		const contextTitle = 'test application resource'
 		const tableTitle = 'test table resource'

@@ -207,7 +207,7 @@ export default {
 			this.showInNavigationDefault = this.getNavDisplay(context)
 		},
 		getNavDisplay(context) {
-			const shares = Object.keys(context.sharing || {})
+			const shares = Object.keys(context?.sharing || {})
 			if (shares.length) {
 				const displayMode = context.sharing[shares[0]].display_mode_default
 				return displayMode !== 0
