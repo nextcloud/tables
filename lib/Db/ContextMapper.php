@@ -278,6 +278,22 @@ class ContextMapper extends QBMapper {
 	}
 
 	/**
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function findIdsOwnedByUser(string $userId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('owner_type', $qb->createNamedParameter(Application::OWNER_TYPE_USER, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('owner_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+		$result = $qb->executeQuery();
+		$ids = array_map(static fn (array $row): int => (int)$row['id'], $result->fetchAllAssociative());
+		$result->closeCursor();
+		return $ids;
+	}
+
+	/**
 	 * Fetch a map of id → name for the given context IDs.
 	 *
 	 * @param int[] $ids
