@@ -160,4 +160,20 @@ describe('GridCanvas', () => {
 			})
 		})
 	})
+
+	it('arranges a nested canvas whenever the canvas around it does, however narrow it is', () => {
+		cy.viewport(1400, 800)
+		const gridNarrow = ref(false)
+		cy.mount(() => h('div', { style: 'width: 600px' }, [h(GridCanvas, { layout, editable: true }, { widget: ({ item, narrow }) => h('span', { 'data-cy': 'slotWidget', 'data-narrow': String(narrow) }, item.widgetId) })]), {
+			global: { provide: { gridNarrow: gridNarrow } },
+		})
+
+		cy.get('[data-cy="slotWidget"]').first().should('have.attr', 'data-narrow', 'false')
+		cy.get('[data-cy="gridNarrowHint"]').should('not.exist')
+		cy.get('[data-cy="gridItem"][gs-id="w2"]').should('have.attr', 'gs-w', '6')
+
+		cy.then(() => { gridNarrow.value = true })
+		cy.get('[data-cy="slotWidget"]').first().should('have.attr', 'data-narrow', 'true')
+		cy.get('[data-cy="gridNarrowHint"]').should('not.exist')
+	})
 })
