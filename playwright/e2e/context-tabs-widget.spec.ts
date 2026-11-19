@@ -56,13 +56,25 @@ test.describe('Tabs widget', () => {
 		await page.keyboard.press('Enter')
 		await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
 		await expect(page.locator('[data-cy="tabsWidget"] [data-cy="gridWidget"]').getByRole('heading', { name: tableTitle })).toBeVisible({ timeout: 30000 })
-		await expect(page.getByText('In the first tab')).toHaveCount(0)
+		await expect(page.getByText('In the first tab')).toBeHidden()
 
 		// A table with a description shows it behind a button
 		const toggle = page.locator('[data-cy="collapsibleDescriptionToggle"]')
 		await expect(toggle).toHaveAttribute('aria-expanded', 'false')
 		await toggle.click()
 		await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+		// Going back and forth keeps the table of a tab, it is not loaded again
+		let reloaded = false
+		page.on('request', request => {
+			if (request.method() === 'GET' && /\/row\/table\/\d+/.test(request.url())) {
+				reloaded = true
+			}
+		})
+		await tabs.nth(0).click()
+		await tabs.nth(1).click()
+		await expect(page.locator('[data-cy="tabsWidget"] [data-cy="gridWidget"]').getByRole('heading', { name: tableTitle })).toBeVisible()
+		expect(reloaded).toBe(false)
 	})
 
 	test('A widget is added to a tab in edit mode and stays there after a reload', async ({ userPage: { page, user } }) => {

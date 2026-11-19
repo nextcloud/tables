@@ -21,23 +21,26 @@
 					class="tabs-widget__tab"
 					:class="{ 'tabs-widget__tab--active': index === activeTab }"
 					:aria-selected="index === activeTab ? 'true' : 'false'"
-					:aria-controls="panelId"
+					:aria-controls="visitedTabs.includes(index) ? panelId(index) : undefined"
 					:tabindex="index === focusTab ? 0 : -1"
 					data-cy="tabsWidgetTab"
 					@click="activeTab = index">
 					{{ title }}
 				</button>
 			</div>
-			<div :id="panelId"
+			<div v-for="index in visitedTabs"
+				v-show="index === activeTab"
+				:id="panelId(index)"
+				:key="index"
 				role="tabpanel"
 				class="tabs-widget__panel"
-				:aria-labelledby="tabId(activeTab)">
-				<GridLevel :key="activeTab" :parent-key="widget.key" :tab="activeTab" />
+				:aria-labelledby="tabId(index)">
+				<GridLevel :parent-key="widget.key" :tab="index" />
 				<NcButton v-if="editable"
 					variant="secondary"
 					class="tabs-widget__add"
 					data-cy="tabsWidgetAdd"
-					@click="grid.addToTab(widget, activeTab)">
+					@click="grid.addToTab(widget, index)">
 					<template #icon>
 						<Plus :size="20" />
 					</template>
@@ -97,15 +100,14 @@ export default {
 		return {
 			activeTab: 0,
 			focusedTab: null,
+			// A tab is mounted when it is first opened and kept, so its widgets keep their state
+			visitedTabs: [0],
 			instance: ++instances,
 		}
 	},
 	computed: {
 		titles() {
 			return tabTitles(this.settings)
-		},
-		panelId() {
-			return 'tabs-widget-panel-' + this.instance
 		},
 		// The tab in the tab order: the one last moved to with the keyboard, else the open one
 		focusTab() {
@@ -117,9 +119,13 @@ export default {
 			if (this.activeTab >= titles.length) {
 				this.activeTab = Math.max(0, titles.length - 1)
 			}
+			this.visitedTabs = this.visitedTabs.filter(index => index < Math.max(1, titles.length))
 		},
-		activeTab() {
+		activeTab(index) {
 			this.focusedTab = null
+			if (!this.visitedTabs.includes(index)) {
+				this.visitedTabs = [...this.visitedTabs, index]
+			}
 		},
 	},
 	methods: {
@@ -129,6 +135,13 @@ export default {
 		 */
 		tabId(index) {
 			return 'tabs-widget-' + this.instance + '-tab-' + index
+		},
+		/**
+		 * @param {number} index position of a tab
+		 * @return {string} the id of its panel
+		 */
+		panelId(index) {
+			return 'tabs-widget-panel-' + this.instance + '-' + index
 		},
 		/**
 		 * Moves the focus between tabs with the arrow keys, Home and End.
