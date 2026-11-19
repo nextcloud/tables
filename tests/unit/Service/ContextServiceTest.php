@@ -53,6 +53,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
 	private MockObject $menuItemMapper;
+	private MockObject $menuService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -77,6 +78,7 @@ final class ContextServiceTest extends TestCase {
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->menuItemMapper = $this->createMock(MenuItemMapper::class);
+		$this->menuService = $this->createMock(MenuService::class);
 
 		$this->service = new ContextService(
 			$this->contextMapper,
@@ -97,7 +99,7 @@ final class ContextServiceTest extends TestCase {
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->menuItemMapper,
-			$this->createMock(MenuService::class),
+			$this->menuService,
 		);
 	}
 
@@ -920,6 +922,39 @@ final class ContextServiceTest extends TestCase {
 		))->willReturnArgument(0);
 
 		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
+	}
+
+	public static function importedMenus(): array {
+		return [
+			'a menu of which an item is kept' => [true, 0],
+			'a menu of which no item is kept' => [false, 1],
+		];
+	}
+
+	/**
+	 * @dataProvider importedMenus
+	 */
+	public function testAnImportedApplicationGetsTheStartPageItemOnlyWhenItsMenuKeepsNoItem(bool $kept, int $seeded): void {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 9;
+			return $context;
+		});
+		$this->contextMapper->method('findById')->willReturn(new Context());
+		$this->contextNodeRelMapper->method('insert')->willReturnArgument(0);
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 80;
+			return $page;
+		});
+		$menu = [['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']]];
+		$this->menuService->expects($this->once())->method('import')->with($this->anything(), $menu)->willReturn([]);
+		$this->menuItemMapper->method('findByContextId')->with(9)->willReturn($kept ? [new MenuItem()] : []);
+		$this->menuItemMapper->expects($this->exactly($seeded))->method('insert')->with($this->callback(
+			static fn (MenuItem $item): bool => [$item->getContextId(), $item->getPageId()] === [9, 80],
+		))->willReturnArgument(0);
+
+		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
+			['id' => 1, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
+		], 'menu' => $menu], 4);
 	}
 
 	public function testAFailedImportIsRolledBack(): void {
