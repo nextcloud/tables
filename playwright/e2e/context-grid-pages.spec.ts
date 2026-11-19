@@ -272,4 +272,22 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.locator('[data-cy="editRowModal"]')).toBeVisible()
 		await expect(page.locator('[data-cy="gridPage"]')).toBeVisible()
 	})
+
+	test('An application opened on its own address keeps the page that is picked', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid standalone table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid standalone app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Standalone page')
+
+		await page.goto(`/index.php/apps/tables/app/${contextId}`)
+		await expect(page.locator('[data-cy="contextPageBar"]')).toBeVisible({ timeout: 30000 })
+		await page.locator('[data-cy="contextPageLink"]', { hasText: 'Standalone page' }).click()
+		await expect(page).toHaveURL(new RegExp(`/application/${contextId}/page/${pageId}$`))
+		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Standalone page')
+
+		await page.locator('[data-cy="contextPageAdd"]').click()
+		await page.locator('[data-cy="contextPageForm"]').getByRole('textbox', { name: 'Title' }).fill('Added standalone')
+		await page.locator('[data-cy="contextPageSubmit"]').click()
+		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Added standalone')
+		await expect(page.locator('[data-cy="contextPageLink"]', { hasText: 'Added standalone' })).toHaveAttribute('aria-selected', 'true')
+	})
 })

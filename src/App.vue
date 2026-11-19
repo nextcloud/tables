@@ -84,9 +84,9 @@ export default {
 			const url = generateUrl('/apps/tables/')
 
 			try {
-				if (loadState('tables', 'contextId', undefined)) {
-					// prepare route, when Context is opened from navigation bar
-					const contextId = loadState('tables', 'contextId', undefined)
+				const contextId = loadState('tables', 'contextId', undefined)
+				// prepare route, when Context is opened from navigation bar; its pages and rows stay
+				if (contextId && !this.isOnContext(currentRoute, contextId)) {
 					const originalUrl = window.location.href
 					this.$router.replace('/application/' + contextId).catch(() => { })
 					// reverts turning /apps/tables/app/28 into /apps/tables/app/28#/application/28
@@ -141,6 +141,14 @@ export default {
 				appContent.focus()
 				appContent.tabIndex = oldTabIndex
 			}
+		},
+		/**
+		 * @param {object|undefined} route a route
+		 * @param {number|string} contextId the id of an application
+		 * @return {boolean} whether the route is on that application
+		 */
+		isOnContext(route, contextId) {
+			return !!route?.path.startsWith('/application/') && String(route.params.contextId) === String(contextId)
 		},
 		switchActiveMenuEntry(targetElement) {
 			targetElement = targetElement?.tagName?.toLowerCase() === 'a' ? targetElement.parentElement : targetElement
