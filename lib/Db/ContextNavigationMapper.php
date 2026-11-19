@@ -16,6 +16,8 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<ContextNavigation> */
 class ContextNavigationMapper extends QBMapper {
+	private const DB_CHUNK_SIZE = 1_000;
+
 	protected string $table = 'tables_contexts_navigation';
 
 	public function __construct(IDBConnection $db) {
@@ -40,7 +42,7 @@ class ContextNavigationMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
 			->where($qb->expr()->in('share_id', $qb->createParameter('shareIds')));
-		foreach (array_chunk($shareIds, 1000) as $chunk) {
+		foreach (array_chunk($shareIds, self::DB_CHUNK_SIZE) as $chunk) {
 			$qb->setParameter('shareIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeStatement();
 		}
