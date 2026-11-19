@@ -5,7 +5,7 @@
 <template>
 	<div>
 		<ElementTitle v-model:view-setting="localViewSetting" :active-element="table" :show-title="showTitle" />
-		<CollapsibleDescription v-if="collapseDescription" :description="table.description ?? ''" />
+		<CollapsibleDescription v-if="collapseDescription" :description="table.description ?? ''" :title="table.title" />
 		<TableDescription v-else :description="table.description" :read-only="true" />
 		<DataTable v-model:view-setting="localViewSetting" :show-options="false" :table="table" :columns="columns" :rows="rows"
 			@create-column="$emit('create-column')"

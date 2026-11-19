@@ -6,15 +6,18 @@
 	<div v-if="description.trim() !== ''" class="collapsible-description" data-cy="collapsibleDescription">
 		<NcButton variant="tertiary"
 			:aria-expanded="open ? 'true' : 'false'"
-			:aria-controls="panelId"
+			:aria-controls="opened ? panelId : undefined"
 			data-cy="collapsibleDescriptionToggle"
-			@click="open = !open">
+			@click="toggle">
 			<template #icon>
 				<InformationOutline :size="20" />
 			</template>
-			{{ open ? t('tables', 'Hide description') : t('tables', 'Show description') }}
+			{{ t('tables', 'Description of {title}', { title }, undefined, { escape: false }) }}
 		</NcButton>
-		<div v-if="open" :id="panelId" class="collapsible-description__panel">
+		<div v-if="opened"
+			v-show="open"
+			:id="panelId"
+			class="collapsible-description__panel">
 			<TableDescription :description="description" :read-only="true" />
 		</div>
 	</div>
@@ -43,12 +46,25 @@ export default {
 			type: String,
 			default: '',
 		},
+		// The title of the table or view, which names the button
+		title: {
+			type: String,
+			default: '',
+		},
 	},
 	data() {
 		return {
 			open: false,
+			// The panel stays once it was opened, so its editor is built once
+			opened: false,
 			panelId: 'collapsible-description-' + (++instances),
 		}
+	},
+	methods: {
+		toggle() {
+			this.open = !this.open
+			this.opened = true
+		},
 	},
 }
 </script>
