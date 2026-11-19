@@ -3,9 +3,9 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<section class="grid-widget"
+	<component :is="hasHeading ? 'section' : 'div'"
+		class="grid-widget"
 		:aria-labelledby="hasHeading ? headingId : undefined"
-		:aria-label="hasHeading ? undefined : label"
 		data-cy="gridWidget">
 		<header v-if="hasHeading || editable"
 			class="grid-widget__header"
@@ -14,7 +14,9 @@
 				<NamedIcon v-if="widget.icon" :name="widget.icon" :size="20" />
 				<span class="grid-widget__title-text">{{ label }}</span>
 			</h2>
-			<NcActions v-if="editable" :aria-label="t('tables', 'Widget actions')" :force-menu="true">
+			<NcActions v-if="editable"
+				ref="actions"
+				:aria-label="t('tables', 'Actions for {label}', { label })" :force-menu="true">
 				<NcActionButton v-if="isKnownType" :close-after-click="true" @click="$emit('configure', widget)">
 					<template #icon>
 						<CogOutline :size="20" />
@@ -30,9 +32,10 @@
 				<NcActionSeparator v-if="arrangeable" />
 				<NcActionButton v-for="step in arrangeable ? layoutSteps : []"
 					:key="step.key"
+					:ref="'step' + step.key"
 					:disabled="step.disabled"
 					:data-cy="'widget' + step.key"
-					@click="$emit('move', widget, step.change)">
+					@click="move(step)">
 					<template #icon>
 						<component :is="step.icon" :size="20" />
 					</template>
@@ -40,6 +43,9 @@
 				</NcActionButton>
 			</NcActions>
 		</header>
+		<p v-if="editable" class="hidden-visually" aria-live="polite" data-cy="gridWidgetAnnouncement">
+			{{ announcement }}
+		</p>
 		<p v-if="widget.description" class="grid-widget__description" data-cy="gridWidgetDescription">
 			{{ widget.description }}
 		</p>
@@ -49,12 +55,12 @@
 				{{ t('tables', 'Unknown widget type "{type}"', { type: widget.type }) }}
 			</p>
 		</div>
-	</section>
+	</component>
 </template>
 
 <script>
 import { computed } from 'vue'
-import { translate as t } from '@nextcloud/l10n'
+import { isRTL, translate as t } from '@nextcloud/l10n'
 import { NcActionButton, NcActions, NcActionSeparator } from '@nextcloud/vue'
 import ArrowCollapseHorizontal from 'vue-material-design-icons/ArrowCollapseHorizontal.vue'
 import ArrowCollapseVertical from 'vue-material-design-icons/ArrowCollapseVertical.vue'
@@ -127,6 +133,13 @@ export default {
 		},
 	},
 	emits: ['configure', 'remove', 'move'],
+	data() {
+		return {
+			// Read out after a step from the menu, once the widget is at its new place
+			announcement: '',
+			movedStep: null,
+		}
+	},
 	computed: {
 		...mapState(useTablesStore, ['widgetTypes', 'tables', 'views']),
 		// The same in view and edit mode, so the widgets keep their size; without a title the edit
@@ -172,9 +185,13 @@ export default {
 		},
 		layoutSteps() {
 			const item = this.layoutItem
+			// In a right-to-left language the grid is mirrored, so left is towards the higher columns
+			const left = isRTL() ? 1 : -1
+			const atStart = item?.gridX <= 0
+			const atEnd = item?.gridX + item?.gridWidth >= GRID_COLUMNS
 			return [
-				{ key: 'MoveLeft', icon: 'ArrowLeft', label: t('tables', 'Move left'), change: { gridX: -1 }, disabled: item?.gridX <= 0 },
-				{ key: 'MoveRight', icon: 'ArrowRight', label: t('tables', 'Move right'), change: { gridX: 1 }, disabled: item?.gridX + item?.gridWidth >= GRID_COLUMNS },
+				{ key: 'MoveLeft', icon: 'ArrowLeft', label: t('tables', 'Move left'), change: { gridX: left }, disabled: left < 0 ? atStart : atEnd },
+				{ key: 'MoveRight', icon: 'ArrowRight', label: t('tables', 'Move right'), change: { gridX: -left }, disabled: left < 0 ? atEnd : atStart },
 				{ key: 'MoveUp', icon: 'ArrowUp', label: t('tables', 'Move up'), change: { gridY: -1 }, disabled: item?.gridY <= 0 },
 				{ key: 'MoveDown', icon: 'ArrowDown', label: t('tables', 'Move down'), change: { gridY: 1 }, disabled: false },
 				{ key: 'Wider', icon: 'ArrowExpandHorizontal', label: t('tables', 'Make wider'), change: { gridWidth: 1 }, disabled: item?.gridWidth >= GRID_COLUMNS },
@@ -184,12 +201,55 @@ export default {
 			]
 		},
 	},
+	watch: {
+		layoutItem(item) {
+			if (!this.movedStep || !item) {
+				return
+			}
+			const step = this.movedStep
+			this.movedStep = null
+			this.announcement = t('tables', 'Column {column}, row {row}, {width} columns wide and {height} rows high', {
+				column: item.gridX + 1,
+				row: item.gridY + 1,
+				width: item.gridWidth,
+				height: item.gridHeight,
+			})
+			this.$nextTick(() => this.focusStep(step))
+		},
+	},
 	created() {
 		// The type titles come from the server, loaded the first time a grid shows a widget
 		this.loadWidgetTypes()
 	},
 	methods: {
 		...mapActions(useTablesStore, ['loadWidgetTypes']),
+		/**
+		 * Asks the page to move or resize the widget by one step of the menu.
+		 *
+		 * @param {{key: string, change: object}} step the step
+		 */
+		move(step) {
+			this.movedStep = step.key
+			this.$emit('move', this.widget, step.change)
+		},
+		/**
+		 * Keeps focus on a step of the open menu, so pressing Enter again repeats it. The menu
+		 * focuses its first action after it renders unless an action is marked active, as its own
+		 * keyboard navigation does, so the step is marked and becomes the start of that navigation.
+		 *
+		 * @param {string} key the key of the step
+		 */
+		focusStep(key) {
+			const button = this.$refs['step' + key]?.[0]?.$el?.querySelector('button')
+			const actions = this.$refs.actions
+			if (!button || !actions?.$refs.menu) {
+				return
+			}
+			actions.$refs.menu.querySelector('li.active')?.classList.remove('active')
+			button.closest('li.action')?.classList.add('active')
+			actions.focusIndex = [...actions.getFocusableMenuItemElements()].indexOf(button)
+			button.focus()
+		},
 	},
 }
 </script>
@@ -243,6 +303,7 @@ export default {
 		margin: 0;
 		padding: var(--default-grid-baseline) calc(3 * var(--default-grid-baseline));
 		color: var(--color-text-maxcontrast);
+		white-space: pre-wrap;
 	}
 
 	&__body {
