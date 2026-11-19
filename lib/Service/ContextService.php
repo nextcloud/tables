@@ -161,11 +161,7 @@ class ContextService {
 			}
 			$this->insertPage($context);
 
-			$startPageItem = new MenuItem();
-			$startPageItem->setContextId($context->getId());
-			$startPageItem->setOrder(0);
-			$startPageItem->setPageId((int)array_key_first($context->getPages()));
-			$this->menuItemMapper->insert($startPageItem);
+			$this->menuItemMapper->insert(MenuItem::forStartPage($context->getId(), (int)array_key_first($context->getPages())));
 		}, $this->dbc);
 		$this->auditLogService->log(Operation::ContextCreated, 'Tables application with ID %s was created for user %s', [
 			'contextId' => $context->getId(),
@@ -708,7 +704,8 @@ class ContextService {
 	}
 
 	/**
-	 * Inserts an exported application with its node relations, pages and page contents.
+	 * Inserts an exported application with its node relations, pages and page contents,
+	 * and a menu that opens its start page.
 	 *
 	 * @throws Exception
 	 */
@@ -750,7 +747,7 @@ class ContextService {
 		$pageMap = [];
 		$pages = $this->importablePages(is_array($context['pages'] ?? null) ? $context['pages'] : []);
 		$slugs = $this->importedPageSlugs($pages);
-		$hasStartPage = false;
+		$startPageId = null;
 		foreach ($pages as $pageKey => $pageArr) {
 			$page = new Page();
 			$page->setContextId($newContext->getId());
@@ -764,7 +761,9 @@ class ContextService {
 				$page->setSlug($slugs[$pageKey]);
 				$page = $this->pageMapper->insert($page);
 			}
-			$hasStartPage = $hasStartPage || $page->getPageType() === Page::TYPE_STARTPAGE;
+			if ($startPageId === null && $page->getPageType() === Page::TYPE_STARTPAGE) {
+				$startPageId = $page->getId();
+			}
 			if ($page->getPageType() === Page::TYPE_GRID && trim((string)$page->getTitle()) === '') {
 				// a grid page is named by its title, so it never stays without one
 				$page->resetUpdatedFields();
@@ -799,10 +798,11 @@ class ContextService {
 			$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $sourceRelMap);
 		}
 
-		if (!$hasStartPage) {
+		if ($startPageId === null) {
 			$this->logger->warning('An imported application had no start page; it gets a new one.');
-			$this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_SLUG, $slugs, true), array_values($nodeRelMap));
+			$startPageId = $this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_SLUG, $slugs, true), array_values($nodeRelMap));
 		}
+		$this->menuItemMapper->insert(MenuItem::forStartPage($newContext->getId(), $startPageId));
 
 		return $newContext;
 	}
@@ -812,9 +812,10 @@ class ContextService {
 	 * tables and views. It is named `dashboard` unless an imported page took that name.
 	 *
 	 * @param list<ContextNodeRelation> $nodeRelations
+	 * @return int the id of the start page
 	 * @throws Exception
 	 */
-	private function insertImportedStartPage(int $contextId, bool $startPageNameTaken, array $nodeRelations): void {
+	private function insertImportedStartPage(int $contextId, bool $startPageNameTaken, array $nodeRelations): int {
 		$page = new Page();
 		$page->setContextId($contextId);
 		$page->setPageType(Page::TYPE_STARTPAGE);
@@ -831,6 +832,7 @@ class ContextService {
 			$pageContent->setOrder(10 * ($i + 1));
 			$this->pageContentMapper->insert($pageContent);
 		}
+		return $page->getId();
 	}
 
 	/**
