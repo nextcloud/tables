@@ -300,9 +300,9 @@ class ContextController extends AOCSController {
 	/**
 	 * [api v2] Preview the changes that would be applied to a context scheme
 	 *
-	 * When the scheme carries a `menu`, the changes hold `menu` with the current menu under
-	 * `from`, the items an import would save under `to` and the items it would skip, with
-	 * the reason, under `skipped`.
+	 * When the scheme carries a `menu` with items, the changes hold `menu` with the current
+	 * menu under `from`, the items an import would save under `to` and the items it would
+	 * skip, with the reason, under `skipped`.
 	 *
 	 * @param int $contextId ID of the context
 	 * @psalm-param TablesContext $updateScheme New scheme of the context

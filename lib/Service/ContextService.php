@@ -1125,7 +1125,7 @@ class ContextService {
 			}
 		}
 
-		if (is_array($updateScheme['menu'] ?? null)) {
+		if (is_array($updateScheme['menu'] ?? null) && $updateScheme['menu'] !== []) {
 			$changes['menu'] = ['from' => $currentScheme->getMenu()] + $this->menuService->previewSchemeImport(
 				$context,
 				$updateScheme['menu'],
