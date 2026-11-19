@@ -5,7 +5,7 @@
 <template>
 	<div>
 		<ElementTitle v-model:view-setting="localViewSetting" :active-element="view" :is-table="false" :show-title="showTitle" />
-		<CollapsibleDescription v-if="collapseDescription" :description="view.description ?? ''" />
+		<CollapsibleDescription v-if="collapseDescription" :description="view.description ?? ''" :title="view.title" />
 		<TableDescription v-else :description="view.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="view" />
