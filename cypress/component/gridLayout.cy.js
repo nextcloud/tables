@@ -16,6 +16,7 @@ import {
 	nextFreeRow,
 	nodeTarget,
 	pageToGrid,
+	sortedLayout,
 	targetTitle,
 	trimText,
 	widgetTarget,
@@ -139,6 +140,16 @@ describe('grid layout', () => {
 	it('places a new widget below the lowest one', () => {
 		expect(nextFreeRow([])).to.equal(0)
 		expect(nextFreeRow([{ gridY: 0, gridHeight: 2 }, { gridY: 3, gridHeight: 4 }, { gridY: 1 }])).to.equal(7)
+	})
+
+	it('sorts a layout by row, then by column, without changing it', () => {
+		const layout = [
+			{ widgetId: 'c', gridX: 6, gridY: 2 },
+			{ widgetId: 'b', gridX: 6, gridY: 0 },
+			{ widgetId: 'a', gridX: 0, gridY: 0 },
+		]
+		expect(sortedLayout(layout).map(item => item.widgetId)).to.deep.equal(['a', 'b', 'c'])
+		expect(layout[0].widgetId).to.equal('c')
 	})
 
 	it('shows 12, 6 or 1 columns by canvas width', () => {

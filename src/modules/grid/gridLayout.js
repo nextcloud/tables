@@ -118,6 +118,16 @@ export function nextFreeRow(layout) {
 }
 
 /**
+ * The layout in reading order: by row, then by column.
+ *
+ * @param {Array} layout layout items
+ * @return {Array} a sorted copy
+ */
+export function sortedLayout(layout) {
+	return [...layout].sort((a, b) => (a.gridY - b.gridY) || (a.gridX - b.gridX))
+}
+
+/**
  * How many columns the grid shows on a canvas of this width: 12 on a wide one, 6 on a
  * medium one and one on a phone.
  *
