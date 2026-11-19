@@ -27,7 +27,7 @@
 
 			<div :id="pagePanelId"
 				role="tabpanel"
-				:aria-labelledby="selectedPageId !== null ? 'context-page-tab-' + selectedPageId : undefined">
+				:aria-labelledby="selectedPageId !== null ? pageTabId(selectedPageId) : undefined">
 				<template v-if="activePageId !== null">
 					<GridPage v-if="activePage"
 						:key="activePage.id"
@@ -88,7 +88,7 @@ import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
 import ContextPageBar from '../modules/grid/ContextPageBar.vue'
 import GridPage from '../modules/grid/GridPage.vue'
 import ContextPageForm from '../modules/modals/ContextPageForm.vue'
-import { contextPages, isStartPage, pageTitle } from '../modules/grid/gridLayout.js'
+import { contextPages, isStartPage, pageTabId, pageTitle } from '../modules/grid/gridLayout.js'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
 import { getDialogBuilder, showError } from '@nextcloud/dialogs'
@@ -127,6 +127,7 @@ export default {
 			pageLoading: false,
 			pageFormOpen: false,
 			pageFormPending: false,
+			pagePanelId: 'context-page-panel',
 			pageBeingEdited: null,
 		}
 	},
@@ -143,9 +144,6 @@ export default {
 				return this.activePageId
 			}
 			return contextPages(this.activeContext).find(isStartPage)?.id ?? null
-		},
-		pagePanelId() {
-			return 'context-page-panel'
 		},
 		canManage() {
 			return this.ownsContext(this.activeContext)
@@ -230,6 +228,7 @@ export default {
 	},
 
 	methods: {
+		pageTabId,
 		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView', 'loadContextPage', 'createContextPage', 'updateContextPage', 'deleteContextPage']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		contextSignature() {

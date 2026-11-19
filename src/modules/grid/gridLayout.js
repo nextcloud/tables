@@ -118,6 +118,14 @@ export function nextFreeRow(layout) {
 }
 
 /**
+ * @param {number} pageId id of a page of an application
+ * @return {string} the id of its tab in the page bar
+ */
+export function pageTabId(pageId) {
+	return 'context-page-tab-' + pageId
+}
+
+/**
  * The layout in reading order: by row, then by column.
  *
  * @param {Array} layout layout items

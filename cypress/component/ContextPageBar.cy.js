@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import ContextPageBar from '../../src/modules/grid/ContextPageBar.vue'
+import { pageTabId } from '../../src/modules/grid/gridLayout.js'
 
 const context = {
 	id: 1,
@@ -30,6 +31,7 @@ describe('ContextPageBar', () => {
 		cy.get('[role="tab"]').eq(1).should('contain.text', 'Overview').and('have.attr', 'aria-selected', 'false')
 		cy.get('[role="tab"]').eq(2).should('contain.text', 'Later')
 		cy.get('[role="tab"]').each(tab => expect(tab).to.have.attr('aria-controls', 'panel'))
+		cy.get('[role="tab"]').eq(0).should('have.attr', 'id', pageTabId(3))
 	})
 
 	it('has one tab stop and moves between tabs with the arrow keys, Home and End', () => {
