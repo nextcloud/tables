@@ -172,11 +172,19 @@
 						<li class="preview-card__meta-title">
 							{{ t('tables', 'To') }}:
 						</li>
-						<li v-for="(column, index) in previewData.nodes.to" :key="index">
+						<li v-for="(column, index) in nodesTo" :key="index">
 							{{ column.node_title }}
 						</li>
 					</ul>
 				</div>
+				<ul v-if="importNodes && refusedNodes.length > 0" class="preview-card__meta" data-cy="importSchemeNodesRefused">
+					<li class="preview-card__meta-title">
+						{{ t('tables', 'Not available here, so the import will be refused') }}:
+					</li>
+					<li v-for="node in refusedNodes" :key="node.index">
+						{{ node.title || node.uuid }}
+					</li>
+				</ul>
 			</div>
 		</div>
 
@@ -313,7 +321,22 @@ export default {
 		},
 
 		importedNodes() {
-			return this.importNodes ? this.previewData.nodes.to : this.previewData.nodes.from
+			return this.importNodes ? this.nodesTo : this.previewData.nodes.from
+		},
+
+		// the nodes of the scheme, without those of new tables that are switched off
+		nodesTo() {
+			const leftOut = new Set()
+			for (const item of this.addTablesConfig.filter(item => !item.included)) {
+				leftOut.add(item.table.uuid)
+				for (const view of item.table.views ?? []) {
+					leftOut.add(view.uuid)
+				}
+			}
+			return (this.previewData.nodes.to ?? []).filter(node => !leftOut.has(node.node_uuid))
+		},
+		refusedNodes() {
+			return this.previewData.nodes.unresolved ?? []
 		},
 	},
 
@@ -463,7 +486,7 @@ export default {
 							.filter(item => item.included)
 							.map(item => ({uuid: item.uuid, ...item.tableSubmitPayload})),
 				},
-				nodes: this.importNodes ? this.previewData.nodes.to : this.previewData.nodes.from,
+				nodes: this.importNodes ? this.nodesTo : this.previewData.nodes.from,
 			}
 			// without a menu the import leaves the menu of the application as it is
 			if (this.importMenu && this.menuPreview) {
