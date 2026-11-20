@@ -47,7 +47,7 @@ use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
  * @method setRowsCount(int $rowsCount)
  * @method getColumnsCount(): int
  * @method setColumnsCount(int $columnsCount)
- * @method getViews(): ?array<TablesView>
+ * @method ?array<View> getViews()
  * @method setViews(array $views)
  * @method getColumns(): array
  * @method setColumns(array $columns)
@@ -171,7 +171,7 @@ class Table extends EntitySuper implements JsonSerializable {
 	 * @return TablesView[]
 	 */
 	private function getViewsArray(): array {
-		return $this->getViews() ?: [];
+		return array_map(static fn (View $view): array => $view->jsonSerialize(), $this->getViews() ?: []);
 	}
 
 	/**

@@ -45,7 +45,6 @@
     "Automatic" : "Avtomatik",
     "Advanced settings" : "İrəliləmiş quraşdırmalar",
     "Saving..." : "Saxlama...",
-    "Export" : "Çıxarış",
     "Copy" : "Kopyala",
     "Favorites" : "Sevimlilər",
     "group" : "qrup",
@@ -59,6 +58,8 @@
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç",
+    "Calendar" : "Təqvim",
+    "Folder" : "Qovluq",
     "This year" : "Bu il",
     "seconds ago" : "saniyələr öncə"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

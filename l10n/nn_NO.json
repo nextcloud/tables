@@ -62,7 +62,6 @@
     "Automatic" : "Automatisk",
     "Advanced settings" : "Avanserte innstillingar",
     "Saving..." : "Lagrar …",
-    "Export" : "Eksporter",
     "Add to favorites" : "Legg til i favorittar",
     "Copy" : "Kopier",
     "Favorites" : "Favorittar",
@@ -84,6 +83,8 @@
     "Page" : "Side",
     "Content" : "Innhald",
     "Select" : "Vel",
+    "Calendar" : "Kalendar",
+    "Folder" : "Mappe",
     "ID" : "ID",
     "seconds ago" : "sekund sidan"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

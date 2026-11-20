@@ -117,7 +117,7 @@ test.describe('Manage a context', () => {
 		const updateResponse = page.waitForResponse(r => r.url().includes('/apps/tables/') && r.request().method() === 'PUT')
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 		await updateResponse
-		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible({ timeout: 10000 })
+		await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible({ timeout: 10000 })
 
 		await loadContext(page, contextTitle)
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible({ timeout: 10000 })
@@ -171,7 +171,7 @@ test.describe('Manage a context', () => {
 		const updateDeleteResponse = page.waitForResponse(r => r.url().includes('/apps/tables/') && r.request().method() === 'PUT')
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 		await updateDeleteResponse
-		await expect(page.locator('[class*="toast_success"]').first()).toBeVisible({ timeout: 10000 })
+		await expect(page.locator('.toast-success, [class*="toast_success"]').first()).toBeVisible({ timeout: 10000 })
 
 		// verify that context was deleted from current user
 		const contextNavItem = page.locator('[data-cy="navigationContextItem"]').filter({ hasText: contextTitle }).first()
@@ -203,6 +203,28 @@ test.describe('Manage a context', () => {
 		await login(page, nonLocalUser)
 		await page.goto('/index.php/apps/tables')
 		await expect(page.locator('li', { hasText: contextTitle })).toBeHidden()
+	})
+
+	test('Delete context from the edit dialog', async ({ userPage: { page } }) => {
+		const contextTitle = 'test application delete in dialog'
+		const errors: string[] = []
+		page.on('console', message => {
+			if (message.type() === 'error' && message.text().startsWith('TypeError')) {
+				errors.push(message.text())
+			}
+		})
+
+		await setupContextAndNavigate(page, contextTitle)
+		await openContextEditModal(page, contextTitle)
+		const dialog = page.getByRole('dialog', { name: 'Edit application' })
+		await dialog.getByRole('button', { name: 'Delete', exact: true }).last().click()
+		const deleteResponse = page.waitForResponse(r => r.url().includes('/apps/tables/api/2/contexts/') && r.request().method() === 'DELETE')
+		await dialog.getByRole('button', { name: 'I really want to delete this application!' }).click()
+		expect((await deleteResponse).ok()).toBeTruthy()
+
+		await expect(dialog).toBeHidden({ timeout: 10000 })
+		await expect(page.locator('[data-cy="navigationContextItem"]').filter({ hasText: contextTitle })).toBeHidden({ timeout: 15000 })
+		expect(errors).toEqual([])
 	})
 
 	test('Remove context resource', async ({ userPage: { page } }) => {

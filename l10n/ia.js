@@ -43,7 +43,6 @@ OC.L10N.register(
     "Automatic" : "Automatic",
     "Advanced settings" : "Configurationes avantiate",
     "Saving..." : "Salveguardante...",
-    "Export" : "Exportar",
     "Favorites" : "Favoritos",
     "group" : "gruppo",
     "Share link" : "Divulgar ligamine",
@@ -58,6 +57,8 @@ OC.L10N.register(
     "Copy link" : "Copiar ligamine",
     "Confirm" : "Confirmar",
     "Select" : "Selectionar",
+    "Calendar" : "Calendario",
+    "Folder" : "Dossier",
     "This month" : "Iste mense",
     "This week" : "Iste septimana",
     "seconds ago" : "secundas passate"

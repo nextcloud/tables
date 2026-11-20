@@ -64,7 +64,6 @@ OC.L10N.register(
     "Automatic" : "Automatisk",
     "Advanced settings" : "Avanserte innstillingar",
     "Saving..." : "Lagrar …",
-    "Export" : "Eksporter",
     "Add to favorites" : "Legg til i favorittar",
     "Copy" : "Kopier",
     "Favorites" : "Favorittar",
@@ -86,6 +85,8 @@ OC.L10N.register(
     "Page" : "Side",
     "Content" : "Innhald",
     "Select" : "Vel",
+    "Calendar" : "Kalendar",
+    "Folder" : "Mappe",
     "ID" : "ID",
     "seconds ago" : "sekund sidan"
 },

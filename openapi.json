@@ -3019,6 +3019,13 @@
                                 "properties": {
                                     "permissionType": {
                                         "type": "string",
+                                        "enum": [
+                                            "read",
+                                            "create",
+                                            "update",
+                                            "delete",
+                                            "manage"
+                                        ],
                                         "description": "Permission type that should be changed"
                                     },
                                     "permissionValue": {
@@ -3566,7 +3573,9 @@
                                         "type": "string",
                                         "enum": [
                                             "user",
-                                            "group"
+                                            "group",
+                                            "circle",
+                                            "remote"
                                         ],
                                         "description": "Receiver type"
                                     },

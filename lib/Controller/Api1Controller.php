@@ -562,7 +562,7 @@ class Api1Controller extends ApiController {
 	 * @param int $nodeId Node ID
 	 * @param 'table'|'view'|'context' $nodeType Node type
 	 * @param string $receiver Receiver ID
-	 * @param 'user'|'group' $receiverType Receiver type
+	 * @param 'user'|'group'|'circle'|'remote' $receiverType Receiver type
 	 * @param bool $permissionRead Permission if receiver can read data
 	 * @param bool $permissionCreate Permission if receiver can create data
 	 * @param bool $permissionUpdate Permission if receiver can update data
@@ -659,7 +659,7 @@ class Api1Controller extends ApiController {
 	 * Update a share permission
 	 *
 	 * @param int $shareId Share ID
-	 * @param string $permissionType Permission type that should be changed
+	 * @param 'read'|'create'|'update'|'delete'|'manage' $permissionType Permission type that should be changed
 	 * @param bool $permissionValue New permission value
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *

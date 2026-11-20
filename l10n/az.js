@@ -47,7 +47,6 @@ OC.L10N.register(
     "Automatic" : "Avtomatik",
     "Advanced settings" : "İrəliləmiş quraşdırmalar",
     "Saving..." : "Saxlama...",
-    "Export" : "Çıxarış",
     "Copy" : "Kopyala",
     "Favorites" : "Sevimlilər",
     "group" : "qrup",
@@ -61,6 +60,8 @@ OC.L10N.register(
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç",
+    "Calendar" : "Təqvim",
+    "Folder" : "Qovluq",
     "This year" : "Bu il",
     "seconds ago" : "saniyələr öncə"
 },

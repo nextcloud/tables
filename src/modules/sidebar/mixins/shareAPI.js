@@ -4,7 +4,6 @@
  */
 import axios from '@nextcloud/axios'
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
-import '@nextcloud/dialogs/style.css'
 import displayError from '../../../shared/utils/displayError.js'
 import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
 import { useTablesStore } from '../../../store/store.js'

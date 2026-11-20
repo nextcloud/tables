@@ -56,7 +56,6 @@ OC.L10N.register(
     "Layout" : "Raspored",
     "Automatic" : "Automatski",
     "Saving..." : "Spremanje...",
-    "Export" : "Izvezi",
     "Copy" : "Kopiraj",
     "Favorites" : "Favoriti",
     "group" : "grupa",
@@ -73,6 +72,8 @@ OC.L10N.register(
     "Copy link" : "Kopiraj vezu",
     "Page" : "Stranica",
     "Content" : "Sadržaj",
-    "Select" : "Izaberi"
+    "Select" : "Izaberi",
+    "Calendar" : "Kalendar",
+    "Folder" : "Fasikla"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

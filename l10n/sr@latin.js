@@ -58,7 +58,6 @@ OC.L10N.register(
     "Layout" : "Raspored",
     "Automatic" : "Automatski",
     "Saving..." : "Upisujem...",
-    "Export" : "Izvezi",
     "Copy" : "Kopiraj",
     "Favorites" : "Omiljene",
     "group" : "grupa",

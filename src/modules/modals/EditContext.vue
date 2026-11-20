@@ -71,7 +71,6 @@
 import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
-import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
@@ -208,7 +207,7 @@ export default {
 			this.showInNavigationDefault = this.getNavDisplay(context)
 		},
 		getNavDisplay(context) {
-			const shares = Object.keys(context.sharing || {})
+			const shares = Object.keys(context?.sharing || {})
 			if (shares.length) {
 				const displayMode = context.sharing[shares[0]].display_mode_default
 				return displayMode !== 0

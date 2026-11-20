@@ -50,7 +50,6 @@
     "Automatic" : "Automatesch",
     "Advanced settings" : "Erweidert Astellungen",
     "Saving..." : "Speicheren...",
-    "Export" : "Exportéieren",
     "Copy" : "Kopie",
     "Favorites" : "Favoriten",
     "group" : "Grupp",
@@ -63,6 +62,11 @@
     "Copy link" : "Link kopéieren",
     "Confirm" : "Konfirméieren",
     "Select" : "Auswielen",
+    "Bookmark" : "Lieszeechen",
+    "Calendar" : "Kalenner",
+    "Camera" : "Kamera",
+    "Folder" : "Dossier",
+    "Key" : "Schlëssel",
     "seconds ago" : "Sekonnen hier"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
