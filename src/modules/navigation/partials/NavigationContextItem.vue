@@ -57,6 +57,7 @@
 </template>
 <script>
 import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
+import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'

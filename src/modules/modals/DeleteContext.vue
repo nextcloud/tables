@@ -19,6 +19,7 @@
 
 import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showSuccess } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 

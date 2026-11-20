@@ -142,6 +142,7 @@ import Account from 'vue-material-design-icons/AccountOutline.vue'
 import moment from '@nextcloud/moment'
 import { showWarning } from '@nextcloud/dialogs'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
+import '@nextcloud/dialogs/style.css'
 
 export default {
 	components: {

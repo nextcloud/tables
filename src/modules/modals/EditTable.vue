@@ -90,6 +90,7 @@
 <script>
 import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
