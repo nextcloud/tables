@@ -22,7 +22,7 @@ const READY_PORT = Number.parseInt(process.env.PLAYWRIGHT_READY_PORT ?? '18089',
 let readyServer = null
 
 async function start() {
-	let branch = process.env.SERVER_BRANCH || 'stable33'
+	let branch = process.env.SERVER_BRANCH || 'stable34'
 
 	if (!branch) {
 		const appinfo = readFileSync('appinfo/info.xml').toString()
@@ -30,7 +30,7 @@ async function start() {
 			/<nextcloud min-version="\d+" max-version="(\d\d+)" \/>/,
 		)?.[1]
 
-		branch = 'stable33'
+		branch = 'stable34'
 		if (maxVersion) {
 			const refs = execSync('git ls-remote --refs').toString('utf-8')
 			branch = refs.includes(`refs/heads/stable${maxVersion}`)
@@ -138,7 +138,7 @@ process.on('SIGTERM', stop)
 const ip = await start()
 await waitOnNextcloud(ip)
 
-const serverBranch = process.env.SERVER_BRANCH || 'stable33'
+const serverBranch = process.env.SERVER_BRANCH || 'stable34'
 const vendoredBranch = serverBranch === 'master' ? 'main' : serverBranch
 
 await configureNextcloud(['tables'], vendoredBranch)
