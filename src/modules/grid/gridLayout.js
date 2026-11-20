@@ -357,6 +357,21 @@ export function newTabKey(tabs = []) {
 }
 
 /**
+ * Whether a required setting still needs a value, by the same rule as the server: a list of
+ * tabs needs at least one tab and a title for each, any other setting a text that is not blank.
+ *
+ * @param {object} setting the schema of the setting
+ * @param {Array|string|null|undefined} value its value
+ * @return {boolean} whether it is still empty
+ */
+export function isMissingSetting(setting, value) {
+	if (setting.type === 'tabs') {
+		return !Array.isArray(value) || value.length === 0 || value.some(tab => isBlank(tab?.title))
+	}
+	return isBlank(value)
+}
+
+/**
  * Moves the widgets of the tabs a tabs widget no longer has onto the page, below the widgets
  * there. The widgets of one tab keep their places relative to each other.
  *

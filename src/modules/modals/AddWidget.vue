@@ -86,7 +86,7 @@ import { mapActions, mapState } from 'pinia'
 import SchemaForm from '../grid/SchemaForm.vue'
 import IconField from '../../shared/components/ncIconPicker/IconField.vue'
 import { useTablesStore } from '../../store/store.js'
-import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isBlank, requiredLabel, trimText } from '../grid/gridLayout.js'
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isMissingSetting, requiredLabel, trimText } from '../grid/gridLayout.js'
 import { WIDGET_TYPE_TABS, getWidgetComponent } from '../grid/widgetRegistry.js'
 
 /**
@@ -179,7 +179,7 @@ export default {
 			}
 			const missing = this.hasSource && !this.nodeOption ? [t('tables', 'Table or view')] : []
 			for (const [name, setting] of Object.entries(this.widgetType.settings)) {
-				if (setting.required && isBlank(this.settings[name])) {
+				if (setting.required && isMissingSetting(setting, this.settings[name])) {
 					missing.push(setting.title)
 				}
 			}
