@@ -469,7 +469,7 @@
                     "id",
                     "contextId",
                     "pageType",
-                    "technicalName",
+                    "slug",
                     "title",
                     "icon",
                     "description",
@@ -488,7 +488,7 @@
                     "pageType": {
                         "type": "string"
                     },
-                    "technicalName": {
+                    "slug": {
                         "type": "string"
                     },
                     "title": {
@@ -1541,6 +1541,9 @@
                     },
                     "required": {
                         "type": "boolean"
+                    },
+                    "hint": {
+                        "type": "string"
                     }
                 }
             },
@@ -15063,11 +15066,11 @@
                                         "default": null,
                                         "description": "New title"
                                     },
-                                    "technicalName": {
+                                    "slug": {
                                         "type": "string",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "New technical name"
+                                        "description": "Slug of the page; it never changes, so only the current slug is accepted"
                                     },
                                     "icon": {
                                         "type": "string",
@@ -15166,7 +15169,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid page field or widget, a widget id that is not on the page, or too many widgets",
+                        "description": "Invalid page field or widget, a slug other than the one of the page, a widget id that is not on the page, or too many widgets",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -16265,10 +16268,10 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages/{technicalName}": {
+        "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages/{slug}": {
             "get": {
-                "operationId": "context_page-show-by-technical-name",
-                "summary": "[api v2] Get a page of an application by its technical name",
+                "operationId": "context_page-show-by-slug",
+                "summary": "[api v2] Get a page of an application by its slug",
                 "tags": [
                     "context_page"
                 ],
@@ -16292,9 +16295,9 @@
                         }
                     },
                     {
-                        "name": "technicalName",
+                        "name": "slug",
                         "in": "path",
-                        "description": "Technical name of the page",
+                        "description": "Slug of the page",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -16452,7 +16455,7 @@
         },
         "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages": {
             "post": {
-                "operationId": "context_page-create",
+                "operationId": "context_page-create-grid-page",
                 "summary": "[api v2] Add a grid page to an application",
                 "tags": [
                     "context_page"
@@ -16479,11 +16482,11 @@
                                         "type": "string",
                                         "description": "Title of the page"
                                     },
-                                    "technicalName": {
+                                    "slug": {
                                         "type": "string",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "Technical name of the page, unique in the application; `page_<id>` when left out, a form reserved for automatic names"
+                                        "description": "Slug of the page, unique in the application and never changed; `page_<id>` when left out, a form reserved for automatic names"
                                     },
                                     "icon": {
                                         "type": "string",
@@ -16556,7 +16559,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid title, icon or description, or an invalid or taken technical name",
+                        "description": "Invalid title, icon or description, or an invalid or taken slug",
                         "content": {
                             "application/json": {
                                 "schema": {
