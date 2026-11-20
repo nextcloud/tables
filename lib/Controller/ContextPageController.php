@@ -95,7 +95,7 @@ class ContextPageController extends AOCSController {
 	 *
 	 * @param int $contextId ID of the application
 	 * @param string $title Title of the page
-	 * @param string|null $slug Slug of the page, unique in the application; `page_<id>` when left out, a form reserved for automatic names
+	 * @param string|null $slug Slug of the page, unique in the application and never changed; `page_<id>` when left out, a form reserved for automatic names
 	 * @param string|null $icon Name of the icon shown with the title
 	 * @param string|null $description Description of the page
 	 * @return DataResponse<Http::STATUS_OK, TablesPage, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
@@ -109,9 +109,9 @@ class ContextPageController extends AOCSController {
 	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'context', idParam: 'contextId')]
 	#[ApiRoute(verb: 'POST', url: '/api/2/contexts/{contextId}/pages', requirements: ['contextId' => '\d+'])]
-	public function create(int $contextId, string $title, ?string $slug = null, ?string $icon = null, ?string $description = null): DataResponse {
+	public function createGridPage(int $contextId, string $title, ?string $slug = null, ?string $icon = null, ?string $description = null): DataResponse {
 		try {
-			return new DataResponse($this->pageService->create($contextId, $title, $slug, $icon, $description));
+			return new DataResponse($this->pageService->createGridPage($contextId, $title, $slug, $icon, $description));
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (NotFoundError $e) {
@@ -136,7 +136,7 @@ class ContextPageController extends AOCSController {
 	 * @param int $contextId ID of the application
 	 * @param int $pageId ID of the page
 	 * @param string|null $title New title
-	 * @param string|null $slug New slug
+	 * @param string|null $slug Slug of the page; it never changes, so only the current slug is accepted
 	 * @param string|null $icon New icon name, empty to remove it
 	 * @param string|null $description New description, empty to remove it
 	 * @param list<TablesWidgetInput>|null $widgets All widgets of the page
@@ -144,7 +144,7 @@ class ContextPageController extends AOCSController {
 	 * @return DataResponse<Http::STATUS_OK, TablesPage, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_CONFLICT|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Page updated
-	 * 400: Invalid page field or widget, a widget id that is not on the page, or too many widgets
+	 * 400: Invalid page field or widget, a slug other than the one of the page, a widget id that is not on the page, or too many widgets
 	 * 403: No permissions
 	 * 404: Not found
 	 * 409: The page was saved by someone else since the given version

@@ -139,7 +139,7 @@ class PageServiceTest extends TestCase {
 			return $page;
 		});
 
-		$page = $this->service->create(7, ' Planning ', null, 'star', ' Next steps ');
+		$page = $this->service->createGridPage(7, ' Planning ', null, 'star', ' Next steps ');
 
 		$this->assertSame([9, Page::TYPE_GRID, 'page_9', 'Planning', 'star', 'Next steps', []], [
 			$page['id'], $page['pageType'], $page['slug'], $page['title'], $page['icon'], $page['description'], $page['widgets'],
@@ -155,10 +155,10 @@ class PageServiceTest extends TestCase {
 			return $page;
 		});
 
-		$this->assertSame('planning', $this->service->create(7, 'Planning', 'planning', null, null)['slug']);
+		$this->assertSame('planning', $this->service->createGridPage(7, 'Planning', 'planning', null, null)['slug']);
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage('The slug taken is already used');
-		$this->service->create(7, 'Planning', 'taken', null, null);
+		$this->service->createGridPage(7, 'Planning', 'taken', null, null);
 	}
 
 	public function testCreateInAnApplicationThatIsGoneIsNotFound(): void {
@@ -169,7 +169,7 @@ class PageServiceTest extends TestCase {
 		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
 
 		$this->expectException(NotFoundError::class);
-		$service->create(7, 'Planning', null, null, null);
+		$service->createGridPage(7, 'Planning', null, null, null);
 	}
 
 	public static function writesOfAPage(): array {
@@ -216,7 +216,7 @@ class PageServiceTest extends TestCase {
 	public function testAGridPageNeedsATitle(string $title): void {
 		$this->pageMapper->expects($this->never())->method('raiseVersion');
 		try {
-			$this->service->create(7, $title, null, null, null);
+			$this->service->createGridPage(7, $title, null, null, null);
 			$this->fail('A page was created without a title.');
 		} catch (BadRequestError $e) {
 			$this->assertStringContainsString('A page title needs 1 to 200 characters', $e->getMessage());
@@ -320,18 +320,18 @@ class PageServiceTest extends TestCase {
 			return $page;
 		});
 
-		$this->service->update(7, self::GRID_PAGE, 'Planning', 'planning', 'star', 'Next steps', null, null);
+		$this->service->update(7, self::GRID_PAGE, 'Planning', 'overview', 'star', 'Next steps', null, null);
 
-		$this->assertSame(['Planning', 'planning', 'star', 'Next steps'], $updated);
+		$this->assertSame(['Planning', 'overview', 'star', 'Next steps'], $updated);
 	}
 
-	public function testARenameToANameAConcurrentSaveTookIsReported(): void {
-		$this->pageMapper->method('raiseVersion')->willReturn(true);
-		$this->pageMapper->method('update')->willThrowException(DbErrorStub::uniqueViolation());
+	public function testTheSlugOfAPageCannotChange(): void {
+		$this->pageMapper->expects($this->never())->method('raiseVersion');
+		$this->pageMapper->expects($this->never())->method('update');
 
 		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('The slug planning is already used');
-		$this->service->update(7, self::GRID_PAGE, null, 'planning', null, null, null, null);
+		$this->expectExceptionMessage('The slug of a page cannot be changed.');
+		$this->service->update(7, self::GRID_PAGE, 'Planning', 'planning', null, null, null, null);
 	}
 
 	public function testAUniqueViolationWithoutARenameIsNotTakenForOne(): void {
@@ -345,7 +345,7 @@ class PageServiceTest extends TestCase {
 	public static function refusedSlugs(): array {
 		return [
 			'upper case' => ['Planning', 'A slug has 1 to 200 lower case letters'],
-			'reserved for another page' => ['page_5', 'The slug page_5 is reserved'],
+			'reserved for automatic names' => ['page_5', 'The slug page_5 is reserved'],
 		];
 	}
 
@@ -353,9 +353,11 @@ class PageServiceTest extends TestCase {
 	 * @dataProvider refusedSlugs
 	 */
 	public function testAnInvalidSlugIsRefused(string $slug, string $message): void {
+		$this->pageMapper->expects($this->never())->method('insert');
+
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage($message);
-		$this->service->update(7, self::GRID_PAGE, null, $slug, null, null, null, null);
+		$this->service->createGridPage(7, 'Planning', $slug, null, null);
 	}
 
 	public function testAPageKeepsItsOwnAutomaticName(): void {
