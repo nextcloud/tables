@@ -1346,7 +1346,8 @@ class ContextService {
 	 * Checks the pages of a scheme against an application of this instance. Pages follow
 	 * {@see self::pageSkipReason()}: the start page of the scheme is the start page of the
 	 * application, and a grid page is the grid page with its slug, or a new one,
-	 * which keeps that name unless the start page has it. A scheme brings at most {@see self::MAX_SCHEME_PAGES} pages. A widget is checked as the
+	 * which keeps that name unless the start page has it. An automatic `page_<id>` slug
+	 * names a page of the instance the scheme came from, so such a page is always new. A scheme brings at most {@see self::MAX_SCHEME_PAGES} pages. A widget is checked as the
 	 * API would save it, and the table or view it shows, named by uuid, must be a node of
 	 * the application once the nodes of the scheme are imported; a widget never adds a
 	 * node, and one whose table or view is not a node is kept without it. A widget that
@@ -1415,7 +1416,7 @@ class ContextService {
 					continue;
 				}
 				$pageId = $startPageId;
-			} elseif ($name !== null && isset($pageIdsByName[$name])) {
+			} elseif ($name !== null && !Page::isDefaultSlug($name) && isset($pageIdsByName[$name])) {
 				$pageId = $pageIdsByName[$name];
 			} elseif ($name !== null && !Page::isDefaultSlug($name) && !isset($takenNames[$name])) {
 				$slug = $name;
