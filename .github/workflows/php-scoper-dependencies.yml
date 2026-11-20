@@ -4,7 +4,9 @@ name: PHP Scoper Dependencies
 
 on:
   pull_request:
-    branches: main
+    branches:
+      - main
+      - stable[2-9]*
 
 permissions:
   contents: read
