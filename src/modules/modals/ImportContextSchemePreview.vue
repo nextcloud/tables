@@ -428,7 +428,7 @@ export default {
 			if (target.url !== undefined) {
 				return t('tables', 'Link: {url}', { url: target.url }, undefined, { escape: false })
 			}
-			if (target.page !== undefined || target.pageId !== undefined) {
+			if (target.page !== undefined) {
 				return t('tables', 'Page')
 			}
 			const isTable = target.table !== undefined

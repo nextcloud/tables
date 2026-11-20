@@ -59,7 +59,7 @@ describe('Import application scheme preview', () => {
 			...schemeMenu,
 			{ parent: null, title: 'Projects', displayTitle: 'Projects', icon: null, description: null, target: { url: 'https://projects.example.org' } },
 			{ parent: null, title: null, displayTitle: 'Projects', icon: null, description: null, target: { table: 'table-uuid' } },
-			{ parent: null, title: null, displayTitle: '', icon: null, description: null, target: { pageId: 4 } },
+			{ parent: null, title: null, displayTitle: '', icon: null, description: null, target: { page: 'dashboard' } },
 		]
 		mountPreview({ from: [], to, skipped: [] }, { from: [], to: [{ node_type: 0, node_uuid: 'table-uuid', node_title: 'Projects' }] })
 

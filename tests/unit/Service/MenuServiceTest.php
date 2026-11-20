@@ -406,7 +406,7 @@ class MenuServiceTest extends DatabaseTestCase {
 	}
 
 	public function testAMenuGoesThroughASchemeExportAndImport(): void {
-		[$contextId, $startPageId, $pageId, $nodeRelId] = $this->createApplication();
+		[$contextId, , $pageId, $nodeRelId] = $this->createApplication();
 		$group = $this->menuService->create($contextId, 'Links', 'star', 'Elsewhere', null, self::OWNER);
 		$site = $this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
 		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
@@ -418,17 +418,31 @@ class MenuServiceTest extends DatabaseTestCase {
 		$imported = $this->contextService->create('Imported', 'tables', '', [['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE]], self::OWNER, Application::OWNER_TYPE_USER);
 		$this->contextIds[] = $imported->getId();
 		$importedContext = $this->contextService->findById($imported->getId(), self::OWNER);
-		$pageIds = $this->menuService->schemePageIds($importedContext, $this->contextService->findById($contextId, self::OWNER)->getPages());
-		$menu = $this->menuService->withLocalPages($exported, $pageIds);
-		$this->contextService->importScheme($imported->getId(), 'Imported', 'tables', '', [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], self::OWNER, $menu);
+		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
+		$preview = $this->menuService->previewSchemeImport($importedContext, $exported, $this->contextService->getPagesWithWidgets($this->contextService->findById($contextId, self::OWNER)), $nodes);
+		$this->contextService->importScheme($imported->getId(), 'Imported', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
 
 		$shape = static fn (array $items): array => array_map(static fn (array $item): array => [$item['displayTitle'], $item['parent'], $item['target'], $item['icon']], $items);
 		$expected = $shape($exported);
 		unset($expected[4]);
 		$expected[0][0] = 'Imported';
-		$expected[0][2] = ['page' => $pageIds[$startPageId]];
 		$this->assertSame(array_values($expected), $shape($this->menuService->export($this->contextService->findById($imported->getId(), self::OWNER))));
-		$this->assertSame([$startPageId, 1], [$exported[0]['target']['page'], $exported[2]['parent']]);
+		$this->assertSame([['page' => 'dashboard'], 1], [$exported[0]['target'], $exported[2]['parent']]);
+		$this->assertSame(['page' => $this->contextService->findById($contextId, self::OWNER)->getPages()[$pageId]['slug']], $exported[4]['target']);
+	}
+
+	public function testTheSchemeExportOfAnApplicationImportsBackUnchanged(): void {
+		[$contextId, , $pageId, $nodeRelId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$before = array_column($this->menu($contextId), 'target');
+		$exported = $this->menuService->export($this->contextService->findById($contextId, self::OWNER));
+		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
+
+		$result = $this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $exported);
+
+		$this->assertSame([], $result['menuSkipped']);
+		$this->assertSame($before, array_column($this->menu($contextId), 'target'));
 	}
 
 	public function testAnExportLoadsTheTablesAndViewsOfItsItemsOnce(): void {
@@ -557,13 +571,13 @@ class MenuServiceTest extends DatabaseTestCase {
 	}
 
 	public function testAPreviewedItemStaysInItsGroupWhenAnItemBeforeItIsSkipped(): void {
-		[$contextId, $startPageId] = $this->createApplication();
+		[$contextId] = $this->createApplication();
 		$context = $this->contextService->findById($contextId, self::OWNER);
 		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
 		$menu = [
-			['title' => null, 'displayTitle' => 'Source application', 'target' => ['page' => $startPageId]],
+			['title' => null, 'displayTitle' => 'Source application', 'target' => ['page' => 'dashboard']],
 			['title' => 'Projects', 'target' => ['table' => self::TABLE_UUID]],
-			['title' => 'Gone', 'target' => ['page' => 999999999]],
+			['title' => 'Gone', 'target' => ['page' => 'gone']],
 			['title' => 'Group One', 'target' => null],
 			['title' => 'Group Two', 'target' => null],
 			['title' => 'Site', 'parent' => 3, 'target' => ['url' => 'https://nextcloud.com']],
@@ -603,7 +617,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$context = $this->contextService->findById($contextId, self::OWNER);
 		$name = $context->getPages()[$pageId]['slug'];
 
-		$this->assertSame([11 => $startPageId, 12 => $pageId], $this->menuService->schemePageIds($context, [
+		$this->assertSame(['home' => $startPageId, $name => $pageId], $this->menuService->schemePageIds($context, [
 			['id' => 11, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
 			['id' => 12, 'page_type' => Page::TYPE_GRID, 'slug' => $name],
 			['id' => 13, 'page_type' => Page::TYPE_GRID, 'slug' => 'somewhere_else'],
@@ -617,9 +631,9 @@ class MenuServiceTest extends DatabaseTestCase {
 		$link = ['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']];
 		return [
 			'not an object' => [['Reports'], 'It is not an object.'],
-			'a page that did not come along' => [[['target' => ['page' => 999999999]]], 'The application has no page 999999999.'],
-			'a page the application does not have' => [[['target' => ['pageId' => 999999999]]], 'The target of a menu item is {pageId} of a page or {nodeRelId} of a table or view of this application, or {url} of a link.'],
-			'a page by name' => [[['target' => ['page' => 'dashboard']]], 'Its target is not'],
+			'a page that did not come along' => [[['target' => ['page' => 'gone']]], 'The application has no page gone.'],
+			'a page id of the application' => [[['target' => ['pageId' => 999999999]]], 'Its target is not'],
+			'a page by id' => [[['target' => ['page' => 5]]], 'Its target is not'],
 			'a table that did not come along' => [[['target' => ['table' => 'f0000000-0000-4000-8000-000000000000']]], 'is not part of the application'],
 			'an unknown kind of target' => [[['title' => 'Row', 'target' => ['row' => 'x']]], 'Its target is not'],
 			'a link that is not http' => [[['target' => ['url' => 'ftp://nextcloud.com']]], 'A link is an http or https address'],

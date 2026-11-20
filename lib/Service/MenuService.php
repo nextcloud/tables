@@ -42,7 +42,7 @@ use OCP\IDBConnection;
  * permissions on it before a write; this class checks that an item belongs to it.
  *
  * @psalm-import-type TablesMenuItem from ResponseDefinitions
- * @psalm-type TablesMenuExportItem = array{parent: ?int, title: ?string, displayTitle: string, icon: ?string, description: ?string, target: array{page: int}|array{table: string}|array{view: string}|array{url: string}|null}
+ * @psalm-type TablesMenuExportItem = array{parent: ?int, title: ?string, displayTitle: string, icon: ?string, description: ?string, target: array{page: string}|array{table: string}|array{view: string}|array{url: string}|null}
  */
 class MenuService {
 	use TTransactional;
@@ -259,12 +259,17 @@ class MenuService {
 		if ($userId !== null && !$this->permissionsService->canManageContext($context, $userId)) {
 			$menu = self::forReader($menu);
 		}
+		$pages = $context->getPages() ?? [];
 		$positions = [];
 		$exported = [];
 		foreach ($menu as $item) {
 			$target = $item['target'];
 			if (isset($target['pageId'])) {
-				$target = ['page' => (int)$target['pageId']];
+				$slug = $pages[$target['pageId']]['slug'] ?? null;
+				if (!is_string($slug)) {
+					continue;
+				}
+				$target = ['page' => $slug];
 			} elseif (isset($target['nodeRelId'])) {
 				$node = $nodes[$target['nodeRelId']];
 				$entity = $nodesById[$node['node_type']][$node['node_id']] ?? null;
@@ -293,7 +298,7 @@ class MenuService {
 	 *
 	 * @param list<mixed> $exported
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
-	 * @param \Closure(int): ?int $pageIdOf
+	 * @param \Closure(string): ?int $pageIdOf
 	 * @return list<array{index: int, title: ?string, reason: string}>
 	 * @throws Exception
 	 */
@@ -322,8 +327,7 @@ class MenuService {
 	 * come along. An icon this instance does not have and a title or description that is
 	 * too long are left out instead, except for the title of a group, which is cut short. Entries past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th are not read
 	 * and are skipped with one record for all of them. `$pageIdOf`
-	 * gives the page of the application for an exported page id, or null; `{pageId}` is a
-	 * page of the application itself, see {@see self::withLocalPages()}. `$nodeRelIdOf`
+	 * gives the page of the application for the slug of an exported page, or null. `$nodeRelIdOf`
 	 * gives the node relation for the kind (`table` or `view`) and uuid, or null. A resolver
 	 * may throw a {@see BadRequestError} to skip the item with its own reason.
 	 * An item sits in the group at the position it names when that group came before it
@@ -331,7 +335,7 @@ class MenuService {
 	 *
 	 * @param list<mixed> $exported
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
-	 * @param \Closure(int): ?int $pageIdOf
+	 * @param \Closure(string): ?int $pageIdOf
 	 * @return array{items: list<array{item: MenuItem, entry: array<array-key, mixed>, index: int, parent: ?int}>, skipped: list<array{index: int, title: ?string, reason: string}>}
 	 */
 	public function readExported(Context $context, array $exported, \Closure $nodeRelIdOf, \Closure $pageIdOf): array {
@@ -393,13 +397,12 @@ class MenuService {
 	}
 
 	/**
-	 * The pages of an application that the pages of a scheme stand for, by exported id. A
-	 * scheme imported into an existing application has no other link between the two: its
-	 * start page is the start page of the application, and any other page is the page of the
-	 * same type with its slug.
+	 * The pages of an application that the pages of a scheme stand for, by the slug of the
+	 * scheme page. The start page of the scheme is the start page of the application, and
+	 * any other page is the page of the same type with its slug.
 	 *
 	 * @param array<array-key, mixed> $schemePages
-	 * @return array<int, int>
+	 * @return array<string, int>
 	 */
 	public function schemePageIds(Context $context, array $schemePages): array {
 		$startPageId = null;
@@ -414,13 +417,13 @@ class MenuService {
 
 		$pageIds = [];
 		foreach ($schemePages as $page) {
-			if (!is_array($page) || !is_int($page['id'] ?? null)) {
+			if (!is_array($page) || !is_string($page['slug'] ?? null) || isset($pageIds[$page['slug']])) {
 				continue;
 			}
 			$pageType = is_string($page['page_type'] ?? null) ? $page['page_type'] : '';
-			$pageId = $pageType === Page::TYPE_STARTPAGE ? $startPageId : ($pageIdsByName[$pageType][(string)($page['slug'] ?? '')] ?? null);
+			$pageId = $pageType === Page::TYPE_STARTPAGE ? $startPageId : ($pageIdsByName[$pageType][$page['slug']] ?? null);
 			if ($pageId !== null) {
-				$pageIds[$page['id']] = $pageId;
+				$pageIds[$page['slug']] = $pageId;
 			}
 		}
 		return $pageIds;
@@ -428,8 +431,8 @@ class MenuService {
 
 	/**
 	 * The menu a scheme import into this application would save, as the preview shows it and
-	 * as the import takes it back: page targets point at pages of the application and show
-	 * the title they get there, an item names its group by the group's position among the
+	 * as the import takes it back: page targets name the slug of the page of the application
+	 * they stand for and show the title they get there, an item names its group by the group's position among the
 	 * kept items, and only tables and views among the scheme's nodes count as having come
 	 * along.
 	 *
@@ -449,7 +452,7 @@ class MenuService {
 			$context,
 			$menu,
 			static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
-			static fn (int $pageId): ?int => $pageIds[$pageId] ?? null,
+			static fn (string $slug): ?int => $pageIds[$slug] ?? null,
 		);
 		$pages = $context->getPages() ?? [];
 		$positions = array_flip(array_column($items, 'index'));
@@ -457,37 +460,20 @@ class MenuService {
 			$entry = ['parent' => $item['parent'] === null ? null : $positions[$item['parent']]] + $item['entry'];
 			$pageId = $item['item']->getPageId();
 			if ($pageId !== null && isset($pages[$pageId])) {
+				$entry['target'] = ['page' => (string)$pages[$pageId]['slug']];
 				$entry['displayTitle'] = $item['item']->getTitle() ?? $pages[$pageId]['title'] ?? $context->getName();
 			}
 			return $entry;
 		}, $items);
-		return ['to' => $this->withLocalPages($entries, $pageIds), 'skipped' => $skipped];
+		return ['to' => $entries, 'skipped' => $skipped];
 	}
 
 	/**
-	 * Points the page targets of exported items at pages of this application, so that they
-	 * no longer depend on the scheme they came from.
+	 * The target of an exported item as the API takes it. `{page}` (a slug), `{table}` and
+	 * `{view}` are translated by the resolvers, which give pages and node relations of the
+	 * application; `{url}` is checked like the API checks a target.
 	 *
-	 * @param list<array<array-key, mixed>> $entries
-	 * @param array<int, int> $pageIds pages of the application by exported id
-	 * @return list<array<array-key, mixed>>
-	 */
-	public function withLocalPages(array $entries, array $pageIds): array {
-		return array_map(static function (array $entry) use ($pageIds): array {
-			$exportedId = $entry['target']['page'] ?? null;
-			if (is_int($exportedId) && isset($pageIds[$exportedId])) {
-				$entry['target'] = ['pageId' => $pageIds[$exportedId]];
-			}
-			return $entry;
-		}, $entries);
-	}
-
-	/**
-	 * The target of an exported item as the API takes it. `{page}`, `{table}` and `{view}`
-	 * are translated by the resolvers, which give pages and node relations of the
-	 * application; `{url}` and `{pageId}` are checked like the API checks a target.
-	 *
-	 * @param \Closure(int): ?int $pageIdOf
+	 * @param \Closure(string): ?int $pageIdOf
 	 * @param \Closure(string, string): ?int $nodeRelIdOf
 	 * @return array{pageId: int}|array{nodeRelId: int}|array{url: string}
 	 * @throws BadRequestError
@@ -496,13 +482,13 @@ class MenuService {
 		if (is_array($target) && count($target) === 1) {
 			$kind = (string)array_key_first($target);
 			$value = $target[$kind];
-			if ($kind === 'page' && is_int($value)) {
+			if ($kind === 'page' && is_string($value)) {
 				return ['pageId' => $pageIdOf($value) ?? throw new BadRequestError('The application has no page ' . $value . '.')];
 			}
 			if (($kind === 'table' || $kind === 'view') && is_string($value)) {
 				return ['nodeRelId' => $nodeRelIdOf($kind, $value) ?? throw new BadRequestError('Its ' . $kind . ' ' . $value . ' is not part of the application.')];
 			}
-			if ($kind === 'url' || $kind === 'pageId') {
+			if ($kind === 'url') {
 				return $this->validateTarget(MenuTarget::fromArray($target), $context);
 			}
 		}
