@@ -36,6 +36,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $contextNodeRelMapper;
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
+	private MockObject $permissionsService;
 	private MockObject $userManager;
 	private MockObject $auditLogService;
 
@@ -47,7 +48,7 @@ final class ContextServiceTest extends TestCase {
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
-		$permissionsService = $this->createMock(PermissionsService::class);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$dbConnection = $this->createMock(IDBConnection::class);
@@ -61,7 +62,7 @@ final class ContextServiceTest extends TestCase {
 			$this->pageMapper,
 			$this->pageContentMapper,
 			$logger,
-			$permissionsService,
+			$this->permissionsService,
 			$this->userManager,
 			$this->auditLogService,
 			$dbConnection,
@@ -247,6 +248,64 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(3, $nodeRelation->getPermissions());
 	}
 
+	public function testUpdateKeepsThePermissionsOfAKeptNodeWithoutPermissions(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([
+			101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 7],
+		]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->with(7, 'user-1')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->contextNodeRelMapper->expects($this->never())->method('update');
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [],
+				'removedNodes' => [],
+				'updatedNodes' => [],
+			]);
+
+		$updatedContext = $this->service->update(7, 'user-1', null, null, null, [
+			['id' => 11, 'type' => 0],
+		]);
+
+		self::assertSame(7, $updatedContext->getNodes()[101]['permissions']);
+	}
+
+	public function testUpdateRevokesThePermissionsOfAKeptNodeGivenZero(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([
+			101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 7],
+		]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->with(7, 'user-1')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$nodeRelation = new ContextNodeRelation();
+		$nodeRelation->id = 101;
+		$nodeRelation->setNodeType(0);
+		$nodeRelation->setNodeId(11);
+		$nodeRelation->setPermissions(7);
+		$this->contextNodeRelMapper->method('findById')->with(101)->willReturn($nodeRelation);
+		$this->contextNodeRelMapper->expects($this->once())->method('update')->with($nodeRelation)->willReturnArgument(0);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [],
+				'removedNodes' => [],
+				'updatedNodes' => [['nodeType' => 0, 'nodeId' => 11, 'previousPermissions' => 7, 'permissions' => 0]],
+			]);
+
+		$this->service->update(7, 'user-1', null, null, null, [
+			['id' => 11, 'type' => 0, 'permissions' => 0],
+		]);
+
+		self::assertSame(0, $nodeRelation->getPermissions());
+	}
+
 	public function testCreateLogsCriticalAction(): void {
 		$this->contextMapper->method('insert')->willReturnCallback(function (Context $context): Context {
 			$context->id = 9;
@@ -265,6 +324,35 @@ final class ContextServiceTest extends TestCase {
 			]);
 
 		$this->service->create('Projects', 'icon', '', [], 'alice', Application::OWNER_TYPE_USER);
+	}
+
+	public function testCreateGivesANodeWithoutPermissionsReadPermissions(): void {
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 9;
+			return $context;
+		});
+		$this->permissionsService->method('canManageNodeById')->with(0, 5, 'alice')->willReturn(true);
+		$insertedRelation = null;
+		$this->contextNodeRelMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(static function (ContextNodeRelation $relation) use (&$insertedRelation): ContextNodeRelation {
+				$relation->id = 101;
+				$insertedRelation = $relation;
+				return $relation;
+			});
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 1;
+			return $page;
+		});
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $pageContent): PageContent {
+			$pageContent->id = 501;
+			return $pageContent;
+		});
+
+		$this->service->create('Projects', 'icon', '', [['id' => 5, 'type' => 0]], 'alice', Application::OWNER_TYPE_USER);
+
+		self::assertInstanceOf(ContextNodeRelation::class, $insertedRelation);
+		self::assertSame(Application::PERMISSION_READ, $insertedRelation->getPermissions());
 	}
 
 	public function testDeleteLogsCriticalAction(): void {
