@@ -752,7 +752,7 @@ class ContextService {
 		}
 
 		// insert pages
-		$pageMap = [];
+		$pageIdsBySlug = [];
 		$pages = $this->importablePages(is_array($context['pages'] ?? null) ? $context['pages'] : []);
 		$slugs = $this->importedPageSlugs($pages);
 		$startPageId = null;
@@ -778,9 +778,8 @@ class ContextService {
 				$page->setTitle((string)$page->getSlug());
 				$this->pageMapper->update($page);
 			}
-			$exportedPageId = self::importedKey($pageArr['id'] ?? null);
-			if ($exportedPageId !== null) {
-				$pageMap[$exportedPageId] = $page;
+			if (is_string($pageArr['slug'] ?? null)) {
+				$pageIdsBySlug[$pageArr['slug']] ??= $page->getId();
 			}
 
 			// insert page conten
@@ -820,7 +819,7 @@ class ContextService {
 				static fn (string $kind, string $uuid): int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false
 					? $tableRelation->getId()
 					: throw new BadRequestError('Its ' . $kind . ' ' . $uuid . ' is not the table of this copy: the account import brings one table per copy of the application.'),
-				static fn (int $pageId): ?int => ($pageMap[$pageId] ?? null)?->getId(),
+				static fn (string $slug): ?int => $pageIdsBySlug[$slug] ?? null,
 			));
 			$menuKept = $this->menuItemMapper->findByContextId($newContext->getId()) !== [];
 		}
@@ -1208,11 +1207,12 @@ class ContextService {
 		if ($menu !== null) {
 			$withNodes = $this->contextMapper->findById($contextId, $userId);
 			$nodeRelIds = $this->menuService->nodeRelIdsByUuid($withNodes);
+			$pageIds = array_flip(array_map(static fn (array $page): string => (string)$page['slug'], $withNodes->getPages() ?? []));
 			$menuSkipped = $this->menuService->import(
 				$withNodes,
 				$menu,
 				static fn (string $kind, string $uuid): ?int => $nodeRelIds[$kind][$uuid] ?? null,
-				static fn (int $pageId): ?int => null,
+				static fn (string $slug): ?int => $pageIds[$slug] ?? null,
 			);
 			$this->logSkippedMenuItems($menuSkipped);
 		}
