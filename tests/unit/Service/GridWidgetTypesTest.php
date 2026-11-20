@@ -35,6 +35,13 @@ class GridWidgetTypesTest extends TestCase {
 		$this->assertSame([], $this->types->sanitizeSettings('data', ['pageSize' => 10]));
 	}
 
+	public function testTheTextWidgetIsCalledTextAndExplainsParagraphs(): void {
+		$text = $this->types->get('text');
+		$this->assertSame('Text', $text['title']);
+		$this->assertSame('Leave an empty line between paragraphs', $text['settings']['text']['hint']);
+		$this->assertArrayNotHasKey('hint', $this->types->get('header')['settings']['heading']);
+	}
+
 	public function testSettingsUpToTheLimitAreKept(): void {
 		// {"text":"…"} adds 11 bytes around the text
 		$text = str_repeat('a', GridWidgetTypes::SETTINGS_MAX_BYTES - 11);

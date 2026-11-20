@@ -28,6 +28,7 @@ use OCP\IL10N;
  *   default: TablesWidgetSettingValue,
  *   options?: list<array{value: string, label: string}>,
  *   required?: bool,
+ *   hint?: string,
  * }
  * @psalm-type TablesWidgetType = array{
  *   type: string,
@@ -87,12 +88,12 @@ class GridWidgetTypes {
 			],
 			self::TYPE_TEXT => [
 				'type' => self::TYPE_TEXT,
-				'title' => $this->l10n->t('Description'),
+				'title' => $this->l10n->t('Text'),
 				'defaultWidth' => 6,
 				'defaultHeight' => 2,
 				'hasSource' => false,
 				'settings' => [
-					'text' => ['type' => 'text', 'title' => $this->l10n->t('Text'), 'default' => ''],
+					'text' => ['type' => 'text', 'title' => $this->l10n->t('Text'), 'default' => '', 'hint' => $this->l10n->t('Leave an empty line between paragraphs')],
 				],
 			],
 			self::TYPE_DATA => [
