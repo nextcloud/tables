@@ -14,6 +14,11 @@ use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
 use OCP\IDBConnection;
+use OCP\Migration\Attributes\AddColumn;
+use OCP\Migration\Attributes\AddIndex;
+use OCP\Migration\Attributes\ColumnType;
+use OCP\Migration\Attributes\CreateTable;
+use OCP\Migration\Attributes\IndexType;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 use Override;
@@ -25,6 +30,16 @@ use Override;
  * Every existing page gets a slug: the start page of an application
  * `dashboard`, every other page `page_<id>`.
  */
+#[AddColumn(table: 'tables_contexts_page', name: 'title', type: ColumnType::STRING)]
+#[AddColumn(table: 'tables_contexts_page', name: 'icon', type: ColumnType::STRING)]
+#[AddColumn(table: 'tables_contexts_page', name: 'description', type: ColumnType::TEXT)]
+#[AddColumn(table: 'tables_contexts_page', name: 'version', type: ColumnType::INTEGER, description: 'optimistic locking counter, raised on every save')]
+#[AddColumn(table: 'tables_contexts_page', name: 'slug', type: ColumnType::STRING, description: 'unique per application', notes: ['existing pages are filled in: start page "dashboard", others "page_<id>"'])]
+#[AddIndex(table: 'tables_contexts_page', type: IndexType::UNIQUE, description: 'context_id + slug (tables_ctx_page_slug_uq)')]
+#[CreateTable(table: 'tables_contexts_widget',
+	columns: ['id', 'page_id', 'type', 'title', 'icon', 'description', 'grid_x', 'grid_y', 'grid_width', 'grid_height', 'settings', 'node_rel_id'],
+	description: 'widgets of grid pages; settings is JSON-encoded TEXT')
+]
 class Version2500Date20261109000000 extends SimpleMigrationStep {
 	private const PREFIX = 'tables_contexts_';
 	private const PAGE_TABLE = self::PREFIX . 'page';
