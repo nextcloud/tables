@@ -88,6 +88,7 @@
 import { NcDialog, NcButton, NcNoteCard } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
+import '@nextcloud/dialogs/style.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'

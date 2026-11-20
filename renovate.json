@@ -53,6 +53,12 @@
       "allowedVersions": "<4"
     },
     {
+      "description": "Hold @nextcloud/dialogs at v7 on main while Nextcloud 33 and 34 are supported (v8 needs Nextcloud 35+)",
+      "matchBaseBranches": ["main"],
+      "matchPackageNames": ["@nextcloud/dialogs"],
+      "allowedVersions": "<8"
+    },
+    {
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<7",
       "description": "Hold back TypeScript 7 (native Go port) until vue-tsc supports it"

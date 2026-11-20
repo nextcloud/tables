@@ -152,6 +152,7 @@
 
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
+import '@nextcloud/dialogs/style.css'
 import { mapState, mapActions } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
 import { useTablesStore } from '../../../store/store.js'

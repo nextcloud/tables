@@ -86,6 +86,7 @@
 <script>
 import { NcDialog, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../shared/components/ncTile/NcTile.vue'

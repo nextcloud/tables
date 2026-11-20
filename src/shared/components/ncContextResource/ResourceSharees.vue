@@ -26,6 +26,7 @@
 import { NcSelect } from '@nextcloud/vue'
 import formatting from '../../../shared/mixins/formatting.js'
 import searchUserGroup from '../../../shared/mixins/searchUserGroup.js'
+import '@nextcloud/dialogs/style.css'
 
 export default {
 
