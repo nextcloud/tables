@@ -99,9 +99,9 @@ describe('Import application scheme preview', () => {
 
 	it('leaves out the menu items for new pages when the pages are not imported', () => {
 		const menu = [
-			{ parent: null, title: 'New report', displayTitle: 'New report', target: { page: 12 } },
+			{ parent: null, title: 'New report', displayTitle: 'New report', target: { page: 'reports' } },
 			{ parent: null, title: 'Reports', displayTitle: 'Reports', target: null },
-			{ parent: 1, title: 'Overview', displayTitle: 'Overview', target: { pageId: 302 } },
+			{ parent: 1, title: 'Overview', displayTitle: 'Overview', target: { page: 'overview' } },
 		]
 		mountPreview({ from: [], to: menu, skipped: [] }, undefined, { to: schemePages, summary: pageSummary, skipped: [] })
 			.then(({ wrapper }) => {
@@ -110,7 +110,7 @@ describe('Import application scheme preview', () => {
 				cy.wrap(null).then(() => {
 					expect(lastPayload(wrapper).menu).to.deep.equal([
 						{ parent: null, title: 'Reports', displayTitle: 'Reports', target: null },
-						{ parent: 0, title: 'Overview', displayTitle: 'Overview', target: { pageId: 302 } },
+						{ parent: 0, title: 'Overview', displayTitle: 'Overview', target: { page: 'overview' } },
 					])
 				})
 			})

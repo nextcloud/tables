@@ -376,17 +376,18 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$startPageId = (int)array_key_first($startPages);
 		$startPageName = $startPages[$startPageId]['slug'];
 		$pages = [['id' => 1, 'page_type' => Page::TYPE_GRID, 'slug' => $startPageName, 'title' => 'Reports']];
-		$menu = [['title' => null, 'displayTitle' => 'Reports', 'target' => ['page' => 1]]];
+		$menu = [['title' => null, 'displayTitle' => 'Reports', 'target' => ['page' => $startPageName]]];
 
 		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($target->getId(), ['pages' => $pages, 'menu' => $menu], self::OWNER));
 		$this->service->importScheme($target->getId(), 'Target', 'tables', '', [], ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['menu']['to'], $preview['pages']['to']);
 
-		$this->assertSame(['add', ['page' => 1]], [$preview['pages']['summary'][0]['action'], $preview['menu']['to'][0]['target']]);
+		$this->assertSame(['add', ['page' => $startPageName]], [$preview['pages']['summary'][0]['action'], $preview['menu']['to'][0]['target']]);
 		$imported = $this->contextMapper->findById($target->getId(), self::OWNER)->getPages();
 		$gridPageIds = array_keys(array_filter($imported, static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID));
 		$this->assertCount(1, $gridPageIds);
 		$this->assertSame($startPageName, $imported[$startPageId]['slug']);
 		$this->assertSame('page_' . $gridPageIds[0], $imported[$gridPageIds[0]]['slug']);
+		$this->assertSame([['pageId' => $gridPageIds[0]]], array_column($this->menuService->findAll($target->getId(), self::OWNER)['menu'], 'target'));
 	}
 
 	public function testAPreviewFindsAViewWithinItsOwnTableWhenViewsShareAUuid(): void {
