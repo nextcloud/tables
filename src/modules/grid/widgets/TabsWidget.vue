@@ -10,38 +10,38 @@
 			:aria-label="widget.title || t('tables', 'Tabs')"
 			@keydown="onKeydown"
 			@focusout="onFocusout">
-			<button v-for="(title, index) in titles"
-				:id="tabId(index)"
-				:key="index"
+			<button v-for="(tab, index) in tabs"
+				:id="tabId(tab.key)"
+				:key="tab.key"
 				type="button"
 				role="tab"
 				class="tabs-widget__tab"
-				:class="{ 'tabs-widget__tab--active': index === activeTab }"
-				:aria-selected="index === activeTab ? 'true' : 'false'"
-				:aria-controls="visitedTabs.includes(index) ? panelId(index) : undefined"
+				:class="{ 'tabs-widget__tab--active': tab.key === activeKey }"
+				:aria-selected="tab.key === activeKey ? 'true' : 'false'"
+				:aria-controls="visitedKeys.includes(tab.key) ? panelId(tab.key) : undefined"
 				:tabindex="index === focusTab ? 0 : -1"
 				data-cy="tabsWidgetTab"
-				@click="openTab(index)">
-				{{ title }}
+				@click="openTab(tab.key)">
+				{{ tab.title }}
 			</button>
 		</div>
-		<div v-for="index in visitedTabs"
-			v-show="index === activeTab"
-			:id="panelId(index)"
-			:key="index"
+		<div v-for="tab in visitedTabs"
+			v-show="tab.key === activeKey"
+			:id="panelId(tab.key)"
+			:key="tab.key"
 			role="tabpanel"
 			class="tabs-widget__panel"
 			tabindex="0"
-			:aria-labelledby="tabId(index)">
-			<p v-if="isEmpty(index)" class="tabs-widget__empty" data-cy="tabsWidgetEmpty">
+			:aria-labelledby="tabId(tab.key)">
+			<p v-if="isEmpty(tab.key)" class="tabs-widget__empty" data-cy="tabsWidgetEmpty">
 				{{ editable ? t('tables', 'Add widgets to this tab.') : t('tables', 'This tab is empty.') }}
 			</p>
-			<GridLevel v-if="editable || !isEmpty(index)" :parent-key="widget.key" :tab="index" />
+			<GridLevel v-if="editable || !isEmpty(tab.key)" :parent-key="widget.key" :tab="tab.key" />
 			<NcButton v-if="editable"
 				variant="secondary"
 				class="tabs-widget__add"
 				data-cy="tabsWidgetAdd"
-				@click="grid.addToTab(widget, index)">
+				@click="grid.addToTab(widget, tab.key)">
 				<template #icon>
 					<Plus :size="20" />
 				</template>
@@ -55,7 +55,7 @@
 import { computed, defineAsyncComponent } from 'vue'
 import { NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
-import { tabTitles } from '../gridLayout.js'
+import { widgetTabs } from '../gridLayout.js'
 import { eventTabIndex, rovingTabTarget } from '../../../shared/utils/rovingTabs.js'
 
 /**
@@ -93,63 +93,70 @@ export default {
 	},
 	data() {
 		return {
-			activeTab: 0,
+			openedKey: null,
 			focusedTab: null,
 			// A tab is mounted when it is first opened and kept, so its widgets keep their state
-			visitedTabs: [0],
+			visitedKeys: [],
 		}
 	},
 	computed: {
-		titles() {
-			return tabTitles(this.widget.settings)
+		tabs() {
+			return widgetTabs(this.widget.settings)
 		},
-		// The tab in the tab order: the one last moved to with the keyboard, else the open one
+		// The opened tab while it exists, else the first one
+		activeKey() {
+			return this.tabs.some(tab => tab.key === this.openedKey) ? this.openedKey : (this.tabs[0]?.key ?? null)
+		},
+		visitedTabs() {
+			return this.tabs.filter(tab => this.visitedKeys.includes(tab.key))
+		},
+		// Position of the tab in the tab order: the one last moved to with the keyboard, else the open one
 		focusTab() {
-			return Math.min(this.focusedTab ?? this.activeTab, this.titles.length - 1)
+			const active = this.tabs.findIndex(tab => tab.key === this.activeKey)
+			return Math.min(this.focusedTab ?? active, this.tabs.length - 1)
 		},
 	},
 	watch: {
-		titles(titles) {
-			if (this.activeTab >= titles.length) {
-				this.activeTab = Math.max(0, titles.length - 1)
-			}
-			this.visitedTabs = this.visitedTabs.filter(index => index < Math.max(1, titles.length))
+		tabs() {
 			this.focusedTab = null
 		},
-		activeTab(index) {
-			this.focusedTab = null
-			if (!this.visitedTabs.includes(index)) {
-				this.visitedTabs = [...this.visitedTabs, index]
-			}
+		activeKey: {
+			handler(key) {
+				this.focusedTab = null
+				if (key !== null && !this.visitedKeys.includes(key)) {
+					this.visitedKeys = [...this.visitedKeys, key]
+				}
+			},
+			immediate: true,
 		},
 	},
 	methods: {
 		/**
-		 * @param {number} index position of a tab
+		 * @param {string} key key of a tab
 		 * @return {string} the id of its tab button
 		 */
-		tabId(index) {
-			return 'tabs-widget-' + this.widget.key + '-tab-' + index
+		tabId(key) {
+			return 'tabs-widget-' + this.widget.key + '-tab-' + key
 		},
 		/**
-		 * @param {number} index position of a tab
+		 * @param {string} key key of a tab
 		 * @return {boolean} whether the tab shows no widgets
 		 */
-		isEmpty(index) {
-			return this.grid.shownLayout(this.widget.key, index).length === 0
+		isEmpty(key) {
+			return this.grid.shownLayout(this.widget.key, key).length === 0
 		},
 		/**
-		 * @param {number} index position of a tab
+		 * @param {string} key key of a tab
 		 * @return {string} the id of its panel
 		 */
-		panelId(index) {
-			return 'tabs-widget-' + this.widget.key + '-panel-' + index
+		panelId(key) {
+			return 'tabs-widget-' + this.widget.key + '-panel-' + key
 		},
 		/**
-		 * @param {number} index position of the tab to open
+		 * @param {string} key key of the tab to open
 		 */
-		openTab(index) {
-			this.activeTab = index
+		openTab(key) {
+			this.openedKey = key
 			this.focusedTab = null
 		},
 		/**
@@ -169,13 +176,13 @@ export default {
 		 */
 		onKeydown(event) {
 			const isRtl = getComputedStyle(this.$refs.tablist).direction === 'rtl'
-			const target = rovingTabTarget(event, eventTabIndex(event), this.titles.length, isRtl)
+			const target = rovingTabTarget(event, eventTabIndex(event), this.tabs.length, isRtl)
 			if (target === null) {
 				return
 			}
 			event.preventDefault()
 			this.focusedTab = target
-			this.$nextTick(() => document.getElementById(this.tabId(target))?.focus())
+			this.$nextTick(() => document.getElementById(this.tabId(this.tabs[target].key))?.focus())
 		},
 	},
 }

@@ -41,9 +41,9 @@ export default {
 			type: String,
 			default: null,
 		},
-		// The position of the tab
+		// The key of the tab
 		tab: {
-			type: Number,
+			type: String,
 			default: null,
 		},
 	},
