@@ -11,6 +11,7 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ShareMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
@@ -38,6 +39,17 @@ class PermissionsServiceTest extends TestCase {
 		$permissionsService = $this->getPermissionServiceWithUserId($userId);
 
 		self::assertEquals($userId, $permissionsService->preCheckUserId($userId));
+	}
+
+	public function testTeamAttachmentDoesNotReplaceTheUserOwner(): void {
+		$table = new Table();
+		$table->setOwnership('alice');
+		$table->setTeamId('team');
+		$permissions = $this->getPermissionServiceWithUserId('alice');
+
+		self::assertTrue($permissions->canManageTable($table, 'alice'));
+		self::assertTrue($permissions->canChangeElementOwner($table, 'alice'));
+		self::assertFalse($permissions->canChangeElementOwner($table, 'bob'));
 	}
 
 	public function testPreCheckUserIdNoUser() {

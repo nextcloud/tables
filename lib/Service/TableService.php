@@ -14,6 +14,7 @@ use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\AuditLog\Operation;
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Dto\Column as ColumnDto;
@@ -23,6 +24,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
+use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\ColumnSettings;
 use OCA\Tables\Model\FilterSet;
@@ -33,6 +35,7 @@ use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
+use OCA\Tables\Service\ValueObject\ShareCreate;
 use OCA\Tables\Service\ValueObject\Title;
 use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\App\IAppManager;
@@ -65,6 +68,7 @@ class TableService extends SuperService {
 		private ViewService $viewService,
 		private ShareService $shareService,
 		protected UserHelper $userHelper,
+		private CircleHelper $circleHelper,
 		protected FavoritesService $favoritesService,
 		protected IEventDispatcher $eventDispatcher,
 		private ContextService $contextService,
@@ -289,9 +293,17 @@ class TableService extends SuperService {
 	 * @throws \InvalidArgumentException
 	 * @noinspection DuplicatedCode
 	 */
-	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null, ?string $uuid = null): Table {
+	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null, ?string $uuid = null, ?string $teamId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // we can assume that the $userId is set
 		$title = (string)new Title($title);
+		if ($teamId !== null) {
+			if ($teamId === '' || !$this->circleHelper->isCirclesEnabled()) {
+				throw new BadRequestError('Team ownership requires a team ID and the Circles app');
+			}
+			if (!$this->circleHelper->circleExists($teamId, $userId)) {
+				throw new PermissionError('You must be a team member to create a team table');
+			}
+		}
 
 		$time = new DateTime();
 		$item = new Table();
@@ -301,6 +313,7 @@ class TableService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setOwnership($userId);
+		$item->setTeamId($teamId);
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
@@ -322,8 +335,15 @@ class TableService extends SuperService {
 		$item->setUuid($applicableUuid);
 
 		try {
-			$newTable = $this->mapper->insert($item);
-		} catch (OcpDbException $e) {
+			$newTable = $teamId === null ? $this->mapper->insert($item) : $this->atomic(function () use ($item, $teamId): Table {
+				$table = $this->mapper->insert($item);
+				$this->shareService->create(new ShareCreate(
+					$table->getId(), 'table', $teamId, ShareReceiverType::CIRCLE,
+					true, true, true, true, false, 0,
+				));
+				return $table;
+			}, $this->dbc);
+		} catch (OcpDbException|InternalError $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
@@ -376,29 +396,25 @@ class TableService extends SuperService {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
-			$table = $this->mapper->find($id);
+			[$table, $previousOwnerUserId] = $this->atomic(function () use ($id, $newOwnerUserId, $userId): array {
+				$table = $this->mapper->findForUpdate($id);
+				if (!$this->permissionsService->canChangeElementOwner($table, $userId)) {
+					throw new PermissionError('PermissionError: can not change table owner with table id ' . $id);
+				}
+				$previousOwnerUserId = $table->getOwnership();
+				$table->setOwnership($newOwnerUserId);
+				$table = $this->mapper->update($table);
+				$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
+				return [$table, $previousOwnerUserId];
+			}, $this->dbc);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
-
-		// security
-		if (!$this->permissionsService->canChangeElementOwner($table, $userId)) {
-			throw new PermissionError('PermissionError: can not change table owner with table id ' . $id);
-		}
-
-		$previousOwnerUserId = $table->getOwnership();
-		$table->setOwnership($newOwnerUserId);
-
-		try {
-			$table = $this->atomic(function () use ($table, $id, $newOwnerUserId, $userId) {
-				$table = $this->mapper->update($table);
-				$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
-				return $table;
-			}, $this->dbc);
+		} catch (PermissionError $e) {
+			throw $e;
 		} catch (\Exception $e) {
 			$this->logger->error('Failed to transfer table ownership: ' . $e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Failed to transfer table ownership: ' . $e->getMessage());
@@ -413,6 +429,48 @@ class TableService extends SuperService {
 		$this->eventDispatcher->dispatchTyped($event);
 
 		return $table;
+	}
+
+	public function handleTeamStewardDeparture(string $teamId, string $userId): void {
+		try {
+			$tables = $this->mapper->findAllByTeamId($teamId, $userId);
+			if ($tables === []) {
+				return;
+			}
+			$successor = $this->circleHelper->findSuccessorUserId($teamId, $userId);
+			foreach ($tables as $table) {
+				if ($successor === null) {
+					$this->deleteTeamOwnedTable($table->getId(), $teamId, $userId);
+				} else {
+					$this->setOwner($table->getId(), $successor, $userId);
+				}
+			}
+		} catch (OcpDbException $e) {
+			$this->logger->error('Could not hand over team tables', ['teamId' => $teamId, 'exception' => $e]);
+			throw new InternalError('Could not hand over team tables', previous: $e);
+		}
+	}
+
+	public function deleteTeamOwnedTables(string $teamId): void {
+		try {
+			foreach ($this->mapper->findAllByTeamId($teamId) as $table) {
+				$this->deleteTeamOwnedTable($table->getId(), $teamId);
+			}
+		} catch (OcpDbException $e) {
+			$this->logger->error('Could not delete team tables', ['teamId' => $teamId, 'exception' => $e]);
+			throw new InternalError('Could not delete team tables', previous: $e);
+		}
+	}
+
+	private function deleteTeamOwnedTable(int $id, string $teamId, ?string $expectedOwner = null): void {
+		$this->atomic(function () use ($id, $teamId, $expectedOwner): void {
+			$table = $this->mapper->findForUpdate($id);
+			if ($table->getTeamId() !== $teamId || ($expectedOwner !== null && $table->getOwnership() !== $expectedOwner)) {
+				$this->logger->info('Skipping team cleanup because table ownership changed', ['tableId' => $id]);
+				return;
+			}
+			$this->delete($id, $table->getOwnership());
+		}, $this->dbc);
 	}
 
 	/**

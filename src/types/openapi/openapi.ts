@@ -1368,6 +1368,7 @@ export type components = {
             readonly title: string;
             readonly emoji: string | null;
             readonly ownership: string;
+            readonly teamId: string | null;
             readonly ownerDisplayName: string;
             readonly createdBy: string;
             readonly createdAt: string;
@@ -4828,6 +4829,11 @@ export interface operations {
                      * @default custom
                      */
                     readonly template?: string;
+                    /**
+                     * @description Team to attach the table to
+                     * @default null
+                     */
+                    readonly teamId?: string | null;
                 };
             };
         };
@@ -4872,6 +4878,22 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
                         };
                     };
                 };
