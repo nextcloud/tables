@@ -1216,6 +1216,33 @@ final class ContextServiceTest extends TestCase {
 		], $warnings);
 	}
 
+	public function testASchemePageWithAnAutomaticSlugIsAddedAsANewPage(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setName('Intake portal');
+		$context->setOwnerId('user-1');
+		$context->setOwnerType(Application::OWNER_TYPE_USER);
+		$context->setNodes([]);
+		$context->setPages([
+			301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'dashboard', 'title' => null, 'icon' => null, 'description' => null, 'content' => []],
+			302 => ['id' => 302, 'page_type' => Page::TYPE_GRID, 'slug' => 'page_302', 'title' => 'Mine', 'icon' => null, 'description' => null, 'content' => []],
+		]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->pageMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->expects($this->once())->method('insertWithDefaultName')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 400;
+			$page->setSlug('page_400');
+			return $page;
+		});
+		$this->widgetService->expects($this->never())->method('syncPage');
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', null, [
+			['page_type' => Page::TYPE_GRID, 'slug' => 'page_302', 'title' => 'Theirs'],
+		]);
+	}
+
 	public function testASchemeBringsAtMostTheMaximumNumberOfPages(): void {
 		$context = new Context();
 		$context->id = 7;
