@@ -1031,15 +1031,15 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
-    readonly "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages/{technicalName}": {
+    readonly "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages/{slug}": {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** [api v2] Get a page of an application by its technical name */
-        readonly get: operations["context_page-show-by-technical-name"];
+        /** [api v2] Get a page of an application by its slug */
+        readonly get: operations["context_page-show-by-slug"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -1058,7 +1058,7 @@ export type paths = {
         readonly get?: never;
         readonly put?: never;
         /** [api v2] Add a grid page to an application */
-        readonly post: operations["context_page-create"];
+        readonly post: operations["context_page-create-grid-page"];
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -1314,7 +1314,7 @@ export type components = {
             /** Format: int64 */
             readonly contextId: number;
             readonly pageType: string;
-            readonly technicalName: string;
+            readonly slug: string;
             readonly title: string | null;
             readonly icon: string | null;
             readonly description: string | null;
@@ -1611,6 +1611,7 @@ export type components = {
                 readonly label: string;
             }[];
             readonly required?: boolean;
+            readonly hint?: string;
         };
         readonly WidgetType: {
             readonly type: string;
@@ -8431,10 +8432,10 @@ export interface operations {
                      */
                     readonly title?: string | null;
                     /**
-                     * @description New technical name
+                     * @description Slug of the page; it never changes, so only the current slug is accepted
                      * @default null
                      */
-                    readonly technicalName?: string | null;
+                    readonly slug?: string | null;
                     /**
                      * @description New icon name, empty to remove it
                      * @default null
@@ -8474,7 +8475,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Invalid page field or widget, a widget id that is not on the page, or too many widgets */
+            /** @description Invalid page field or widget, a slug other than the one of the page, a widget id that is not on the page, or too many widgets */
             readonly 400: {
                 headers: {
                     readonly [name: string]: unknown;
@@ -8838,7 +8839,7 @@ export interface operations {
             };
         };
     };
-    readonly "context_page-show-by-technical-name": {
+    readonly "context_page-show-by-slug": {
         readonly parameters: {
             readonly query?: never;
             readonly header: {
@@ -8848,8 +8849,8 @@ export interface operations {
             readonly path: {
                 /** @description ID of the application */
                 readonly contextId: number;
-                /** @description Technical name of the page */
-                readonly technicalName: string;
+                /** @description Slug of the page */
+                readonly slug: string;
             };
             readonly cookie?: never;
         };
@@ -8916,7 +8917,7 @@ export interface operations {
             };
         };
     };
-    readonly "context_page-create": {
+    readonly "context_page-create-grid-page": {
         readonly parameters: {
             readonly query?: never;
             readonly header: {
@@ -8935,10 +8936,10 @@ export interface operations {
                     /** @description Title of the page */
                     readonly title: string;
                     /**
-                     * @description Technical name of the page, unique in the application; `page_<id>` when left out, a form reserved for automatic names
+                     * @description Slug of the page, unique in the application and never changed; `page_<id>` when left out, a form reserved for automatic names
                      * @default null
                      */
-                    readonly technicalName?: string | null;
+                    readonly slug?: string | null;
                     /**
                      * @description Name of the icon shown with the title
                      * @default null
@@ -8967,7 +8968,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Invalid title, icon or description, or an invalid or taken technical name */
+            /** @description Invalid title, icon or description, or an invalid or taken slug */
             readonly 400: {
                 headers: {
                     readonly [name: string]: unknown;
