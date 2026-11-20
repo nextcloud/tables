@@ -16,6 +16,7 @@ use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\PermissionsService;
+use OCA\Tables\Service\RowVisibilityService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Middleware;
@@ -31,6 +32,7 @@ class PermissionMiddleware extends Middleware {
 		private readonly IRequest $request,
 		private readonly ?string $userId,
 		private readonly ContextService $contextService,
+		private readonly RowVisibilityService $rowVisibilityService,
 	) {
 	}
 
@@ -97,6 +99,15 @@ class PermissionMiddleware extends Middleware {
 			if (!$this->permissionsService->canAccessNodeById($nodeType, $nodeId, $this->userId)) {
 				throw new NotFoundError();
 			}
+		}
+
+		if ($attribute->getRowIdParam() !== null) {
+			$rowId = $this->request->getParam($attribute->getRowIdParam());
+			if (!is_numeric($rowId)) {
+				throw new InternalError('Invalid row ID');
+			}
+			$rowId = (int)$rowId;
+			$this->assertRowBelongsToNode($nodeType, $nodeId, $rowId);
 		}
 
 		match ($attribute->getPermission()) {
@@ -242,6 +253,22 @@ class PermissionMiddleware extends Middleware {
 					$this->userId, (int)$contextId
 				));
 			}
+		}
+	}
+
+	protected function assertRowBelongsToNode(int $nodeType, int $nodeId, int $rowId): void {
+		if (
+			(
+				$nodeType === Application::NODE_TYPE_TABLE
+				&& !$this->rowVisibilityService->rowBelongsToTableWithId($rowId, $nodeId)
+			)
+			|| ($nodeType === Application::NODE_TYPE_VIEW
+				&& !$this->rowVisibilityService->userSeesRowWithViewId($rowId, $nodeId, $this->userId)
+			)
+		) {
+			throw new PermissionError(sprintf('User %s cannot delete rows on node %d (type %d)',
+				$this->userId, $nodeId, $nodeType
+			));
 		}
 	}
 
