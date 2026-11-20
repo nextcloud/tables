@@ -79,14 +79,14 @@ class PageService {
 
 	/**
 	 * Adds a grid page to an application. Without a slug the page is named
-	 * `page_<id>`; a given slug that is taken is refused.
+	 * `page_<id>`; a given slug that is taken is refused. The slug never changes.
 	 *
 	 * @return TablesPage
 	 * @throws BadRequestError
 	 * @throws NotFoundError
 	 * @throws Exception
 	 */
-	public function create(int $contextId, string $title, ?string $slug, ?string $icon, ?string $description): array {
+	public function createGridPage(int $contextId, string $title, ?string $slug, ?string $icon, ?string $description): array {
 		$page = new Page();
 		$page->setContextId($contextId);
 		$page->setPageType(Page::TYPE_GRID);
@@ -94,7 +94,7 @@ class PageService {
 		$page->setIcon($this->validateIcon($icon));
 		$page->setDescription($this->validateDescription($description));
 		if ($slug !== null) {
-			$page->setSlug($this->validateSlug($slug, null));
+			$page->setSlug($this->validateSlug($slug));
 		}
 
 		$page = $this->save(fn (): Page => $this->atomic(function () use ($contextId, $page): Page {
@@ -110,6 +110,7 @@ class PageService {
 	 * them in one transaction. A null argument keeps the current value; an empty icon
 	 * or description removes it, and so does an empty title of the start page. A
 	 * widget's `source` is `{nodeRelId}` of a table or view of this application, or null.
+	 * A slug other than the one of the page is refused.
 	 *
 	 * A save with widgets names the version of the page it was based on, and is refused
 	 * when another save raised it since.
@@ -128,7 +129,7 @@ class PageService {
 			$page->setTitle($this->validateTitle($title, $page->getPageType()));
 		}
 		if ($slug !== null && $slug !== $page->getSlug()) {
-			$page->setSlug($this->validateSlug($slug, $pageId));
+			throw new BadRequestError('The slug of a page cannot be changed.');
 		}
 		if ($icon !== null) {
 			$page->setIcon($this->validateIcon($icon));
@@ -145,7 +146,6 @@ class PageService {
 			$inputs = $this->readWidgets($widgets, $contextId);
 		}
 
-		$renamed = array_key_exists('slug', $page->getUpdatedFields());
 		$stored = $this->save(fn (): ?array => $this->atomic(function () use ($page, $contextId, $pageId, $version, $inputs): ?array {
 			$this->lockApplication($contextId);
 			if (!$this->pageMapper->raiseVersion($pageId, $version)) {
@@ -156,7 +156,7 @@ class PageService {
 			$stored = $inputs === null ? null : $this->widgetService->syncPage($pageId, $inputs);
 			$page->setVersion($this->pageMapper->findVersion($pageId));
 			return $stored;
-		}, $this->dbc), $renamed ? (string)$page->getSlug() : null);
+		}, $this->dbc), null);
 
 		return $this->response($page, $stored ?? $this->widgetService->findByPageIds([$pageId])[$pageId] ?? []);
 	}
@@ -307,11 +307,11 @@ class PageService {
 	/**
 	 * @throws BadRequestError
 	 */
-	private function validateSlug(string $slug, ?int $pageId): string {
+	private function validateSlug(string $slug): string {
 		if (!TechnicalNameValidator::isValid($slug)) {
 			throw new BadRequestError('A slug has 1 to ' . TechnicalNameValidator::MAX_LENGTH . ' lower case letters, digits and underscores and starts with a letter.');
 		}
-		if (Page::isDefaultSlug($slug) && $slug !== Page::DEFAULT_SLUG_PREFIX . $pageId) {
+		if (Page::isDefaultSlug($slug)) {
 			throw new BadRequestError('The slug ' . $slug . ' is reserved for automatic names.');
 		}
 		return $slug;

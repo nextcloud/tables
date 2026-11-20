@@ -50,8 +50,8 @@ class ContextPageControllerTest extends TestCase {
 		return [
 			'show' => ['find', [7, 2], static fn (ContextPageController $controller) => $controller->show(7, 2)],
 			'show by name' => ['findBySlug', [7, 'overview'], static fn (ContextPageController $controller) => $controller->showBySlug(7, 'overview')],
-			'create' => ['create', [7, 'Overview', 'overview', 'star', 'At a glance'], static fn (ContextPageController $controller) => $controller->create(7, 'Overview', 'overview', 'star', 'At a glance')],
-			'update' => ['update', [7, 2, null, 'planning', '', null, $widgets, 4], static fn (ContextPageController $controller) => $controller->update(7, 2, null, 'planning', '', null, $widgets, 4)],
+			'create' => ['createGridPage', [7, 'Overview', 'overview', 'star', 'At a glance'], static fn (ContextPageController $controller) => $controller->createGridPage(7, 'Overview', 'overview', 'star', 'At a glance')],
+			'update' => ['update', [7, 2, null, 'overview', '', null, $widgets, 4], static fn (ContextPageController $controller) => $controller->update(7, 2, null, 'overview', '', null, $widgets, 4)],
 			'destroy' => ['delete', [7, 2], static fn (ContextPageController $controller) => $controller->destroy(7, 2)],
 		];
 	}
