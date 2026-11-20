@@ -8,15 +8,33 @@
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\QBMapper;
+use OCP\AppFramework\Db\TTransactional;
+use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Page> */
 class PageMapper extends QBMapper {
+	use TTransactional;
+
 	protected string $table = 'tables_contexts_page';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, Page::class);
+	}
+
+	/**
+	 * Inserts a page under the default slug `page_<id>`.
+	 *
+	 * @throws Exception
+	 */
+	public function insertWithDefaultName(Page $page): Page {
+		return $this->atomic(function () use ($page): Page {
+			$page = $this->insert($page);
+			$page->resetUpdatedFields();
+			$page->setSlug(Page::DEFAULT_SLUG_PREFIX . $page->getId());
+			return $this->update($page);
+		}, $this->db);
 	}
 
 	/**

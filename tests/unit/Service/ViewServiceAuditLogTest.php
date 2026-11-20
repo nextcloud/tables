@@ -14,6 +14,7 @@ use OCA\Tables\AuditLog\Operation;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\ViewUpdateInput;
@@ -91,6 +92,29 @@ final class ViewServiceAuditLogTest extends TestCase {
 			]);
 
 		$this->service->create('Open items', null, $table, 'alice');
+	}
+
+	public static function invalidTechnicalNames(): array {
+		return [
+			'too long' => [str_repeat('a', 201), 'Technical name must not exceed 200 characters.'],
+			'upper case' => ['Sales', 'Technical name must start with a lowercase letter and contain only lowercase letters, numbers, and underscores.'],
+			'trailing newline' => ["sales\n", 'Technical name must start with a lowercase letter'],
+		];
+	}
+
+	/**
+	 * @dataProvider invalidTechnicalNames
+	 */
+	public function testCreateRefusesAnInvalidTechnicalNameWithItsMessage(string $technicalName, string $message): void {
+		$table = new Table();
+		$table->setId(5);
+		$table->setOwnership('alice');
+		$this->permissionsService->method('canManageTable')->willReturn(true);
+		$this->mapper->expects($this->never())->method('insert');
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage($message);
+		$this->service->create('Open items', null, $table, 'alice', $technicalName);
 	}
 
 	public function testUpdateFilterLogsCriticalAction(): void {

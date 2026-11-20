@@ -15,6 +15,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\IconHelper;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Model\ContextNodeInputSet;
 use OCA\Tables\ResponseDefinitions;
@@ -111,7 +112,7 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
-			if (!$this->isValidIcon($iconName)) {
+			if (!IconHelper::isValid($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
 			try {
@@ -157,7 +158,7 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
-			if ($iconName !== null && !$this->isValidIcon($iconName)) {
+			if ($iconName !== null && !IconHelper::isValid($iconName)) {
 				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
 			}
 			try {
@@ -366,14 +367,6 @@ class ContextController extends AOCSController {
 			$this->db->rollBack();
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
-	}
-
-	protected function isValidIcon(string $iconName): bool {
-		if ($iconName === '' || !preg_match('/^[a-zA-Z0-9-]+$/', $iconName)) {
-			return false;
-		}
-		$iconPath = dirname(__DIR__, 2) . '/img/material/' . $iconName . '.svg';
-		return file_exists($iconPath);
 	}
 
 	/**
