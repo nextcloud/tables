@@ -4,6 +4,7 @@
  */
 
 import { translate as t } from '@nextcloud/l10n'
+import { isTechnicalNameValid } from '../../shared/utils/columnUtils.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.ts'
 
 /** The page type of a grid page, as the API returns it. */
@@ -11,9 +12,6 @@ export const PAGE_TYPE_GRID = 'grid'
 
 /** The page type of the start page of an application. */
 export const PAGE_TYPE_START = 'startpage'
-
-/** Slugs of pages: lower case letters, digits and underscores, starting with a letter. */
-export const PAGE_SLUG_PATTERN = /^[a-z][a-z0-9_]*$/
 
 /** Names of this form are kept for the names the server gives pages itself. */
 export const PAGE_SLUG_RESERVED = /^page_\d+$/
@@ -338,7 +336,7 @@ export function isStartPage(page) {
  *                  other page without one goes by its slug
  */
 export function pageTitle(page) {
-	return page?.title || (isStartPage(page) ? t('tables', 'Home') : (page?.slug ?? page?.slug ?? ''))
+	return page?.title || (isStartPage(page) ? t('tables', 'Home') : (page?.slug ?? ''))
 }
 
 /**
@@ -352,7 +350,7 @@ export function pageSlugError(name) {
 	if (!name) {
 		return null
 	}
-	if (name.length > 200 || !PAGE_SLUG_PATTERN.test(name)) {
+	if (name.length > 200 || !isTechnicalNameValid(name)) {
 		return t('tables', 'Use lower case letters, digits and underscores, starting with a letter.')
 	}
 	if (PAGE_SLUG_RESERVED.test(name)) {
