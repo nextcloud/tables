@@ -66,8 +66,8 @@ class Version2500Date20261109000000Test extends DatabaseTestCase {
 		$this->migration->changeSchema(new NullOutput(), fn () => $schema, []);
 
 		$this->assertSame($before, $this->describePageTable($schema));
-		$this->assertContains('technical_name', $before['columns']);
-		$this->assertContains('tables_ctx_page_name_uq', $before['indexes']);
+		$this->assertContains('slug', $before['columns']);
+		$this->assertContains('tables_ctx_page_slug_uq', $before['indexes']);
 	}
 
 	public function testTheDatabaseAllowsPagesWithoutANameThatTheCodeNeverWrites(): void {
@@ -96,40 +96,40 @@ class Version2500Date20261109000000Test extends DatabaseTestCase {
 
 	/**
 	 * @dataProvider backfills
-	 * @param list<array{int, string, ?string}> $pages id, type and technical name in one application
+	 * @param list<array{int, string, ?string}> $pages id, type and slug in one application
 	 */
 	public function testBackfillNames(array $pages, array $expected): void {
-		$rows = array_map(static fn (array $page): array => ['id' => $page[0], 'context_id' => 10, 'page_type' => $page[1], 'technical_name' => $page[2]], $pages);
+		$rows = array_map(static fn (array $page): array => ['id' => $page[0], 'context_id' => 10, 'page_type' => $page[1], 'slug' => $page[2]], $pages);
 
-		$this->assertSame($expected, Version2500Date20261109000000::backfillNames($rows));
+		$this->assertSame($expected, Version2500Date20261109000000::backfillSlugs($rows));
 	}
 
-	private function insertPage(int $contextId, string $pageType, ?string $title, ?string $technicalName): int {
+	private function insertPage(int $contextId, string $pageType, ?string $title, ?string $slug): int {
 		$qb = $this->connectionAdapter->getQueryBuilder();
 		$qb->insert('tables_contexts_page')
 			->values([
 				'context_id' => $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT),
 				'page_type' => $qb->createNamedParameter($pageType),
 				'title' => $qb->createNamedParameter($title),
-				'technical_name' => $qb->createNamedParameter($technicalName),
+				'slug' => $qb->createNamedParameter($slug),
 			])
 			->executeStatement();
 		return $qb->getLastInsertId();
 	}
 
 	/**
-	 * @return array<int, ?string> technical name by page id
+	 * @return array<int, ?string> slug by page id
 	 */
 	private function names(): array {
 		$qb = $this->connectionAdapter->getQueryBuilder();
-		$qb->select('id', 'technical_name')
+		$qb->select('id', 'slug')
 			->from('tables_contexts_page')
 			->where($qb->expr()->in('context_id', $qb->createNamedParameter([self::CONTEXT, self::OTHER_CONTEXT], IQueryBuilder::PARAM_INT_ARRAY)))
 			->orderBy('id');
 		$result = $qb->executeQuery();
 		$names = [];
 		while ($row = $result->fetchAssociative()) {
-			$names[(int)$row['id']] = $row['technical_name'];
+			$names[(int)$row['id']] = $row['slug'];
 		}
 		$result->closeCursor();
 		return $names;

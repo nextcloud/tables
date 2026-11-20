@@ -24,7 +24,7 @@ class PageMapper extends QBMapper {
 	}
 
 	/**
-	 * Inserts a page under the default technical name `page_<id>`.
+	 * Inserts a page under the default slug `page_<id>`.
 	 *
 	 * @throws Exception
 	 */
@@ -32,7 +32,7 @@ class PageMapper extends QBMapper {
 		return $this->atomic(function () use ($page): Page {
 			$page = $this->insert($page);
 			$page->resetUpdatedFields();
-			$page->setTechnicalName(Page::DEFAULT_NAME_PREFIX . $page->getId());
+			$page->setSlug(Page::DEFAULT_SLUG_PREFIX . $page->getId());
 			return $this->update($page);
 		}, $this->db);
 	}

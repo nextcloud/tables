@@ -19,17 +19,17 @@ use OCP\Migration\SimpleMigrationStep;
 use Override;
 
 /**
- * Grid pages: a title, icon, description and technical name on pages, the widgets of
+ * Grid pages: a title, icon, description and slug on pages, the widgets of
  * a page with their settings as one JSON object, and the node a data widget shows.
  *
- * Every existing page gets a technical name: the start page of an application
+ * Every existing page gets a slug: the start page of an application
  * `dashboard`, every other page `page_<id>`.
  */
 class Version2500Date20261109000000 extends SimpleMigrationStep {
 	private const PREFIX = 'tables_contexts_';
 	private const PAGE_TABLE = self::PREFIX . 'page';
-	private const PAGE_NAME_INDEX = 'tables_ctx_page_name_uq';
-	private const START_PAGE_NAME = 'dashboard';
+	private const PAGE_SLUG_INDEX = 'tables_ctx_page_slug_uq';
+	private const START_PAGE_SLUG = 'dashboard';
 
 	public function __construct(
 		private readonly IDBConnection $db,
@@ -65,21 +65,21 @@ class Version2500Date20261109000000 extends SimpleMigrationStep {
 		if (!$table->hasColumn('version')) {
 			$table->addColumn('version', Types::INTEGER, ['notnull' => true, 'default' => 0]);
 		}
-		if (!$table->hasColumn('technical_name')) {
-			$table->addColumn('technical_name', Types::STRING, ['notnull' => false, 'length' => 200]);
+		if (!$table->hasColumn('slug')) {
+			$table->addColumn('slug', Types::STRING, ['notnull' => false, 'length' => 200]);
 		}
 		// Also serves lookups by context_id. Safe while existing pages have no name yet:
 		// pgsql, mysql and sqlite, the databases Tables supports, treat NULLs in a unique
 		// index as distinct.
-		if (!$table->hasIndex(self::PAGE_NAME_INDEX)) {
-			$table->addUniqueIndex(['context_id', 'technical_name'], self::PAGE_NAME_INDEX);
+		if (!$table->hasIndex(self::PAGE_SLUG_INDEX)) {
+			$table->addUniqueIndex(['context_id', 'slug'], self::PAGE_SLUG_INDEX);
 		}
 	}
 
 	#[Override]
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
 		$select = $this->db->getQueryBuilder();
-		$select->select('id', 'context_id', 'page_type', 'technical_name')
+		$select->select('id', 'context_id', 'page_type', 'slug')
 			->from(self::PAGE_TABLE)
 			->orderBy('context_id')
 			->addOrderBy('id');
@@ -87,20 +87,20 @@ class Version2500Date20261109000000 extends SimpleMigrationStep {
 		$rows = $result->fetchAllAssociative();
 		$result->closeCursor();
 
-		$names = self::backfillNames($rows);
+		$names = self::backfillSlugs($rows);
 		if ($names === []) {
 			return;
 		}
 
 		$update = $this->db->getQueryBuilder();
 		$update->update(self::PAGE_TABLE)
-			->set('technical_name', $update->createParameter('technicalName'))
+			->set('slug', $update->createParameter('slug'))
 			->where($update->expr()->eq('id', $update->createParameter('pageId')));
 
 		$this->db->beginTransaction();
 		try {
-			foreach ($names as $pageId => $technicalName) {
-				$update->setParameter('technicalName', $technicalName);
+			foreach ($names as $pageId => $slug) {
+				$update->setParameter('slug', $slug);
 				$update->setParameter('pageId', $pageId, IQueryBuilder::PARAM_INT);
 				$update->executeStatement();
 			}
@@ -112,34 +112,34 @@ class Version2500Date20261109000000 extends SimpleMigrationStep {
 	}
 
 	/**
-	 * The technical name of every page row that has none, by page id. The start page of
+	 * The slug of every page row that has none, by page id. The start page of
 	 * an application gets `dashboard`, unless an earlier page holds it; every other page
 	 * gets `page_<id>`.
 	 *
 	 * @param list<array<string, mixed>> $rows page rows
 	 * @return array<int, string>
 	 */
-	public static function backfillNames(array $rows): array {
+	public static function backfillSlugs(array $rows): array {
 		usort($rows, static fn (array $a, array $b): int => [(int)$a['context_id'], (int)$a['id']] <=> [(int)$b['context_id'], (int)$b['id']]);
 
 		$taken = [];
 		foreach ($rows as $row) {
-			if (is_string($row['technical_name'] ?? null) && $row['technical_name'] !== '') {
-				$taken[(int)$row['context_id']][$row['technical_name']] = true;
+			if (is_string($row['slug'] ?? null) && $row['slug'] !== '') {
+				$taken[(int)$row['context_id']][$row['slug']] = true;
 			}
 		}
 
 		$names = [];
 		foreach ($rows as $row) {
-			if (is_string($row['technical_name'] ?? null) && $row['technical_name'] !== '') {
+			if (is_string($row['slug'] ?? null) && $row['slug'] !== '') {
 				continue;
 			}
 			$contextId = (int)$row['context_id'];
-			$technicalName = $row['page_type'] === 'startpage' && !isset($taken[$contextId][self::START_PAGE_NAME])
-				? self::START_PAGE_NAME
+			$slug = $row['page_type'] === 'startpage' && !isset($taken[$contextId][self::START_PAGE_SLUG])
+				? self::START_PAGE_SLUG
 				: 'page_' . (int)$row['id'];
-			$taken[$contextId][$technicalName] = true;
-			$names[(int)$row['id']] = $technicalName;
+			$taken[$contextId][$slug] = true;
+			$names[(int)$row['id']] = $slug;
 		}
 		return $names;
 	}

@@ -550,7 +550,7 @@ class ContextService {
 		$page = new Page();
 		$page->setContextId($context->getId());
 		$page->setPageType(Page::TYPE_STARTPAGE);
-		$page->setTechnicalName(Page::START_PAGE_NAME);
+		$page->setSlug(Page::START_PAGE_SLUG);
 		$this->pageMapper->insert($page);
 
 		$addedPage = $page->jsonSerialize();
@@ -692,7 +692,7 @@ class ContextService {
 		// insert pages
 		$pageMap = [];
 		$pages = $this->importablePages(is_array($context['pages'] ?? null) ? $context['pages'] : []);
-		$technicalNames = $this->importedPageNames($pages);
+		$slugs = $this->importedPageSlugs($pages);
 		$hasStartPage = false;
 		foreach ($pages as $pageKey => $pageArr) {
 			$page = new Page();
@@ -701,17 +701,17 @@ class ContextService {
 			$page->setTitle($this->importedText($pageArr['title'] ?? null, TextHelper::TITLE_MAX_LENGTH, 'page title'));
 			$page->setIcon($this->importedIcon($pageArr['icon'] ?? null));
 			$page->setDescription($this->importedText($pageArr['description'] ?? null, TextHelper::DESCRIPTION_MAX_LENGTH, 'page description'));
-			if ($technicalNames[$pageKey] === null) {
+			if ($slugs[$pageKey] === null) {
 				$page = $this->pageMapper->insertWithDefaultName($page);
 			} else {
-				$page->setTechnicalName($technicalNames[$pageKey]);
+				$page->setSlug($slugs[$pageKey]);
 				$page = $this->pageMapper->insert($page);
 			}
 			$hasStartPage = $hasStartPage || $page->getPageType() === Page::TYPE_STARTPAGE;
 			if ($page->getPageType() === Page::TYPE_GRID && trim((string)$page->getTitle()) === '') {
 				// a grid page is named by its title, so it never stays without one
 				$page->resetUpdatedFields();
-				$page->setTitle((string)$page->getTechnicalName());
+				$page->setTitle((string)$page->getSlug());
 				$page = $this->pageMapper->update($page);
 			}
 			$pageMap[$pageArr['id'] ?? null] = $page;
@@ -732,7 +732,7 @@ class ContextService {
 
 		if (!$hasStartPage) {
 			$this->logger->warning('An imported application had no start page; it gets a new one.');
-			$this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_NAME, $technicalNames, true), array_values($nodeRelMap));
+			$this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_SLUG, $slugs, true), array_values($nodeRelMap));
 		}
 
 		return $newContext;
@@ -771,7 +771,7 @@ class ContextService {
 		if ($startPageNameTaken) {
 			$page = $this->pageMapper->insertWithDefaultName($page);
 		} else {
-			$page->setTechnicalName(Page::START_PAGE_NAME);
+			$page->setSlug(Page::START_PAGE_SLUG);
 			$page = $this->pageMapper->insert($page);
 		}
 		foreach ($nodeRelations as $i => $nodeRelation) {
@@ -784,7 +784,7 @@ class ContextService {
 	}
 
 	/**
-	 * The technical names of the pages of an imported application, by page key. A valid
+	 * The slugs of the pages of an imported application, by page key. A valid
 	 * exported name is kept unless an earlier page of the import uses it or it has the
 	 * reserved form `page_<id>`, a start page without one gets `dashboard` while it is
 	 * free, and null leaves the default name.
@@ -792,22 +792,22 @@ class ContextService {
 	 * @param array<array-key, mixed> $pages exported pages
 	 * @return array<array-key, ?string>
 	 */
-	private function importedPageNames(array $pages): array {
+	private function importedPageSlugs(array $pages): array {
 		$names = [];
 		$taken = [];
 		foreach ($pages as $key => $pageArr) {
-			$name = is_array($pageArr) ? ($pageArr['technical_name'] ?? null) : null;
+			$name = is_array($pageArr) ? ($pageArr['slug'] ?? null) : null;
 			$names[$key] = null;
-			if (is_string($name) && TechnicalNameValidator::isValid($name) && !Page::isDefaultName($name) && !isset($taken[$name])) {
+			if (is_string($name) && TechnicalNameValidator::isValid($name) && !Page::isDefaultSlug($name) && !isset($taken[$name])) {
 				$names[$key] = $name;
 				$taken[$name] = true;
 			}
 		}
 		foreach ($pages as $key => $pageArr) {
 			$isStartPage = is_array($pageArr) && ($pageArr['page_type'] ?? '') === Page::TYPE_STARTPAGE;
-			if ($names[$key] === null && $isStartPage && !isset($taken[Page::START_PAGE_NAME])) {
-				$names[$key] = Page::START_PAGE_NAME;
-				$taken[Page::START_PAGE_NAME] = true;
+			if ($names[$key] === null && $isStartPage && !isset($taken[Page::START_PAGE_SLUG])) {
+				$names[$key] = Page::START_PAGE_SLUG;
+				$taken[Page::START_PAGE_SLUG] = true;
 			}
 		}
 		return $names;

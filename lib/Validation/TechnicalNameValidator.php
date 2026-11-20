@@ -8,7 +8,7 @@
 namespace OCA\Tables\Validation;
 
 /**
- * The rule for technical names of columns, views, pages and menu items: lower case
+ * The rule for technical names of columns, views and menu items and for page slugs: lower case
  * letters, digits and underscores, starting with a letter, at most 200 characters.
  * Callers report a broken rule in their own words.
  */

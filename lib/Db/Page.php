@@ -16,8 +16,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setContextId(int $value): void
  * @method getPageType(): string
  * @method setPageType(string $value): void
- * @method getTechnicalName(): ?string
- * @method setTechnicalName(?string $value): void
+ * @method getSlug(): ?string
+ * @method setSlug(?string $value): void
  * @method getTitle(): ?string
  * @method setTitle(?string $value): void
  * @method getIcon(): ?string
@@ -30,12 +30,12 @@ use OCP\AppFramework\Db\Entity;
 class Page extends Entity implements \JsonSerializable {
 	public const TYPE_STARTPAGE = 'startpage';
 	public const TYPE_GRID = 'grid';
-	public const START_PAGE_NAME = 'dashboard';
-	public const DEFAULT_NAME_PREFIX = 'page_';
+	public const START_PAGE_SLUG = 'dashboard';
+	public const DEFAULT_SLUG_PREFIX = 'page_';
 
 	protected ?int $contextId = null;
 	protected ?string $pageType = null;
-	protected ?string $technicalName = null;
+	protected ?string $slug = null;
 	protected ?string $title = null;
 	protected ?string $icon = null;
 	protected ?string $description = null;
@@ -47,10 +47,10 @@ class Page extends Entity implements \JsonSerializable {
 	}
 
 	/**
-	 * Whether a technical name has the reserved form of the automatic `page_<id>`.
+	 * Whether a slug has the reserved form of the automatic `page_<id>`.
 	 */
-	public static function isDefaultName(string $technicalName): bool {
-		return TechnicalNameValidator::isDefaultName($technicalName, self::DEFAULT_NAME_PREFIX);
+	public static function isDefaultSlug(string $slug): bool {
+		return TechnicalNameValidator::isDefaultName($slug, self::DEFAULT_SLUG_PREFIX);
 	}
 
 	public function jsonSerialize(): array {
@@ -58,7 +58,7 @@ class Page extends Entity implements \JsonSerializable {
 			'id' => $this->getId(),
 			'contextId' => $this->getContextId(),
 			'pageType' => $this->getPageType(),
-			'technicalName' => $this->getTechnicalName(),
+			'slug' => $this->getSlug(),
 			'title' => $this->getTitle(),
 			'icon' => $this->getIcon(),
 			'description' => $this->getDescription(),

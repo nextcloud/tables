@@ -42,7 +42,7 @@ class PageTest extends DatabaseTestCase {
 		$page = new Page();
 		$page->setContextId(self::CONTEXT);
 		$page->setPageType(Page::TYPE_GRID);
-		$page->setTechnicalName('overview');
+		$page->setSlug('overview');
 		$page->setTitle('Overview');
 		$page->setIcon('star');
 		$page->setDescription('Open tasks by team');
@@ -52,7 +52,7 @@ class PageTest extends DatabaseTestCase {
 			'id' => $page->getId(),
 			'contextId' => self::CONTEXT,
 			'pageType' => 'grid',
-			'technicalName' => 'overview',
+			'slug' => 'overview',
 			'title' => 'Overview',
 			'icon' => 'star',
 			'description' => 'Open tasks by team',
@@ -66,17 +66,17 @@ class PageTest extends DatabaseTestCase {
 		$page->setTitle('Overview');
 		$page = $this->mapper->insertWithDefaultName($page);
 
-		$this->assertSame('page_' . $page->getId(), $page->getTechnicalName());
-		$this->assertSame('page_' . $page->getId(), $this->load($page->getId())->getTechnicalName());
+		$this->assertSame('page_' . $page->getId(), $page->getSlug());
+		$this->assertSame('page_' . $page->getId(), $this->load($page->getId())->getSlug());
 	}
 
-	public function testOnlyTheAutomaticFormIsADefaultName(): void {
+	public function testOnlyTheAutomaticFormIsADefaultSlug(): void {
 		foreach (['page_7' => true, 'page_123456' => true, 'page' => false, 'page_' => false, 'page_7a' => false, 'my_page_7' => false, 'dashboard' => false] as $name => $isDefault) {
-			$this->assertSame($isDefault, Page::isDefaultName($name), $name);
+			$this->assertSame($isDefault, Page::isDefaultSlug($name), $name);
 		}
 	}
 
-	public function testATechnicalNameIsUniqueWithinAnApplication(): void {
+	public function testASlugIsUniqueWithinAnApplication(): void {
 		$this->insertNamed(self::CONTEXT, 'sales');
 		$this->insertNamed(self::OTHER_CONTEXT, 'sales');
 
@@ -89,11 +89,11 @@ class PageTest extends DatabaseTestCase {
 		$this->assertCount(1, $this->mapper->getPageIdsForContext(self::CONTEXT));
 	}
 
-	private function insertNamed(int $contextId, string $technicalName): Page {
+	private function insertNamed(int $contextId, string $slug): Page {
 		$page = new Page();
 		$page->setContextId($contextId);
 		$page->setPageType(Page::TYPE_GRID);
-		$page->setTechnicalName($technicalName);
+		$page->setSlug($slug);
 		return $this->mapper->insert($page);
 	}
 
