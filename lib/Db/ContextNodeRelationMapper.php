@@ -34,6 +34,26 @@ class ContextNodeRelationMapper extends QBMapper {
 		$qb->executeStatement();
 	}
 
+	/**
+	 * The ids of the applications that hold a node.
+	 *
+	 * @return list<int>
+	 * @throws Exception
+	 */
+	public function getContextIdsForNode(int $nodeId, int $nodeType): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->selectDistinct('context_id')->from($this->table)
+			->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)));
+		$result = $qb->executeQuery();
+		$contextIds = [];
+		while ($row = $result->fetchAssociative()) {
+			$contextIds[] = (int)$row['context_id'];
+		}
+		$result->closeCursor();
+		return $contextIds;
+	}
+
 	public function getRelIdsForNode(int $nodeId, int $nodeType): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')->from($this->table)

@@ -380,8 +380,9 @@ class ContextService {
 
 	public function deleteNodeRel(int $nodeId, int $nodeType): void {
 		try {
-			$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
-			$this->atomic(function () use ($nodeRelIds): void {
+			$this->atomic(function () use ($nodeId, $nodeType): void {
+				$this->lockContexts($this->contextNodeRelMapper->getContextIdsForNode($nodeId, $nodeType));
+				$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
 				$this->widgetService->deleteSourcesByNodeRelIds($nodeRelIds);
 				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
@@ -479,13 +480,32 @@ class ContextService {
 	 */
 	public function removeNodeFromContextAndPages(int $nodeRelationId): array {
 		return $this->atomic(function () use ($nodeRelationId): array {
-			// the order of deleteNodeRel(): sources, contents, relation
+			// the order of deleteNodeRel(): application, sources, contents, relation
+			$nodeRelation = $this->contextNodeRelMapper->findById($nodeRelationId);
+			$this->lockContexts([$nodeRelation->getContextId()]);
 			$this->widgetService->deleteSourcesByNodeRelIds([$nodeRelationId]);
 			$contents = $this->pageContentMapper->findByNodeRelation($nodeRelationId);
 			$this->pageContentMapper->deleteByNodeRelIds([$nodeRelationId]);
-			$nodeRelation = $this->removeNodeFromContextById($nodeRelationId);
+			$nodeRelation = $this->removeNodeFromContext($nodeRelation);
 			return [$nodeRelation, $contents];
 		}, $this->dbc);
+	}
+
+	/**
+	 * Locks application rows until the transaction ends, in ascending id order. A write
+	 * that removes tables or views from applications takes them before it touches widgets,
+	 * contents or relations, the order of a page save and of an application delete, so
+	 * neither waits for the other while holding what the other needs.
+	 *
+	 * @param list<int> $contextIds
+	 * @throws Exception
+	 */
+	private function lockContexts(array $contextIds): void {
+		$contextIds = array_values(array_unique($contextIds));
+		sort($contextIds);
+		foreach ($contextIds as $contextId) {
+			$this->contextMapper->lock($contextId);
+		}
 	}
 
 	/**
