@@ -7972,7 +7972,7 @@ export interface operations {
                         readonly modifyTables: readonly components["schemas"]["Table"][];
                     };
                     /**
-                     * @description Menu of the scheme, replacing the menu of the context: pages by technical name, tables and views by uuid, the group of an item by its position in the list; items that cannot be used here are skipped. Left out, the menu stays as it is
+                     * @description Menu of the scheme, replacing the menu of the context: pages by slug, tables and views by uuid, the group of an item by its position in the list; items that cannot be used here are skipped. Left out, the menu stays as it is
                      * @default null
                      */
                     readonly menu?: readonly {
