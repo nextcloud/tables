@@ -4,7 +4,7 @@
 -->
 <template>
 	<div>
-		<div v-if="localLoading || !element" class="icon-loading" />
+		<div v-if="localLoading || !element" class="icon-loading loading-placeholder" />
 
 		<div v-else>
 			<CustomView v-if="isView"

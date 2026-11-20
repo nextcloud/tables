@@ -4,9 +4,7 @@
 -->
 <template>
 	<div class="main-view-view" :class="{ 'main-view-view--cards': isCardLayout }">
-		<div v-if="!activeView && !errorMessage">
-			<div class="icon-loading" />
-		</div>
+		<div v-if="!activeView && !errorMessage" class="icon-loading loading-placeholder" />
 
 		<div v-else-if="activeView">
 			<MainWrapper :element="activeView" :is-view="true" @update:layout="localLayout = $event" />
