@@ -339,9 +339,19 @@ export default {
 		},
 
 		/**
-		 * The menu the import saves. An item for a page the import adds points at it by
-		 * `{ page }`, so without the pages it is left out, and the groups of the other
-		 * items are named by their new position.
+		 * The slugs of the pages of the application that the scheme updates. Without the
+		 * pages, only items for these pages find their page.
+		 *
+		 * @return {Set<string>}
+		 */
+		existingPageSlugs() {
+			return new Set((this.previewData.pages?.summary ?? []).filter(page => page.action === 'update').map(page => page.slug))
+		},
+
+		/**
+		 * The menu the import saves. An item for a page the import adds is left out
+		 * without the pages, and the groups of the other items are named by their new
+		 * position.
 		 *
 		 * @return {Array<object>}
 		 */
@@ -353,7 +363,7 @@ export default {
 			const positions = new Map()
 			const kept = []
 			items.forEach((item, index) => {
-				if (item.target?.page === undefined) {
+				if (item.target?.page === undefined || this.existingPageSlugs.has(item.target.page)) {
 					positions.set(index, kept.length)
 					kept.push(item)
 				}
@@ -373,7 +383,7 @@ export default {
 				return skipped
 			}
 			return skipped.concat((this.menuPreview?.to ?? [])
-				.filter(item => item.target?.page !== undefined)
+				.filter(item => item.target?.page !== undefined && !this.existingPageSlugs.has(item.target.page))
 				.map(item => ({
 					label: t('tables', '{item}: its page is not imported', { item: this.menuItemTitle(item) }, undefined, raw),
 				})))

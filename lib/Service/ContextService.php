@@ -1241,8 +1241,8 @@ class ContextService {
 				'skipped' => $skipped,
 			];
 			foreach ($pages as $page) {
-				if ($page['exportedId'] !== null) {
-					$schemePageIds[$page['exportedId']] = $page['pageId'];
+				if ($page['exportedSlug'] !== null) {
+					$schemePageIds[$page['exportedSlug']] = $page['pageId'];
 				}
 			}
 		}
@@ -1372,7 +1372,7 @@ class ContextService {
 	 *
 	 * @param list<array<array-key, mixed>> $schemePages
 	 * @param array<string, ?int> $nodes the nodes of the application after the import, by node type and uuid (`<type>:<uuid>`), with their id when it is known
-	 * @return array{pages: list<array{entry: array<array-key, mixed>, exportedId: ?int, pageId: ?int, pageType: string, slug: ?string, title: ?string, currentTitle: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>, unlinkedWidgetCount: int}>, skipped: list<array{pageIndex: int, page: mixed, widgetIndex: ?int, widget: mixed, reason: string}>}
+	 * @return array{pages: list<array{entry: array<array-key, mixed>, exportedSlug: ?string, pageId: ?int, pageType: string, slug: ?string, title: ?string, currentTitle: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>, unlinkedWidgetCount: int}>, skipped: list<array{pageIndex: int, page: mixed, widgetIndex: ?int, widget: mixed, reason: string}>}
 	 */
 	private function resolveSchemePages(Context $context, array $schemePages, array $nodes): array {
 		$startPageId = null;
@@ -1472,7 +1472,7 @@ class ContextService {
 			$title = $this->importedText($pageArr['title'] ?? null, TextHelper::TITLE_MAX_LENGTH, 'page title');
 			$pages[] = [
 				'entry' => ['widgets' => $keptEntries] + $pageArr,
-				'exportedId' => is_int($pageArr['id'] ?? null) ? $pageArr['id'] : null,
+				'exportedSlug' => $name,
 				'pageId' => $pageId,
 				'pageType' => $pageType,
 				'slug' => $slug,
@@ -1497,8 +1497,8 @@ class ContextService {
 	 * based on the version from before the import is refused.
 	 *
 	 * @param Context $context the application, loaded after its nodes were imported
-	 * @param list<array{exportedId: ?int, pageId: ?int, pageType: string, slug: ?string, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>, ...}> $pages
-	 * @return array<int, int> ids of the pages by the id the scheme gives them
+	 * @param list<array{exportedSlug: ?string, pageId: ?int, pageType: string, slug: ?string, title: ?string, icon: ?string, description: ?string, widgets: list<array{widget: WidgetInput, source: ?array{0: int, 1: ?int}}>, ...}> $pages
+	 * @return array<string, int> ids of the pages by the slug the scheme gives them
 	 * @throws Exception
 	 * @throws \JsonException
 	 */
@@ -1547,8 +1547,8 @@ class ContextService {
 				$pageId = $page->getId();
 				$this->widgetService->insertAll($pageId, $widgets);
 			}
-			if ($resolved['exportedId'] !== null) {
-				$pageIds[$resolved['exportedId']] = $pageId;
+			if ($resolved['exportedSlug'] !== null) {
+				$pageIds[$resolved['exportedSlug']] = $pageId;
 			}
 		}
 		return $pageIds;
@@ -1663,7 +1663,7 @@ class ContextService {
 				$withNodes,
 				$menu,
 				static fn (string $kind, string $uuid): ?int => $nodeRelIds[$kind][$uuid] ?? null,
-				static fn (int $pageId): ?int => $schemePageIds[$pageId] ?? null,
+				static fn (string $slug): ?int => $schemePageIds[$slug] ?? $pageIds[$slug] ?? null,
 			);
 			$this->logSkippedMenuItems($menuSkipped);
 		}
