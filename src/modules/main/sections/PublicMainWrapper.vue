@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="public-table-wrapper">
-		<div v-if="loading" class="icon-loading" />
+		<div v-if="loading" class="icon-loading loading-placeholder" />
 
 		<div v-else>
 			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" @download-filtered-csv="downloadFilteredCSV" />
