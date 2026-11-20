@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="row main-context-view">
-		<div v-if="loading" class="icon-loading" />
+		<div v-if="loading" class="icon-loading loading-placeholder" />
 
 		<div v-else-if="activeContext">
 			<div class="content context">

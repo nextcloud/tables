@@ -6,7 +6,7 @@
 	<NcContent app-name="tables">
 		<Navigation v-if="!isPublicShare" />
 		<NcAppContent>
-			<div v-if="isLoadingSomething" class="icon-loading" />
+			<div v-if="isLoadingSomething" class="icon-loading loading-placeholder" />
 
 			<PublicTableView v-if="isPublicShare && !isLoadingSomething" :token="shareToken" />
 			<router-view v-else-if="!isLoadingSomething" />
@@ -281,10 +281,6 @@ button[class^='icon-'] {
 
 .error input {
 	border-color: var(--color-error);
-}
-
-.icon-loading:first-child {
-	top: 10vh;
 }
 
 .block {
