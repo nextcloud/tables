@@ -554,7 +554,8 @@ class MenuServiceTest extends DatabaseTestCase {
 	}
 
 	public function testTheMenuOfASchemePreviewImportsAsShown(): void {
-		[$contextId, $startPageId, $pageId, $nodeRelId] = $this->createApplication();
+		[$contextId, $startPageId, , $nodeRelId] = $this->createApplication();
+		$pageId = $this->pageService->createGridPage($contextId, 'Overview', 'overview', null, null)['id'];
 		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
 		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
 		$context = $this->contextService->findById($contextId, self::OWNER);
@@ -613,7 +614,8 @@ class MenuServiceTest extends DatabaseTestCase {
 	}
 
 	public function testSchemePagesAreMatchedByStartPageAndSlug(): void {
-		[$contextId, $startPageId, $pageId] = $this->createApplication();
+		[$contextId, $startPageId] = $this->createApplication();
+		$pageId = $this->pageService->createGridPage($contextId, 'Sales', 'sales', null, null)['id'];
 		$context = $this->contextService->findById($contextId, self::OWNER);
 		$name = $context->getPages()[$pageId]['slug'];
 
@@ -624,6 +626,17 @@ class MenuServiceTest extends DatabaseTestCase {
 			['id' => 14, 'page_type' => Page::TYPE_GRID, 'slug' => $context->getPages()[$startPageId]['slug']],
 			['page_type' => Page::TYPE_GRID, 'slug' => $name],
 			'not a page',
+		]));
+	}
+
+	public function testAnAutomaticSlugOfASchemePageStandsForNoPage(): void {
+		[$contextId, , $pageId] = $this->createApplication();
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$automatic = $context->getPages()[$pageId]['slug'];
+		$this->assertTrue(Page::isDefaultSlug($automatic));
+
+		$this->assertSame([], $this->menuService->schemePageIds($context, [
+			['id' => 12, 'page_type' => Page::TYPE_GRID, 'slug' => $automatic],
 		]));
 	}
 

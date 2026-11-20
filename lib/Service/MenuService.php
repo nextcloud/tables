@@ -399,7 +399,8 @@ class MenuService {
 	/**
 	 * The pages of an application that the pages of a scheme stand for, by the slug of the
 	 * scheme page. The start page of the scheme is the start page of the application, and
-	 * any other page is the page of the same type with its slug.
+	 * any other page is the page of the same type with its slug. An automatic `page_<id>`
+	 * slug names a page of the instance the scheme came from, so it stands for no page here.
 	 *
 	 * @param array<array-key, mixed> $schemePages
 	 * @return array<string, int>
@@ -421,7 +422,11 @@ class MenuService {
 				continue;
 			}
 			$pageType = is_string($page['page_type'] ?? null) ? $page['page_type'] : '';
-			$pageId = $pageType === Page::TYPE_STARTPAGE ? $startPageId : ($pageIdsByName[$pageType][$page['slug']] ?? null);
+			$pageId = match (true) {
+				$pageType === Page::TYPE_STARTPAGE => $startPageId,
+				Page::isDefaultSlug($page['slug']) => null,
+				default => $pageIdsByName[$pageType][$page['slug']] ?? null,
+			};
 			if ($pageId !== null) {
 				$pageIds[$page['slug']] = $pageId;
 			}
