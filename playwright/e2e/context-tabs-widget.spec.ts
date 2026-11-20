@@ -35,9 +35,9 @@ test.describe('Tabs widget', () => {
 			data: {
 				version: 0,
 				widgets: [
-					{ type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 10, settings: { tabs: 'Notes\nData' } },
-					{ type: 'text', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'In the first tab' }, parentIndex: 0, parentTab: 0 },
-					{ type: 'data', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 6, source: { nodeRelId }, parentIndex: 0, parentTab: 1 },
+					{ type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 10, settings: { tabs: [{ key: 'notes', title: 'Notes' }, { key: 'data', title: 'Data' }] } },
+					{ type: 'text', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'In the first tab' }, parentIndex: 0, parentTab: 'notes' },
+					{ type: 'data', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 6, source: { nodeRelId }, parentIndex: 0, parentTab: 'data' },
 				],
 			},
 		})
@@ -101,7 +101,7 @@ test.describe('Tabs widget', () => {
 		await page.locator('[data-cy="gridPageSave"]').click()
 		const widgets = (await (await response).json()).ocs.data.widgets
 		const tabsWidget = widgets.find((widget: { type: string }) => widget.type === 'tabs')
-		expect(widgets.find((widget: { type: string }) => widget.type === 'text')).toMatchObject({ parentId: tabsWidget.id, parentTab: 1 })
+		expect(widgets.find((widget: { type: string }) => widget.type === 'text')).toMatchObject({ parentId: tabsWidget.id, parentTab: tabsWidget.settings.tabs[1].key })
 
 		await page.reload()
 		await expect(page.locator('[data-cy="tabsWidget"]').getByRole('tab')).toHaveCount(2, { timeout: 30000 })
@@ -118,9 +118,9 @@ test.describe('Tabs widget', () => {
 			data: {
 				version: 0,
 				widgets: [
-					{ type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 12, settings: { tabs: 'First\nSecond' } },
-					{ type: 'text', title: 'Upper', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Upper' }, parentIndex: 0, parentTab: 1 },
-					{ type: 'text', title: 'Lower', gridX: 0, gridY: 2, gridWidth: 6, gridHeight: 2, settings: { text: 'Lower' }, parentIndex: 0, parentTab: 1 },
+					{ type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 12, settings: { tabs: [{ key: 'first', title: 'First' }, { key: 'second', title: 'Second' }] } },
+					{ type: 'text', title: 'Upper', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Upper' }, parentIndex: 0, parentTab: 'second' },
+					{ type: 'text', title: 'Lower', gridX: 0, gridY: 2, gridWidth: 6, gridHeight: 2, settings: { text: 'Lower' }, parentIndex: 0, parentTab: 'second' },
 				],
 			},
 		})

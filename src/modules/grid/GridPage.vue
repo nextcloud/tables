@@ -111,7 +111,7 @@ import GridLevel from './GridLevel.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, levelLayout, mergeLayout, nextFreeRow, pageTitle, pageToGrid, sortedLayout, tabTitles, widgetTarget } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, levelLayout, mergeLayout, nextFreeRow, pageTitle, pageToGrid, releaseRemovedTabs, sortedLayout, widgetTabs, widgetTarget } from './gridLayout.js'
 import { WIDGET_TYPE_DATA } from './widgetRegistry.js'
 
 /**
@@ -330,7 +330,7 @@ export default {
 		 * the application only shows in edit mode, where it can get another one or be removed.
 		 *
 		 * @param {string|null} parentKey the key of the tabs widget, or null for the page itself
-		 * @param {number|null} tab the position of the tab
+		 * @param {string|null} tab the key of the tab
 		 * @return {Array} the layout items to show
 		 */
 		shownLayout(parentKey = null, tab = null) {
@@ -355,7 +355,7 @@ export default {
 		 * Opens the dialog for a new widget in a tab of a tabs widget.
 		 *
 		 * @param {object} tabsWidget the tabs widget
-		 * @param {number} tab the position of the tab
+		 * @param {string} tab the key of the tab
 		 */
 		openAddWidgetInTab(tabsWidget, tab) {
 			this.widgetBeingConfigured = null
@@ -386,7 +386,7 @@ export default {
 		},
 		/**
 		 * Updates the configured widget, or places a new one below the others on its level. A tabs
-		 * widget that loses tabs moves the widgets of those tabs into its last one.
+		 * widget that loses tabs moves the widgets of those tabs onto the page.
 		 *
 		 * @param {{type: string, title: string, icon: string|null, description: string, settings: object, nodeRelId: number|null}} payload the widget from the dialog
 		 */
@@ -397,19 +397,13 @@ export default {
 			}
 			if (this.widgetBeingConfigured) {
 				const configuredKey = this.widgetBeingConfigured.key
-				const lastTab = Math.max(0, tabTitles(payload.settings).length - 1)
-				this.draftGrid = {
+				const grid = {
 					...this.draftGrid,
-					widgets: this.draftGrid.widgets.map(widget => {
-						if (widget.key === configuredKey) {
-							return { ...widget, title: payload.title, icon: payload.icon, description: payload.description, settings: payload.settings, nodeRelId: payload.nodeRelId }
-						}
-						if (widget.parentKey === configuredKey && widget.parentTab > lastTab) {
-							return { ...widget, parentTab: lastTab }
-						}
-						return widget
-					}),
+					widgets: this.draftGrid.widgets.map(widget => widget.key === configuredKey
+						? { ...widget, title: payload.title, icon: payload.icon, description: payload.description, settings: payload.settings, nodeRelId: payload.nodeRelId }
+						: widget),
 				}
+				this.draftGrid = releaseRemovedTabs(grid, configuredKey, widgetTabs(payload.settings))
 				this.closeAddWidget()
 				return
 			}

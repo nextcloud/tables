@@ -7,15 +7,23 @@ import { createPinia } from 'pinia'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import TabsWidget from '../../src/modules/grid/widgets/TabsWidget.vue'
 import GridLevel from '../../src/modules/grid/GridLevel.vue'
-import { gridToWidgets, levelLayout, mergeLayout, pageToGrid, tabTitles } from '../../src/modules/grid/gridLayout.js'
+import { gridToWidgets, levelLayout, mergeLayout, newTabKey, pageToGrid, releaseRemovedTabs, widgetTabs } from '../../src/modules/grid/gridLayout.js'
 
 const page = {
 	widgets: [
-		{ id: 1, type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 8, settings: { tabs: 'Open\n\nClosed' }, source: null, parentId: null, parentTab: null },
-		{ id: 2, type: 'text', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Open ones' }, source: null, parentId: 1, parentTab: 0 },
-		{ id: 3, type: 'text', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Closed ones' }, source: null, parentId: 1, parentTab: 1 },
+		{ id: 1, type: 'tabs', gridX: 0, gridY: 0, gridWidth: 12, gridHeight: 8, settings: { tabs: [{ key: 'open', title: 'Open' }, { key: 'closed', title: 'Closed' }] }, source: null, parentId: null, parentTab: null },
+		{ id: 2, type: 'text', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Open ones' }, source: null, parentId: 1, parentTab: 'open' },
+		{ id: 3, type: 'text', gridX: 0, gridY: 0, gridWidth: 6, gridHeight: 2, settings: { text: 'Closed ones' }, source: null, parentId: 1, parentTab: 'closed' },
 		{ id: 4, type: 'header', gridX: 0, gridY: 8, gridWidth: 12, gridHeight: 2, settings: { heading: 'Below' }, source: null, parentId: null, parentTab: null },
 	],
+}
+
+/**
+ * @param {...string} titles titles of tabs
+ * @return {Array<{key: string, title: string}>} the tabs, keyed by their titles in lower case
+ */
+function tabList(...titles) {
+	return titles.map(title => ({ key: title.toLowerCase(), title }))
 }
 
 const widgetTypes = [{ type: 'tabs', hasSource: false }, { type: 'text', hasSource: false }, { type: 'header', hasSource: false }]
@@ -95,7 +103,7 @@ describe('TabsWidget', () => {
 	})
 
 	it('tells a viewer that a tab is empty and asks an editor to add widgets to it', () => {
-		const grid = pageToGrid({ widgets: [{ ...page.widgets[0], settings: { tabs: 'Empty' } }] })
+		const grid = pageToGrid({ widgets: [{ ...page.widgets[0], settings: { tabs: [{ key: 'empty', title: 'Empty' }] } }] })
 		mountInPage(TabsWidget, { widget: grid.widgets[0], editable: false }, gridLevel(grid, false))
 		cy.get('[data-cy="tabsWidgetEmpty"]').should('have.text', 'This tab is empty.')
 		cy.get('[data-cy="gridItem"]').should('not.exist')
@@ -118,7 +126,7 @@ describe('TabsWidget', () => {
 
 describe('TabsWidget keyboard', () => {
 	it('keeps one tab in the tab order when the tabs change, and leaves Alt with an arrow to the browser', () => {
-		const grid = pageToGrid({ widgets: [{ ...page.widgets[0], settings: { tabs: 'One\nTwo\nThree\nFour' } }] })
+		const grid = pageToGrid({ widgets: [{ ...page.widgets[0], settings: { tabs: tabList('One', 'Two', 'Three', 'Four') } }] })
 		const actions = gridLevel(grid, false)
 		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
 		cy.mount(TabsWidget, {
@@ -128,7 +136,7 @@ describe('TabsWidget keyboard', () => {
 
 		cy.get('[role="tab"]').eq(0).focus().trigger('keydown', { key: 'End' })
 		cy.focused().should('contain.text', 'Four')
-		cy.get('@wrapper').then(wrapper => wrapper.setProps({ widget: { ...grid.widgets[0], settings: { tabs: 'One\nTwo' } } }))
+		cy.get('@wrapper').then(wrapper => wrapper.setProps({ widget: { ...grid.widgets[0], settings: { tabs: tabList('One', 'Two') } } }))
 		cy.get('[role="tab"]').should('have.length', 2)
 		cy.get('[role="tab"][tabindex="0"]').should('have.length', 1)
 
@@ -162,7 +170,7 @@ describe('GridLevel', () => {
 	it('shows the widgets of one tab', () => {
 		cy.viewport(1400, 800)
 		const grid = pageToGrid(page)
-		mountInPage(GridLevel, { parentKey: 'w1', tab: 1 }, gridLevel(grid, false))
+		mountInPage(GridLevel, { parentKey: 'w1', tab: 'closed' }, gridLevel(grid, false))
 
 		cy.contains('Closed ones').should('be.visible')
 		cy.contains('Open ones').should('not.exist')
@@ -174,16 +182,62 @@ describe('grid levels', () => {
 	it('splits the grid by level and saves widgets in tabs with the position of their tabs widget', () => {
 		const grid = pageToGrid(page)
 
-		expect(tabTitles(grid.widgets[0].settings)).to.deep.equal(['Open', 'Closed'])
+		expect(widgetTabs(grid.widgets[0].settings).map(tab => tab.title)).to.deep.equal(['Open', 'Closed'])
 		expect(levelLayout(grid).map(item => item.widgetId)).to.deep.equal(['w1', 'w4'])
-		expect(levelLayout(grid, 'w1', 1).map(item => item.widgetId)).to.deep.equal(['w3'])
+		expect(levelLayout(grid, 'w1', 'closed').map(item => item.widgetId)).to.deep.equal(['w3'])
 		const merged = mergeLayout(grid.layout, [{ widgetId: 'w3', gridX: 6, gridY: 1, gridWidth: 6, gridHeight: 2 }])
 		expect(merged[2].gridX).to.equal(6)
 		expect(merged[0]).to.equal(grid.layout[0])
 
 		const saved = gridToWidgets(grid, widgetTypes)
-		expect(saved[1]).to.deep.include({ parentIndex: 0, parentTab: 0 })
-		expect(saved[2]).to.deep.include({ parentIndex: 0, parentTab: 1 })
+		expect(saved[1]).to.deep.include({ parentIndex: 0, parentTab: 'open' })
+		expect(saved[2]).to.deep.include({ parentIndex: 0, parentTab: 'closed' })
 		expect(saved[0]).not.to.have.property('parentIndex')
+	})
+	it('moves the widgets of a removed tab onto the page below its widgets, one tab below the other', () => {
+		const grid = pageToGrid({
+			widgets: [
+				...page.widgets,
+				{ id: 5, type: 'text', gridX: 6, gridY: 3, gridWidth: 6, gridHeight: 4, settings: { text: 'Closed too' }, source: null, parentId: 1, parentTab: 'closed' },
+			],
+		})
+
+		expect(releaseRemovedTabs(grid, 'w1', widgetTabs(grid.widgets[0].settings))).to.equal(grid)
+		const released = releaseRemovedTabs(grid, 'w1', [])
+		expect(released.widgets.filter(widget => widget.parentKey !== null)).to.have.length(0)
+		const rows = Object.fromEntries(released.layout.map(item => [item.widgetId, [item.gridX, item.gridY]]))
+		// The page ends at row 10; the tab "Open" takes rows 10-11, the tab "Closed" starts at 12
+		expect(rows).to.deep.equal({ w1: [0, 0], w2: [0, 10], w3: [0, 12], w4: [0, 8], w5: [6, 15] })
+		const renamed = releaseRemovedTabs(grid, 'w1', [{ key: 'closed', title: 'Done' }, { key: 'open', title: 'Open' }])
+		expect(renamed.widgets).to.deep.equal(grid.widgets)
+	})
+
+	it('makes a new tab key that the server accepts and no other tab has', () => {
+		const tabs = [{ key: 'a' }]
+		const key = newTabKey(tabs)
+		expect(key).to.match(/^[0-9a-f]{12}$/)
+		expect(newTabKey([...tabs, { key }])).not.to.equal(key)
+	})
+})
+
+describe('TabsWidget keyed tabs', () => {
+	it('keeps the widgets of a tab and the open tab when the tabs are renamed and reordered', () => {
+		cy.viewport(1400, 800)
+		const grid = pageToGrid(page)
+		cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: [] } })
+		cy.mount(TabsWidget, {
+			props: { widget: grid.widgets[0], editable: false },
+			global: { plugins: [createPinia()], mixins: [{ methods: { t, n } }], provide: { gridLevel: gridLevel(grid, false) } },
+		}).then(({ wrapper }) => cy.wrap(wrapper).as('wrapper'))
+
+		cy.get('[role="tab"]').eq(1).click()
+		cy.contains('Closed ones', { timeout: 20000 }).should('be.visible')
+		cy.get('@wrapper').then(wrapper => wrapper.setProps({
+			widget: { ...grid.widgets[0], settings: { tabs: [{ key: 'closed', title: 'Done' }, { key: 'open', title: 'Open' }] } },
+		}))
+		cy.get('[role="tab"]').eq(0).should('have.text', 'Done').and('have.attr', 'aria-selected', 'true')
+		cy.contains('Closed ones').should('be.visible')
+		cy.get('[role="tab"]').eq(1).click()
+		cy.contains('Open ones').should('be.visible')
 	})
 })
