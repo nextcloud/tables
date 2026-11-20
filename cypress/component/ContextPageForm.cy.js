@@ -44,10 +44,10 @@ describe('ContextPageForm', () => {
 		})
 	})
 
-	it('keeps the automatic name of a page being edited and does not send it again', () => {
+	it('shows the slug of a page being edited without letting it change or sending it', () => {
 		mountForm({ id: 12, title: 'Overview', icon: 'star', slug: 'page_12', description: '' })
 
-		cy.get('[data-cy="contextPageSlug"]').should('have.value', 'page_12')
+		cy.get('[data-cy="contextPageSlug"]').should('have.value', 'page_12').and('have.attr', 'readonly')
 		cy.get('[data-cy="iconFieldClear"]').click()
 		cy.get('[data-cy="contextPageSubmit"]').should('be.enabled').click()
 		cy.get('@wrapper').then(wrapper => {

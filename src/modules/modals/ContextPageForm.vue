@@ -16,12 +16,19 @@
 				:maxlength="200"
 				data-cy="contextPageTitle" />
 			<IconField v-model="icon" :label="t('tables', 'Icon')" />
-			<NcTextField v-model="slug"
+			<NcTextField v-if="page"
+				:model-value="page.slug ?? ''"
+				:label="t('tables', 'Slug')"
+				:helper-text="t('tables', 'Used by imports and links to this page. It stays as it was set when the page was added.')"
+				readonly
+				data-cy="contextPageSlug" />
+			<NcTextField v-else
+				v-model="slug"
 				:label="t('tables', 'Slug')"
 				:maxlength="200"
 				:error="slugError !== null"
 				:aria-invalid="slugError !== null ? 'true' : undefined"
-				:helper-text="slugError ?? t('tables', 'Used by imports and links to this page. Leave empty to get one automatically.')"
+				:helper-text="slugError ?? t('tables', 'Used by imports and links to this page. It cannot be changed later. Leave empty to get one automatically.')"
 				data-cy="contextPageSlug" />
 			<NcTextArea v-model="description"
 				:label="t('tables', 'Description')"
@@ -47,8 +54,8 @@ import IconField from '../../shared/components/ncIconPicker/IconField.vue'
 import { pageSlugError } from '../grid/gridLayout.js'
 
 /**
- * Asks for the title, icon, slug and description of a new grid page, or of the
- * page being edited.
+ * Asks for the title, icon, slug and description of a new grid page, or for the title,
+ * icon and description of the page being edited, whose slug never changes.
  */
 export default {
 	name: 'ContextPageForm',
@@ -86,11 +93,7 @@ export default {
 	},
 	computed: {
 		slugError() {
-			// A page keeps the name it has, also one the server gave it
-			if (this.page && this.slug === this.page.slug) {
-				return null
-			}
-			return pageSlugError(this.slug.trim())
+			return this.page ? null : pageSlugError(this.slug.trim())
 		},
 		canSubmit() {
 			return this.title.trim() !== '' && this.slugError === null
@@ -101,15 +104,15 @@ export default {
 			if (open) {
 				this.title = this.page?.title ?? ''
 				this.icon = this.page?.icon ?? null
-				this.slug = this.page?.slug ?? ''
+				this.slug = ''
 				this.description = this.page?.description ?? ''
 			}
 		},
 	},
 	methods: {
 		/**
-		 * Hands the fields to the parent. Fields left empty are sent empty, so they are removed;
-		 * an empty slug is left out, so the server keeps or gives one.
+		 * Hands the fields to the parent. Fields left empty are sent empty, so they are removed.
+		 * A slug goes only with a new page; left empty, the server gives one.
 		 */
 		submit() {
 			if (!this.canSubmit || this.pending) {
@@ -117,7 +120,7 @@ export default {
 			}
 			const data = { title: this.title.trim(), icon: this.icon ?? '', description: this.description.trim() }
 			const slug = this.slug.trim()
-			if (slug !== '' && slug !== this.page?.slug) {
+			if (!this.page && slug !== '') {
 				data.slug = slug
 			}
 			this.$emit('submit', data)
