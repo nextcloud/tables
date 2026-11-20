@@ -34,6 +34,8 @@ final class NotificationHelperTest extends TestCase {
 	private View $view;
 	/** @var list<string> */
 	private array $notifiedUsers = [];
+	/** @var list<array> */
+	private array $subjectParams = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -65,9 +67,13 @@ final class NotificationHelperTest extends TestCase {
 		);
 
 		$notification = $this->createMock(INotification::class);
-		foreach (['setApp', 'setDateTime', 'setObject', 'setSubject'] as $setter) {
+		foreach (['setApp', 'setDateTime', 'setObject'] as $setter) {
 			$notification->method($setter)->willReturnSelf();
 		}
+		$notification->method('setSubject')->willReturnCallback(function (string $subject, array $params) use ($notification): INotification {
+			$this->subjectParams[] = $params;
+			return $notification;
+		});
 		$notification->method('setUser')->willReturnCallback(function (string $userId) use ($notification): INotification {
 			$this->notifiedUsers[] = $userId;
 			return $notification;
@@ -108,6 +114,26 @@ final class NotificationHelperTest extends TestCase {
 		$this->sendRowCreated();
 
 		$this->assertSame([], $this->notifiedUsers);
+	}
+
+	public function testViewNotificationCarriesCardTitleSource(): void {
+		$this->view->setViewSettings(json_encode(['cardTitleSource' => 3]));
+		$this->rowVisibility->method('usersSeeingRow')->willReturn(['visible']);
+
+		$this->sendRowCreated();
+
+		$this->assertCount(1, $this->subjectParams);
+		$this->assertTrue($this->subjectParams[0]['isViewContext']);
+		$this->assertSame(['id' => 7, 'title' => 'View', 'labelColumnId' => 3], $this->subjectParams[0]['view']);
+	}
+
+	public function testViewNotificationWithoutCardTitleSource(): void {
+		$this->rowVisibility->method('usersSeeingRow')->willReturn(['visible']);
+
+		$this->sendRowCreated();
+
+		$this->assertCount(1, $this->subjectParams);
+		$this->assertNull($this->subjectParams[0]['view']['labelColumnId']);
 	}
 
 	private function sendRowCreated(): void {
