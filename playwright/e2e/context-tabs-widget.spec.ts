@@ -85,7 +85,10 @@ test.describe('Tabs widget', () => {
 		await page.locator('[data-cy="gridPageAddWidget"]').click()
 		await page.locator('[data-cy="addWidgetType"] input').click()
 		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'Tabs' }).click()
-		await page.locator('[data-cy="widgetFieldTabs"] textarea').fill('First\nSecond')
+		await page.locator('[data-cy="tabsEditorAdd"]').click()
+		await page.locator('[data-cy="tabsEditorTitle"]').nth(0).fill('First')
+		await page.locator('[data-cy="tabsEditorAdd"]').click()
+		await page.locator('[data-cy="tabsEditorTitle"]').nth(1).fill('Second')
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 
 		await page.locator('[data-cy="tabsWidget"]').getByRole('tab', { name: 'Second' }).click()
