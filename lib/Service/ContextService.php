@@ -70,6 +70,7 @@ class ContextService {
 		private WidgetService $widgetService,
 		private GridWidgetTypes $gridWidgetTypes,
 		private MenuItemMapper $menuItemMapper,
+		private MenuService $menuService,
 	) {
 	}
 
@@ -676,15 +677,22 @@ class ContextService {
 	}
 
 	/**
+	 * Imports an application of a user's data that holds the given table. Its menu keeps
+	 * the links, the items for its pages and the items for the table, found by the uuid
+	 * it was exported with. Items for other tables and for views of the application are
+	 * left out, as each table brings its own copy of the application. Without a menu, or
+	 * when none of its items is kept, the menu gets the item that opens the start page.
+	 *
 	 * @param Table $table
 	 * @param array $context
 	 * @param int $tableOldId
+	 * @param string|null $tableOldUuid
 	 *
 	 * @return Context|null
 	 *
 	 * @throws \Exception
 	 */
-	public function importContext(Table $table, array $context, int $tableOldId): ?Context {
+	public function importContext(Table $table, array $context, int $tableOldId, ?string $tableOldUuid = null): ?Context {
 		// checking if any node in $context['nodes'] matches the old table id
 		$hasMatchingNode = false;
 		if (!empty($context['nodes'])) {
@@ -700,7 +708,7 @@ class ContextService {
 			return null;
 		}
 
-		return $this->atomic(fn (): Context => $this->insertImportedContext($table, $context, $tableOldId), $this->dbc);
+		return $this->atomic(fn (): Context => $this->insertImportedContext($table, $context, $tableOldId, $tableOldUuid), $this->dbc);
 	}
 
 	/**
@@ -709,7 +717,7 @@ class ContextService {
 	 *
 	 * @throws Exception
 	 */
-	private function insertImportedContext(Table $table, array $context, int $tableOldId): Context {
+	private function insertImportedContext(Table $table, array $context, int $tableOldId, ?string $tableOldUuid): Context {
 		$newContext = new Context();
 		$newContext->setName($context['name'] ?? '');
 		$newContext->setIcon($context['iconName'] ?? '');
@@ -744,7 +752,7 @@ class ContextService {
 		}
 
 		// insert pages
-		$pageMap = [];
+		$pageIdsBySlug = [];
 		$pages = $this->importablePages(is_array($context['pages'] ?? null) ? $context['pages'] : []);
 		$slugs = $this->importedPageSlugs($pages);
 		$startPageId = null;
@@ -770,9 +778,8 @@ class ContextService {
 				$page->setTitle((string)$page->getSlug());
 				$this->pageMapper->update($page);
 			}
-			$exportedPageId = self::importedKey($pageArr['id'] ?? null);
-			if ($exportedPageId !== null) {
-				$pageMap[$exportedPageId] = $page;
+			if (is_string($pageArr['slug'] ?? null)) {
+				$pageIdsBySlug[$pageArr['slug']] ??= $page->getId();
 			}
 
 			// insert page conten
@@ -802,7 +809,23 @@ class ContextService {
 			$this->logger->warning('An imported application had no start page; it gets a new one.');
 			$startPageId = $this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_SLUG, $slugs, true), array_values($nodeRelMap));
 		}
-		$this->menuItemMapper->insert(MenuItem::forStartPage($newContext->getId(), $startPageId));
+
+		$menuKept = false;
+		if (is_array($context['menu'] ?? null)) {
+			$tableRelation = reset($sourceRelMap);
+			$this->logSkippedMenuItems($this->menuService->import(
+				$this->contextMapper->findById($newContext->getId()),
+				$context['menu'],
+				static fn (string $kind, string $uuid): int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false
+					? $tableRelation->getId()
+					: throw new BadRequestError('Its ' . $kind . ' ' . $uuid . ' is not the table of this copy: the account import brings one table per copy of the application.'),
+				static fn (string $slug): ?int => $pageIdsBySlug[$slug] ?? null,
+			));
+			$menuKept = $this->menuItemMapper->findByContextId($newContext->getId()) !== [];
+		}
+		if (!$menuKept) {
+			$this->menuItemMapper->insert(MenuItem::forStartPage($newContext->getId(), $startPageId));
+		}
 
 		return $newContext;
 	}
@@ -833,6 +856,15 @@ class ContextService {
 			$this->pageContentMapper->insert($pageContent);
 		}
 		return $page->getId();
+	}
+
+	/**
+	 * @param list<array{index: int, title: ?string, reason: string}> $skipped
+	 */
+	private function logSkippedMenuItems(array $skipped): void {
+		if ($skipped !== []) {
+			$this->logger->warning('Skipping imported menu items: ' . implode('; ', array_map(static fn (array $item): string => $item['index'] . ': ' . $item['reason'], $skipped)));
+		}
 	}
 
 	/**
@@ -1009,6 +1041,7 @@ class ContextService {
 			array_values($nodes),
 			$this->getPagesWithWidgets($context),
 			array_values($tables),
+			$this->menuService->export($context),
 		);
 	}
 
@@ -1078,6 +1111,12 @@ class ContextService {
 			}
 		}
 
+		if (is_array($updateScheme['menu'] ?? null) && $updateScheme['menu'] !== []) {
+			$schemePages = is_array($updateScheme['pages'] ?? null) ? $updateScheme['pages'] : [];
+			$changes['menu'] = ['from' => $currentScheme->getMenu()] + $this->menuService->previewSchemeImport($context, $updateScheme['menu'], $schemePages, $changes['nodes']['to'] ?? []);
+			$changes['menu']['withCurrentNodes'] = $this->menuService->previewSchemeImport($context, $updateScheme['menu'], $schemePages, $changes['nodes']['from'] ?? []);
+		}
+
 		return $changes;
 	}
 
@@ -1089,8 +1128,9 @@ class ContextService {
 	 * @param array $nodes
 	 * @param array $tables
 	 * @param string $userId
+	 * @param list<mixed>|null $menu the menu of the scheme, see {@see MenuService::readExported()}; null leaves the menu alone
 	 *
-	 * @return Context
+	 * @return array{context: Context, menuSkipped: list<array{index: int, title: ?string, reason: string}>} the application and the menu items the import skipped
 	 *
 	 * @throws BadRequestError
 	 * @throws ContainerExceptionInterface
@@ -1102,7 +1142,7 @@ class ContextService {
 	 * @throws NotFoundExceptionInterface
 	 * @throws PermissionError
 	 */
-	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId): Context {
+	public function importScheme(int $contextId, string $name, string $iconName, string $description, array $nodes, array $tables, string $userId, ?array $menu = null): array {
 		// Validate the structure of the columns and views arrays
 		if (!isset($tables['addTables']) || !is_array($tables['addTables'])
 			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
@@ -1163,7 +1203,20 @@ class ContextService {
 		}
 
 		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
+		$menuSkipped = [];
+		if ($menu !== null) {
+			$withNodes = $this->contextMapper->findById($contextId, $userId);
+			$nodeRelIds = $this->menuService->nodeRelIdsByUuid($withNodes);
+			$pageIds = array_flip(array_map(static fn (array $page): string => (string)$page['slug'], $withNodes->getPages() ?? []));
+			$menuSkipped = $this->menuService->import(
+				$withNodes,
+				$menu,
+				static fn (string $kind, string $uuid): ?int => $nodeRelIds[$kind][$uuid] ?? null,
+				static fn (string $slug): ?int => $pageIds[$slug] ?? null,
+			);
+			$this->logSkippedMenuItems($menuSkipped);
+		}
 
-		return $context;
+		return ['context' => $context, 'menuSkipped' => $menuSkipped];
 	}
 }

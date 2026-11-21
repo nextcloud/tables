@@ -48,6 +48,12 @@
 			<div v-if="showResults">
 				<div v-if="!importFailed" class="row space-T">
 					{{ t('tables', 'Import completed successfully.') }}
+					<ul v-if="menuSkipped.length > 0" data-cy="importSchemeMenuSkippedResult">
+						<li>{{ t('tables', 'Menu items left out') }}:</li>
+						<li v-for="item in menuSkipped" :key="item.index">
+							{{ item.title || t('tables', 'Untitled item') }}: {{ item.reason }}
+						</li>
+					</ul>
 				</div>
 				<div v-else>
 					<NcEmptyContent :name="t('tables', 'Failed')" :description="errorMessage" />
@@ -142,6 +148,7 @@ export default {
 			loading: false,
 			importFailed: false,
 			result: null,
+			menuSkipped: [],
 			importFinished: false,
 			preview: null,
 			schemeData: null,
@@ -259,6 +266,7 @@ export default {
 				if (res.status === 200) {
 					this.importFinished = true
 					this.result = res.data
+					this.menuSkipped = res.data?.ocs?.data?.menuSkipped ?? []
 				} else {
 					console.debug('error while importing', res)
 					this.importFailed = true
@@ -281,6 +289,7 @@ export default {
 		},
 		reset() {
 			this.result = null
+			this.menuSkipped = []
 			this.importFinished = false
 			this.importFailed = false
 			this.preview = null

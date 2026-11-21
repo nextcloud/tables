@@ -17,7 +17,9 @@ use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Errors\BadRequestError;
@@ -36,6 +38,8 @@ use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Service\WidgetService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
@@ -49,11 +53,20 @@ use Psr\Log\LoggerInterface;
 class MenuServiceTest extends DatabaseTestCase {
 	private const OWNER = 'menu-service-owner';
 	private const TABLE = 4151;
+	private const TABLE_UUID = 'a5d8e2c4-4151-4cde-9f00-000000004151';
+	private const OTHER_TABLE = 4152;
+	private const OTHER_TABLE_UUID = 'a5d8e2c4-4152-4cde-9f00-000000004152';
+	private const VIEW = 4153;
+	private const VIEW_UUID = 'a5d8e2c4-4153-4cde-9f00-000000004153';
+	private const SHARED_VIEW_UUID = 'a5d8e2c4-4154-4cde-9f00-000000004154';
 
 	private MenuService $menuService;
 	private ContextService $contextService;
 	private PageService $pageService;
 	private MenuItemMapper $menuItemMapper;
+	private ContextMapper $contextMapper;
+	private ViewMapper&MockObject $viewMapper;
+	private LoggerInterface&MockObject $logger;
 	private PermissionsService&MockObject $permissionsService;
 	private bool $canManage = true;
 	/** @var int[] */
@@ -66,6 +79,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$userHelper = $this->createMock(UserHelper::class);
 		$userHelper->method('getGroupIdsForUser')->willReturn([]);
 		$contextMapper = new ContextMapper($this->connectionAdapter, $userHelper, $this->createMock(GroupHelper::class));
+		$this->contextMapper = $contextMapper;
 		$pageMapper = new PageMapper($this->connectionAdapter);
 		$pageContentMapper = new PageContentMapper($this->connectionAdapter);
 		$widgetService = new WidgetService(new WidgetMapper($this->connectionAdapter), new ContextNodeRelationMapper($this->connectionAdapter), $this->connectionAdapter);
@@ -75,13 +89,24 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->permissionsService->method('canManageContext')->willReturnCallback(fn (): bool => $this->canManage);
 		$tableMapper = $this->createMock(TableMapper::class);
 		$tableMapper->method('findIdToTitleMap')->willReturnCallback(static fn (array $ids): array => in_array(self::TABLE, $ids, true) ? [self::TABLE => 'Projects'] : []);
+		$table = new Table();
+		$table->id = self::TABLE;
+		$table->setUuid(self::TABLE_UUID);
+		$table->setTitle('Projects');
+		$tableMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => in_array(self::TABLE, $ids, true) ? [self::TABLE => $table] : []);
+		$otherTable = new Table();
+		$otherTable->id = self::OTHER_TABLE;
+		$otherTable->setUuid(self::OTHER_TABLE_UUID);
+		$tableMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): Table => [self::TABLE_UUID => $table, self::OTHER_TABLE_UUID => $otherTable][$uuid] ?? throw new DoesNotExistException('No table'));
+		$this->viewMapper = $this->createMock(ViewMapper::class);
+		$this->menuService = new MenuService($contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $this->menuItemMapper, $this->permissionsService, $tableMapper, $this->viewMapper, $this->connectionAdapter);
 
 		$this->contextService = new ContextService(
 			$contextMapper,
 			new ContextNodeRelationMapper($this->connectionAdapter),
 			$pageMapper,
 			$pageContentMapper,
-			$this->createMock(LoggerInterface::class),
+			$this->logger = $this->createMock(LoggerInterface::class),
 			$this->permissionsService,
 			$this->createMock(IUserManager::class),
 			$this->createMock(AuditLogServiceInterface::class),
@@ -91,13 +116,13 @@ class MenuServiceTest extends DatabaseTestCase {
 			$this->createMock(INavigationManager::class),
 			$this->createMock(IURLGenerator::class),
 			$tableMapper,
-			$this->createMock(ViewMapper::class),
+			$this->viewMapper,
 			$widgetService,
 			new GridWidgetTypes($l10n),
 			$this->menuItemMapper,
+			$this->menuService,
 		);
 		$this->pageService = new PageService($contextMapper, $pageMapper, $pageContentMapper, $widgetService, new GridWidgetTypes($l10n), $this->connectionAdapter, $this->menuItemMapper);
-		$this->menuService = new MenuService($contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $this->menuItemMapper, $this->permissionsService, $tableMapper, $this->createMock(ViewMapper::class), $this->connectionAdapter);
 	}
 
 	protected function tearDown(): void {
@@ -378,6 +403,341 @@ class MenuServiceTest extends DatabaseTestCase {
 				$this->addToAssertionCount(1);
 			}
 		}
+	}
+
+	public function testAMenuGoesThroughASchemeExportAndImport(): void {
+		[$contextId, , $pageId, $nodeRelId] = $this->createApplication();
+		$group = $this->menuService->create($contextId, 'Links', 'star', 'Elsewhere', null, self::OWNER);
+		$site = $this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$menu = $this->menu($contextId);
+		$this->menuService->saveOrder($contextId, MenuOrderEntry::listFromArray(array_map(static fn (array $item): array => ['id' => $item['id'], 'parentId' => $item['id'] === $site['id'] ? $group['id'] : null], $menu)), $this->version($contextId), self::OWNER);
+		$exported = $this->menuService->export($this->contextService->findById($contextId, self::OWNER));
+
+		$imported = $this->contextService->create('Imported', 'tables', '', [['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE]], self::OWNER, Application::OWNER_TYPE_USER);
+		$this->contextIds[] = $imported->getId();
+		$importedContext = $this->contextService->findById($imported->getId(), self::OWNER);
+		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
+		$preview = $this->menuService->previewSchemeImport($importedContext, $exported, $this->contextService->getPagesWithWidgets($this->contextService->findById($contextId, self::OWNER)), $nodes);
+		$this->contextService->importScheme($imported->getId(), 'Imported', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
+
+		$shape = static fn (array $items): array => array_map(static fn (array $item): array => [$item['displayTitle'], $item['parent'], $item['target'], $item['icon']], $items);
+		$expected = $shape($exported);
+		unset($expected[4]);
+		$expected[0][0] = 'Imported';
+		$this->assertSame(array_values($expected), $shape($this->menuService->export($this->contextService->findById($imported->getId(), self::OWNER))));
+		$this->assertSame([['page' => 'dashboard'], 1], [$exported[0]['target'], $exported[2]['parent']]);
+		$this->assertSame(['page' => $this->contextService->findById($contextId, self::OWNER)->getPages()[$pageId]['slug']], $exported[4]['target']);
+	}
+
+	public function testTheSchemeExportOfAnApplicationImportsBackUnchanged(): void {
+		[$contextId, , $pageId, $nodeRelId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$before = array_column($this->menu($contextId), 'target');
+		$exported = $this->menuService->export($this->contextService->findById($contextId, self::OWNER));
+		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
+
+		$result = $this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $exported);
+
+		$this->assertSame([], $result['menuSkipped']);
+		$this->assertSame($before, array_column($this->menu($contextId), 'target'));
+	}
+
+	public function testAnExportLoadsTheTablesAndViewsOfItsItemsOnce(): void {
+		[$contextId, , , $nodeRelId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$table = new Table();
+		$table->id = self::TABLE;
+		$table->setUuid(self::TABLE_UUID);
+		$table->setTitle('Projects');
+		$tableMapper = $this->createMock(TableMapper::class);
+		$tableMapper->expects($this->once())->method('findMany')->with([self::TABLE])->willReturn([self::TABLE => $table]);
+		$tableMapper->expects($this->never())->method('findIdToTitleMap');
+		$viewMapper = $this->createMock(ViewMapper::class);
+		$viewMapper->expects($this->once())->method('findMany')->with([])->willReturn([]);
+		$viewMapper->expects($this->never())->method('findIdToTitleMap');
+		$menuService = new MenuService($this->contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $this->menuItemMapper, $this->permissionsService, $tableMapper, $viewMapper, $this->connectionAdapter);
+
+		$exported = $menuService->export($this->contextService->findById($contextId, self::OWNER));
+
+		$this->assertSame(['Sales', 'Projects'], array_column($exported, 'displayTitle'));
+		$this->assertSame(['table' => self::TABLE_UUID], $exported[1]['target']);
+	}
+
+	public function testAReadersExportLeavesOutTheEmptyGroupsTheReaderDoesNotSee(): void {
+		[$contextId] = $this->createApplication();
+		$this->menuService->create($contextId, 'Empty', null, null, null, self::OWNER);
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$this->canManage = false;
+
+		$this->assertSame(['Sales'], array_column($this->menuService->export($context, 'reader'), 'displayTitle'));
+		$this->assertSame(['Sales', 'Empty'], array_column($this->menuService->export($context), 'displayTitle'));
+	}
+
+	public function testAMovedUsersMenuKeepsItsTableItsPagesAndItsLinks(): void {
+		[$contextId, , $pageId, $nodeRelId] = $this->createApplication();
+		$this->menuService->create($contextId, 'Projects', null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['url' => 'https://nextcloud.com']), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$exported = json_decode(json_encode($context->jsonSerialize() + ['pages' => $this->contextService->getPagesWithWidgets($context), 'menu' => $this->menuService->export($context)]), true);
+		$movedTable = new Table();
+		$movedTable->id = self::TABLE;
+		$movedTable->setOwnership(self::OWNER);
+		$exported['menu'][] = ['title' => 'Elsewhere', 'target' => ['table' => 'f0000000-0000-4000-8000-000000000000']];
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
+
+		$moved = $this->contextService->importContext($movedTable, $exported, self::TABLE, self::TABLE_UUID);
+		$this->contextIds[] = $moved->getId();
+
+		$menu = $this->menu($moved->getId());
+		$movedContext = $this->contextService->findById($moved->getId(), self::OWNER);
+		$movedPages = array_flip(array_map(static fn (array $page): string => $page['page_type'], $movedContext->getPages()));
+		$this->assertSame(['Sales', 'Projects', 'https://nextcloud.com', 'Overview'], array_column($menu, 'displayTitle'));
+		$this->assertSame([['pageId' => $movedPages[Page::TYPE_STARTPAGE]], ['nodeRelId' => (int)array_key_first($movedContext->getNodes())], ['pageId' => $movedPages[Page::TYPE_GRID]]], [$menu[0]['target'], $menu[1]['target'], $menu[3]['target']]);
+		$this->assertSame(['Skipping imported menu items: 4: Its table f0000000-0000-4000-8000-000000000000 is not the table of this copy: the account import brings one table per copy of the application.'], $warnings);
+	}
+
+	public function testASchemeImportWithoutAMenuKeepsTheMenu(): void {
+		[$contextId, , $pageId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$before = $this->menu($contextId);
+
+		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], self::OWNER);
+
+		$this->assertSame($before, $this->menu($contextId));
+	}
+
+	public function testASchemeImportLeavesOutAnItemForATableOutsideTheApplication(): void {
+		[$contextId] = $this->createApplication();
+		$menu = [
+			['title' => 'Elsewhere', 'target' => ['table' => self::OTHER_TABLE_UUID]],
+			['title' => 'Projects', 'target' => ['table' => self::TABLE_UUID]],
+		];
+
+		$imported = $this->contextService->importScheme($contextId, 'Sales', 'tables', '', [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], self::OWNER, $menu);
+
+		$this->assertSame(['Projects'], array_column($this->menu($contextId), 'displayTitle'));
+		$this->assertSame([['index' => 0, 'title' => 'Elsewhere', 'reason' => 'Its table ' . self::OTHER_TABLE_UUID . ' is not part of the application.']], $imported['menuSkipped']);
+	}
+
+	public function testASchemeImportFindsAViewAmongTheApplicationsOwnViews(): void {
+		$view = new View();
+		$view->id = self::VIEW;
+		$view->setUuid(self::VIEW_UUID);
+		$view->setTableId(self::TABLE);
+		$this->viewMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): View => $uuid === self::VIEW_UUID ? $view : throw new MultipleObjectsReturnedException('Two views'));
+		$this->viewMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => $view] : []);
+		$this->viewMapper->method('findIdToTitleMap')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => 'Open projects'] : []);
+		$context = $this->contextService->create('Sales', 'tables', '', [['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE], ['id' => self::VIEW, 'type' => Application::NODE_TYPE_VIEW]], self::OWNER, Application::OWNER_TYPE_USER);
+		$contextId = $context->getId();
+		$this->contextIds[] = $contextId;
+		$nodes = [
+			['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1],
+			['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => self::VIEW_UUID, 'permissions' => 1],
+		];
+		$menu = [
+			['title' => 'Shared', 'target' => ['view' => self::SHARED_VIEW_UUID]],
+			['title' => null, 'target' => ['view' => self::VIEW_UUID]],
+		];
+
+		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $menu);
+
+		$imported = $this->menu($contextId);
+		$viewRelations = array_keys(array_filter($this->contextService->findById($contextId, self::OWNER)->getNodes(), static fn (array $node): bool => $node['node_type'] === Application::NODE_TYPE_VIEW));
+		$this->assertSame([['Open projects', ['nodeRelId' => $viewRelations[0]]]], array_map(static fn (array $item): array => [$item['displayTitle'], $item['target']], $imported));
+	}
+
+	public function testTheMenuOfASchemePreviewImportsAsShown(): void {
+		[$contextId, $startPageId, , $nodeRelId] = $this->createApplication();
+		$pageId = $this->pageService->createGridPage($contextId, 'Overview', 'overview', null, null)['id'];
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['nodeRelId' => $nodeRelId]), self::OWNER);
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
+		$scheme = ['pages' => $this->contextService->getPagesWithWidgets($context), 'menu' => $this->menuService->export($context)];
+		foreach ($this->menu($contextId) as $item) {
+			$this->menuService->delete($contextId, $item['id'], self::OWNER);
+		}
+
+		$preview = $this->menuService->previewSchemeImport($this->contextService->findById($contextId, self::OWNER), $scheme['menu'], $scheme['pages'], $nodes);
+		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
+
+		$this->assertSame([[], ['pageId' => $startPageId], ['nodeRelId' => $nodeRelId], ['pageId' => $pageId]], [$preview['skipped'], ...array_column($this->menu($contextId), 'target')]);
+	}
+
+	public function testAPreviewedItemStaysInItsGroupWhenAnItemBeforeItIsSkipped(): void {
+		[$contextId] = $this->createApplication();
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
+		$menu = [
+			['title' => null, 'displayTitle' => 'Source application', 'target' => ['page' => 'dashboard']],
+			['title' => 'Projects', 'target' => ['table' => self::TABLE_UUID]],
+			['title' => 'Gone', 'target' => ['page' => 'gone']],
+			['title' => 'Group One', 'target' => null],
+			['title' => 'Group Two', 'target' => null],
+			['title' => 'Site', 'parent' => 3, 'target' => ['url' => 'https://nextcloud.com']],
+		];
+
+		$preview = $this->menuService->previewSchemeImport($context, $menu, $this->contextService->getPagesWithWidgets($context), $nodes);
+		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
+
+		$imported = $this->menu($contextId);
+		$this->assertSame([null, null, null, null, 2], array_column($preview['to'], 'parent'));
+		$this->assertSame('Sales', $preview['to'][0]['displayTitle']);
+		$this->assertSame(['Sales', 'Projects', 'Group One', 'Group Two', 'Site'], array_column($imported, 'displayTitle'));
+		$this->assertSame($imported[2]['id'], $imported[4]['parentId']);
+	}
+
+	public function testAnItemFollowsItsPageWhenTheImportDropsThePagesName(): void {
+		[$contextId, , $pageId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$exported = json_decode(json_encode($context->jsonSerialize() + ['pages' => $this->contextService->getPagesWithWidgets($context), 'menu' => $this->menuService->export($context)]), true);
+		$table = new Table();
+		$table->id = self::TABLE;
+		$table->setOwnership(self::OWNER);
+
+		$moved = $this->contextService->importContext($table, $exported, self::TABLE, self::TABLE_UUID);
+		$this->contextIds[] = $moved->getId();
+
+		$movedContext = $this->contextService->findById($moved->getId(), self::OWNER);
+		$gridPages = array_filter($movedContext->getPages(), static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID);
+		$this->assertCount(1, $gridPages);
+		$this->assertNotSame($context->getPages()[$pageId]['slug'], reset($gridPages)['slug']);
+		$this->assertSame(['pageId' => (int)array_key_first($gridPages)], $this->menu($moved->getId())[1]['target']);
+	}
+
+	public function testSchemePagesAreMatchedByStartPageAndSlug(): void {
+		[$contextId, $startPageId] = $this->createApplication();
+		$pageId = $this->pageService->createGridPage($contextId, 'Sales', 'sales', null, null)['id'];
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$name = $context->getPages()[$pageId]['slug'];
+
+		$this->assertSame(['home' => $startPageId, $name => $pageId], $this->menuService->schemePageIds($context, [
+			['id' => 11, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
+			['id' => 12, 'page_type' => Page::TYPE_GRID, 'slug' => $name],
+			['id' => 13, 'page_type' => Page::TYPE_GRID, 'slug' => 'somewhere_else'],
+			['id' => 14, 'page_type' => Page::TYPE_GRID, 'slug' => $context->getPages()[$startPageId]['slug']],
+			['page_type' => Page::TYPE_GRID, 'slug' => $name],
+			'not a page',
+		]));
+	}
+
+	public function testAnAutomaticSlugOfASchemePageStandsForNoPage(): void {
+		[$contextId, , $pageId] = $this->createApplication();
+		$context = $this->contextService->findById($contextId, self::OWNER);
+		$automatic = $context->getPages()[$pageId]['slug'];
+		$this->assertTrue(Page::isDefaultSlug($automatic));
+
+		$this->assertSame([], $this->menuService->schemePageIds($context, [
+			['id' => 12, 'page_type' => Page::TYPE_GRID, 'slug' => $automatic],
+		]));
+	}
+
+	public static function unusableItems(): array {
+		$link = ['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']];
+		return [
+			'not an object' => [['Reports'], 'It is not an object.'],
+			'a page that did not come along' => [[['target' => ['page' => 'gone']]], 'The application has no page gone.'],
+			'a page id of the application' => [[['target' => ['pageId' => 999999999]]], 'Its target is not'],
+			'a page by id' => [[['target' => ['page' => 5]]], 'Its target is not'],
+			'a table that did not come along' => [[['target' => ['table' => 'f0000000-0000-4000-8000-000000000000']]], 'is not part of the application'],
+			'an unknown kind of target' => [[['title' => 'Row', 'target' => ['row' => 'x']]], 'Its target is not'],
+			'a link that is not http' => [[['target' => ['url' => 'ftp://nextcloud.com']]], 'A link is an http or https address'],
+			'a group without a title' => [[['target' => null]], 'A group needs a title.'],
+			'a title that is not a text' => [[['title' => ['Site'], 'target' => ['url' => 'https://nextcloud.com']]], 'Its title is not a text.'],
+			'two targets' => [[['target' => ['url' => 'https://nextcloud.com', 'page' => 'dashboard']]], 'Its target is not'],
+			'one item past the limit' => [array_fill(0, MenuItem::MAX_ITEMS_PER_APPLICATION + 1, $link), 'A menu holds at most 200 items.'],
+		];
+	}
+
+	/**
+	 * @dataProvider unusableItems
+	 */
+	public function testAnImportSkipsTheItemsItCannotUseWithTheReason(array $exported, string $reason): void {
+		[$contextId] = $this->createApplication();
+		$before = $this->menu($contextId);
+
+		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static fn (): ?int => null, static fn (): ?int => null);
+
+		$this->assertCount(1, $skipped);
+		$this->assertStringContainsString($reason, $skipped[0]['reason']);
+		$this->assertCount(count($exported) === 1 ? count($before) : count($exported) - 1, $this->menu($contextId));
+	}
+
+	public function testAnImportReadsNoMoreEntriesThanAMenuHolds(): void {
+		[$contextId] = $this->createApplication();
+		$lookups = 0;
+		$exported = array_fill(0, 1000, ['title' => 'Elsewhere', 'target' => ['table' => self::OTHER_TABLE_UUID]]);
+
+		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static function () use (&$lookups): ?int {
+			$lookups++;
+			return null;
+		}, static fn (): ?int => null);
+
+		$this->assertSame(MenuItem::MAX_ITEMS_PER_APPLICATION, $lookups);
+		$this->assertCount(MenuItem::MAX_ITEMS_PER_APPLICATION + 1, $skipped);
+		$this->assertSame(['index' => 200, 'title' => null, 'reason' => 'A menu holds at most 200 items. 800 more were left out.'], end($skipped));
+	}
+
+	public function testAnImportedItemLosesOnlyTheFieldsThisInstanceCannotUse(): void {
+		[$contextId] = $this->createApplication();
+		$exported = [
+			['title' => str_repeat('g', 250), 'icon' => 'no-such-icon', 'target' => null],
+			['title' => 'Site', 'parent' => 0, 'description' => str_repeat('d', 2500), 'target' => ['url' => 'https://nextcloud.com']],
+			['title' => str_repeat('t', 250), 'parent' => 0, 'icon' => 'star', 'target' => ['url' => 'https://docs.nextcloud.com']],
+		];
+
+		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static fn (): ?int => null, static fn (): ?int => null);
+
+		$menu = $this->menu($contextId);
+		$this->assertSame([], $skipped);
+		$this->assertSame([str_repeat('g', 200), 'Site', null], array_column($menu, 'title'));
+		$this->assertSame([null, null, 'star'], array_column($menu, 'icon'));
+		$this->assertSame([null, null, null], array_column($menu, 'description'));
+		$this->assertSame([null, $menu[0]['id'], $menu[0]['id']], array_column($menu, 'parentId'));
+	}
+
+	public static function menusWithoutAUsableItem(): array {
+		return [
+			'an empty menu' => [[], 0],
+			'only unusable items' => [[['target' => ['url' => 'ftp://nextcloud.com']], ['title' => 'Elsewhere', 'target' => ['table' => self::OTHER_TABLE_UUID]]], 2],
+		];
+	}
+
+	/**
+	 * @dataProvider menusWithoutAUsableItem
+	 */
+	public function testAnImportThatKeepsNoItemLeavesTheMenuAsItIs(array $exported, int $skippedCount): void {
+		[$contextId, , $pageId] = $this->createApplication();
+		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
+		$before = $this->menu($contextId);
+
+		$skipped = $this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static fn (): ?int => null, static fn (): ?int => null);
+
+		$this->assertCount($skippedCount, $skipped);
+		$this->assertSame($before, $this->menu($contextId));
+	}
+
+	public function testAnImportedItemMovesToTheTopWhenItsGroupDidNotComeFirst(): void {
+		[$contextId] = $this->createApplication();
+		$exported = [
+			['title' => 'Site', 'parent' => 1, 'target' => ['url' => 'https://nextcloud.com']],
+			['title' => 'Links', 'target' => null],
+			['title' => 'Docs', 'parent' => 1, 'target' => ['url' => 'https://docs.nextcloud.com']],
+			['title' => 'Help', 'parent' => 0, 'target' => ['url' => 'https://help.nextcloud.com']],
+		];
+
+		$this->menuService->import($this->contextService->findById($contextId, self::OWNER), $exported, static fn (): ?int => null, static fn (): ?int => null);
+
+		$menu = $this->menu($contextId);
+		$this->assertSame([null, null, $menu[1]['id'], null], array_column($menu, 'parentId'));
 	}
 
 	/**
