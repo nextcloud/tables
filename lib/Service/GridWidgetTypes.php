@@ -18,7 +18,7 @@ use OCA\Tables\ResponseDefinitions;
 use OCP\IL10N;
 
 /**
- * The widget types a grid page can hold. Every type has a schema for its settings;
+ * The widget types a page can hold. Every type has a schema for its settings;
  * the frontend renders its form from it and saved widgets are validated against it.
  * A type with a source shows a table or view of the application.
  *
@@ -33,6 +33,9 @@ class GridWidgetTypes {
 	public const TYPE_TABLES = 'tables';
 
 	public const GRID_COLUMNS = 12;
+	public const HEADER_HEIGHT = 2;
+	public const DATA_HEIGHT = 5;
+	public const TABLES_HEIGHT = 8;
 	public const GRID_MAX_HEIGHT = 100;
 	public const GRID_MAX_Y = 10000;
 	public const MAX_WIDGETS_PER_PAGE = 100;
@@ -52,8 +55,8 @@ class GridWidgetTypes {
 			self::TYPE_HEADER => [
 				'type' => self::TYPE_HEADER,
 				'title' => $this->l10n->t('Header'),
-				'defaultWidth' => 12,
-				'defaultHeight' => 2,
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => self::HEADER_HEIGHT,
 				'hasSource' => false,
 				'settings' => [
 					'heading' => ['type' => 'string', 'title' => $this->l10n->t('Heading'), 'default' => '', 'required' => true],
@@ -86,20 +89,30 @@ class GridWidgetTypes {
 			self::TYPE_DATA => [
 				'type' => self::TYPE_DATA,
 				'title' => $this->l10n->t('Table or view'),
-				'defaultWidth' => 12,
-				'defaultHeight' => 5,
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => self::DATA_HEIGHT,
 				'hasSource' => true,
 				'settings' => [],
 			],
 			self::TYPE_TABLES => [
 				'type' => self::TYPE_TABLES,
 				'title' => $this->l10n->t('Tables and views'),
-				'defaultWidth' => 12,
-				'defaultHeight' => 8,
+				'defaultWidth' => self::GRID_COLUMNS,
+				'defaultHeight' => self::TABLES_HEIGHT,
 				'hasSource' => false,
 				'settings' => [],
 			],
 		];
+	}
+
+	/**
+	 * The widgets a start page starts with: one full width widget that lists the tables and
+	 * views of its application.
+	 *
+	 * @return list<WidgetInput>
+	 */
+	public function startPageWidgets(): array {
+		return [new WidgetInput(null, self::TYPE_TABLES, null, null, null, 0, 0, self::GRID_COLUMNS, self::TABLES_HEIGHT, [], null)];
 	}
 
 	/**
