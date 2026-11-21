@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { translate as t } from '@nextcloud/l10n'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.ts'
 
 /** Number of columns of a grid page. */
@@ -23,6 +24,15 @@ export const GRID_BREAKPOINT_SINGLE = 560
 /** Below this canvas width in pixels the grid shows six columns. */
 export const GRID_BREAKPOINT_MEDIUM = 960
 
+/** Longest title of a widget, as TextHelper::TITLE_MAX_LENGTH on the server. */
+export const TITLE_MAX_LENGTH = 200
+
+/** Longest description of a widget, as TextHelper::DESCRIPTION_MAX_LENGTH on the server. */
+export const DESCRIPTION_MAX_LENGTH = 2000
+
+/** Blanks at either end of a text, the ones TextHelper::trim() removes on the server. */
+const EDGE_BLANKS = /^[\s\p{Z}\u0085\u200B\uFEFF]+|[\s\p{Z}\u0085\u200B\uFEFF]+$/gu
+
 /**
  * Deep copy of plain data. A JSON round-trip also copies reactive proxies, which
  * structuredClone refuses.
@@ -35,12 +45,49 @@ function copy(value) {
 }
 
 /**
+ * A text without blanks at either end, including zero width spaces, so a text of blanks
+ * only is empty as it is on the server.
+ *
+ * @param {string|null|undefined} text the text
+ * @return {string} the trimmed text
+ */
+export function trimText(text) {
+	return String(text ?? '').replace(EDGE_BLANKS, '')
+}
+
+/**
+ * @param {string|null|undefined} text the text
+ * @return {boolean} whether the server reads the text as empty
+ */
+export function isBlank(text) {
+	return trimText(text) === ''
+}
+
+/**
+ * @param {string} label the label of a form field
+ * @return {string} the label marked as required
+ */
+export function requiredLabel(label) {
+	return t('tables', '{label} *', { label }, undefined, { escape: false, sanitize: false })
+}
+
+/**
  * @param {Array} widgetTypes the types loaded from the server
  * @param {string} type widget type
  * @return {object|null} that type, or null when the server does not know it
  */
 export function findWidgetType(widgetTypes, type) {
 	return widgetTypes.find(widgetType => widgetType.type === type) ?? null
+}
+
+/**
+ * The settings a new widget of this type starts with: every setting at its default.
+ *
+ * @param {object|null} widgetType a type from the server
+ * @return {object} the settings
+ */
+export function defaultSettings(widgetType) {
+	return Object.fromEntries(Object.entries(widgetType?.settings ?? {}).map(([name, setting]) => [name, copy(setting.default)]))
 }
 
 /**
@@ -127,15 +174,12 @@ export function pageToGrid(page) {
 }
 
 /**
- * The table or view a data widget shows.
+ * The table or view a node of the application stands for.
  *
- * @param {object} widget a widget of the grid
- * @param {object} nodes the nodes of the application by relation id, as in context.nodes
- * @return {{type: string, id: number}|null} the target, or null when the widget has no source
- * or its table or view left the application
+ * @param {object|null|undefined} node a node of the application, as in context.nodes
+ * @return {{type: string, id: number}|null} the target, or null for a node of another type
  */
-export function widgetTarget(widget, nodes) {
-	const node = widget?.nodeRelId ? nodes?.[widget.nodeRelId] : null
+export function nodeTarget(node) {
 	if (!node) {
 		return null
 	}
@@ -144,6 +188,64 @@ export function widgetTarget(widget, nodes) {
 		return null
 	}
 	return { type: nodeType === NODE_TYPE_VIEW ? 'view' : 'table', id: parseInt(node.node_id) }
+}
+
+/**
+ * The table or view a data widget shows.
+ *
+ * @param {object} widget a widget of the grid
+ * @param {object} nodes the nodes of the application by relation id, as in context.nodes
+ * @return {{type: string, id: number}|null} the target, or null when the widget has no source
+ * or its table or view left the application
+ */
+export function widgetTarget(widget, nodes) {
+	return nodeTarget(widget?.nodeRelId ? nodes?.[widget.nodeRelId] : null)
+}
+
+/**
+ * The emoji and title of a table or view.
+ *
+ * @param {{type: string, id: number}} target the table or view
+ * @param {Array} tables tables known to the store
+ * @param {Array} views views known to the store
+ * @return {string} the title, empty when the store does not know the table or view
+ */
+export function targetTitle(target, tables, views) {
+	const elements = target?.type === 'view' ? views : tables
+	const element = target ? elements.find(element => element.id === target.id) : null
+	return element ? [element.emoji, element.title].filter(Boolean).join(' ') : ''
+}
+
+/**
+ * The tables and views of the application a data widget can show, with their titles. A view
+ * also names its table, so views with the same title can be told apart.
+ *
+ * @param {object} nodes the nodes of the application by relation id
+ * @param {Array} tables tables known to the store
+ * @param {Array} views views known to the store
+ * @return {Array<{id: number, label: string}>} one option per table or view, by relation id
+ */
+export function applicationNodeOptions(nodes, tables, views) {
+	// The select shows labels as text, so they are neither escaped nor sanitized
+	const options = { escape: false, sanitize: false }
+	return Object.values(nodes ?? {}).flatMap(node => {
+		const target = nodeTarget(node)
+		if (!target) {
+			return []
+		}
+		const title = targetTitle(target, tables, views) || '#' + target.id
+		if (target.type !== 'view') {
+			return [{ id: parseInt(node.id), label: title }]
+		}
+		const tableId = views.find(view => view.id === target.id)?.tableId
+		const table = tableId ? targetTitle({ type: 'table', id: tableId }, tables, views) : ''
+		return [{
+			id: parseInt(node.id),
+			label: table
+				? t('tables', '{title} (view of {table})', { title, table }, undefined, options)
+				: t('tables', '{title} (view)', { title }, undefined, options),
+		}]
+	})
 }
 
 /**
@@ -160,9 +262,9 @@ export function gridToWidgets(grid) {
 		const { gridX, gridY, gridWidth, gridHeight } = positions[widget.key]
 		const saved = {
 			type: widget.type,
-			title: widget.title?.trim() || null,
+			title: trimText(widget.title) || null,
 			icon: widget.icon || null,
-			description: widget.description?.trim() || null,
+			description: trimText(widget.description) || null,
 			gridX,
 			gridY,
 			gridWidth,
