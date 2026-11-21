@@ -1306,6 +1306,7 @@ export type components = {
         readonly PublicRow: {
             /** Format: int64 */
             readonly id: number;
+            readonly uuid: string | null;
             readonly createdAt: string;
             readonly lastEditAt: string;
             readonly data: {
@@ -1324,6 +1325,7 @@ export type components = {
         readonly Row: {
             /** Format: int64 */
             readonly id: number;
+            readonly uuid: string | null;
             /** Format: int64 */
             readonly tableId: number;
             readonly createdBy: string;
