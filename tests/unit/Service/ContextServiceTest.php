@@ -54,6 +54,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $dbConnection;
 	private MockObject $menuItemMapper;
 	private MockObject $menuService;
+	private MockObject $logger;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -66,7 +67,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
@@ -85,7 +86,7 @@ final class ContextServiceTest extends TestCase {
 			$this->contextNodeRelMapper,
 			$this->pageMapper,
 			$this->pageContentMapper,
-			$logger,
+			$this->logger,
 			$this->permissionsService,
 			$this->userManager,
 			$this->auditLogService,
@@ -1054,5 +1055,141 @@ final class ContextServiceTest extends TestCase {
 		], 5);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
+	}
+
+	public function testImportingSchemePagesKeepsWhatCanBeUsedAndSkipsTheRestWithAReason(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setName('Intake portal');
+		$context->setOwnerId('user-1');
+		$context->setOwnerType(Application::OWNER_TYPE_USER);
+		$context->setNodes([]);
+		$context->setPages([
+			301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'dashboard', 'title' => null, 'icon' => null, 'description' => null, 'content' => []],
+			302 => ['id' => 302, 'page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => 'Overview', 'icon' => 'star', 'description' => null, 'content' => []],
+		]);
+		// once in update(), once after it for the pages and the menu, once for the answer
+		$this->contextMapper->expects($this->exactly(3))->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->expects($this->never())->method('findById');
+		$raised = [];
+		$this->pageMapper->method('raiseVersion')->willReturnCallback(static function (int $pageId, ?int $expected) use (&$raised): bool {
+			$raised[] = [$pageId, $expected];
+			return true;
+		});
+		$updated = [];
+		$this->pageMapper->method('update')->willReturnCallback(static function (Page $page) use (&$updated): Page {
+			$updated[] = [$page->getId(), $page->getTitle(), $page->getIcon(), array_keys($page->getUpdatedFields())];
+			return $page;
+		});
+		$inserted = [];
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$inserted): Page {
+			$page->id = 400 + count($inserted);
+			$inserted[] = [$page->getSlug(), $page->getTitle(), $page->getPageType()];
+			return $page;
+		});
+		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use (&$inserted): Page {
+			$page->id = 400 + count($inserted);
+			$page->setSlug('page_' . $page->getId());
+			$inserted[] = ['page_' . $page->getId(), $page->getTitle(), $page->getPageType()];
+			return $page;
+		});
+		$synced = [];
+		$widgetsOf = static fn (array $widgets): array => array_map(static fn (WidgetInput $widget): array => [$widget->type, $widget->title, $widget->nodeRelId], $widgets);
+		$this->widgetService->method('syncPage')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced, $widgetsOf): array {
+			$synced[$pageId] = $widgetsOf($widgets);
+			return [];
+		});
+		$this->widgetService->method('insertAll')->willReturnCallback(static function (int $pageId, array $widgets) use (&$synced, $widgetsOf): array {
+			$synced[$pageId] = $widgetsOf($widgets);
+			return [];
+		});
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
+		$text = static fn (?string $title): array => ['type' => 'text', 'title' => $title, 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hi']];
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', null, [
+			['page_type' => Page::TYPE_STARTPAGE, 'slug' => 'dashboard', 'title' => 'Home', 'icon' => 'star', 'widgets' => [$text('On the start page')]],
+			['page_type' => Page::TYPE_STARTPAGE, 'title' => 'Second start'],
+			['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => 'Overview', 'icon' => 'star', 'widgets' => [
+				['id' => '12', 'icon' => 'no-such-icon'] + $text('Kept'),
+				['type' => 'data', 'title' => 'Without source', 'gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => null],
+				['type' => 'data', 'title' => 'Old source', 'gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['nodeRelId' => 5]],
+				['type' => 'data', 'title' => 'Not a resource', 'gridX' => 0, 'gridY' => 7, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['targetType' => 'table', 'targetUuid' => 'elsewhere']],
+				['type' => 'chart', 'title' => 'Unknown type', 'gridX' => 0, 'gridY' => 12, 'gridWidth' => 12, 'gridHeight' => 5],
+			]],
+			['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => '   '],
+			['page_type' => 'list'],
+			['page_type' => Page::TYPE_GRID, 'slug' => 'reports', 'title' => 'Reports', 'widgets' => array_fill(0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE + 50, $text(null))],
+		]);
+
+		$this->assertSame([[301, null], [302, null]], $raised);
+		$this->assertSame([[301, 'Home', 'star', ['title', 'icon']], [400, 'page_400', null, ['title']]], $updated);
+		$this->assertSame([['page_400', null, Page::TYPE_GRID], ['reports', 'Reports', Page::TYPE_GRID]], $inserted);
+		$this->assertSame([['text', 'On the start page', null]], $synced[301]);
+		$this->assertSame([['text', 'Kept', null], ['data', 'Without source', null], ['data', 'Old source', null], ['data', 'Not a resource', null]], $synced[302]);
+		$this->assertSame([], $synced[400]);
+		$this->assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $synced[401]);
+		$this->assertSame([
+			'Skipping page 1 of an imported scheme: an application has one start page',
+			'Skipping widget 4 of page 2 of an imported scheme: Unknown widget type "chart", expected one of: header, text, data, tables',
+			'Skipping page 4 of an imported scheme: its type is not startpage or grid',
+			'Skipping page 5 of an imported scheme: 50 widgets past the limit of 100 widgets of a page',
+		], $warnings);
+	}
+
+	public function testASchemePageWithAnAutomaticSlugIsAddedAsANewPage(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setName('Intake portal');
+		$context->setOwnerId('user-1');
+		$context->setOwnerType(Application::OWNER_TYPE_USER);
+		$context->setNodes([]);
+		$context->setPages([
+			301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'dashboard', 'title' => null, 'icon' => null, 'description' => null, 'content' => []],
+			302 => ['id' => 302, 'page_type' => Page::TYPE_GRID, 'slug' => 'page_302', 'title' => 'Mine', 'icon' => null, 'description' => null, 'content' => []],
+		]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$this->pageMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->expects($this->once())->method('insertWithDefaultName')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 400;
+			$page->setSlug('page_400');
+			return $page;
+		});
+		$this->widgetService->expects($this->never())->method('syncPage');
+
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', null, [
+			['page_type' => Page::TYPE_GRID, 'slug' => 'page_302', 'title' => 'Theirs'],
+		]);
+	}
+
+	public function testASchemeBringsAtMostTheMaximumNumberOfPages(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page): Page {
+			$page->id = 500;
+			return $page;
+		});
+		$this->widgetService->expects($this->exactly(ContextService::MAX_SCHEME_PAGES))->method('insertAll');
+		$warnings = [];
+		$this->logger->method('warning')->willReturnCallback(static function (string $message) use (&$warnings): void {
+			$warnings[] = $message;
+		});
+
+		$pages = [];
+		for ($i = 0; $i < ContextService::MAX_SCHEME_PAGES + 30; $i++) {
+			$pages[] = ['page_type' => Page::TYPE_GRID, 'slug' => 'page' . $i, 'title' => 'Page ' . $i];
+		}
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []], 'user-1', null, $pages);
+
+		$this->assertSame(['Skipping page 50 of an imported scheme: 30 pages past the limit of 50 pages of a scheme'], $warnings);
 	}
 }

@@ -206,7 +206,7 @@
 						<li class="preview-card__meta-title">
 							{{ t('tables', 'To') }}:
 						</li>
-						<li v-for="entry in menuTree(menuPreview.to)" :key="entry.index" data-cy="importSchemeMenuTo">
+						<li v-for="entry in menuTree(menuToImport)" :key="entry.index" data-cy="importSchemeMenuTo">
 							<span class="preview-menu__title">{{ menuItemTitle(entry.item) }}</span>
 							<span class="preview-menu__target">{{ menuItemTarget(entry.item, importedNodes) }}</span>
 							<ul v-if="entry.children.length > 0" class="preview-menu__children">
@@ -218,13 +218,34 @@
 						</li>
 					</ul>
 				</div>
-				<ul v-if="importMenu && menuPreview.skipped.length > 0" class="preview-card__meta" data-cy="importSchemeMenuSkipped">
+				<ul v-if="importMenu && menuSkipped.length > 0" class="preview-card__meta" data-cy="importSchemeMenuSkipped">
 					<li class="preview-card__meta-title">
 						{{ t('tables', 'Skipped, not available here') }}:
 					</li>
-					<li v-for="item in menuPreview.skipped" :key="item.index">
-						<span class="preview-menu__title">{{ menuItemTitle(item) }}</span>
-						<span class="preview-menu__target">{{ item.reason }}</span>
+					<li v-for="(item, index) in menuSkipped" :key="index">
+						{{ item.label }}
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Pages Section -->
+		<div v-if="previewData.pages" class="preview-section preview-section--option">
+			<div class="preview-option">
+				<NcCheckboxRadioSwitch v-model="importPages" class="preview-option__label" type="switch" data-cy="importSchemePages">
+					{{ t('tables', 'Pages') }}
+				</NcCheckboxRadioSwitch>
+				<ul v-if="importPages" class="preview-card__meta" data-cy="importSchemePagesList">
+					<li v-for="(page, index) in previewData.pages.summary" :key="index">
+						{{ pageLabel(page) }}
+					</li>
+				</ul>
+				<ul v-if="importPages && previewData.pages.skipped.length > 0" class="preview-card__meta" data-cy="importSchemePagesSkipped">
+					<li class="preview-card__meta-title">
+						{{ t('tables', 'Skipped, not available here') }}:
+					</li>
+					<li v-for="item in previewData.pages.skipped" :key="item.pageIndex + '-' + item.widgetIndex">
+						{{ skippedPageLabel(item) }}
 					</li>
 				</ul>
 			</div>
@@ -233,7 +254,7 @@
 </template>
 
 <script>
-import { translate as t } from '@nextcloud/l10n'
+import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import ImportTableSchemePreview from './ImportTableSchemePreview.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js';
@@ -288,6 +309,7 @@ export default {
 			importDescription: true,
 			importNodes: true,
 			importMenu: true,
+			importPages: true,
 			addTablesConfig: [],
 			removeColumnsConfig: [],
 			modifyTablesConfig: [],
@@ -314,6 +336,57 @@ export default {
 
 		importedNodes() {
 			return this.importNodes ? this.previewData.nodes.to : this.previewData.nodes.from
+		},
+
+		/**
+		 * The slugs of the pages of the application that the scheme updates. Without the
+		 * pages, only items for these pages find their page.
+		 *
+		 * @return {Set<string>}
+		 */
+		existingPageSlugs() {
+			return new Set((this.previewData.pages?.summary ?? []).filter(page => page.action === 'update').map(page => page.slug))
+		},
+
+		/**
+		 * The menu the import saves. An item for a page the import adds is left out
+		 * without the pages, and the groups of the other items are named by their new
+		 * position.
+		 *
+		 * @return {Array<object>}
+		 */
+		menuToImport() {
+			const items = this.menuPreview?.to ?? []
+			if (this.importPages || !this.previewData.pages) {
+				return items
+			}
+			const positions = new Map()
+			const kept = []
+			items.forEach((item, index) => {
+				if (item.target?.page === undefined || this.existingPageSlugs.has(item.target.page)) {
+					positions.set(index, kept.length)
+					kept.push(item)
+				}
+			})
+			return kept.map(item => (item.parent === null || item.parent === undefined ? item : { ...item, parent: positions.get(item.parent) ?? null }))
+		},
+
+		/**
+		 * @return {Array<{label: string}>} the menu items the import skips, with the reason
+		 */
+		menuSkipped() {
+			const raw = { escape: false, sanitize: false }
+			const skipped = (this.menuPreview?.skipped ?? []).map(item => ({
+				label: t('tables', '{item}: {reason}', { item: this.menuItemTitle(item), reason: item.reason }, undefined, raw),
+			}))
+			if (this.importPages || !this.previewData.pages) {
+				return skipped
+			}
+			return skipped.concat((this.menuPreview?.to ?? [])
+				.filter(item => item.target?.page !== undefined && !this.existingPageSlugs.has(item.target.page))
+				.map(item => ({
+					label: t('tables', '{item}: its page is not imported', { item: this.menuItemTitle(item) }, undefined, raw),
+				})))
 		},
 	},
 
@@ -346,6 +419,11 @@ export default {
 			}
 		},
 		importMenu: {
+			handler() {
+				this.emitPayload()
+			},
+		},
+		importPages: {
 			handler() {
 				this.emitPayload()
 			},
@@ -442,6 +520,41 @@ export default {
 				: t('tables', 'View: {title}', { title: node.node_title }, undefined, { escape: false })
 		},
 
+		/**
+		 * @param {object} page a page of the import as the preview sums it up
+		 * @return {string} whether the page is new or which page it updates, with its widgets
+		 */
+		pageLabel(page) {
+			// Vue escapes the text, so the titles are interpolated as they are
+			const raw = { escape: false, sanitize: false }
+			let label
+			if (page.pageType === 'startpage') {
+				label = t('tables', 'Updates the start page')
+			} else if (page.action === 'update') {
+				label = t('tables', 'Updates {page}', { page: page.currentTitle || page.slug }, undefined, raw)
+			} else {
+				label = t('tables', 'New page {page}', { page: page.title || page.slug || t('tables', 'Untitled page') }, undefined, raw)
+			}
+			const widgets = n('tables', '%n widget', '%n widgets', page.widgetCount)
+			if (page.unlinkedWidgetCount > 0) {
+				return t('tables', '{page}, {widgets}, {unlinked} without their table or view', { page: label, widgets, unlinked: page.unlinkedWidgetCount }, undefined, raw)
+			}
+			return t('tables', '{page}, {widgets}', { page: label, widgets }, undefined, raw)
+		},
+
+		/**
+		 * @param {object} item a skipped page, or a skipped widget of a page
+		 * @return {string} the page, the widget when it is one, and why it is skipped
+		 */
+		skippedPageLabel(item) {
+			const raw = { escape: false, sanitize: false }
+			const page = item.page || t('tables', 'Untitled page')
+			if (item.widgetIndex === null) {
+				return t('tables', '{page}: {reason}', { page, reason: item.reason }, undefined, raw)
+			}
+			return t('tables', '{page}: {widget}: {reason}', { page, widget: item.widget || t('tables', 'Untitled widget'), reason: item.reason }, undefined, raw)
+		},
+
 		getShortDescription(description) {
 			if (!description) {
 				return ''
@@ -467,7 +580,11 @@ export default {
 			}
 			// without a menu the import leaves the menu of the application as it is
 			if (this.importMenu && this.menuPreview) {
-				payload.menu = this.menuPreview.to
+				payload.menu = this.menuToImport
+			}
+			// without pages the import leaves the pages of the application as they are
+			if (this.importPages && this.previewData.pages) {
+				payload.pages = this.previewData.pages.to
 			}
 
 			this.$emit('update', payload)

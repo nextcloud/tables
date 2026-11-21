@@ -20,10 +20,13 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\MenuTarget;
+use OCA\Tables\Model\TableScheme;
 use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\GridWidgetTypes;
@@ -31,12 +34,17 @@ use OCA\Tables\Service\MenuService;
 use OCA\Tables\Service\PermissionsService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
+use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
 use OCA\Tables\Service\WidgetService;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -51,6 +59,10 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 	private ContextNodeRelationMapper $nodeRelMapper;
 	private PageMapper $pageMapper;
 	private WidgetService $widgetService;
+	private MenuService $menuService;
+	private PermissionsService&MockObject $permissionsService;
+	private TableMapper&MockObject $tableMapper;
+	private ViewMapper&MockObject $viewMapper;
 	/** @var int[] */
 	private array $contextIds = [];
 
@@ -68,13 +80,18 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			new ContextNodeRelationMapper($this->connectionAdapter),
 			$this->connectionAdapter,
 		);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
+		$this->tableMapper = $this->createMock(TableMapper::class);
+		$this->viewMapper = $this->createMock(ViewMapper::class);
+		$menuItemMapper = new MenuItemMapper($this->connectionAdapter);
+		$this->menuService = new MenuService($this->contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $menuItemMapper, $this->permissionsService, $this->tableMapper, $this->viewMapper, $this->connectionAdapter);
 		$this->service = new ContextService(
 			$this->contextMapper,
 			$this->nodeRelMapper,
 			$this->pageMapper,
 			new PageContentMapper($this->connectionAdapter),
 			$this->createMock(LoggerInterface::class),
-			$this->createMock(PermissionsService::class),
+			$this->permissionsService,
 			$this->createMock(IUserManager::class),
 			$this->createMock(AuditLogServiceInterface::class),
 			$this->connectionAdapter,
@@ -82,12 +99,12 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			false,
 			$this->createMock(INavigationManager::class),
 			$this->createMock(IURLGenerator::class),
-			$this->createMock(TableMapper::class),
-			$this->createMock(ViewMapper::class),
+			$this->tableMapper,
+			$this->viewMapper,
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
-			$this->createMock(MenuItemMapper::class),
-			$this->createMock(MenuService::class),
+			$menuItemMapper,
+			$this->menuService,
 		);
 	}
 
@@ -209,5 +226,258 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		]);
 
 		return [$context, $relation, $page->getId()];
+	}
+
+	public function testASchemeCarriesPagesWithWidgetsOnTheirTablesAndViewsByUuid(): void {
+		$this->permissionsService->method('canManageNodeById')->willReturnCallback(static fn (int $type, int $id): bool => $id !== 5199);
+		$this->permissionsService->method('canManageContext')->willReturn(true);
+		$this->tableMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => array_combine($ids, array_map(static fn (): Table => new Table(), $ids)));
+		$node = static fn (int $id, int $type): array => ['id' => $id, 'type' => $type, 'permissions' => Application::PERMISSION_MANAGE];
+		$source = $this->service->create('Source', 'tables', '', [$node(4181, Application::NODE_TYPE_TABLE), $node(4182, Application::NODE_TYPE_VIEW)], self::OWNER, Application::OWNER_TYPE_USER);
+		$this->contextIds[] = $source->getId();
+		$relationIds = array_column($this->contextMapper->findById($source->getId(), self::OWNER)->getNodes(), 'id', 'node_id');
+		$overview = $this->insertGridPage($source->getId(), 'overview', 'Overview');
+		$this->widgetService->insertAll($overview->getId(), [
+			new WidgetInput(null, 'header', null, null, null, 0, 0, 12, 2, ['heading' => 'Source'], null),
+			new WidgetInput(null, 'data', 'Tasks', null, null, 0, 2, 12, 5, [], $relationIds[4181]),
+			new WidgetInput(null, 'data', 'Open tasks', null, null, 0, 7, 12, 5, [], $relationIds[4182]),
+		]);
+		$notes = $this->insertGridPage($source->getId(), null, 'Notes');
+		$this->menuService->create($source->getId(), 'Notes', null, null, MenuTarget::fromArray(['pageId' => $notes->getId()]), self::OWNER);
+
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('find')->willReturnCallback(static fn (int $id): Table => self::withUuid(new Table(), $id, 'table-' . $id));
+		$tableService->method('getScheme')->willReturn($this->createMock(TableScheme::class));
+		$tableService->method('findAll')->willReturn([self::withUuid(new Table(), 5181, 'table-4181')]);
+		$tableService->method('compareTableSchemeChanges')->willReturn(['hasChanges' => false]);
+		$viewService = $this->createMock(ViewService::class);
+		$viewService->method('find')->willReturnCallback(static function (int $id): View {
+			$view = self::withUuid(new View(), $id, 'view-' . $id);
+			$view->setTableId(4181);
+			return $view;
+		});
+		$scheme = $this->withServices([TableService::class => $tableService, ViewService::class => $viewService], fn (): array => json_decode(json_encode($this->service->getScheme($source->getId(), self::OWNER)), true));
+		$this->assertSame(['targetType' => 'view', 'targetUuid' => 'view-4182'], array_diff_key(array_values(array_filter($scheme['pages'], static fn (array $page): bool => $page['slug'] === 'overview'))[0]['widgets'][2]['source'], ['nodeRelId' => true]));
+		// the columns of the tables are not under test here
+		$scheme['tables'] = [['uuid' => 'table-4181', 'views' => [['uuid' => 'view-4182']]]];
+		$overviewWidgets = &$scheme['pages'][array_key_first(array_filter($scheme['pages'], static fn (array $page): bool => $page['slug'] === 'overview'))]['widgets'];
+		$overviewWidgets[] = ['type' => 'data', 'title' => 'Elsewhere', 'gridX' => 0, 'gridY' => 12, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['targetType' => 'table', 'targetUuid' => 'table-4199']];
+		// here and manageable, but not a node of the scheme: a widget does not add it
+		$overviewWidgets[] = ['type' => 'data', 'title' => 'Not a resource', 'gridX' => 0, 'gridY' => 17, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['targetType' => 'table', 'targetUuid' => 'table-4198']];
+		unset($overviewWidgets);
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+		$this->contextIds[] = $targetId = $target->getId();
+
+		$this->tableMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): Table => match ($uuid) {
+			'table-4181' => self::withUuid(new Table(), 5181, $uuid),
+			'table-4198' => self::withUuid(new Table(), 5198, $uuid),
+			'table-4199' => self::withUuid(new Table(), 5199, $uuid),
+			default => throw new DoesNotExistException('No table'),
+		});
+		$this->viewMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): View => $uuid === 'view-4182' ? self::withUuid(new View(), 5182, $uuid) : throw new DoesNotExistException('No view'));
+		$this->viewMapper->method('findByTableIdsAndUuids')->willReturnCallback(static fn (array $tableIds, array $uuids): array => $tableIds === [5181] && $uuids === ['view-4182'] ? [self::viewOfTable(5182, 'view-4182', 5181)] : []);
+		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($targetId, $scheme, self::OWNER));
+
+		$this->assertSame([], $preview['pages']['skipped']);
+		$this->assertSame(
+			[['update', Page::TYPE_STARTPAGE, 0, 0], ['add', Page::TYPE_GRID, 5, 2], ['add', Page::TYPE_GRID, 0, 0]],
+			array_map(static fn (array $page): array => [$page['action'], $page['pageType'], $page['widgetCount'], $page['unlinkedWidgetCount']], $preview['pages']['summary']),
+		);
+		$this->assertSame([], $preview['menu']['skipped']);
+		$this->service->addNodeToContext($this->contextMapper->findById($targetId, self::OWNER), 5181, Application::NODE_TYPE_TABLE, Application::PERMISSION_MANAGE);
+		$this->service->addNodeToContext($this->contextMapper->findById($targetId, self::OWNER), 5182, Application::NODE_TYPE_VIEW, Application::PERMISSION_MANAGE);
+		$this->service->importScheme($targetId, 'Target', 'tables', '', $scheme['nodes'], ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['menu']['to'], $preview['pages']['to']);
+
+		$target = $this->contextMapper->findById($targetId, self::OWNER);
+		$targetRelationIds = array_column($target->getNodes(), 'id', 'node_id');
+		$this->assertEqualsCanonicalizing([5181, 5182], array_keys($targetRelationIds));
+		$pages = $this->service->getPagesWithWidgets($target);
+		$byTitle = array_column(array_filter($pages, static fn (array $page): bool => $page['title'] !== null), null, 'title');
+		$this->assertSame('overview', $byTitle['Overview']['slug']);
+		$this->assertSame(
+			[['header', null], ['data', $targetRelationIds[5181]], ['data', $targetRelationIds[5182]], ['data', null], ['data', null]],
+			array_map(static fn (array $widget): array => [$widget['type'], $widget['source']['nodeRelId'] ?? null], $byTitle['Overview']['widgets']),
+		);
+		$notesId = $byTitle['Notes']['id'];
+		$this->assertSame('page_' . $notesId, $byTitle['Notes']['slug']);
+		$this->assertSame([['pageId' => $notesId]], array_column(array_values(array_filter($this->menuService->findAll($targetId, self::OWNER)['menu'], static fn (array $item): bool => $item['title'] === 'Notes')), 'target'));
+	}
+
+	public function testAPreviewCountsTheTablesAndViewsTheImportAddsAsResources(): void {
+		$this->tableMapper->method('findByUuid')->willThrowException(new DoesNotExistException('No table'));
+		$this->viewMapper->method('findByUuid')->willThrowException(new DoesNotExistException('No view'));
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('findAll')->willReturn([]);
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+		$this->contextIds[] = $target->getId();
+		$widget = static fn (string $title, string $type, string $uuid): array => ['type' => 'data', 'title' => $title, 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['targetType' => $type, 'targetUuid' => $uuid]];
+
+		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($target->getId(), [
+			'nodes' => [
+				['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => 'new-table', 'permissions' => 1],
+				['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => 'new-view', 'permissions' => 1],
+				['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => 'gone-view', 'permissions' => 1],
+			],
+			'tables' => [['uuid' => 'new-table', 'views' => [['uuid' => 'new-view']]]],
+			'pages' => [['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'widgets' => [
+				$widget('Added table', 'table', 'new-table'),
+				$widget('Added view', 'view', 'new-view'),
+				$widget('Gone', 'view', 'gone-view'),
+			]]],
+		], self::OWNER));
+
+		$this->assertSame(['Added table', 'Added view', 'Gone'], array_column($preview['pages']['to'][0]['widgets'], 'title'));
+		$this->assertSame([], $preview['pages']['skipped']);
+		$this->assertSame([3, 1], [$preview['pages']['summary'][0]['widgetCount'], $preview['pages']['summary'][0]['unlinkedWidgetCount']]);
+	}
+
+	public function testTheStartPageKeepsItsWidgetsThroughASchemeAndTheImportRaisesTheVersion(): void {
+		$this->permissionsService->method('canManageContext')->willReturn(true);
+		$context = $this->service->create('Projects', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+		$startPageId = (int)array_key_first($this->contextMapper->findById($context->getId(), self::OWNER)->getPages());
+		$this->widgetService->insertAll($startPageId, [
+			new WidgetInput(null, 'header', 'Welcome', null, null, 0, 0, 12, 2, ['heading' => 'Projects'], null),
+		]);
+		$versionBefore = $this->pageMapper->findById($startPageId)->getVersion();
+		$scheme = json_decode(json_encode(['pages' => $this->service->getPagesWithWidgets($this->contextMapper->findById($context->getId(), self::OWNER))]), true);
+		$this->widgetService->syncPage($startPageId, []);
+
+		$this->service->importScheme($context->getId(), 'Projects', 'tables', '', [], ['addTables' => [], 'modifyTables' => []], self::OWNER, null, $scheme['pages']);
+
+		$widgets = $this->widgetService->findByPageIds([$startPageId])[$startPageId] ?? [];
+		$this->assertSame([['header', 'Welcome']], array_map(static fn (array $widget): array => [$widget['type'], $widget['title']], $widgets));
+		$this->assertFalse($this->pageMapper->raiseVersion($startPageId, $versionBefore), 'a save based on the version from before the import is refused');
+	}
+
+	public function testAGridPageWithoutATitleIsNamedByItsSlug(): void {
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('findAll')->willReturn([]);
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+		$pages = [
+			['id' => 1, 'page_type' => Page::TYPE_GRID, 'slug' => 'reports', 'title' => '   '],
+			['id' => 2, 'page_type' => Page::TYPE_GRID, 'slug' => 'page_77', 'title' => null],
+		];
+
+		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($target->getId(), ['pages' => $pages], self::OWNER));
+		$this->service->importScheme($target->getId(), 'Target', 'tables', '', [], ['addTables' => [], 'modifyTables' => []], self::OWNER, null, $preview['pages']['to']);
+
+		$this->assertSame(['reports', null], array_column($preview['pages']['summary'], 'title'));
+		$gridPages = array_values(array_filter($this->contextMapper->findById($target->getId(), self::OWNER)->getPages(), static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID));
+		usort($gridPages, static fn (array $a, array $b): int => $a['id'] <=> $b['id']);
+		$this->assertSame(['reports', 'page_' . $gridPages[1]['id']], array_column($gridPages, 'title'));
+		$this->assertSame(array_column($gridPages, 'slug'), array_column($gridPages, 'title'));
+	}
+
+	public function testAGridPageNamedLikeTheStartPageIsANewPageAndItsMenuItemOpensIt(): void {
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('findAll')->willReturn([]);
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+		$startPages = $this->contextMapper->findById($target->getId(), self::OWNER)->getPages();
+		$startPageId = (int)array_key_first($startPages);
+		$startPageName = $startPages[$startPageId]['slug'];
+		$pages = [['id' => 1, 'page_type' => Page::TYPE_GRID, 'slug' => $startPageName, 'title' => 'Reports']];
+		$menu = [['title' => null, 'displayTitle' => 'Reports', 'target' => ['page' => $startPageName]]];
+
+		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($target->getId(), ['pages' => $pages, 'menu' => $menu], self::OWNER));
+		$this->service->importScheme($target->getId(), 'Target', 'tables', '', [], ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['menu']['to'], $preview['pages']['to']);
+
+		$this->assertSame(['add', ['page' => $startPageName]], [$preview['pages']['summary'][0]['action'], $preview['menu']['to'][0]['target']]);
+		$imported = $this->contextMapper->findById($target->getId(), self::OWNER)->getPages();
+		$gridPageIds = array_keys(array_filter($imported, static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID));
+		$this->assertCount(1, $gridPageIds);
+		$this->assertSame($startPageName, $imported[$startPageId]['slug']);
+		$this->assertSame('page_' . $gridPageIds[0], $imported[$gridPageIds[0]]['slug']);
+		$this->assertSame([['pageId' => $gridPageIds[0]]], array_column($this->menuService->findAll($target->getId(), self::OWNER)['menu'], 'target'));
+	}
+
+	public function testAPreviewFindsAViewWithinItsOwnTableWhenViewsShareAUuid(): void {
+		$this->permissionsService->method('canManageNodeById')->willReturnCallback(static fn (int $type, int $id): bool => [$type, $id] === [Application::NODE_TYPE_VIEW, 6102]);
+		$this->viewMapper->method('findByUuid')->willThrowException(new MultipleObjectsReturnedException('Two views'));
+		$this->viewMapper->expects($this->once())->method('findByTableIdsAndUuids')->with([6002], ['shared-view'])
+			->willReturn([self::viewOfTable(6102, 'shared-view', 6002)]);
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('findAll')->willReturn([self::withUuid(new Table(), 6001, 'first-table'), self::withUuid(new Table(), 6002, 'second-table')]);
+		$tableService->method('compareTableSchemeChanges')->willReturn(['hasChanges' => false]);
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+		$widget = ['type' => 'data', 'title' => 'Shared', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => ['targetType' => 'view', 'targetUuid' => 'shared-view']];
+
+		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($target->getId(), [
+			'nodes' => [['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => 'shared-view', 'permissions' => 1]],
+			'tables' => [['uuid' => 'second-table', 'views' => [['uuid' => 'shared-view']]]],
+			'pages' => [['page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'widgets' => [$widget]]],
+			'menu' => [['title' => 'Shared', 'target' => ['view' => 'shared-view']], ['title' => 'Unknown', 'target' => ['view' => 'unknown-view']]],
+		], self::OWNER));
+
+		$this->assertSame(0, $preview['pages']['summary'][0]['unlinkedWidgetCount']);
+		$this->assertSame(['Shared'], array_column($preview['menu']['to'], 'title'));
+		$this->assertSame(['Unknown'], array_column($preview['menu']['skipped'], 'title'));
+	}
+
+	public function testAPreviewWithoutPagesOrMenuLooksNothingUp(): void {
+		$this->tableMapper->expects($this->never())->method('findByUuid');
+		$this->viewMapper->expects($this->never())->method('findByUuid');
+		$this->viewMapper->expects($this->never())->method('findByTableIdsAndUuids');
+		$this->permissionsService->expects($this->never())->method('canManageNodeById');
+		$tableService = $this->createMock(TableService::class);
+		$tableService->method('findAll')->willReturn([]);
+		$target = $this->service->create('Target', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
+
+		$preview = $this->withServices([TableService::class => $tableService], fn (): array => $this->service->compareSchemeChanges($target->getId(), [
+			'nodes' => [['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => 'some-view', 'permissions' => 1]],
+			'pages' => [],
+		], self::OWNER));
+
+		$this->assertSame(['to' => [], 'summary' => [], 'skipped' => []], $preview['pages']);
+	}
+
+	private function insertGridPage(int $contextId, ?string $slug, string $title): Page {
+		$page = new Page();
+		$page->setContextId($contextId);
+		$page->setPageType(Page::TYPE_GRID);
+		$page->setTitle($title);
+		if ($slug === null) {
+			return $this->pageMapper->insertWithDefaultName($page);
+		}
+		$page->setSlug($slug);
+		return $this->pageMapper->insert($page);
+	}
+
+	private static function viewOfTable(int $id, string $uuid, int $tableId): View {
+		$view = self::withUuid(new View(), $id, $uuid);
+		$view->setTableId($tableId);
+		return $view;
+	}
+
+	/**
+	 * @template T of Table|View
+	 * @param T $node
+	 * @return T
+	 */
+	private static function withUuid(Table|View $node, int $id, string $uuid): Table|View {
+		$node->id = $id;
+		$node->setUuid($uuid);
+		return $node;
+	}
+
+	/**
+	 * Runs a callback with services of the server container replaced, as the scheme
+	 * export and preview get them from there.
+	 *
+	 * @param array<class-string, object> $services
+	 */
+	private function withServices(array $services, callable $callback): mixed {
+		$container = \OC::$server->getAppContainerForService(TableService::class) ?? \OC::$server;
+		$real = [];
+		foreach ($services as $class => $service) {
+			$real[$class] = \OCP\Server::get($class);
+			$container->registerService($class, static fn () => $service);
+		}
+		try {
+			return $callback();
+		} finally {
+			foreach ($real as $class => $service) {
+				$container->registerService($class, static fn () => $service);
+			}
+		}
 	}
 }
