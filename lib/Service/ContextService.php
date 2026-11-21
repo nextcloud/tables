@@ -23,6 +23,7 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
@@ -37,6 +38,7 @@ use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Validation\TechnicalNameValidator;
+use OCA\Tables\Vendor\Symfony\Component\Uid\Uuid;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
@@ -50,6 +52,11 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 class ContextService {
+	/** The most nodes a scheme import takes */
+	public const MAX_SCHEME_NODES = 1_000;
+
+	private const NODE_UNAVAILABLE = 'is not a table or view that is here and can be managed by the user';
+	private const NODE_AMBIGUOUS = 'matches more than one view here that the user can manage';
 
 	public function __construct(
 		private ContextMapper $contextMapper,
@@ -868,6 +875,120 @@ class ContextService {
 	}
 
 	/**
+	 * The node relation of an application for a table or view (by kind, `table` or `view`) and id.
+	 */
+	private function nodeRelId(Context $context, string $kind, ?int $nodeId): ?int {
+		if ($nodeId === null) {
+			return null;
+		}
+		$nodeType = $kind === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+		foreach ($context->getNodes() ?? [] as $relId => $relation) {
+			if ($relation['node_type'] === $nodeType && $relation['node_id'] === $nodeId) {
+				return (int)$relId;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * The tables and views the nodes of a scheme name, for the preview and the import alike.
+	 * A node resolves to a table or view that is a node of the application, comes with a
+	 * table the import adds (id null until it is added), or is the only one with its uuid
+	 * the user can manage. Every other node is unresolved, with the reason.
+	 *
+	 * @param array<array-key, mixed> $nodes nodes of the scheme
+	 * @param array<array-key, mixed> $addTables tables the import adds
+	 * @return array{resolved: list<array{index: int, kind: 'table'|'view', uuid: string, type: int, id: ?int, permissions: mixed}>, unresolved: list<array{index: int, uuid: ?string, title: ?string, reason: string}>}
+	 * @throws BadRequestError when the scheme has more than MAX_SCHEME_NODES nodes
+	 * @throws Exception
+	 */
+	private function resolveSchemeNodes(Context $context, array $nodes, array $addTables, string $userId): array {
+		if (count($nodes) > self::MAX_SCHEME_NODES) {
+			throw new BadRequestError('A scheme has at most ' . self::MAX_SCHEME_NODES . ' nodes.');
+		}
+
+		$added = ['table' => [], 'view' => []];
+		foreach ($addTables as $tableScheme) {
+			if (is_string($tableScheme['uuid'] ?? null) && Uuid::isValid($tableScheme['uuid'])) {
+				$added['table'][$tableScheme['uuid']] = true;
+			}
+			foreach (is_array($tableScheme['views'] ?? null) ? $tableScheme['views'] : [] as $viewScheme) {
+				if (is_string($viewScheme['uuid'] ?? null) && Uuid::isValid($viewScheme['uuid'])) {
+					$added['view'][$viewScheme['uuid']] = true;
+				}
+			}
+		}
+
+		$nodes = array_values($nodes);
+		$valid = [];
+		$lookup = ['table' => [], 'view' => []];
+		$unresolved = [];
+		foreach ($nodes as $index => $node) {
+			$kind = match (is_array($node) ? $node['node_type'] ?? null : null) {
+				Application::NODE_TYPE_TABLE => 'table',
+				Application::NODE_TYPE_VIEW => 'view',
+				default => null,
+			};
+			$uuid = is_array($node) && is_string($node['node_uuid'] ?? null) ? $node['node_uuid'] : null;
+			if ($kind === null || $uuid === null || !Uuid::isValid($uuid)) {
+				$unresolved[$index] = $this->unresolvedSchemeNode($index, $node, self::NODE_UNAVAILABLE);
+				continue;
+			}
+			$valid[$index] = [$kind, $uuid];
+			if (!isset($added[$kind][$uuid])) {
+				$lookup[$kind][$uuid] = true;
+			}
+		}
+
+		$candidates = ['table' => [], 'view' => []];
+		foreach ($lookup['table'] === [] ? [] : $this->tableMapper->findAllByUuids(array_keys($lookup['table'])) as $table) {
+			$candidates['table'][$table->getUuid()][] = $table;
+		}
+		foreach ($lookup['view'] === [] ? [] : $this->viewMapper->findAllByUuids(array_keys($lookup['view'])) as $view) {
+			$candidates['view'][$view->getUuid()][] = $view;
+		}
+
+		$currentNodes = [];
+		foreach ($context->getNodes() ?? [] as $relation) {
+			$currentNodes[sprintf('t%di%d', $relation['node_type'], $relation['node_id'])] = true;
+		}
+
+		$resolved = [];
+		foreach ($valid as $index => [$kind, $uuid]) {
+			$type = $kind === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+			$id = null;
+			if (!isset($added[$kind][$uuid])) {
+				$found = $candidates[$kind][$uuid] ?? [];
+				$current = array_filter($found, static fn (Table|View $node): bool => isset($currentNodes[sprintf('t%di%d', $type, $node->getId())]));
+				$usable = $current !== [] ? $current : array_filter($found, fn (Table|View $node): bool => $node instanceof Table
+					? $this->permissionsService->canManageTable($node, $userId)
+					: $this->permissionsService->canManageView($node, $userId));
+				if (count($usable) !== 1) {
+					$unresolved[$index] = $this->unresolvedSchemeNode($index, $nodes[$index], $usable === [] ? self::NODE_UNAVAILABLE : self::NODE_AMBIGUOUS);
+					continue;
+				}
+				$id = reset($usable)->getId();
+			}
+			$resolved[] = ['index' => $index, 'kind' => $kind, 'uuid' => $uuid, 'type' => $type, 'id' => $id, 'permissions' => $nodes[$index]['permissions'] ?? null];
+		}
+		ksort($unresolved);
+
+		return ['resolved' => $resolved, 'unresolved' => array_values($unresolved)];
+	}
+
+	/**
+	 * @return array{index: int, uuid: ?string, title: ?string, reason: string}
+	 */
+	private function unresolvedSchemeNode(int $index, mixed $node, string $reason): array {
+		return [
+			'index' => $index,
+			'uuid' => is_array($node) && is_string($node['node_uuid'] ?? null) ? $node['node_uuid'] : null,
+			'title' => is_array($node) && is_string($node['node_title'] ?? null) ? $node['node_title'] : null,
+			'reason' => $reason,
+		];
+	}
+
+	/**
 	 * The slugs of the pages of an imported application, by page key. A valid
 	 * exported name is kept unless an earlier page of the import uses it or it has the
 	 * reserved form `page_<id>`, a start page without one gets `dashboard` while it is
@@ -1111,6 +1232,10 @@ class ContextService {
 			}
 		}
 
+		$changes['nodes']['unresolved'] = is_array($updateScheme['nodes'] ?? null)
+			? $this->resolveSchemeNodes($context, $updateScheme['nodes'], $changes['addTables'], $userId)['unresolved']
+			: [];
+
 		if (is_array($updateScheme['menu'] ?? null) && $updateScheme['menu'] !== []) {
 			$schemePages = is_array($updateScheme['pages'] ?? null) ? $updateScheme['pages'] : [];
 			$changes['menu'] = ['from' => $currentScheme->getMenu()] + $this->menuService->previewSchemeImport($context, $updateScheme['menu'], $schemePages, $changes['nodes']['to'] ?? []);
@@ -1148,14 +1273,55 @@ class ContextService {
 			|| !isset($tables['modifyTables']) || !is_array($tables['modifyTables'])) {
 			throw new BadRequestError('Invalid tables structure provided.');
 		}
+		foreach ([...$tables['addTables'], ...$tables['modifyTables']] as $tableScheme) {
+			if (!is_array($tableScheme)) {
+				throw new BadRequestError('Invalid tables structure provided.');
+			}
+		}
 
 		$tableService = \OCP\Server::get(TableService::class);
 		$viewService = \OCP\Server::get(ViewService::class);
 		$columnService = \OCP\Server::get(ColumnService::class);
 
+		// everything that can refuse the import is checked before the first write
 		foreach ($tables['addTables'] as $tableScheme) {
 			$tableService->validateTableScheme($tableScheme);
+		}
+		$modifyUuids = [];
+		foreach ($tables['modifyTables'] as $tableScheme) {
+			if (!isset($tableScheme['uuid'])) {
+				throw new BadRequestError('Table scheme must include a UUID for modification.');
+			}
+			$tableService->validateTableScheme($tableScheme);
+			if (is_string($tableScheme['uuid']) && Uuid::isValid($tableScheme['uuid'])) {
+				$modifyUuids[] = $tableScheme['uuid'];
+			}
+		}
+		$tablesByUuid = [];
+		foreach ($modifyUuids === [] ? [] : $this->tableMapper->findAllByUuids($modifyUuids) as $table) {
+			$tablesByUuid[$table->getUuid()] = $table;
+		}
+		$tablesToModify = [];
+		foreach (array_values($tables['modifyTables']) as $index => $tableScheme) {
+			$table = is_string($tableScheme['uuid']) ? $tablesByUuid[$tableScheme['uuid']] ?? null : null;
+			if ($table === null || !$this->permissionsService->canManageTable($table, $userId)) {
+				throw new BadRequestError('The table ' . (is_string($tableScheme['uuid']) ? $tableScheme['uuid'] : 'at position ' . $index) . ' to modify is not here or cannot be managed by the user.');
+			}
+			$tablesToModify[] = [$table, $tableScheme];
+		}
+
+		$schemeNodes = $this->resolveSchemeNodes($this->contextMapper->findById($contextId, $userId, false), $nodes, $tables['addTables'], $userId);
+		if ($schemeNodes['unresolved'] !== []) {
+			$first = $schemeNodes['unresolved'][0];
+			$others = count($schemeNodes['unresolved']) - 1;
+			throw new BadRequestError('Node ' . $first['index'] . ' of the scheme ' . $first['reason'] . '.'
+				. ($others > 0 ? ' ' . $others . ' more nodes cannot be imported either.' : ''));
+		}
+
+		$addedIds = ['table' => [], 'view' => []];
+		foreach ($tables['addTables'] as $tableScheme) {
 			$table = $tableService->importTable($tableScheme, $userId);
+			$addedIds['table'][(string)$table->getUuid()] = $table->getId();
 			foreach ($tableScheme['columns'] as $columnData) {
 				$columnService->importColumn($table, $columnData);
 			}
@@ -1169,49 +1335,36 @@ class ContextService {
 				$viewData['columnSettings'] = ColumnSettings::createViewSettingsFromInputArray($viewData['columnSettings'], $columnsMap)->jsonSerialize();
 				$viewData['sort'] = SortRuleSet::createFromInputArray($viewData['sort'], $columnsMap)->jsonSerialize();
 				$viewData['filter'] = FilterSet::createFromInputArray($viewData['filter'], $columnsMap)->jsonSerialize();
-				$viewService->importView($table->getId(), $viewData, $userId);
+				$view = $viewService->importView($table->getId(), $viewData, $userId);
+				$addedIds['view'][(string)$view->getUuid()] = $view->getId();
 			}
 		}
 
-		foreach ($tables['modifyTables'] as $tableScheme) {
-			if (!isset($tableScheme['uuid'])) {
-				throw new BadRequestError('Table scheme must include a UUID for modification.');
-			}
-			$tableService->validateTableScheme($tableScheme);
-			$table = $this->tableMapper->findByUuid($tableScheme['uuid']);
+		foreach ($tablesToModify as [$table, $tableScheme]) {
 			$tableService->updateTableStructure($table->getId(), $tableScheme['columns'], $tableScheme['views'], $tableScheme['columnOrder'], $tableScheme['sort'], $userId);
 		}
 
-		// Resolve node ids for the new tables and views
 		$resolvedNodes = [];
-		foreach ($nodes as $node) {
-			if ($node['node_type'] === Application::NODE_TYPE_TABLE) {
-				$table = $this->tableMapper->findByUuid($node['node_uuid']);
-				$resolvedNodes[] = [
-					'id' => $table->getId(),
-					'type' => $node['node_type'],
-					'permissions' => $node['permissions'],
-				];
-			} elseif ($node['node_type'] === Application::NODE_TYPE_VIEW) {
-				$view = $this->viewMapper->findByUuid($node['node_uuid']);
-				$resolvedNodes[] = [
-					'id' => $view->getId(),
-					'type' => $node['node_type'],
-					'permissions' => $node['permissions'],
-				];
-			}
+		$nodeIds = ['table' => [], 'view' => []];
+		foreach ($schemeNodes['resolved'] as $node) {
+			$id = $node['id'] ?? $addedIds[$node['kind']][$node['uuid']];
+			$nodeIds[$node['kind']][$node['uuid']] = $id;
+			$resolvedNodes[] = [
+				'id' => $id,
+				'type' => $node['type'],
+				'permissions' => $node['permissions'],
+			];
 		}
 
 		$context = $this->update($contextId, $userId, $name, $iconName, $description, $resolvedNodes);
 		$menuSkipped = [];
 		if ($menu !== null) {
 			$withNodes = $this->contextMapper->findById($contextId, $userId);
-			$nodeRelIds = $this->menuService->nodeRelIdsByUuid($withNodes);
-			$pageIds = array_flip(array_map(static fn (array $page): string => (string)$page['slug'], $withNodes->getPages() ?? []));
+			$pageIds = array_flip(array_map(static fn (array $page): string => (string)($page['slug'] ?? ''), $withNodes->getPages() ?? []));
 			$menuSkipped = $this->menuService->import(
 				$withNodes,
 				$menu,
-				static fn (string $kind, string $uuid): ?int => $nodeRelIds[$kind][$uuid] ?? null,
+				fn (string $kind, string $uuid): ?int => $this->nodeRelId($withNodes, $kind, $nodeIds[$kind][$uuid] ?? null),
 				static fn (string $slug): ?int => $pageIds[$slug] ?? null,
 			);
 			$this->logSkippedMenuItems($menuSkipped);

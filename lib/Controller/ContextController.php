@@ -341,7 +341,7 @@ class ContextController extends AOCSController {
 	 * @param string $name Title of the context
 	 * @param string $iconName Identifier of the context icon
 	 * @param string $description Description of the context
-	 * @param list<array{node_type: int, node_uuid: string, permissions: int}> $nodes Ordered meta data of the related nodes
+	 * @param list<array{node_type: int, node_uuid: string, permissions: int}> $nodes Ordered meta data of the related nodes, at most 1000. Each must name a table or view that is a node of the context, comes with a table to be added, or is the only one with its uuid that the user can manage; otherwise the whole import is refused with 400 before anything is written
 	 * @psalm-param array{addTables: list<TablesTable>, modifyTables: list<TablesTable>} $tables Tables to be added or modified
 	 * @param list<array<string, mixed>>|null $menu Menu of the scheme, replacing the menu of the context: pages by slug, tables and views by uuid, the group of an item by its position in the list; items that cannot be used here are skipped. Left out, the menu stays as it is
 	 *

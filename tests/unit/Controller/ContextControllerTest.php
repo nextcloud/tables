@@ -64,6 +64,18 @@ final class ContextControllerTest extends TestCase {
 		$this->assertSame($status, $response->getStatus());
 	}
 
+	public function testASchemeImportThatIsRefusedAnswers400AndRollsBack(): void {
+		$contextService = $this->createMock(ContextService::class);
+		$contextService->method('importScheme')->willThrowException(new BadRequestError('The table to modify is not here.'));
+		$db = $this->createMock(IDBConnection::class);
+		$db->expects($this->once())->method('rollBack');
+
+		$response = $this->controller($contextService, $db)->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => []]);
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertSame('The table to modify is not here.', $response->getData()['message']);
+	}
+
 	private function controller(ContextService $contextService, IDBConnection $db): ContextController {
 		return new ContextController(
 			$this->createMock(IRequest::class),
