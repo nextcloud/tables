@@ -13,6 +13,8 @@ use Closure;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
+use OCP\Migration\Attributes\AddColumn;
+use OCP\Migration\Attributes\ColumnType;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 use Override;
@@ -21,6 +23,8 @@ use Override;
  * A widget can sit in a tab of a tabs widget on the same page: `parent_id` is the tabs
  * widget and `parent_tab` the key of the tab, both empty for a widget on the page itself.
  */
+#[AddColumn(table: 'tables_contexts_widget', name: 'parent_id', type: ColumnType::INTEGER, description: 'the tabs widget this widget sits in, empty on the page itself')]
+#[AddColumn(table: 'tables_contexts_widget', name: 'parent_tab', type: ColumnType::STRING, description: 'key of the tab of the parent tabs widget, empty on the page itself')]
 class Version2500Date20261109020000 extends SimpleMigrationStep {
 	private const WIDGET_TABLE = 'tables_contexts_widget';
 
