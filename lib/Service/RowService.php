@@ -636,7 +636,7 @@ class RowService extends SuperService {
 			}
 
 			// is row in view?
-			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
+			if ($item->getTableId() !== $view->getTableId() || !$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 
@@ -759,7 +759,7 @@ class RowService extends SuperService {
 			} catch (DoesNotExistException) {
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
-			if (!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
+			if ($item->getTableId() !== $view->getTableId() || !$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 			}
 		} else {

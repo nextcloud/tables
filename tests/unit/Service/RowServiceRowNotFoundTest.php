@@ -144,6 +144,19 @@ class RowServiceRowNotFoundTest extends TestCase {
 		}
 	}
 
+	public function testDeletingARowThroughAViewOfAnotherTableIsNotFoundWithoutAskingTheMapper(): void {
+		$view = new View();
+		$view->setId(self::VIEW_ID);
+		$view->setTableId(self::TABLE_ID + 1);
+		$this->viewMapper->method('find')->willReturn($view);
+		$this->permissionsService->method('canDeleteRowsByViewId')->willReturn(true);
+		$this->row2Mapper->expects($this->never())->method('isRowInViewPresent');
+
+		$this->logger->expects($this->never())->method('error');
+		$this->expectException(NotFoundError::class);
+		$this->service->delete(self::ROW_ID, self::VIEW_ID, 'alice');
+	}
+
 	public function testUpdatingARowThatIsNotInTheTableIsNotFound(): void {
 		$this->logger->expects($this->never())->method('error');
 		$this->expectException(NotFoundError::class);
