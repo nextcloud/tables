@@ -267,8 +267,8 @@ class ContextMapper extends QBMapper {
 	public function findAllContainingNode(int $nodeType, int $nodeId, string $userId): array {
 		$qb = $this->getFindContextBaseQuery($userId);
 
-		$qb->andWhere($qb->expr()->eq('r.node_id', $qb->createNamedParameter($nodeId)))
-			->andWhere($qb->expr()->eq('r.node_type', $qb->createNamedParameter($nodeType)));
+		$qb->andWhere($qb->expr()->eq('r.node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('r.node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)));
 
 		$result = $qb->executeQuery();
 		$r = $result->fetchAllAssociative();

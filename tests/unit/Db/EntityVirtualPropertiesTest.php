@@ -9,6 +9,11 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Tests\Unit\Db;
 
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Types\BigIntType;
+use Doctrine\DBAL\Types\BooleanType;
+use Doctrine\DBAL\Types\IntegerType;
+use Doctrine\DBAL\Types\SmallIntType;
 use OCA\Tables\Db\EntitySuper;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
 use OCP\AppFramework\Db\Entity;
@@ -130,9 +135,9 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 		$classProperties = $this->getClassProperties($reflection);
 
 		// 3. Get database table fields
-		$tableFieldsRaw = $this->getDatabaseTableFields($className);
+		$tableColumns = $this->getDatabaseTableFields($className);
 		$tableFields = [];
-		foreach ($tableFieldsRaw as $columnName) {
+		foreach (array_keys($tableColumns) as $columnName) {
 			$tableFields[] = $this->columnToProperty($columnName);
 		}
 
@@ -163,6 +168,30 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 				implode(', ', $missingVirtualProperties)
 			)
 		);
+
+		// 6. Check that every field type names a property and every integer or boolean column has a field type
+		$fieldTypes = $reflection->newInstance()->getFieldTypes();
+		$unknownFields = array_filter(array_keys($fieldTypes), static fn (string $field): bool => !property_exists($className, $field));
+		$this->assertEmpty(
+			$unknownFields,
+			sprintf('Class %s registers field types for unknown properties: %s', $className, implode(', ', $unknownFields))
+		);
+
+		$untypedColumns = [];
+		foreach ($tableColumns as $columnName => $column) {
+			$property = $this->columnToProperty($columnName);
+			if (!property_exists($className, $property) || isset($fieldTypes[$property])) {
+				continue;
+			}
+			$type = $column->getType();
+			if ($type instanceof IntegerType || $type instanceof BigIntType || $type instanceof SmallIntType || $type instanceof BooleanType) {
+				$untypedColumns[] = $property;
+			}
+		}
+		$this->assertEmpty(
+			$untypedColumns,
+			sprintf('Class %s has integer or boolean columns without a field type: %s', $className, implode(', ', $untypedColumns))
+		);
 	}
 
 	/**
@@ -191,7 +220,9 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 	}
 
 	/**
-	 * Get database table fields for Entity class
+	 * Get database table columns for Entity class, keyed by column name
+	 *
+	 * @return array<string, Column>
 	 */
 	private function getDatabaseTableFields(string $className): array {
 		// Try to get table name from class
@@ -212,7 +243,7 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 
 		$fields = [];
 		foreach ($columns as $column) {
-			$fields[] = $column->getName();
+			$fields[$column->getName()] = $column;
 		}
 
 		return $fields;
