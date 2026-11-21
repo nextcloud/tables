@@ -185,6 +185,7 @@ OC.L10N.register(
     "Train" : "Воз",
     "Truck" : "Камион",
     "Watermark" : "Воден печат",
+    "Checked" : "Проверено",
     "This year" : "Оваа година",
     "This week" : "Оваа недела",
     "Now" : "Сега",
