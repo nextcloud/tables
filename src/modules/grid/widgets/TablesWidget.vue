@@ -20,11 +20,11 @@
 import { NcEmptyContent } from '@nextcloud/vue'
 import TableIcon from 'vue-material-design-icons/TableLarge.vue'
 import DataWidget from './DataWidget.vue'
-import { widgetTarget } from '../gridLayout.js'
+import { orderedNodeRelIds, widgetTarget } from '../gridLayout.js'
 
 /**
- * Shows every table and view of the application, one below the other, as the start page
- * did before it became a grid page. The start page of a new application begins with it.
+ * Shows every table and view of the application, one below the other in the order of
+ * "Edit application", as the start page did before it became a grid page. The start page of a new application begins with it.
  */
 export default {
 	name: 'TablesWidget',
@@ -34,16 +34,21 @@ export default {
 		TableIcon,
 	},
 	props: {
-		// The nodes of the application by relation id, in the order they were added
+		// The nodes of the application by relation id
 		nodes: {
+			type: Object,
+			default: () => ({}),
+		},
+		// The content of the start page, which holds the order of the tables and views
+		content: {
 			type: Object,
 			default: () => ({}),
 		},
 	},
 	computed: {
 		targets() {
-			return Object.keys(this.nodes ?? {})
-				.map(nodeRelId => widgetTarget({ nodeRelId: parseInt(nodeRelId) }, this.nodes))
+			return orderedNodeRelIds(this.nodes, this.content)
+				.map(nodeRelId => widgetTarget({ nodeRelId }, this.nodes))
 				.filter(Boolean)
 		},
 	},

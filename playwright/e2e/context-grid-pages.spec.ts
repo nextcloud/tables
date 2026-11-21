@@ -7,7 +7,8 @@ import { type APIRequestContext, type Page } from '@playwright/test'
 import { test, expect } from '../support/fixtures'
 import { createRandomUser, ocsRequest, type TestUser } from '../support/api'
 import { login } from '../support/login'
-import { openContextEditModal } from '../support/commands'
+import * as fs from 'fs'
+import { clickOnTableThreeDotMenu, openContextEditModal } from '../support/commands'
 
 // The app navigation takes width from the canvas; the grid only arranges at 12 columns
 test.use({ viewport: { width: 1600, height: 1000 } })
@@ -64,21 +65,46 @@ async function pickOption(page: Page, selectCy: string, option: string) {
 }
 
 test.describe('Grid pages of an application', () => {
-	test('The start page lists the tables as before, with the page bar under the description', async ({ userPage: { page, user } }) => {
+	test('The start page of a new application shows its tables in one widget', async ({ userPage: { page, user } }) => {
 		const first = await createTableViaApi(page.request, user, 'grid first table')
 		const second = await createTableViaApi(page.request, user, 'grid second table')
 		const contextId = await createApplicationViaApi(page.request, user, 'grid existing app', [first, second])
 
 		await openApplication(page, contextId)
 
-		const firstHeading = page.locator('h1', { hasText: 'grid first table' })
-		const secondHeading = page.locator('h1', { hasText: 'grid second table' })
-		await expect(firstHeading).toBeVisible()
-		await expect(secondHeading).toBeVisible()
+		const startPage = page.locator('[data-cy="startPageGrid"]')
+		await expect(startPage).toBeVisible()
+		const tablesWidget = startPage.locator('[data-cy="tablesWidget"]')
+		const firstHeading = tablesWidget.getByRole('heading', { name: 'grid first table' })
+		const secondHeading = tablesWidget.getByRole('heading', { name: 'grid second table' })
+		await expect(firstHeading).toBeVisible({ timeout: 30000 })
+		await expect(secondHeading).toBeVisible({ timeout: 30000 })
 		expect((await firstHeading.boundingBox())!.y).toBeLessThan((await secondHeading.boundingBox())!.y)
+		await expect(page.locator('[data-cy="gridWidget"]')).toHaveCount(1)
+		await expect(startPage.locator('.header-widget')).toHaveCount(0)
 		await expect(page.locator('[data-cy="contextStartPageLink"]')).toHaveAttribute('aria-selected', 'true')
 		await expect(page.locator('[data-cy="contextPageAdd"]')).toBeVisible()
-		await expect(page.locator('[data-cy="gridPage"]')).toHaveCount(0)
+	})
+
+	test('The start page can be edited like a grid page, but not deleted', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid start edit table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid start edit app', [table])
+		await openApplication(page, contextId)
+
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.locator('[data-cy="gridPageAddWidget"]').click()
+		await pickOption(page, 'addWidgetType', 'Description')
+		await page.locator('[data-cy="widgetFieldText"] textarea').fill('Read this first')
+		await page.locator('[data-cy="addWidgetSubmit"]').click()
+		const saved = page.waitForResponse(r => /\/pages\/\d+/.test(r.url()) && r.request().method() === 'PATCH')
+		await page.locator('[data-cy="gridPageSave"]').click()
+		expect((await saved).ok()).toBe(true)
+
+		await page.reload()
+		await expect(page.getByText('Read this first')).toBeVisible({ timeout: 30000 })
+		// With only one action left the menu shows it as a button of its own
+		await expect(page.getByRole('button', { name: 'Edit page details' })).toBeVisible()
+		await expect(page.locator('[data-cy="gridPageDelete"]')).toHaveCount(0)
 	})
 
 	test('A new page holds a header and a table of the application after a reload', async ({ userPage: { page, user } }) => {
@@ -139,7 +165,7 @@ test.describe('Grid pages of an application', () => {
 		const startPage = Object.values(application.pages as Record<string, { page_type: string, content: object }>).find(entry => entry.page_type === 'startpage')
 		expect(Object.keys(startPage!.content)).toHaveLength(1)
 		await page.locator('[data-cy="contextStartPageLink"]').click()
-		await expect(page.locator('h1', { hasText: 'grid table in app' })).toBeVisible({ timeout: 30000 })
+		await expect(page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: 'grid table in app' })).toBeVisible({ timeout: 30000 })
 		await expect(page.locator('[data-cy="gridPage"]')).toHaveCount(0)
 	})
 
@@ -205,7 +231,7 @@ test.describe('Grid pages of an application', () => {
 		await shareeContext.close()
 	})
 
-	test('A table removed from the application leaves its widget asking for a new one', async ({ userPage: { page, user } }) => {
+	test('A table removed from the application hides its widget, which asks for a new one in edit mode', async ({ userPage: { page, user } }) => {
 		const table = await createTableViaApi(page.request, user, 'grid removed table')
 		const contextId = await createApplicationViaApi(page.request, user, 'grid removal app', [table])
 		const pageId = await createPageViaApi(page.request, user, contextId, 'Board')
@@ -222,10 +248,11 @@ test.describe('Grid pages of an application', () => {
 		})
 
 		await openApplication(page, contextId, `/page/${pageId}`)
-		await expect(page.locator('[data-cy="gridWidget"] h3', { hasText: 'Gone soon' })).toBeVisible({ timeout: 30000 })
-		await expect(page.locator('[data-cy="dataWidgetNoSource"]')).toBeVisible()
+		await expect(page.locator('[data-cy="gridPage"]')).toBeVisible({ timeout: 30000 })
+		await expect(page.locator('[data-cy="gridWidget"]')).toHaveCount(0)
 
 		await page.locator('[data-cy="gridPageEdit"]').click()
+		await expect(page.locator('[data-cy="gridWidget"] h3', { hasText: 'Gone soon' })).toBeVisible()
 		await expect(page.locator('[data-cy="dataWidgetPickSource"]')).toBeVisible()
 	})
 
@@ -491,5 +518,153 @@ test.describe('Grid pages of an application', () => {
 		await expect(page.locator('[data-cy="gridPageEdit"]')).toBeVisible()
 		await page.waitForTimeout(1000)
 		expect(reloaded).toBe(false)
+	})
+
+	test('Opening a row while the start page is edited does not ask to discard the changes', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid guard table')
+		const rowId = await createRowViaApi(page.request, user, table, 'Guarded task')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid guard app', [table])
+		await openApplication(page, contextId)
+		const row = page.locator('[data-cy="tablesWidget"] tr', { hasText: 'Guarded task' })
+		await expect(row).toBeVisible({ timeout: 30000 })
+
+		await page.locator('[data-cy="gridPageEdit"]').click()
+		await page.getByRole('button', { name: /^Actions for / }).click()
+		await page.locator('[data-cy="widgetTaller"] button').click()
+		await page.keyboard.press('Escape')
+
+		await row.locator('[data-cy="rowActionMenu"] button').click()
+		await page.locator('[data-cy="editRowBtn"]').click()
+		await expect(page).toHaveURL(new RegExp(`/application/${contextId}/row/${rowId}$`))
+		await expect(page.locator('[data-cy="editRowModal"]')).toBeVisible()
+		await expect(page.getByRole('dialog', { name: 'Discard unsaved changes?' })).toHaveCount(0)
+		await expect(page.locator('[data-cy="gridPageSave"]')).toBeVisible()
+	})
+
+	test('An application opened after a missing one shows its own start page', async ({ userPage: { page, user } }) => {
+		const first = await createTableViaApi(page.request, user, 'grid before missing table')
+		const second = await createTableViaApi(page.request, user, 'grid after missing table')
+		const firstId = await createApplicationViaApi(page.request, user, 'grid before missing app', [first])
+		const secondId = await createApplicationViaApi(page.request, user, 'grid after missing app', [second])
+
+		await openApplication(page, firstId)
+		await expect(page.locator('[data-cy="tablesWidget"]').getByRole('heading', { name: 'grid before missing table' })).toBeVisible({ timeout: 30000 })
+		await page.goto('/index.php/apps/tables/#/application/999999')
+		await expect(page.getByText(/could not be found/)).toBeVisible({ timeout: 30000 })
+		await page.goto(`/index.php/apps/tables/#/application/${secondId}`)
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		await expect(tablesWidget.getByRole('heading', { name: 'grid after missing table' })).toBeVisible({ timeout: 30000 })
+		await expect(tablesWidget.getByRole('heading', { name: 'grid before missing table' })).toHaveCount(0)
+	})
+
+	test('Going back to the start page loads each of its tables once, without a spinner', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid back home table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid back home app', [table])
+		const pageId = await createPageViaApi(page.request, user, contextId, 'Away')
+		await openApplication(page, contextId)
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		await expect(tablesWidget.getByRole('heading', { name: 'grid back home table' })).toBeVisible({ timeout: 30000 })
+
+		await page.locator('[data-cy="contextPageLink"]', { hasText: 'Away' }).click()
+		await expect(page).toHaveURL(new RegExp(`/page/${pageId}$`))
+		await expect(page.locator('[data-cy="gridPageTitle"]')).toHaveText('Away')
+
+		const rowRequests: string[] = []
+		page.on('request', request => {
+			if (request.method() === 'GET' && new RegExp(`/row/table/${table}(\\?|$)`).test(request.url())) {
+				rowRequests.push(request.url())
+			}
+		})
+		await page.locator('[data-cy="contextStartPageLink"]').click()
+		await expect(tablesWidget.getByRole('heading', { name: 'grid back home table' })).toBeVisible()
+		await expect(tablesWidget.locator('.data-widget__loading')).toHaveCount(0)
+		await page.waitForTimeout(1000)
+		expect(rowRequests).toHaveLength(1)
+	})
+
+	test('The tables widget on the start page follows the order of the application', async ({ userPage: { page, user } }) => {
+		const first = await createTableViaApi(page.request, user, 'grid order first table')
+		const second = await createTableViaApi(page.request, user, 'grid order second table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid order app', [first, second])
+		await ocsRequest(page.request, user, {
+			method: 'PUT',
+			url: `${API}/contexts/${contextId}?format=json`,
+			data: { nodes: [second, first].map(id => ({ id, type: 0, permissions: 1 })) },
+		})
+		await openApplication(page, contextId)
+
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		const firstHeading = tablesWidget.getByRole('heading', { name: 'grid order first table' })
+		const secondHeading = tablesWidget.getByRole('heading', { name: 'grid order second table' })
+		await expect(firstHeading).toBeVisible({ timeout: 30000 })
+		await expect(secondHeading).toBeVisible({ timeout: 30000 })
+		expect((await secondHeading.boundingBox())!.y).toBeLessThan((await firstHeading.boundingBox())!.y)
+	})
+
+	test('A table on the start page exports all rows and the filtered rows as CSV', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid export table')
+		await createRowViaApi(page.request, user, table, 'Exported task')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid export app', [table])
+		await openApplication(page, contextId)
+		const tablesWidget = page.locator('[data-cy="tablesWidget"]')
+		await expect(tablesWidget.getByText('Exported task')).toBeVisible({ timeout: 30000 })
+
+		const [all] = await Promise.all([
+			page.waitForEvent('download'),
+			clickOnTableThreeDotMenu(page, 'Export all rows'),
+		])
+		expect(fs.readFileSync(await all.path(), 'utf8')).toContain('Exported task')
+
+		await tablesWidget.getByRole('textbox', { name: 'Search' }).fill('Exported')
+		await page.waitForTimeout(600)
+		const [filtered] = await Promise.all([
+			page.waitForEvent('download'),
+			clickOnTableThreeDotMenu(page, 'Export filtered rows'),
+		])
+		expect(fs.readFileSync(await filtered.path(), 'utf8')).toContain('Exported task')
+	})
+
+	test('A table on the start page opens the scheme import', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid scheme table')
+		const contextId = await createApplicationViaApi(page.request, user, 'grid scheme app', [table])
+		await openApplication(page, contextId)
+		await expect(page.locator('[data-cy="tablesWidget"]').getByRole('heading', { name: 'grid scheme table' })).toBeVisible({ timeout: 30000 })
+
+		await page.locator('[data-cy="customTableAction"] button').first().click()
+		await page.getByRole('menuitem', { name: 'Import scheme' }).click()
+		await expect(page.getByRole('dialog', { name: /Import scheme/i })).toBeVisible()
+	})
+
+	test('A view on the start page shows its rows in the sorting it is saved with', async ({ userPage: { page, user } }) => {
+		const table = await createTableViaApi(page.request, user, 'grid sorted table')
+		const column = await ocsRequest(page.request, user, {
+			method: 'POST',
+			url: `/index.php/apps/tables/api/1/tables/${table}/columns`,
+			data: { title: 'Name', type: 'text', subtype: 'line', mandatory: false },
+		})
+		const columnId = (await column.json()).id
+		for (const name of ['Banana', 'Apple', 'Cherry']) {
+			await ocsRequest(page.request, user, { method: 'POST', url: `/index.php/apps/tables/api/1/tables/${table}/rows`, data: { data: { [columnId]: name } } })
+		}
+		const view = await ocsRequest(page.request, user, { method: 'POST', url: `/index.php/apps/tables/api/1/tables/${table}/views`, data: { title: 'grid sorted view' } })
+		const viewId = (await view.json()).id
+		await ocsRequest(page.request, user, {
+			method: 'PUT',
+			url: `/index.php/apps/tables/api/1/views/${viewId}`,
+			data: { data: { columnSettings: [{ columnId, order: 0 }], sort: [{ columnId, mode: 'DESC' }] } },
+		})
+		const res = await ocsRequest(page.request, user, {
+			method: 'POST',
+			url: `${API}/contexts?format=json`,
+			data: { name: 'grid sorted app', iconName: 'equalizer', description: '', nodes: [{ id: viewId, type: 1, permissions: 1 }] },
+		})
+		const contextId = (await res.json()).ocs.data.id
+		await openApplication(page, contextId)
+
+		const rows = page.locator('[data-cy="tablesWidget"] [data-cy="customTableRow"]')
+		await expect(rows).toHaveCount(3, { timeout: 30000 })
+		await expect(rows.nth(0)).toContainText('Cherry')
+		await expect(rows.nth(1)).toContainText('Banana')
+		await expect(rows.nth(2)).toContainText('Apple')
 	})
 })

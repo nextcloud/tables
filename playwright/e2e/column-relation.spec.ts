@@ -11,7 +11,6 @@ import {
 	createTextLineColumn,
 	loadContext,
 	loadTable,
-	openContextEditModal,
 	openCreateColumnModal,
 	openCreateRowModal,
 	fillInValueTextLine,
@@ -147,16 +146,8 @@ test.describe('Test column relation', () => {
 		await selectFromVueDropdown(page, 'Select relation value', 'Bob')
 		await page.locator('[data-cy="createRowSaveButton"]').click()
 
-		// add the target table to an application context
-		await createContext(page, contextTitle)
-		await openContextEditModal(page, contextTitle)
-
-		const resourceInput = page.locator('[data-cy="contextResourceForm"] input').first()
-		await resourceInput.click()
-		await resourceInput.fill(contextTargetTitle)
-		await page.getByRole('option', { name: new RegExp(contextTargetTitle, 'i') }).first().click()
-
-		await page.locator('[data-cy="editContextSubmitBtn"]').click()
+		// an application created with the target table shows it on its start page
+		await createContext(page, contextTitle, false, [contextTargetTitle])
 
 		// load the context and verify the relation label is rendered without crashing
 		await loadContext(page, contextTitle)

@@ -121,6 +121,11 @@ export default {
 			type: Object,
 			default: () => ({}),
 		},
+		// The content of the start page of the application, for the order of its tables and views
+		startPageContent: {
+			type: Object,
+			default: () => ({}),
+		},
 		// Where the widget sits, so steps that cannot apply are disabled
 		layoutItem: {
 			type: Object,
@@ -174,7 +179,7 @@ export default {
 				return { target: widgetTarget(this.widget, this.nodes), editable: this.editable, showTitle: !this.sourceTitle }
 			}
 			if (this.widget.type === WIDGET_TYPE_TABLES) {
-				return { nodes: this.nodes }
+				return { nodes: this.nodes, content: this.startPageContent }
 			}
 			return { settings: this.widget.settings, editable: this.editable }
 		},

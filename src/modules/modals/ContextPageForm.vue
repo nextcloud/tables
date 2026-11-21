@@ -13,6 +13,7 @@
 		<div class="context-page-form">
 			<NcTextField v-model="title"
 				:label="t('tables', 'Title')"
+				:helper-text="isStartPage ? t('tables', 'Leave empty to call it Home.') : ''"
 				:maxlength="200"
 				data-cy="contextPageTitle" />
 			<IconField v-model="icon" :label="t('tables', 'Icon')" />
@@ -51,7 +52,7 @@
 <script>
 import { NcButton, NcDialog, NcTextArea, NcTextField } from '@nextcloud/vue'
 import IconField from '../../shared/components/ncIconPicker/IconField.vue'
-import { pageSlugError } from '../grid/gridLayout.js'
+import { isStartPage, pageSlugError } from '../grid/gridLayout.js'
 
 /**
  * Asks for the title, icon, slug and description of a new grid page, or for the title,
@@ -95,8 +96,12 @@ export default {
 		slugError() {
 			return this.page ? null : pageSlugError(this.slug.trim())
 		},
+		// The start page goes without a title, then it is called Home
+		isStartPage() {
+			return isStartPage(this.page)
+		},
 		canSubmit() {
-			return this.title.trim() !== '' && this.slugError === null
+			return (this.isStartPage || this.title.trim() !== '') && this.slugError === null
 		},
 	},
 	watch: {
