@@ -2,6 +2,18 @@
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+import { ColumnTypes } from '../components/ncTable/mixins/columnHandler.js'
+
+/**
+ * Whether the column is virtual, i.e. it does not store its own cell data.
+ * For plain column objects only — AbstractColumn instances provide isVirtual().
+ *
+ * @param {object|null|undefined} column the column to check
+ * @return {boolean}
+ */
+export function isVirtualColumn(column) {
+	return column?.type === ColumnTypes.Lookup
+}
 
 /**
  * @param {string|null|undefined} technicalName the raw technical name to normalize

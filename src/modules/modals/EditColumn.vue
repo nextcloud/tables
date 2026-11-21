@@ -18,7 +18,8 @@
 						:edit-column="true"
 						:title-missing-error="editErrorTitle"
 						:technical-name-invalid-error="technicalNameInvalidError"
-						:width-invalid-error="widthInvalidError" />
+						:width-invalid-error="widthInvalidError"
+						:mandatory-disabled="column.isVirtual()" />
 				</div>
 				<div class="col-2 space-LR space-T">
 					<component :is="getColumnForm" v-model:can-save="canSave"
@@ -71,6 +72,7 @@ import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTyp
 import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
 import RelationForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationForm.vue'
+import LookupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/LookupForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
@@ -107,6 +109,7 @@ export default {
 		NcUserBubble,
 		UsergroupForm,
 		RelationForm,
+		LookupForm,
 	},
 	props: {
 		column: {

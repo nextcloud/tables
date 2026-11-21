@@ -31,19 +31,19 @@ export default class RelationColumn extends AbstractColumn {
 	/**
 	 * Parse the value from input
 	 * @param {unknown} value The value to parse
-	 * @return {unknown} The parsed value
+	 * @return {number|null} The parsed value
 	 */
 	parseValue(value) {
 		if (value === null || value === undefined || value === '') {
 			return null
 		}
-		// For single relations, return the value as is
-		return value
+		// Normalize relation IDs to match numeric option IDs
+		return Number(value)
 	}
 
 	getValueString(valueObject) {
 		valueObject = valueObject || this.value || null
-		return this.getLabel(valueObject.value)
+		return this.getLabel(valueObject.value) ?? String(valueObject.value)
 	}
 
 	getLabel(rowId) {
@@ -52,9 +52,9 @@ export default class RelationColumn extends AbstractColumn {
 			const dataStore = useDataStore()
 
 			const columnRelations = dataStore.getRelations(this.id)
-			const option = columnRelations[rowId]
+			const option = columnRelations.values?.[rowId]
 
-			return option ? option.label : ''
+			return option ? option.value : ''
 		} catch (error) {
 			console.warn('Failed to get relation label:', error)
 			return ''

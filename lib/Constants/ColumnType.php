@@ -16,4 +16,5 @@ enum ColumnType: string {
 	case DATETIME = 'datetime';
 	case PEOPLE = 'usergroup';
 	case RELATION = 'relation';
+	case LOOKUP = 'lookup';
 }

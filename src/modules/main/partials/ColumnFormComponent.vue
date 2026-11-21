@@ -23,6 +23,7 @@ import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTyp
 import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
 import UsergroupForm from '../../../shared/components/ncTable/partials/rowTypePartials/UsergroupForm.vue'
 import RelationForm from '../../../shared/components/ncTable/partials/rowTypePartials/RelationForm.vue'
+import LookupForm from '../../../shared/components/ncTable/partials/rowTypePartials/LookupForm.vue'
 
 export default {
 	name: 'ColumnFormComponent',
@@ -42,6 +43,7 @@ export default {
 		DatetimeTimeForm,
 		UsergroupForm,
 		RelationForm,
+		LookupForm,
 	},
 	props: {
 		column: {

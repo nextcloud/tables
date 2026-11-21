@@ -135,6 +135,7 @@ export default {
 				ColumnTypes.SelectionMulti,
 				ColumnTypes.TextLink,
 				ColumnTypes.Usergroup,
+				ColumnTypes.Lookup,
 			].includes(col.type)
 		},
 		eligibleColumns(selectedId) { // filter sortable and unused columns

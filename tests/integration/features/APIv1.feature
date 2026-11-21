@@ -761,6 +761,7 @@ Feature: APIv1
       | name      | Cherry |
       | available | true   |
     When user "participant1" create view "Available Fruits" with emoji "✅" for "fruits" as "available-fruits"
+    And user "participant1" sets columnSettings "name,available" to view "available-fruits"
     And user "participant1" sets filter to view "available-fruits"
       | column    | operator | value |
       | available | is-equal | true  |
@@ -849,6 +850,153 @@ Feature: APIv1
     Given table "Smoothies" with emoji "🥤" exists for user "participant1" as "smoothies"
     When user "participant1" attempts to create relation column "ingredient" on table "smoothies" pointing to view "names-only" using label column "price"
     Then the reported status is "400"
+
+  @api1 @relation @lookup
+  Scenario: Create a lookup column and fetch relations for a table
+    Given table "Products" with emoji "📦" exists for user "participant1" as "products"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then column "category" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then row exists with following values
+      | name     | Apple  |
+      | category | Fruit  |
+    Then row exists with following values
+      | name     | Banana |
+      | category | Berry  |
+    Given table "Orders" with emoji "🛒" exists for user "participant1" as "orders"
+    Then relation column "product" exists on table "orders" pointing to table "products" using label column "name"
+    Then lookup column "product category" exists on table "orders" for relation column "product" using target column "category"
+    When user "participant1" fetches relations for table "orders"
+    Then the reported status is "200"
+    Then the relations response contains 2 entries for column "product"
+    Then the relations response for column "product" has an entry with label "Apple"
+    Then the relations response for column "product" has an entry with label "Banana"
+    Then the relations response contains 2 entries for column "product category"
+    Then the relations response for column "product category" has an entry with value "Fruit"
+    Then the relations response for column "product category" has an entry with value "Berry"
+
+  @api1 @relation @lookup
+  Scenario: Create a lookup column for a relation pointing to a view
+    Given table "Fruits" with emoji "🍎" exists for user "participant1" as "fruits"
+    Then column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then column "color" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    Then row exists with following values
+      | name  | Apple  |
+      | color | Red    |
+    Then row exists with following values
+      | name  | Banana |
+      | color | Yellow |
+    When user "participant1" create view "Fruit View" with emoji "👁" for "fruits" as "fruit-view"
+    And user "participant1" sets columnSettings "name,color" to view "fruit-view"
+    Given table "Baskets" with emoji "🧺" exists for user "participant1" as "baskets"
+    Then relation column "fruit" exists on table "baskets" pointing to view "fruit-view" using label column "name"
+    Then lookup column "fruit color" exists on table "baskets" for relation column "fruit" using target column "color"
+    When user "participant1" fetches relations for table "baskets"
+    Then the reported status is "200"
+    Then the relations response contains 2 entries for column "fruit"
+    Then the relations response for column "fruit" has an entry with label "Apple"
+    Then the relations response for column "fruit" has an entry with label "Banana"
+    Then the relations response contains 2 entries for column "fruit color"
+    Then the relations response for column "fruit color" has an entry with value "Red"
+    Then the relations response for column "fruit color" has an entry with value "Yellow"
+
+  @api1 @relation @lookup @permissions
+  Scenario Outline: Lookup creation requires read access to the relation target
+    Given table "Products" with emoji "" exists for user "participant1" as "products"
+    And column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    And column "category" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    And user "participant1" create view "Product details" with emoji "" for "products" as "products"
+    And user "participant1" sets columnSettings "name,category" to view "products"
+    And table "Orders" with emoji "" exists for user "participant1" as "orders"
+    And relation column "product" exists on table "orders" pointing to <targetType> "products" using label column "name"
+    And user "participant1" shares "table" "orders" with "user" "participant2"
+    And user "participant1" sets permission "manage" to 1
+    And user "participant1" shares "<targetType>" "products" with "user" "participant2"
+    And user "participant1" sets permission "update" to 0
+    And user "participant1" sets permission "read" to <canRead>
+    When user "participant2" attempts to create lookup column "product category" on table "orders" for relation column "product" using target column "category"
+    Then the reported status is "<status>"
+
+    Examples:
+      | targetType | canRead | status |
+      | table      | 0       | 403    |
+      | table      | 1       | 200    |
+      | view       | 0       | 403    |
+      | view       | 1       | 200    |
+
+  @api1 @relation @lookup @permissions
+  Scenario Outline: Lookup retargeting requires read access to the relation target
+    Given table "Products" with emoji "" exists for user "participant1" as "products"
+    And column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    And column "category" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    And user "participant1" create view "Product details" with emoji "" for "products" as "products"
+    And user "participant1" sets columnSettings "name,category" to view "products"
+    And table "Orders" with emoji "" exists for user "participant1" as "orders"
+    And relation column "product" exists on table "orders" pointing to <targetType> "products" using label column "name"
+    And lookup column "product name" exists on table "orders" for relation column "product" using target column "name"
+    And user "participant1" shares "table" "orders" with "user" "participant2"
+    And user "participant1" sets permission "manage" to 1
+    And user "participant1" shares "<targetType>" "products" with "user" "participant2"
+    And user "participant1" sets permission "update" to 0
+    And user "participant1" sets permission "read" to <canRead>
+    When user "participant2" attempts to update lookup column "product name" for relation column "product" using target column "category"
+    Then the reported status is "<status>"
+
+    Examples:
+      | targetType | canRead | status |
+      | table      | 0       | 403    |
+      | table      | 1       | 200    |
+      | view       | 0       | 403    |
+      | view       | 1       | 200    |
+
+  @api1 @relation @lookup @permissions
+  Scenario Outline: Lookup presentation can be updated without access to the relation target
+    Given table "Products" with emoji "" exists for user "participant1" as "products"
+    And column "name" exists with following properties
+      | type      | text |
+      | subtype   | line |
+      | mandatory | 0    |
+    And user "participant1" create view "Product details" with emoji "" for "products" as "products"
+    And user "participant1" sets columnSettings "name" to view "products"
+    And table "Orders" with emoji "" exists for user "participant1" as "orders"
+    And relation column "product" exists on table "orders" pointing to <targetType> "products" using label column "name"
+    And lookup column "product name" exists on table "orders" for relation column "product" using target column "name"
+    And user "participant1" shares "table" "orders" with "user" "participant2"
+    And user "participant1" sets permission "manage" to 1
+    And as user "participant2"
+    When set following properties for last created column
+      | title | Renamed lookup |
+    And user "participant2" attempts to update lookup column "product name" for relation column "product" using target column "name"
+      | width | 200 |
+    Then the reported status is "200"
+
+    Examples:
+      | targetType |
+      | table      |
+      | view       |
 
   @api1 @columns @rows
   Scenario: Column technicalName is returned and dataByAlias maps alias to row values
