@@ -373,7 +373,7 @@ export default {
 				mandatory: this.column.mandatory,
 				viewId: this.isView ? this.element.id : null,
 				tableId: !this.isView ? this.element.id : null,
-				customSettings: { width: this.column.customSettings.width },
+				customSettings: { width: this.column.customSettings.width === '' ? undefined : this.column.customSettings.width },
 			}
 			if (this.combinedType === ColumnTypes.TextLine) {
 				data.textUnique = this.column.textUnique
