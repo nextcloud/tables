@@ -70,7 +70,7 @@
 			</div>
 		</div>
 
-		<NcEmptyContent v-if="shownLayout.length === 0"
+		<NcEmptyContent v-if="shownLayout().length === 0"
 			class="grid-page__empty"
 			:name="t('tables', 'This page is empty')"
 			:description="emptyDescription">
@@ -84,24 +84,12 @@
 			</template>
 		</NcEmptyContent>
 
-		<GridCanvas :layout="shownLayout" :editable="canChange" @layout-change="onLayoutChange">
-			<template #widget="{ item, narrow }">
-				<GridWidget v-if="widgetsById[item.widgetId]"
-					:widget="widgetsById[item.widgetId]"
-					:nodes="context.nodes"
-					:start-page-content="startPageContent"
-					:layout-item="item"
-					:editable="canChange"
-					:arrangeable="!narrow"
-					@configure="configureWidget"
-					@remove="removeWidget"
-					@move="moveWidget" />
-			</template>
-		</GridCanvas>
+		<GridLevel />
 
 		<AddWidget :show-modal="addWidgetOpen"
 			:editing-widget="widgetBeingConfigured"
 			:nodes="context.nodes"
+			:allow-tabs="targetTab === null"
 			@close="closeAddWidget"
 			@submit="onWidgetSubmit" />
 	</div>
@@ -119,12 +107,11 @@ import ViewDashboardOutline from 'vue-material-design-icons/ViewDashboardOutline
 import { computed, ref } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { mapActions, mapState } from 'pinia'
-import GridCanvas from './GridCanvas.vue'
-import GridWidget from './GridWidget.vue'
+import GridLevel from './GridLevel.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid, sortedLayout, widgetTarget } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, levelLayout, mergeLayout, nextFreeRow, pageTitle, pageToGrid, releaseRemovedTabs, sortedLayout, widgetTabs, widgetTarget } from './gridLayout.js'
 import { WIDGET_TYPE_DATA } from './widgetRegistry.js'
 
 /**
@@ -144,8 +131,7 @@ export default {
 		TextBoxEditOutline,
 		TrashCanOutline,
 		ViewDashboardOutline,
-		GridCanvas,
-		GridWidget,
+		GridLevel,
 		AddWidget,
 		NamedIcon,
 	},
@@ -153,6 +139,19 @@ export default {
 		return {
 			// Widget titles sit below the title of the page, or of the application on a start page without one
 			gridHeadingLevel: computed(() => this.showHeading ? 3 : 2),
+			// What each level of the grid, the page and every tab, needs to show and change its widgets
+			gridLevel: {
+				shownLayout: this.shownLayout,
+				widgetsByKey: () => this.widgetsById,
+				nodes: () => this.context.nodes,
+				startPageContent: () => this.startPageContent,
+				editable: () => this.canChange,
+				changeLayout: this.onLayoutChange,
+				configure: this.configureWidget,
+				remove: this.removeWidget,
+				move: this.moveWidget,
+				addToTab: this.openAddWidgetInTab,
+			},
 		}
 	},
 	props: {
@@ -220,6 +219,8 @@ export default {
 			saving: false,
 			addWidgetOpen: false,
 			widgetBeingConfigured: null,
+			// The tab a new widget goes into, as {parentKey, tab}; null for the page itself
+			targetTab: null,
 		}
 	},
 	computed: {
@@ -252,17 +253,6 @@ export default {
 				return t('tables', 'Add a header, a description or a table.')
 			}
 			return this.canEdit ? t('tables', 'Edit the page to add widgets.') : ''
-		},
-		// A data widget whose table or view left the application only shows in edit mode,
-		// where it can get another one or be removed
-		shownLayout() {
-			if (this.isEditing) {
-				return this.activeGrid.layout
-			}
-			return this.activeGrid.layout.filter(item => {
-				const widget = this.widgetsById[item.widgetId]
-				return widget?.type !== WIDGET_TYPE_DATA || widgetTarget(widget, this.context.nodes) !== null
-			})
 		},
 		widgetsById() {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.key, widget]))
@@ -325,13 +315,44 @@ export default {
 			if (!this.canChange) {
 				return
 			}
-			this.draftGrid = { ...this.draftGrid, layout }
+			// A canvas shows one level of the grid, the page itself or one tab
+			this.draftGrid = { ...this.draftGrid, layout: mergeLayout(this.draftGrid.layout, layout) }
+		},
+		/**
+		 * The layout of one level of the grid as it shows. A data widget whose table or view left
+		 * the application only shows in edit mode, where it can get another one or be removed.
+		 *
+		 * @param {string|null} parentKey the key of the tabs widget, or null for the page itself
+		 * @param {string|null} tab the key of the tab
+		 * @return {Array} the layout items to show
+		 */
+		shownLayout(parentKey = null, tab = null) {
+			const layout = levelLayout(this.activeGrid, parentKey, tab)
+			if (this.isEditing) {
+				return layout
+			}
+			return layout.filter(item => {
+				const widget = this.widgetsById[item.widgetId]
+				return widget?.type !== WIDGET_TYPE_DATA || widgetTarget(widget, this.context.nodes) !== null
+			})
 		},
 		/**
 		 * Opens the dialog for a new widget.
 		 */
 		openAddWidget() {
 			this.widgetBeingConfigured = null
+			this.targetTab = null
+			this.addWidgetOpen = true
+		},
+		/**
+		 * Opens the dialog for a new widget in a tab of a tabs widget.
+		 *
+		 * @param {object} tabsWidget the tabs widget
+		 * @param {string} tab the key of the tab
+		 */
+		openAddWidgetInTab(tabsWidget, tab) {
+			this.widgetBeingConfigured = null
+			this.targetTab = { parentKey: tabsWidget.key, tab }
 			this.addWidgetOpen = true
 		},
 		/**
@@ -341,6 +362,7 @@ export default {
 			const configured = this.widgetBeingConfigured
 			this.addWidgetOpen = false
 			this.widgetBeingConfigured = null
+			this.targetTab = null
 			// The menu item that opened the dialog is gone, so the focus goes back to the menu
 			if (configured) {
 				this.focusLater(() => this.widgetActionsButton(configured.key))
@@ -356,7 +378,8 @@ export default {
 			this.addWidgetOpen = true
 		},
 		/**
-		 * Updates the configured widget, or places a new one below the others.
+		 * Updates the configured widget, or places a new one below the others on its level. A tabs
+		 * widget that loses tabs moves the widgets of those tabs onto the page.
 		 *
 		 * @param {{type: string, title: string, icon: string|null, description: string, settings: object, nodeRelId: number|null}} payload the widget from the dialog
 		 */
@@ -366,24 +389,27 @@ export default {
 				return
 			}
 			if (this.widgetBeingConfigured) {
-				this.draftGrid = {
+				const configuredKey = this.widgetBeingConfigured.key
+				const grid = {
 					...this.draftGrid,
-					widgets: this.draftGrid.widgets.map(widget => widget.key === this.widgetBeingConfigured.key
+					widgets: this.draftGrid.widgets.map(widget => widget.key === configuredKey
 						? { ...widget, title: payload.title, icon: payload.icon, description: payload.description, settings: payload.settings, nodeRelId: payload.nodeRelId }
 						: widget),
 				}
+				this.draftGrid = releaseRemovedTabs(grid, configuredKey, widgetTabs(payload.settings))
 				this.closeAddWidget()
 				return
 			}
 			const key = 'new-' + payload.type + '-' + Date.now()
 			const widgetType = findWidgetType(this.widgetTypes, payload.type)
 			const size = { gridWidth: widgetType?.defaultWidth ?? 6, gridHeight: widgetType?.defaultHeight ?? 3 }
+			const parent = this.targetTab ? { parentKey: this.targetTab.parentKey, parentTab: this.targetTab.tab } : { parentKey: null, parentTab: null }
 			this.draftGrid = {
-				widgets: [...this.draftGrid.widgets, { key, id: null, ...payload }],
+				widgets: [...this.draftGrid.widgets, { key, id: null, ...payload, ...parent }],
 				layout: [...this.draftGrid.layout, {
 					widgetId: key,
 					gridX: 0,
-					gridY: nextFreeRow(this.draftGrid.layout),
+					gridY: nextFreeRow(levelLayout(this.draftGrid, parent.parentKey, parent.parentTab)),
 					gridWidth: size.gridWidth,
 					gridHeight: size.gridHeight,
 				}],
@@ -416,19 +442,22 @@ export default {
 			}
 		},
 		/**
-		 * Removes a widget and its place on the grid.
+		 * Removes a widget and its place on the grid; a tabs widget takes the widgets in its tabs along.
 		 *
 		 * @param {object} widget the widget to remove
 		 */
 		removeWidget(widget) {
-			// The focus goes to the widget after it in reading order, else the one before
-			const order = sortedLayout(this.draftGrid.layout)
+			// The focus goes to the widget after it in reading order on its level, else the one before
+			const order = sortedLayout(levelLayout(this.draftGrid, widget.parentKey ?? null, widget.parentTab ?? null))
 			const index = order.findIndex(item => item.widgetId === widget.key)
 			const next = order[index + 1] ?? order[index - 1]
 			this.focusLater(() => (next ? this.widgetActionsButton(next.widgetId) : null) ?? this.$refs.addWidgetButton?.$el)
+			const removed = new Set(this.draftGrid.widgets
+				.filter(item => item.key === widget.key || item.parentKey === widget.key)
+				.map(item => item.key))
 			this.draftGrid = {
-				widgets: this.draftGrid.widgets.filter(item => item.key !== widget.key),
-				layout: this.draftGrid.layout.filter(item => item.widgetId !== widget.key),
+				widgets: this.draftGrid.widgets.filter(item => !removed.has(item.key)),
+				layout: this.draftGrid.layout.filter(item => !removed.has(item.widgetId)),
 			}
 		},
 		/**

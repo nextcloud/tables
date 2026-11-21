@@ -86,8 +86,8 @@ import { mapActions, mapState } from 'pinia'
 import SchemaForm from '../grid/SchemaForm.vue'
 import IconField from '../../shared/components/ncIconPicker/IconField.vue'
 import { useTablesStore } from '../../store/store.js'
-import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isBlank, requiredLabel, trimText } from '../grid/gridLayout.js'
-import { getWidgetComponent } from '../grid/widgetRegistry.js'
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isMissingSetting, requiredLabel, trimText } from '../grid/gridLayout.js'
+import { WIDGET_TYPE_TABS, getWidgetComponent } from '../grid/widgetRegistry.js'
 
 /**
  * Collects the type, title, icon, description and settings of a widget; the settings form comes from the
@@ -120,6 +120,11 @@ export default {
 			type: Object,
 			default: () => ({}),
 		},
+		// False for a widget in a tab: tabs go one level deep
+		allowTabs: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	emits: ['close', 'submit'],
 	data() {
@@ -140,6 +145,7 @@ export default {
 		typeOptions() {
 			return this.widgetTypes
 				.filter(widgetType => getWidgetComponent(widgetType.type) !== null)
+				.filter(widgetType => this.allowTabs || widgetType.type !== WIDGET_TYPE_TABS)
 				.map(widgetType => ({ id: widgetType.type, label: widgetType.title }))
 		},
 		widgetType() {
@@ -173,7 +179,7 @@ export default {
 			}
 			const missing = this.hasSource && !this.nodeOption ? [t('tables', 'Table or view')] : []
 			for (const [name, setting] of Object.entries(this.widgetType.settings)) {
-				if (setting.required && isBlank(this.settings[name])) {
+				if (setting.required && isMissingSetting(setting, this.settings[name])) {
 					missing.push(setting.title)
 				}
 			}

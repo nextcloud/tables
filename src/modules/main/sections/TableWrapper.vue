@@ -5,7 +5,7 @@
 <template>
 	<div>
 		<ElementTitle v-model:view-setting="localViewSetting" :active-element="table" :show-title="showTitle" />
-		<TableDescription :description="table.description" :read-only="true" />
+		<CollapsibleDescription :description="table.description ?? ''" :title="table.title" />
 		<DataTable v-model:view-setting="localViewSetting" :show-options="false" :table="table" :columns="columns" :rows="rows"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import TableDescription from './TableDescription.vue'
+import CollapsibleDescription from './CollapsibleDescription.vue'
 import ElementTitle from './ElementTitle.vue'
 import DataTable from './DataTable.vue'
 import { mapState } from 'pinia'
@@ -31,7 +31,7 @@ export default {
 	components: {
 		ElementTitle,
 		DataTable,
-		TableDescription,
+		CollapsibleDescription,
 	},
 
 	props: {
