@@ -7,6 +7,8 @@
 
 namespace OCA\Tables\Db;
 
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
@@ -35,6 +37,72 @@ class PageMapper extends QBMapper {
 			$page->setSlug(Page::DEFAULT_SLUG_PREFIX . $page->getId());
 			return $this->update($page);
 		}, $this->db);
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function findById(int $pageId): Page {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)));
+
+		return $this->findEntity($qb);
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function findBySlug(int $contextId, string $slug): Page {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('context_id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('slug', $qb->createNamedParameter($slug)));
+
+		return $this->findEntity($qb);
+	}
+
+	/**
+	 * Raises the version of a page, the first write of a save. It locks the page row until
+	 * the transaction ends, so saves and the delete of one page run one after the other.
+	 *
+	 * @param ?int $expected the version the save was based on, or null to take any
+	 * @return bool false when the page is gone or has another version
+	 * @throws Exception
+	 */
+	public function raiseVersion(int $pageId, ?int $expected): bool {
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->table)
+			->set('version', $qb->func()->add('version', $qb->createNamedParameter(1, IQueryBuilder::PARAM_INT)))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)));
+		if ($expected !== null) {
+			$qb->andWhere($qb->expr()->eq('version', $qb->createNamedParameter($expected, IQueryBuilder::PARAM_INT)));
+		}
+		return $qb->executeStatement() === 1;
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 */
+	public function findVersion(int $pageId): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('version')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)));
+		$result = $qb->executeQuery();
+		$version = $result->fetchOne();
+		$result->closeCursor();
+		if ($version === false) {
+			throw new DoesNotExistException('Page ' . $pageId . ' does not exist');
+		}
+		return (int)$version;
 	}
 
 	/**

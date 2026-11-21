@@ -46,6 +46,8 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $userManager;
 	private MockObject $auditLogService;
 	private bool $contextExists = true;
+	/** @var list<string> the writes of a test in the order they ran */
+	private array $calls = [];
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
 
@@ -53,7 +55,10 @@ final class ContextServiceTest extends TestCase {
 		parent::setUp();
 
 		$this->contextMapper = $this->createMock(ContextMapper::class);
-		$this->contextMapper->method('lock')->willReturnCallback(fn (): bool => $this->contextExists);
+		$this->contextMapper->method('lock')->willReturnCallback(function (int $contextId): bool {
+			$this->calls[] = 'lock ' . $contextId;
+			return $this->contextExists;
+		});
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
@@ -288,6 +293,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextMapper->method('update')->willReturnArgument(0);
 		$nodeRelation = new ContextNodeRelation();
 		$nodeRelation->id = 101;
+		$nodeRelation->setContextId(7);
 		$this->contextNodeRelMapper->method('findById')->with(101)->willReturn($nodeRelation);
 		$this->contextNodeRelMapper->method('delete')->willReturnArgument(0);
 		$this->pageContentMapper->method('findByNodeRelation')->willReturn([]);
@@ -509,13 +515,59 @@ final class ContextServiceTest extends TestCase {
 	}
 
 	public function testAFailedNodeRemovalRollsBackTheDeletedSources(): void {
-		$this->contextNodeRelMapper->method('findById')->willThrowException(new \OCP\AppFramework\Db\DoesNotExistException('gone'));
+		$nodeRelation = new ContextNodeRelation();
+		$nodeRelation->id = 101;
+		$nodeRelation->setContextId(7);
+		$this->contextNodeRelMapper->method('findById')->willReturn($nodeRelation);
+		$this->contextNodeRelMapper->method('delete')->willThrowException(new Exception('gone'));
 		$this->widgetService->expects($this->once())->method('deleteSourcesByNodeRelIds')->with([101]);
 		$this->dbConnection->expects($this->once())->method('rollBack');
 		$this->dbConnection->expects($this->never())->method('commit');
 
-		$this->expectException(\OCP\AppFramework\Db\DoesNotExistException::class);
+		$this->expectException(Exception::class);
 		$this->service->removeNodeFromContextAndPages(101);
+	}
+
+	public function testDeletingANodeLocksItsApplicationsInAscendingOrderFirst(): void {
+		$this->contextNodeRelMapper->method('getContextIdsForNode')->with(11, 0)->willReturn([9, 3, 9]);
+		$this->contextNodeRelMapper->method('getRelIdsForNode')->willReturnCallback(function (): array {
+			$this->calls[] = 'read relations';
+			return [101, 102];
+		});
+		$this->recordNodeRemoval();
+		$this->contextNodeRelMapper->method('deleteByNodeRelIds')->willReturnCallback(function (): void {
+			$this->calls[] = 'relations';
+		});
+
+		$this->service->deleteNodeRel(11, 0);
+
+		$this->assertSame(['lock 3', 'lock 9', 'read relations', 'sources', 'contents', 'relations'], $this->calls);
+	}
+
+	public function testRemovingANodeFromAnApplicationLocksTheApplicationFirst(): void {
+		$nodeRelation = new ContextNodeRelation();
+		$nodeRelation->id = 101;
+		$nodeRelation->setContextId(7);
+		$this->contextNodeRelMapper->method('findById')->with(101)->willReturn($nodeRelation);
+		$this->pageContentMapper->method('findByNodeRelation')->willReturn([]);
+		$this->recordNodeRemoval();
+		$this->contextNodeRelMapper->method('delete')->willReturnCallback(function (ContextNodeRelation $relation): ContextNodeRelation {
+			$this->calls[] = 'relations';
+			return $relation;
+		});
+
+		$this->service->removeNodeFromContextAndPages(101);
+
+		$this->assertSame(['lock 7', 'sources', 'contents', 'relations'], $this->calls);
+	}
+
+	private function recordNodeRemoval(): void {
+		$this->widgetService->method('deleteSourcesByNodeRelIds')->willReturnCallback(function (): void {
+			$this->calls[] = 'sources';
+		});
+		$this->pageContentMapper->method('deleteByNodeRelIds')->willReturnCallback(function (): void {
+			$this->calls[] = 'contents';
+		});
 	}
 
 	public function testImportContextRemapsSourcesAndSkipsInvalidWidgets(): void {

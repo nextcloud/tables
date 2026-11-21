@@ -10,6 +10,7 @@ namespace OCA\Tables\Controller;
 use Exception;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Errors\ConflictError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -56,6 +57,14 @@ abstract class AOCSController extends OCSController {
 	protected function handleNotFoundError(NotFoundError $e): DataResponse {
 		$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
 		return new DataResponse(['message' => $this->n->t('A not found error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_NOT_FOUND);
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_CONFLICT, array{message: string}, array{}>
+	 */
+	protected function handleConflictError(ConflictError $e): DataResponse {
+		$this->logger->info('A conflict was encountered: ' . $e->getMessage(), ['exception' => $e]);
+		return new DataResponse(['message' => $e->getMessage()], Http::STATUS_CONFLICT);
 	}
 
 	/**
