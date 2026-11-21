@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
@@ -50,6 +51,7 @@ class PageService {
 		private readonly WidgetService $widgetService,
 		private readonly GridWidgetTypes $gridWidgetTypes,
 		private readonly IDBConnection $dbc,
+		private readonly MenuItemMapper $menuItemMapper,
 	) {
 	}
 
@@ -91,8 +93,8 @@ class PageService {
 		$page->setContextId($contextId);
 		$page->setPageType(Page::TYPE_GRID);
 		$page->setTitle($this->validateTitle($title, Page::TYPE_GRID));
-		$page->setIcon($this->validateIcon($icon));
-		$page->setDescription($this->validateDescription($description));
+		$page->setIcon(IconHelper::optional($icon, 'a page'));
+		$page->setDescription(TextHelper::description($description, 'a page'));
 		if ($slug !== null) {
 			$page->setSlug($this->validateSlug($slug));
 		}
@@ -132,10 +134,10 @@ class PageService {
 			throw new BadRequestError('The slug of a page cannot be changed.');
 		}
 		if ($icon !== null) {
-			$page->setIcon($this->validateIcon($icon));
+			$page->setIcon(IconHelper::optional($icon, 'a page'));
 		}
 		if ($description !== null) {
-			$page->setDescription($this->validateDescription($description));
+			$page->setDescription(TextHelper::description($description, 'a page'));
 		}
 
 		$inputs = null;
@@ -162,7 +164,8 @@ class PageService {
 	}
 
 	/**
-	 * Deletes a page with its widgets. The start page cannot be deleted.
+	 * Deletes a page with its widgets and the menu items opening it. The start page cannot
+	 * be deleted.
 	 *
 	 * @return TablesPage the deleted page
 	 * @throws BadRequestError
@@ -182,6 +185,7 @@ class PageService {
 			}
 			$widgets = $this->widgetService->findByPageIds([$pageId])[$pageId] ?? [];
 			$this->widgetService->deleteByPageIds([$pageId]);
+			$this->menuItemMapper->deleteByPageIds([$pageId]);
 			$this->pageContentMapper->deleteByPageId($pageId);
 			$this->pageMapper->deleteByPageId($pageId);
 			return $widgets;
@@ -317,30 +321,4 @@ class PageService {
 		return $slug;
 	}
 
-	/**
-	 * A named icon, or null for an empty one.
-	 *
-	 * @throws BadRequestError
-	 */
-	private function validateIcon(?string $icon): ?string {
-		$icon = trim((string)$icon);
-		if ($icon === '') {
-			return null;
-		}
-		if (!IconHelper::isValid($icon)) {
-			throw new BadRequestError('A page has an unknown icon: ' . $icon);
-		}
-		return $icon;
-	}
-
-	/**
-	 * @throws BadRequestError
-	 */
-	private function validateDescription(?string $description): ?string {
-		try {
-			return TextHelper::optional($description, TextHelper::DESCRIPTION_MAX_LENGTH);
-		} catch (\InvalidArgumentException) {
-			throw new BadRequestError('A page description has at most ' . TextHelper::DESCRIPTION_MAX_LENGTH . ' characters.');
-		}
-	}
 }

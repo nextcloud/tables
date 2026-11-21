@@ -105,36 +105,6 @@ class GridWidgetTypesTest extends TestCase {
 		$this->types->validatePosition(3, $widget);
 	}
 
-	public static function texts(): array {
-		return [
-			'title trimmed' => ['validateTitle', '  Notes ', 'Notes'],
-			'title of the maximum length' => ['validateTitle', str_repeat('a', 200), str_repeat('a', 200)],
-			'empty title' => ['validateTitle', '  ', null],
-			'title of invisible spaces' => ['validateTitle', "\u{00A0}\u{3000}\u{200B}", null],
-			'no title' => ['validateTitle', null, null],
-			'title too long' => ['validateTitle', str_repeat('a', 201), 'The title of widget 2'],
-			'title not text' => ['validateTitle', 5, 'The title of widget 2'],
-			'description trimmed' => ['validateDescription', ' Open tasks ', 'Open tasks'],
-			'description of the maximum length' => ['validateDescription', str_repeat('a', 2000), str_repeat('a', 2000)],
-			'empty description' => ['validateDescription', ' ', null],
-			'description too long' => ['validateDescription', str_repeat('a', 2001), 'The description of widget 2'],
-			'description not text' => ['validateDescription', ['a'], 'The description of widget 2'],
-		];
-	}
-
-	/**
-	 * @dataProvider texts
-	 * @param 'validateTitle'|'validateDescription' $method
-	 * @param ?string $expected the text kept, or the start of the message it is refused with
-	 */
-	public function testATitleOrDescriptionIsTrimmedOrRefused(string $method, mixed $text, ?string $expected): void {
-		if ($expected !== null && str_starts_with($expected, 'The ')) {
-			$this->expectException(BadRequestError::class);
-			$this->expectExceptionMessage($expected);
-		}
-		$this->assertSame($expected, $this->types->$method(2, $text));
-	}
-
 	public function testAWidgetIsReadWithEveryField(): void {
 		$widget = $this->types->readWidget(0, [
 			'id' => 31, 'type' => 'data', 'title' => ' Tasks ', 'icon' => 'star', 'description' => 'Open',

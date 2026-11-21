@@ -12,6 +12,7 @@ namespace OCA\Tables\Tests\Unit\Service;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
@@ -73,6 +74,7 @@ class PageServiceTest extends TestCase {
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->createMock(IDBConnection::class),
+			$this->createMock(MenuItemMapper::class),
 		);
 	}
 
@@ -166,7 +168,7 @@ class PageServiceTest extends TestCase {
 		$contextMapper->method('lock')->willReturn(false);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageMapper->expects($this->never())->method('insertWithDefaultName');
-		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
+		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class), $this->createMock(MenuItemMapper::class));
 
 		$this->expectException(NotFoundError::class);
 		$service->createGridPage(7, 'Planning', null, null, null);
@@ -194,7 +196,9 @@ class PageServiceTest extends TestCase {
 		$this->pageMapper->expects($this->never())->method('update');
 		$this->pageMapper->expects($this->never())->method('deleteByPageId');
 		$this->widgetService->expects($this->never())->method($this->anything());
-		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class));
+		$menuItemMapper = $this->createMock(MenuItemMapper::class);
+		$menuItemMapper->expects($this->never())->method($this->anything());
+		$service = new PageService($contextMapper, $this->pageMapper, $this->pageContentMapper, $this->widgetService, new GridWidgetTypes($this->createMock(IL10N::class)), $this->createMock(IDBConnection::class), $menuItemMapper);
 
 		$this->expectException(NotFoundError::class);
 		$this->expectExceptionMessage('Application 7 does not exist');
@@ -370,7 +374,7 @@ class PageServiceTest extends TestCase {
 
 	public function testAnUnknownIconIsRefused(): void {
 		$this->expectException(BadRequestError::class);
-		$this->expectExceptionMessage('unknown icon');
+		$this->expectExceptionMessage('The icon of a page must be the name of an icon.');
 		$this->service->update(7, self::GRID_PAGE, null, null, 'no-such-icon', null, null, null);
 	}
 
