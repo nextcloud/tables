@@ -55,8 +55,8 @@ export default {
 		},
 	},
 	watch: {
-		'$route'(to) {
-			this.routing(to)
+		'$route'(to, from) {
+			this.routing(to, from)
 		},
 	},
 	async created() {
@@ -80,13 +80,17 @@ export default {
 	},
 	methods: {
 		...mapActions(useTablesStore, ['loadTablesFromBE', 'getAllContexts', 'loadViewsSharedWithMeFromBE', 'loadTemplatesFromBE', 'setActiveRowId', 'setActiveTableId', 'setActiveViewId', 'setActiveContextId']),
-		routing(currentRoute) {
+		/**
+		 * @param {object} currentRoute the route that is shown
+		 * @param {object} [previousRoute] the route shown before, when the route changed
+		 */
+		routing(currentRoute, previousRoute) {
 			const url = generateUrl('/apps/tables/')
 
 			try {
-				if (loadState('tables', 'contextId', undefined)) {
-					// prepare route, when Context is opened from navigation bar
-					const contextId = loadState('tables', 'contextId', undefined)
+				const contextId = loadState('tables', 'contextId', undefined)
+				// prepare route, when Context is opened from navigation bar; its pages and rows stay
+				if (contextId && !this.isOnContext(currentRoute, contextId)) {
 					const originalUrl = window.location.href
 					this.$router.replace('/application/' + contextId).catch(() => { })
 					// reverts turning /apps/tables/app/28 into /apps/tables/app/28#/application/28
@@ -132,7 +136,11 @@ export default {
 					this.switchActiveMenuEntry(targetElement)
 				}
 
-				// move the focus away from nav bar (import for app-internal switch)
+				// move the focus away from nav bar (import for app-internal switch); a page tab
+				// of the same application keeps it
+				if (this.isOnContext(previousRoute, contextId)) {
+					return
+				}
 				const appContent = document.getElementById('app-content-vue')
 				const oldTabIndex = appContent.tabIndex
 				if (oldTabIndex === -1) {
@@ -141,6 +149,14 @@ export default {
 				appContent.focus()
 				appContent.tabIndex = oldTabIndex
 			}
+		},
+		/**
+		 * @param {object|undefined} route a route
+		 * @param {number|string} contextId the id of an application
+		 * @return {boolean} whether the route is on that application
+		 */
+		isOnContext(route, contextId) {
+			return !!route?.path.startsWith('/application/') && String(route.params.contextId) === String(contextId)
 		},
 		switchActiveMenuEntry(targetElement) {
 			targetElement = targetElement?.tagName?.toLowerCase() === 'a' ? targetElement.parentElement : targetElement
