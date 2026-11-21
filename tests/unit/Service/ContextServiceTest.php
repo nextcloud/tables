@@ -228,7 +228,17 @@ final class ContextServiceTest extends TestCase {
 		]);
 	}
 
-	public function testTheAuditEntryOfAnAddedNodeHasItsPermissions(): void {
+	public static function addedNodePermissions(): array {
+		return [
+			'given' => [['id' => 13, 'type' => 0, 'permissions' => 5], 5],
+			'omitted' => [['id' => 13, 'type' => 0], Application::PERMISSION_READ],
+		];
+	}
+
+	/**
+	 * @dataProvider addedNodePermissions
+	 */
+	public function testTheAuditEntryOfAnAddedNodeHasItsPermissions(array $node, int $expectedPermissions): void {
 		$context = new Context();
 		$context->id = 7;
 		$context->setNodes([]);
@@ -259,12 +269,12 @@ final class ContextServiceTest extends TestCase {
 			->method('log')
 			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
 				'contextId' => 7,
-				'addedNodes' => [['nodeType' => 0, 'nodeId' => 13, 'permissions' => 5]],
+				'addedNodes' => [['nodeType' => 0, 'nodeId' => 13, 'permissions' => $expectedPermissions]],
 				'removedNodes' => [],
 				'updatedNodes' => [],
 			]);
 
-		$this->service->update(7, 'user-1', null, null, null, [['id' => 13, 'type' => 0, 'permissions' => 5]]);
+		$this->service->update(7, 'user-1', null, null, null, [$node]);
 	}
 
 	public function testUpdateLogsRemovedNodes(): void {

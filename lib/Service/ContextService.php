@@ -268,7 +268,8 @@ class ContextService {
 			foreach ($nodesBeingAdded as $node) {
 				$nodeType = (int)($node['type']);
 				$nodeId = (int)($node['id']);
-				$addedNodes[] = ['nodeType' => $nodeType, 'nodeId' => $nodeId, 'permissions' => (int)$node['permissions']];
+				$permissions = (int)($node['permissions'] ?? Application::PERMISSION_READ);
+				$addedNodes[] = ['nodeType' => $nodeType, 'nodeId' => $nodeId, 'permissions' => $permissions];
 
 				/** @var ContextNodeRelation $addedNode */
 				/** @var PageContent $updatedContent */
@@ -276,7 +277,7 @@ class ContextService {
 					$contextId,
 					$node['id'],
 					$node['type'],
-					$node['permissions'] ?? Application::PERMISSION_READ,
+					$permissions,
 					$node['order'] ?? 100,
 					$userId
 				);
