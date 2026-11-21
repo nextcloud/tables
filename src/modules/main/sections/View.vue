@@ -4,7 +4,7 @@
 -->
 <template>
 	<div>
-		<ElementTitle v-model:view-setting="localViewSetting" :active-element="view" :is-table="false" />
+		<ElementTitle v-model:view-setting="localViewSetting" :active-element="view" :is-table="false" :show-title="showTitle" />
 		<TableDescription :description="view.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="view" />
@@ -138,6 +138,10 @@ export default {
 		viewSetting: {
 			type: Object,
 			default: null,
+		},
+		showTitle: {
+			type: Boolean,
+			default: true,
 		},
 
 	},
