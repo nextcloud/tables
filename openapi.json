@@ -1378,7 +1378,9 @@
                     "gridWidth",
                     "gridHeight",
                     "settings",
-                    "source"
+                    "source",
+                    "parentId",
+                    "parentTab"
                 ],
                 "properties": {
                     "id": {
@@ -1434,6 +1436,15 @@
                                 "format": "int64"
                             }
                         }
+                    },
+                    "parentId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "parentTab": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             },
@@ -1496,6 +1507,17 @@
                                 "format": "int64"
                             }
                         }
+                    },
+                    "parentIndex": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "parentId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "parentTab": {
+                        "type": "string"
                     }
                 }
             },
@@ -1512,7 +1534,8 @@
                         "enum": [
                             "string",
                             "text",
-                            "enum"
+                            "enum",
+                            "tabs"
                         ]
                     },
                     "title": {
@@ -1542,7 +1565,26 @@
                     "required": {
                         "type": "boolean"
                     },
+                    "maxItems": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
                     "hint": {
+                        "type": "string"
+                    }
+                }
+            },
+            "WidgetTab": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "title"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "title": {
                         "type": "string"
                     }
                 }
@@ -1584,7 +1626,17 @@
                 }
             },
             "WidgetValue": {
-                "type": "string"
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WidgetTab"
+                        }
+                    }
+                ]
             }
         }
     },
@@ -15041,7 +15093,7 @@
             "patch": {
                 "operationId": "context_page-update",
                 "summary": "[api v2] Change a page or its widgets",
-                "description": "Fields left out keep their value; an empty icon or description removes it. A given `widgets` list replaces the widgets of the page, a grid page or the start page: listed widgets with an `id` are updated, others are added, and widgets not listed are deleted.\nA widget has a `type`, `gridX`, `gridY`, `gridWidth` and `gridHeight` on a grid of 12 columns, `settings` following the schema of its type, and optionally an `id`, `title`, `icon` and `description`. A data widget's `source` is `{nodeRelId}` of a table or view of this application, or null.",
+                "description": "Fields left out keep their value; an empty icon or description removes it. A given `widgets` list replaces the widgets of the page, a grid page or the start page: listed widgets with an `id` are updated, others are added, and widgets not listed are deleted.\nA widget has a `type`, `gridX`, `gridY`, `gridWidth` and `gridHeight` on a grid of 12 columns, `settings` following the schema of its type, and optionally an `id`, `title`, `icon` and `description`. A data widget's `source` is `{nodeRelId}` of a table or view of this application, or null.\nA widget in a tab of a tabs widget names that tabs widget by `parentIndex`, its position in `widgets`, or by `parentId`, the `id` of a widget listed in the same request, so a page read from the API can be sent back as it is. `parentTab` is the `key` of the tab in the tabs widget's `tabs` setting. A widget in a tab is placed on the tab's own grid of 12 columns, with rows counted from the top of the tab. Tabs go one level deep: a tabs widget sits on the page itself and holds no tabs widget.\nThe response lists the widgets of the page and of all its tabs in one list, ordered by row, so a widget can come before its tabs widget.",
                 "tags": [
                     "context_page"
                 ],

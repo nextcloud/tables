@@ -161,6 +161,36 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->assertSame([], $startPageWidgets($withoutWidgets, 4245));
 	}
 
+	public function testWidgetsInTabsComeAlongInTheirTabsWidgetAndOrphansStayOnThePage(): void {
+		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
+		$this->widgetService->insertAll($gridPageId, [
+			new WidgetInput(null, 'tabs', null, null, null, 0, 7, 12, 8, ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]], null),
+			new WidgetInput(null, 'text', null, null, null, 0, 0, 6, 2, ['text' => 'Closed ones'], null, 0, 'closed'),
+		]);
+		$exported = json_decode(json_encode(array_merge(
+			$this->contextMapper->findById($context->getId(), self::OWNER)->jsonSerialize(),
+			['pages' => $this->service->getPagesWithWidgets($this->contextMapper->findById($context->getId(), self::OWNER))],
+		)), true);
+		$exported['nodes'][$relation->getId()]['node_id'] = 4246;
+		// A widget whose tabs widget did not come along, listed first so the positions of the others shift
+		array_unshift($exported['pages'][$gridPageId]['widgets'], ['type' => 'text', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Orphan'], 'parentId' => 999999, 'parentTab' => 'open']);
+		$table = new Table();
+		$table->id = 4246;
+		$table->setOwnership(self::OWNER);
+
+		$imported = $this->service->importContext($table, $exported, 4246);
+		$this->assertNotNull($imported);
+		$this->contextIds[] = $imported->getId();
+
+		$pages = $this->service->getPagesWithWidgets($this->contextMapper->findById($imported->getId(), self::OWNER));
+		$grid = array_values(array_filter($pages, static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID))[0];
+		$importedTabs = array_values(array_filter($grid['widgets'], static fn (array $widget): bool => $widget['type'] === 'tabs'))[0];
+		$texts = array_map(static fn (array $widget): array => [$widget['settings']['text'], $widget['parentId'], $widget['parentTab']], array_filter($grid['widgets'], static fn (array $widget): bool => $widget['type'] === 'text'));
+		usort($texts, static fn (array $a, array $b): int => strcmp($a[0], $b[0]));
+		$this->assertSame([['Closed ones', $importedTabs['id'], 'closed'], ['Orphan', null, null]], $texts);
+		$this->assertSame(['open', 'closed'], array_column($importedTabs['settings']['tabs'], 'key'));
+	}
+
 	public function testAnUnknownIconIsDroppedOnImport(): void {
 		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
 		$table = new Table();

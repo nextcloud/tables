@@ -33,6 +33,7 @@ use OCA\Tables\Model\ContextScheme;
 use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\Model\ViewSettings;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
 use OCA\Tables\Validation\TechnicalNameValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -905,11 +906,13 @@ class ContextService {
 	/**
 	 * Imports the widgets of a page the way the API would save them: a widget that does
 	 * not pass is skipped with the reason, and a data widget keeps its source only when
-	 * that table or view came along.
+	 * that table or view came along. A widget in a tab goes into the imported tabs widget
+	 * it was in, and onto the page when that tabs widget or tab did not come along.
 	 *
 	 * @param list<mixed> $widgets
 	 * @param array<array-key, ContextNodeRelation> $nodeRelMap new node relations by exported id
 	 * @throws Exception
+	 * @throws \JsonException
 	 */
 	private function importWidgets(int $pageId, array $widgets, array $nodeRelMap): void {
 		$inputs = [];
@@ -921,6 +924,10 @@ class ContextService {
 			if (is_array($widgetArr) && is_string($widgetArr['type'] ?? null) && !($this->gridWidgetTypes->all()[$widgetArr['type']]['hasSource'] ?? true)) {
 				$widgetArr['source'] = null;
 			}
+			if (is_array($widgetArr)) {
+				// an export names the tabs widget by its id
+				unset($widgetArr['parentIndex']);
+			}
 			try {
 				$input = $this->gridWidgetTypes->readWidget($index, $widgetArr);
 			} catch (BadRequestError $e) {
@@ -928,9 +935,33 @@ class ContextService {
 				continue;
 			}
 			$newNodeRel = $input->nodeRelId !== null ? ($nodeRelMap[$input->nodeRelId] ?? null) : null;
-			$inputs[] = $input->withId(null)->withNodeRelId($newNodeRel?->getId());
+			$inputs[] = $input->withNodeRelId($newNodeRel?->getId());
 		}
-		$this->widgetService->insertAll($pageId, $inputs);
+
+		// a widget whose tabs widget or tab did not come along keeps its content on the page
+		$exportedIds = array_filter(array_map(static fn (WidgetInput $input): ?int => $input->id, $inputs), static fn (?int $id): bool => $id !== null);
+		foreach ($inputs as $position => $input) {
+			if ($input->parentId !== null && !in_array($input->parentId, $exportedIds, true)) {
+				$this->logger->warning('Putting imported widget ' . $position . ' on the page: its tabs widget did not come along.');
+				$inputs[$position] = $input->withParent(null, null);
+			}
+		}
+		$inputs = GridWidgetTypes::resolveParents($inputs);
+		// tabs widgets first: one that moves to the page can still hold the widgets of its tabs
+		foreach ([true, false] as $tabsWidgets) {
+			foreach ($inputs as $position => $input) {
+				if (($input->type === GridWidgetTypes::TYPE_TABS) !== $tabsWidgets) {
+					continue;
+				}
+				try {
+					GridWidgetTypes::validateParent($position, $inputs);
+				} catch (BadRequestError $e) {
+					$this->logger->warning('Putting imported widget ' . $position . ' on the page: ' . $e->getMessage());
+					$inputs[$position] = $input->withParent(null, null);
+				}
+			}
+		}
+		$this->widgetService->insertAll($pageId, array_map(static fn (WidgetInput $input): WidgetInput => $input->withId(null), $inputs));
 	}
 
 	/**

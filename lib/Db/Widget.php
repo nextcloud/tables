@@ -16,7 +16,7 @@ use OCP\AppFramework\Db\Entity;
  * on the grid, its settings, stored as one JSON object, and for a data widget the node
  * relation of the table or view it shows.
  *
- * @psalm-type TablesWidgetSettingValue = string
+ * @psalm-type TablesWidgetSettingValue = string|list<array{key: string, title: string}>
  *
  * @method getPageId(): int
  * @method setPageId(int $value): void
@@ -40,6 +40,10 @@ use OCP\AppFramework\Db\Entity;
  * @method setSettings(?string $value): void
  * @method getNodeRelId(): ?int
  * @method setNodeRelId(?int $value): void
+ * @method getParentId(): ?int
+ * @method setParentId(?int $value): void
+ * @method getParentTab(): ?string
+ * @method setParentTab(?string $value): void
  */
 class Widget extends Entity {
 	/** Non-ASCII text and slashes are stored as written, so limits count the text itself. */
@@ -56,6 +60,8 @@ class Widget extends Entity {
 	protected ?int $gridHeight = null;
 	protected ?string $settings = null;
 	protected ?int $nodeRelId = null;
+	protected ?int $parentId = null;
+	protected ?string $parentTab = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -65,6 +71,7 @@ class Widget extends Entity {
 		$this->addType('gridWidth', 'integer');
 		$this->addType('gridHeight', 'integer');
 		$this->addType('nodeRelId', 'integer');
+		$this->addType('parentId', 'integer');
 	}
 
 	/**

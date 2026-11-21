@@ -257,6 +257,8 @@ class PageService {
 			}
 			$inputs[] = $input;
 		}
+		$inputs = GridWidgetTypes::resolveParents($inputs);
+		GridWidgetTypes::validateParents($inputs);
 		return $inputs;
 	}
 
