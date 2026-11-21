@@ -14,6 +14,9 @@ use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
 use OCP\IDBConnection;
+use OCP\Migration\Attributes\AddIndex;
+use OCP\Migration\Attributes\CreateTable;
+use OCP\Migration\Attributes\IndexType;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 use Override;
@@ -25,6 +28,14 @@ use Override;
  * Every existing application gets a menu of one item, without a title, opening its
  * start page.
  */
+#[CreateTable(table: 'tables_contexts_menu_item',
+	columns: ['id', 'context_id', 'parent_id', 'order', 'title', 'icon', 'description', 'page_id', 'node_rel_id', 'url'],
+	description: 'menu items of applications; an item opens a page, a node or a URL, or groups the items whose parent_id it is',
+	notes: ['every existing application gets one item without a title opening its start page'])
+]
+#[AddIndex(table: 'tables_contexts_menu_item', type: IndexType::INDEX, description: 'context_id (tables_ctx_menu_ctx_idx)')]
+#[AddIndex(table: 'tables_contexts_menu_item', type: IndexType::INDEX, description: 'page_id (tables_ctx_menu_page_idx)')]
+#[AddIndex(table: 'tables_contexts_menu_item', type: IndexType::INDEX, description: 'node_rel_id (tables_ctx_menu_rel_idx)')]
 class Version2500Date20261109030000 extends SimpleMigrationStep {
 	private const TABLE = 'tables_contexts_menu_item';
 	private const PAGE_TABLE = 'tables_contexts_page';
