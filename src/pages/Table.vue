@@ -4,9 +4,7 @@
 -->
 <template>
 	<div class="main-table-view">
-		<div v-if="!activeTable && !errorMessage">
-			<div class="icon-loading" />
-		</div>
+		<div v-if="!activeTable && !errorMessage" class="icon-loading loading-placeholder" />
 
 		<div v-else-if="activeTable">
 			<MainWrapper :element="activeTable" :is-view="false" />

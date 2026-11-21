@@ -1,0 +1,14 @@
+/**
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/*
+ * The core `icon-loading` spinner is centered within its own box, so an empty
+ * element without dimensions renders it at the top of the page. Give the
+ * loading placeholder a real size to center it in the app content area.
+ */
+.loading-placeholder {
+	width: var(--app-content-width, 100%);
+	min-height: calc(100vh - var(--header-height, 50px));
+}
