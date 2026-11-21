@@ -155,7 +155,7 @@ class PermissionsService {
 
 	public function canManageContextById(int $contextId, ?string $userId = null): bool {
 		try {
-			$context = $this->contextMapper->findById($contextId, $userId);
+			$context = $this->contextMapper->findById($contextId, $userId, false);
 		} catch (DoesNotExistException) {
 			$this->logger->warning('Context does not exist');
 			return false;
@@ -180,7 +180,7 @@ class PermissionsService {
 	 */
 	public function canAccessContextById(int $contextId, ?string $userId = null): bool {
 		try {
-			$this->contextMapper->findById($contextId, $userId ?? $this->userId);
+			$this->contextMapper->findById($contextId, $userId ?? $this->userId, false);
 			return true;
 		} catch (NotFoundError) {
 			return false;
