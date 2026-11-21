@@ -302,6 +302,23 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
+	 * @return int[]
+	 * @throws Exception
+	 */
+	public function findContextShareIdsByReceiver(string $receiver, string $receiverType): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('receiver', $qb->createNamedParameter($receiver, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('context', IQueryBuilder::PARAM_STR)));
+		$result = $qb->executeQuery();
+		$ids = array_map(intval(...), array_column($result->fetchAllAssociative(), 'id'));
+		$result->closeCursor();
+		return $ids;
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function deleteByReceiver(string $receiver, string $receiverType): int {
