@@ -21,7 +21,6 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
-use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\NotFoundError;
@@ -53,7 +52,9 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $widgetService;
 	private MockObject $dbConnection;
 	private MockObject $menuItemMapper;
+	private MockObject $viewMapper;
 	private MockObject $menuService;
+	private MockObject $logger;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -66,7 +67,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
@@ -95,7 +96,7 @@ final class ContextServiceTest extends TestCase {
 			$navigationManager,
 			$urlGenerator,
 			$this->createMock(TableMapper::class),
-			$this->createMock(ViewMapper::class),
+			$this->viewMapper = $this->createMock(ViewMapper::class),
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->menuItemMapper,
@@ -624,9 +625,6 @@ final class ContextServiceTest extends TestCase {
 	}
 
 	public function testImportContextRemapsSourcesAndSkipsInvalidWidgets(): void {
-		$table = new Table();
-		$table->id = 77;
-		$table->setOwnership('user-1');
 		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
 			$context->id = 8;
 			return $context;
@@ -654,7 +652,7 @@ final class ContextServiceTest extends TestCase {
 			return [];
 		});
 
-		$this->service->importContext($table, [
+		$this->service->importContext([
 			'name' => 'Projects',
 			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
 			'pages' => [[
@@ -675,7 +673,7 @@ final class ContextServiceTest extends TestCase {
 					['type' => 'text', 'title' => '  Notes ', 'gridX' => 6, 'gridY' => 11, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null],
 				],
 			]],
-		], 5);
+		], 'user-1', [5 => 77], []);
 
 		self::assertSame(['overview', 'Overview', 'star', 'At a glance'], [$insertedPages[0]->getSlug(), $insertedPages[0]->getTitle(), $insertedPages[0]->getIcon(), $insertedPages[0]->getDescription()]);
 		self::assertCount(4, $inserted);
@@ -756,9 +754,6 @@ final class ContextServiceTest extends TestCase {
 	 * @param array<int, array{0: string, 1: string}> $expected type and slug by page id
 	 */
 	public function testImportedPages(array $pages, array $expected): void {
-		$table = new Table();
-		$table->id = 40;
-		$table->setOwnership('user-1');
 		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
 			$context->id = 8;
 			return $context;
@@ -783,7 +778,7 @@ final class ContextServiceTest extends TestCase {
 			return $page;
 		});
 
-		$this->service->importContext($table, ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
+		$this->service->importContext(['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 'user-1', [4 => 40], []);
 
 		self::assertSame($expected, $inserted);
 		$titled = array_column(array_filter($pages, static fn ($page): bool => is_array($page) && isset($page['title'])), 'slug');
@@ -805,10 +800,10 @@ final class ContextServiceTest extends TestCase {
 		});
 		$this->pageMapper->expects($this->never())->method('update');
 
-		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
+		$this->service->importContext(['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
 			['id' => 1, 'page_type' => Page::TYPE_STARTPAGE, 'title' => 'Welcome', 'icon' => 'star', 'description' => 'Start here'],
 			['id' => 2, 'page_type' => Page::TYPE_GRID, 'slug' => 'overview', 'title' => '  Overview ', 'icon' => 'no-such-icon', 'description' => str_repeat('a', 2001)],
-		]], 4);
+		]], 'user-1', [4 => 40], []);
 
 		self::assertSame(
 			[['Welcome', 'star', 'Start here'], ['Overview', null, null]],
@@ -845,7 +840,7 @@ final class ContextServiceTest extends TestCase {
 			static fn (MenuItem $item): bool => [$item->getContextId(), $item->getOrder(), $item->getPageId(), $item->getTitle()] === [9, 0, $startPageId, null],
 		))->willReturnArgument(0);
 
-		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 4);
+		$this->service->importContext(['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => $pages], 'user-1', [4 => 40], []);
 	}
 
 	public static function importedMenus(): array {
@@ -876,9 +871,9 @@ final class ContextServiceTest extends TestCase {
 			static fn (MenuItem $item): bool => [$item->getContextId(), $item->getPageId()] === [9, 80],
 		))->willReturnArgument(0);
 
-		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
+		$this->service->importContext(['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
 			['id' => 1, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
-		], 'menu' => $menu], 4);
+		], 'menu' => $menu], 'user-1', [4 => 40], []);
 	}
 
 	public function testAFailedImportIsRolledBack(): void {
@@ -890,9 +885,9 @@ final class ContextServiceTest extends TestCase {
 		$this->dbConnection->expects($this->never())->method('commit');
 
 		$this->expectException(\RuntimeException::class);
-		$this->service->importContext($this->importTable(), ['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
+		$this->service->importContext(['name' => 'Projects', 'nodes' => [['id' => 1, 'node_id' => 4, 'node_type' => 0]], 'pages' => [
 			['id' => 1, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
-		]], 4);
+		]], 'user-1', [4 => 40], []);
 	}
 
 	/**
@@ -909,13 +904,6 @@ final class ContextServiceTest extends TestCase {
 			});
 		}
 		return $calls;
-	}
-
-	private function importTable(): Table {
-		$table = new Table();
-		$table->id = 40;
-		$table->setOwnership('user-1');
-		return $table;
 	}
 
 	private function buildPageContent(int $id, int $pageId, int $nodeRelId, int $order): PageContent {
@@ -979,40 +967,75 @@ final class ContextServiceTest extends TestCase {
 		return ['type' => 'data', 'title' => null, 'gridX' => 0, 'gridY' => $gridY, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => $source];
 	}
 
-	public function testAnImportedWidgetSourceKeepsOnlyTheTableBeingImported(): void {
+	public function testAnApplicationIsImportedOnceWithEachNodeOnItsOwnTableOrView(): void {
 		$exported = [
 			'name' => 'Projects',
 			'nodes' => [
-				['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1],
-				['id' => 102, 'node_id' => 6, 'node_type' => 0, 'permissions' => 1],
+				['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 102, 'node_id' => 6, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 3],
+				['id' => 103, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+				['id' => 104, 'node_id' => 9, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
 			],
 			'pages' => [[
 				'id' => 301,
 				'page_type' => Page::TYPE_GRID,
 				'slug' => 'overview',
-				'content' => [],
-				'widgets' => [self::dataWidget(0, ['nodeRelId' => 101]), self::dataWidget(5, ['nodeRelId' => 102])],
+				'content' => [['node_rel_id' => 101, 'order' => 10], ['node_rel_id' => 103, 'order' => 20], ['node_rel_id' => 104, 'order' => 30]],
+				'widgets' => [
+					self::dataWidget(0, ['nodeRelId' => 101]),
+					self::dataWidget(5, ['nodeRelId' => 102]),
+					self::dataWidget(10, ['nodeRelId' => 103]),
+					self::dataWidget(15, ['nodeRelId' => 104]),
+				],
 			]],
 		];
 		$record = $this->recordImport();
-		$table = new Table();
-		$table->id = 78;
-		$table->setOwnership('user-1');
+		$contents = [];
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content) use (&$contents): PageContent {
+			$contents[] = $content->getNodeRelId();
+			return $content;
+		});
 
-		// the migrator imports the application once per table it holds; this is table 6
-		$this->service->importContext($table, $exported, 6);
+		$imported = $this->service->importContext($exported, 'user-1', [5 => 77, 6 => 78], [5 => 90]);
 
-		$relationOfTable6 = $record['relations'][1];
-		self::assertSame([null, $relationOfTable6->getId()], array_column($record['widgets'], 5));
+		self::assertSame('user-1', $imported->getOwnerId());
+		self::assertSame(
+			[[Application::NODE_TYPE_TABLE, 77, 1], [Application::NODE_TYPE_TABLE, 78, 3], [Application::NODE_TYPE_VIEW, 90, 1]],
+			array_map(static fn (ContextNodeRelation $relation): array => [$relation->getNodeType(), $relation->getNodeId(), $relation->getPermissions()], $record['relations']),
+		);
+		// the grid page's own contents, then the start page the archive lacked, holding every node
+		self::assertSame([501, 503, 501, 502, 503], $contents);
+		self::assertSame([501, 502, 503, null], array_column($record['widgets'], 5));
+	}
+
+	public function testAnApplicationWithoutImportedNodesIsImportedWithItsPagesAndMenu(): void {
+		$record = $this->recordImport();
+		$this->logger->expects($this->exactly(3))->method('info')->with('Leaving a node out of an imported application: its table or view was not imported.');
+		$this->menuService->expects($this->once())->method('import')->willReturn([]);
+
+		$imported = $this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [
+				['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE],
+				['id' => 102, 'node_id' => '6', 'node_type' => Application::NODE_TYPE_TABLE],
+				['id' => 103, 'node_id' => 6, 'node_type' => 7],
+			],
+			'pages' => [['id' => 301, 'page_type' => Page::TYPE_GRID, 'slug' => 'notes', 'widgets' => [
+				['type' => 'text', 'title' => 'Notes', 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hi'], 'source' => null],
+			]]],
+			'menu' => [['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']]],
+		], 'user-1', [6 => 78], [5 => 90]);
+
+		self::assertSame(['user-1', Application::OWNER_TYPE_USER], [$imported->getOwnerId(), $imported->getOwnerType()]);
+		self::assertSame([], $record['relations']);
+		self::assertSame([Page::TYPE_GRID, Page::TYPE_STARTPAGE], array_map(static fn (Page $page): string => $page->getPageType(), $record['pages']));
+		self::assertSame(['Notes'], array_column($record['widgets'], 2));
 	}
 
 	public function testABrokenExportFileSkipsTheWidgetInsteadOfFailing(): void {
 		$record = $this->recordImport();
-		$table = new Table();
-		$table->id = 77;
-		$table->setOwnership('user-1');
 
-		$this->service->importContext($table, [
+		$this->service->importContext([
 			'name' => 'Projects',
 			'nodes' => [['id' => [101], 'node_id' => 5, 'node_type' => 0, 'permissions' => 1], ['id' => 102, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
 			'pages' => [[
@@ -1030,7 +1053,7 @@ final class ContextServiceTest extends TestCase {
 					self::dataWidget(20, ['nodeRelId' => 102]),
 				],
 			]],
-		], 5);
+		], 'user-1', [5 => 77], []);
 
 		self::assertSame(['overview', null], [$record['pages'][0]->getTitle(), $record['pages'][0]->getDescription()], 'an unusable title falls back to the slug');
 		self::assertCount(1, $record['widgets']);
@@ -1039,20 +1062,67 @@ final class ContextServiceTest extends TestCase {
 
 	public function testAnImportedPageKeepsAtMostTheMaximumNumberOfWidgets(): void {
 		$record = $this->recordImport();
-		$table = new Table();
-		$table->id = 77;
-		$table->setOwnership('user-1');
 		$widgets = [];
 		for ($i = 0; $i < GridWidgetTypes::MAX_WIDGETS_PER_PAGE + 5; $i++) {
 			$widgets[] = ['type' => 'text', 'title' => null, 'gridX' => 0, 'gridY' => $i * 2, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null];
 		}
 
-		$this->service->importContext($table, [
+		$this->service->importContext([
 			'name' => 'Projects',
 			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
 			'pages' => [['id' => 301, 'page_type' => Page::TYPE_GRID, 'slug' => 'one', 'content' => [], 'widgets' => $widgets]],
-		], 5);
+		], 'user-1', [5 => 77], []);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
+	}
+
+	public function testANodeWhosePermissionsAreNotANumberIsImportedWithoutPermissions(): void {
+		$record = $this->recordImport();
+
+		$this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => '15']],
+		], 'user-1', [5 => 77], []);
+
+		self::assertSame([[77, 0]], array_map(static fn (ContextNodeRelation $relation): array => [$relation->getNodeId(), $relation->getPermissions()], $record['relations']));
+	}
+
+	public function testAnEmptyMenuIsNotImported(): void {
+		$this->recordImport();
+		$this->contextMapper->expects($this->never())->method('findById');
+		$this->menuService->expects($this->never())->method('import');
+
+		$this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]],
+			'menu' => [],
+		], 'user-1', [5 => 77], []);
+	}
+
+	public function testAMenuItemFindsItsViewByUuidAmongTheNodesOfTheApplication(): void {
+		$record = $this->recordImport();
+		$this->contextMapper->expects($this->never())->method('findById');
+		$this->viewMapper->expects($this->never())->method('findByUuid');
+		$nodeRelIdOf = null;
+		$this->menuService->expects($this->once())->method('import')
+			->willReturnCallback(static function (Context $context, array $menu, \Closure $resolve) use (&$nodeRelIdOf): array {
+				$nodeRelIdOf = $resolve;
+				return [];
+			});
+
+		$this->service->importContext([
+			'name' => 'Projects',
+			'nodes' => [
+				['id' => 101, 'node_id' => 5, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 102, 'node_id' => 6, 'node_type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+			],
+			'menu' => [['title' => 'Team', 'target' => ['view' => 'shared-uuid']]],
+		], 'user-1', [5 => 77], [6 => 90, 7 => 91], ['table' => ['table-uuid' => [77]], 'view' => ['shared-uuid' => [91, 90]]]);
+
+		self::assertSame([501, 502], array_map(static fn (ContextNodeRelation $relation): int => $relation->getId(), $record['relations']));
+		self::assertSame(
+			[502, 501, null, null],
+			[$nodeRelIdOf('view', 'shared-uuid'), $nodeRelIdOf('table', 'table-uuid'), $nodeRelIdOf('table', 'shared-uuid'), $nodeRelIdOf('view', 'unknown-uuid')],
+		);
 	}
 }

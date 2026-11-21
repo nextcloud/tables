@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\UserMigration;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
@@ -193,7 +194,6 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 		$contexts = json_decode($importSource->getFileContents(self::FILE_CONTEXTS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
 
 		$tableIdMap = [];
-		$contextIdMap = [];
 		$columnIdMap = [];
 		$rowIdMap = [];
 		$userId = $user->getUID();
@@ -234,12 +234,13 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 				}
 
 				$rowIdMap = $this->importRows($importSource, $newTable, $table, $rowIdMap);
-
-				$this->importContexts($contexts, $newTable, $table, $contextIdMap);
 				$tableIdMap[$table['id']] = $newTable->getId();
 			}
 
-			$this->importViews($importSource, $tableIdMap, $columnIdMap, $userId);
+			$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
+			$viewIdMap = $this->importViews($views, $tableIdMap, $columnIdMap, $userId);
+			$uuids = ['table' => self::newIdsByUuid($tables, $tableIdMap), 'view' => self::newIdsByUuid($views, $viewIdMap)];
+			$contextIdMap = $this->importContexts($contexts, $userId, $importSource->getOriginalUid(), $tableIdMap, $viewIdMap, $uuids, $output);
 			$this->importShares($importSource, $tableIdMap, $contextIdMap, $userId);
 
 			$this->importRowCells(
@@ -344,15 +345,15 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	}
 
 	/**
-	 * @param IImportSource $importSource
+	 * @param array $views exported views
 	 * @param array $tableIdMap
 	 * @param array $columnIdMap
 	 * @param string $userId
 	 *
-	 * @return void
+	 * @return array<int, int> new view ids by exported id
 	 */
-	private function importViews(IImportSource $importSource, array $tableIdMap, array $columnIdMap, string $userId): void {
-		$views = json_decode($importSource->getFileContents(self::FILE_VIEWS), true, self::JSON_DEPTH, self::JSON_OPTIONS);
+	private function importViews(array $views, array $tableIdMap, array $columnIdMap, string $userId): array {
+		$viewIdMap = [];
 		foreach ($views as $view) {
 			if (isset($tableIdMap[$view['tableId']])) {
 				$newTableId = $tableIdMap[$view['tableId']];
@@ -365,9 +366,50 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 					unset($setting);
 				}
 				$view = $this->remapViewCardSources($view, $columnIdMap);
-				$this->viewService->importView($newTableId, $view, $userId);
+				$view = self::remapViewFilterAndSort($view, $columnIdMap);
+				$viewIdMap[$view['id']] = $this->viewService->importView($newTableId, $view, $userId)->getId();
 			}
 		}
+		return $viewIdMap;
+	}
+
+	/**
+	 * The ids of the imported tables or views by the uuid they were exported with. A
+	 * uuid can stand for more than one of them.
+	 *
+	 * @param array $exported exported tables or views
+	 * @param array<int, int> $idMap new ids by exported id
+	 * @return array<string, list<int>>
+	 */
+	private static function newIdsByUuid(array $exported, array $idMap): array {
+		$ids = [];
+		foreach ($exported as $node) {
+			$uuid = $node['uuid'] ?? null;
+			if (is_string($uuid) && isset($idMap[$node['id']])) {
+				$ids[$uuid][] = $idMap[$node['id']];
+			}
+		}
+		return $ids;
+	}
+
+	/**
+	 * Points the filter rules and sort rules of an exported view at the imported columns.
+	 * A meta column, or a column that was not imported, keeps its id.
+	 */
+	private static function remapViewFilterAndSort(array $view, array $columnIdMap): array {
+		$remap = static function (mixed $rule) use ($columnIdMap): mixed {
+			if (is_array($rule) && is_int($rule['columnId'] ?? null) && isset($columnIdMap[$rule['columnId']])) {
+				$rule['columnId'] = $columnIdMap[$rule['columnId']];
+			}
+			return $rule;
+		};
+		if (is_array($view['filter'] ?? null)) {
+			$view['filter'] = array_map(static fn (mixed $group): mixed => is_array($group) ? array_map($remap, $group) : $group, $view['filter']);
+		}
+		if (is_array($view['sort'] ?? null)) {
+			$view['sort'] = array_map($remap, $view['sort']);
+		}
+		return $view;
 	}
 
 	private function remapViewCardSources(array $view, array $columnIdMap): array {
@@ -435,20 +477,28 @@ class TablesMigrator implements IMigrator, ISizeEstimationMigrator {
 	}
 
 	/**
-	 * @param array $contexts
-	 * @param Table $newTable
-	 * @param array $table
-	 * @param array $contextIdMap
+	 * Imports each application the exporting user owned once, with its nodes pointing at
+	 * the imported tables and views. An application that was shared with them is skipped.
 	 *
-	 * @return void
+	 * @param array $contexts
+	 * @param string $userId the user the data is imported for
+	 * @param string $originalUid the user the data was exported from
+	 * @param array<int, int> $tableIdMap new table ids by exported id
+	 * @param array<int, int> $viewIdMap new view ids by exported id
+	 * @param array{table: array<string, list<int>>, view: array<string, list<int>>} $uuids new table and view ids by exported uuid
+	 *
+	 * @return array<int, int> new application ids by exported id
 	 */
-	private function importContexts(array $contexts, Table $newTable, array $table, array &$contextIdMap): void {
+	private function importContexts(array $contexts, string $userId, string $originalUid, array $tableIdMap, array $viewIdMap, array $uuids, OutputInterface $output): array {
+		$contextIdMap = [];
 		foreach ($contexts as $context) {
-			$newContext = $this->contextService->importContext($newTable, $context, $table['id'], $table['uuid'] ?? null);
-			if ($newContext !== null) {
-				$contextIdMap[$context['id']] = $newContext->getId();
+			if (($context['owner'] ?? null) !== $originalUid || ($context['ownerType'] ?? null) !== Application::OWNER_TYPE_USER) {
+				$output->writeln('Skipping application ' . ($context['id'] ?? '?') . ': the exported user did not own it.');
+				continue;
 			}
+			$contextIdMap[$context['id']] = $this->contextService->importContext($context, $userId, $tableIdMap, $viewIdMap, $uuids)->getId();
 		}
+		return $contextIdMap;
 	}
 
 	/**
