@@ -92,11 +92,11 @@ test.describe('Tabs widget', () => {
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 
 		await page.locator('[data-cy="tabsWidget"]').getByRole('tab', { name: 'Second' }).click()
-		await page.locator('[data-cy="tabsWidgetAdd"]').click()
+		await page.getByRole('tabpanel', { name: 'Second' }).locator('[data-cy="tabsWidgetAdd"]').click()
 		await page.locator('[data-cy="addWidgetType"] input').click()
 		// Tabs go one level deep
 		await expect(page.locator('.vs__dropdown-menu li').filter({ hasText: 'Tabs' })).toHaveCount(0)
-		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'Description' }).click()
+		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'Text' }).click()
 		await page.locator('[data-cy="widgetFieldText"] textarea').fill('Only in the second tab')
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 
