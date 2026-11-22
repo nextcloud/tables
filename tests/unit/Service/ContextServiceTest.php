@@ -117,7 +117,7 @@ final class ContextServiceTest extends TestCase {
 
 	protected function tearDown(): void {
 		foreach ($this->replacedServices as $class => $original) {
-			\OC::$server->registerService($class, static fn (): object => $original);
+			$this->registerService($class, $original);
 		}
 		parent::tearDown();
 	}
@@ -132,8 +132,18 @@ final class ContextServiceTest extends TestCase {
 	private function replaceService(string $class): MockObject {
 		$this->replacedServices[$class] ??= \OCP\Server::get($class);
 		$mock = $this->createMock($class);
-		\OC::$server->registerService($class, static fn (): object => $mock);
+		$this->registerService($class, $mock);
+		self::assertSame($mock, \OCP\Server::get($class), 'The mock of ' . $class . ' does not reach \\OCP\\Server::get().');
 		return $mock;
+	}
+
+	/**
+	 * Registers a service where `\OCP\Server::get()` resolves it: the app container for
+	 * an app class, the server otherwise.
+	 */
+	private function registerService(string $class, object $service): void {
+		$container = \OC::$server->getAppContainerForService($class) ?? \OC::$server;
+		$container->registerService($class, static fn (): object => $service);
 	}
 
 	public function testTransferLogsPreviousAndNewOwner(): void {
