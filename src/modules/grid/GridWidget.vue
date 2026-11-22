@@ -317,6 +317,8 @@ export default {
 		flex: 1;
 		min-height: 0;
 		overflow: auto;
+		// Keeps the sticky bars of a table below the floating menu of the widget
+		isolation: isolate;
 	}
 
 	&__unknown {
