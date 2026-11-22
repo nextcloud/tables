@@ -260,7 +260,16 @@ export default {
 									permissionUpdate: this.getPermissionFromBitmask(node.permissions, PERMISSION_UPDATE),
 									permissionDelete: this.getPermissionFromBitmask(node.permissions, PERMISSION_DELETE),
 								}
-								resources.push(resource)
+								const listedResource = resources.find(listed => listed.key === resource.key)
+								if (listedResource) {
+									// An application can hold a table or view more than once, and the
+									// permissions of its copies add up.
+									for (const permission of ['permissionRead', 'permissionCreate', 'permissionUpdate', 'permissionDelete']) {
+										listedResource[permission] ||= resource[permission]
+									}
+								} else {
+									resources.push(resource)
+								}
 							}
 						}
 					}
