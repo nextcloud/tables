@@ -93,7 +93,7 @@ test.describe('Grid pages of an application', () => {
 
 		await page.locator('[data-cy="gridPageEdit"]').click()
 		await page.locator('[data-cy="gridPageAddWidget"]').click()
-		await pickOption(page, 'addWidgetType', 'Description')
+		await pickOption(page, 'addWidgetType', 'Text')
 		await page.locator('[data-cy="widgetFieldText"] textarea').fill('Read this first')
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 		const saved = page.waitForResponse(r => /\/pages\/\d+/.test(r.url()) && r.request().method() === 'PATCH')
@@ -626,13 +626,15 @@ test.describe('Grid pages of an application', () => {
 
 	test('A table on the start page opens the scheme import', async ({ userPage: { page, user } }) => {
 		const table = await createTableViaApi(page.request, user, 'grid scheme table')
+		// A table without columns shows no table menu
+		await createRowViaApi(page.request, user, table, 'Scheme task')
 		const contextId = await createApplicationViaApi(page.request, user, 'grid scheme app', [table])
 		await openApplication(page, contextId)
 		await expect(page.locator('[data-cy="tablesWidget"]').getByRole('heading', { name: 'grid scheme table' })).toBeVisible({ timeout: 30000 })
 
 		await page.locator('[data-cy="customTableAction"] button').first().click()
 		await page.getByRole('menuitem', { name: 'Import scheme' }).click()
-		await expect(page.getByRole('dialog', { name: /Import scheme/i })).toBeVisible()
+		await expect(page.getByRole('dialog', { name: 'Import table scheme' })).toBeVisible()
 	})
 
 	test('A view on the start page shows its rows in the sorting it is saved with', async ({ userPage: { page, user } }) => {
