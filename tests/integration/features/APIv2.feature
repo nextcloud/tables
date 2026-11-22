@@ -179,6 +179,17 @@ Feature: APIv2
     Then they will find Contexts "" and no other
 
   @api2 @contexts
+  Scenario: Attempt to create a context containing a table twice
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    When user "participant1-v2" attempts to create the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read                |
+      | t1    | table | read                |
+    Then the reported status is "400"
+    And user "participant1-v2" fetches all Contexts
+    Then they will find Contexts "" and no other
+
+  @api2 @contexts
   Scenario: Attempt to create a context containing an inaccessible view
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "👋" exists for user "participant2-v2" as "t2" via v2
@@ -563,6 +574,20 @@ Feature: APIv2
     When user "participant1-v2" updates the nodes of the Context "c1" with a JSON "list" of
       | alias | type  | permissions         |
       | t1    | table | create              |
+    Then the reported status is "400"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" contains "table" "t1" with permissions "read,create,update"
+
+  @api2 @contexts @contexts-update
+  Scenario: Attempt to list a table of an owned context twice
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    When user "participant1-v2" updates the nodes of the Context "c1" with a JSON "list" of
+      | alias | type  | permissions         |
+      | t1    | table | read                |
+      | t1    | table | read                |
     Then the reported status is "400"
     When user "participant1-v2" fetches Context "c1"
     Then known Context "c1" contains "table" "t1" with permissions "read,create,update"

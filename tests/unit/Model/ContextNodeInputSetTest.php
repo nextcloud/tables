@@ -60,6 +60,18 @@ class ContextNodeInputSetTest extends TestCase {
 		], $nodeSet->jsonSerialize());
 	}
 
+	public function testCreateFromInputArrayAcceptsATableAndAViewWithTheSameId(): void {
+		$nodeSet = ContextNodeInputSet::createFromInputArray([
+			['id' => 5, 'type' => Application::NODE_TYPE_TABLE],
+			['id' => 5, 'type' => Application::NODE_TYPE_VIEW],
+		]);
+
+		$this->assertSame([
+			['id' => 5, 'type' => Application::NODE_TYPE_TABLE],
+			['id' => 5, 'type' => Application::NODE_TYPE_VIEW],
+		], $nodeSet->jsonSerialize());
+	}
+
 	public function testCreateFromInputArrayWithEmptyArray(): void {
 		$nodeSet = ContextNodeInputSet::createFromInputArray([]);
 		$this->assertSame([], $nodeSet->jsonSerialize());
@@ -118,6 +130,8 @@ class ContextNodeInputSetTest extends TestCase {
 			'string entry' => [['not-an-array'], 'Each node must be an object'],
 			'null entry' => [[null], 'Each node must be an object'],
 			'invalid entry after a valid one' => [[$node, ['id' => 6]], 'Unexpected node type'],
+			'repeated table' => [[$node, $node], 'Each table or view must be listed only once'],
+			'repeated table as strings with other permissions' => [[$node, ['id' => '05', 'type' => '0', 'permissions' => '15']], 'Each table or view must be listed only once'],
 		];
 	}
 
