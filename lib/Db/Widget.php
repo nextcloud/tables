@@ -16,7 +16,7 @@ use OCP\AppFramework\Db\Entity;
  * on the grid, its settings, stored as one JSON object, and for a data widget the node
  * relation of the table or view it shows.
  *
- * @psalm-type TablesWidgetSettingValue = string|int|float|bool|null
+ * @psalm-type TablesWidgetSettingValue = string
  *
  * @method getPageId(): int
  * @method setPageId(int $value): void
@@ -42,6 +42,9 @@ use OCP\AppFramework\Db\Entity;
  * @method setNodeRelId(?int $value): void
  */
 class Widget extends Entity {
+	/** Non-ASCII text and slashes are stored as written, so limits count the text itself. */
+	public const SETTINGS_JSON_FLAGS = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
 	protected ?int $pageId = null;
 	protected ?string $type = null;
 	protected ?string $title = null;
@@ -84,7 +87,7 @@ class Widget extends Entity {
 	 * @throws \JsonException
 	 */
 	public function setSettingsArray(array $settings): void {
-		$this->setSettings(json_encode((object)$settings, JSON_THROW_ON_ERROR));
+		$this->setSettings(json_encode((object)$settings, self::SETTINGS_JSON_FLAGS | JSON_THROW_ON_ERROR));
 	}
 
 	/**

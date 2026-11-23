@@ -22,8 +22,13 @@ use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\Support\AuditLogServiceInterface;
+use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
@@ -34,18 +39,21 @@ use Psr\Log\LoggerInterface;
 final class ContextServiceTest extends TestCase {
 	private ContextService $service;
 	private MockObject $contextMapper;
+	private MockObject $permissionsService;
 	private MockObject $contextNodeRelMapper;
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
-	private MockObject $permissionsService;
 	private MockObject $userManager;
 	private MockObject $auditLogService;
+	private bool $contextExists = true;
+	private MockObject $widgetService;
 	private MockObject $dbConnection;
 
 	protected function setUp(): void {
 		parent::setUp();
 
 		$this->contextMapper = $this->createMock(ContextMapper::class);
+		$this->contextMapper->method('lock')->willReturnCallback(fn (): bool => $this->contextExists);
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
@@ -54,6 +62,9 @@ final class ContextServiceTest extends TestCase {
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$this->dbConnection = $this->createMock(IDBConnection::class);
+		$this->widgetService = $this->createMock(WidgetService::class);
+		$l10n = $this->createMock(IL10N::class);
+		$l10n->method('t')->willReturnArgument(0);
 		$shareService = $this->createMock(ShareService::class);
 		$navigationManager = $this->createMock(INavigationManager::class);
 		$urlGenerator = $this->createMock(IURLGenerator::class);
@@ -74,6 +85,8 @@ final class ContextServiceTest extends TestCase {
 			$urlGenerator,
 			$this->createMock(TableMapper::class),
 			$this->createMock(ViewMapper::class),
+			$this->widgetService,
+			new GridWidgetTypes($l10n),
 		);
 	}
 
@@ -192,6 +205,78 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(10, $updatedContext->getPages()[301]['content'][502]['order']);
 	}
 
+	public function testAFailedOrderWriteFailsTheUpdateAndIsNotLogged(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([
+			101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1],
+			102 => ['id' => 102, 'node_type' => 0, 'node_id' => 12, 'permissions' => 1],
+		]);
+		$context->setPages([301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'content' => [
+			501 => ['id' => 501, 'node_rel_id' => 101, 'order' => 10],
+			502 => ['id' => 502, 'node_rel_id' => 102, 'order' => 20],
+		]]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->pageContentMapper->method('findById')->willReturnCallback(fn (int $contentId): PageContent => $this->buildPageContent($contentId, 301, $contentId - 400, 10));
+		$this->pageContentMapper->method('update')->willThrowException(new Exception('serialization failure'));
+		$this->auditLogService->expects($this->never())->method('log');
+
+		$this->expectException(Exception::class);
+		$this->service->update(7, 'user-1', null, null, null, [
+			['id' => 12, 'type' => 0, 'permissions' => 1],
+			['id' => 11, 'type' => 0, 'permissions' => 1],
+		]);
+	}
+
+	public static function addedNodePermissions(): array {
+		return [
+			'given' => [['id' => 13, 'type' => 0, 'permissions' => 5], 5],
+			'omitted' => [['id' => 13, 'type' => 0], Application::PERMISSION_READ],
+		];
+	}
+
+	/**
+	 * @dataProvider addedNodePermissions
+	 */
+	public function testTheAuditEntryOfAnAddedNodeHasItsPermissions(array $node, int $expectedPermissions): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([]);
+		$context->setPages([301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'content' => []]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		// the added relation in the shape the application holds its nodes
+		$added = new class extends ContextNodeRelation {
+			public function jsonSerialize(): array {
+				return ['id' => 103, 'context_id' => 7, 'node_id' => 13, 'node_type' => 0, 'permissions' => 5];
+			}
+		};
+		$added->id = 103;
+		$added->setContextId(7);
+		$this->contextNodeRelMapper->method('insert')->willReturn($added);
+		$content = new class extends PageContent {
+			public function jsonSerialize(): array {
+				return ['id' => 503, 'page_id' => 301, 'node_rel_id' => 103, 'order' => 100];
+			}
+		};
+		$content->id = 503;
+		$content->setPageId(301);
+		$this->pageContentMapper->method('insert')->willReturn($content);
+		$this->pageContentMapper->method('findById')->with(503)->willReturn($content);
+		$this->pageContentMapper->method('update')->willReturnArgument(0);
+		$this->auditLogService->expects($this->once())
+			->method('log')
+			->with(Operation::ContextUpdated, 'Tables application with ID %s was updated', [
+				'contextId' => 7,
+				'addedNodes' => [['nodeType' => 0, 'nodeId' => 13, 'permissions' => $expectedPermissions]],
+				'removedNodes' => [],
+				'updatedNodes' => [],
+			]);
+
+		$this->service->update(7, 'user-1', null, null, null, [$node]);
+	}
+
 	public function testUpdateLogsRemovedNodes(): void {
 		$context = new Context();
 		$context->id = 7;
@@ -216,6 +301,21 @@ final class ContextServiceTest extends TestCase {
 			]);
 
 		$this->service->update(7, 'user-1', null, null, null, []);
+	}
+
+	public function testAnUpdateRefusedForAnAddedNodeRemovesNothing(): void {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes([101 => ['id' => 101, 'node_type' => 0, 'node_id' => 11, 'permissions' => 1]]);
+		$context->setPages([]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->permissionsService->method('canManageNodeById')->willReturn(false);
+		$this->widgetService->expects($this->never())->method('deleteSourcesByNodeRelIds');
+		$this->contextNodeRelMapper->expects($this->never())->method('delete');
+		$this->contextMapper->expects($this->never())->method('update');
+
+		$this->expectException(PermissionError::class);
+		$this->service->update(7, 'user-1', 'Renamed', null, null, [['id' => 12, 'type' => 0, 'permissions' => 1]]);
 	}
 
 	public function testUpdateLogsNodePermissionChanges(): void {
@@ -371,6 +471,114 @@ final class ContextServiceTest extends TestCase {
 			]);
 
 		$this->service->delete(9, 'alice');
+	}
+
+	public function testASecondDeleteOfTheSameApplicationIsNotFoundAndNotLogged(): void {
+		$context = new Context();
+		$context->id = 9;
+		$this->contextMapper->method('findById')->with(9, 'alice')->willReturn($context);
+		$this->contextExists = false;
+
+		$this->contextMapper->expects($this->never())->method('delete');
+		$this->auditLogService->expects($this->never())->method('log');
+		$this->expectException(NotFoundError::class);
+
+		$this->service->delete(9, 'alice');
+	}
+
+	public function testDeleteRemovesTheWidgetsOfEveryPage(): void {
+		$context = new Context();
+		$context->id = 7;
+		$this->contextMapper->method('findById')->with(7, 'user-1')->willReturn($context);
+		$this->pageMapper->method('getPageIdsForContext')->with(7)->willReturn([301, 302]);
+
+		$this->widgetService->expects($this->once())->method('deleteByPageIds')->with([301, 302]);
+		$this->pageMapper->expects($this->exactly(2))->method('deleteByPageId');
+		$this->contextMapper->expects($this->once())->method('delete')->with($context);
+
+		$this->service->delete(7, 'user-1');
+	}
+
+	public function testDeletingANodeUnlinksItsWidgets(): void {
+		$this->contextNodeRelMapper->method('getRelIdsForNode')->with(11, 0)->willReturn([101, 102]);
+
+		$this->widgetService->expects($this->once())->method('deleteSourcesByNodeRelIds')->with([101, 102]);
+		$this->pageContentMapper->expects($this->once())->method('deleteByNodeRelIds')->with([101, 102]);
+
+		$this->service->deleteNodeRel(11, 0);
+	}
+
+	public function testAFailedNodeRemovalRollsBackTheDeletedSources(): void {
+		$this->contextNodeRelMapper->method('findById')->willThrowException(new \OCP\AppFramework\Db\DoesNotExistException('gone'));
+		$this->widgetService->expects($this->once())->method('deleteSourcesByNodeRelIds')->with([101]);
+		$this->dbConnection->expects($this->once())->method('rollBack');
+		$this->dbConnection->expects($this->never())->method('commit');
+
+		$this->expectException(\OCP\AppFramework\Db\DoesNotExistException::class);
+		$this->service->removeNodeFromContextAndPages(101);
+	}
+
+	public function testImportContextRemapsSourcesAndSkipsInvalidWidgets(): void {
+		$table = new Table();
+		$table->id = 77;
+		$table->setOwnership('user-1');
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnCallback(static function (ContextNodeRelation $relation): ContextNodeRelation {
+			$relation->id = 501;
+			return $relation;
+		});
+		$insertedPages = [];
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use (&$insertedPages): Page {
+			$page->id = 600 + count($insertedPages);
+			$insertedPages[] = $page;
+			return $page;
+		});
+
+		$insertedContents = [];
+		$this->pageContentMapper->method('insert')->willReturnCallback(static function (PageContent $content) use (&$insertedContents): PageContent {
+			$insertedContents[] = [$content->getPageId(), $content->getNodeRelId(), $content->getOrder()];
+			return $content;
+		});
+
+		$inserted = [];
+		$this->widgetService->method('insertAll')->willReturnCallback(function (int $pageId, array $widgets) use (&$inserted): array {
+			$inserted = [...$inserted, ...self::widgetArgs($pageId, $widgets)];
+			return [];
+		});
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
+			'pages' => [[
+				'id' => 301,
+				'page_type' => Page::TYPE_GRID,
+				'slug' => 'overview',
+				'title' => '  Overview ',
+				'icon' => 'star',
+				'description' => 'At a glance',
+				'content' => [['node_rel_id' => 101, 'order' => 10], ['node_rel_id' => 999, 'order' => 20]],
+				'widgets' => [
+					['type' => 'data', 'title' => 'Tasks', 'icon' => 'star', 'description' => 'Open tasks', 'gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => ['unknown' => 10], 'source' => ['nodeRelId' => 101]],
+					['type' => 'data', 'title' => null, 'gridX' => 0, 'gridY' => 7, 'gridWidth' => 6, 'gridHeight' => 5, 'settings' => [], 'source' => ['nodeRelId' => 999]],
+					['type' => 'text', 'title' => null, 'gridX' => 6, 'gridY' => 7, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => ['text' => 'Hi'], 'source' => ['nodeRelId' => 101]],
+					['type' => 'header', 'title' => null, 'gridX' => 0, 'gridY' => 0, 'gridWidth' => 12, 'gridHeight' => 2, 'settings' => ['heading' => ''], 'source' => null],
+					['type' => 'chart', 'title' => null, 'gridX' => 0, 'gridY' => 9, 'gridWidth' => 12, 'gridHeight' => 2, 'settings' => [], 'source' => null],
+					['type' => 'text', 'title' => null, 'gridX' => 8, 'gridY' => 11, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null],
+					['type' => 'text', 'title' => '  Notes ', 'gridX' => 6, 'gridY' => 11, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null],
+				],
+			]],
+		], 5);
+
+		self::assertSame(['overview', 'Overview', 'star', 'At a glance'], [$insertedPages[0]->getSlug(), $insertedPages[0]->getTitle(), $insertedPages[0]->getIcon(), $insertedPages[0]->getDescription()]);
+		self::assertCount(4, $inserted);
+		self::assertSame(['Notes', ['gridX' => 6, 'gridY' => 11, 'gridWidth' => 6, 'gridHeight' => 2]], [$inserted[3][2], $inserted[3][3]]);
+		self::assertSame([[600, 501, 10], [601, 501, 10]], $insertedContents, 'the archive has no start page, so a new one holds the table');
+		self::assertSame([600, 'data', 'Tasks', ['gridX' => 0, 'gridY' => 2, 'gridWidth' => 12, 'gridHeight' => 5], [], 501, 'star', 'Open tasks'], $inserted[0]);
+		self::assertNull($inserted[1][5]);
+		self::assertSame([600, 'text', null, ['gridX' => 6, 'gridY' => 7, 'gridWidth' => 6, 'gridHeight' => 2], ['text' => 'Hi'], null, null, null], $inserted[2]);
 	}
 
 	public function testANewApplicationGetsAStartPageNamedDashboard(): void {
@@ -529,5 +737,133 @@ final class ContextServiceTest extends TestCase {
 		$pageContent->setOrder($order);
 
 		return $pageContent;
+	}
+
+	/**
+	 * Mocks the inserts of an import and returns what they write.
+	 *
+	 * @return \ArrayObject<string, list<mixed>> pages, relations and widgets as inserted
+	 */
+	private function recordImport(): \ArrayObject {
+		$record = new \ArrayObject(['pages' => [], 'relations' => [], 'widgets' => []]);
+		$this->contextMapper->method('insert')->willReturnCallback(static function (Context $context): Context {
+			$context->id = 8;
+			return $context;
+		});
+		$this->contextNodeRelMapper->method('insert')->willReturnCallback(static function (ContextNodeRelation $relation) use ($record): ContextNodeRelation {
+			$relation->id = 501 + count($record['relations']);
+			$record['relations'] = [...$record['relations'], $relation];
+			return $relation;
+		});
+		$this->pageMapper->method('insert')->willReturnCallback(static function (Page $page) use ($record): Page {
+			$page->id = 600 + count($record['pages']);
+			$record['pages'] = [...$record['pages'], $page];
+			return $page;
+		});
+		$this->pageMapper->method('insertWithDefaultName')->willReturnCallback(static function (Page $page) use ($record): Page {
+			$page->id = 600 + count($record['pages']);
+			$record['pages'] = [...$record['pages'], $page];
+			return $page;
+		});
+		$this->widgetService->method('insertAll')->willReturnCallback(static function (int $pageId, array $widgets) use ($record): array {
+			$record['widgets'] = [...$record['widgets'], ...self::widgetArgs($pageId, $widgets)];
+			return [];
+		});
+		return $record;
+	}
+
+	/**
+	 * The widgets handed to insertAll(), each as page id, type, title, position, settings,
+	 * source, icon and description.
+	 *
+	 * @param list<WidgetInput> $widgets
+	 * @return list<list<mixed>>
+	 */
+	private static function widgetArgs(int $pageId, array $widgets): array {
+		return array_map(static fn (WidgetInput $w): array => [$pageId, $w->type, $w->title, ['gridX' => $w->gridX, 'gridY' => $w->gridY, 'gridWidth' => $w->gridWidth, 'gridHeight' => $w->gridHeight], $w->settings, $w->nodeRelId, $w->icon, $w->description], $widgets);
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	private static function dataWidget(int $gridY, mixed $source): array {
+		return ['type' => 'data', 'title' => null, 'gridX' => 0, 'gridY' => $gridY, 'gridWidth' => 12, 'gridHeight' => 5, 'settings' => [], 'source' => $source];
+	}
+
+	public function testAnImportedWidgetSourceKeepsOnlyTheTableBeingImported(): void {
+		$exported = [
+			'name' => 'Projects',
+			'nodes' => [
+				['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1],
+				['id' => 102, 'node_id' => 6, 'node_type' => 0, 'permissions' => 1],
+			],
+			'pages' => [[
+				'id' => 301,
+				'page_type' => Page::TYPE_GRID,
+				'slug' => 'overview',
+				'content' => [],
+				'widgets' => [self::dataWidget(0, ['nodeRelId' => 101]), self::dataWidget(5, ['nodeRelId' => 102])],
+			]],
+		];
+		$record = $this->recordImport();
+		$table = new Table();
+		$table->id = 78;
+		$table->setOwnership('user-1');
+
+		// the migrator imports the application once per table it holds; this is table 6
+		$this->service->importContext($table, $exported, 6);
+
+		$relationOfTable6 = $record['relations'][1];
+		self::assertSame([null, $relationOfTable6->getId()], array_column($record['widgets'], 5));
+	}
+
+	public function testABrokenExportFileSkipsTheWidgetInsteadOfFailing(): void {
+		$record = $this->recordImport();
+		$table = new Table();
+		$table->id = 77;
+		$table->setOwnership('user-1');
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => [101], 'node_id' => 5, 'node_type' => 0, 'permissions' => 1], ['id' => 102, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
+			'pages' => [[
+				'id' => 301,
+				'page_type' => Page::TYPE_GRID,
+				'slug' => 'overview',
+				'title' => ['Overview'],
+				'description' => str_repeat('a', 2001),
+				'content' => [['node_rel_id' => [102], 'order' => 10]],
+				'widgets' => [
+					self::dataWidget(0, ['nodeRelId' => [102]]),
+					self::dataWidget(5, 'a source'),
+					self::dataWidget(10, ['nodeRelId' => '102']),
+					['type' => 'text', 'title' => null, 'description' => str_repeat('a', 2001), 'gridX' => 0, 'gridY' => 15, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null],
+					self::dataWidget(20, ['nodeRelId' => 102]),
+				],
+			]],
+		], 5);
+
+		self::assertSame(['overview', null], [$record['pages'][0]->getTitle(), $record['pages'][0]->getDescription()], 'an unusable title falls back to the slug');
+		self::assertCount(1, $record['widgets']);
+		self::assertSame([20, 502], [$record['widgets'][0][3]['gridY'], $record['widgets'][0][5]]);
+	}
+
+	public function testAnImportedPageKeepsAtMostTheMaximumNumberOfWidgets(): void {
+		$record = $this->recordImport();
+		$table = new Table();
+		$table->id = 77;
+		$table->setOwnership('user-1');
+		$widgets = [];
+		for ($i = 0; $i < GridWidgetTypes::MAX_WIDGETS_PER_PAGE + 5; $i++) {
+			$widgets[] = ['type' => 'text', 'title' => null, 'gridX' => 0, 'gridY' => $i * 2, 'gridWidth' => 6, 'gridHeight' => 2, 'settings' => [], 'source' => null];
+		}
+
+		$this->service->importContext($table, [
+			'name' => 'Projects',
+			'nodes' => [['id' => 101, 'node_id' => 5, 'node_type' => 0, 'permissions' => 1]],
+			'pages' => [['id' => 301, 'page_type' => Page::TYPE_GRID, 'slug' => 'one', 'content' => [], 'widgets' => $widgets]],
+		], 5);
+
+		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
 	}
 }
