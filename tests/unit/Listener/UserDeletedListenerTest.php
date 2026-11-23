@@ -96,12 +96,13 @@ final class UserDeletedListenerTest extends TestCase {
 		$this->assertSame(['application', 'table'], $calls);
 	}
 
-	public function testAFailingApplicationDoesNotStopTheRest(): void {
+	public function testAFailingApplicationDoesNotStopTheRestAndIsRethrown(): void {
+		$failure = new \RuntimeException('broken');
 		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([1, 2]);
 		$this->contextService->expects($this->exactly(2))->method('delete')
-			->willReturnCallback(function (int $contextId): Context {
+			->willReturnCallback(function (int $contextId) use ($failure): Context {
 				if ($contextId === 1) {
-					throw new \RuntimeException('broken');
+					throw $failure;
 				}
 				return new Context();
 			});
@@ -110,28 +111,30 @@ final class UserDeletedListenerTest extends TestCase {
 		$this->logger->expects($this->once())->method('error')
 			->with($this->stringContains('could not delete application 1'));
 
+		$this->expectExceptionObject($failure);
 		$this->listener->handle($this->event('alice'));
 	}
 
-	public function testFailingToFindTheApplicationsStillDeletesTheTables(): void {
-		$this->contextMapper->method('findIdsOwnedByUser')->willThrowException(new Exception('db down'));
+	public function testFailingToFindTheApplicationsIsRethrown(): void {
+		$failure = new Exception('db down');
+		$this->contextMapper->method('findIdsOwnedByUser')->willThrowException($failure);
 		$this->contextService->expects($this->never())->method('delete');
-		$this->tableMapper->method('findAll')->willReturn([$this->table(7)]);
-		$this->tableService->expects($this->once())->method('delete')->with(7, 'alice');
-		$this->logger->expects($this->once())->method('error')
-			->with($this->stringContains('could not find the applications'));
+		$this->tableMapper->expects($this->never())->method('findAll');
+		$this->tableService->expects($this->never())->method('delete');
 
+		$this->expectExceptionObject($failure);
 		$this->listener->handle($this->event('alice'));
 	}
 
-	public function testAFailingTableDoesNotStopTheRest(): void {
+	public function testAFailingTableDoesNotStopTheRestAndIsRethrown(): void {
+		$failure = new PermissionError('no');
 		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([]);
 		$this->tableMapper->method('findAll')->willReturn([$this->table(7), $this->table(8)]);
 		$deleted = [];
 		$this->tableService->expects($this->exactly(2))->method('delete')
-			->willReturnCallback(function (int $tableId) use (&$deleted): Table {
+			->willReturnCallback(function (int $tableId) use (&$deleted, $failure): Table {
 				if ($tableId === 7) {
-					throw new PermissionError('no');
+					throw $failure;
 				}
 				$deleted[] = $tableId;
 				return $this->table($tableId);
@@ -139,18 +142,35 @@ final class UserDeletedListenerTest extends TestCase {
 		$this->logger->expects($this->once())->method('error')
 			->with($this->stringContains('could not delete table 7'));
 
-		$this->listener->handle($this->event('alice'));
-
+		try {
+			$this->listener->handle($this->event('alice'));
+			$this->fail('the failed table deletion was not rethrown');
+		} catch (PermissionError $e) {
+			$this->assertSame($failure, $e);
+		}
 		$this->assertSame([8], $deleted);
 	}
 
-	public function testFailingToFindTheTablesIsLogged(): void {
-		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([]);
-		$this->tableMapper->method('findAll')->willThrowException(new Exception('db down'));
-		$this->tableService->expects($this->never())->method('delete');
-		$this->logger->expects($this->once())->method('error')
-			->with($this->stringContains('could not find the tables'));
+	public function testRethrowsTheFirstFailureAfterTryingEverything(): void {
+		$applicationFailure = new \RuntimeException('broken');
+		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([1]);
+		$this->contextService->method('delete')->willThrowException($applicationFailure);
+		$this->tableMapper->method('findAll')->willReturn([$this->table(7)]);
+		$this->tableService->expects($this->once())->method('delete')->willThrowException(new PermissionError('no'));
+		$this->logger->expects($this->exactly(2))->method('error');
 
+		$this->expectExceptionObject($applicationFailure);
+		$this->listener->handle($this->event('alice'));
+	}
+
+	public function testFailingToFindTheTablesIsRethrown(): void {
+		$failure = new Exception('db down');
+		$this->contextMapper->method('findIdsOwnedByUser')->willReturn([1]);
+		$this->contextService->expects($this->once())->method('delete')->with(1, 'alice');
+		$this->tableMapper->method('findAll')->willThrowException($failure);
+		$this->tableService->expects($this->never())->method('delete');
+
+		$this->expectExceptionObject($failure);
 		$this->listener->handle($this->event('alice'));
 	}
 

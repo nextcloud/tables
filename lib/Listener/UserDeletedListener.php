@@ -11,6 +11,7 @@ use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\TableService;
+use OCP\DB\Exception;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\User\Events\UserDeletedEvent;
@@ -38,43 +39,53 @@ class UserDeletedListener implements IEventListener {
 		$this->logger->info('event "user deleted" was triggered, will try to delete all data for the user: ' . $userId . ' (' . $event->getUser()->getDisplayName() . ')');
 
 		// applications first, so deleting the tables does not detach them from applications that go anyway
-		$this->deleteApplications($userId);
-		$this->deleteTables($userId);
+		$applicationFailure = $this->deleteApplications($userId);
+		$tableFailure = $this->deleteTables($userId);
+
+		// the server keeps the user marked as deleted and runs the deletion again later
+		$failure = $applicationFailure ?? $tableFailure;
+		if ($failure !== null) {
+			throw $failure;
+		}
 	}
 
-	private function deleteApplications(string $userId): void {
-		try {
-			$contextIds = $this->contextMapper->findIdsOwnedByUser($userId);
-		} catch (\Throwable $e) {
-			$this->logger->error('could not find the applications of the deleted user ' . $userId, ['exception' => $e]);
-			return;
-		}
+	/**
+	 * @return \Throwable|null the first failed deletion, after trying all applications
+	 * @throws Exception when the applications cannot be looked up
+	 */
+	private function deleteApplications(string $userId): ?\Throwable {
+		$contextIds = $this->contextMapper->findIdsOwnedByUser($userId);
 
 		$this->logger->debug('found ' . count($contextIds) . ' applications for the user');
+		$failure = null;
 		foreach ($contextIds as $contextId) {
 			try {
 				$this->contextService->delete($contextId, $userId);
 			} catch (\Throwable $e) {
 				$this->logger->error('could not delete application ' . $contextId . ' of the deleted user ' . $userId, ['exception' => $e]);
+				$failure ??= $e;
 			}
 		}
+		return $failure;
 	}
 
-	private function deleteTables(string $userId): void {
-		try {
-			$tables = $this->tableMapper->findAll($userId);
-		} catch (\Throwable $e) {
-			$this->logger->error('could not find the tables of the deleted user ' . $userId, ['exception' => $e]);
-			return;
-		}
+	/**
+	 * @return \Throwable|null the first failed deletion, after trying all tables
+	 * @throws Exception when the tables cannot be looked up
+	 */
+	private function deleteTables(string $userId): ?\Throwable {
+		$tables = $this->tableMapper->findAll($userId);
 
 		$this->logger->debug('found ' . count($tables) . ' tables for the user');
+		$failure = null;
 		foreach ($tables as $table) {
 			try {
 				$this->tableService->delete($table->getId(), $userId);
 			} catch (\Throwable $e) {
 				$this->logger->error('could not delete table ' . $table->getId() . ' of the deleted user ' . $userId, ['exception' => $e]);
+				$failure ??= $e;
 			}
 		}
+		return $failure;
 	}
 }
