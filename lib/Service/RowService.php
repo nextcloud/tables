@@ -563,11 +563,12 @@ class RowService extends SuperService {
 			}
 			$row = $this->row2Mapper->find($rowId, $this->columnMapper->findAllByTable($this->row2Mapper->getTableIdForRow($rowId)));
 			$row->markAsLoaded();
-		} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+		} catch (InternalError|MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		} catch (DoesNotExistException) {
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': Row not found.');
 		} catch (NotFoundError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		$this->tmpRows[$rowId] = $row;
@@ -611,7 +612,6 @@ class RowService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (NotFoundError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
@@ -737,7 +737,6 @@ class RowService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (NotFoundError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 

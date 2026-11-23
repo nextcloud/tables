@@ -45,6 +45,7 @@ class RowServiceRowNotFoundTest extends TestCase {
 	private LoggerInterface&MockObject $logger;
 	private bool $canReadView = true;
 	private bool $canDeleteFromTable = true;
+	private bool $rowExists = true;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -54,7 +55,8 @@ class RowServiceRowNotFoundTest extends TestCase {
 		$row->setTableId(self::TABLE_ID);
 
 		$this->row2Mapper = $this->createMock(Row2Mapper::class);
-		$this->row2Mapper->method('getTableIdForRow')->willReturn(self::TABLE_ID);
+		$this->row2Mapper->method('getTableIdForRow')
+			->willReturnCallback(fn (): int => $this->rowExists ? self::TABLE_ID : throw new DoesNotExistException('Did expect one result but found none when executing: query "SELECT * FROM oc_tables_row_sleeves"'));
 		$this->row2Mapper->method('find')->willReturn($row);
 		$this->row2Mapper->expects($this->never())->method('update');
 		$this->row2Mapper->expects($this->never())->method('delete');
@@ -189,5 +191,35 @@ class RowServiceRowNotFoundTest extends TestCase {
 		$this->expectException(PermissionError::class);
 		$this->expectExceptionMessage('Delete row is not allowed.');
 		$this->service->delete(self::ROW_ID, null, 'alice');
+	}
+
+	public function testUpdatingARowThatWasDeletedMeanwhileIsNotFound(): void {
+		$this->rowExists = false;
+		$this->permissionsService->expects($this->never())->method('canUpdateRowsByTableId');
+
+		$this->logger->expects($this->never())->method('error');
+		try {
+			$this->service->updateSet(self::ROW_ID, null, [], 'alice', self::TABLE_ID);
+			$this->fail('Expected a NotFoundError');
+		} catch (NotFoundError $e) {
+			$this->assertStringEndsWith(': Row not found.', $e->getMessage());
+			$this->assertStringNotContainsString('SELECT', $e->getMessage());
+		}
+	}
+
+	public function testUpdatingARowThatWasDeletedMeanwhileThroughAViewIsNotFound(): void {
+		$this->rowExists = false;
+
+		$this->logger->expects($this->never())->method('error');
+		$this->expectException(NotFoundError::class);
+		$this->service->updateSet(self::ROW_ID, self::VIEW_ID, [], 'alice', null);
+	}
+
+	public function testDeletingARowThatWasDeletedMeanwhileIsNotFound(): void {
+		$this->rowExists = false;
+
+		$this->logger->expects($this->never())->method('error');
+		$this->expectException(NotFoundError::class);
+		$this->service->delete(self::ROW_ID, null, 'alice', self::TABLE_ID);
 	}
 }

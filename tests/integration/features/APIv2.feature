@@ -1071,6 +1071,13 @@ Feature: APIv2
     Then the reported status is 404
     And the response has a message
     And the user "participant1-v2" fetches table "t1", it has exactly these rows "r-red,r-blue"
+    # Changing a row that was deleted meanwhile is a 404 with a message
+    When user "participant1-v2" tries to delete row "r-blue" using v2 on table "t1"
+    Then the reported status is 200
+    When user "participant1-v2" tries to update row "r-blue" using v2 on table "t1" with following values
+      | team | green |
+    Then the reported status is 404
+    And the response has a message
 
   @api2 @rows @views
   Scenario: Create rows on a view via v2 without access
