@@ -11,16 +11,23 @@ namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\FederationDisabledError;
+use OCA\Tables\Errors\FederationRequestError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Federation\FederationProxy;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Service\ConfigService;
 use OCA\Tables\Service\FederationService;
 use OCP\Federation\ICloudFederationFactory;
 use OCP\Federation\ICloudFederationProviderManager;
+use OCP\Federation\ICloudId;
 use OCP\Federation\ICloudIdManager;
+use OCP\Http\Client\IResponse;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -86,5 +93,60 @@ class FederationServiceTest extends TestCase {
 
 		$this->expectException(FederationDisabledError::class);
 		$this->federationService->sendShare($share);
+	}
+
+	public static function remoteCalls(): array {
+		return [
+			'columns' => [static fn (FederationService $service, Table $table) => $service->getColumns($table)],
+			'rows' => [static fn (FederationService $service, Table $table) => $service->getRows($table)],
+			'create row' => [static fn (FederationService $service, Table $table) => $service->createRow($table, [])],
+			'update row' => [static fn (FederationService $service, Table $table) => $service->updateRow($table, 3, [])],
+			'delete row' => [static fn (FederationService $service, Table $table) => $service->deleteRow($table, 3)],
+		];
+	}
+
+	/**
+	 * @dataProvider remoteCalls
+	 */
+	#[DataProvider('remoteCalls')]
+	public function testANotFoundFromTheRemoteIsNotLoggedAsAnError(callable $call): void {
+		$this->assertRemoteFailureIsLogged($call, new NotFoundError('Remote answered with status 404'), 'debug');
+	}
+
+	/**
+	 * @dataProvider remoteCalls
+	 */
+	#[DataProvider('remoteCalls')]
+	public function testAForbiddenFromTheRemoteIsNotLoggedAsAnError(callable $call): void {
+		$this->assertRemoteFailureIsLogged($call, new PermissionError('Remote answered with status 403'), 'debug');
+	}
+
+	/**
+	 * @dataProvider remoteCalls
+	 */
+	#[DataProvider('remoteCalls')]
+	public function testAFailedRemoteRequestIsLoggedAsAnError(callable $call): void {
+		$this->assertRemoteFailureIsLogged($call, new FederationRequestError('Error parsing JSON response'), 'error');
+	}
+
+	private function assertRemoteFailureIsLogged(callable $call, \Exception $failure, string $level): void {
+		$cloudId = $this->createMock(ICloudId::class);
+		$cloudId->method('getRemote')->willReturn('https://remote.example');
+		$this->cloudIdManager->method('resolveCloudId')->willReturn($cloudId);
+		$response = $this->createMock(IResponse::class);
+		foreach (['get', 'post', 'put', 'delete'] as $verb) {
+			$this->proxy->method($verb)->willReturn($response);
+		}
+		$this->proxy->method('getOCSData')->with($response)->willThrowException($failure);
+		$this->logger->expects($level === 'error' ? $this->once() : $this->never())->method('error');
+		$this->logger->expects($level === 'debug' ? $this->once() : $this->never())->method('debug')
+			->with($this->anything(), ['exception' => $failure]);
+
+		$table = new Table();
+		$table->setOwnership('alice@remote.example');
+		$table->setShareToken('token');
+
+		$this->expectExceptionObject($failure);
+		$call($this->federationService, $table);
 	}
 }
