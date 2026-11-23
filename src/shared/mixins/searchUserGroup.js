@@ -10,6 +10,7 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import ShareTypes from './shareTypesMixin.js'
 import generalHelper from './generalHelper.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	mixins: [ShareTypes, generalHelper],

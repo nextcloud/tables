@@ -9,6 +9,7 @@ import displayError from '../../../shared/utils/displayError.js'
 import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
 import { useTablesStore } from '../../../store/store.js'
 import { mapActions } from 'pinia'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	mixins: [ShareTypes],
