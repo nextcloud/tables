@@ -87,6 +87,9 @@ export default {
 			this.localResources = this.contextResources
 		},
 		addResource(resource) {
+			if (this.contextResources.some(listed => listed.key === resource.key)) {
+				return
+			}
 			this.contextResources.push(resource)
 			this.localResources = this.contextResources
 		},

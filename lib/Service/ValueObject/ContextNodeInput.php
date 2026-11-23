@@ -58,6 +58,14 @@ class ContextNodeInput implements JsonSerializable {
 	}
 
 	/**
+	 * Identifies the table or view. The type is part of it, as a table and a view
+	 * can have the same ID.
+	 */
+	public function getNodeKey(): string {
+		return sprintf('t%di%d', $this->nodeType, $this->nodeId);
+	}
+
+	/**
 	 * @return array{id: int, type: int, permissions?: int, order?: int}
 	 */
 	public function jsonSerialize(): array {

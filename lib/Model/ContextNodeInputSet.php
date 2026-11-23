@@ -38,9 +38,14 @@ class ContextNodeInputSet implements JsonSerializable {
 			if (!is_array($inputNode)) {
 				throw new InvalidArgumentException('Each node must be an object');
 			}
-			$nodes[] = ContextNodeInput::fromArray($inputNode);
+			$node = ContextNodeInput::fromArray($inputNode);
+			$nodeKey = $node->getNodeKey();
+			if (isset($nodes[$nodeKey])) {
+				throw new InvalidArgumentException('Each table or view must be listed only once');
+			}
+			$nodes[$nodeKey] = $node;
 		}
-		return new self($nodes);
+		return new self(array_values($nodes));
 	}
 
 	/**
