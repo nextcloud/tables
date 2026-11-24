@@ -5,11 +5,76 @@
 
 # Changelog
 
+## 2.5.0
+
+### Added
+* [Show the profile hover card for users in a user column (tables#3026)](https://github.com/nextcloud/tables/pull/3026)
+
+### Fixed
+* [Fix\(api\): document existing relation endpoints in OpenAPI (tables#3181)](https://github.com/nextcloud/tables/pull/3181)
+* [Fix\(views\): accept the columns list when updating a view (tables#3197)](https://github.com/nextcloud/tables/pull/3197)
+* [Fix\(activity\): return recipient user ids as strings (tables#3224)](https://github.com/nextcloud/tables/pull/3224)
+* [Fix\(activity\): stop storing cell values and full entities in event params (tables#3247)](https://github.com/nextcloud/tables/pull/3247)
+* [Perf\(rows\): check whether a row is in a view with a single\-row query (tables#3248)](https://github.com/nextcloud/tables/pull/3248)
+* [Fix\(notifications\): only notify view followers about rows visible to them (tables#3250)](https://github.com/nextcloud/tables/pull/3250)
+* [Fix\(contexts\): validate the nodes of an application before saving (tables#3266)](https://github.com/nextcloud/tables/pull/3266)
+* [Fix\(a11y\): give each icon in the icon picker its own screen reader name (tables#3268)](https://github.com/nextcloud/tables/pull/3268)
+* [Fix\(sharing\): remove federated share when sending to remote fails (tables#3294)](https://github.com/nextcloud/tables/pull/3294)
+* [Fix\(api\): document accepted share and context parameter values (tables#3295)](https://github.com/nextcloud/tables/pull/3295)
+* [Enh\(ux\): replace "Export" with "Export scheme" (tables#3297)](https://github.com/nextcloud/tables/pull/3297)
+* [Fix\(contexts\): close the edit dialog without an error after deleting the application (tables#3299)](https://github.com/nextcloud/tables/pull/3299)
+* [Fix\(Notifications\): set a name for a row if possible (tables#3305)](https://github.com/nextcloud/tables/pull/3305)
+* [fix\(ux\): center loading spinner in the content area (tables#3312)](https://github.com/nextcloud/tables/pull/3312)
+* [fix\(contexts\): reject a table or view that is listed twice in an application (tables#3339)](https://github.com/nextcloud/tables/pull/3339)
+* [fix\(contexts\): remove the navigation settings of a deleted receiver (tables#3340)](https://github.com/nextcloud/tables/pull/3340)
+
+### Dependencies
+* [Chore\(deps\): update dependency typescript to ^5.9.3 \(main\) (tables#3147)](https://github.com/nextcloud/tables/pull/3147)
+* [Build\(deps\): Bump systeminformation from 5.31.17 to 5.33.18 (tables#3174)](https://github.com/nextcloud/tables/pull/3174)
+* [Chore\(deps\): update dependency psalm/phar to ^6.20.1 \(main\) (tables#3179)](https://github.com/nextcloud/tables/pull/3179)
+* [Fix\(deps\): update dependency @material\-symbols/svg\-400 to ^0.48.1 \(main\) (tables#3180)](https://github.com/nextcloud/tables/pull/3180)
+* [Fix\(deps\): update dependency @nextcloud/files to ^4.1.1 \(main\) (tables#3182)](https://github.com/nextcloud/tables/pull/3182)
+* [Chore\(deps\): update dependency @rollup/rollup\-linux\-x64\-gnu to ^4.65.0 \(main\) (tables#3183)](https://github.com/nextcloud/tables/pull/3183)
+* [Fix\(deps\): update dependency @nextcloud/vue to ^9.14.0 \(main\) (tables#3184)](https://github.com/nextcloud/tables/pull/3184)
+* [Fix\(deps\): update dependency pinia to v4 \(main\) (tables#3185)](https://github.com/nextcloud/tables/pull/3185)
+* [Fix\(deps\): update dependency vue\-router to v5 \(main\) (tables#3189)](https://github.com/nextcloud/tables/pull/3189)
+* [Update nextcloud/ocp dependency (tables#3193)](https://github.com/nextcloud/tables/pull/3193)
+* [Chore\(deps\): update dependency psalm/phar to ^6.20.6 \(main\) (tables#3235)](https://github.com/nextcloud/tables/pull/3235)
+* [Fix\(deps\): update dependency @material\-symbols/svg\-400 to ^0.48.2 \(main\) (tables#3236)](https://github.com/nextcloud/tables/pull/3236)
+* [Fix\(deps\): update dependency @nextcloud/vue to ^9.14.1 \(main\) (tables#3237)](https://github.com/nextcloud/tables/pull/3237)
+* [Fix\(deps\): update tiptap to ^3.32.2 \(main\) (tables#3238)](https://github.com/nextcloud/tables/pull/3238)
+* [Chore\(deps\): update dependency psalm/phar to ^6.20.9 \(main\) (tables#3269)](https://github.com/nextcloud/tables/pull/3269)
+* [Fix\(deps\): update dependency @material\-symbols/svg\-400 to ^0.48.3 \(main\) (tables#3270)](https://github.com/nextcloud/tables/pull/3270)
+* [Fix\(deps\): update dependency vue to ^3.5.45 \(main\) (tables#3271)](https://github.com/nextcloud/tables/pull/3271)
+* [Chore\(deps\): update dependency @playwright/test to ^1.65.0 \(main\) (tables#3272)](https://github.com/nextcloud/tables/pull/3272)
+* [Chore\(deps\): update dependency psalm/phar to ^6.20.10 \(main\) (tables#3273)](https://github.com/nextcloud/tables/pull/3273)
+* [Chore\(deps\): update dependency @rollup/rollup\-linux\-x64\-gnu to ^4.68.1 \(main\) (tables#3274)](https://github.com/nextcloud/tables/pull/3274)
+* [Chore\(deps\): update dependency eslint to ^10.14.0 \(main\) (tables#3275)](https://github.com/nextcloud/tables/pull/3275)
+* [Fix\(deps\): update tiptap to ^3.33.0 \(main\) (tables#3277)](https://github.com/nextcloud/tables/pull/3277)
+* [Chore\(deps\): update dependency psalm/phar to v7 \(main\) (tables#3278)](https://github.com/nextcloud/tables/pull/3278)
+* [Fix\(deps\): update dependency @nextcloud/dialogs to v8 \(main\) (tables#3279)](https://github.com/nextcloud/tables/pull/3279)
+* [Update nextcloud/ocp dependency (tables#3283)](https://github.com/nextcloud/tables/pull/3283)
+* [Fix npm audit (tables#3284)](https://github.com/nextcloud/tables/pull/3284)
+* [Fix\(deps\): update dependency phpoffice/phpspreadsheet to ^5.11.0 \(main\) (tables#3286)](https://github.com/nextcloud/tables/pull/3286)
+* [Fix\(deps\): revert @nextcloud/dialogs to v7 for NC < 35 support (tables#3306)](https://github.com/nextcloud/tables/pull/3306)
+
+### Other
+* [Ci: Add release relay job (tables#3175)](https://github.com/nextcloud/tables/pull/3175)
+* [Fix\(ci\): hold rector at 2.7 so the Nextcloud rules keep working (tables#3209)](https://github.com/nextcloud/tables/pull/3209)
+* [Deps: ignore unstable updates (tables#3245)](https://github.com/nextcloud/tables/pull/3245)
+* [Add Cell value indices (tables#3249)](https://github.com/nextcloud/tables/pull/3249)
+* [Build\(renovate\): limit updates on stable branches (tables#3252)](https://github.com/nextcloud/tables/pull/3252)
+* [Test\(unit\): adapt activity and notification tests to RowVisibilityService (tables#3254)](https://github.com/nextcloud/tables/pull/3254)
+* [Build\(vendor\): mark phpoffice/wmf as a prod dep (tables#3290)](https://github.com/nextcloud/tables/pull/3290)
+* [Ci: downgrade phpstan for green rector ci (tables#3292)](https://github.com/nextcloud/tables/pull/3292)
+* [Ci: update workflows from templates (tables#3293)](https://github.com/nextcloud/tables/pull/3293)
+* [build\(stable2\): stable2.x branch to be compatible with up to NC 35 (tables#3311)](https://github.com/nextcloud/tables/pull/3311)
+
 ## 2.4.0
 
 ### Added
 
-* [🖼 Add persistent per-view layout modes (table / tiles / gallery) (tables#2407)](https://github.com/nextcloud/tables/pull/2407)
+* [Add persistent per-view layout modes (table / tiles / gallery) (tables#2407)](https://github.com/nextcloud/tables/pull/2407)
 * [Feat: expand audit logging (tables#3125)](https://github.com/nextcloud/tables/pull/3125)
 
 ### Fixed
