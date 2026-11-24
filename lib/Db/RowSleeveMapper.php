@@ -8,6 +8,7 @@
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -29,6 +30,15 @@ class RowSleeveMapper extends QBMapper {
 	}
 
 	/**
+	 * @param RowSleeve $entity
+	 * @return RowSleeve
+	 */
+	public function insert(Entity $entity): Entity {
+		$entity->assignUuid();
+		return parent::insert($entity);
+	}
+
+	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 * @throws Exception
@@ -41,6 +51,32 @@ class RowSleeveMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
+	public function findByUuid(string $uuid): RowSleeve {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->table)
+			->where($qb->expr()->eq('uuid', $qb->createNamedParameter($uuid)));
+		return $this->findEntity($qb);
+	}
+
+	/**
+	 * Keeps an archived UUID unless another row already has it, in which case
+	 * the imported row gets a new one.
+	 *
+	 * @throws Exception
+	 */
+	public function insertImported(RowSleeve $sleeve, ?string $archivedUuid): RowSleeve {
+		// Look the UUID up rather than running into the unique index, because the
+		// import runs inside a transaction that a constraint violation would cancel.
+		if ($archivedUuid !== null) {
+			try {
+				$this->findByUuid($archivedUuid);
+			} catch (DoesNotExistException) {
+				$sleeve->setUuid($archivedUuid);
+			}
+		}
+		return $this->insert($sleeve);
+	}
+
 	/**
 	 * @param int[] $ids
 	 * @return RowSleeve[]
@@ -51,6 +87,7 @@ class RowSleeveMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select(
 			$sleeveAlias . '.id',
+			$sleeveAlias . '.uuid',
 			$sleeveAlias . '.table_id',
 			$sleeveAlias . '.created_by',
 			$sleeveAlias . '.created_at',
