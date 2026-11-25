@@ -60,7 +60,7 @@ async function openApplication(page: Page, contextId: number, path = '') {
 
 async function pickOption(page: Page, selectCy: string, option: string) {
 	await page.locator(`[data-cy="${selectCy}"] input`).click()
-	await page.locator('.vs__dropdown-menu li').filter({ hasText: option }).click()
+	await page.getByRole('option', { name: option, exact: true }).click()
 }
 
 test.describe('Grid pages of an application', () => {
@@ -115,8 +115,8 @@ test.describe('Grid pages of an application', () => {
 		await page.locator('[data-cy="gridPageAddWidget"]').click()
 		await pickOption(page, 'addWidgetType', 'Table or view')
 		await dialog.locator('[data-cy="addWidgetNode"] input').click()
-		await expect(page.locator('.vs__dropdown-menu li').filter({ hasText: 'grid table outside app' })).toHaveCount(0)
-		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'grid table in app' }).click()
+		await expect(page.getByRole('option', { name: 'grid table outside app', exact: true })).toHaveCount(0)
+		await page.getByRole('option', { name: 'grid table in app', exact: true }).click()
 		await dialog.getByRole('textbox', { name: 'Title' }).fill('Tasks')
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 		await expect(dialog).toBeHidden()
