@@ -81,7 +81,7 @@
 					</template>
 
 					<template #action>
-						<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
+						<NcButton @click="filterString = ''">
 							{{ t('tables', 'Clear filter') }}
 						</NcButton>
 					</template>
@@ -243,7 +243,6 @@ export default {
 
 .search-info {
 	text-align: center;
-	justify-content: center;
 
 	.empty-content {
 		margin-top: 3vh;
