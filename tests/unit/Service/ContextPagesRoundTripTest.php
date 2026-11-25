@@ -18,7 +18,6 @@ use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
-use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Db\WidgetMapper;
@@ -37,6 +36,7 @@ use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -51,8 +51,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 	private ContextNodeRelationMapper $nodeRelMapper;
 	private PageMapper $pageMapper;
 	private WidgetService $widgetService;
-	/** @var int[] */
-	private array $contextIds = [];
+	private PermissionsService&MockObject $permissionsService;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -68,13 +67,14 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			new ContextNodeRelationMapper($this->connectionAdapter),
 			$this->connectionAdapter,
 		);
+		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->service = new ContextService(
 			$this->contextMapper,
 			$this->nodeRelMapper,
 			$this->pageMapper,
 			new PageContentMapper($this->connectionAdapter),
 			$this->createMock(LoggerInterface::class),
-			$this->createMock(PermissionsService::class),
+			$this->permissionsService,
 			$this->createMock(IUserManager::class),
 			$this->createMock(AuditLogServiceInterface::class),
 			$this->connectionAdapter,
@@ -101,9 +101,6 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 
 	public function testExportedWidgetsAreImportedWithTheirNode(): void {
 		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
-		$table = new Table();
-		$table->id = 4242;
-		$table->setOwnership(self::OWNER);
 
 		$exported = json_decode(json_encode(array_merge(
 			$this->contextMapper->findById($context->getId(), self::OWNER)->jsonSerialize(),
@@ -111,9 +108,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		)), true);
 		$exported['nodes'][$relation->getId()]['node_id'] = 4242;
 
-		$imported = $this->service->importContext($table, $exported, 4242);
-		$this->assertNotNull($imported);
-		$this->contextIds[] = $imported->getId();
+		$imported = $this->service->importContext($exported, self::OWNER, [4242 => 4242], []);
 
 		$importedContext = $this->contextMapper->findById($imported->getId(), self::OWNER);
 		$importedRelationId = array_key_first($importedContext->getNodes());
@@ -137,9 +132,6 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 
 	public function testAnUnknownIconIsDroppedOnImport(): void {
 		[$context, $relation, $gridPageId] = $this->createContextWithGridPage();
-		$table = new Table();
-		$table->id = 4243;
-		$table->setOwnership(self::OWNER);
 		$exported = json_decode(json_encode(array_merge(
 			$this->contextMapper->findById($context->getId(), self::OWNER)->jsonSerialize(),
 			['pages' => $this->service->getPagesWithWidgets($this->contextMapper->findById($context->getId(), self::OWNER))],
@@ -148,9 +140,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$exported['pages'][$gridPageId]['icon'] = 'no-such-icon';
 		$exported['pages'][$gridPageId]['widgets'][0]['icon'] = '../star';
 
-		$imported = $this->service->importContext($table, $exported, 4243);
-		$this->assertNotNull($imported);
-		$this->contextIds[] = $imported->getId();
+		$imported = $this->service->importContext($exported, self::OWNER, [4243 => 4243], []);
 
 		$importedPages = $this->service->getPagesWithWidgets($this->contextMapper->findById($imported->getId(), self::OWNER));
 		$gridPages = array_values(array_filter($importedPages, static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID));
@@ -185,12 +175,50 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 		$this->assertSame($initial + 2, $this->pageMapper->findVersion($gridPageId));
 	}
 
+	public function testAnApplicationOfTwoTablesAndAViewIsImportedWithEachNodeOnItsOwnTarget(): void {
+		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$node = static fn (int $id, int $type): array => ['id' => $id, 'type' => $type, 'permissions' => Application::PERMISSION_READ];
+		$context = $this->service->create('Two tables', 'tables', '', [
+			$node(4151, Application::NODE_TYPE_TABLE),
+			$node(4152, Application::NODE_TYPE_TABLE),
+			$node(4153, Application::NODE_TYPE_VIEW),
+		], self::OWNER, Application::OWNER_TYPE_USER);
+		$stored = $this->contextMapper->findById($context->getId(), self::OWNER);
+		$relationIds = array_column($stored->getNodes(), 'id', 'node_id');
+		$page = new Page();
+		$page->setContextId($context->getId());
+		$page->setPageType(Page::TYPE_GRID);
+		$page->setSlug('overview');
+		$page = $this->pageMapper->insert($page);
+		foreach ([4151, 4152, 4153] as $y => $nodeId) {
+			$this->widgetService->insertAll($page->getId(), [new WidgetInput(null, 'data', 'Node ' . $nodeId, null, null, 0, $y * 5, 12, 5, [], $relationIds[$nodeId])]);
+		}
+		$stored = $this->contextMapper->findById($context->getId(), self::OWNER);
+		$exported = json_decode(json_encode(array_merge($stored->jsonSerialize(), ['pages' => $this->service->getPagesWithWidgets($stored)])), true);
+
+		$imported = $this->service->importContext($exported, self::OWNER, [4151 => 5151, 4152 => 5152], [4153 => 5153]);
+
+		$importedContext = $this->contextMapper->findById($imported->getId(), self::OWNER);
+		$nodes = array_values($importedContext->getNodes());
+		$this->assertSame(
+			[[5151, Application::NODE_TYPE_TABLE], [5152, Application::NODE_TYPE_TABLE], [5153, Application::NODE_TYPE_VIEW]],
+			array_map(static fn (array $node): array => [$node['node_id'], $node['node_type']], $nodes),
+		);
+		$importedRelationIds = array_column($nodes, 'id', 'node_id');
+		$startPage = array_values(array_filter($importedContext->getPages(), static fn (array $page): bool => $page['page_type'] === Page::TYPE_STARTPAGE))[0];
+		$this->assertEqualsCanonicalizing(array_values($importedRelationIds), array_column($startPage['content'], 'node_rel_id'));
+		$gridPage = array_values(array_filter($this->service->getPagesWithWidgets($importedContext), static fn (array $page): bool => $page['page_type'] === Page::TYPE_GRID))[0];
+		$this->assertSame(
+			['Node 4151' => $importedRelationIds[5151], 'Node 4152' => $importedRelationIds[5152], 'Node 4153' => $importedRelationIds[5153]],
+			array_combine(array_column($gridPage['widgets'], 'title'), array_map(static fn (array $widget): ?int => $widget['source']['nodeRelId'] ?? null, $gridPage['widgets'])),
+		);
+	}
+
 	/**
 	 * @return array{0: Context, 1: ContextNodeRelation, 2: int}
 	 */
 	private function createContextWithGridPage(): array {
 		$context = $this->service->create('Projects', 'tables', '', [], self::OWNER, Application::OWNER_TYPE_USER);
-		$this->contextIds[] = $context->getId();
 		$relation = $this->service->addNodeToContext($context, 4141, Application::NODE_TYPE_TABLE, Application::PERMISSION_READ);
 		$this->service->addNodeRelToPage($relation);
 

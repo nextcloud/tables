@@ -22,6 +22,7 @@ use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
@@ -32,12 +33,14 @@ use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCA\Tables\UserMigration\TablesMigrator;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IUser;
 use OCP\UserMigration\IExportDestination;
 use OCP\UserMigration\IImportSource;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class TablesMigratorTest extends TestCase {
 	private TablesMigrator $migrator;
@@ -344,6 +347,7 @@ class TablesMigratorTest extends TestCase {
 		];
 		$views = [
 			[
+				'id' => 30,
 				'tableId' => 1,
 				'title' => 'Nested settings',
 				'columnSettings' => [['columnId' => 10, 'order' => 0]],
@@ -353,6 +357,7 @@ class TablesMigratorTest extends TestCase {
 				],
 			],
 			[
+				'id' => 31,
 				'tableId' => 1,
 				'title' => 'Without settings',
 				'columnSettings' => [['columnId' => 11, 'order' => 0]],
@@ -405,5 +410,119 @@ class TablesMigratorTest extends TestCase {
 		$this->assertSame(20, $importedViews[0]['columnSettings'][0]['columnId']);
 		$this->assertArrayNotHasKey('viewSettings', $importedViews[1]);
 		$this->assertSame(21, $importedViews[1]['columnSettings'][0]['columnId']);
+	}
+
+	public function testImportImportsEachApplicationOnceWithItsTablesAndViews(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('user1');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$importSource->method('getOriginalUid')->willReturn('user1');
+		$context = ['id' => 7, 'name' => 'Projects', 'owner' => 'user1', 'ownerType' => 0, 'nodes' => [
+			['id' => 1, 'node_id' => 1, 'node_type' => 0],
+			['id' => 2, 'node_id' => 2, 'node_type' => 0],
+			['id' => 3, 'node_id' => 30, 'node_type' => 1],
+		]];
+		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
+			'tables.json' => json_encode([['id' => 1, 'uuid' => 'tasks-uuid', 'title' => 'Tasks'], ['id' => 2, 'uuid' => 'people-uuid', 'title' => 'People']]),
+			'views.json' => json_encode([['id' => 30, 'uuid' => 'team-uuid', 'tableId' => 2, 'title' => 'Team'], ['id' => 31, 'uuid' => 'team-uuid', 'tableId' => 2, 'title' => 'Team again']]),
+			'contexts.json' => json_encode([$context]),
+			default => json_encode([]),
+		});
+		$this->tableMapper->method('getDBConnection')->willReturn($this->createMock(IDBConnection::class));
+		$this->tableService->method('importTable')->willReturnCallback(static function (array $table): Table {
+			$newTable = new Table();
+			$newTable->setId($table['id'] * 100);
+			return $newTable;
+		});
+		$this->viewService->method('importView')->willReturnCallback(static function (int $tableId, array $view): View {
+			$newView = new View();
+			$newView->setId($view['id'] * 10);
+			return $newView;
+		});
+
+		$this->contextService->expects($this->once())
+			->method('importContext')
+			->with($context, 'user1', [1 => 100, 2 => 200], [30 => 300, 31 => 310], ['table' => ['tasks-uuid' => [100], 'people-uuid' => [200]], 'view' => ['team-uuid' => [300, 310]]])
+			->willReturn($this->createMock(Context::class));
+
+		$this->migrator->import($user, $importSource, new NullOutput());
+	}
+
+	public function testImportTakesTheApplicationsTheExportingUserOwnedAndSkipsSharedOnes(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('new-uid');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$importSource->method('getOriginalUid')->willReturn('old-uid');
+		$own = ['id' => 7, 'name' => 'Notes', 'owner' => 'old-uid', 'ownerType' => 0, 'nodes' => [], 'menu' => [['title' => 'Site', 'target' => ['url' => 'https://nextcloud.com']]]];
+		$shared = ['id' => 8, 'name' => 'Team', 'owner' => 'someone-else', 'ownerType' => 0, 'nodes' => []];
+		$groupOwned = ['id' => 9, 'name' => 'Group', 'owner' => 'old-uid', 'ownerType' => 1, 'nodes' => []];
+		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
+			'contexts.json' => json_encode([$own, $shared, $groupOwned]),
+			default => json_encode([]),
+		});
+		$this->tableMapper->method('getDBConnection')->willReturn($this->createMock(IDBConnection::class));
+		$newContext = new Context();
+		$newContext->setId(70);
+		$this->contextService->expects($this->once())
+			->method('importContext')
+			->with($own, 'new-uid', [], [], ['table' => [], 'view' => []])
+			->willReturn($newContext);
+		$output = $this->createMock(OutputInterface::class);
+		$skipped = [];
+		$output->method('writeln')->willReturnCallback(static function (string $line) use (&$skipped): void {
+			if (str_starts_with($line, 'Skipping application')) {
+				$skipped[] = $line;
+			}
+		});
+		$this->shareService->expects($this->never())->method('importShare');
+
+		$this->migrator->import($user, $importSource, $output);
+
+		$this->assertSame(['Skipping application 8: the exported user did not own it.', 'Skipping application 9: the exported user did not own it.'], $skipped);
+	}
+
+	public function testImportPointsTheFilterAndSortOfAViewAtTheImportedColumns(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('user1');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$view = [
+			'id' => 30,
+			'tableId' => 1,
+			'title' => 'Open',
+			'columnSettings' => [],
+			'filter' => [
+				[['columnId' => 10, 'operator' => 'is-equal', 'value' => 'open'], ['columnId' => -1, 'operator' => 'is-equal', 'value' => 3]],
+				[['columnId' => 11, 'operator' => 'contains', 'value' => 'x'], ['columnId' => 99, 'operator' => 'is-empty', 'value' => '']],
+			],
+			'sort' => [['columnId' => 11, 'mode' => 'DESC'], ['columnId' => -2, 'mode' => 'ASC']],
+		];
+		$importSource->method('getFileContents')->willReturnCallback(static fn (string $file): string => match ($file) {
+			'tables.json' => json_encode([['id' => 1, 'title' => 'Tasks']]),
+			'columns.json' => json_encode([['id' => 10, 'tableId' => 1], ['id' => 11, 'tableId' => 1]]),
+			'views.json' => json_encode([$view]),
+			default => json_encode([]),
+		});
+		$this->tableMapper->method('getDBConnection')->willReturn($this->createMock(IDBConnection::class));
+		$newTable = new Table();
+		$newTable->setId(100);
+		$this->tableService->method('importTable')->willReturn($newTable);
+		$this->columnService->method('importColumn')->willReturnOnConsecutiveCalls(20, 21);
+		$imported = null;
+		$this->viewService->expects($this->once())->method('importView')
+			->willReturnCallback(static function (int $tableId, array $view) use (&$imported): View {
+				$imported = $view;
+				$newView = new View();
+				$newView->setId(300);
+				return $newView;
+			});
+
+		$this->migrator->import($user, $importSource, new NullOutput());
+
+		$this->assertSame([[20, -1], [21, 99]], array_map(static fn (array $group): array => array_column($group, 'columnId'), $imported['filter']));
+		$this->assertSame([['columnId' => 21, 'mode' => 'DESC'], ['columnId' => -2, 'mode' => 'ASC']], $imported['sort']);
+		$this->assertSame(['is-equal', 'open'], [$imported['filter'][0][0]['operator'], $imported['filter'][0][0]['value']]);
 	}
 }

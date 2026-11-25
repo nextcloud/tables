@@ -21,7 +21,6 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
-use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
@@ -688,77 +687,63 @@ class ContextService {
 	}
 
 	/**
-	 * Imports an application of a user's data that holds the given table. Its menu keeps
-	 * the links, the items for its pages and the items for the table, found by the uuid
-	 * it was exported with. Items for other tables and for views of the application are
-	 * left out, as each table brings its own copy of the application. Without a menu, or
-	 * when none of its items is kept, the menu gets the item that opens the start page.
+	 * Imports an exported application of a moved user's data as an application of
+	 * `$ownerId`, with each node pointing at the table or view it was imported as. A node
+	 * that was not imported is left out, with a log line, together with the page contents,
+	 * widget sources and menu items showing it. A menu item finds its table or view by the
+	 * uuid it was exported with, among the nodes of this application only. Without a menu,
+	 * or when none of its items is kept, the menu gets the item that opens the start page.
 	 *
-	 * @param Table $table
-	 * @param array $context
-	 * @param int $tableOldId
-	 * @param string|null $tableOldUuid
-	 *
-	 * @return Context|null
+	 * @param array<array-key, mixed> $context exported application
+	 * @param string $ownerId the user the application is imported for
+	 * @param array<int, int> $tableIds ids of the tables this import created, by exported id
+	 * @param array<int, int> $viewIds ids of the views this import created, by exported id
+	 * @param array{table?: array<string, list<int>>, view?: array<string, list<int>>} $uuids ids of the tables and views this import created, by kind and exported uuid
+	 * @return Context the imported application
 	 *
 	 * @throws \Exception
 	 */
-	public function importContext(Table $table, array $context, int $tableOldId, ?string $tableOldUuid = null): ?Context {
-		// checking if any node in $context['nodes'] matches the old table id
-		$hasMatchingNode = false;
-		if (!empty($context['nodes'])) {
-			foreach ($context['nodes'] as $nodeArr) {
-				if (($nodeArr['node_id'] ?? null) == $tableOldId) {
-					$hasMatchingNode = true;
-					break;
-				}
+	public function importContext(array $context, string $ownerId, array $tableIds, array $viewIds, array $uuids = []): Context {
+		$nodes = [];
+		foreach (is_array($context['nodes'] ?? null) ? $context['nodes'] : [] as $nodeArr) {
+			$node = is_array($nodeArr) ? self::importedNode($nodeArr, $tableIds, $viewIds) : null;
+			if ($node === null) {
+				$this->logger->info('Leaving a node out of an imported application: its table or view was not imported.', [
+					'app' => Application::APP_ID,
+					'node' => $nodeArr,
+				]);
+				continue;
 			}
+			$nodes[] = $node;
 		}
 
-		if (!$hasMatchingNode) {
-			return null;
-		}
-
-		return $this->atomic(fn (): Context => $this->insertImportedContext($table, $context, $tableOldId, $tableOldUuid), $this->dbc);
+		return $this->atomic(fn (): Context => $this->insertImportedContext($context, $ownerId, $nodes, $uuids), $this->dbc);
 	}
 
 	/**
-	 * Inserts an exported application with its node relations, pages and page contents,
-	 * and a menu that opens its start page.
+	 * Inserts an exported application with its node relations, pages, page contents and menu,
+	 * or a menu that opens its start page when it brings no item of one.
 	 *
+	 * @param list<array{oldRelId: int|string|null, nodeType: int, nodeId: int, permissions: int}> $nodes
+	 * @param array{table?: array<string, list<int>>, view?: array<string, list<int>>} $uuids
 	 * @throws Exception
 	 */
-	private function insertImportedContext(Table $table, array $context, int $tableOldId, ?string $tableOldUuid): Context {
+	private function insertImportedContext(array $context, string $ownerId, array $nodes, array $uuids): Context {
 		$newContext = new Context();
 		$newContext->setName($context['name'] ?? '');
 		$newContext->setIcon($context['iconName'] ?? '');
 		$newContext->setDescription($context['description'] ?? '');
-		$newContext->setOwnerId($table->getOwnership() ?? '');
-		$newContext->setOwnerType($context['ownerType'] ?? 0);
+		$newContext->setOwnerId($ownerId);
+		$newContext->setOwnerType(Application::OWNER_TYPE_USER);
 		$this->contextMapper->insert($newContext);
 
-		// insert nodes
 		$nodeRelMap = [];
-		// the relations of the table being imported, the only node a widget source can keep
-		$sourceRelMap = [];
-		if (!empty($context['nodes'])) {
-			foreach ($context['nodes'] as $nodeArr) {
-				$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? 0;
-				$contextNodeRel = new ContextNodeRelation();
-				$contextNodeRel->setContextId($newContext->getId());
-				$contextNodeRel->setNodeId($table->getId());
-				$contextNodeRel->setNodeType($nodeType);
-				$contextNodeRel->setPermissions($nodeArr['permissions'] ?? 0);
-				$contextNodeRel = $this->contextNodeRelMapper->insert($contextNodeRel);
-				$oldRelId = self::importedKey($nodeArr['id'] ?? null);
-				if ($oldRelId === null) {
-					continue;
-				}
-				$nodeRelMap[$oldRelId] = $contextNodeRel;
-				$oldNodeId = $nodeArr['node_id'] ?? $nodeArr['nodeId'] ?? null;
-				if (is_numeric($nodeType) && (int)$nodeType === Application::NODE_TYPE_TABLE && is_numeric($oldNodeId) && (int)$oldNodeId === $tableOldId) {
-					$sourceRelMap[$oldRelId] = $contextNodeRel;
-				}
+		$relIdsByNode = [];
+		foreach ($nodes as $node) {
+			$contextNodeRel = $this->addNodeToContext($newContext, $node['nodeId'], $node['nodeType'], $node['permissions']);
+			$relIdsByNode[$node['nodeType']][$node['nodeId']] = $contextNodeRel->getId();
+			if ($node['oldRelId'] !== null) {
+				$nodeRelMap[$node['oldRelId']] = $contextNodeRel;
 			}
 		}
 
@@ -813,7 +798,7 @@ class ContextService {
 			if (count($widgets) > GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
 				$this->logger->warning('Skipping ' . (count($widgets) - GridWidgetTypes::MAX_WIDGETS_PER_PAGE) . ' imported widgets: a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . '.');
 			}
-			$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $sourceRelMap);
+			$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $nodeRelMap);
 		}
 
 		if ($startPageId === null) {
@@ -822,14 +807,11 @@ class ContextService {
 		}
 
 		$menuKept = false;
-		if (is_array($context['menu'] ?? null)) {
-			$tableRelation = reset($sourceRelMap);
+		if (is_array($context['menu'] ?? null) && $context['menu'] !== []) {
 			$this->logSkippedMenuItems($this->menuService->import(
-				$this->contextMapper->findById($newContext->getId()),
+				$newContext,
 				$context['menu'],
-				static fn (string $kind, string $uuid): int => $kind === 'table' && $uuid === $tableOldUuid && $tableRelation !== false
-					? $tableRelation->getId()
-					: throw new BadRequestError('Its ' . $kind . ' ' . $uuid . ' is not the table of this copy: the account import brings one table per copy of the application.'),
+				static fn (string $kind, string $uuid): ?int => self::importedNodeRelId($relIdsByNode, $uuids, $kind, $uuid),
 				static fn (string $slug): ?int => $pageIdsBySlug[$slug] ?? null,
 			));
 			$menuKept = $this->menuItemMapper->findByContextId($newContext->getId()) !== [];
@@ -867,6 +849,55 @@ class ContextService {
 			$this->pageContentMapper->insert($pageContent);
 		}
 		return $page->getId();
+	}
+
+	/**
+	 * An exported node as it is imported, or null when its table or view was not imported.
+	 * Permissions that are not a number become none.
+	 *
+	 * @param array<array-key, mixed> $nodeArr
+	 * @param array<int, int> $tableIds new table ids by exported id
+	 * @param array<int, int> $viewIds new view ids by exported id
+	 * @return array{oldRelId: int|string|null, nodeType: int, nodeId: int, permissions: int}|null
+	 */
+	private static function importedNode(array $nodeArr, array $tableIds, array $viewIds): ?array {
+		$nodeType = $nodeArr['node_type'] ?? $nodeArr['nodeType'] ?? null;
+		$oldNodeId = $nodeArr['node_id'] ?? $nodeArr['nodeId'] ?? null;
+		if (!is_int($oldNodeId)) {
+			return null;
+		}
+		$nodeId = match ($nodeType) {
+			Application::NODE_TYPE_TABLE => $tableIds[$oldNodeId] ?? null,
+			Application::NODE_TYPE_VIEW => $viewIds[$oldNodeId] ?? null,
+			default => null,
+		};
+		if ($nodeId === null) {
+			return null;
+		}
+		return [
+			'oldRelId' => self::importedKey($nodeArr['id'] ?? null),
+			'nodeType' => $nodeType,
+			'nodeId' => $nodeId,
+			'permissions' => is_int($nodeArr['permissions'] ?? null) ? $nodeArr['permissions'] : 0,
+		];
+	}
+
+	/**
+	 * The node relation of an imported application for the table or view a menu item
+	 * names by its exported uuid. Several imported tables or views can share a uuid; the
+	 * one that is a node of the application is taken.
+	 *
+	 * @param array<int, array<int, int>> $relIdsByNode node relation ids by node type and node id
+	 * @param array{table?: array<string, list<int>>, view?: array<string, list<int>>} $uuids
+	 */
+	private static function importedNodeRelId(array $relIdsByNode, array $uuids, string $kind, string $uuid): ?int {
+		$nodeType = $kind === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+		foreach ($uuids[$kind][$uuid] ?? [] as $nodeId) {
+			if (isset($relIdsByNode[$nodeType][$nodeId])) {
+				return $relIdsByNode[$nodeType][$nodeId];
+			}
+		}
+		return null;
 	}
 
 	/**
