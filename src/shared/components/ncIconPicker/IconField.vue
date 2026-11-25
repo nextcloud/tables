@@ -7,7 +7,7 @@
 		<NcIconPicker :close-on-select="true" @select="name => $emit('update:modelValue', name)">
 			<NcButton ref="pickButton"
 				variant="secondary"
-				:aria-label="modelValue ? t('tables', '{label}: {icon}', { label, icon: modelValue }) : t('tables', '{label}: none', { label })"
+				:aria-label="modelValue ? t('tables', '{label}: {icon}', { label, icon: iconLabel(modelValue) }) : t('tables', '{label}: none', { label })"
 				data-cy="iconFieldPick">
 				<template #icon>
 					<NamedIcon :name="modelValue">
@@ -35,6 +35,7 @@ import Close from 'vue-material-design-icons/Close.vue'
 import ImageOffOutline from 'vue-material-design-icons/ImageOffOutline.vue'
 import NcIconPicker from './NcIconPicker.vue'
 import NamedIcon from './NamedIcon.vue'
+import { iconLabel } from './iconNames.js'
 
 /**
  * Picks a named icon for a form, with a button to remove it again.
@@ -64,6 +65,7 @@ export default {
 	},
 	emits: ['update:modelValue'],
 	methods: {
+		iconLabel,
 		/**
 		 * Removes the icon. The remove button goes with it, so focus moves to the button that
 		 * picks an icon.

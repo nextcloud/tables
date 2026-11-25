@@ -164,6 +164,12 @@ describe('AddWidget', () => {
 		cy.get('[data-cy="addWidgetLoading"]').should('not.exist')
 	})
 
+	it('names the icon button by the name of the icon, not by its id', () => {
+		mountDialog({ editingWidget: { key: 'w1', id: 1, type: 'header', title: 'Hi', icon: 'account', description: '', settings: { heading: 'Old' }, nodeRelId: null } })
+
+		cy.get('[data-cy="iconFieldPick"]').should('have.attr', 'aria-label', 'Icon: Person')
+	})
+
 	it('moves focus to the icon button after removing the icon', () => {
 		mountDialog({ editingWidget: { key: 'w1', id: 1, type: 'header', title: 'Hi', icon: 'star', description: '', settings: { heading: 'Old' }, nodeRelId: null } })
 
