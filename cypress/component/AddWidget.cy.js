@@ -46,6 +46,20 @@ describe('AddWidget', () => {
 		cy.get('.vs__dropdown-menu').should('contain.text', 'Table or view').and('not.contain.text', 'Not shown yet')
 	})
 
+	it('names every option by its whole label, so no space shows up in the middle of it', () => {
+		mountDialog()
+
+		cy.get('[data-cy="addWidgetType"] input').click()
+		cy.get('.vs__dropdown-menu li[role="option"]').eq(1).within(() => {
+			cy.get('.name-parts__last').should('not.exist')
+			cy.get('[title="Table or view"]').should('have.text', 'Table or view')
+		})
+		cy.get('.vs__dropdown-menu li[role="option"]').eq(1).click()
+		cy.get('[data-cy="addWidgetType"] .vs__selected [title="Table or view"]').should('have.text', 'Table or view')
+		cy.get('[data-cy="addWidgetNode"] input').click()
+		cy.get('.vs__dropdown-menu li[role="option"] [title="Tasks"]').should('have.text', 'Tasks')
+	})
+
 	it('builds the settings form from the server schema and hands the widget to the parent', () => {
 		mountDialog()
 

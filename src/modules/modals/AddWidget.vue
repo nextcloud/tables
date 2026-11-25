@@ -21,7 +21,14 @@
 					:disabled="editingWidget !== null"
 					label="label"
 					data-cy="addWidgetType"
-					@update:model-value="selectType" />
+					@update:model-value="selectType">
+					<template #option="{ label }">
+						<SelectOptionLabel :label="label" />
+					</template>
+					<template #selected-option="{ label }">
+						<SelectOptionLabel :label="label" />
+					</template>
+				</NcSelect>
 			</div>
 
 			<div class="row space-T">
@@ -57,7 +64,14 @@
 					:placeholder="t('tables', 'Pick a table or view of this application')"
 					label="label"
 					data-cy="addWidgetNode"
-					@update:model-value="option => nodeRelId = option?.id ?? null" />
+					@update:model-value="option => nodeRelId = option?.id ?? null">
+					<template #option="{ label }">
+						<SelectOptionLabel :label="label" />
+					</template>
+					<template #selected-option="{ label }">
+						<SelectOptionLabel :label="label" />
+					</template>
+				</NcSelect>
 				<p v-if="nodeOptions.length === 0" class="add-widget__hint">
 					{{ t('tables', 'Add a table or view to the application first.') }}
 				</p>
@@ -85,6 +99,7 @@ import { translate as t } from '@nextcloud/l10n'
 import { mapActions, mapState } from 'pinia'
 import SchemaForm from '../grid/SchemaForm.vue'
 import IconField from '../../shared/components/ncIconPicker/IconField.vue'
+import SelectOptionLabel from '../../shared/components/SelectOptionLabel.vue'
 import { useTablesStore } from '../../store/store.js'
 import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isBlank, requiredLabel, trimText } from '../grid/gridLayout.js'
 import { getWidgetComponent } from '../grid/widgetRegistry.js'
@@ -105,6 +120,7 @@ export default {
 		NcTextArea,
 		NcTextField,
 		SchemaForm,
+		SelectOptionLabel,
 	},
 	props: {
 		showModal: {

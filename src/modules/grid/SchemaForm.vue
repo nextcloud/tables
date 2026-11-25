@@ -29,13 +29,21 @@
 				:options="property.options"
 				:clearable="false"
 				label="label"
-				@update:model-value="option => set(name, option?.value ?? property.default)" />
+				@update:model-value="option => set(name, option?.value ?? property.default)">
+				<template #option="{ label }">
+					<SelectOptionLabel :label="label" />
+				</template>
+				<template #selected-option="{ label }">
+					<SelectOptionLabel :label="label" />
+				</template>
+			</NcSelect>
 		</div>
 	</div>
 </template>
 
 <script>
 import { NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
+import SelectOptionLabel from '../../shared/components/SelectOptionLabel.vue'
 import { requiredLabel } from './gridLayout.js'
 
 /**
@@ -48,6 +56,7 @@ export default {
 		NcSelect,
 		NcTextArea,
 		NcTextField,
+		SelectOptionLabel,
 	},
 	props: {
 		properties: {
