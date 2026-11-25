@@ -86,6 +86,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->menuItemMapper = new MenuItemMapper($this->connectionAdapter);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->permissionsService->method('canManageNodeById')->willReturn(true);
+		$this->permissionsService->method('canManageTable')->willReturn(true);
 		$this->permissionsService->method('canManageContext')->willReturnCallback(fn (): bool => $this->canManage);
 		$tableMapper = $this->createMock(TableMapper::class);
 		$tableMapper->method('findIdToTitleMap')->willReturnCallback(static fn (array $ids): array => in_array(self::TABLE, $ids, true) ? [self::TABLE => 'Projects'] : []);
@@ -98,6 +99,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$otherTable->id = self::OTHER_TABLE;
 		$otherTable->setUuid(self::OTHER_TABLE_UUID);
 		$tableMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): Table => [self::TABLE_UUID => $table, self::OTHER_TABLE_UUID => $otherTable][$uuid] ?? throw new DoesNotExistException('No table'));
+		$tableMapper->method('findAllByUuids')->willReturnCallback(static fn (array $uuids): array => array_values(array_intersect_key([self::TABLE_UUID => $table, self::OTHER_TABLE_UUID => $otherTable], array_flip($uuids))));
 		$this->viewMapper = $this->createMock(ViewMapper::class);
 		$this->menuService = new MenuService($contextMapper, new ContextNodeRelationMapper($this->connectionAdapter), $this->menuItemMapper, $this->permissionsService, $tableMapper, $this->viewMapper, $this->connectionAdapter);
 
@@ -532,6 +534,7 @@ class MenuServiceTest extends DatabaseTestCase {
 		$view->setUuid(self::VIEW_UUID);
 		$view->setTableId(self::TABLE);
 		$this->viewMapper->method('findByUuid')->willReturnCallback(static fn (string $uuid): View => $uuid === self::VIEW_UUID ? $view : throw new MultipleObjectsReturnedException('Two views'));
+		$this->viewMapper->method('findAllByUuids')->willReturnCallback(static fn (array $uuids): array => in_array(self::VIEW_UUID, $uuids, true) ? [$view] : []);
 		$this->viewMapper->method('findMany')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => $view] : []);
 		$this->viewMapper->method('findIdToTitleMap')->willReturnCallback(static fn (array $ids): array => in_array(self::VIEW, $ids, true) ? [self::VIEW => 'Open projects'] : []);
 		$context = $this->contextService->create('Sales', 'tables', '', [['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE], ['id' => self::VIEW, 'type' => Application::NODE_TYPE_VIEW]], self::OWNER, Application::OWNER_TYPE_USER);

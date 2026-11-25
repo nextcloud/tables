@@ -23,7 +23,9 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Model\WidgetInput;
@@ -41,7 +43,6 @@ use Psr\Log\LoggerInterface;
 final class ContextServiceTest extends TestCase {
 	private ContextService $service;
 	private MockObject $contextMapper;
-	private MockObject $permissionsService;
 	private MockObject $contextNodeRelMapper;
 	private MockObject $pageMapper;
 	private MockObject $pageContentMapper;
@@ -54,6 +55,14 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $dbConnection;
 	private MockObject $menuItemMapper;
 	private MockObject $menuService;
+	private MockObject $logger;
+	private MockObject $permissionsService;
+	private MockObject $tableMapper;
+	private MockObject $viewMapper;
+	/** @var array<class-string, object> services replaced for a test, with the originals */
+	private array $replacedServices = [];
+	/** @var list<mixed> */
+	private array $serviceArguments;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -66,8 +75,10 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
+		$this->tableMapper = $this->createMock(TableMapper::class);
+		$this->viewMapper = $this->createMock(ViewMapper::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 		$this->dbConnection = $this->createMock(IDBConnection::class);
@@ -80,12 +91,12 @@ final class ContextServiceTest extends TestCase {
 		$this->menuItemMapper = $this->createMock(MenuItemMapper::class);
 		$this->menuService = $this->createMock(MenuService::class);
 
-		$this->service = new ContextService(
+		$this->serviceArguments = [
 			$this->contextMapper,
 			$this->contextNodeRelMapper,
 			$this->pageMapper,
 			$this->pageContentMapper,
-			$logger,
+			$this->logger,
 			$this->permissionsService,
 			$this->userManager,
 			$this->auditLogService,
@@ -94,13 +105,45 @@ final class ContextServiceTest extends TestCase {
 			false,
 			$navigationManager,
 			$urlGenerator,
-			$this->createMock(TableMapper::class),
-			$this->createMock(ViewMapper::class),
+			$this->tableMapper,
+			$this->viewMapper,
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
 			$this->menuItemMapper,
 			$this->menuService,
-		);
+		];
+		$this->service = new ContextService(...$this->serviceArguments);
+	}
+
+	protected function tearDown(): void {
+		foreach ($this->replacedServices as $class => $original) {
+			$this->registerService($class, $original);
+		}
+		parent::tearDown();
+	}
+
+	/**
+	 * Lets `\OCP\Server::get()` hand out a mock for the rest of the test.
+	 *
+	 * @template T of object
+	 * @param class-string<T> $class
+	 * @return T&MockObject
+	 */
+	private function replaceService(string $class): MockObject {
+		$this->replacedServices[$class] ??= \OCP\Server::get($class);
+		$mock = $this->createMock($class);
+		$this->registerService($class, $mock);
+		self::assertSame($mock, \OCP\Server::get($class), 'The mock of ' . $class . ' does not reach \\OCP\\Server::get().');
+		return $mock;
+	}
+
+	/**
+	 * Registers a service where `\OCP\Server::get()` resolves it: the app container for
+	 * an app class, the server otherwise.
+	 */
+	private function registerService(string $class, object $service): void {
+		$container = \OC::$server->getAppContainerForService($class) ?? \OC::$server;
+		$container->registerService($class, static fn (): object => $service);
 	}
 
 	public function testTransferLogsPreviousAndNewOwner(): void {
@@ -1130,5 +1173,230 @@ final class ContextServiceTest extends TestCase {
 		], 5);
 
 		self::assertCount(GridWidgetTypes::MAX_WIDGETS_PER_PAGE, $record['widgets']);
+	}
+
+	private const TABLE_UUID = '0195f1a0-0000-7000-8000-000000000001';
+	private const OTHER_TABLE_UUID = '0195f1a0-0000-7000-8000-000000000002';
+	private const VIEW_UUID = '0195f1a0-0000-7000-8000-000000000003';
+	private const NEW_TABLE_UUID = '0195f1a0-0000-7000-8000-000000000004';
+	private const NEW_VIEW_UUID = '0195f1a0-0000-7000-8000-000000000005';
+	private const UNAVAILABLE = 'Node 0 of the scheme is not a table or view that is here and can be managed by the user.';
+
+	/**
+	 * @return array<string, array{mixed, ?int}>
+	 */
+	public static function tablesThatCannotBeModified(): array {
+		return [
+			'not here' => [self::TABLE_UUID, null],
+			'here but cannot be managed' => [self::TABLE_UUID, 5],
+			'a uuid that is not a string' => [123, 5],
+			'a string that is not a uuid' => ['some-uuid', 5],
+		];
+	}
+
+	/**
+	 * @dataProvider tablesThatCannotBeModified
+	 */
+	public function testImportingASchemeRefusesToModifyATableThatIsNotHereOrCannotBeManagedBeforeWriting(mixed $uuid, ?int $tableId): void {
+		$this->tableMapper->method('findAllByUuids')->willReturn($tableId === null ? [] : [$this->table($tableId, self::TABLE_UUID)]);
+		$this->permissionsService->method('canManageTable')->willReturn(false);
+		$tableService = $this->replaceService(TableService::class);
+		$tableService->expects($this->never())->method('importTable');
+		$tableService->expects($this->never())->method('updateTableStructure');
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('The table ' . (is_string($uuid) ? $uuid : 'at position 0') . ' to modify is not here or cannot be managed by the user.');
+		$this->service->importScheme(7, 'Intake', 'star', '', [], [
+			'addTables' => [$this->tableScheme(self::NEW_TABLE_UUID)],
+			'modifyTables' => [$this->tableScheme($uuid)],
+		], 'user-1');
+	}
+
+	public function testImportingASchemeModifiesATableTheUserCanManage(): void {
+		$this->contextMapper->method('findById')->willReturn($this->contextWithNodes([]));
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->tableMapper->method('findAllByUuids')->willReturn([$this->table(5, self::TABLE_UUID), $this->table(6, self::OTHER_TABLE_UUID)]);
+		$this->permissionsService->method('canManageTable')->willReturnCallback(static fn (Table $table): bool => $table->getId() === 5);
+		$tableService = $this->replaceService(TableService::class);
+
+		$tableService->expects($this->once())->method('updateTableStructure')->with(5);
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => [$this->tableScheme(self::TABLE_UUID)]], 'user-1');
+
+		$this->expectException(BadRequestError::class);
+		$this->service->importScheme(7, 'Intake', 'star', '', [], ['addTables' => [], 'modifyTables' => [$this->tableScheme(self::OTHER_TABLE_UUID)]], 'user-1');
+	}
+
+	/**
+	 * @return array<string, array{mixed}>
+	 */
+	public static function nodesThatCannotBeImported(): array {
+		return [
+			'a table that is not here' => [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::OTHER_TABLE_UUID, 'permissions' => 1]],
+			'a table that cannot be managed' => [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]],
+			'a view that cannot be managed' => [['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => self::VIEW_UUID, 'permissions' => 1]],
+			'a uuid that is not a string' => [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => 123, 'permissions' => 1]],
+			'a string that is not a uuid' => [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => 'some-uuid', 'permissions' => 1]],
+			'no uuid' => [['node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]],
+			'a node type that is a string' => [['node_type' => '0', 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]],
+			'not an object' => ['table'],
+		];
+	}
+
+	/**
+	 * @dataProvider nodesThatCannotBeImported
+	 */
+	public function testImportingASchemeRefusesANodeThatCannotBeImportedAlikeBeforeWriting(mixed $node): void {
+		$this->contextMapper->method('findById')->willReturn($this->contextWithNodes([]));
+		$this->tableMapper->method('findAllByUuids')->willReturnCallback(fn (array $uuids): array => in_array(self::TABLE_UUID, $uuids, true) ? [$this->table(5, self::TABLE_UUID)] : []);
+		$this->viewMapper->method('findAllByUuids')->willReturnCallback(fn (array $uuids): array => in_array(self::VIEW_UUID, $uuids, true) ? [$this->view(6, 5, self::VIEW_UUID)] : []);
+		$this->permissionsService->method('canManageTable')->willReturn(false);
+		$this->permissionsService->method('canManageView')->willReturn(false);
+		$tableService = $this->replaceService(TableService::class);
+		$tableService->expects($this->never())->method('importTable');
+		$this->contextNodeRelMapper->expects($this->never())->method('insert');
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage(self::UNAVAILABLE);
+		$this->service->importScheme(7, 'Intake', 'star', '', [$node], ['addTables' => [$this->tableScheme(self::NEW_TABLE_UUID)], 'modifyTables' => []], 'user-1');
+	}
+
+	public function testImportingASchemeLooksUpEachUuidOnceAndCountsTheNodesItRefuses(): void {
+		$this->contextMapper->method('findById')->willReturn($this->contextWithNodes([]));
+		$this->tableMapper->expects($this->once())->method('findAllByUuids')->with([self::TABLE_UUID, self::OTHER_TABLE_UUID])->willReturn([]);
+		$this->viewMapper->expects($this->never())->method('findAllByUuids');
+		$node = static fn (string $uuid): array => ['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => $uuid, 'permissions' => 1];
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage(self::UNAVAILABLE . ' 2 more nodes cannot be imported either.');
+		$this->service->importScheme(7, 'Intake', 'star', '', [$node(self::TABLE_UUID), $node(self::OTHER_TABLE_UUID), $node(self::TABLE_UUID)], ['addTables' => [], 'modifyTables' => []], 'user-1');
+	}
+
+	public function testImportingASchemeRefusesMoreNodesThanItTakesBeforeLookingThemUp(): void {
+		$this->contextMapper->method('findById')->willReturn($this->contextWithNodes([]));
+		$this->tableMapper->expects($this->never())->method('findAllByUuids');
+		$nodes = array_fill(0, ContextService::MAX_SCHEME_NODES + 1, ['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]);
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('A scheme has at most ' . ContextService::MAX_SCHEME_NODES . ' nodes.');
+		$this->service->importScheme(7, 'Intake', 'star', '', $nodes, ['addTables' => [], 'modifyTables' => []], 'user-1');
+	}
+
+	public function testImportingASchemeKeepsACurrentNodeAndAddsManageableAndImportedOnes(): void {
+		// table 3 is a node of the application the user cannot manage, table 4 and view 9 can be managed
+		$before = $this->contextWithNodes([101 => ['id' => 101, 'node_id' => 3, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]]);
+		$after = $this->contextWithNodes([
+			101 => ['id' => 101, 'node_id' => 3, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+			202 => ['id' => 202, 'node_id' => 20, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+			203 => ['id' => 203, 'node_id' => 21, 'node_type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+		]);
+		// the check reads the application without its other pages, the menu import reads it after the update
+		$this->contextMapper->method('findById')->willReturnCallback(static fn (int $id, ?string $userId = null, bool $withAllPages = true): Context => $withAllPages ? $after : $before);
+		$this->tableMapper->method('findAllByUuids')->with([self::TABLE_UUID, self::OTHER_TABLE_UUID])
+			->willReturn([$this->table(3, self::TABLE_UUID), $this->table(4, self::OTHER_TABLE_UUID)]);
+		// two views have the uuid, the user can manage one of them
+		$this->viewMapper->method('findAllByUuids')->with([self::VIEW_UUID])
+			->willReturn([$this->view(8, 3, self::VIEW_UUID), $this->view(9, 4, self::VIEW_UUID)]);
+		$this->permissionsService->method('canManageTable')->willReturnCallback(static fn (Table $table): bool => $table->getId() === 4);
+		$this->permissionsService->method('canManageView')->willReturnCallback(static fn (View $view): bool => $view->getId() === 9);
+		$tableService = $this->replaceService(TableService::class);
+		$tableService->expects($this->once())->method('importTable')->willReturn($this->table(20, self::NEW_TABLE_UUID));
+		$viewService = $this->replaceService(ViewService::class);
+		$viewService->expects($this->once())->method('importView')->with(20)->willReturn($this->view(21, 20, self::NEW_VIEW_UUID));
+		$this->replaceService(ColumnService::class)->method('findAllByTable')->willReturn([]);
+		$nodeRelIdOf = null;
+		$this->menuService->method('import')->willReturnCallback(static function (Context $context, array $menu, \Closure $nodeRelIds) use (&$nodeRelIdOf): array {
+			$nodeRelIdOf = $nodeRelIds;
+			return [];
+		});
+		$node = static fn (int $type, string $uuid): array => ['node_type' => $type, 'node_uuid' => $uuid, 'permissions' => 1];
+		$viewScheme = ['uuid' => self::NEW_VIEW_UUID, 'title' => 'Open', 'emoji' => null, 'columnSettings' => [], 'sort' => [], 'filter' => []];
+
+		$service = $this->getMockBuilder(ContextService::class)->setConstructorArgs($this->serviceArguments)->onlyMethods(['update'])->getMock();
+		$service->expects($this->once())->method('update')
+			->with(7, 'user-1', 'Intake', 'star', '', [
+				['id' => 3, 'type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 4, 'type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 9, 'type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+				['id' => 20, 'type' => Application::NODE_TYPE_TABLE, 'permissions' => 1],
+				['id' => 21, 'type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+			])
+			->willReturn($after);
+
+		$service->importScheme(7, 'Intake', 'star', '', [
+			$node(Application::NODE_TYPE_TABLE, self::TABLE_UUID),
+			$node(Application::NODE_TYPE_TABLE, self::OTHER_TABLE_UUID),
+			$node(Application::NODE_TYPE_VIEW, self::VIEW_UUID),
+			$node(Application::NODE_TYPE_TABLE, self::NEW_TABLE_UUID),
+			$node(Application::NODE_TYPE_VIEW, self::NEW_VIEW_UUID),
+		], ['addTables' => [$this->tableScheme(self::NEW_TABLE_UUID, [$viewScheme])], 'modifyTables' => []], 'user-1', []);
+
+		$this->assertSame([101, 202, 203, null], [
+			$nodeRelIdOf('table', self::TABLE_UUID),
+			$nodeRelIdOf('table', self::NEW_TABLE_UUID),
+			$nodeRelIdOf('view', self::NEW_VIEW_UUID),
+			$nodeRelIdOf('view', self::OTHER_TABLE_UUID),
+		]);
+	}
+
+	public function testUpdateAcceptsWhatTheImportKeepsAsANodeOfTheApplication(): void {
+		// the update itself, not a mock: a current node the user cannot manage is kept
+		$context = $this->contextWithNodes([101 => ['id' => 101, 'node_id' => 3, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]]);
+		$this->contextMapper->method('findById')->willReturn($context);
+		$this->contextMapper->method('update')->willReturnArgument(0);
+		$this->tableMapper->method('findAllByUuids')->willReturn([$this->table(3, self::TABLE_UUID)]);
+		$this->permissionsService->method('canManageTable')->willReturn(false);
+		$this->permissionsService->method('canManageNodeById')->willReturn(false);
+		$this->contextNodeRelMapper->expects($this->never())->method('insert');
+		$this->contextNodeRelMapper->expects($this->never())->method('delete');
+
+		$imported = $this->service->importScheme(7, 'Intake', 'star', '', [
+			['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1],
+		], ['addTables' => [], 'modifyTables' => []], 'user-1')['context'];
+
+		$this->assertSame([101], array_keys($imported->getNodes()));
+	}
+
+	public function testImportingASchemeRefusesAViewUuidThatMatchesSeveralManageableViews(): void {
+		$this->contextMapper->method('findById')->willReturn($this->contextWithNodes([]));
+		$this->viewMapper->method('findAllByUuids')->willReturn([$this->view(8, 3, self::VIEW_UUID), $this->view(9, 4, self::VIEW_UUID)]);
+		$this->permissionsService->method('canManageView')->willReturn(true);
+
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('Node 0 of the scheme matches more than one view here that the user can manage.');
+		$this->service->importScheme(7, 'Intake', 'star', '', [['node_type' => Application::NODE_TYPE_VIEW, 'node_uuid' => self::VIEW_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], 'user-1');
+	}
+
+	/**
+	 * @param array<int, array<string, int>> $nodes
+	 */
+	private function contextWithNodes(array $nodes): Context {
+		$context = new Context();
+		$context->id = 7;
+		$context->setNodes($nodes);
+		$context->setPages([301 => ['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'content' => []]]);
+		return $context;
+	}
+
+	private function table(int $id, string $uuid): Table {
+		$table = new Table();
+		$table->id = $id;
+		$table->setUuid($uuid);
+		return $table;
+	}
+
+	private function view(int $id, int $tableId, string $uuid): View {
+		$view = new View();
+		$view->id = $id;
+		$view->setTableId($tableId);
+		$view->setUuid($uuid);
+		return $view;
+	}
+
+	/**
+	 * @param list<array<string, mixed>> $views
+	 * @return array<string, mixed>
+	 */
+	private function tableScheme(mixed $uuid, array $views = []): array {
+		return ['uuid' => $uuid, 'title' => 'T', 'emoji' => null, 'description' => '', 'archived' => false, 'columns' => [], 'views' => $views, 'columnOrder' => [], 'sort' => []];
 	}
 }
