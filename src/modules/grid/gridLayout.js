@@ -64,14 +64,6 @@ export function isBlank(text) {
 }
 
 /**
- * @param {string} label the label of a form field
- * @return {string} the label marked as required
- */
-export function requiredLabel(label) {
-	return t('tables', '{label} *', { label }, undefined, { escape: false, sanitize: false })
-}
-
-/**
  * @param {Array} widgetTypes the types loaded from the server
  * @param {string} type widget type
  * @return {object|null} that type, or null when the server does not know it

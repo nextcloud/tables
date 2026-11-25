@@ -37,6 +37,17 @@ function mountDialog(props = {}) {
 	})
 }
 
+/**
+ * A required field shows a mark after its label, with an empty alternative text so screen
+ * readers do not read it as part of the name.
+ *
+ * @param {HTMLElement} label the label of the field
+ */
+function expectRequiredMark(label) {
+	const content = window.getComputedStyle(label, '::after').content
+	expect(content).to.match(/^" \*"\s*\/\s*""$/)
+}
+
 describe('AddWidget', () => {
 	it('offers only the widget types it can show', () => {
 		mountDialog()
@@ -111,7 +122,8 @@ describe('AddWidget', () => {
 		mountDialog()
 
 		cy.get('[data-cy="widgetFieldHeading"] input').should('have.attr', 'required')
-		cy.get('[data-cy="widgetFieldHeading"]').should('contain.text', 'Heading *')
+		cy.get('[data-cy="widgetFieldHeading"] label').should('have.text', 'Heading').then(label => expectRequiredMark(label[0]))
+		cy.get('[data-cy="widgetFieldTextAlign"] label').should(label => expect(window.getComputedStyle(label[0], '::after').content).to.equal('none'))
 		cy.get('[data-cy="widgetFieldHeading"]').should('contain.text', 'The large text at the top')
 		cy.get('[data-cy="addWidgetMissing"]').should('contain.text', 'Still needed: Heading')
 		cy.get('[data-cy="widgetFieldHeading"] input').type('\u200B\u200B')
@@ -125,7 +137,7 @@ describe('AddWidget', () => {
 	it('marks the table or view of a data widget as required', () => {
 		mountDialog({ editingWidget: { key: 'w2', id: 2, type: 'data', title: '', settings: {}, nodeRelId: null } })
 
-		cy.get('[data-cy="addWidgetNode"]').should('contain.text', 'Table or view *')
+		cy.get('[data-cy="addWidgetNode"] label').should('have.text', 'Table or view').then(label => expectRequiredMark(label[0]))
 		cy.get('[data-cy="addWidgetNode"] input').should('have.attr', 'required')
 		cy.get('[data-cy="addWidgetMissing"]').should('contain.text', 'Still needed: Table or view')
 	})

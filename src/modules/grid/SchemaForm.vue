@@ -4,18 +4,22 @@
 -->
 <template>
 	<div class="schema-form">
-		<div v-for="(property, name) in properties" :key="name" class="schema-form__field" :data-cy="fieldDataCy(name)">
+		<div v-for="(property, name) in properties"
+			:key="name"
+			class="schema-form__field"
+			:class="{ 'schema-form__field--required': property.required }"
+			:data-cy="fieldDataCy(name)">
 			<NcTextField v-if="property.type === 'string'"
 				class="schema-form__input"
 				:model-value="value(name)"
-				:label="fieldLabel(property)"
+				:label="property.title"
 				:required="!!property.required"
 				:helper-text="property.hint"
 				@update:model-value="text => set(name, text)" />
 			<NcTextArea v-else-if="property.type === 'text'"
 				class="schema-form__input"
 				:model-value="value(name)"
-				:label="fieldLabel(property)"
+				:label="property.title"
 				:required="!!property.required"
 				:helper-text="property.hint"
 				resize="vertical"
@@ -24,7 +28,7 @@
 			<NcSelect v-else-if="property.type === 'enum'"
 				class="schema-form__input"
 				:model-value="enumOption(property, value(name))"
-				:input-label="fieldLabel(property)"
+				:input-label="property.title"
 				:required="!!property.required"
 				:options="property.options"
 				:clearable="false"
@@ -44,7 +48,6 @@
 <script>
 import { NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
 import SelectOptionLabel from '../../shared/components/SelectOptionLabel.vue'
-import { requiredLabel } from './gridLayout.js'
 
 /**
  * Renders the settings form of a widget from the schema of its type, so a
@@ -76,13 +79,6 @@ export default {
 		 */
 		fieldDataCy(name) {
 			return 'widgetField' + name.charAt(0).toUpperCase() + name.slice(1)
-		},
-		/**
-		 * @param {object} property a property of the schema
-		 * @return {string} its title, marked when the property is required
-		 */
-		fieldLabel(property) {
-			return property.required ? requiredLabel(property.title) : property.title
 		},
 		/**
 		 * @param {string} name property name
@@ -119,5 +115,10 @@ export default {
 	&__input {
 		width: 100%;
 	}
+}
+
+// The mark has an empty alternative text, so it stays out of the accessible name
+.schema-form__field--required > .schema-form__input :deep(:is(.input-field__label, .textarea__label))::after {
+	content: ' *' / '';
 }
 </style>

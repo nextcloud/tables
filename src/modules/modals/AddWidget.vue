@@ -56,8 +56,8 @@
 
 			<div v-if="hasSource" class="row space-T">
 				<NcSelect :model-value="nodeOption"
-					class="add-widget__input"
-					:input-label="requiredLabel(t('tables', 'Table or view'))"
+					class="add-widget__input add-widget__input--required"
+					:input-label="t('tables', 'Table or view')"
 					:options="nodeOptions"
 					:clearable="false"
 					:required="true"
@@ -101,7 +101,7 @@ import SchemaForm from '../grid/SchemaForm.vue'
 import IconField from '../../shared/components/ncIconPicker/IconField.vue'
 import SelectOptionLabel from '../../shared/components/SelectOptionLabel.vue'
 import { useTablesStore } from '../../store/store.js'
-import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isBlank, requiredLabel, trimText } from '../grid/gridLayout.js'
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, applicationNodeOptions, defaultSettings, findWidgetType, isBlank, trimText } from '../grid/gridLayout.js'
 import { getWidgetComponent } from '../grid/widgetRegistry.js'
 
 /**
@@ -209,7 +209,6 @@ export default {
 	},
 	methods: {
 		...mapActions(useTablesStore, ['loadWidgetTypes']),
-		requiredLabel,
 		/**
 		 * Fills the form for a new widget, or with the widget being configured. A widget being
 		 * configured keeps its type also when this frontend has no renderer for it yet; a widget of
@@ -282,5 +281,10 @@ export default {
 	.add-widget__loading {
 		margin: calc(4 * var(--default-grid-baseline)) auto;
 	}
+}
+
+// The mark has an empty alternative text, so it stays out of the accessible name
+.add-widget__input--required :deep(.input-field__label)::after {
+	content: ' *' / '';
 }
 </style>
