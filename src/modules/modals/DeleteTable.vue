@@ -51,7 +51,7 @@ export default {
 		async deleteMe() {
 			const tableId = this.table.id
 			let activeTableId
-			if (this.activeElement) activeTableId = this.isView ? this.activeElement.id : this.activeElement.tableId
+			if (this.activeElement) activeTableId = this.isView ? this.activeElement.tableId : this.activeElement.id
 			const res = await this.removeTable({ tableId: this.table.id })
 			if (res) {
 				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
