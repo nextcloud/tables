@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\AppInfo\Application;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -17,8 +18,6 @@ use Psr\Log\LoggerInterface;
 
 /** @template-extends QBMapper<RowSleeve> */
 class RowSleeveMapper extends QBMapper {
-	private const DB_CHUNK_SIZE = 1_000;
-
 	protected string $table = 'tables_row_sleeves';
 
 	public function __construct(
@@ -143,7 +142,7 @@ class RowSleeveMapper extends QBMapper {
 			->groupBy('table_id');
 
 		$counts = [];
-		foreach (array_chunk($tableIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($tableIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('tableIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			try {
 				$result = $qb->executeQuery();

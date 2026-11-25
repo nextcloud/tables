@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\AppInfo\Application;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -17,8 +18,6 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<ContextNodeRelation> */
 class ContextNodeRelationMapper extends QBMapper {
-	private const DB_CHUNK_SIZE = 1_000;
-
 	protected string $table = 'tables_contexts_rel_context_node';
 
 	public function __construct(IDBConnection $db) {
@@ -111,7 +110,7 @@ class ContextNodeRelationMapper extends QBMapper {
 		$this->lockRows($qb);
 
 		$ids = [];
-		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($nodeRelIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
 			while ($row = $result->fetchAssociative()) {
@@ -140,7 +139,7 @@ class ContextNodeRelationMapper extends QBMapper {
 			->where($qb->expr()->in('id', $qb->createParameter('ids')))
 			->orderBy('id');
 		$this->lockRows($qb);
-		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($nodeRelIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeQuery()->closeCursor();
 		}

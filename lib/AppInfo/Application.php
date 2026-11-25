@@ -79,6 +79,13 @@ class Application extends App implements IBootstrap {
 	public const PERMISSION_OWNER = 32;
 	public const PERMISSION_ALL = 31;
 
+	/**
+	 * Maximum number of items in a single IN predicate.
+	 *
+	 * Mirrors IQueryBuilder::MAX_IN_PARAMETERS; use that instead once Nextcloud 35 is the minimum supported version.
+	 */
+	public const MAX_IN_PARAMETERS = 999;
+
 	public function __construct() {
 		parent::__construct(self::APP_ID);
 	}
