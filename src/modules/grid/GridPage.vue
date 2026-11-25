@@ -49,7 +49,7 @@
 						</template>
 						{{ t('tables', 'Edit page') }}
 					</NcButton>
-					<NcActions :aria-label="t('tables', 'Page actions')" data-cy="gridPageActions">
+					<NcActions ref="pageActions" :aria-label="t('tables', 'Page actions')" data-cy="gridPageActions">
 						<NcActionButton :close-after-click="true" data-cy="gridPageEditDetails" @click="$emit('edit-details', page)">
 							<template #icon>
 								<TextBoxEditOutline :size="20" />
@@ -271,6 +271,13 @@ export default {
 		 */
 		focusLater(find) {
 			this.$nextTick(() => setTimeout(() => find()?.focus()))
+		},
+		/**
+		 * Focuses the button of the page actions once a dialog opened from that menu closes,
+		 * since the menu item that opened it is gone by then.
+		 */
+		focusPageActions() {
+			this.focusLater(() => this.$refs.pageActions?.$el?.querySelector('button'))
 		},
 		/**
 		 * @param {string} key the key of a widget on the grid

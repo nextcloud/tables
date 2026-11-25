@@ -30,6 +30,7 @@
 				:aria-labelledby="selectedPageId !== null ? pageTabId(selectedPageId) : undefined">
 				<template v-if="activePageId !== null">
 					<GridPage v-if="activePage"
+						ref="gridPage"
 						:key="activePage.id"
 						:context="activeContext"
 						:page="activePage"
@@ -427,6 +428,9 @@ export default {
 			this.pageFormOpen = true
 		},
 		closePageForm() {
+			if (this.pageBeingEdited) {
+				this.$refs.gridPage?.focusPageActions()
+			}
 			this.pageFormOpen = false
 			this.pageBeingEdited = null
 		},
