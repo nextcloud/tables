@@ -11,6 +11,8 @@ OC.L10N.register(
     "Missing a temporary folder" : "Müvəqqəti qovluq çatışmır",
     "Could not write file to disk" : "Faylı diskə yazmaq mümkün olmadı",
     "A PHP extension stopped the file upload" : "PHP uzantısı faylın yüklənməsini dayandırdı",
+    "Neutral" : "Neytral",
+    "Warning" : "Xəbərdarlıq",
     "Error" : "Səhv",
     "Date" : "Date",
     "Comments" : "Şərhlər",

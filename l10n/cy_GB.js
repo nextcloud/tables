@@ -10,6 +10,8 @@ OC.L10N.register(
     "No file was uploaded" : "Ni lwythwyd ffeil i fyny",
     "Missing a temporary folder" : "Plygell dros dro yn eisiau",
     "Could not write file to disk" : "Methwyd ysgrifennu i'r ddisg",
+    "Neutral" : "Niwtral",
+    "Warning" : "Rhybudd",
     "Error" : "Gwall",
     "Date" : "Date",
     "Name" : "Enw",

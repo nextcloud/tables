@@ -4,6 +4,8 @@ OC.L10N.register(
     "No" : "Nann",
     "The file was uploaded" : "Kaset eo bet ar restr",
     "No file was uploaded" : "N'eus restr ebet a zo bet kaset",
+    "Color" : "Liv",
+    "Warning" : "Kemenadenn",
     "Error" : "Fazi",
     "Text" : "Testenn",
     "Date" : "Deiz",
