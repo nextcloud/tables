@@ -452,6 +452,7 @@ export const useTablesStore = defineStore('store', {
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert application.'))
+				this.setLoading({ key: 'contexts', value: false })
 				return false
 			}
 			const contexts = this.contexts
@@ -463,21 +464,15 @@ export const useTablesStore = defineStore('store', {
 		},
 
 		async updateContext({ id, data, previousReceivers, receivers, displayMode }) {
-			let res = null
 			try {
-				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
+				await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
 				await this.shareContext({ id, previousReceivers, receivers, displayMode })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update application.'))
 				return false
 			}
 
-			const context = res.data.ocs.data
-			const index = this.contexts.findIndex(c => c.id === context.id)
-			if (index !== -1) {
-				this.contexts[index] = context
-			}
-
+			await this.loadContext({ id }).catch(() => {})
 			return true
 		},
 
@@ -529,14 +524,17 @@ export const useTablesStore = defineStore('store', {
 
 		async getContextsTablesAndViews() {
 			for (const context of this.contexts) {
-				for (const node of Object.values(context?.nodes)) {
-					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
-						await this.loadContextTable({ id: node.node_id })
-					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
-						await this.loadContextView({ id: node.node_id })
+				for (const node of Object.values(context?.nodes ?? {})) {
+					try {
+						if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
+							await this.loadContextTable({ id: node.node_id })
+						} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
+							await this.loadContextView({ id: node.node_id })
+						}
+					} catch (e) {
+						console.error('Could not load resource ' + node.node_id + ' of application ' + context.id, e)
 					}
 				}
-
 			}
 		},
 
