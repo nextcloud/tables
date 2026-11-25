@@ -363,8 +363,9 @@ export const useDataStore = defineStore('data', {
 				this.rows[stateId] = updatedRows
 				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 				this.syncElementRowsCount({ isView, elementId })
-				const parentTableId = row?.tableId ?? (isView ? useTablesStore().getView(elementId)?.tableId : elementId)
-				this.refreshTableViewCounts(parentTableId)
+				if (!isView) {
+					this.refreshTableViewCounts(elementId)
+				}
 			}
 
 			return true
@@ -411,7 +412,9 @@ export const useDataStore = defineStore('data', {
 				if (viewId && parentTableId) {
 					tablesStore.addToTableRowsCount({ tableId: parentTableId, delta: 1 })
 				}
-				this.refreshTableViewCounts(parentTableId)
+				if (!viewId) {
+					this.refreshTableViewCounts(tableId)
+				}
 			}
 
 			return true
@@ -462,7 +465,9 @@ export const useDataStore = defineStore('data', {
 				if (viewId && parentTableId) {
 					tablesStore.addToTableRowsCount({ tableId: parentTableId, delta: -1 })
 				}
-				this.refreshTableViewCounts(parentTableId)
+				if (!isView) {
+					this.refreshTableViewCounts(elementId)
+				}
 			}
 			return true
 		},
