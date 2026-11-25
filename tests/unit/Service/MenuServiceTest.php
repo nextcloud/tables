@@ -418,9 +418,9 @@ class MenuServiceTest extends DatabaseTestCase {
 		$imported = $this->contextService->create('Imported', 'tables', '', [['id' => self::TABLE, 'type' => Application::NODE_TYPE_TABLE]], self::OWNER, Application::OWNER_TYPE_USER);
 		$this->contextIds[] = $imported->getId();
 		$importedContext = $this->contextService->findById($imported->getId(), self::OWNER);
-		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
-		$preview = $this->menuService->previewSchemeImport($importedContext, $exported, $this->contextService->getPagesWithWidgets($this->contextService->findById($contextId, self::OWNER)), $nodes);
-		$this->contextService->importScheme($imported->getId(), 'Imported', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
+		$importedStartPageId = (int)array_key_first(array_filter($importedContext->getPages(), static fn (array $page): bool => $page['page_type'] === Page::TYPE_STARTPAGE));
+		$preview = $this->menuService->previewSchemeImport($importedContext, $exported, ['dashboard' => $importedStartPageId], [Application::NODE_TYPE_TABLE . ':' . self::TABLE_UUID => self::TABLE]);
+		$this->contextService->importScheme($imported->getId(), 'Imported', 'tables', '', [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]], ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
 
 		$shape = static fn (array $items): array => array_map(static fn (array $item): array => [$item['displayTitle'], $item['parent'], $item['target'], $item['icon']], $items);
 		$expected = $shape($exported);
@@ -560,19 +560,19 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->menuService->create($contextId, null, null, null, MenuTarget::fromArray(['pageId' => $pageId]), self::OWNER);
 		$context = $this->contextService->findById($contextId, self::OWNER);
 		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
-		$scheme = ['pages' => $this->contextService->getPagesWithWidgets($context), 'menu' => $this->menuService->export($context)];
+		$scheme = ['menu' => $this->menuService->export($context)];
 		foreach ($this->menu($contextId) as $item) {
 			$this->menuService->delete($contextId, $item['id'], self::OWNER);
 		}
 
-		$preview = $this->menuService->previewSchemeImport($this->contextService->findById($contextId, self::OWNER), $scheme['menu'], $scheme['pages'], $nodes);
+		$preview = $this->menuService->previewSchemeImport($this->contextService->findById($contextId, self::OWNER), $scheme['menu'], ['dashboard' => $startPageId, $context->getPages()[$pageId]['slug'] => $pageId], [Application::NODE_TYPE_TABLE . ':' . self::TABLE_UUID => self::TABLE]);
 		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
 
 		$this->assertSame([[], ['pageId' => $startPageId], ['nodeRelId' => $nodeRelId], ['pageId' => $pageId]], [$preview['skipped'], ...array_column($this->menu($contextId), 'target')]);
 	}
 
 	public function testAPreviewedItemStaysInItsGroupWhenAnItemBeforeItIsSkipped(): void {
-		[$contextId] = $this->createApplication();
+		[$contextId, $startPageId] = $this->createApplication();
 		$context = $this->contextService->findById($contextId, self::OWNER);
 		$nodes = [['node_type' => Application::NODE_TYPE_TABLE, 'node_uuid' => self::TABLE_UUID, 'permissions' => 1]];
 		$menu = [
@@ -584,7 +584,7 @@ class MenuServiceTest extends DatabaseTestCase {
 			['title' => 'Site', 'parent' => 3, 'target' => ['url' => 'https://nextcloud.com']],
 		];
 
-		$preview = $this->menuService->previewSchemeImport($context, $menu, $this->contextService->getPagesWithWidgets($context), $nodes);
+		$preview = $this->menuService->previewSchemeImport($context, $menu, ['dashboard' => $startPageId], [Application::NODE_TYPE_TABLE . ':' . self::TABLE_UUID => self::TABLE]);
 		$this->contextService->importScheme($contextId, 'Sales', 'tables', '', $nodes, ['addTables' => [], 'modifyTables' => []], self::OWNER, $preview['to']);
 
 		$imported = $this->menu($contextId);
@@ -611,33 +611,6 @@ class MenuServiceTest extends DatabaseTestCase {
 		$this->assertCount(1, $gridPages);
 		$this->assertNotSame($context->getPages()[$pageId]['slug'], reset($gridPages)['slug']);
 		$this->assertSame(['pageId' => (int)array_key_first($gridPages)], $this->menu($moved->getId())[1]['target']);
-	}
-
-	public function testSchemePagesAreMatchedByStartPageAndSlug(): void {
-		[$contextId, $startPageId] = $this->createApplication();
-		$pageId = $this->pageService->createGridPage($contextId, 'Sales', 'sales', null, null)['id'];
-		$context = $this->contextService->findById($contextId, self::OWNER);
-		$name = $context->getPages()[$pageId]['slug'];
-
-		$this->assertSame(['home' => $startPageId, $name => $pageId], $this->menuService->schemePageIds($context, [
-			['id' => 11, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home'],
-			['id' => 12, 'page_type' => Page::TYPE_GRID, 'slug' => $name],
-			['id' => 13, 'page_type' => Page::TYPE_GRID, 'slug' => 'somewhere_else'],
-			['id' => 14, 'page_type' => Page::TYPE_GRID, 'slug' => $context->getPages()[$startPageId]['slug']],
-			['page_type' => Page::TYPE_GRID, 'slug' => $name],
-			'not a page',
-		]));
-	}
-
-	public function testAnAutomaticSlugOfASchemePageStandsForNoPage(): void {
-		[$contextId, , $pageId] = $this->createApplication();
-		$context = $this->contextService->findById($contextId, self::OWNER);
-		$automatic = $context->getPages()[$pageId]['slug'];
-		$this->assertTrue(Page::isDefaultSlug($automatic));
-
-		$this->assertSame([], $this->menuService->schemePageIds($context, [
-			['id' => 12, 'page_type' => Page::TYPE_GRID, 'slug' => $automatic],
-		]));
 	}
 
 	public static function unusableItems(): array {
