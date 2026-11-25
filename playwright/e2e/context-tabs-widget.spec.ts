@@ -84,7 +84,7 @@ test.describe('Tabs widget', () => {
 		await page.locator('[data-cy="gridPageEdit"]').click({ timeout: 30000 })
 		await page.locator('[data-cy="gridPageAddWidget"]').click()
 		await page.locator('[data-cy="addWidgetType"] input').click()
-		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'Tabs' }).click()
+		await page.getByRole('option', { name: 'Tabs', exact: true }).click()
 		await page.locator('[data-cy="tabsEditorAdd"]').click()
 		await page.locator('[data-cy="tabsEditorTitle"]').nth(0).fill('First')
 		await page.locator('[data-cy="tabsEditorAdd"]').click()
@@ -95,8 +95,8 @@ test.describe('Tabs widget', () => {
 		await page.getByRole('tabpanel', { name: 'Second' }).locator('[data-cy="tabsWidgetAdd"]').click()
 		await page.locator('[data-cy="addWidgetType"] input').click()
 		// Tabs go one level deep
-		await expect(page.locator('.vs__dropdown-menu li').filter({ hasText: 'Tabs' })).toHaveCount(0)
-		await page.locator('.vs__dropdown-menu li').filter({ hasText: 'Text' }).click()
+		await expect(page.getByRole('option', { name: 'Tabs', exact: true })).toHaveCount(0)
+		await page.getByRole('option', { name: 'Text', exact: true }).click()
 		await page.locator('[data-cy="widgetFieldText"] textarea').fill('Only in the second tab')
 		await page.locator('[data-cy="addWidgetSubmit"]').click()
 
