@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\Entity;
@@ -19,8 +20,6 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Table> */
 class TableMapper extends QBMapper {
-	private const DB_CHUNK_SIZE = 1_000;
-
 	protected string $table = 'tables_tables';
 	protected CappedMemoryCache $cache;
 	public function __construct(
@@ -88,7 +87,7 @@ class TableMapper extends QBMapper {
 		}
 
 		$missing = array_keys($missing);
-		foreach (array_chunk($missing, 1000) as $missingChunk) {
+		foreach (array_chunk($missing, Application::MAX_IN_PARAMETERS) as $missingChunk) {
 			$qb = $this->db->getQueryBuilder();
 			$qb->select('*')
 				->from($this->table)
@@ -239,7 +238,7 @@ class TableMapper extends QBMapper {
 			->from($this->table)
 			->where($qb->expr()->in('id', $qb->createParameter('ids')));
 		$map = [];
-		foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($ids, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
 			foreach ($result->fetchAllAssociative() as $row) {

@@ -9,6 +9,7 @@ namespace OCA\Tables\Db;
 
 use DateTime;
 use DateTimeImmutable;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -30,8 +31,6 @@ use Throwable;
 
 class Row2Mapper {
 	use TTransactional;
-
-	private const DB_CHUNK_SIZE = 1_000;
 
 	public function __construct(
 		private ?string $userId,
@@ -200,7 +199,7 @@ class Row2Mapper {
 		}
 
 		$allRows = [];
-		foreach (array_chunk($rowIds, self::DB_CHUNK_SIZE) as $rowIdChunk) {
+		foreach (array_chunk($rowIds, Application::MAX_IN_PARAMETERS) as $rowIdChunk) {
 			$allRows[] = $this->getRowsChunk($rowIdChunk, $columnIds);
 		}
 		return array_merge(...$allRows);

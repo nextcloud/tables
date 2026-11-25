@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\AppInfo\Application;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -16,8 +17,6 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<ContextNavigation> */
 class ContextNavigationMapper extends QBMapper {
-	private const DB_CHUNK_SIZE = 1_000;
-
 	protected string $table = 'tables_contexts_navigation';
 
 	public function __construct(IDBConnection $db) {
@@ -42,7 +41,7 @@ class ContextNavigationMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
 			->where($qb->expr()->in('share_id', $qb->createParameter('shareIds')));
-		foreach (array_chunk($shareIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($shareIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('shareIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeStatement();
 		}

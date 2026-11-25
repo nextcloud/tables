@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -101,7 +102,7 @@ class ShareMapper extends QBMapper {
 
 		$chunks = [];
 		// deduct extra parameters (sender, node type, receiver type)
-		foreach (array_chunk($receivers, 1000 - 3) as $receiversChunk) {
+		foreach (array_chunk($receivers, Application::MAX_IN_PARAMETERS - 3) as $receiversChunk) {
 			$qb = $this->db->getQueryBuilder();
 			$qb->select('*')
 				->from($this->table)

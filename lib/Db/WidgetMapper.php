@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\AppInfo\Application;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -16,8 +17,6 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Widget> */
 class WidgetMapper extends QBMapper {
-	private const DB_CHUNK_SIZE = 1_000;
-
 	protected string $table = 'tables_contexts_widget';
 
 	public function __construct(IDBConnection $db) {
@@ -48,7 +47,7 @@ class WidgetMapper extends QBMapper {
 		}
 
 		$widgets = [];
-		foreach (array_chunk($pageIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($pageIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('pageIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			array_push($widgets, ...$this->findEntities($qb));
 		}
@@ -85,7 +84,7 @@ class WidgetMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
 			->where($qb->expr()->in('id', $qb->createParameter('ids')));
-		foreach (array_chunk($widgetIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($widgetIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeStatement();
 		}
@@ -105,7 +104,7 @@ class WidgetMapper extends QBMapper {
 		$qb->update($this->table)
 			->set('node_rel_id', $qb->createNamedParameter(null, IQueryBuilder::PARAM_NULL))
 			->where($qb->expr()->in('node_rel_id', $qb->createParameter('nodeRelIds')));
-		foreach (array_chunk($nodeRelIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($nodeRelIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('nodeRelIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$qb->executeStatement();
 		}

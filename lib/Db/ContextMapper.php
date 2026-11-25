@@ -19,8 +19,6 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Context> */
 class ContextMapper extends QBMapper {
-	private const DB_CHUNK_SIZE = 1_000;
-
 	protected string $table = 'tables_contexts_context';
 
 	public function __construct(
@@ -310,7 +308,7 @@ class ContextMapper extends QBMapper {
 			->from($this->table)
 			->where($qb->expr()->in('id', $qb->createParameter('ids')));
 		$map = [];
-		foreach (array_chunk($ids, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($ids, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('ids', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
 			foreach ($result->fetchAllAssociative() as $row) {
@@ -365,7 +363,7 @@ class ContextMapper extends QBMapper {
 			->where($qb->expr()->in('context_id', $qb->createParameter('contextIds')))
 			->andWhere($qb->expr()->neq('page_type', $qb->createNamedParameter(Page::TYPE_STARTPAGE)))
 			->orderBy('id');
-		foreach (array_chunk($contextIds, self::DB_CHUNK_SIZE) as $chunk) {
+		foreach (array_chunk($contextIds, Application::MAX_IN_PARAMETERS) as $chunk) {
 			$qb->setParameter('contextIds', $chunk, IQueryBuilder::PARAM_INT_ARRAY);
 			$result = $qb->executeQuery();
 			while ($page = $result->fetchAssociative()) {
