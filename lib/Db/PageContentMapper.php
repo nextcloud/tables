@@ -31,7 +31,7 @@ class PageContentMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageContentId)));
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageContentId, IQueryBuilder::PARAM_INT)));
 
 		return $this->mapRowToEntity($this->findOneQuery($qb));
 	}
@@ -44,8 +44,8 @@ class PageContentMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->andX(
-				$qb->expr()->eq('page_id', $qb->createNamedParameter($pageId)),
-				$qb->expr()->eq('node_rel_id', $qb->createNamedParameter($nodeRelId)),
+				$qb->expr()->eq('page_id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)),
+				$qb->expr()->eq('node_rel_id', $qb->createNamedParameter($nodeRelId, IQueryBuilder::PARAM_INT)),
 			));
 
 		$result = $qb->executeQuery();
@@ -58,7 +58,7 @@ class PageContentMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->andX(
-				$qb->expr()->eq('node_rel_id', $qb->createNamedParameter($nodeRelId)),
+				$qb->expr()->eq('node_rel_id', $qb->createNamedParameter($nodeRelId, IQueryBuilder::PARAM_INT)),
 			));
 
 		return $this->findEntities($qb);

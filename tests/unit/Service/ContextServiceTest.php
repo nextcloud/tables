@@ -54,6 +54,7 @@ final class ContextServiceTest extends TestCase {
 	private MockObject $dbConnection;
 	private MockObject $menuItemMapper;
 	private MockObject $menuService;
+	private MockObject $logger;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -66,7 +67,7 @@ final class ContextServiceTest extends TestCase {
 		$this->contextNodeRelMapper = $this->createMock(ContextNodeRelationMapper::class);
 		$this->pageMapper = $this->createMock(PageMapper::class);
 		$this->pageContentMapper = $this->createMock(PageContentMapper::class);
-		$logger = $this->createMock(LoggerInterface::class);
+		$this->logger = $logger = $this->createMock(LoggerInterface::class);
 		$this->permissionsService = $this->createMock(PermissionsService::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
@@ -1111,6 +1112,34 @@ final class ContextServiceTest extends TestCase {
 		self::assertSame(['overview', null], [$record['pages'][0]->getTitle(), $record['pages'][0]->getDescription()], 'an unusable title falls back to the slug');
 		self::assertCount(1, $record['widgets']);
 		self::assertSame([20, 502], [$record['widgets'][0][3]['gridY'], $record['widgets'][0][5]]);
+	}
+
+	public function testAnImportedNodeOfAnUnknownTypeIsSkipped(): void {
+		$record = $this->recordImport();
+		$this->logger->expects($this->exactly(2))->method('warning')->with($this->stringContains('node type'));
+
+		$this->service->importContext($this->importTable(), [
+			'name' => 'Projects',
+			'nodes' => [
+				['id' => 101, 'node_id' => 4, 'node_type' => 'view', 'permissions' => 1],
+				['id' => 102, 'node_id' => 4, 'node_type' => ['x'], 'permissions' => 1],
+				['id' => 103, 'node_id' => 4, 'node_type' => Application::NODE_TYPE_VIEW, 'permissions' => 1],
+			],
+			'pages' => [['id' => 301, 'page_type' => Page::TYPE_STARTPAGE, 'slug' => 'home', 'content' => []]],
+		], 4);
+
+		self::assertSame([Application::NODE_TYPE_VIEW], array_map(static fn (ContextNodeRelation $relation): int => $relation->getNodeType(), $record['relations']));
+	}
+
+	public function testAnImportedApplicationNotOwnedByAUserIsSkipped(): void {
+		$this->contextMapper->expects($this->never())->method('insert');
+		$this->logger->expects($this->once())->method('warning')->with($this->stringContains('owner type'));
+
+		self::assertNull($this->service->importContext($this->importTable(), [
+			'name' => 'Projects',
+			'ownerType' => 'user',
+			'nodes' => [['id' => 101, 'node_id' => 4, 'node_type' => Application::NODE_TYPE_TABLE, 'permissions' => 1]],
+		], 4));
 	}
 
 	public function testAnImportedPageKeepsAtMostTheMaximumNumberOfWidgets(): void {

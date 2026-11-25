@@ -57,8 +57,8 @@ class ContextNodeRelationMapper extends QBMapper {
 	public function getRelIdsForNode(int $nodeId, int $nodeType): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')->from($this->table)
-			->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId)))
-			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType)));
+			->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_INT)));
 		$result = $qb->executeQuery();
 		$nodeRelIds = [];
 		while ($row = $result->fetchAssociative()) {
@@ -83,7 +83,7 @@ class ContextNodeRelationMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($nodeRelId)));
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($nodeRelId, IQueryBuilder::PARAM_INT)));
 
 		$row = $this->findOneQuery($qb);
 		return $this->mapRowToEntity($row);

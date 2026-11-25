@@ -45,7 +45,7 @@ class Context extends EntitySuper implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
-		$this->addType('owner_type', 'integer');
+		$this->addType('ownerType', 'integer');
 	}
 
 	public function jsonSerialize(): array {
