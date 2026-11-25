@@ -136,16 +136,14 @@
 				</template>
 			</NcActionButton>
 		</template>
-		<ul>
-			<NavigationViewItem v-for="(view, index) in orderedViews" :key="'view' + view.id" :view="view"
-				:show-share-sender="false"
-				:draggable="canReorderViews"
-				:class="{ 'view-drop-target': dragOverIndex === index }"
-				@dragstart="onViewDragStart(index)"
-				@dragover.prevent="onViewDragOver(index)"
-				@drop.prevent="onViewDrop"
-				@dragend="onViewDragEnd" />
-		</ul>
+		<NavigationViewItem v-for="(view, index) in orderedViews" :key="'view' + view.id" :view="view"
+			:show-share-sender="false"
+			:draggable="canReorderViews"
+			:class="{ 'view-drop-target': dragOverIndex === index }"
+			@dragstart="onViewDragStart(index)"
+			@dragover.prevent="onViewDragOver(index)"
+			@drop.prevent="onViewDrop"
+			@dragend="onViewDragEnd" />
 	</NcAppNavigationItem>
 </template>
 
