@@ -157,6 +157,7 @@ export default {
 			this.icon.svg = await this.getContextIcon(iconName)
 		},
 		actionCancel() {
+			emit('tables:context:edit:closed', this.contextId)
 			this.reset()
 			this.$emit('close')
 		},

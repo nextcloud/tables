@@ -73,6 +73,7 @@ import { useTablesStore } from '../../../store/store.js'
 import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
 import Import from 'vue-material-design-icons/Import.vue'
+import { useEventBusSubscriptions } from '../../../shared/composables/useEventBusSubscriptions.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -99,6 +100,10 @@ export default {
 		},
 	},
 
+	setup() {
+		return { ...useEventBusSubscriptions() }
+	},
+
 	data() {
 		return {
 			icon: null,
@@ -118,8 +123,24 @@ export default {
 		},
 	},
 
+	mounted() {
+		this.subscribeToEventBus('tables:context:edit:closed', this.focusActions)
+	},
+
 	methods: {
 		...mapActions(useTablesStore, ['updateDisplayMode']),
+		/**
+		 * Focuses the actions button of this application once its edit dialog closes, since the
+		 * menu item that opened the dialog is gone by then.
+		 *
+		 * @param {number} contextId the application whose dialog closed
+		 */
+		focusActions(contextId) {
+			if (contextId !== this.context?.id) {
+				return
+			}
+			this.$nextTick(() => setTimeout(() => this.$el?.querySelector?.('.action-item__menutoggle')?.focus()))
+		},
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
