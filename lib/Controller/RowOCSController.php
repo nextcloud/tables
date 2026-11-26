@@ -121,7 +121,7 @@ class RowOCSController extends AOCSController {
 	 * 500: Internal error
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(permission: Application::PERMISSION_UPDATE, typeParam: 'nodeCollection')]
+	#[RequirePermission(permission: Application::PERMISSION_UPDATE, typeParam: 'nodeCollection', rowIdParam: 'rowId')]
 	#[ApiRoute(verb: 'PUT', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
 	public function updateRow(string $nodeCollection, int $nodeId, int $rowId, mixed $data): DataResponse {
 		if (is_string($data)) {
@@ -172,7 +172,7 @@ class RowOCSController extends AOCSController {
 	 * 500: Internal error
 	 */
 	#[NoAdminRequired]
-	#[RequirePermission(permission: Application::PERMISSION_DELETE, typeParam: 'nodeCollection')]
+	#[RequirePermission(permission: Application::PERMISSION_DELETE, typeParam: 'nodeCollection', rowIdParam: 'rowId')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/2/{nodeCollection}/{nodeId}/rows/{rowId}', requirements: ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)'])]
 	public function deleteRow(string $nodeCollection, int $nodeId, int $rowId): DataResponse {
 		$iNodeType = ConversionHelper::stringNodeType2Const($nodeCollection);
