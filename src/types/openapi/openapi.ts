@@ -4097,7 +4097,10 @@ export interface operations {
                 /** @description Offset */
                 readonly offset?: number | null;
             };
-            readonly header?: never;
+            readonly header?: {
+                /** @description Respond with 304 Not Modified if the table has not been edited since this date */
+                readonly "if-modified-since"?: string;
+            };
             readonly path: {
                 /** @description Table ID */
                 readonly tableId: number;
@@ -4114,6 +4117,13 @@ export interface operations {
                 content: {
                     readonly "application/json": readonly components["schemas"]["Row"][];
                 };
+            };
+            /** @description Not modified */
+            readonly 304: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Current user is not logged in */
             readonly 401: {
