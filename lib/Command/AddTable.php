@@ -68,7 +68,7 @@ class AddTable extends Command {
 		$template = $input->getOption('template') ?: '';
 
 		try {
-			$table = $this->tableService->create($title, $template, $emoji, $userId);
+			$table = $this->tableService->create($title, $template, $emoji, userId: $userId);
 
 			$arr = $table->jsonSerialize();
 			unset($arr['hasShares']);
