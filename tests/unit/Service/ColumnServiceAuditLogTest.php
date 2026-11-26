@@ -15,6 +15,7 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Notification\NotificationHelper;
 use OCA\Tables\Service\ColumnService;
@@ -57,6 +58,7 @@ final class ColumnServiceAuditLogTest extends TestCase {
 			$this->createMock(UserHelper::class),
 			$this->createMock(ColumnDtoValidator::class),
 			$this->auditLogService,
+			$this->createMock(ViewMapper::class),
 		);
 
 		$column = new Column();

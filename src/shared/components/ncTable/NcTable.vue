@@ -294,11 +294,11 @@ export default {
 			// if we don't have to search and/or filter
 			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
 				// cleanup markers
-				if (this.rows && this.columns) {
+				if (this.rows && this.parsedColumns) {
 					this.rows.forEach(row => {
 						if (row && row.data) {
-							this.columns.forEach(column => {
-								const cell = row.data.find(item => item && item.columnId === column.id)
+							this.parsedColumns.forEach(column => {
+								const cell = row.data.find(item => item && item.columnId === (column.id < 0 ? column.id : column.getValueColumnId()))
 								if (cell === undefined) {
 									return
 								}
@@ -314,7 +314,7 @@ export default {
 			const data = [] // array of rows
 			const searchString = this.viewSetting?.searchString
 			// each row
-			if (!this.rows || !this.columns) {
+			if (!this.rows || !this.parsedColumns) {
 				return []
 			}
 
@@ -326,7 +326,7 @@ export default {
 				let searchStatusRow = false
 
 				// each column in a row => cell
-				this.columns.forEach(column => {
+				this.parsedColumns.forEach(column => {
 					let filterStatus = null
 					let searchStatus = true
 					const filters = getFiltersForColumn(column, this.viewSetting)
@@ -351,7 +351,7 @@ export default {
 							break
 						}
 					} else {
-						cell = row.data.find(item => item && item.columnId === column.id)
+						cell = row.data.find(item => item && item.columnId === column.getValueColumnId())
 					}
 
 					if (cell === undefined) {
@@ -390,7 +390,7 @@ export default {
 			return data
 		},
 		getSearchedAndFilteredAndSortedRows() {
-			const allColumns = this.columns.concat(MetaColumns)
+			const allColumns = this.parsedColumns.concat(MetaColumns)
 			const sort = (sortCols) => {
 				const sortColumn = allColumns.find(item => item.id === sortCols?.[0].columnId)
 				const nextSorts = []

@@ -26,7 +26,7 @@
 				:value="getCellValue(col)"
 				:element-id="elementId"
 				:is-view="isView"
-				:can-edit="config.canEditRows" />
+				:can-edit="canEditColumn(col)" />
 		</td>
 		<td v-if="config.showActions && (config.canEditRows || config.canDeleteRows || config.canCreateRows)"
 			:class="{sticky: config.showActions}">
@@ -69,7 +69,7 @@ import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import Pencil from 'vue-material-design-icons/PencilOutline.vue'
 import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { getTableCellComponent } from './TableCell.js'
-import { getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
+import { ColumnTypes, getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
@@ -148,6 +148,7 @@ export default {
 		// to be used to trigger the edit modal instead of inline editing
 		nonInlineEditableColumnTypes() {
 			return [
+				ColumnTypes.Lookup,
 			]
 		},
 	},
@@ -156,9 +157,12 @@ export default {
 		getColumnWidthStyle,
 		getFrozenColumnStyle,
 		getTableCellComponent,
+		canEditColumn(column) {
+			return this.config.canEditRows && !column.isVirtual()
+		},
 		handleCellClick(column) {
 			// If the column type doesn't support inline editing, trigger the edit modal
-			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.config.canEditRows) {
+			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.canEditColumn(column)) {
 				this.$emit('edit-row', this.row.id)
 			}
 		},
@@ -193,7 +197,7 @@ export default {
 			}
 
 			// lets see if we have a value
-			const cell = this.getCell(column.id)
+			const cell = this.getCell(column.getValueColumnId())
 			let value
 
 			if (cell) {
