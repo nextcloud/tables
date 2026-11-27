@@ -168,7 +168,7 @@ describe('AddWidget', () => {
 			cy.wrap(wrapper.setProps({ showModal: true }))
 		})
 
-		cy.get('[data-cy="addWidgetLoading"]').should('exist')
+		cy.get('[data-cy="addWidgetLoading"]').should('have.attr', 'role', 'img').and('have.attr', 'aria-label', 'Loading widget types')
 		cy.get('[data-cy="addWidgetTitle"]').should('not.exist')
 		cy.get('[data-cy="addWidgetSubmit"]').should('be.disabled')
 		cy.wait('@slowTypes')

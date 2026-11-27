@@ -9,7 +9,7 @@
 		data-cy="addWidgetModal"
 		@closing="$emit('close')">
 		<div v-if="!ready" class="modal__content">
-			<NcLoadingIcon :size="32" class="add-widget__loading" data-cy="addWidgetLoading" />
+			<NcLoadingIcon :size="32" :name="t('tables', 'Loading widget types')" class="add-widget__loading" data-cy="addWidgetLoading" />
 		</div>
 		<div v-else class="modal__content">
 			<div class="row space-T">
