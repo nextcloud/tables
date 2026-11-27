@@ -19,7 +19,11 @@
 		</template>
 		<template #counter>
 			<IconCloudOutline v-if="view.isFederated" :size="20" decorative style="margin-right: 8px;" />
-			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
+			<NcActions v-if="view.hasShares" :inline="1" :class="{'margin-right': !(activeView && view.id === activeView.id)}">
+				<NcActionButton icon="icon-share" @click="actionShowShare">
+					{{ t('tables', 'Share') }}
+				</NcActionButton>
+			</NcActions>
 			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view) && showShareSender" class="margin-left">
 				<NcAvatar :user="view.ownership" :show-user-status="false" />
 			</div>
@@ -115,7 +119,7 @@
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcAppNavigationItem, NcActionButton, NcAvatar } from '@nextcloud/vue'
+import { NcAppNavigationItem, NcActionButton, NcActions, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
 import { getCurrentUser } from '@nextcloud/auth'
 import { mapState, mapActions } from 'pinia'
@@ -147,6 +151,7 @@ export default {
 		StarOutline,
 		NcAppNavigationItem,
 		NcActionButton,
+		NcActions,
 		ListBoxOutline,
 		NcAvatar,
 		PlaylistPlay,

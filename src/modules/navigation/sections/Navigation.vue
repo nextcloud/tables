@@ -4,7 +4,7 @@
 -->
 <template>
 	<NcAppNavigation v-if="!isStandaloneContext">
-		<template #list>
+		<template #search>
 			<div class="filter-box">
 				<NcTextField v-model="filterString" :label="t('tables', 'Filter items')"
 					trailing-button-icon="close" :show-trailing-button="filterString !== ''"
@@ -12,10 +12,14 @@
 					<Magnify :size="16" />
 				</NcTextField>
 			</div>
+		</template>
 
-			<div v-if="isLoadingSomething" class="icon-loading" />
+		<template #list>
+			<li v-if="isLoadingSomething">
+				<NcLoadingIcon :name="t('tables', 'Loading …')" />
+			</li>
 
-			<ul v-if="!isLoadingSomething">
+			<template v-if="!isLoadingSomething">
 				<NcAppNavigationCaption v-if="getFavoriteNodes.length > 0" :name="t('tables', 'Favorites')" />
 
 				<!-- FAVORITES -->
@@ -57,8 +61,7 @@
 					<NavigationTableItem v-for="table in getArchivedTables" :key="table.id"
 						:filter-string="filterString" :table="table" />
 				</NcAppNavigationItem>
-			</ul>
-			<ul v-if="!isLoadingSomething">
+
 				<NcAppNavigationCaption :name="t('tables', 'Applications')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create application')" icon="icon-add" data-cy="createContextIcon"
@@ -69,21 +72,21 @@
 				<template v-for="node in getAllContexts" :key="node.id">
 					<NavigationContextItem :context="node" />
 				</template>
-			</ul>
+			</template>
 
-			<div v-if="filterString !== ''" class="search-info">
+			<li v-if="filterString !== ''" class="search-info">
 				<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
 					<template #icon>
 						<Magnify :size="10" />
 					</template>
 
 					<template #action>
-						<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
+						<NcButton @click="filterString = ''">
 							{{ t('tables', 'Clear filter') }}
 						</NcButton>
 					</template>
 				</NcEmptyContent>
-			</div>
+			</li>
 		</template>
 	</NcAppNavigation>
 </template>
@@ -98,6 +101,7 @@ import {
 	NcButton,
 	NcEmptyContent,
 	NcCounterBubble,
+	NcLoadingIcon,
 } from '@nextcloud/vue'
 
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
@@ -127,6 +131,7 @@ export default {
 		ArchiveOutline,
 		NcButton,
 		NcCounterBubble,
+		NcLoadingIcon,
 		NcEmptyContent,
 	},
 	setup() {
@@ -225,6 +230,8 @@ export default {
 
 <style lang="scss" scoped>
 :deep(.filter-box) {
+	padding: var(--app-navigation-padding, 8px) var(--app-navigation-padding, 8px) 0;
+
 	.input-field {
 		padding: 8px;
 	}
@@ -236,7 +243,6 @@ export default {
 
 .search-info {
 	text-align: center;
-	justify-content: center;
 
 	.empty-content {
 		margin-top: 3vh;
