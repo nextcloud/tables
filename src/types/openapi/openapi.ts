@@ -946,7 +946,7 @@ export type paths = {
         readonly put: operations["context-update-content-order"];
         readonly post?: never;
         /**
-         * [api v2] Delete a grid page with its widgets
+         * [api v2] Delete a page with its widgets
          * @description The start page of an application cannot be deleted.
          */
         readonly delete: operations["context_page-destroy"];
@@ -954,7 +954,7 @@ export type paths = {
         readonly head?: never;
         /**
          * [api v2] Change a page or its widgets
-         * @description Fields left out keep their value; an empty icon or description removes it. A given `widgets` list replaces the widgets of the grid page: listed widgets with an `id` are updated, others are added, and widgets not listed are deleted.
+         * @description Fields left out keep their value; an empty icon or description removes it. A given `widgets` list replaces the widgets of the page, a grid page or the start page: listed widgets with an `id` are updated, others are added, and widgets not listed are deleted.
          *     A widget has a `type`, `gridX`, `gridY`, `gridWidth` and `gridHeight` on a grid of 12 columns, `settings` following the schema of its type, and optionally an `id`, `title`, `icon` and `description`. A data widget's `source` is `{nodeRelId}` of a table or view of this application, or null.
          */
         readonly patch: operations["context_page-update"];
@@ -1073,7 +1073,7 @@ export type paths = {
             readonly cookie?: never;
         };
         /**
-         * [api v2] Get the widget types a grid page can hold
+         * [api v2] Get the widget types a page can hold
          * @description Every type carries the schema of its settings and whether it shows a table or view.
          */
         readonly get: operations["context_page-widget-types"];

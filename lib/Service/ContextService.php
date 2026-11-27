@@ -614,6 +614,8 @@ class ContextService {
 			}
 		}
 
+		$this->insertStartPageWidgets($page->getId());
+
 		$context->setPages([$addedPage['id'] => $addedPage]);
 	}
 
@@ -788,6 +790,11 @@ class ContextService {
 				}
 			}
 
+			// A start page exported before pages held widgets starts filled, like a new one
+			if ($page->getPageType() === Page::TYPE_STARTPAGE && !array_key_exists('widgets', $pageArr)) {
+				$this->insertStartPageWidgets($page->getId());
+			}
+
 			$widgets = is_array($pageArr['widgets'] ?? null) ? array_values($pageArr['widgets']) : [];
 			if (count($widgets) > GridWidgetTypes::MAX_WIDGETS_PER_PAGE) {
 				$this->logger->warning('Skipping ' . (count($widgets) - GridWidgetTypes::MAX_WIDGETS_PER_PAGE) . ' imported widgets: a page holds at most ' . GridWidgetTypes::MAX_WIDGETS_PER_PAGE . '.');
@@ -827,6 +834,17 @@ class ContextService {
 			$pageContent->setOrder(10 * ($i + 1));
 			$this->pageContentMapper->insert($pageContent);
 		}
+		$this->insertStartPageWidgets($page->getId());
+	}
+
+	/**
+	 * Fills a new start page with a widget that lists the tables and views of its application.
+	 *
+	 * @throws Exception
+	 * @throws \JsonException
+	 */
+	private function insertStartPageWidgets(int $pageId): void {
+		$this->widgetService->insertAll($pageId, $this->gridWidgetTypes->startPageWidgets());
 	}
 
 	/**
