@@ -83,4 +83,24 @@ describe('ContextPageForm', () => {
 		cy.get('[data-cy="contextPageSlug"]').clear().type('good_name')
 		cy.get('[data-cy="contextPageSlug"]').should('not.have.attr', 'aria-invalid')
 	})
+
+	it('saves the start page without a title, so it is called Home', () => {
+		mountForm({ id: 3, title: 'Welcome', icon: null, slug: 'page_3', description: '', pageType: 'startpage' })
+
+		cy.contains('Leave empty to call it Home.')
+		cy.get('[data-cy="contextPageTitle"]').clear()
+		cy.get('[data-cy="contextPageDescription"]').type('Where we start')
+		cy.get('[data-cy="contextPageSubmit"]').should('be.enabled').click()
+		cy.get('@wrapper').then(wrapper => {
+			expect(wrapper.emitted('submit')[0][0]).to.deep.equal({ title: '', icon: '', description: 'Where we start' })
+		})
+	})
+
+	it('still asks a grid page for a title', () => {
+		mountForm({ id: 4, title: 'Overview', icon: null, slug: 'page_4', description: '', pageType: 'page' })
+
+		cy.contains('Leave empty to call it Home.').should('not.exist')
+		cy.get('[data-cy="contextPageTitle"]').clear()
+		cy.get('[data-cy="contextPageSubmit"]').should('be.disabled')
+	})
 })

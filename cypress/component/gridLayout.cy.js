@@ -15,6 +15,7 @@ import {
 	isBlank,
 	nextFreeRow,
 	nodeTarget,
+	orderedNodeRelIds,
 	pageToGrid,
 	sortedLayout,
 	targetTitle,
@@ -150,6 +151,13 @@ describe('grid layout', () => {
 		]
 		expect(sortedLayout(layout).map(item => item.widgetId)).to.deep.equal(['a', 'b', 'c'])
 		expect(layout[0].widgetId).to.equal('c')
+	})
+
+	it('orders the nodes as the start page does, then by id', () => {
+		const applicationNodes = { 4: {}, 5: {}, 6: {}, 7: {} }
+		const content = { 1: { node_rel_id: 4, order: 3 }, 2: { node_rel_id: 6, order: 1 }, 3: { node_rel_id: 5, order: 2 } }
+		expect(orderedNodeRelIds(applicationNodes, content)).to.deep.equal([6, 5, 4, 7])
+		expect(orderedNodeRelIds(applicationNodes, undefined)).to.deep.equal([4, 5, 6, 7])
 	})
 
 	it('shows 12, 6 or 1 columns by canvas width', () => {

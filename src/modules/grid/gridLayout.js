@@ -116,6 +116,21 @@ export function nextFreeRow(layout) {
 }
 
 /**
+ * The relation ids of the nodes of an application in the order "Edit application" gives
+ * them, kept in the content of the start page. Nodes without an order follow by id.
+ *
+ * @param {object} nodes the nodes of the application by relation id
+ * @param {object} content the content of the start page, as {id: {node_rel_id, order}}
+ * @return {number[]} the relation ids in order
+ */
+export function orderedNodeRelIds(nodes, content) {
+	const order = new Map(Object.values(content ?? {}).map(entry => [parseInt(entry.node_rel_id), entry.order]))
+	return Object.keys(nodes ?? {})
+		.map(id => parseInt(id))
+		.sort((a, b) => (order.get(a) ?? Infinity) - (order.get(b) ?? Infinity) || a - b)
+}
+
+/**
  * @param {number} pageId id of a page of an application
  * @return {string} the id of its tab in the page bar
  */

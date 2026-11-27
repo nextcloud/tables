@@ -3,9 +3,9 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="grid-page" data-cy="gridPage">
-		<div class="grid-page__header">
-			<div class="grid-page__heading">
+	<div class="grid-page" :data-cy="isStartPage ? 'startPageGrid' : 'gridPage'">
+		<div v-if="showHeading || canEdit" class="grid-page__header">
+			<div v-if="showHeading" class="grid-page__heading">
 				<h2 class="grid-page__title" data-cy="gridPageTitle">
 					<NamedIcon v-if="page.icon" :name="page.icon" :size="20" />
 					{{ title }}
@@ -56,7 +56,10 @@
 							</template>
 							{{ t('tables', 'Edit page details') }}
 						</NcActionButton>
-						<NcActionButton :close-after-click="true" data-cy="gridPageDelete" @click="$emit('delete', page)">
+						<NcActionButton v-if="!isStartPage"
+							:close-after-click="true"
+							data-cy="gridPageDelete"
+							@click="$emit('delete', page)">
 							<template #icon>
 								<TrashCanOutline :size="20" />
 							</template>
@@ -67,7 +70,7 @@
 			</div>
 		</div>
 
-		<NcEmptyContent v-if="activeGrid.layout.length === 0"
+		<NcEmptyContent v-if="shownLayout.length === 0"
 			class="grid-page__empty"
 			:name="t('tables', 'This page is empty')"
 			:description="emptyDescription">
@@ -81,11 +84,12 @@
 			</template>
 		</NcEmptyContent>
 
-		<GridCanvas :layout="activeGrid.layout" :editable="canChange" @layout-change="onLayoutChange">
+		<GridCanvas :layout="shownLayout" :editable="canChange" @layout-change="onLayoutChange">
 			<template #widget="{ item, narrow }">
 				<GridWidget v-if="widgetsById[item.widgetId]"
 					:widget="widgetsById[item.widgetId]"
 					:nodes="context.nodes"
+					:start-page-content="startPageContent"
 					:layout-item="item"
 					:editable="canChange"
 					:arrangeable="!narrow"
@@ -120,7 +124,8 @@ import GridWidget from './GridWidget.vue'
 import AddWidget from '../modals/AddWidget.vue'
 import NamedIcon from '../../shared/components/ncIconPicker/NamedIcon.vue'
 import { useTablesStore } from '../../store/store.js'
-import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, findWidgetType, gridToWidgets, nextFreeRow, pageTitle, pageToGrid, sortedLayout } from './gridLayout.js'
+import { GRID_COLUMNS, GRID_MIN_WIDTH, cloneGrid, contextPages, findWidgetType, gridToWidgets, isStartPage, nextFreeRow, pageTitle, pageToGrid, sortedLayout, widgetTarget } from './gridLayout.js'
+import { WIDGET_TYPE_DATA } from './widgetRegistry.js'
 
 /**
  * A grid page of an application: its widgets on a grid, with an edit mode that saves the
@@ -144,9 +149,11 @@ export default {
 		AddWidget,
 		NamedIcon,
 	},
-	provide: {
-		// Widget titles sit below the title of the page
-		gridHeadingLevel: 3,
+	provide() {
+		return {
+			// Widget titles sit below the title of the page, or of the application on a start page without one
+			gridHeadingLevel: computed(() => this.showHeading ? 3 : 2),
+		}
 	},
 	props: {
 		// The application, for its id and its nodes
@@ -193,9 +200,18 @@ export default {
 			}
 		}
 
+		/**
+		 * @param {object} to the route that opens
+		 * @param {object} from the route that is shown
+		 * @return {boolean} whether the route shows this page too, as when a row of it opens
+		 */
+		const staysOnPage = (to, from) => String(to.params.contextId) === String(from.params.contextId)
+			&& (to.params.pageId ? parseInt(to.params.pageId) === props.page.id : isStartPage(props.page))
+
 		// Leaving the page, or switching to another page, asks first while the grid has unsaved changes
-		onBeforeRouteLeave(confirmDiscard)
-		onBeforeRouteUpdate(confirmDiscard)
+		const guard = (to, from) => staysOnPage(to, from) || confirmDiscard()
+		onBeforeRouteLeave(guard)
+		onBeforeRouteUpdate(guard)
 
 		return { draftGrid, storedGrid, hasUnsavedChanges, confirmDiscard }
 	},
@@ -210,6 +226,16 @@ export default {
 		...mapState(useTablesStore, ['widgetTypes']),
 		title() {
 			return pageTitle(this.page)
+		},
+		isStartPage() {
+			return isStartPage(this.page)
+		},
+		// The start page sits under the title of its application, so it only has a heading of its own once it gets a title
+		showHeading() {
+			return !this.isStartPage || !!this.page.title || !!this.page.description
+		},
+		startPageContent() {
+			return contextPages(this.context).find(isStartPage)?.content ?? {}
 		},
 		activeGrid() {
 			return this.draftGrid ?? this.storedGrid
@@ -226,6 +252,17 @@ export default {
 				return t('tables', 'Add a header, a description or a table.')
 			}
 			return this.canEdit ? t('tables', 'Edit the page to add widgets.') : ''
+		},
+		// A data widget whose table or view left the application only shows in edit mode,
+		// where it can get another one or be removed
+		shownLayout() {
+			if (this.isEditing) {
+				return this.activeGrid.layout
+			}
+			return this.activeGrid.layout.filter(item => {
+				const widget = this.widgetsById[item.widgetId]
+				return widget?.type !== WIDGET_TYPE_DATA || widgetTarget(widget, this.context.nodes) !== null
+			})
 		},
 		widgetsById() {
 			return Object.fromEntries(this.activeGrid.widgets.map(widget => [widget.key, widget]))

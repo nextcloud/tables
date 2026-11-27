@@ -11,6 +11,7 @@ import {
 	createTable,
 	createTextLineColumn,
 	createView,
+	escapeRegExp,
 	fillInValueTextLine,
 	loadContext,
 	loadTable,
@@ -33,7 +34,7 @@ async function selectFromVueDropdown(page: Page, inputSelector: string, value: s
 	await input.clear()
 	await input.fill(value)
 
-	const optionByRole = page.getByRole('option', { name: new RegExp(value, 'i') }).first()
+	const optionByRole = page.getByRole('option', { name: new RegExp(escapeRegExp(value), 'i') }).first()
 	if (await optionByRole.isVisible({ timeout: 5000 }).catch(() => false)) {
 		await optionByRole.click()
 		return
@@ -54,6 +55,14 @@ async function expectSelectedShare(page: Page, userId: string) {
 	await expect(
 		page.locator('[data-cy="contextResourceShare"] .vs__selected').filter({ hasText: userId }).first(),
 	).toBeVisible()
+}
+
+/**
+ * Waits for a table or view of the application on its start page, where the tables widget shows
+ * every table and view, also one added after the application was created.
+ */
+async function expectTableOnStartPage(page: Page, tableTitle: string, timeout?: number) {
+	await expect(page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: tableTitle })).toBeVisible({ timeout })
 }
 
 test.describe('Manage a context', () => {
@@ -95,8 +104,10 @@ test.describe('Manage a context', () => {
 		await loadContext(page, `updated ${contextTitle}`)
 
 		await expect(page.locator('h1', { hasText: `updated ${contextTitle}` })).toBeVisible()
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible()
-		await expect(page.locator('h1', { hasText: viewTitle })).toBeVisible()
+		// Tables and views added after the application was created show up in its tables widget
+		await expect(page.locator('[data-cy="startPageGrid"]')).toBeVisible()
+		await expectTableOnStartPage(page, tableTitle)
+		await expectTableOnStartPage(page, viewTitle)
 	})
 
 	test('Share context with resources', async ({ userPage: { page }, request }) => {
@@ -121,7 +132,7 @@ test.describe('Manage a context', () => {
 
 		await loadContext(page, contextTitle)
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible({ timeout: 10000 })
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible({ timeout: 10000 })
+		await expectTableOnStartPage(page, tableTitle, 10000)
 
 		// verify context was shared properly
 		await page.context().clearCookies()
@@ -130,7 +141,7 @@ test.describe('Manage a context', () => {
 
 		await loadContext(page, contextTitle)
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible()
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible()
+		await expectTableOnStartPage(page, tableTitle)
 	})
 
 	test('Transfer context', async ({ userPage: { page }, request }) => {
@@ -243,7 +254,7 @@ test.describe('Manage a context', () => {
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible()
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible()
+		await expectTableOnStartPage(page, tableTitle)
 
 		await openContextEditModal(page, contextTitle)
 		await page.locator('[data-cy="contextResourceList"] button').filter({ hasText: 'Delete' }).click({ force: true })
@@ -252,7 +263,7 @@ test.describe('Manage a context', () => {
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
 
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible()
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeHidden()
+		await expect(page.locator('[data-cy="gridWidget"]').getByRole('heading', { name: tableTitle })).toBeHidden()
 	})
 
 	test('Modify resource rows and columns from context', async ({ userPage: { page } }) => {
@@ -270,6 +281,7 @@ test.describe('Manage a context', () => {
 		await expect(page.locator('[data-cy="contextResourceList"]')).toContainText(tableTitle)
 		await expect(page.locator('[data-cy="contextResourcePerms"]')).toContainText(tableTitle)
 		await page.locator('[data-cy="editContextSubmitBtn"]').click()
+		await expectTableOnStartPage(page, tableTitle)
 
 		await createTextLineColumn(page, 'title', '', '', true)
 		await page.locator('button').filter({ hasText: 'Create row' }).first().click()
@@ -315,7 +327,7 @@ test.describe('Manage a context', () => {
 		await updatePermsResponse
 
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible({ timeout: 10000 })
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible({ timeout: 10000 })
+		await expectTableOnStartPage(page, tableTitle, 10000)
 
 		// verify that shared user can modify and delete data in the resource
 		await page.context().clearCookies()
@@ -324,7 +336,7 @@ test.describe('Manage a context', () => {
 
 		await loadContext(page, contextTitle)
 		await expect(page.locator('h1', { hasText: contextTitle })).toBeVisible()
-		await expect(page.locator('h1', { hasText: tableTitle })).toBeVisible()
+		await expectTableOnStartPage(page, tableTitle)
 
 		await page.locator('button').filter({ hasText: 'Create row' }).first().click()
 		await fillInValueTextLine(page, 'title', 'first row')
