@@ -41,6 +41,12 @@
 					<SelectOptionLabel :label="label" />
 				</template>
 			</NcSelect>
+			<TabsEditor v-else-if="property.type === 'tabs'"
+				:model-value="value(name) ?? []"
+				:label="property.title"
+				:required="!!property.required"
+				:max-items="property.maxItems"
+				@update:model-value="tabs => set(name, tabs)" />
 		</div>
 	</div>
 </template>
@@ -48,6 +54,7 @@
 <script>
 import { NcSelect, NcTextArea, NcTextField } from '@nextcloud/vue'
 import SelectOptionLabel from '../../shared/components/SelectOptionLabel.vue'
+import TabsEditor from './TabsEditor.vue'
 
 /**
  * Renders the settings form of a widget from the schema of its type, so a
@@ -60,6 +67,7 @@ export default {
 		NcTextArea,
 		NcTextField,
 		SelectOptionLabel,
+		TabsEditor,
 	},
 	props: {
 		properties: {
@@ -82,14 +90,14 @@ export default {
 		},
 		/**
 		 * @param {string} name property name
-		 * @return {string|null} the current value of the property
+		 * @return {string|Array|null} the current value of the property
 		 */
 		value(name) {
 			return this.modelValue[name]
 		},
 		/**
 		 * @param {string} name property name
-		 * @param {string|null} value the new value of the property
+		 * @param {string|Array|null} value the new value of the property
 		 */
 		set(name, value) {
 			this.$emit('update:modelValue', { ...this.modelValue, [name]: value })

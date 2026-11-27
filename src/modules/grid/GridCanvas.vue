@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="grid-canvas" :class="{ 'grid-canvas--editing': isArranging }">
-		<p v-if="editable && isNarrow" class="grid-canvas__hint" data-cy="gridNarrowHint">
+		<p v-if="editable && isNarrow && !isNested" class="grid-canvas__hint" data-cy="gridNarrowHint">
 			{{ t('tables', 'Widen the window to arrange the widgets. On a narrow screen the page is only shown.') }}
 		</p>
 		<div ref="gridElement" class="grid-stack grid-canvas__stack">
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { GridStack } from 'gridstack'
 import { isRTL } from '@nextcloud/l10n'
 import 'gridstack/dist/gridstack.min.css'
@@ -50,6 +51,15 @@ function isAtPosition(node, item) {
  */
 export default {
 	name: 'GridCanvas',
+	inject: {
+		// The column mode of the canvas around this one, as for the canvas of a tab
+		parentNarrow: { from: 'gridNarrow', default: null },
+	},
+	provide() {
+		return {
+			gridNarrow: computed(() => this.isNarrow),
+		}
+	},
 	props: {
 		layout: {
 			type: Array,
@@ -67,8 +77,12 @@ export default {
 		}
 	},
 	computed: {
+		isNested() {
+			return this.parentNarrow !== null
+		},
+		// A nested canvas arranges whenever the page does, however narrow it is itself
 		isNarrow() {
-			return this.columns !== GRID_COLUMNS
+			return this.isNested ? this.parentNarrow : this.columns !== GRID_COLUMNS
 		},
 		isArranging() {
 			return this.editable && !this.isNarrow
@@ -85,6 +99,9 @@ export default {
 		layout(layout, previousLayout) {
 			this.syncGridItems(layout, previousLayout ?? [])
 		},
+		isNarrow() {
+			this.applyColumns(this.width)
+		},
 	},
 	created() {
 		// Not declared in data(): GridStack and the observer must stay plain objects, a reactive
@@ -94,6 +111,7 @@ export default {
 		this.minWidth = GRID_MIN_WIDTH
 		// Set while the grid takes a layout from the prop, whose changes are not the user's
 		this.applyingLayout = false
+		this.width = 0
 	},
 	mounted() {
 		this.grid = GridStack.init({
@@ -107,6 +125,12 @@ export default {
 			disableResize: !this.isArranging,
 			minRow: 1,
 		}, this.$refs.gridElement)
+		// GridStack takes a grid inside an item of another grid for its sub grid and hands its
+		// changes to the outer one; the canvas of a tab handles its own
+		if (this.grid.parentGridNode) {
+			delete this.grid.parentGridNode.subGrid
+			delete this.grid.parentGridNode
+		}
 		this.grid.on('change', (event, changedNodes) => this.onGridChange(changedNodes))
 		// The column count follows the canvas width, so the grid restores when the window grows again
 		this.resizeObserver = new ResizeObserver(entries => this.applyColumns(entries[0]?.contentRect.width ?? 0))
@@ -183,10 +207,12 @@ export default {
 		 * @param {number} width current width of the canvas in pixels
 		 */
 		applyColumns(width) {
+			this.width = width
 			if (!this.grid || width === 0) {
 				return
 			}
-			const columns = columnsForWidth(width)
+			// A nested canvas keeps all columns while the page arranges, and reflows with it
+			const columns = this.isNested && !this.isNarrow ? GRID_COLUMNS : columnsForWidth(width)
 			if (this.grid.getColumn() !== columns) {
 				this.applyingLayout = true
 				try {

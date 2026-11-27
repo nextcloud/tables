@@ -197,6 +197,8 @@ export function pageToGrid(page) {
 			// An empty settings map arrives as a JSON array
 			settings: Array.isArray(widget.settings) ? {} : copy(widget.settings ?? {}),
 			nodeRelId: widget.source?.nodeRelId ?? null,
+			parentKey: widget.parentId ? 'w' + widget.parentId : null,
+			parentTab: widget.parentTab ?? null,
 		})),
 		layout: widgets.map(widget => ({
 			widgetId: 'w' + widget.id,
@@ -293,7 +295,9 @@ export function applicationNodeOptions(nodes, tables, views) {
  */
 export function gridToWidgets(grid) {
 	const positions = Object.fromEntries(grid.layout.map(item => [item.widgetId, item]))
-	return grid.widgets.filter(widget => positions[widget.key]).map(widget => {
+	const placed = grid.widgets.filter(widget => positions[widget.key])
+	const indexOfKey = Object.fromEntries(placed.map((widget, index) => [widget.key, index]))
+	return placed.map(widget => {
 		const { gridX, gridY, gridWidth, gridHeight } = positions[widget.key]
 		const saved = {
 			type: widget.type,
@@ -310,8 +314,119 @@ export function gridToWidgets(grid) {
 		if (widget.id) {
 			saved.id = widget.id
 		}
+		if (widget.parentKey && indexOfKey[widget.parentKey] !== undefined) {
+			saved.parentIndex = indexOfKey[widget.parentKey]
+			saved.parentTab = widget.parentTab
+		}
 		return saved
 	})
+}
+
+/**
+ * The tabs of a tabs widget, each a key that stays when the tab is renamed or moved and a title.
+ *
+ * @param {object} settings the settings of the widget
+ * @return {Array<{key: string, title: string}>} the tabs in their order
+ */
+export function widgetTabs(settings) {
+	return Array.isArray(settings?.tabs) ? settings.tabs : []
+}
+
+/**
+ * A key for a new tab, unlike the keys of the other tabs: twelve hex digits, as the server
+ * makes them, so widgets can be put in the tab before it is saved.
+ *
+ * @param {Array<{key: string}>} tabs the tabs of the widget
+ * @return {string} the key
+ */
+export function newTabKey(tabs = []) {
+	const taken = new Set(tabs.map(tab => tab.key))
+	let key
+	do {
+		key = Array.from(crypto.getRandomValues(new Uint8Array(6)), byte => byte.toString(16).padStart(2, '0')).join('')
+	} while (taken.has(key))
+	return key
+}
+
+/**
+ * Whether a required setting still needs a value, by the same rule as the server: a list of
+ * tabs needs at least one tab and a title for each, any other setting a text that is not blank.
+ *
+ * @param {object} setting the schema of the setting
+ * @param {Array|string|null|undefined} value its value
+ * @return {boolean} whether it is still empty
+ */
+export function isMissingSetting(setting, value) {
+	if (setting.type === 'tabs') {
+		return !Array.isArray(value) || value.length === 0 || value.some(tab => isBlank(tab?.title))
+	}
+	return isBlank(value)
+}
+
+/**
+ * Moves the widgets of the tabs a tabs widget no longer has onto the page, below the widgets
+ * there. The widgets of one tab keep their places relative to each other.
+ *
+ * @param {{widgets: Array, layout: Array}} grid the grid
+ * @param {string} tabsKey the key of the tabs widget
+ * @param {Array<{key: string}>} tabs the tabs it keeps
+ * @return {{widgets: Array, layout: Array}} the grid with those widgets on the page
+ */
+export function releaseRemovedTabs(grid, tabsKey, tabs) {
+	const kept = new Set(tabs.map(tab => tab.key))
+	const groups = new Map()
+	for (const widget of grid.widgets) {
+		if (widget.parentKey === tabsKey && !kept.has(widget.parentTab)) {
+			groups.set(widget.parentTab, [...(groups.get(widget.parentTab) ?? []), widget.key])
+		}
+	}
+	if (groups.size === 0) {
+		return grid
+	}
+	const moved = {}
+	let top = nextFreeRow(levelLayout(grid))
+	for (const keys of groups.values()) {
+		const items = grid.layout.filter(item => keys.includes(item.widgetId))
+		if (items.length === 0) {
+			continue
+		}
+		const offset = top - Math.min(...items.map(item => item.gridY))
+		for (const item of items) {
+			moved[item.widgetId] = { ...item, gridY: item.gridY + offset }
+		}
+		top = nextFreeRow(Object.values(moved))
+	}
+	return {
+		widgets: grid.widgets.map(widget => moved[widget.key] ? { ...widget, parentKey: null, parentTab: null } : widget),
+		layout: grid.layout.map(item => moved[item.widgetId] ?? item),
+	}
+}
+
+/**
+ * The layout of one level of a grid: the widgets on the page itself, or those in one tab.
+ *
+ * @param {{widgets: Array, layout: Array}} grid the grid
+ * @param {string|null} parentKey the key of the tabs widget, or null for the page itself
+ * @param {string|null} tab the key of the tab
+ * @return {Array} the layout items of that level
+ */
+export function levelLayout(grid, parentKey = null, tab = null) {
+	const level = new Set(grid.widgets
+		.filter(widget => (widget.parentKey ?? null) === parentKey && (parentKey === null || widget.parentTab === tab))
+		.map(widget => widget.key))
+	return grid.layout.filter(item => level.has(item.widgetId))
+}
+
+/**
+ * The layout with the items of one level replaced by their new positions.
+ *
+ * @param {Array} layout the whole layout
+ * @param {Array} levelItems changed items of one level
+ * @return {Array} the whole layout
+ */
+export function mergeLayout(layout, levelItems) {
+	const changed = Object.fromEntries(levelItems.map(item => [item.widgetId, item]))
+	return layout.map(item => changed[item.widgetId] ?? item)
 }
 
 /**

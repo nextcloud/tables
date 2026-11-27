@@ -25,9 +25,10 @@ const nodes = { 4: { id: 4, node_type: 0, node_id: 40, permissions: 1 } }
 
 /**
  * @param {object} props props of the dialog besides showModal
+ * @param {Array} types the widget types the server sends
  */
-function mountDialog(props = {}) {
-	cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: widgetTypes } }).as('widgetTypes')
+function mountDialog(props = {}, types = widgetTypes) {
+	cy.intercept('GET', '**/apps/tables/api/2/widget-types', { ocs: { data: types } }).as('widgetTypes')
 	cy.mount(AddWidget, { props: { showModal: false, nodes, ...props } }).then(({ wrapper }) => {
 		const store = useTablesStore()
 		store.widgetTypes = []
@@ -189,5 +190,24 @@ describe('AddWidget', () => {
 		cy.focused().type('{enter}')
 		cy.get('[data-cy="iconFieldClear"]').should('not.exist')
 		cy.focused().should('have.attr', 'data-cy', 'iconFieldPick')
+	})
+
+	it('edits the tabs of a tabs widget and asks for a title for each tab', () => {
+		const tabsType = { type: 'tabs', title: 'Tabs', defaultWidth: 12, defaultHeight: 8, hasSource: false, settings: { tabs: { type: 'tabs', title: 'Tabs', default: [], required: true, maxItems: 20 } } }
+		mountDialog({}, [tabsType])
+
+		cy.get('[data-cy="widgetFieldTabs"] textarea').should('not.exist')
+		cy.get('[data-cy="addWidgetMissing"]').should('contain.text', 'Still needed: Tabs')
+		cy.get('[data-cy="tabsEditorAdd"]').click()
+		cy.focused().type('\u00A0\u3000', { parseSpecialCharSequences: false })
+		cy.get('[data-cy="addWidgetSubmit"]').should('be.disabled')
+		cy.focused().clear().type('Open')
+		cy.get('[data-cy="addWidgetSubmit"]').should('be.enabled').click()
+		cy.get('@wrapper').then(wrapper => {
+			const tabs = wrapper.emitted('submit')[0][0].settings.tabs
+			expect(tabs).to.have.length(1)
+			expect(tabs[0]).to.deep.include({ title: 'Open' })
+			expect(tabs[0].key).to.match(/^[0-9a-f]{12}$/)
+		})
 	})
 })
