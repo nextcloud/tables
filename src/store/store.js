@@ -10,6 +10,7 @@ import { showError } from '@nextcloud/dialogs'
 import displayError from '../shared/utils/displayError.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 import { getCurrentUser } from '@nextcloud/auth'
+import { translate as t } from '@nextcloud/l10n'
 
 export const useTablesStore = defineStore('store', {
 	state: () => ({

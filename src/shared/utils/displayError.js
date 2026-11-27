@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
 
 export function getNotFoundError(type) {
 	return t('tables', 'This {type} could not be found', { type })

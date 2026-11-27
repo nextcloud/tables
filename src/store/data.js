@@ -12,6 +12,7 @@ import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { getCurrentUser } from '@nextcloud/auth'
 import { useTablesStore } from './store.js'
+import { translate as t } from '@nextcloud/l10n'
 
 function genStateKey(isView, elementId) {
 	elementId = elementId.toString()
