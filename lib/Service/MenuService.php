@@ -16,7 +16,9 @@ use OCA\Tables\Db\ContextNodeRelationMapper;
 use OCA\Tables\Db\MenuItem;
 use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\ConflictError;
@@ -40,6 +42,7 @@ use OCP\IDBConnection;
  * permissions on it before a write; this class checks that an item belongs to it.
  *
  * @psalm-import-type TablesMenuItem from ResponseDefinitions
+ * @psalm-type TablesMenuExportItem = array{parent: ?int, title: ?string, displayTitle: string, icon: ?string, description: ?string, target: array{page: string}|array{table: string}|array{view: string}|array{url: string}|null}
  */
 class MenuService {
 	use TTransactional;
@@ -72,8 +75,7 @@ class MenuService {
 		$items = $this->visibleItems($context, $this->menuItemMapper->findByContextId($contextId));
 		$menu = $this->serialize($context, $items);
 		if (!$this->permissionsService->canManageContext($context, $userId)) {
-			$parentIds = array_flip(array_filter(array_column($menu, 'parentId')));
-			$menu = array_values(array_filter($menu, static fn (array $item): bool => $item['target'] !== null || isset($parentIds[$item['id']])));
+			$menu = self::forReader($menu);
 		}
 		return ['menu' => $menu, 'version' => $this->version($items)];
 	}
@@ -103,16 +105,8 @@ class MenuService {
 				throw new BadRequestError('A menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items.');
 			}
 
-			$item = new MenuItem();
-			$item->setContextId($contextId);
+			$item = $this->newItem($context, TextHelper::title($title, self::ITEM), IconHelper::optional($icon, self::ITEM), TextHelper::description($description, self::ITEM), $target === null ? null : $this->validateTarget($target, $context));
 			$item->setOrder($items === [] ? 0 : max(array_map(static fn (MenuItem $item): int => $item->getOrder(), $items)) + 1);
-			$item->setTitle(TextHelper::title($title, self::ITEM));
-			$item->setIcon(IconHelper::optional($icon, self::ITEM));
-			$item->setDescription(TextHelper::description($description, self::ITEM));
-			if ($target !== null) {
-				$item->setTarget($this->validateTarget($target, $context));
-			}
-			$this->assertValid($item);
 
 			return $this->serializeOne($context, $this->menuItemMapper->insert($item));
 		}, $this->dbc);
@@ -245,6 +239,313 @@ class MenuService {
 	}
 
 	/**
+	 * The menu as an export carries it: a page by its slug, a table or view by
+	 * uuid, and the group of an item by the group's position in the exported menu. Each
+	 * item keeps the title it shows, for a preview; an import reads only its own title.
+	 * With a user who cannot manage the application, the menu is the one that user reads.
+	 *
+	 * @return list<TablesMenuExportItem>
+	 * @throws Exception
+	 */
+	public function export(Context $context, ?string $userId = null): array {
+		$items = $this->menuItemMapper->findByContextId($context->getId());
+		$nodes = $context->getNodes() ?? [];
+		$nodeIds = $this->nodeIdsByType($items, $nodes);
+		$nodesById = [
+			Application::NODE_TYPE_TABLE => $this->tableMapper->findMany($nodeIds[Application::NODE_TYPE_TABLE]),
+			Application::NODE_TYPE_VIEW => $this->viewMapper->findMany($nodeIds[Application::NODE_TYPE_VIEW]),
+		];
+		$menu = $this->serialize($context, $items, array_map(static fn (array $entities): array => array_map(static fn (Table|View $entity): ?string => $entity->getTitle(), $entities), $nodesById));
+		if ($userId !== null && !$this->permissionsService->canManageContext($context, $userId)) {
+			$menu = self::forReader($menu);
+		}
+		$pages = $context->getPages() ?? [];
+		$positions = [];
+		$exported = [];
+		foreach ($menu as $item) {
+			$target = $item['target'];
+			if (isset($target['pageId'])) {
+				$slug = $pages[$target['pageId']]['slug'] ?? null;
+				if (!is_string($slug)) {
+					continue;
+				}
+				$target = ['page' => $slug];
+			} elseif (isset($target['nodeRelId'])) {
+				$node = $nodes[$target['nodeRelId']];
+				$entity = $nodesById[$node['node_type']][$node['node_id']] ?? null;
+				if ($entity === null) {
+					continue;
+				}
+				$target = [$node['node_type'] === Application::NODE_TYPE_TABLE ? 'table' : 'view' => (string)$entity->getUuid()];
+			}
+			$positions[$item['id']] = count($exported);
+			$exported[] = [
+				'parent' => $item['parentId'] === null ? null : ($positions[$item['parentId']] ?? null),
+				'title' => $item['title'],
+				'displayTitle' => $item['displayTitle'],
+				'icon' => $item['icon'],
+				'description' => $item['description'],
+				'target' => $target,
+			];
+		}
+		return $exported;
+	}
+
+	/**
+	 * Replaces the menu of an application with an exported one, as {@see self::readExported()}
+	 * reads it, and returns the items it skipped. A menu of which no item is kept leaves the
+	 * menu as it is. Callers check permissions.
+	 *
+	 * @param list<mixed> $exported
+	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @param \Closure(string): ?int $pageIdOf
+	 * @return list<array{index: int, title: ?string, reason: string}>
+	 * @throws Exception
+	 */
+	public function import(Context $context, array $exported, \Closure $nodeRelIdOf, \Closure $pageIdOf): array {
+		['items' => $items, 'skipped' => $skipped] = $this->readExported($context, $exported, $nodeRelIdOf, $pageIdOf);
+		if ($items === []) {
+			return $skipped;
+		}
+
+		$this->atomic(function () use ($context, $items): void {
+			$this->menuItemMapper->deleteByContextId($context->getId());
+			$idsByIndex = [];
+			foreach ($items as $position => ['item' => $item, 'index' => $index, 'parent' => $parent]) {
+				$item->setOrder($position);
+				$item->setParentId($parent === null ? null : $idsByIndex[$parent]);
+				$idsByIndex[$index] = $this->menuItemMapper->insert($item)->getId();
+			}
+		}, $this->dbc);
+
+		return $skipped;
+	}
+
+	/**
+	 * Reads an exported menu for an application. Every item is checked like the API
+	 * checks it, and skipped, with the reason, when it fails or when its target did not
+	 * come along. An icon this instance does not have and a title or description that is
+	 * too long are left out instead, except for the title of a group, which is cut short. Entries past the {@see MenuItem::MAX_ITEMS_PER_APPLICATION}th are not read
+	 * and are skipped with one record for all of them. `$pageIdOf`
+	 * gives the page of the application for the slug of an exported page, or null. `$nodeRelIdOf`
+	 * gives the node relation for the kind (`table` or `view`) and uuid, or null. A resolver
+	 * may throw a {@see BadRequestError} to skip the item with its own reason.
+	 * An item sits in the group at the position it names when that group came before it
+	 * and was kept; otherwise it moves to the top.
+	 *
+	 * @param list<mixed> $exported
+	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @param \Closure(string): ?int $pageIdOf
+	 * @return array{items: list<array{item: MenuItem, entry: array<array-key, mixed>, index: int, parent: ?int}>, skipped: list<array{index: int, title: ?string, reason: string}>}
+	 */
+	public function readExported(Context $context, array $exported, \Closure $nodeRelIdOf, \Closure $pageIdOf): array {
+		$items = [];
+		$skipped = [];
+		$groups = [];
+		$exported = array_values($exported);
+		foreach (array_slice($exported, 0, MenuItem::MAX_ITEMS_PER_APPLICATION) as $index => $entry) {
+			try {
+				if (!is_array($entry)) {
+					throw new BadRequestError('It is not an object.');
+				}
+				$target = ($entry['target'] ?? null) === null ? null : $this->importedTarget($entry['target'], $context, $pageIdOf, $nodeRelIdOf);
+				$title = self::importedOptional(self::importedText($entry, 'title'), TextHelper::TITLE_MAX_LENGTH, $target === null);
+				$item = $this->newItem($context, $title, self::importedIcon(self::importedText($entry, 'icon')), self::importedOptional(self::importedText($entry, 'description'), TextHelper::DESCRIPTION_MAX_LENGTH), $target);
+			} catch (BadRequestError $e) {
+				$skipped[] = ['index' => $index, 'title' => is_array($entry) ? self::importedTitle($entry) : null, 'reason' => $e->getMessage()];
+				continue;
+			}
+			$parent = $entry['parent'] ?? null;
+			$parent = !$item->isGroup() && is_int($parent) && isset($groups[$parent]) ? $parent : null;
+			if ($item->isGroup()) {
+				$groups[$index] = true;
+			}
+			$items[] = ['item' => $item, 'entry' => $entry, 'index' => $index, 'parent' => $parent];
+		}
+		$leftOut = count($exported) - MenuItem::MAX_ITEMS_PER_APPLICATION;
+		if ($leftOut > 0) {
+			$skipped[] = ['index' => MenuItem::MAX_ITEMS_PER_APPLICATION, 'title' => null, 'reason' => 'A menu holds at most ' . MenuItem::MAX_ITEMS_PER_APPLICATION . ' items. ' . $leftOut . ' more were left out.'];
+		}
+		return ['items' => $items, 'skipped' => $skipped];
+	}
+
+	/**
+	 * The node relations of an application by kind (`table` or `view`) and the uuid of their
+	 * table or view, for resolving the tables and views of an exported menu. A view uuid is
+	 * unique per table only; when two views of the application share one, the first counts.
+	 *
+	 * @return array<string, array<string, int>>
+	 * @throws Exception
+	 */
+	public function nodeRelIdsByUuid(Context $context): array {
+		$relIdsByNode = [];
+		foreach ($context->getNodes() ?? [] as $relId => $node) {
+			$relIdsByNode[$node['node_type']][$node['node_id']] ??= (int)$relId;
+		}
+		$entities = [
+			'table' => $this->tableMapper->findMany(array_keys($relIdsByNode[Application::NODE_TYPE_TABLE] ?? [])),
+			'view' => $this->viewMapper->findMany(array_keys($relIdsByNode[Application::NODE_TYPE_VIEW] ?? [])),
+		];
+		$relIds = [];
+		foreach ($entities as $kind => $byId) {
+			$nodeType = $kind === 'table' ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
+			foreach ($byId as $id => $entity) {
+				$relIds[$kind][(string)$entity->getUuid()] ??= $relIdsByNode[$nodeType][$id];
+			}
+		}
+		return $relIds;
+	}
+
+	/**
+	 * The pages of an application that the pages of a scheme stand for, by the slug of the
+	 * scheme page. The start page of the scheme is the start page of the application, and
+	 * any other page is the page of the same type with its slug. An automatic `page_<id>`
+	 * slug names a page of the instance the scheme came from, so it stands for no page here.
+	 *
+	 * @param array<array-key, mixed> $schemePages
+	 * @return array<string, int>
+	 */
+	public function schemePageIds(Context $context, array $schemePages): array {
+		$startPageId = null;
+		$pageIdsByName = [];
+		foreach ($context->getPages() ?? [] as $pageId => $page) {
+			if ($page['page_type'] === Page::TYPE_STARTPAGE) {
+				$startPageId ??= (int)$pageId;
+			} else {
+				$pageIdsByName[$page['page_type']][(string)($page['slug'] ?? '')] = (int)$pageId;
+			}
+		}
+
+		$pageIds = [];
+		foreach ($schemePages as $page) {
+			if (!is_array($page) || !is_string($page['slug'] ?? null) || isset($pageIds[$page['slug']])) {
+				continue;
+			}
+			$pageType = is_string($page['page_type'] ?? null) ? $page['page_type'] : '';
+			$pageId = match (true) {
+				$pageType === Page::TYPE_STARTPAGE => $startPageId,
+				Page::isDefaultSlug($page['slug']) => null,
+				default => $pageIdsByName[$pageType][$page['slug']] ?? null,
+			};
+			if ($pageId !== null) {
+				$pageIds[$page['slug']] = $pageId;
+			}
+		}
+		return $pageIds;
+	}
+
+	/**
+	 * The menu a scheme import into this application would save, as the preview shows it and
+	 * as the import takes it back: page targets name the slug of the page of the application
+	 * they stand for and show the title they get there, an item names its group by the group's position among the
+	 * kept items, and only tables and views among the scheme's nodes count as having come
+	 * along.
+	 *
+	 * @param list<mixed> $menu
+	 * @param array<array-key, mixed> $schemePages
+	 * @param array<array-key, mixed> $schemeNodes
+	 * @return array{to: list<array<array-key, mixed>>, skipped: list<array{index: int, title: ?string, reason: string}>}
+	 */
+	public function previewSchemeImport(Context $context, array $menu, array $schemePages, array $schemeNodes): array {
+		$schemeUuids = [];
+		foreach ($schemeNodes as $node) {
+			$kind = ($node['node_type'] ?? null) === Application::NODE_TYPE_VIEW ? 'view' : 'table';
+			$schemeUuids[$kind][(string)($node['node_uuid'] ?? '')] = true;
+		}
+		$pageIds = $this->schemePageIds($context, $schemePages);
+		['items' => $items, 'skipped' => $skipped] = $this->readExported(
+			$context,
+			$menu,
+			static fn (string $kind, string $uuid): ?int => isset($schemeUuids[$kind][$uuid]) ? 0 : null,
+			static fn (string $slug): ?int => $pageIds[$slug] ?? null,
+		);
+		$pages = $context->getPages() ?? [];
+		$positions = array_flip(array_column($items, 'index'));
+		$entries = array_map(static function (array $item) use ($positions, $pages, $context): array {
+			$entry = ['parent' => $item['parent'] === null ? null : $positions[$item['parent']]] + $item['entry'];
+			$pageId = $item['item']->getPageId();
+			if ($pageId !== null && isset($pages[$pageId])) {
+				$entry['target'] = ['page' => (string)$pages[$pageId]['slug']];
+				$entry['displayTitle'] = $item['item']->getTitle() ?? $pages[$pageId]['title'] ?? $context->getName();
+			}
+			return $entry;
+		}, $items);
+		return ['to' => $entries, 'skipped' => $skipped];
+	}
+
+	/**
+	 * The target of an exported item as the API takes it. `{page}` (a slug), `{table}` and
+	 * `{view}` are translated by the resolvers, which give pages and node relations of the
+	 * application; `{url}` is checked like the API checks a target.
+	 *
+	 * @param \Closure(string): ?int $pageIdOf
+	 * @param \Closure(string, string): ?int $nodeRelIdOf
+	 * @return array{pageId: int}|array{nodeRelId: int}|array{url: string}
+	 * @throws BadRequestError
+	 */
+	private function importedTarget(mixed $target, Context $context, \Closure $pageIdOf, \Closure $nodeRelIdOf): array {
+		if (is_array($target) && count($target) === 1) {
+			$kind = (string)array_key_first($target);
+			$value = $target[$kind];
+			if ($kind === 'page' && is_string($value)) {
+				return ['pageId' => $pageIdOf($value) ?? throw new BadRequestError('The application has no page ' . $value . '.')];
+			}
+			if (($kind === 'table' || $kind === 'view') && is_string($value)) {
+				return ['nodeRelId' => $nodeRelIdOf($kind, $value) ?? throw new BadRequestError('Its ' . $kind . ' ' . $value . ' is not part of the application.')];
+			}
+			if ($kind === 'url') {
+				return $this->validateTarget(MenuTarget::fromArray($target), $context);
+			}
+		}
+		throw new BadRequestError('Its target is not {page}, {table}, {view} or {url}.');
+	}
+
+	/**
+	 * A text field of an exported item, or null when it is left out.
+	 *
+	 * @param array<array-key, mixed> $entry
+	 * @throws BadRequestError
+	 */
+	private static function importedText(array $entry, string $field): ?string {
+		$value = $entry[$field] ?? null;
+		if ($value !== null && !is_string($value)) {
+			throw new BadRequestError('Its ' . $field . ' is not a text.');
+		}
+		return $value;
+	}
+
+	/**
+	 * An exported text, trimmed, or null when it is empty or too long. With `$cut` a text
+	 * that is too long is cut to the length instead.
+	 */
+	private static function importedOptional(?string $text, int $maxLength, bool $cut = false): ?string {
+		if ($cut && $text !== null) {
+			$text = mb_substr(TextHelper::trim($text), 0, $maxLength);
+		}
+		try {
+			return TextHelper::optional($text, $maxLength);
+		} catch (\InvalidArgumentException) {
+			return null;
+		}
+	}
+
+	/**
+	 * An exported icon name, or null when it is empty or this instance has no such icon.
+	 */
+	private static function importedIcon(?string $icon): ?string {
+		$icon = trim((string)$icon);
+		return $icon !== '' && IconHelper::isValid($icon) ? $icon : null;
+	}
+
+	/**
+	 * @param array<array-key, mixed> $entry
+	 */
+	private static function importedTitle(array $entry): ?string {
+		$title = $entry['displayTitle'] ?? $entry['title'] ?? null;
+		return is_string($title) ? $title : null;
+	}
+
+	/**
 	 * Locks the application as the first statement of a menu write, so the menu's rules
 	 * are checked on what no other write changes meanwhile, and an item is never added to
 	 * an application that is being deleted.
@@ -337,11 +638,12 @@ class MenuService {
 
 	/**
 	 * @param list<MenuItem> $items
+	 * @param array<int, array<int, ?string>>|null $nodeTitles the titles of the tables and views of the items by node type and id, or null to load them
 	 * @return list<TablesMenuItem> the items the menu shows, see {@see self::displayTitles()}
 	 * @throws Exception
 	 */
-	private function serialize(Context $context, array $items): array {
-		$titles = $this->displayTitles($context, $items);
+	private function serialize(Context $context, array $items, ?array $nodeTitles = null): array {
+		$titles = $this->displayTitles($context, $items, $nodeTitles);
 		$menu = [];
 		foreach ($items as $item) {
 			if (!isset($titles[$item->getId()])) {
@@ -368,23 +670,20 @@ class MenuService {
 	 * part of the application or no longer exists.
 	 *
 	 * @param list<MenuItem> $items
+	 * @param array<int, array<int, ?string>>|null $nodeTitles the titles of the tables and views of the items by node type and id, or null to load them
 	 * @return array<int, string>
 	 * @throws Exception
 	 */
-	private function displayTitles(Context $context, array $items): array {
+	private function displayTitles(Context $context, array $items, ?array $nodeTitles = null): array {
 		$pages = $context->getPages() ?? [];
 		$nodes = $context->getNodes() ?? [];
-		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
-		foreach ($items as $item) {
-			$node = $this->nodeOf($item, $nodes);
-			if ($node !== null) {
-				$nodeIds[$node['node_type']][] = $node['node_id'];
-			}
+		if ($nodeTitles === null) {
+			$nodeIds = $this->nodeIdsByType($items, $nodes);
+			$nodeTitles = [
+				Application::NODE_TYPE_TABLE => $this->tableMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_TABLE]),
+				Application::NODE_TYPE_VIEW => $this->viewMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_VIEW]),
+			];
 		}
-		$nodeTitles = [
-			Application::NODE_TYPE_TABLE => $this->tableMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_TABLE]),
-			Application::NODE_TYPE_VIEW => $this->viewMapper->findIdToTitleMap($nodeIds[Application::NODE_TYPE_VIEW]),
-		];
 
 		$titles = [];
 		foreach ($items as $item) {
@@ -400,6 +699,35 @@ class MenuService {
 			}
 		}
 		return $titles;
+	}
+
+	/**
+	 * The ids of the tables and views the items open, by node type.
+	 *
+	 * @param list<MenuItem> $items
+	 * @param array<array-key, mixed> $nodes the nodes of the application by relation id
+	 * @return array<int, list<int>>
+	 */
+	private function nodeIdsByType(array $items, array $nodes): array {
+		$nodeIds = [Application::NODE_TYPE_TABLE => [], Application::NODE_TYPE_VIEW => []];
+		foreach ($items as $item) {
+			$node = $this->nodeOf($item, $nodes);
+			if ($node !== null) {
+				$nodeIds[$node['node_type']][] = $node['node_id'];
+			}
+		}
+		return $nodeIds;
+	}
+
+	/**
+	 * The menu as a reader who cannot manage the application sees it: without empty groups.
+	 *
+	 * @param list<TablesMenuItem> $menu
+	 * @return list<TablesMenuItem>
+	 */
+	private static function forReader(array $menu): array {
+		$parentIds = array_flip(array_filter(array_column($menu, 'parentId')));
+		return array_values(array_filter($menu, static fn (array $item): bool => $item['target'] !== null || isset($parentIds[$item['id']])));
 	}
 
 	/**
@@ -421,6 +749,25 @@ class MenuService {
 			throw new BadRequestError('The target of a menu item is {pageId} of a page or {nodeRelId} of a table or view of this application, or {url} of a link.');
 		}
 		return $target->toArray();
+	}
+
+	/**
+	 * A new item of the application, checked like every item.
+	 *
+	 * @param array{pageId: int}|array{nodeRelId: int}|array{url: string}|null $target
+	 * @throws BadRequestError
+	 */
+	private function newItem(Context $context, ?string $title, ?string $icon, ?string $description, ?array $target): MenuItem {
+		$item = new MenuItem();
+		$item->setContextId($context->getId());
+		$item->setTitle($title);
+		$item->setIcon($icon);
+		$item->setDescription($description);
+		if ($target !== null) {
+			$item->setTarget($target);
+		}
+		$this->assertValid($item);
+		return $item;
 	}
 
 	/**
