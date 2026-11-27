@@ -17,22 +17,46 @@
 				<div class="row space-L context__description">
 					{{ activeContext.description }}
 				</div>
+				<ContextPageBar :context="activeContext"
+					:selected-page-id="selectedPageId"
+					:panel-id="pagePanelId"
+					:can-manage="canManage"
+					@select="openPage"
+					@add-page="openPageForm(null)" />
 			</div>
 
-			<div class="resources">
-				<div v-for="resource in contextResources" :key="resource.key">
-					<div v-if="!resource.isView" class="resource">
-						<TableWrapper v-model:view-setting="resourceViewSettings[resource.key]" :table="resource" :columns="columns[resource.key]"
-							:rows="rows[resource.key]" @create-column="createColumn(false, resource)"
-							@import-scheme="openImportSchemeModal(resource)"
-							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
-							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
-					</div>
-					<div v-else-if="resource.isView" class="resource">
-						<CustomView v-model:view-setting="resourceViewSettings[resource.key]" :view="resource" :columns="columns[resource.key]"
-							:rows="rows[resource.key]" @create-column="createColumn(true, resource)"
-							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
-							@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
+			<div :id="pagePanelId"
+				role="tabpanel"
+				:aria-labelledby="selectedPageId !== null ? pageTabId(selectedPageId) : undefined">
+				<template v-if="activePageId !== null">
+					<GridPage v-if="activePage"
+						ref="gridPage"
+						:key="activePage.id"
+						:context="activeContext"
+						:page="activePage"
+						:can-edit="canManage"
+						@saved="page => activePage = page"
+						@edit-details="openPageForm"
+						@delete="deletePage" />
+					<div v-else-if="pageLoading" class="icon-loading" />
+					<ErrorMessage v-else :message="t('tables', 'This page could not be found')" />
+				</template>
+
+				<div v-else class="resources">
+					<div v-for="resource in contextResources" :key="resource.key">
+						<div v-if="!resource.isView" class="resource">
+							<TableWrapper v-model:view-setting="resourceViewSettings[resource.key]" :table="resource" :columns="columns[resource.key]"
+								:rows="rows[resource.key]" @create-column="createColumn(false, resource)"
+								@import-scheme="openImportSchemeModal(resource)"
+								@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)"
+								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, false)" />
+						</div>
+						<div v-else-if="resource.isView" class="resource">
+							<CustomView v-model:view-setting="resourceViewSettings[resource.key]" :view="resource" :columns="columns[resource.key]"
+								:rows="rows[resource.key]" @create-column="createColumn(true, resource)"
+								@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)"
+								@download-filtered-csv="rows => downloadFilteredCSV(rows, resource, true)" />
+						</div>
 					</div>
 				</div>
 			</div>
@@ -40,6 +64,11 @@
 
 		<ErrorMessage v-else-if="errorMessage" :message="errorMessage" />
 
+		<ContextPageForm :show-modal="pageFormOpen"
+			:page="pageBeingEdited"
+			:pending="pageFormPending"
+			@close="closePageForm"
+			@submit="submitPageForm" />
 		<MainModals />
 	</div>
 </template>
@@ -57,8 +86,13 @@ import svgHelper from '../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
 import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
+import ContextPageBar from '../modules/grid/ContextPageBar.vue'
+import GridPage from '../modules/grid/GridPage.vue'
+import ContextPageForm from '../modules/modals/ContextPageForm.vue'
+import { contextPages, isStartPage, pageTabId, pageTitle } from '../modules/grid/gridLayout.js'
+import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
-import { showError } from '@nextcloud/dialogs'
+import { getDialogBuilder, showError } from '@nextcloud/dialogs'
 
 export default {
 	components: {
@@ -67,9 +101,12 @@ export default {
 		ErrorMessage,
 		TableWrapper,
 		CustomView,
+		ContextPageBar,
+		GridPage,
+		ContextPageForm,
 	},
 
-	mixins: [exportTableMixin, svgHelper],
+	mixins: [exportTableMixin, svgHelper, permissionsMixin],
 	setup() {
 		const store = useDataStore()
 		const { getColumns, getRows } = storeToRefs(store)
@@ -86,11 +123,32 @@ export default {
 			errorMessage: null,
 			loadedSignature: null,
 			isReloading: false,
+			reloadAgain: false,
+			activePage: null,
+			pageLoading: false,
+			pageFormOpen: false,
+			pageFormPending: false,
+			pagePanelId: 'context-page-panel',
+			pageBeingEdited: null,
 		}
 	},
 
 	computed: {
 		...mapState(useTablesStore, ['tables', 'contexts', 'activeContextId', 'views', 'activeContext']),
+		// The grid page in the route; null on the start page
+		activePageId() {
+			return this.$route.params.pageId ? parseInt(this.$route.params.pageId) : null
+		},
+		// The page shown: the grid page in the route, else the start page
+		selectedPageId() {
+			if (this.activePageId !== null) {
+				return this.activePageId
+			}
+			return contextPages(this.activeContext).find(isStartPage)?.id ?? null
+		},
+		canManage() {
+			return this.ownsContext(this.activeContext)
+		},
 		rows() {
 			const rows = {}
 			if (this.context && this.context.nodes) {
@@ -142,12 +200,25 @@ export default {
 				this.reload()
 			},
 		},
+		activePageId(pageId, previousPageId) {
+			if (pageId !== null) {
+				this.loadActivePage()
+			} else if (previousPageId !== null) {
+				// The start page resources are only loaded while the start page is shown
+				this.reload()
+			}
+		},
 		'context.iconName': {
 			async handler(value) {
 				this.icon = value ? await this.getContextIcon(value) : ''
 			},
 			immediate: true,
 		},
+	},
+
+	created() {
+		// Counts the page loads, so a load that a newer one overtook leaves the page alone
+		this.pageRequest = 0
 	},
 
 	async mounted() {
@@ -158,7 +229,8 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView']),
+		pageTabId,
+		...mapActions(useTablesStore, ['loadContext', 'validateExportAccess', 'loadContextTable', 'loadContextView', 'loadContextPage', 'createContextPage', 'updateContextPage', 'deleteContextPage']),
 		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE', 'loadRelationsFromBE']),
 		contextSignature() {
 			const ctx = this.activeContext
@@ -169,13 +241,21 @@ export default {
 				return
 			}
 
+			// A reload asked for while one runs follows it, so it sees the latest application
 			if (this.isReloading) {
+				this.reloadAgain = true
 				return
 			}
 			this.isReloading = true
-			this.loading = true
-			this.contextResources = []
-			this.resourceViewSettings = {}
+			// The same application is refreshed in place, so an edit of its page goes on
+			const quiet = this.context !== null && parseInt(this.context.id) === parseInt(this.activeContextId) && !this.errorMessage
+			if (!quiet) {
+				this.loading = true
+				this.contextResources = []
+				this.resourceViewSettings = {}
+			}
+			const resources = []
+			const viewSettings = {}
 
 			try {
 				await this.loadContext({ id: this.activeContextId })
@@ -191,7 +271,9 @@ export default {
 
 				this.icon = await this.getContextIcon(this.activeContext.iconName)
 
-				if (this.context && this.context.pages) {
+				if (this.activePageId !== null) {
+					await this.loadActivePage()
+				} else if (this.context && this.context.pages) {
 					const pages = Object.values(this.context.pages)
 					const startPage = pages.find(p => p.page_type === 'startpage')
 
@@ -222,8 +304,8 @@ export default {
 										})
 										table.key = (table.id).toString()
 										table.isView = false
-										this.resourceViewSettings[table.key] = this.createViewSetting(table)
-										this.contextResources.push(table)
+										viewSettings[table.key] = this.resourceViewSettings[table.key] ?? this.createViewSetting(table)
+										resources.push(table)
 									}
 
 								} else if (nodeType === NODE_TYPE_VIEW) {
@@ -242,8 +324,8 @@ export default {
 										})
 										view.key = 'view-' + (view.id).toString()
 										view.isView = true
-										this.resourceViewSettings[view.key] = this.createViewSetting(view)
-										this.contextResources.push(view)
+										viewSettings[view.key] = this.resourceViewSettings[view.key] ?? this.createViewSetting(view)
+										resources.push(view)
 									}
 								}
 							} catch (err) {
@@ -252,6 +334,8 @@ export default {
 							}
 						}
 					}
+					this.resourceViewSettings = viewSettings
+					this.contextResources = resources
 					// TODO: check this
 					// Fallback if no startpage or content (though unexpected for valid contexts with nodes)
 					// If nodes exist but not in startpage content, they won't be shown.
@@ -267,6 +351,135 @@ export default {
 			} finally {
 				this.loading = false
 				this.isReloading = false
+				if (this.reloadAgain) {
+					this.reloadAgain = false
+					await this.reload()
+				}
+			}
+		},
+		/**
+		 * Loads the grid page in the route with its widgets, and the tables and views of the
+		 * application so data widgets can show their titles.
+		 */
+		async loadActivePage() {
+			const pageId = this.activePageId
+			this.pageLoading = true
+			// The page shown stays until it is loaded again, so its edit mode keeps its draft
+			if (this.activePage?.id !== pageId) {
+				this.activePage = null
+			}
+			const request = ++this.pageRequest
+			try {
+				const page = await this.loadContextPage({ contextId: this.activeContextId, pageId })
+				if (request === this.pageRequest && pageId === this.activePageId) {
+					this.activePage = page
+				}
+			} catch (e) {
+				if (request !== this.pageRequest) {
+					return
+				}
+				if (e?.response?.status !== 404) {
+					displayError(e, t('tables', 'Could not load the page.'))
+				} else {
+					this.activePage = null
+				}
+			} finally {
+				if (request === this.pageRequest) {
+					this.pageLoading = false
+				}
+			}
+			if (request === this.pageRequest) {
+				await this.loadApplicationNodes()
+			}
+		},
+		/**
+		 * Puts the tables and views of the application in the store, without their rows.
+		 */
+		async loadApplicationNodes() {
+			for (const node of Object.values(this.activeContext?.nodes ?? {})) {
+				try {
+					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
+						await this.loadContextTable({ id: node.node_id })
+					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
+						await this.loadContextView({ id: node.node_id })
+					}
+				} catch {
+					// A table or view that cannot be loaded is shown by id in the widget dialog
+				}
+			}
+		},
+		/**
+		 * Opens a page from the page bar.
+		 *
+		 * @param {object} page a page of the application
+		 */
+		openPage(page) {
+			if (isStartPage(page)) {
+				this.$router.push({ name: 'context', params: { contextId: this.activeContextId } })
+			} else {
+				this.$router.push({ name: 'contextPage', params: { contextId: this.activeContextId, pageId: page.id } })
+			}
+		},
+		/**
+		 * @param {object|null} page the grid page to edit, or null to add one
+		 */
+		openPageForm(page) {
+			this.pageBeingEdited = page
+			this.pageFormOpen = true
+		},
+		closePageForm() {
+			if (this.pageBeingEdited) {
+				this.$refs.gridPage?.focusPageActions()
+			}
+			this.pageFormOpen = false
+			this.pageBeingEdited = null
+		},
+		/**
+		 * Adds a grid page and opens it, or saves the details of the page being edited.
+		 *
+		 * @param {{title: string, icon: string, slug?: string, description: string}} data the page fields
+		 */
+		async submitPageForm(data) {
+			const editing = this.pageBeingEdited
+			this.pageFormPending = true
+			let page
+			try {
+				page = editing
+					? await this.updateContextPage({ contextId: this.activeContextId, pageId: editing.id, data })
+					: await this.createContextPage({ contextId: this.activeContextId, data })
+			} finally {
+				this.pageFormPending = false
+			}
+			if (!page) {
+				return
+			}
+			this.closePageForm()
+			if (editing) {
+				this.activePage = page
+				return
+			}
+			await this.$router.push({ name: 'contextPage', params: { contextId: this.activeContextId, pageId: page.id } })
+		},
+		/**
+		 * Deletes a grid page after confirmation and goes back to the start page.
+		 *
+		 * @param {object} page the page to delete
+		 */
+		async deletePage(page) {
+			let confirmed = false
+			try {
+				await getDialogBuilder(t('tables', 'Delete page'))
+					.setText(t('tables', 'Delete the page "{title}" and its widgets? The tables and views stay in the application.', { title: pageTitle(page) }, undefined, { escape: false }))
+					.setSeverity('warning')
+					.addButton({ label: t('tables', 'Cancel'), callback: () => {} })
+					.addButton({ label: t('tables', 'Delete page'), variant: 'error', callback: () => { confirmed = true } })
+					.build()
+					.show()
+			} catch {
+				// Closing the dialog keeps the page
+			}
+			if (confirmed && await this.deleteContextPage({ contextId: this.activeContextId, pageId: page.id })) {
+				await this.$router.push({ name: 'context', params: { contextId: this.activeContextId } })
 			}
 		},
 		createColumn(isView, element) {
@@ -346,7 +559,8 @@ export default {
 	&__description {
 		margin: calc(3 * var(--default-grid-baseline, 4px));
 		max-width: 790px;
-		margin-inline-start: 32px;
+		// Lines up with the page tabs and the widget texts
+		margin-inline-start: calc(32px + 3 * var(--default-grid-baseline));
 	}
 
 	&:deep(.icon-vue) {
@@ -355,7 +569,9 @@ export default {
 	}
 }
 
-.main-context-view {
+// Only the table list grows wider than the content, so the page bar and the grid pages
+// keep the width of the content
+.resources {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
 }
