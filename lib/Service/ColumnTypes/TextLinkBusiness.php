@@ -9,12 +9,13 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Helper\UrlHelper;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class TextLinkBusiness extends SuperBusiness {
 
-	public const ALLOWED_PROTOCOLS = ['http', 'https'];
+	public const ALLOWED_PROTOCOLS = UrlHelper::ALLOWED_SCHEMES;
 
 	public function __construct(
 		LoggerInterface $logger,
@@ -115,7 +116,7 @@ class TextLinkBusiness extends SuperBusiness {
 		$data = json_decode((string)$value, true);
 
 		// Only allow URLs that start with http or https
-		if (isset($data['value']) && !$this->isValidUrlProtocol($data['value'])) {
+		if (isset($data['value']) && !UrlHelper::hasAllowedScheme((string)$data['value'])) {
 			throw new BadRequestError(
 				'Column "' . $column->getTitle() . '" contains an invalid protocol. Only http and https are allowed.',
 				translatedMessage: $this->n->t(
@@ -124,15 +125,5 @@ class TextLinkBusiness extends SuperBusiness {
 				),
 			);
 		}
-	}
-
-	private function isValidUrlProtocol(string $url): bool {
-		$parsed = parse_url($url);
-
-		if ($parsed === false || !isset($parsed['scheme'])) {
-			return false;
-		}
-
-		return in_array($parsed['scheme'], self::ALLOWED_PROTOCOLS, true);
 	}
 }

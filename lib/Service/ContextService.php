@@ -15,6 +15,8 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\ContextNodeRelation;
 use OCA\Tables\Db\ContextNodeRelationMapper;
+use OCA\Tables\Db\MenuItem;
+use OCA\Tables\Db\MenuItemMapper;
 use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
@@ -67,6 +69,7 @@ class ContextService {
 		private ViewMapper $viewMapper,
 		private WidgetService $widgetService,
 		private GridWidgetTypes $gridWidgetTypes,
+		private MenuItemMapper $menuItemMapper,
 	) {
 	}
 
@@ -135,6 +138,9 @@ class ContextService {
 	}
 
 	/**
+	 * Creates an application with its start page and a menu of one item, without a
+	 * title, opening the start page.
+	 *
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
@@ -154,6 +160,8 @@ class ContextService {
 				$this->insertNodesFromArray($context, $nodes);
 			}
 			$this->insertPage($context);
+
+			$this->menuItemMapper->insert(MenuItem::forStartPage($context->getId(), (int)array_key_first($context->getPages())));
 		}, $this->dbc);
 		$this->auditLogService->log(Operation::ContextCreated, 'Tables application with ID %s was created for user %s', [
 			'contextId' => $context->getId(),
@@ -380,6 +388,7 @@ class ContextService {
 				$this->pageContentMapper->deleteByPageId($pageId);
 				$this->pageMapper->deleteByPageId($pageId);
 			}
+			$this->menuItemMapper->deleteByContextId($context->getId());
 			$this->contextMapper->delete($context);
 		}, $this->dbc);
 		$this->auditLogService->log(Operation::ContextDeleted, 'Tables application with ID %s was deleted', [
@@ -396,6 +405,7 @@ class ContextService {
 				$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
 				$this->widgetService->deleteSourcesByNodeRelIds($nodeRelIds);
 				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
+				$this->menuItemMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
 			}, $this->dbc);
 		} catch (Exception $e) {
@@ -491,12 +501,13 @@ class ContextService {
 	 */
 	public function removeNodeFromContextAndPages(int $nodeRelationId): array {
 		return $this->atomic(function () use ($nodeRelationId): array {
-			// the order of deleteNodeRel(): application, sources, contents, relation
+			// the order of deleteNodeRel(): application, widget sources, page contents, menu items, relation
 			$nodeRelation = $this->contextNodeRelMapper->findById($nodeRelationId);
 			$this->lockContexts([$nodeRelation->getContextId()]);
 			$this->widgetService->deleteSourcesByNodeRelIds([$nodeRelationId]);
 			$contents = $this->pageContentMapper->findByNodeRelation($nodeRelationId);
 			$this->pageContentMapper->deleteByNodeRelIds([$nodeRelationId]);
+			$this->menuItemMapper->deleteByNodeRelIds([$nodeRelationId]);
 			$nodeRelation = $this->removeNodeFromContext($nodeRelation);
 			return [$nodeRelation, $contents];
 		}, $this->dbc);
@@ -704,7 +715,8 @@ class ContextService {
 	}
 
 	/**
-	 * Inserts an exported application with its node relations, pages and page contents.
+	 * Inserts an exported application with its node relations, pages and page contents,
+	 * and a menu that opens its start page.
 	 *
 	 * @throws Exception
 	 */
@@ -746,7 +758,7 @@ class ContextService {
 		$pageMap = [];
 		$pages = $this->importablePages(is_array($context['pages'] ?? null) ? $context['pages'] : []);
 		$slugs = $this->importedPageSlugs($pages);
-		$hasStartPage = false;
+		$startPageId = null;
 		foreach ($pages as $pageKey => $pageArr) {
 			$page = new Page();
 			$page->setContextId($newContext->getId());
@@ -760,7 +772,9 @@ class ContextService {
 				$page->setSlug($slugs[$pageKey]);
 				$page = $this->pageMapper->insert($page);
 			}
-			$hasStartPage = $hasStartPage || $page->getPageType() === Page::TYPE_STARTPAGE;
+			if ($startPageId === null && $page->getPageType() === Page::TYPE_STARTPAGE) {
+				$startPageId = $page->getId();
+			}
 			if ($page->getPageType() === Page::TYPE_GRID && trim((string)$page->getTitle()) === '') {
 				// a grid page is named by its title, so it never stays without one
 				$page->resetUpdatedFields();
@@ -795,10 +809,11 @@ class ContextService {
 			$this->importWidgets($page->getId(), array_slice($widgets, 0, GridWidgetTypes::MAX_WIDGETS_PER_PAGE), $sourceRelMap);
 		}
 
-		if (!$hasStartPage) {
+		if ($startPageId === null) {
 			$this->logger->warning('An imported application had no start page; it gets a new one.');
-			$this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_SLUG, $slugs, true), array_values($nodeRelMap));
+			$startPageId = $this->insertImportedStartPage($newContext->getId(), in_array(Page::START_PAGE_SLUG, $slugs, true), array_values($nodeRelMap));
 		}
+		$this->menuItemMapper->insert(MenuItem::forStartPage($newContext->getId(), $startPageId));
 
 		return $newContext;
 	}
@@ -808,9 +823,10 @@ class ContextService {
 	 * tables and views. It is named `dashboard` unless an imported page took that name.
 	 *
 	 * @param list<ContextNodeRelation> $nodeRelations
+	 * @return int the id of the start page
 	 * @throws Exception
 	 */
-	private function insertImportedStartPage(int $contextId, bool $startPageNameTaken, array $nodeRelations): void {
+	private function insertImportedStartPage(int $contextId, bool $startPageNameTaken, array $nodeRelations): int {
 		$page = new Page();
 		$page->setContextId($contextId);
 		$page->setPageType(Page::TYPE_STARTPAGE);
@@ -827,6 +843,7 @@ class ContextService {
 			$pageContent->setOrder(10 * ($i + 1));
 			$this->pageContentMapper->insert($pageContent);
 		}
+		return $page->getId();
 	}
 
 	/**
