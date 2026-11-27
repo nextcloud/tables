@@ -261,6 +261,40 @@ class PageServiceTest extends TestCase {
 		$this->assertSame([$stored, 5], [$page['widgets'], $page['version']]);
 	}
 
+	public function testWidgetsCanSitInTheTabsOfATabsWidgetListedAfterThem(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$synced = null;
+		$this->widgetService->expects($this->once())->method('syncPage')->willReturnCallback(function (int $pageId, array $widgets) use (&$synced): array {
+			$synced = $widgets;
+			return [];
+		});
+
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [
+			self::widget(['settings' => ['text' => 'In the second tab'], 'parentIndex' => 1, 'parentTab' => 'closed']),
+			self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => " Closed\u{200B}"]]]]),
+		], 4);
+
+		$this->assertSame([[1, 'closed'], [null, null]], array_map(static fn (WidgetInput $w): array => [$w->parentIndex, $w->parentTab], $synced));
+		$this->assertSame(['open', 'closed'], array_column($synced[1]->settings['tabs'], 'key'));
+		$this->assertSame('Closed', $synced[1]->settings['tabs'][1]['title']);
+	}
+
+	public function testAPageReadFromTheApiCanBeSentBackAsItIs(): void {
+		$this->pageMapper->method('raiseVersion')->willReturn(true);
+		$synced = null;
+		$this->widgetService->expects($this->once())->method('syncPage')->willReturnCallback(function (int $pageId, array $widgets) use (&$synced): array {
+			$synced = $widgets;
+			return [];
+		});
+
+		$this->service->update(7, self::GRID_PAGE, null, null, null, null, [
+			self::widget(['id' => 31, 'settings' => ['text' => 'In a tab'], 'parentId' => 32, 'parentTab' => 'closed']),
+			self::widget(['id' => 32, 'type' => 'tabs', 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]]]),
+		], 4);
+
+		$this->assertSame([[1, 'closed'], [null, null]], array_map(static fn (WidgetInput $w): array => [$w->parentIndex, $w->parentTab], $synced));
+	}
+
 	public function testTheStartPageHoldsWidgets(): void {
 		$this->pageMapper->method('raiseVersion')->willReturn(true);
 		$this->widgetService->expects($this->once())->method('syncPage')->with(self::START_PAGE)->willReturn([]);
@@ -381,6 +415,21 @@ class PageServiceTest extends TestCase {
 			'source of another application' => [[self::widget(['type' => 'data', 'settings' => [], 'source' => ['nodeRelId' => 99]])], 'The source of widget 0'],
 			'the same id twice' => [[self::widget(['id' => 31]), self::widget(['id' => 31])], 'Widget 1 has the id of another widget'],
 			'too many' => [array_fill(0, 101, self::widget()), 'A page holds at most 100 widgets'],
+			'tab without tabs widget' => [[self::widget(['parentTab' => 'open'])], 'names a tab but no tabs widget'],
+			'parent not a tabs widget' => [[self::widget(), self::widget(['parentIndex' => 0, 'parentTab' => 'open'])], 'Widget 1 must sit in a tabs widget'],
+			'parentIndex not a number' => [[self::widget(['parentIndex' => '0', 'parentTab' => 'open'])], 'parentIndex of widget 0 must be a number'],
+			'parentIndex and parentId' => [[self::widget(['id' => 32, 'type' => 'tabs', 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]]]), self::widget(['parentIndex' => 0, 'parentId' => 32, 'parentTab' => 'open'])], 'not both'],
+			'parentId not listed' => [[self::widget(['parentId' => 99, 'parentTab' => 'open'])], 'names a tabs widget that is not in the list'],
+			'parentIndex past the list' => [[self::widget(['parentIndex' => 5, 'parentTab' => 'open'])], 'Widget 0 must sit in a tabs widget'],
+			'tabs in tabs' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]]]), self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]], 'parentIndex' => 0, 'parentTab' => 'open'])], 'more than one level deep'],
+			'unknown tab' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]]]), self::widget(['parentIndex' => 0, 'parentTab' => 'archived'])], 'must name the key of one of the tabs'],
+			'tab named by position' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'open', 'title' => 'Open'], ['key' => 'closed', 'title' => 'Closed']]]]), self::widget(['parentIndex' => 0, 'parentTab' => 1])], 'must be the key of a tab'],
+			'tabs as text' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => "Open\nClosed"]])], 'must be a list of tabs'],
+			'no tabs' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => []]])], 'needs at least one tab'],
+			'blank tab title' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'a', 'title' => "\u{00A0}\u{200B}"]]]])], 'Tab 0 of widget setting tabs.tabs needs a title'],
+			'the same key twice' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'a', 'title' => 'A'], ['key' => 'a', 'title' => 'B']]]])], 'Tab 1 of widget setting tabs.tabs has the key of another tab'],
+			'a key with a space' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => [['key' => 'a b', 'title' => 'A']]]])], 'needs a key of at most 32'],
+			'too many tabs' => [[self::widget(['type' => 'tabs', 'settings' => ['tabs' => array_map(static fn (int $n): array => ['title' => 'Tab ' . $n], range(1, 21))]])], 'holds at most 20 tabs'],
 		];
 	}
 

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\Errors\BadRequestError;
+use OCA\Tables\Model\WidgetInput;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCP\IL10N;
 use PHPUnit\Framework\TestCase;
@@ -167,5 +168,129 @@ class GridWidgetTypesTest extends TestCase {
 		$this->expectException(BadRequestError::class);
 		$this->expectExceptionMessage($message);
 		$this->types->readWidget(1, $widget);
+	}
+
+	public function testTabsAreKeptWithTheirKeysAndATabWithoutAKeyGetsOne(): void {
+		$tabs = $this->types->sanitizeSettings('tabs', ['tabs' => [
+			['key' => 'open_tasks-1', 'title' => ' Open '],
+			['title' => 'Done'],
+			['key' => '', 'title' => 'Later'],
+		]])['tabs'];
+
+		$this->assertSame(['key' => 'open_tasks-1', 'title' => 'Open'], $tabs[0]);
+		$this->assertSame('Done', $tabs[1]['title']);
+		$this->assertMatchesRegularExpression('/^[0-9a-f]{12}$/', $tabs[1]['key']);
+		$this->assertMatchesRegularExpression('/^[0-9a-f]{12}$/', $tabs[2]['key']);
+		$this->assertNotSame($tabs[1]['key'], $tabs[2]['key']);
+	}
+
+	public function testTheMaximumNumberOfTabsIsKept(): void {
+		$tabs = array_map(fn (int $i) => ['key' => 't' . $i, 'title' => 'Tab ' . $i], range(1, GridWidgetTypes::MAX_TABS));
+		$this->assertSame($tabs, $this->types->sanitizeSettings('tabs', ['tabs' => $tabs])['tabs']);
+	}
+
+	public function testATabKeyOfTheMaximumLengthIsKept(): void {
+		$key = str_repeat('k', GridWidgetTypes::TAB_KEY_MAX_LENGTH);
+		$this->assertSame([['key' => $key, 'title' => 'A']], $this->types->sanitizeSettings('tabs', ['tabs' => [['key' => $key, 'title' => 'A']]])['tabs']);
+	}
+
+	public static function invalidTabs(): array {
+		$tab = ['key' => 'a', 'title' => 'A'];
+		return [
+			'not a list' => [['first' => $tab], 'tabs.tabs must be a list of tabs'],
+			'not an array' => ['A', 'tabs.tabs must be a list of tabs'],
+			'missing, so empty' => [null, 'tabs.tabs needs at least one tab'],
+			'empty' => [[], 'tabs.tabs needs at least one tab'],
+			'too many' => [array_map(fn (int $i) => ['key' => 't' . $i, 'title' => 'T'], range(0, GridWidgetTypes::MAX_TABS)), 'holds at most 20 tabs'],
+			'tab not an object' => [['A'], 'Tab 0 of widget setting tabs.tabs needs a title'],
+			'no title' => [[['key' => 'a']], 'Tab 0 of widget setting tabs.tabs needs a title'],
+			'title not text' => [[['key' => 'a', 'title' => 5]], 'Tab 0 of widget setting tabs.tabs needs a title'],
+			'blank title' => [[$tab, ['key' => 'b', 'title' => '  ']], 'Tab 1 of widget setting tabs.tabs needs a title'],
+			'title of a no-break and a zero width space' => [[['key' => 'a', 'title' => "\u{00A0}\u{200B}"]], 'Tab 0 of widget setting tabs.tabs needs a title'],
+			'title too long' => [[['key' => 'a', 'title' => str_repeat('a', 201)]], 'needs a title of at most 200 characters'],
+			'key not text' => [[['key' => 5, 'title' => 'A']], 'Tab 0 of widget setting tabs.tabs needs a key'],
+			'key with a space' => [[['key' => 'a b', 'title' => 'A']], 'Tab 0 of widget setting tabs.tabs needs a key'],
+			'key with markup' => [[['key' => '<b>', 'title' => 'A']], 'Tab 0 of widget setting tabs.tabs needs a key'],
+			'key too long' => [[['key' => str_repeat('k', 33), 'title' => 'A']], 'needs a key of at most 32 letters'],
+			'duplicate key' => [[$tab, ['key' => 'a', 'title' => 'B']], 'Tab 1 of widget setting tabs.tabs has the key of another tab'],
+		];
+	}
+
+	/**
+	 * @dataProvider invalidTabs
+	 */
+	public function testTabsThatBreakARuleAreRefused(mixed $tabs, string $message): void {
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage($message);
+		$this->types->sanitizeSettings('tabs', $tabs === null ? [] : ['tabs' => $tabs]);
+	}
+
+	private static function widget(string $type, ?int $parentIndex = null, ?string $parentTab = null, ?int $id = null, ?int $parentId = null): WidgetInput {
+		$settings = $type === GridWidgetTypes::TYPE_TABS ? ['tabs' => [['key' => 'a', 'title' => 'A'], ['key' => 'b', 'title' => 'B']]] : [];
+		return new WidgetInput($id, $type, null, null, null, 0, 0, 6, 2, $settings, null, $parentIndex, $parentTab, $parentId);
+	}
+
+	public function testWidgetsOnThePageAndInATabOfATabsWidgetAreAccepted(): void {
+		$widgets = [
+			self::widget('text'),
+			self::widget('tabs'),
+			self::widget('text', 1, 'b'),
+			self::widget('data', 1, 'a'),
+		];
+
+		GridWidgetTypes::validateParents($widgets);
+		foreach (array_keys($widgets) as $index) {
+			GridWidgetTypes::validateParent($index, $widgets);
+		}
+		$this->addToAssertionCount(1);
+	}
+
+	public static function misplacedWidgets(): array {
+		return [
+			'tab without a tabs widget' => [[self::widget('text', null, 'a')], 0, 'Widget 0 names a tab but no tabs widget'],
+			'parent not a tabs widget' => [[self::widget('text'), self::widget('text', 0, 'a')], 1, 'Widget 1 must sit in a tabs widget of the same page'],
+			'parent not in the list' => [[self::widget('tabs'), self::widget('text', 5, 'a')], 1, 'Widget 1 must sit in a tabs widget of the same page'],
+			'its own parent' => [[self::widget('tabs', 0, 'a')], 0, 'Widget 0 must sit in a tabs widget of the same page'],
+			'tabs in a tab' => [[self::widget('tabs'), self::widget('tabs', 0, 'a')], 1, 'Widget 1 would nest tabs more than one level deep'],
+			'parent sits in a tab' => [[self::widget('tabs'), self::widget('tabs', 0, 'a'), self::widget('text', 1, 'a')], 2, 'Widget 2 would nest tabs more than one level deep'],
+			'unknown tab key' => [[self::widget('tabs'), self::widget('text', 0, 'c')], 1, 'Widget 1 must name the key of one of the tabs'],
+			'no tab key' => [[self::widget('tabs'), self::widget('text', 0)], 1, 'Widget 1 must name the key of one of the tabs'],
+			'unresolved parentId' => [[self::widget('tabs', null, null, 10), self::widget('text', null, 'a', null, 10)], 1, 'Widget 1 names its tabs widget by an id that was not resolved'],
+		];
+	}
+
+	/**
+	 * @dataProvider misplacedWidgets
+	 * @param list<WidgetInput> $widgets
+	 */
+	public function testAWidgetThatSitsWhereItCannotIsRefused(array $widgets, int $index, string $message): void {
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage($message);
+		GridWidgetTypes::validateParent($index, $widgets);
+	}
+
+	public function testEveryWidgetOfAListIsChecked(): void {
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('Widget 2 must name the key of one of the tabs');
+		GridWidgetTypes::validateParents([self::widget('tabs'), self::widget('text', 0, 'a'), self::widget('text', 0, 'c')]);
+	}
+
+	public function testAParentIdBecomesThePositionOfThatWidget(): void {
+		$text = self::widget('text', null, 'b', 12, 10);
+		$onPage = self::widget('header', null, null, 11);
+		$tabs = self::widget('tabs', null, null, 10);
+
+		$resolved = GridWidgetTypes::resolveParents([$text, $onPage, $tabs]);
+
+		$this->assertSame([2, 'b', null, 12], [$resolved[0]->parentIndex, $resolved[0]->parentTab, $resolved[0]->parentId, $resolved[0]->id]);
+		$this->assertSame($onPage, $resolved[1]);
+		$this->assertSame($tabs, $resolved[2]);
+		GridWidgetTypes::validateParents($resolved);
+	}
+
+	public function testAParentIdOfAWidgetNotInTheListIsRefused(): void {
+		$this->expectException(BadRequestError::class);
+		$this->expectExceptionMessage('Widget 1 names a tabs widget that is not in the list');
+		GridWidgetTypes::resolveParents([self::widget('tabs', null, null, 10), self::widget('text', null, 'a', null, 11)]);
 	}
 }

@@ -956,6 +956,8 @@ export type paths = {
          * [api v2] Change a page or its widgets
          * @description Fields left out keep their value; an empty icon or description removes it. A given `widgets` list replaces the widgets of the page, a grid page or the start page: listed widgets with an `id` are updated, others are added, and widgets not listed are deleted.
          *     A widget has a `type`, `gridX`, `gridY`, `gridWidth` and `gridHeight` on a grid of 12 columns, `settings` following the schema of its type, and optionally an `id`, `title`, `icon` and `description`. A data widget's `source` is `{nodeRelId}` of a table or view of this application, or null.
+         *     A widget in a tab of a tabs widget names that tabs widget by `parentIndex`, its position in `widgets`, or by `parentId`, the `id` of a widget listed in the same request, so a page read from the API can be sent back as it is. `parentTab` is the `key` of the tab in the tabs widget's `tabs` setting. A widget in a tab is placed on the tab's own grid of 12 columns, with rows counted from the top of the tab. Tabs go one level deep: a tabs widget sits on the page itself and holds no tabs widget.
+         *     The response lists the widgets of the page and of all its tabs in one list, ordered by row, so a widget can come before its tabs widget.
          */
         readonly patch: operations["context_page-update"];
         readonly trace?: never;
@@ -1577,6 +1579,9 @@ export type components = {
                 /** Format: int64 */
                 readonly nodeRelId: number;
             } | null;
+            /** Format: int64 */
+            readonly parentId: number | null;
+            readonly parentTab: string | null;
         };
         readonly WidgetInput: {
             /** Format: int64 */
@@ -1600,10 +1605,15 @@ export type components = {
                 /** Format: int64 */
                 readonly nodeRelId: number;
             };
+            /** Format: int64 */
+            readonly parentIndex?: number;
+            /** Format: int64 */
+            readonly parentId?: number;
+            readonly parentTab?: string;
         };
         readonly WidgetSettingSchema: {
             /** @enum {string} */
-            readonly type: "string" | "text" | "enum";
+            readonly type: "string" | "text" | "enum" | "tabs";
             readonly title: string;
             readonly default: components["schemas"]["WidgetValue"];
             readonly options?: readonly {
@@ -1611,7 +1621,13 @@ export type components = {
                 readonly label: string;
             }[];
             readonly required?: boolean;
+            /** Format: int64 */
+            readonly maxItems?: number;
             readonly hint?: string;
+        };
+        readonly WidgetTab: {
+            readonly key: string;
+            readonly title: string;
         };
         readonly WidgetType: {
             readonly type: string;
@@ -1625,7 +1641,7 @@ export type components = {
                 readonly [key: string]: components["schemas"]["WidgetSettingSchema"];
             };
         };
-        readonly WidgetValue: string;
+        readonly WidgetValue: string | readonly components["schemas"]["WidgetTab"][];
     };
     responses: never;
     parameters: never;

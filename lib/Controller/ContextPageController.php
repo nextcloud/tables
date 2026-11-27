@@ -134,6 +134,16 @@ class ContextPageController extends AOCSController {
 	 * `title`, `icon` and `description`. A data widget's `source` is `{nodeRelId}` of a
 	 * table or view of this application, or null.
 	 *
+	 * A widget in a tab of a tabs widget names that tabs widget by `parentIndex`, its
+	 * position in `widgets`, or by `parentId`, the `id` of a widget listed in the same
+	 * request, so a page read from the API can be sent back as it is. `parentTab` is the
+	 * `key` of the tab in the tabs widget's `tabs` setting. A widget in a tab is placed on
+	 * the tab's own grid of 12 columns, with rows counted from the top of the tab. Tabs go
+	 * one level deep: a tabs widget sits on the page itself and holds no tabs widget.
+	 *
+	 * The response lists the widgets of the page and of all its tabs in one list, ordered
+	 * by row, so a widget can come before its tabs widget.
+	 *
 	 * @param int $contextId ID of the application
 	 * @param int $pageId ID of the page
 	 * @param string|null $title New title
