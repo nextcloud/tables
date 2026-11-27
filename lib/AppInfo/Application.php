@@ -55,7 +55,6 @@ use OCP\OCM\Events\LocalOCMDiscoveryEvent;
 use OCP\Security\Signature\ISignatoryManager;
 use OCP\Server;
 use OCP\Share\ShareReview\RegisterShareReviewSourceEvent;
-use OCP\User\Events\BeforeUserDeletedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use Psr\Container\ContainerInterface;
 
@@ -94,7 +93,7 @@ class Application extends App implements IBootstrap {
 		$context->registerService(AuditLogServiceInterface::class, fn (ContainerInterface $c) => $c->get(DefaultAuditLogService::class));
 		$context->registerService(ISignatoryManager::class, fn (ContainerInterface $c) => $c->get(OCMSignatoryManager::class));
 
-		$context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
+		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
 		$context->registerEventListener(RegisterShareReviewSourceEvent::class, ShareReviewListener::class);
 		$context->registerEventListener(RenderReferenceEvent::class, TablesReferenceListener::class);

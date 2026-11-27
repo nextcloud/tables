@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Service;
 
 use OCA\Tables\AuditLog\Operation;
+use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
@@ -78,25 +79,7 @@ class ShareServiceTest extends TestCase {
 		$this->federationService = $this->createMock(FederationService::class);
 		$this->auditLogService = $this->createMock(AuditLogServiceInterface::class);
 
-		$this->shareService = new ShareService(
-			$this->permissionsService,
-			$this->logger,
-			'admin',
-			$this->mapper,
-			$this->tableMapper,
-			$this->viewMapper,
-			$this->userHelper,
-			$this->groupHelper,
-			$this->circleHelper,
-			$this->contextNavigationMapper,
-			$this->dbc,
-			$this->secureRandom,
-			$this->userManager,
-			$this->hasher,
-			$this->shareManager,
-			$this->federationService,
-			$this->auditLogService,
-		);
+		$this->shareService = $this->createShareService('admin');
 
 		$this->publicShare = new Share();
 		$this->publicShare->setSender('userA');
@@ -370,5 +353,41 @@ class ShareServiceTest extends TestCase {
 
 		$this->expectException(Exception::class);
 		$this->shareService->deleteForShareReview(5);
+	}
+
+	public function testDeleteAllForContextWorksWithoutASessionUser(): void {
+		$shareService = $this->createShareService(null);
+		$context = new Context();
+		$context->setId(9);
+		$share = new Share();
+		$share->setId(4);
+
+		$this->mapper->expects($this->once())->method('findAllSharesForNode')->with('context', 9)->willReturn([$share]);
+		$this->contextNavigationMapper->expects($this->once())->method('deleteByShareId')->with(4);
+		$this->mapper->expects($this->once())->method('deleteByNode')->with(9, 'context');
+
+		$shareService->deleteAllForContext($context);
+	}
+
+	private function createShareService(?string $userId): ShareService {
+		return new ShareService(
+			$this->permissionsService,
+			$this->logger,
+			$userId,
+			$this->mapper,
+			$this->tableMapper,
+			$this->viewMapper,
+			$this->userHelper,
+			$this->groupHelper,
+			$this->circleHelper,
+			$this->contextNavigationMapper,
+			$this->dbc,
+			$this->secureRandom,
+			$this->userManager,
+			$this->hasher,
+			$this->shareManager,
+			$this->federationService,
+			$this->auditLogService,
+		);
 	}
 }
