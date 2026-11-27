@@ -3146,6 +3146,52 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user tries to update row :rowAlias using v2 on :nodeType :nodeAlias with following values
+	 */
+	public function userTriesToUpdateRowUsingV2OnNode(string $user, string $rowAlias, string $nodeType, string $nodeAlias, TableNode $properties): void {
+		$this->setCurrentUser($user);
+		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+		$row = $this->collectionManager->getByAlias('row', $rowAlias);
+
+		$props = [];
+		foreach ($properties->getRows() as $property) {
+			$columnId = $this->collectionManager->getByAlias('column', $property[0])['id'];
+			$props[$columnId] = $property[1];
+		}
+
+		$this->sendOcsRequest(
+			'PUT',
+			sprintf('/apps/tables/api/2/%ss/%d/rows/%d', $nodeType, $node['id'], $row['id']),
+			['data' => $props]
+		);
+	}
+
+	/**
+	 * @When user :user tries to delete row :rowAlias using v2 on :nodeType :nodeAlias
+	 */
+	public function userTriesToDeleteRowUsingV2OnNode(string $user, string $rowAlias, string $nodeType, string $nodeAlias): void {
+		$this->setCurrentUser($user);
+		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+		$row = $this->collectionManager->getByAlias('row', $rowAlias);
+
+		$this->sendOcsRequest(
+			'DELETE',
+			sprintf('/apps/tables/api/2/%ss/%d/rows/%d', $nodeType, $node['id'], $row['id'])
+		);
+	}
+
+	/**
+	 * @Then the response has a message
+	 */
+	public function theResponseHasAMessage(): void {
+		$this->response->getBody()->rewind();
+		$data = $this->getDataFromResponse($this->response);
+		$message = $data['ocs']['data']['message'] ?? $data['message'] ?? null;
+		Assert::assertIsString($message);
+		Assert::assertNotSame('', $message);
+	}
+
+	/**
 	 * @When the user :user fetches :nodeType :nodeAlias, it has exactly these rows :rowAliasList
 	 */
 	public function nodeHasExactlyThoseRows(string $user, string $nodeType, string $nodeAlias, string $rowAliasList): void {

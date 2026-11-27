@@ -691,7 +691,13 @@ class ImportService extends SuperService {
 			}
 
 			if ($rowId) {
-				$this->rowService->updateSet($rowId, $this->viewId, $data, $this->userId, $this->tableId);
+				try {
+					$this->rowService->updateSet($rowId, $this->viewId, $data, $this->userId, $this->tableId);
+				} catch (NotFoundError $e) {
+					$this->logger->warning('Row ' . $rowId . ' to update is not reachable through the import target, skipping it.', ['exception' => $e]);
+					$this->countErrors++;
+					return;
+				}
 				$this->countUpdatedRows++;
 			} else {
 				$this->rowService->create($this->tableId, $this->viewId, $data, $this->userId);

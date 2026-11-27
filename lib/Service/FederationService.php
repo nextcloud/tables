@@ -17,6 +17,8 @@ use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\FederationDisabledError;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Federation\FederationProvider;
 use OCA\Tables\Federation\FederationProxy;
 use OCA\Tables\Helper\UserHelper;
@@ -50,6 +52,17 @@ class FederationService {
 		return $remote . '/ocs/v2.php/apps/tables/api/2/public/' . $node->getShareToken();
 	}
 
+	/**
+	 * A 404 or 403 answered by the remote is an expected outcome, so it is only logged at debug level.
+	 */
+	private function logRemoteFailure(string $message, \Exception $e): void {
+		if ($e instanceof NotFoundError || $e instanceof PermissionError) {
+			$this->logger->debug($message, ['exception' => $e]);
+			return;
+		}
+		$this->logger->error($message, ['exception' => $e]);
+	}
+
 	public function getColumns(Table|View $node): array {
 		try {
 			$response = $this->proxy->get(
@@ -58,7 +71,7 @@ class FederationService {
 			);
 			return $this->proxy->getOCSData($response);
 		} catch (\Exception $e) {
-			$this->logger->error('Could not fetch columns from remote node', ['exception' => $e]);
+			$this->logRemoteFailure('Could not fetch columns from remote node', $e);
 			throw $e;
 		}
 	}
@@ -74,7 +87,7 @@ class FederationService {
 			);
 			return $this->proxy->getOCSData($response);
 		} catch (\Exception $e) {
-			$this->logger->error('Could not fetch rows from remote node', ['exception' => $e]);
+			$this->logRemoteFailure('Could not fetch rows from remote node', $e);
 			throw $e;
 		}
 	}
@@ -88,7 +101,7 @@ class FederationService {
 			);
 			return $this->proxy->getOCSData($response);
 		} catch (\Exception $e) {
-			$this->logger->error('Could not create row on remote node', ['exception' => $e]);
+			$this->logRemoteFailure('Could not create row on remote node', $e);
 			throw $e;
 		}
 	}
@@ -102,7 +115,7 @@ class FederationService {
 			);
 			return $this->proxy->getOCSData($response);
 		} catch (\Exception $e) {
-			$this->logger->error('Could not update row on remote node', ['exception' => $e]);
+			$this->logRemoteFailure('Could not update row on remote node', $e);
 			throw $e;
 		}
 	}
@@ -115,7 +128,7 @@ class FederationService {
 			);
 			return $this->proxy->getOCSData($response);
 		} catch (\Exception $e) {
-			$this->logger->error('Could not delete row on remote node', ['exception' => $e]);
+			$this->logRemoteFailure('Could not delete row on remote node', $e);
 			throw $e;
 		}
 	}

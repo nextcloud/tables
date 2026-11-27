@@ -14,6 +14,8 @@ use GuzzleHttp\Exception\ServerException;
 use OC\Http\Client\Response;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Errors\FederationRequestError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Http;
 use OCP\Federation\ICloudFederationFactory;
 use OCP\Federation\ICloudFederationProviderManager;
@@ -124,11 +126,23 @@ class FederationProxy {
 	}
 
 	/**
+	 * A 404 or 403 from the remote that is not in $allowedStatusCodes is raised as
+	 * NotFoundError or PermissionError, so callers answer with the same status.
+	 *
 	 * @throws FederationRequestError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	public function getOCSData(IResponse $response, array $allowedStatusCodes = [Http::STATUS_OK]): array {
-		if (!in_array($response->getStatusCode(), $allowedStatusCodes, true)) {
-			$this->logger->debug('Unexpected status code ' . $response->getStatusCode());
+		$status = $response->getStatusCode();
+		if (!in_array($status, $allowedStatusCodes, true)) {
+			$this->logger->debug('Unexpected status code ' . $status);
+			if ($status === Http::STATUS_NOT_FOUND) {
+				throw new NotFoundError('Remote answered with status ' . $status);
+			}
+			if ($status === Http::STATUS_FORBIDDEN) {
+				throw new PermissionError('Remote answered with status ' . $status);
+			}
 		}
 
 		try {

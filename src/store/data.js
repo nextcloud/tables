@@ -347,9 +347,9 @@ export const useDataStore = defineStore('data', {
 			try {
 				res = await axios.put(generateOcsUrl('apps/tables/api/2/' + nodeCollection + '/' + elementId + '/rows/' + id), { data })
 			} catch (e) {
-				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
+				if (e?.response?.status === 404) {
 					showError(t('tables', 'Outdated data. View is reloaded'))
-					await this.loadRowsFromBE({ viewId })
+					await this.loadRowsFromBE({ tableId: isView ? null : elementId, viewId })
 				} else {
 					displayError(e, t('tables', 'Could not update row.'))
 				}
@@ -446,9 +446,9 @@ export const useDataStore = defineStore('data', {
 			try {
 				await axios.delete(generateOcsUrl('apps/tables/api/2/' + nodeCollection + '/' + elementId + '/rows/' + rowId))
 			} catch (e) {
-				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
+				if (e?.response?.status === 404) {
 					showError(t('tables', 'Outdated data. View is reloaded'))
-					await this.loadRowsFromBE({ viewId })
+					await this.loadRowsFromBE({ tableId: isView ? null : elementId, viewId })
 				} else {
 					displayError(e, t('tables', 'Could not remove row.'))
 				}

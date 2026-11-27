@@ -1079,6 +1079,30 @@ Feature: APIv2
     # Resolving the view link enhances the view and reads its rows in one request,
     # which is where the excluded rows used to leak
     And the user "participant2-v2" resolves a reference to view "v1", it has exactly these rows "r-red"
+    # Changing an excluded row through the view is a 404 with a message, in API v2 and API v1
+    When user "participant1-v2" tries to update row "r-blue" using v2 on view "v1" with following values
+      | team | green |
+    Then the reported status is 404
+    And the response has a message
+    When user "participant1-v2" tries to delete row "r-blue" using v2 on view "v1"
+    Then the reported status is 404
+    And the response has a message
+    When using view "v1"
+    And user "participant1-v2" updates row "r-blue" with following values:
+      | team | green |
+    Then the reported status is 404
+    And the response has a message
+    When user "participant1-v2" deletes row "r-blue"
+    Then the reported status is 404
+    And the response has a message
+    And the user "participant1-v2" fetches table "t1", it has exactly these rows "r-red,r-blue"
+    # Changing a row that was deleted meanwhile is a 404 with a message
+    When user "participant1-v2" tries to delete row "r-blue" using v2 on table "t1"
+    Then the reported status is 200
+    When user "participant1-v2" tries to update row "r-blue" using v2 on table "t1" with following values
+      | team | green |
+    Then the reported status is 404
+    And the response has a message
 
   @api2 @rows @views
   Scenario: Create rows on a view via v2 without access
