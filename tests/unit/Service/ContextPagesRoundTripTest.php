@@ -24,6 +24,8 @@ use OCA\Tables\Db\WidgetMapper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\WidgetInput;
+use OCA\Tables\Service\ArchiveCleanupService;
+use OCA\Tables\Service\ArchiveService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\GridWidgetTypes;
 use OCA\Tables\Service\PermissionsService;
@@ -77,6 +79,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			$this->createMock(AuditLogServiceInterface::class),
 			$this->connectionAdapter,
 			$this->createMock(ShareService::class),
+			$this->createMock(ArchiveCleanupService::class),
 			false,
 			$this->createMock(INavigationManager::class),
 			$this->createMock(IURLGenerator::class),
@@ -84,6 +87,7 @@ class ContextPagesRoundTripTest extends DatabaseTestCase {
 			$this->createMock(ViewMapper::class),
 			$this->widgetService,
 			new GridWidgetTypes($l10n),
+			$this->createMock(ArchiveService::class),
 		);
 	}
 

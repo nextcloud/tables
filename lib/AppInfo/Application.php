@@ -11,6 +11,7 @@ use Exception;
 use OC\OCM\OCMSignatoryManager;
 use OCA\Analytics\Datasource\DatasourceEvent;
 use OCA\Circles\Events\CircleDestroyedEvent;
+use OCA\Circles\Events\CircleMemberRemovedEvent;
 use OCA\Tables\Capabilities;
 use OCA\Tables\Config\ConfigLexicon;
 use OCA\Tables\Event\RowDeletedEvent;
@@ -20,6 +21,7 @@ use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Federation\FederationProvider;
 use OCA\Tables\Listener\AddMissingIndicesListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
+use OCA\Tables\Listener\ArchiveCleanupListener;
 use OCA\Tables\Listener\LoadAdditionalEntriesListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\ReceiverCleanupListener;
@@ -50,6 +52,7 @@ use OCP\DB\Events\AddMissingIndicesEvent;
 use OCP\Federation\ICloudFederationProvider;
 use OCP\Federation\ICloudFederationProviderManager;
 use OCP\Group\Events\GroupDeletedEvent;
+use OCP\Group\Events\UserRemovedEvent;
 use OCP\Navigation\Events\LoadAdditionalEntriesEvent;
 use OCP\OCM\Events\LocalOCMDiscoveryEvent;
 use OCP\Security\Signature\ISignatoryManager;
@@ -64,6 +67,7 @@ class Application extends App implements IBootstrap {
 
 	public const NODE_TYPE_TABLE = 0;
 	public const NODE_TYPE_VIEW = 1;
+	public const NODE_TYPE_CONTEXT = 2;
 
 	public const OWNER_TYPE_USER = 0;
 
@@ -108,6 +112,8 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(UserDeletedEvent::class, ReceiverCleanupListener::class);
 		$context->registerEventListener(GroupDeletedEvent::class, ReceiverCleanupListener::class);
 		$context->registerEventListener(CircleDestroyedEvent::class, ReceiverCleanupListener::class);
+		$context->registerEventListener(UserRemovedEvent::class, ArchiveCleanupListener::class);
+		$context->registerEventListener(CircleMemberRemovedEvent::class, ArchiveCleanupListener::class);
 		$context->registerEventListener(LocalOCMDiscoveryEvent::class, ResourceTypeRegisterListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);

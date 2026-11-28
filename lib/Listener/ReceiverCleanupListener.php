@@ -11,6 +11,7 @@ use OCA\Circles\Events\CircleDestroyedEvent;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\ShareMapper;
+use OCA\Tables\Service\ArchiveCleanupService;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Group\Events\GroupDeletedEvent;
@@ -22,6 +23,7 @@ class ReceiverCleanupListener implements IEventListener {
 	public function __construct(
 		private readonly ShareMapper $shareMapper,
 		private readonly ContextNavigationMapper $contextNavigationMapper,
+		private readonly ArchiveCleanupService $archiveCleanupService,
 		private readonly LoggerInterface $logger,
 	) {
 	}
@@ -31,10 +33,35 @@ class ReceiverCleanupListener implements IEventListener {
 			$userId = $event->getUser()->getUID();
 			$this->cleanupByParticipant(ShareReceiverType::USER, $userId);
 			$this->cleanupNavigationOfUser($userId);
+			$this->archiveCleanupService->cleanupDeletedUser($userId);
 		} elseif ($event instanceof GroupDeletedEvent) {
-			$this->cleanupByParticipant(ShareReceiverType::GROUP, $event->getGroup()->getGID());
+			$this->cleanupReceiverGone(ShareReceiverType::GROUP, $event->getGroup()->getGID());
 		} elseif ($event instanceof CircleDestroyedEvent) {
-			$this->cleanupByParticipant(ShareReceiverType::CIRCLE, $event->getCircle()->getSingleId());
+			$this->cleanupReceiverGone(ShareReceiverType::CIRCLE, $event->getCircle()->getSingleId());
+		}
+	}
+
+	/**
+	 * Delete all shares of a removed group or circle receiver and drop the
+	 * archive overrides of every ex-member who lost access to the affected
+	 * nodes with those shares.
+	 */
+	private function cleanupReceiverGone(string $type, string $participant): void {
+		try {
+			$nodes = $this->shareMapper->findNodesByReceiver($participant, $type);
+		} catch (\Throwable $e) {
+			$this->logger->warning('collecting nodes shared with deleted receiver has failed: ' . $e->getMessage(), [
+				'exception' => $e,
+				'receiver_type' => $type,
+				'receiver' => $participant,
+			]);
+			$nodes = [];
+		}
+
+		$this->cleanupByParticipant($type, $participant);
+
+		foreach ($nodes as $node) {
+			$this->archiveCleanupService->purgeShareNodeOverrides((string)$node['nodeType'], $node['nodeId']);
 		}
 	}
 
